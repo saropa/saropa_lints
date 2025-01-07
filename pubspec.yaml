@@ -1,6 +1,6 @@
 name: saropa_lints
 description: Custom lint rules for Saropa projects.
-version: 0.0.2
+version: 0.0.3
 # publish_to: none
 
 license: MIT
