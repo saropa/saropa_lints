@@ -20,6 +20,8 @@
   "useGitignore": true,
   "words": [
     "COPPA",
+    "dartdoc",
+    "dotenv",
     "Github",
     "rgba",
     "saropa_dart_utils",
