@@ -33,15 +33,15 @@
     },
     {
       "name": "async",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/async-2.12.0",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/async-2.11.0",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "2.18"
     },
     {
       "name": "boolean_selector",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/boolean_selector-2.1.2",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/boolean_selector-2.1.1",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "2.17"
     },
     {
       "name": "checked_yaml",
@@ -63,7 +63,7 @@
     },
     {
       "name": "collection",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/collection-1.19.1",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/collection-1.19.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -183,9 +183,9 @@
     },
     {
       "name": "lints",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/lints-3.0.0",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/lints-5.1.1",
       "packageUri": "lib/",
-      "languageVersion": "3.0"
+      "languageVersion": "3.6"
     },
     {
       "name": "logging",
@@ -201,13 +201,13 @@
     },
     {
       "name": "matcher",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/matcher-0.12.17",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/matcher-0.12.16+1",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.0"
     },
     {
       "name": "meta",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/meta-1.16.0",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/meta-1.15.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -231,9 +231,9 @@
     },
     {
       "name": "path",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/path-1.9.1",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/path-1.9.0",
       "packageUri": "lib/",
-      "languageVersion": "3.4"
+      "languageVersion": "3.0"
     },
     {
       "name": "pool",
@@ -297,9 +297,9 @@
     },
     {
       "name": "source_span",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/source_span-1.10.1",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/source_span-1.10.0",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "2.18"
     },
     {
       "name": "sprintf",
@@ -309,15 +309,15 @@
     },
     {
       "name": "stack_trace",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/stack_trace-1.12.1",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/stack_trace-1.12.0",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
     {
       "name": "stream_channel",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/stream_channel-2.1.4",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/stream_channel-2.1.2",
       "packageUri": "lib/",
-      "languageVersion": "3.3"
+      "languageVersion": "2.19"
     },
     {
       "name": "stream_transform",
@@ -327,15 +327,15 @@
     },
     {
       "name": "string_scanner",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/string_scanner-1.4.1",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/string_scanner-1.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.1"
     },
     {
       "name": "term_glyph",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/term_glyph-1.2.2",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/term_glyph-1.2.1",
       "packageUri": "lib/",
-      "languageVersion": "3.1"
+      "languageVersion": "2.12"
     },
     {
       "name": "test",
@@ -369,7 +369,7 @@
     },
     {
       "name": "vm_service",
-      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/vm_service-14.3.1",
+      "rootUri": "file:///D:/tools/Pub/Cache/hosted/pub.dev/vm_service-14.3.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -416,7 +416,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-01-07T17:49:06.668702Z",
+  "generated": "2025-01-07T18:11:19.967087Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "pubCache": "file:///D:/tools/Pub/Cache"
