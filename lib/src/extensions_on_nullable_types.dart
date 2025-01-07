@@ -20,8 +20,7 @@ class _DetectExtensionsOnNullableTypes extends DartLintRule {
     problemMessage: 'Avoid defining extensions on nullable types, '
         'as they might not be called when used with ?.',
     correctionMessage: 'Consider using the ?? operator to handle null values.',
-    url:
-        'https://github.com/myusername/myproject/blob/main/README.md#avoid-extensions-on-nullable-types', // Update with your URL
+    url: 'https://pub.dev/packages/saropa_lints',
   );
 
   @override
