@@ -3,6 +3,8 @@ description: Custom lint rules for Saropa projects.
 version: 0.0.1
 # publish_to: none
 
+license: MIT
+
 repository: https://github.com/saropa/saropa_lints
 
 environment:
