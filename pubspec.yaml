@@ -1,0 +1,17 @@
+name: saropa_lints
+description: Custom lint rules for Saropa projects.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.6.0 # detect: flutter doctor -v
+
+dependencies:
+  analyzer: ^6.1.0
+  analyzer_plugin: ^0.11.2
+  custom_lint_builder: ^0.7.0
+
+dev_dependencies:
+  custom_lint: ^0.7.0
+  lints: ^3.0.0
+  test: ^1.24.6
