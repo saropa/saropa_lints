@@ -26,8 +26,9 @@ Learn more at https://saropa.com, or email dev.tools@saropa.com
 
 ****
 
-## 0.0.2
+## 0.0.3
 
+* Removed empty files
 * Updated mandatory files - LICENCE, and other markdowns
 * ✨ Initial release with bool list methods.
 
