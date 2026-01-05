@@ -21,7 +21,9 @@
       "Bash(wc:*)",
       "Bash(flutter pub get:*)",
       "Bash(rm:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(flutter pub publish:*)",
+      "Bash(git tag:*)"
     ]
   }
 }
