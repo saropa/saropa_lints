@@ -5699,7 +5699,7 @@ class PreferOverridingParentEqualityRule extends DartLintRule {
       for (final MethodElement method in superElement.methods) {
         if (method.name == '==' && !method.isAbstract) {
           // Check if it's from Object or a custom implementation
-          final Element? enclosing = method.enclosingElement3;
+          final enclosing = (method as Element).enclosingElement3;
           final String? enclosingName = enclosing is InterfaceElement ? enclosing.name : null;
           if (enclosingName != null && enclosingName != 'Object') {
             parentHasCustomEquals = true;
