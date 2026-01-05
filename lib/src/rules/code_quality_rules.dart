@@ -46,7 +46,7 @@ class AvoidAdjacentStringsRule extends DartLintRule {
   }
 }
 
-/// Warns when accessing enum values by index (EnumName.values[i]).
+/// Warns when accessing enum values by index (`EnumName.values[i]`).
 class AvoidEnumValuesByIndexRule extends DartLintRule {
   const AvoidEnumValuesByIndexRule() : super(code: _code);
 
