@@ -1,0 +1,267 @@
+# Saropa Lints - Comprehensive Tier (~700 rules)
+#
+# Professional + more code quality, style, and edge cases.
+# For quality-obsessed teams.
+#
+# Usage in analysis_options.yaml:
+#   include: package:saropa_lints/tiers/comprehensive.yaml
+
+include: package:saropa_lints/tiers/professional.yaml
+
+custom_lint:
+  rules:
+    # =========================================================================
+    # ARCHITECTURE - Complete
+    # =========================================================================
+    avoid_singleton_pattern: true
+    avoid_service_locator_overuse: true
+
+    # =========================================================================
+    # FLUTTER WIDGETS - Complete
+    # =========================================================================
+    avoid_border_all: true
+    avoid_incorrect_image_opacity: true
+    avoid_image_without_cache: true
+    avoid_missing_image_alt: true
+    prefer_const_border_radius: true
+    prefer_correct_edge_insets_constructor: true
+    prefer_text_rich: true
+    prefer_define_hero_tag: true
+    prefer_sliver_prefix: true
+    prefer_widget_private_members: true
+
+    # =========================================================================
+    # ASYNC - Complete
+    # =========================================================================
+    avoid_nullable_tostring: true
+
+    # =========================================================================
+    # CODE QUALITY - Thorough
+    # =========================================================================
+    avoid_long_files: true
+    avoid_local_functions: true
+    avoid_declaring_call_method: true
+    avoid_immediately_invoked_functions: true
+    avoid_always_null_parameters: true
+    avoid_mutating_parameters: true
+    avoid_unused_callback_parameters: true
+    function_always_returns_null: true
+    function_always_returns_same_value: true
+    avoid_unused_assignment: true
+    avoid_unused_instances: true
+    avoid_unused_after_null_check: true
+    avoid_unused_generics: true
+    avoid_unnecessary_local_variable: true
+    avoid_unnecessary_reassignment: true
+    avoid_complex_loop_conditions: true
+    avoid_duplicate_switch_case_conditions: true
+    avoid_wildcard_cases_with_enums: true
+    avoid_wildcard_cases_with_sealed_classes: true
+    no_equal_conditions: true
+    no_equal_nested_conditions: true
+    no_equal_switch_case: true
+    no_equal_switch_expression_cases: true
+    prefer_correct_switch_length: true
+    prefer_specific_cases_first: true
+    avoid_non_empty_constructor_bodies: true
+    avoid_unnecessary_constructor: true
+    avoid_unnecessary_super: true
+    avoid_unnecessary_overrides: true
+    avoid_assigning_to_static_field: true
+    avoid_default_tostring: true
+    avoid_incomplete_copy_with: true
+    avoid_duplicate_mixins: true
+    avoid_contradictory_expressions: true
+
+    # =========================================================================
+    # CONTROL FLOW - Complete
+    # =========================================================================
+    avoid_constant_assert_conditions: true
+    avoid_constant_switches: true
+    avoid_inverted_boolean_checks: true
+    avoid_negated_conditions: true
+    avoid_negations_in_equality_checks: true
+    avoid_unnecessary_negations: true
+    avoid_collapsible_if: true
+    avoid_if_with_many_branches: true
+    avoid_nested_switch_expressions: true
+    avoid_nested_switches: true
+    avoid_nested_try: true
+    avoid_redundant_else: true
+    avoid_unconditional_break: true
+    avoid_continue: true
+    avoid_unnecessary_continue: true
+
+    # =========================================================================
+    # NAMING - Complete
+    # =========================================================================
+    prefer_correct_identifier_length: true
+    prefer_correct_type_name: true
+    prefer_correct_error_name: true
+    prefer_correct_setter_parameter_name: true
+    prefer_correct_callback_field_name: true
+    prefer_correct_handler_name: true
+    prefer_prefixed_global_constants: true
+    prefer_trailing_underscore_for_unused: true
+    match_getter_setter_field_names: true
+
+    # =========================================================================
+    # RECORDS & PATTERNS - Complete
+    # =========================================================================
+    avoid_one_field_records: true
+    avoid_long_records: true
+    avoid_nested_records: true
+    avoid_mixing_named_and_positional_fields: true
+    avoid_function_type_in_records: true
+    avoid_bottom_type_in_records: true
+    avoid_extensions_on_records: true
+    avoid_positional_record_field_access: true
+    avoid_redundant_positional_field_name: true
+    avoid_bottom_type_in_patterns: true
+    avoid_duplicate_patterns: true
+    avoid_explicit_pattern_field_name: true
+    avoid_keywords_in_wildcard_pattern: true
+    avoid_unnecessary_patterns: true
+    avoid_single_field_destructuring: true
+    avoid_nested_shorthands: true
+    prefer_wildcard_pattern: true
+    prefer_simpler_patterns_null_check: true
+    move_records_to_typedefs: true
+    match_positional_field_names_on_assignment: true
+    use_existing_destructuring: true
+    record_fields_ordering: true
+    pattern_fields_ordering: true
+
+    # =========================================================================
+    # FORMATTING - Complete
+    # =========================================================================
+    format_comment: true
+    prefer_commenting_analyzer_ignores: true
+    prefer_commenting_future_delayed: true
+    prefer_trailing_comma: true
+    unnecessary_trailing_comma: true
+    newline_before_case: true
+    newline_before_method: true
+    newline_before_constructor: true
+
+    # =========================================================================
+    # IMPORTS - Complete
+    # =========================================================================
+    avoid_barrel_files: true
+    avoid_double_slash_imports: true
+    avoid_duplicate_exports: true
+    avoid_duplicate_named_imports: true
+    max_imports: true
+    prefer_named_imports: true
+
+    # =========================================================================
+    # COLLECTIONS - Complete
+    # =========================================================================
+    avoid_duplicate_collection_elements: true
+    avoid_accessing_collections_by_constant_index: true
+    avoid_slow_collection_methods: true
+    prefer_add_all: true
+    prefer_any_or_every: true
+    prefer_for_in: true
+    prefer_iterable_of: true
+    prefer_set_for_lookup: true
+    map_keys_ordering: true
+    avoid_unnecessary_collections: true
+
+    # =========================================================================
+    # EXCEPTION - Complete
+    # =========================================================================
+    avoid_only_rethrow: true
+    avoid_throw_in_catch_block: true
+    avoid_throw_objects_without_tostring: true
+    avoid_identical_exception_handling_blocks: true
+    avoid_missing_completer_stack_trace: true
+    avoid_non_final_exception_class_fields: true
+    prefer_public_exception_classes: true
+
+    # =========================================================================
+    # STRINGS & NUMBERS
+    # =========================================================================
+    avoid_adjacent_strings: true
+    avoid_non_ascii_symbols: true
+    avoid_substring: true
+    avoid_incorrect_uri: true
+    no_magic_string: true
+    avoid_complex_arithmetic_expressions: true
+    avoid_bitwise_operators_with_booleans: true
+    avoid_inconsistent_digit_separators: true
+    avoid_unnecessary_digit_separators: true
+    prefer_digit_separators: true
+    prefer_addition_subtraction_assignments: true
+    prefer_compound_assignment_operators: true
+
+    # =========================================================================
+    # EXPRESSIONS
+    # =========================================================================
+    avoid_excessive_expressions: true
+    avoid_cascade_after_if_null: true
+    prefer_parentheses_with_if_null: true
+    prefer_null_aware_spread: true
+    prefer_null_aware_elements: true
+
+    # =========================================================================
+    # UNNECESSARY CODE
+    # =========================================================================
+    avoid_unnecessary_block: true
+    avoid_unnecessary_call: true
+    avoid_unnecessary_extends: true
+    avoid_unnecessary_getter: true
+    avoid_unnecessary_statements: true
+    avoid_unnecessary_length_check: true
+    avoid_referencing_discarded_variables: true
+    avoid_empty_spread: true
+    avoid_duplicate_constant_values: true
+    avoid_duplicate_initializers: true
+    missing_use_result_annotation: true
+
+    # =========================================================================
+    # VARIABLES
+    # =========================================================================
+    avoid_global_state: true
+    avoid_multi_assignment: true
+    avoid_nested_assignments: true
+    move_variable_closer_to_usage: true
+    move_variable_outside_iteration: true
+    use_existing_variable: true
+    prefer_type_over_var: true
+
+    # =========================================================================
+    # EQUALITY
+    # =========================================================================
+    no_equal_arguments: true
+    avoid_unnecessary_compare_to: true
+    prefer_overriding_parent_equality: true
+
+    # =========================================================================
+    # TESTING - Thorough
+    # =========================================================================
+    prefer_visible_for_testing_on_members: true
+
+    # =========================================================================
+    # PRAGMAS
+    # =========================================================================
+    avoid_redundant_pragma_inline: true
+    avoid_unknown_pragma: true
+    prefer_both_inlining_annotations: true
+
+    # =========================================================================
+    # ADVANCED RULES
+    # =========================================================================
+    no_object_declaration: true
+    avoid_casting_to_extension_type: true
+    avoid_collection_methods_with_unrelated_types: true
+    avoid_nullable_interpolation: true
+    avoid_nullable_parameters_with_default_values: true
+    avoid_unnecessary_nullable_fields: true
+    avoid_unnecessary_nullable_parameters: true
+    avoid_unnecessary_nullable_return_type: true
+    avoid_hardcoded_colors: true
+    avoid_debug_print: true
+    avoid_unguarded_debug: true
+    match_lib_folder_structure: true
+    prefer_utc_datetimes: true
