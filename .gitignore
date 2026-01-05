@@ -35,3 +35,6 @@ doc/api/
 
 # Custom lint log
 custom_lint.log
+/.claude
+nul
+pubspec.lock
