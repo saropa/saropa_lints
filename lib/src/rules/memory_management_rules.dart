@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -40,7 +40,7 @@ class AvoidLargeObjectsInStateRule extends DartLintRule {
     name: 'avoid_large_objects_in_state',
     problemMessage: 'Large data structures in State may cause memory issues.',
     correctionMessage: 'Consider pagination, streaming, or external state management.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _largeTypePatterns = <String>{
@@ -124,7 +124,7 @@ class RequireImageDisposalRule extends DartLintRule {
     name: 'require_image_disposal',
     problemMessage: 'ui.Image objects must be disposed to free memory.',
     correctionMessage: 'Call image.dispose() in the dispose() method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -215,7 +215,7 @@ class AvoidCapturingThisInCallbacksRule extends DartLintRule {
     name: 'avoid_capturing_this_in_callbacks',
     problemMessage: 'Callback may capture entire object, preventing garbage collection.',
     correctionMessage: 'Use method reference or extract only needed values.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _longLivedCallbacks = <String>{
@@ -298,7 +298,7 @@ class RequireCacheEvictionPolicyRule extends DartLintRule {
     name: 'require_cache_eviction_policy',
     problemMessage: 'Cache lacks eviction policy and may grow unbounded.',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -364,7 +364,7 @@ class PreferWeakReferencesForCacheRule extends DartLintRule {
     name: 'prefer_weak_references_for_cache',
     problemMessage: 'Consider using WeakReference for cache entries.',
     correctionMessage: 'WeakReference allows garbage collection under memory pressure.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -430,7 +430,7 @@ class AvoidExpandoCircularReferencesRule extends DartLintRule {
     name: 'avoid_expando_circular_references',
     problemMessage: 'Expando value may reference its key, causing memory leak.',
     correctionMessage: 'Ensure Expando values do not hold references to their keys.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -495,7 +495,7 @@ class AvoidLargeIsolateCommunicationRule extends DartLintRule {
     name: 'avoid_large_isolate_communication',
     problemMessage: 'Sending large objects between isolates is expensive.',
     correctionMessage: 'Use TransferableTypedData or process data in chunks.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

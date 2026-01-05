@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -34,7 +34,7 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
     name: 'avoid_hardcoded_strings_in_ui',
     problemMessage: 'Hardcoded string in UI should be localized.',
     correctionMessage: 'Use AppLocalizations or your l10n solution instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _textWidgets = <String>{
@@ -125,7 +125,7 @@ class RequireLocaleAwareFormattingRule extends DartLintRule {
     name: 'require_locale_aware_formatting',
     problemMessage: 'Use locale-aware formatting for dates and numbers.',
     correctionMessage: 'Use DateFormat, NumberFormat, or intl package.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -187,7 +187,7 @@ class RequireDirectionalWidgetsRule extends DartLintRule {
     name: 'require_directional_widgets',
     problemMessage: 'Use directional widgets for RTL language support.',
     correctionMessage: 'Use EdgeInsetsDirectional, AlignmentDirectional, etc.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -262,7 +262,7 @@ class RequirePluralHandlingRule extends DartLintRule {
     name: 'require_plural_handling',
     problemMessage: 'Plural forms should use Intl.plural or similar.',
     correctionMessage: 'Use Intl.plural() for proper pluralization.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _pluralIndicators = <String>{
@@ -354,7 +354,7 @@ class AvoidHardcodedLocaleRule extends DartLintRule {
     name: 'avoid_hardcoded_locale',
     problemMessage: 'Locale should not be hardcoded.',
     correctionMessage: 'Use Localizations.localeOf(context) or similar.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static final RegExp _localePattern = RegExp(r"'[a-z]{2}_[A-Z]{2}'");
@@ -398,7 +398,7 @@ class AvoidStringConcatenationInUiRule extends DartLintRule {
     name: 'avoid_string_concatenation_in_ui',
     problemMessage: 'String concatenation breaks internationalization.',
     correctionMessage: 'Use localized strings with placeholders.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -461,7 +461,7 @@ class AvoidTextInImagesRule extends DartLintRule {
     name: 'avoid_text_in_images',
     problemMessage: 'Image path suggests embedded text that cannot be localized.',
     correctionMessage: 'Use locale-specific images or text overlays.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _textIndicators = <String>{
@@ -529,7 +529,7 @@ class AvoidHardcodedAppNameRule extends DartLintRule {
     name: 'avoid_hardcoded_app_name',
     problemMessage: 'App name should not be hardcoded in UI.',
     correctionMessage: 'Use a configuration constant or localized string.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
