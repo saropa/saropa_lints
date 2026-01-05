@@ -3334,9 +3334,14 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
   _DisposeCallFinder(this.onFound);
   final void Function(String) onFound;
 
+  static const Set<String> _disposeMethodNames = <String>{
+    'dispose',
+    'disposeSafe',
+  };
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'dispose') {
+    if (_disposeMethodNames.contains(node.methodName.name)) {
       final Expression? target = node.realTarget;
       if (target is SimpleIdentifier) {
         onFound(target.name);
