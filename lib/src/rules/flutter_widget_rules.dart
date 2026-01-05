@@ -50,7 +50,8 @@ class AvoidContextInInitStateDisposeRule extends DartLintRule {
     name: 'avoid_context_in_initstate_dispose',
     problemMessage: "Avoid using 'context' in initState or dispose. "
         'The widget may not be mounted.',
-    correctionMessage: 'Use WidgetsBinding.instance.addPostFrameCallback to defer '
+    correctionMessage:
+        'Use WidgetsBinding.instance.addPostFrameCallback to defer '
         'context access until after the widget is mounted.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -262,7 +263,8 @@ class AvoidExpandedAsSpacerRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_as_spacer',
     problemMessage: 'Use Spacer() instead of Expanded with empty child.',
-    correctionMessage: 'Replace Expanded(child: SizedBox/Container()) with Spacer().',
+    correctionMessage:
+        'Replace Expanded(child: SizedBox/Container()) with Spacer().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -272,7 +274,8 @@ class AvoidExpandedAsSpacerRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'Expanded') return;
 
@@ -287,7 +290,8 @@ class AvoidExpandedAsSpacerRule extends DartLintRule {
             if (childType == 'SizedBox' || childType == 'Container') {
               // Check if it has no child argument (empty)
               final bool hasChild = childExpr.argumentList.arguments.any(
-                (Expression e) => e is NamedExpression && e.name.label.name == 'child',
+                (Expression e) =>
+                    e is NamedExpression && e.name.label.name == 'child',
               );
               if (!hasChild) {
                 reporter.atNode(node, code);
@@ -328,7 +332,8 @@ class AvoidFlexibleOutsideFlexRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_flexible_outside_flex',
     problemMessage: 'Flexible/Expanded used outside of Row, Column, or Flex.',
-    correctionMessage: 'Flexible and Expanded only work inside Row, Column, or Flex widgets.',
+    correctionMessage:
+        'Flexible and Expanded only work inside Row, Column, or Flex widgets.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -345,7 +350,8 @@ class AvoidFlexibleOutsideFlexRule extends DartLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName == null || !_flexibleWidgets.contains(constructorName)) {
+      if (constructorName == null ||
+          !_flexibleWidgets.contains(constructorName)) {
         return;
       }
 
@@ -393,8 +399,10 @@ class AvoidIncorrectImageOpacityRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_image_opacity',
-    problemMessage: 'Image wrapped in Opacity. Use Image color property instead.',
-    correctionMessage: 'Use Image.color with colorBlendMode for better performance.',
+    problemMessage:
+        'Image wrapped in Opacity. Use Image color property instead.',
+    correctionMessage:
+        'Use Image.color with colorBlendMode for better performance.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -404,7 +412,8 @@ class AvoidIncorrectImageOpacityRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Opacity') return;
 
@@ -469,7 +478,8 @@ class AvoidLateContextRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_context',
     problemMessage: 'Avoid using BuildContext in late field initializers.',
-    correctionMessage: 'Initialize in didChangeDependencies() or build() instead.',
+    correctionMessage:
+        'Initialize in didChangeDependencies() or build() instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -711,7 +721,8 @@ class AvoidMissingImageAltRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Image') return;
 
@@ -731,9 +742,11 @@ class AvoidMissingImageAltRule extends DartLintRule {
     });
   }
 
-  void _checkForSemanticLabel(InstanceCreationExpression node, DiagnosticReporter reporter) {
+  void _checkForSemanticLabel(
+      InstanceCreationExpression node, DiagnosticReporter reporter) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
-      (Expression arg) => arg is NamedExpression && arg.name.label.name == 'semanticLabel',
+      (Expression arg) =>
+          arg is NamedExpression && arg.name.label.name == 'semanticLabel',
     );
 
     if (!hasSemanticLabel) {
@@ -741,9 +754,11 @@ class AvoidMissingImageAltRule extends DartLintRule {
     }
   }
 
-  void _checkForSemanticLabelInMethod(MethodInvocation node, DiagnosticReporter reporter) {
+  void _checkForSemanticLabelInMethod(
+      MethodInvocation node, DiagnosticReporter reporter) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
-      (Expression arg) => arg is NamedExpression && arg.name.label.name == 'semanticLabel',
+      (Expression arg) =>
+          arg is NamedExpression && arg.name.label.name == 'semanticLabel',
     );
 
     if (!hasSemanticLabel) {
@@ -883,7 +898,8 @@ class AvoidShrinkWrapInListsRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName == null) return;
 
@@ -899,8 +915,10 @@ class AvoidShrinkWrapInListsRule extends DartLintRule {
           AstNode? parent = node.parent;
           while (parent != null) {
             if (parent is InstanceCreationExpression) {
-              final String? parentConstructor = parent.constructorName.type.element?.name;
-              if (parentConstructor != null && _scrollableWidgets.contains(parentConstructor)) {
+              final String? parentConstructor =
+                  parent.constructorName.type.element?.name;
+              if (parentConstructor != null &&
+                  _scrollableWidgets.contains(parentConstructor)) {
                 reporter.atNode(arg, code);
                 return;
               }
@@ -940,7 +958,8 @@ class AvoidSingleChildColumnRowRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'Column' && constructorName != 'Row') return;
 
@@ -1110,7 +1129,8 @@ class AvoidUnnecessaryGestureDetectorRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_gesture_detector',
     problemMessage: 'GestureDetector has no gesture callbacks defined.',
-    correctionMessage: 'Add gesture callbacks or remove the GestureDetector wrapper.',
+    correctionMessage:
+        'Add gesture callbacks or remove the GestureDetector wrapper.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1174,7 +1194,8 @@ class AvoidUnnecessaryGestureDetectorRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'GestureDetector') return;
 
@@ -1228,7 +1249,8 @@ class AvoidUnnecessarySetStateRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_setstate',
     problemMessage: 'setState called in lifecycle method where not needed.',
-    correctionMessage: 'In initState/dispose, modify state directly without setState.',
+    correctionMessage:
+        'In initState/dispose, modify state directly without setState.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1309,7 +1331,8 @@ class AvoidUnnecessaryStatefulWidgetsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_stateful_widgets',
     problemMessage: 'StatefulWidget may be unnecessary.',
-    correctionMessage: 'Consider using StatelessWidget if no mutable state is needed.',
+    correctionMessage:
+        'Consider using StatelessWidget if no mutable state is needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1375,7 +1398,8 @@ class AvoidUnremovableCallbacksInListenersRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unremovable_callbacks_in_listeners',
     problemMessage: 'Anonymous function cannot be removed from listener.',
-    correctionMessage: 'Use a named function or store reference to remove later.',
+    correctionMessage:
+        'Use a named function or store reference to remove later.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1445,7 +1469,8 @@ class AvoidUnsafeSetStateRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_setstate',
     problemMessage: 'setState() called without a mounted check.',
-    correctionMessage: 'Wrap in `if (mounted)` or use `mounted ? setState(...) : null`.',
+    correctionMessage:
+        'Wrap in `if (mounted)` or use `mounted ? setState(...) : null`.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1617,7 +1642,8 @@ class AvoidWrappingInPaddingRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_wrapping_in_padding',
-    problemMessage: 'Widget has its own padding property, avoid wrapping in Padding.',
+    problemMessage:
+        'Widget has its own padding property, avoid wrapping in Padding.',
     correctionMessage: 'Use the padding property of the child widget instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1645,7 +1671,8 @@ class AvoidWrappingInPaddingRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Padding') return;
 
@@ -1691,8 +1718,10 @@ class CheckForEqualsInRenderObjectSettersRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'check_for_equals_in_render_object_setters',
-    problemMessage: 'RenderObject setter should check equality before updating.',
-    correctionMessage: 'Add equality check: if (_field == value) return; before assignment.',
+    problemMessage:
+        'RenderObject setter should check equality before updating.',
+    correctionMessage:
+        'Add equality check: if (_field == value) return; before assignment.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1827,7 +1856,8 @@ class ConsistentUpdateRenderObjectRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'consistent_update_render_object',
-    problemMessage: 'updateRenderObject may be missing property updates from createRenderObject.',
+    problemMessage:
+        'updateRenderObject may be missing property updates from createRenderObject.',
     correctionMessage:
         'Ensure all properties set in createRenderObject are also updated in updateRenderObject.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1899,7 +1929,8 @@ class ConsistentUpdateRenderObjectRule extends DartLintRule {
       );
 
       // Check if any createRenderObject properties are missing in updateRenderObject
-      final Set<String> missingProperties = createProperties.difference(updateProperties);
+      final Set<String> missingProperties =
+          createProperties.difference(updateProperties);
       if (missingProperties.isNotEmpty) {
         reporter.atNode(updateMethod, code);
       }
@@ -1942,7 +1973,8 @@ class PreferConstBorderRadiusRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_border_radius',
     problemMessage: 'Prefer const BorderRadius.all for constant border radius.',
-    correctionMessage: 'Use const BorderRadius.all(Radius.circular(x)) instead.',
+    correctionMessage:
+        'Use const BorderRadius.all(Radius.circular(x)) instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2000,7 +2032,8 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_edge_insets_constructor',
     problemMessage: 'Consider using a more specific EdgeInsets constructor.',
-    correctionMessage: 'Use .all() for equal values or .symmetric() for symmetric values.',
+    correctionMessage:
+        'Use .all() for equal values or .symmetric() for symmetric values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2010,7 +2043,8 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'EdgeInsets') return;
 
@@ -2024,12 +2058,14 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
     });
   }
 
-  void _checkFromLTRB(InstanceCreationExpression node, DiagnosticReporter reporter) {
+  void _checkFromLTRB(
+      InstanceCreationExpression node, DiagnosticReporter reporter) {
     final NodeList<Expression> args = node.argumentList.arguments;
     if (args.length != 4) return;
 
     // Get all values as strings
-    final List<String> values = args.map((Expression e) => e.toSource()).toList();
+    final List<String> values =
+        args.map((Expression e) => e.toSource()).toList();
 
     // Check if all values are the same (could use .all)
     if (values.toSet().length == 1) {
@@ -2041,7 +2077,8 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
     }
   }
 
-  void _checkOnly(InstanceCreationExpression node, DiagnosticReporter reporter) {
+  void _checkOnly(
+      InstanceCreationExpression node, DiagnosticReporter reporter) {
     final NodeList<Expression> args = node.argumentList.arguments;
 
     // Extract named arguments
@@ -2064,15 +2101,24 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
     }
 
     // Check if all present values are the same (could use .all)
-    final List<String?> presentValues =
-        <String?>[left, right, top, bottom].where((String? v) => v != null).toList();
+    final List<String?> presentValues = <String?>[left, right, top, bottom]
+        .where((String? v) => v != null)
+        .toList();
     if (presentValues.length == 4 && presentValues.toSet().length == 1) {
       reporter.atNode(node, code);
     }
     // Check for symmetric patterns
-    else if (left != null && right != null && left == right && top == null && bottom == null) {
+    else if (left != null &&
+        right != null &&
+        left == right &&
+        top == null &&
+        bottom == null) {
       reporter.atNode(node, code);
-    } else if (top != null && bottom != null && top == bottom && left == null && right == null) {
+    } else if (top != null &&
+        bottom != null &&
+        top == bottom &&
+        left == null &&
+        right == null) {
       reporter.atNode(node, code);
     }
   }
@@ -2110,13 +2156,15 @@ class PreferDefineHeroTagRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Hero') return;
 
       // Check if tag is defined
       final bool hasTag = node.argumentList.arguments.any(
-        (Expression arg) => arg is NamedExpression && arg.name.label.name == 'tag',
+        (Expression arg) =>
+            arg is NamedExpression && arg.name.label.name == 'tag',
       );
 
       if (!hasTag) {
@@ -2268,7 +2316,8 @@ class PreferSliverPrefixRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause != null) {
         final String superclass = extendsClause.superclass.name.lexeme;
-        if (_sliverBaseClasses.contains(superclass) || superclass.startsWith('Sliver')) {
+        if (_sliverBaseClasses.contains(superclass) ||
+            superclass.startsWith('Sliver')) {
           reporter.atNode(node, code);
           return;
         }
@@ -2279,7 +2328,8 @@ class PreferSliverPrefixRule extends DartLintRule {
       if (implementsClause != null) {
         for (final NamedType interface in implementsClause.interfaces) {
           final String interfaceName = interface.name.lexeme;
-          if (_sliverBaseClasses.contains(interfaceName) || interfaceName.startsWith('Sliver')) {
+          if (_sliverBaseClasses.contains(interfaceName) ||
+              interfaceName.startsWith('Sliver')) {
             reporter.atNode(node, code);
             return;
           }
@@ -2291,7 +2341,8 @@ class PreferSliverPrefixRule extends DartLintRule {
       if (withClause != null) {
         for (final NamedType mixin in withClause.mixinTypes) {
           final String mixinName = mixin.name.lexeme;
-          if (_sliverBaseClasses.contains(mixinName) || mixinName.startsWith('Sliver')) {
+          if (_sliverBaseClasses.contains(mixinName) ||
+              mixinName.startsWith('Sliver')) {
             reporter.atNode(node, code);
             return;
           }
@@ -2322,7 +2373,8 @@ class PreferTextRichRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich',
     problemMessage: 'Prefer Text.rich over RichText widget.',
-    correctionMessage: 'Use Text.rich(TextSpan(...)) instead of RichText(text: TextSpan(...)).',
+    correctionMessage:
+        'Use Text.rich(TextSpan(...)) instead of RichText(text: TextSpan(...)).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2332,7 +2384,8 @@ class PreferTextRichRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'RichText') {
         reporter.atNode(node, code);
@@ -2363,8 +2416,10 @@ class PreferUsingListViewRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_using_list_view',
-    problemMessage: 'Column inside SingleChildScrollView. Consider using ListView.',
-    correctionMessage: 'Use ListView for better performance with scrollable lists.',
+    problemMessage:
+        'Column inside SingleChildScrollView. Consider using ListView.',
+    correctionMessage:
+        'Use ListView for better performance with scrollable lists.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2374,7 +2429,8 @@ class PreferUsingListViewRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'SingleChildScrollView') return;
 
@@ -2432,7 +2488,8 @@ class PreferWidgetPrivateMembersRule extends DartLintRule {
 
   static const LintCode _codeMethod = LintCode(
     name: 'prefer_widget_private_members',
-    problemMessage: 'Consider making this helper method private in Widget class.',
+    problemMessage:
+        'Consider making this helper method private in Widget class.',
     correctionMessage: 'Prefix with underscore to make private.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2965,7 +3022,8 @@ class AlwaysRemoveListenerRule extends DartLintRule {
       for (final _ListenerInfo added in addedListeners) {
         final bool hasRemove = removedListeners.any(
           (_ListenerInfo removed) =>
-              removed.target == added.target && removed.callback == added.callback,
+              removed.target == added.target &&
+              removed.callback == added.callback,
         );
         if (!hasRemove && added.node != null) {
           reporter.atNode(added.node!, code);
@@ -3037,7 +3095,8 @@ class AvoidBorderAllRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_border_all',
     problemMessage: 'Prefer Border.fromBorderSide for const borders.',
-    correctionMessage: 'Use const Border.fromBorderSide(BorderSide(...)) instead.',
+    correctionMessage:
+        'Use const Border.fromBorderSide(BorderSide(...)) instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3097,7 +3156,8 @@ class AvoidDeeplyNestedWidgetsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deeply_nested_widgets',
     problemMessage: 'Widget tree is too deeply nested.',
-    correctionMessage: 'Extract subtrees into separate widgets to improve readability.',
+    correctionMessage:
+        'Extract subtrees into separate widgets to improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3113,7 +3173,8 @@ class AvoidDeeplyNestedWidgetsRule extends DartLintRule {
       if (node.name.lexeme != 'build') return;
 
       // Find nested widget depth
-      final _WidgetDepthVisitor visitor = _WidgetDepthVisitor(_maxDepth, reporter, code);
+      final _WidgetDepthVisitor visitor =
+          _WidgetDepthVisitor(_maxDepth, reporter, code);
       node.body.accept(visitor);
     });
   }
@@ -3222,7 +3283,8 @@ class RequireAnimationDisposalRule extends DartLintRule {
         if (member is FieldDeclaration) {
           final TypeAnnotation? type = member.fields.type;
           if (type is NamedType && type.name.lexeme == 'AnimationController') {
-            for (final VariableDeclaration variable in member.fields.variables) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
               animationControllerFields.add(variable.name.lexeme);
             }
           }
@@ -3252,7 +3314,8 @@ class RequireAnimationDisposalRule extends DartLintRule {
           // Report at the field declaration
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }
@@ -3303,7 +3366,8 @@ class AvoidUncontrolledTextFieldRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_uncontrolled_text_field',
-    problemMessage: 'TextField should have a controller for proper state management.',
+    problemMessage:
+        'TextField should have a controller for proper state management.',
     correctionMessage: 'Add a TextEditingController to the TextField.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3314,7 +3378,8 @@ class AvoidUncontrolledTextFieldRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextField' && typeName != 'TextFormField') return;
 
@@ -3354,7 +3419,8 @@ class AvoidHardcodedAssetPathsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_asset_paths',
     problemMessage: 'Asset path should not be hardcoded.',
-    correctionMessage: 'Use a constants class or generated assets for asset paths.',
+    correctionMessage:
+        'Use a constants class or generated assets for asset paths.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3379,14 +3445,16 @@ class AvoidHardcodedAssetPathsRule extends DartLintRule {
       final Expression firstArg = args.arguments.first;
       if (firstArg is StringLiteral) {
         final String? path = firstArg.stringValue;
-        if (path != null && (path.contains('assets/') || path.contains('images/'))) {
+        if (path != null &&
+            (path.contains('assets/') || path.contains('images/'))) {
           reporter.atNode(firstArg, code);
         }
       }
     });
 
     // Also check for AssetImage constructor
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AssetImage') return;
 
@@ -3396,7 +3464,8 @@ class AvoidHardcodedAssetPathsRule extends DartLintRule {
       final Expression firstArg = args.arguments.first;
       if (firstArg is StringLiteral) {
         final String? path = firstArg.stringValue;
-        if (path != null && (path.contains('assets/') || path.contains('images/'))) {
+        if (path != null &&
+            (path.contains('assets/') || path.contains('images/'))) {
           reporter.atNode(firstArg, code);
         }
       }
@@ -3499,7 +3568,9 @@ class AvoidCatchingGenericExceptionRule extends DartLintRule {
       // Check for generic types
       if (exceptionType is NamedType) {
         final String typeName = exceptionType.name.lexeme;
-        if (typeName == 'Exception' || typeName == 'Object' || typeName == 'dynamic') {
+        if (typeName == 'Exception' ||
+            typeName == 'Object' ||
+            typeName == 'dynamic') {
           reporter.atNode(exceptionType, code);
         }
       }
@@ -3534,7 +3605,8 @@ class AvoidServiceLocatorOveruseRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_overuse',
-    problemMessage: 'Service locator call in widget. Prefer constructor injection.',
+    problemMessage:
+        'Service locator call in widget. Prefer constructor injection.',
     correctionMessage: 'Pass dependencies through the constructor instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3569,11 +3641,14 @@ class _ServiceLocatorFinder extends RecursiveAstVisitor<void> {
     final Expression? target = node.target;
 
     if (target is SimpleIdentifier) {
-      if (target.name == 'GetIt' || target.name == 'locator' || target.name == 'sl') {
+      if (target.name == 'GetIt' ||
+          target.name == 'locator' ||
+          target.name == 'sl') {
         onFound(node);
       }
     } else if (target is PrefixedIdentifier) {
-      if (target.identifier.name == 'I' || target.identifier.name == 'instance') {
+      if (target.identifier.name == 'I' ||
+          target.identifier.name == 'instance') {
         if (target.prefix.name == 'GetIt') {
           onFound(node);
         }
@@ -3597,7 +3672,8 @@ class PreferUtcDateTimesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_utc_datetimes',
     problemMessage: 'Consider using UTC DateTime for storage/transmission.',
-    correctionMessage: 'Use DateTime.now().toUtc() or DateTime.utc() for timestamps.',
+    correctionMessage:
+        'Use DateTime.now().toUtc() or DateTime.utc() for timestamps.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3653,7 +3729,8 @@ class AvoidRegexInLoopRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_regex_in_loop',
-    problemMessage: 'RegExp created inside loop. Move it outside for efficiency.',
+    problemMessage:
+        'RegExp created inside loop. Move it outside for efficiency.',
     correctionMessage: 'Create the RegExp once outside the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3930,7 +4007,8 @@ class PreferConstWidgetsInListsRule extends DartLintRule {
         expr is BooleanLiteral ||
         expr is NullLiteral ||
         expr is SymbolLiteral ||
-        (expr is InstanceCreationExpression && expr.keyword?.type == Keyword.CONST);
+        (expr is InstanceCreationExpression &&
+            expr.keyword?.type == Keyword.CONST);
   }
 }
 
@@ -3958,7 +4036,8 @@ class AvoidScaffoldMessengerAfterAwaitRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_scaffold_messenger_after_await',
-    problemMessage: 'Using ScaffoldMessenger.of(context) after await may use an invalid context.',
+    problemMessage:
+        'Using ScaffoldMessenger.of(context) after await may use an invalid context.',
     correctionMessage: 'Store ScaffoldMessenger.of(context) before the await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -4046,7 +4125,8 @@ class AvoidBuildContextInProvidersRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_build_context_in_providers',
     problemMessage: 'Storing BuildContext in providers can cause memory leaks.',
-    correctionMessage: 'Pass BuildContext as a method parameter when needed instead.',
+    correctionMessage:
+        'Pass BuildContext as a method parameter when needed instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4124,7 +4204,8 @@ class PreferSemanticWidgetNamesRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'Container') {
@@ -4140,7 +4221,8 @@ class PreferSemanticWidgetNamesRule extends DartLintRule {
         if (usedProps.length == 1) {
           if (usedProps.contains('decoration')) {
             reporter.atNode(node.constructorName, code);
-          } else if (usedProps.contains('width') || usedProps.contains('height')) {
+          } else if (usedProps.contains('width') ||
+              usedProps.contains('height')) {
             reporter.atNode(node.constructorName, code);
           } else if (usedProps.contains('padding')) {
             reporter.atNode(node.constructorName, code);
@@ -4226,7 +4308,8 @@ class PreferWidgetStateMixinRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_widget_state_mixin',
     problemMessage: 'Consider using WidgetStateMixin for interaction states.',
-    correctionMessage: 'Use WidgetStateMixin to manage hover, pressed, and focus states.',
+    correctionMessage:
+        'Use WidgetStateMixin to manage hover, pressed, and focus states.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4303,7 +4386,8 @@ class AvoidImageWithoutCacheRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_without_cache',
-    problemMessage: 'Image.network should specify cacheWidth/cacheHeight for memory efficiency.',
+    problemMessage:
+        'Image.network should specify cacheWidth/cacheHeight for memory efficiency.',
     correctionMessage: 'Add cacheWidth and/or cacheHeight parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4314,7 +4398,8 @@ class AvoidImageWithoutCacheRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -4363,8 +4448,10 @@ class PreferSplitWidgetConstRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_split_widget_const',
-    problemMessage: 'Large widget subtree could be extracted to a const widget.',
-    correctionMessage: 'Extract this subtree to a separate const widget for better performance.',
+    problemMessage:
+        'Large widget subtree could be extracted to a const widget.',
+    correctionMessage:
+        'Extract this subtree to a separate const widget for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4374,7 +4461,8 @@ class PreferSplitWidgetConstRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check common container widgets
@@ -4552,7 +4640,8 @@ class PreferSafeAreaConsumerRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_consumer',
-    problemMessage: 'SafeArea may be redundant when used directly inside Scaffold body.',
+    problemMessage:
+        'SafeArea may be redundant when used directly inside Scaffold body.',
     correctionMessage:
         'Scaffold already handles safe areas via its appBar and bottomNavigationBar properties.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4564,7 +4653,8 @@ class PreferSafeAreaConsumerRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'Scaffold') {
@@ -4605,7 +4695,8 @@ class AvoidUnrestrictedTextFieldLengthRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrestricted_text_field_length',
-    problemMessage: 'TextField should have maxLength to prevent excessive input.',
+    problemMessage:
+        'TextField should have maxLength to prevent excessive input.',
     correctionMessage: 'Add maxLength parameter to limit input length.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4616,7 +4707,8 @@ class AvoidUnrestrictedTextFieldLengthRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'TextField' || typeName == 'TextFormField') {
@@ -4654,7 +4746,8 @@ class PreferScaffoldMessengerMaybeOfRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_scaffold_messenger_maybeof',
-    problemMessage: 'Consider using ScaffoldMessenger.maybeOf for safer access.',
+    problemMessage:
+        'Consider using ScaffoldMessenger.maybeOf for safer access.',
     correctionMessage:
         'Use maybeOf to handle cases where ScaffoldMessenger might not be available.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4710,7 +4803,8 @@ class AvoidFormWithoutKeyRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'Form') {
@@ -4753,7 +4847,8 @@ class AvoidListViewWithoutItemExtentRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_listview_without_item_extent',
-    problemMessage: 'ListView.builder should specify itemExtent for better scroll performance.',
+    problemMessage:
+        'ListView.builder should specify itemExtent for better scroll performance.',
     correctionMessage: 'Add itemExtent or prototypeItem parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4764,7 +4859,8 @@ class AvoidListViewWithoutItemExtentRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -4812,7 +4908,8 @@ class AvoidMediaQueryInBuildRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mediaquery_in_build',
     problemMessage: 'Use specific MediaQuery methods instead of MediaQuery.of.',
-    correctionMessage: 'Use MediaQuery.sizeOf, MediaQuery.paddingOf, etc. for better performance.',
+    correctionMessage:
+        'Use MediaQuery.sizeOf, MediaQuery.paddingOf, etc. for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4857,8 +4954,10 @@ class PreferSliverListDelegateRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list_delegate',
-    problemMessage: 'Use SliverChildBuilderDelegate for better performance with large lists.',
-    correctionMessage: 'Replace SliverChildListDelegate with SliverChildBuilderDelegate.',
+    problemMessage:
+        'Use SliverChildBuilderDelegate for better performance with large lists.',
+    correctionMessage:
+        'Replace SliverChildListDelegate with SliverChildBuilderDelegate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4868,7 +4967,8 @@ class PreferSliverListDelegateRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'SliverChildListDelegate') {
@@ -4913,7 +5013,8 @@ class AvoidLayoutBuilderMisuseRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_misuse',
     problemMessage: 'LayoutBuilder should use constraints in its builder.',
-    correctionMessage: 'Ensure the builder actually uses the constraints parameter.',
+    correctionMessage:
+        'Ensure the builder actually uses the constraints parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4923,7 +5024,8 @@ class AvoidLayoutBuilderMisuseRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'LayoutBuilder') {
@@ -4933,11 +5035,14 @@ class AvoidLayoutBuilderMisuseRule extends DartLintRule {
             if (builderExpr is FunctionExpression) {
               final FormalParameterList? params = builderExpr.parameters;
               if (params != null && params.parameters.length >= 2) {
-                final String? constraintsName = params.parameters[1].name?.lexeme;
-                if (constraintsName != null && !constraintsName.startsWith('_')) {
+                final String? constraintsName =
+                    params.parameters[1].name?.lexeme;
+                if (constraintsName != null &&
+                    !constraintsName.startsWith('_')) {
                   // Check if constraints is used in body
                   final Set<String> usedIds = <String>{};
-                  builderExpr.body.visitChildren(_SimpleIdentifierCollector(usedIds));
+                  builderExpr.body
+                      .visitChildren(_SimpleIdentifierCollector(usedIds));
                   if (!usedIds.contains(constraintsName)) {
                     reporter.atNode(node.constructorName, code);
                   }
@@ -4983,7 +5088,8 @@ class AvoidRepaintBoundaryMisuseRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_repaint_boundary_misuse',
-    problemMessage: 'RepaintBoundary around const/static content provides no benefit.',
+    problemMessage:
+        'RepaintBoundary around const/static content provides no benefit.',
     correctionMessage: 'Use RepaintBoundary for frequently repainting content.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4994,7 +5100,8 @@ class AvoidRepaintBoundaryMisuseRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'RepaintBoundary') {
@@ -5002,7 +5109,8 @@ class AvoidRepaintBoundaryMisuseRule extends DartLintRule {
           if (arg is NamedExpression && arg.name.label.name == 'child') {
             final Expression child = arg.expression;
             // Check if child is const
-            if (child is InstanceCreationExpression && child.keyword?.type == Keyword.CONST) {
+            if (child is InstanceCreationExpression &&
+                child.keyword?.type == Keyword.CONST) {
               reporter.atNode(node.constructorName, code);
             }
           }
@@ -5038,8 +5146,10 @@ class AvoidSingleChildScrollViewWithColumnRule extends DartLintRule {
   // cspell: ignore singlechildscrollview
   static const LintCode _code = LintCode(
     name: 'avoid_singlechildscrollview_with_column',
-    problemMessage: 'SingleChildScrollView with Column may cause layout issues.',
-    correctionMessage: 'Consider using ListView instead, or remove Expanded/Flexible children.',
+    problemMessage:
+        'SingleChildScrollView with Column may cause layout issues.',
+    correctionMessage:
+        'Consider using ListView instead, or remove Expanded/Flexible children.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5049,7 +5159,8 @@ class AvoidSingleChildScrollViewWithColumnRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'SingleChildScrollView') {
@@ -5119,7 +5230,8 @@ class PreferCachedNetworkImageRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -5154,8 +5266,10 @@ class AvoidGestureDetectorInScrollViewRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_detector_in_scrollview',
-    problemMessage: 'GestureDetector around scrollable can cause gesture conflicts.',
-    correctionMessage: 'Move GestureDetector to individual items inside the scrollable.',
+    problemMessage:
+        'GestureDetector around scrollable can cause gesture conflicts.',
+    correctionMessage:
+        'Move GestureDetector to individual items inside the scrollable.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5174,7 +5288,8 @@ class AvoidGestureDetectorInScrollViewRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'GestureDetector' || typeName == 'InkWell') {
@@ -5215,7 +5330,8 @@ class AvoidStatefulWidgetInListRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_widget_in_list',
-    problemMessage: 'Creating StatefulWidget in list builder can cause state loss.',
+    problemMessage:
+        'Creating StatefulWidget in list builder can cause state loss.',
     correctionMessage: 'Use keys or consider StatelessWidget for list items.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5248,7 +5364,8 @@ class AvoidStatefulWidgetInListRule extends DartLintRule {
                 // Check if key is provided
                 bool hasKey = false;
                 for (final Expression argExpr in expr.argumentList.arguments) {
-                  if (argExpr is NamedExpression && argExpr.name.label.name == 'key') {
+                  if (argExpr is NamedExpression &&
+                      argExpr.name.label.name == 'key') {
                     hasKey = true;
                     break;
                   }
@@ -5294,7 +5411,8 @@ class PreferOpacityWidgetRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_opacity_widget',
     problemMessage: 'Consider using Opacity widget for complex child widgets.',
-    correctionMessage: 'Opacity widget can optimize rendering of transparent content.',
+    correctionMessage:
+        'Opacity widget can optimize rendering of transparent content.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5305,13 +5423,15 @@ class PreferOpacityWidgetRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name == 'withOpacity' || node.methodName.name == 'withAlpha') {
+      if (node.methodName.name == 'withOpacity' ||
+          node.methodName.name == 'withAlpha') {
         // Check if this is part of a color argument to a container-like widget
         final AstNode? parent = node.parent;
         if (parent is NamedExpression && parent.name.label.name == 'color') {
           final AstNode? grandparent = parent.parent?.parent;
           if (grandparent is InstanceCreationExpression) {
-            final String typeName = grandparent.constructorName.type.name.lexeme;
+            final String typeName =
+                grandparent.constructorName.type.name.lexeme;
             if (typeName == 'Container' || typeName == 'DecoratedBox') {
               // Check if it has a child that might be expensive
               for (final Expression arg in grandparent.argumentList.arguments) {
@@ -5399,14 +5519,16 @@ class _InheritedWidgetVisitor extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
 
     final String methodName = node.methodName.name;
-    if (!AvoidInheritedWidgetInInitStateRule._inheritedWidgetMethods.contains(methodName)) {
+    if (!AvoidInheritedWidgetInInitStateRule._inheritedWidgetMethods
+        .contains(methodName)) {
       return;
     }
 
     // Check if target is a common inherited widget
     final Expression? target = node.target;
     if (target is SimpleIdentifier) {
-      if (AvoidInheritedWidgetInInitStateRule._commonInheritedWidgets.contains(target.name)) {
+      if (AvoidInheritedWidgetInInitStateRule._commonInheritedWidgets
+          .contains(target.name)) {
         reporter.atNode(node, code);
       }
     }
@@ -5429,7 +5551,8 @@ class AvoidRecursiveWidgetCallsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_widget_calls',
-    problemMessage: 'Widget creates instance of itself, causing infinite recursion.',
+    problemMessage:
+        'Widget creates instance of itself, causing infinite recursion.',
     correctionMessage: 'Remove the recursive widget instantiation.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -5448,7 +5571,8 @@ class AvoidRecursiveWidgetCallsRule extends DartLintRule {
       if (extendsClause == null) return;
 
       final String superclassName = extendsClause.superclass.name.lexeme;
-      if (superclassName != 'StatelessWidget' && superclassName != 'StatefulWidget') {
+      if (superclassName != 'StatelessWidget' &&
+          superclassName != 'StatefulWidget') {
         return;
       }
 
@@ -5456,7 +5580,8 @@ class AvoidRecursiveWidgetCallsRule extends DartLintRule {
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           // Check for self-instantiation in build
-          member.body.accept(_RecursiveWidgetVisitor(className, reporter, code));
+          member.body
+              .accept(_RecursiveWidgetVisitor(className, reporter, code));
         }
       }
     });
@@ -5542,7 +5667,8 @@ class AvoidUndisposedInstancesRule extends DartLintRule {
 
             // Check if field is a disposable type
             if (initializer is InstanceCreationExpression) {
-              final String typeName = initializer.constructorName.type.name.lexeme;
+              final String typeName =
+                  initializer.constructorName.type.name.lexeme;
               if (_disposableTypes.contains(typeName)) {
                 disposableFields.add(fieldName);
               }
@@ -5570,7 +5696,8 @@ class AvoidUndisposedInstancesRule extends DartLintRule {
           // Find the field declaration to report on
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }
@@ -5659,7 +5786,8 @@ class AvoidUnnecessaryOverridesInStateRule extends DartLintRule {
               if (stmt is ExpressionStatement) {
                 final Expression expr = stmt.expression;
                 if (expr is MethodInvocation) {
-                  if (expr.target is SuperExpression && expr.methodName.name == methodName) {
+                  if (expr.target is SuperExpression &&
+                      expr.methodName.name == methodName) {
                     reporter.atNode(member, code);
                   }
                 }
@@ -5686,7 +5814,8 @@ class DisposeFieldsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'dispose_fields',
-    problemMessage: 'Field requires disposal but dispose method is missing or incomplete.',
+    problemMessage:
+        'Field requires disposal but dispose method is missing or incomplete.',
     correctionMessage: 'Add dispose method and call dispose on this field.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -5716,7 +5845,8 @@ class DisposeFieldsRule extends DartLintRule {
       if (superclassName != 'State') return;
 
       // Find disposable fields
-      final List<VariableDeclaration> disposableFields = <VariableDeclaration>[];
+      final List<VariableDeclaration> disposableFields =
+          <VariableDeclaration>[];
       bool hasDisposeMethod = false;
 
       for (final ClassMember member in node.members) {
@@ -5724,7 +5854,8 @@ class DisposeFieldsRule extends DartLintRule {
           for (final VariableDeclaration variable in member.fields.variables) {
             final Expression? initializer = variable.initializer;
             if (initializer is InstanceCreationExpression) {
-              final String typeName = initializer.constructorName.type.name.lexeme;
+              final String typeName =
+                  initializer.constructorName.type.name.lexeme;
               if (_disposableTypes.contains(typeName)) {
                 disposableFields.add(variable);
               }
@@ -5772,7 +5903,8 @@ class PassExistingFutureToFutureBuilderRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_existing_future_to_future_builder',
     problemMessage: 'Creating new Future in FutureBuilder causes rebuilds.',
-    correctionMessage: 'Store the Future in a field and pass it to the builder.',
+    correctionMessage:
+        'Store the Future in a field and pass it to the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5782,7 +5914,8 @@ class PassExistingFutureToFutureBuilderRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FutureBuilder') return;
 
@@ -5831,7 +5964,8 @@ class PassExistingStreamToStreamBuilderRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_existing_stream_to_stream_builder',
     problemMessage: 'Creating new Stream in StreamBuilder causes rebuilds.',
-    correctionMessage: 'Store the Stream in a field and pass it to the builder.',
+    correctionMessage:
+        'Store the Stream in a field and pass it to the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5841,7 +5975,8 @@ class PassExistingStreamToStreamBuilderRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'StreamBuilder') return;
 

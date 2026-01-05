@@ -35,7 +35,8 @@ class AvoidDirectDataAccessInUiRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_direct_data_access_in_ui',
     problemMessage: 'UI layer should not directly access data layer.',
-    correctionMessage: 'Use a ViewModel, Cubit, or Controller to mediate data access.',
+    correctionMessage:
+        'Use a ViewModel, Cubit, or Controller to mediate data access.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -115,7 +116,8 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_business_logic_in_ui',
     problemMessage: 'Business logic should not be in UI layer.',
-    correctionMessage: 'Move calculations and business rules to domain/service layer.',
+    correctionMessage:
+        'Move calculations and business rules to domain/service layer.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -155,7 +157,9 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
           final String methodName = member.name.lexeme.toLowerCase();
 
           // Skip build and lifecycle methods
-          if (methodName == 'build' || methodName == 'initstate' || methodName == 'dispose') {
+          if (methodName == 'build' ||
+              methodName == 'initstate' ||
+              methodName == 'dispose') {
             continue;
           }
 
@@ -198,7 +202,8 @@ class AvoidCircularDependenciesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_dependencies',
     problemMessage: 'Potential circular dependency detected.',
-    correctionMessage: 'Break the cycle using interfaces, dependency injection, or events.',
+    correctionMessage:
+        'Break the cycle using interfaces, dependency injection, or events.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -225,7 +230,8 @@ class AvoidCircularDependenciesRule extends DartLintRule {
               }
             }
 
-            if (paramType != null && _isSameLayerDependency(className, paramType)) {
+            if (paramType != null &&
+                _isSameLayerDependency(className, paramType)) {
               reporter.atNode(param, code);
             }
           }
@@ -277,7 +283,8 @@ class AvoidGodClassRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_god_class',
     problemMessage: 'Class has too many responsibilities.',
-    correctionMessage: 'Split into smaller classes with single responsibilities.',
+    correctionMessage:
+        'Split into smaller classes with single responsibilities.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -339,7 +346,8 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ui_in_domain_layer',
     problemMessage: 'Domain layer should not have UI dependencies.',
-    correctionMessage: 'Remove Flutter/UI imports from domain models and services.',
+    correctionMessage:
+        'Remove Flutter/UI imports from domain models and services.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -362,8 +370,9 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
     // Check if file is in domain layer (heuristic based on path)
     final String path = resolver.source.fullName;
 
-    final bool isDomainLayer =
-        path.contains('/domain/') || path.contains('/models/') || path.contains('/entities/');
+    final bool isDomainLayer = path.contains('/domain/') ||
+        path.contains('/models/') ||
+        path.contains('/entities/');
 
     if (!isDomainLayer) return;
 
@@ -380,7 +389,8 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
       }
 
       // Check parameters
-      for (final FormalParameter param in node.parameters?.parameters ?? <FormalParameter>[]) {
+      for (final FormalParameter param
+          in node.parameters?.parameters ?? <FormalParameter>[]) {
         String? paramType;
         if (param is SimpleFormalParameter) {
           paramType = param.type?.toSource();
@@ -420,7 +430,8 @@ class AvoidCrossFeatureDependenciesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cross_feature_dependencies',
     problemMessage: 'Feature module depends on another feature.',
-    correctionMessage: 'Move shared code to core/shared layer or use dependency injection.',
+    correctionMessage:
+        'Move shared code to core/shared layer or use dependency injection.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -484,7 +495,8 @@ class AvoidSingletonPatternRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_pattern',
     problemMessage: 'Singleton pattern makes testing difficult.',
-    correctionMessage: 'Use dependency injection container instead of static singletons.',
+    correctionMessage:
+        'Use dependency injection container instead of static singletons.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

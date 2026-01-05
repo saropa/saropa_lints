@@ -48,7 +48,8 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keys_in_animated_lists',
     problemMessage: 'AnimatedList/AnimatedGrid items should have keys.',
-    correctionMessage: 'Add a Key to the returned widget for correct animations.',
+    correctionMessage:
+        'Add a Key to the returned widget for correct animations.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -191,7 +192,8 @@ class AvoidExpensiveBuildRule extends DartLintRule {
       if (node.name.lexeme != 'build') return;
 
       // Check if this is a widget build method
-      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -266,7 +268,8 @@ class PreferConstChildWidgetsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_child_widgets',
     problemMessage: 'Child widgets could be const.',
-    correctionMessage: 'Add const to the list literal to prevent unnecessary rebuilds.',
+    correctionMessage:
+        'Add const to the list literal to prevent unnecessary rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -425,7 +428,8 @@ class PreferComputeForHeavyWorkRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compute_for_heavy_work',
     problemMessage: 'Heavy computation should use compute() or Isolate.',
-    correctionMessage: 'Move heavy work to a separate isolate using compute() or Isolate.run().',
+    correctionMessage:
+        'Move heavy work to a separate isolate using compute() or Isolate.run().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -463,7 +467,9 @@ class PreferComputeForHeavyWorkRule extends DartLintRule {
           while (current != null) {
             if (current is MethodInvocation) {
               final String parentMethod = current.methodName.name;
-              if (parentMethod == 'compute' || parentMethod == 'run' || parentMethod == 'spawn') {
+              if (parentMethod == 'compute' ||
+                  parentMethod == 'run' ||
+                  parentMethod == 'spawn') {
                 insideIsolate = true;
                 break;
               }
@@ -534,7 +540,8 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
     context.registry.addForElement((ForElement node) {
       // For elements in list comprehensions
       if (node.body is InstanceCreationExpression) {
-        final InstanceCreationExpression creation = node.body as InstanceCreationExpression;
+        final InstanceCreationExpression creation =
+            node.body as InstanceCreationExpression;
         _checkCreation(creation, reporter);
       }
     });
@@ -604,7 +611,8 @@ class PreferCachedGetterRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_getter',
     problemMessage: 'Getter called multiple times - consider caching.',
-    correctionMessage: 'Store the getter result in a local variable if called multiple times.',
+    correctionMessage:
+        'Store the getter result in a local variable if called multiple times.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -773,7 +781,8 @@ class RequireItemExtentForLargeListsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_item_extent_for_large_lists',
     problemMessage: 'Large list should specify itemExtent for performance.',
-    correctionMessage: 'Add itemExtent or prototypeItem for better scrolling performance.',
+    correctionMessage:
+        'Add itemExtent or prototypeItem for better scrolling performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -869,7 +878,8 @@ class RequireImageCacheDimensionsRule extends DartLintRule {
       final String? namedConstructor = node.constructorName.name?.name;
       if (namedConstructor != 'network') return;
 
-      final bool hasCacheDimensions = node.argumentList.arguments.any((Expression arg) {
+      final bool hasCacheDimensions =
+          node.argumentList.arguments.any((Expression arg) {
         if (arg is NamedExpression) {
           final String name = arg.name.label.name;
           return name == 'cacheWidth' || name == 'cacheHeight';
@@ -909,7 +919,8 @@ class PreferImagePrecacheRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_precache',
     problemMessage: 'Consider precaching large or hero images.',
-    correctionMessage: 'Use precacheImage() in didChangeDependencies for smoother UX.',
+    correctionMessage:
+        'Use precacheImage() in didChangeDependencies for smoother UX.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -938,7 +949,8 @@ class PreferImagePrecacheRule extends DartLintRule {
       if (namedConstructor != 'asset' && namedConstructor != 'network') return;
 
       // Check if in build method
-      final MethodDeclaration? method = node.thisOrAncestorOfType<MethodDeclaration>();
+      final MethodDeclaration? method =
+          node.thisOrAncestorOfType<MethodDeclaration>();
       if (method == null || method.name.lexeme != 'build') return;
 
       // Check if image name suggests it's a hero/important image
@@ -984,7 +996,8 @@ class AvoidControllerInBuildRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_controller_in_build',
     problemMessage: 'Controller should not be created in build method.',
-    correctionMessage: 'Create controllers as class fields and dispose them properly.',
+    correctionMessage:
+        'Create controllers as class fields and dispose them properly.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1066,7 +1079,8 @@ class AvoidSetStateInBuildRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_setstate_in_build',
     problemMessage: 'setState should not be called in build method.',
-    correctionMessage: 'Use addPostFrameCallback or move state changes to event handlers.',
+    correctionMessage:
+        'Use addPostFrameCallback or move state changes to event handlers.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

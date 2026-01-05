@@ -82,7 +82,8 @@ class AvoidCascadeAfterIfNullRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_cascade_after_if_null',
     problemMessage: 'Cascade after ?? may have unexpected precedence.',
-    correctionMessage: 'Wrap the ?? expression in parentheses: (a ?? b)..cascade',
+    correctionMessage:
+        'Wrap the ?? expression in parentheses: (a ?? b)..cascade',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -95,7 +96,8 @@ class AvoidCascadeAfterIfNullRule extends DartLintRule {
     context.registry.addCascadeExpression((CascadeExpression node) {
       // Check if the target of the cascade is a binary expression with ??
       final Expression target = node.target;
-      if (target is BinaryExpression && target.operator.type == TokenType.QUESTION_QUESTION) {
+      if (target is BinaryExpression &&
+          target.operator.type == TokenType.QUESTION_QUESTION) {
         reporter.atNode(node, code);
       }
     });
@@ -127,7 +129,8 @@ class AvoidComplexArithmeticExpressionsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_complex_arithmetic_expressions',
-    problemMessage: 'Arithmetic expression has more than $_maxOperators operators.',
+    problemMessage:
+        'Arithmetic expression has more than $_maxOperators operators.',
     correctionMessage: 'Extract parts into named variables for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -324,7 +327,8 @@ class AvoidExcessiveExpressionsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_expressions',
-    problemMessage: 'Expression has excessive complexity (>$_maxOperators operators).',
+    problemMessage:
+        'Expression has excessive complexity (>$_maxOperators operators).',
     correctionMessage: 'Break into smaller expressions with named variables.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -348,7 +352,9 @@ class AvoidExcessiveExpressionsRule extends DartLintRule {
 
   int _countOperators(Expression node) {
     if (node is BinaryExpression) {
-      return 1 + _countOperators(node.leftOperand) + _countOperators(node.rightOperand);
+      return 1 +
+          _countOperators(node.leftOperand) +
+          _countOperators(node.rightOperand);
     } else if (node is ParenthesizedExpression) {
       return _countOperators(node.expression);
     }
@@ -397,7 +403,8 @@ class AvoidImmediatelyInvokedFunctionsRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
 
       // Check for (expression)() pattern
@@ -558,7 +565,8 @@ class PreferMovingToVariableRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
-      final Map<String, List<Expression>> expressions = <String, List<Expression>>{};
+      final Map<String, List<Expression>> expressions =
+          <String, List<Expression>>{};
 
       // Collect method invocations and property accesses
       node.visitChildren(
@@ -572,7 +580,8 @@ class PreferMovingToVariableRule extends DartLintRule {
       );
 
       // Report expressions that appear more than twice
-      for (final MapEntry<String, List<Expression>> entry in expressions.entries) {
+      for (final MapEntry<String, List<Expression>> entry
+          in expressions.entries) {
         if (entry.value.length > 2) {
           reporter.atNode(entry.value.first, code);
         }
@@ -641,7 +650,12 @@ class PreferParenthesesWithIfNullRule extends DartLintRule {
       if (left is BinaryExpression) {
         final String op = left.operator.lexeme;
         // Skip comparison operators which are usually clear
-        if (op != '==' && op != '!=' && op != '>' && op != '<' && op != '>=' && op != '<=') {
+        if (op != '==' &&
+            op != '!=' &&
+            op != '>' &&
+            op != '<' &&
+            op != '>=' &&
+            op != '<=') {
           reporter.atNode(node, code);
           return;
         }
