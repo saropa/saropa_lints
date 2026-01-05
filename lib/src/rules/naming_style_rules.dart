@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -14,7 +14,7 @@ class AvoidGetterPrefixRule extends DartLintRule {
     name: 'avoid_getter_prefix',
     problemMessage: "Getter name should not start with 'get'.",
     correctionMessage: "Remove the 'get' prefix from the getter name.",
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -63,7 +63,7 @@ class AvoidNonAsciiSymbolsRule extends DartLintRule {
     name: 'avoid_non_ascii_symbols',
     problemMessage: 'String contains non-ASCII characters.',
     correctionMessage: 'Use only ASCII characters or escape sequences.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -110,7 +110,7 @@ class FormatCommentRule extends DartLintRule {
     name: 'capitalize_comment',
     problemMessage: 'Comment should start with capital letter.',
     correctionMessage: 'Capitalize the first letter of the comment.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -181,7 +181,7 @@ class MatchClassNamePatternRule extends DartLintRule {
     name: 'match_class_name_pattern',
     problemMessage: 'Class name does not follow expected pattern.',
     correctionMessage: 'Ensure class name follows naming conventions.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -199,7 +199,7 @@ class MatchClassNamePatternRule extends DartLintRule {
       // Check for common suffix patterns that should match superclass
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause != null) {
-        final String superName = extendsClause.superclass.name.lexeme;
+        final String superName = extendsClause.superclass.name2.lexeme;
 
         // Widgets should end with Widget-like suffix
         if (superName.endsWith('Widget') ||
@@ -265,7 +265,7 @@ class MatchGetterSetterFieldNamesRule extends DartLintRule {
     name: 'match_getter_setter_field_names',
     problemMessage: 'Getter/setter name should match the backing field.',
     correctionMessage: 'Rename to match the field name (without underscore).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -338,7 +338,7 @@ class MatchLibFolderStructureRule extends DartLintRule {
     name: 'match_lib_folder_structure',
     problemMessage: 'Test file location should mirror lib folder structure.',
     correctionMessage: 'Move test file to match the lib directory structure.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -378,7 +378,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
     name: 'match_positional_field_names_on_assignment',
     problemMessage: 'Positional field name should match the variable being assigned.',
     correctionMessage: 'Rename the positional field to match the assignment target.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -441,7 +441,7 @@ class PreferBooleanPrefixesRule extends DartLintRule {
     name: 'prefer_boolean_prefixes',
     problemMessage: 'Boolean variable should have a prefix (is/has/can/should/will/did).',
     correctionMessage: 'Rename to use a boolean prefix like isEnabled, hasData, etc.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const List<String> _validPrefixes = <String>[
@@ -480,7 +480,7 @@ class PreferBooleanPrefixesRule extends DartLintRule {
 
       final TypeAnnotation? type = parent.type;
       if (type is! NamedType) return;
-      if (type.name.lexeme != 'bool') return;
+      if (type.name2.lexeme != 'bool') return;
 
       final String name = node.name.lexeme;
       // Skip private variables (starting with _)
@@ -517,7 +517,7 @@ class PreferCorrectCallbackFieldNameRule extends DartLintRule {
     name: 'prefer_correct_callback_field_name',
     problemMessage: "Callback field should be named with 'on' prefix.",
     correctionMessage: "Rename to 'onX' pattern (e.g., onPressed, onChanged).",
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -637,7 +637,7 @@ class PreferCorrectErrorNameRule extends DartLintRule {
     name: 'prefer_correct_error_name',
     problemMessage: 'Catch parameter should be named "e" or "error".',
     correctionMessage: 'Rename to "e" or "error".',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _validNames = <String>{
@@ -690,7 +690,7 @@ class PreferCorrectHandlerNameRule extends DartLintRule {
     name: 'prefer_correct_handler_name',
     problemMessage: 'Event handler should start with "on" or "_on".',
     correctionMessage: 'Rename to follow handler naming convention.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _handlerSuffixes = <String>{
@@ -761,7 +761,7 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
     name: 'prefer_correct_identifier_length',
     problemMessage: 'Identifier name length is not ideal.',
     correctionMessage: 'Use names between 2-30 characters (except common short names).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   // Common acceptable short names
@@ -850,7 +850,7 @@ class PreferCorrectSetterParameterNameRule extends DartLintRule {
     name: 'prefer_correct_setter_parameter_name',
     problemMessage: 'Setter parameter should be named "value".',
     correctionMessage: 'Rename the parameter to "value".',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -906,7 +906,7 @@ class PreferExplicitParameterNamesRule extends DartLintRule {
     name: 'prefer_explicit_parameter_names',
     problemMessage: 'Function type parameters should have names.',
     correctionMessage: 'Add parameter names for better documentation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -941,7 +941,7 @@ class PreferMatchFileNameRule extends DartLintRule {
     name: 'prefer_match_file_name',
     problemMessage: 'File name should match the primary class name.',
     correctionMessage: 'Rename the file or class to match.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1000,7 +1000,7 @@ class PreferPrefixedGlobalConstantsRule extends DartLintRule {
     name: 'prefer_prefixed_global_constants',
     problemMessage: 'Global constant should have a descriptive prefix.',
     correctionMessage: 'Consider prefixing with "k" or using a descriptive name.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1058,7 +1058,7 @@ class TagNameRule extends DartLintRule {
     name: 'prefer_kebab_tag_name',
     problemMessage: 'Tag name should follow naming conventions.',
     correctionMessage: 'Use kebab-case for tag names.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1116,7 +1116,7 @@ class PreferNamedExtensionsRule extends DartLintRule {
     name: 'prefer_named_extensions',
     problemMessage: 'Anonymous extension should be named.',
     correctionMessage: 'Add a name to the extension for better debugging and documentation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1157,7 +1157,7 @@ class PreferTypedefForCallbacksRule extends DartLintRule {
     name: 'prefer_typedef_for_callbacks',
     problemMessage: 'Consider using typedef for repeated function types.',
     correctionMessage: 'Create a typedef for this function type to improve readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1217,7 +1217,7 @@ class PreferEnhancedEnumsRule extends DartLintRule {
     name: 'prefer_enhanced_enums',
     problemMessage: 'Consider using enhanced enum instead of extension.',
     correctionMessage: 'Move extension members into the enum itself.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1240,7 +1240,7 @@ class PreferEnhancedEnumsRule extends DartLintRule {
 
       final TypeAnnotation extendedType = onClause.extendedType;
       if (extendedType is NamedType) {
-        final String typeName = extendedType.name.lexeme;
+        final String typeName = extendedType.name2.lexeme;
         if (enumNames.contains(typeName)) {
           reporter.atNode(node, code);
         }

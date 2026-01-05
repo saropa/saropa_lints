@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -14,7 +14,7 @@ class AlwaysFailRule extends DartLintRule {
     name: 'always_fail',
     problemMessage: 'This custom lint always fails (test hook).',
     correctionMessage: 'Disable the rule or remove the test lint trigger.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   @override
@@ -42,7 +42,7 @@ class AvoidCommentedOutCodeRule extends DartLintRule {
     name: 'avoid_commented_out_code',
     problemMessage: 'Avoid commented-out code.',
     correctionMessage: 'Remove commented-out code. Use version control to preserve history.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   // Common code patterns that indicate commented-out code
@@ -112,7 +112,7 @@ class AvoidDebugPrintRule extends DartLintRule {
         'Use a proper logging solution instead.',
     correctionMessage: 'Replace debugPrint with a logger that can be '
         'configured per environment.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -175,7 +175,7 @@ class AvoidUnguardedDebugRule extends DartLintRule {
     problemMessage: 'Debug statement is not guarded by a debug mode check.',
     correctionMessage: 'Wrap in if (kDebugMode), if (DebugType.*.isDebug), '
         'or add level: DebugLevels.Warning/Error parameter.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -335,7 +335,7 @@ class PreferCommentingAnalyzerIgnoresRule extends DartLintRule {
     name: 'prefer_commenting_analyzer_ignores',
     problemMessage: 'Analyzer ignore comment should have a preceding explanatory comment.',
     correctionMessage: 'Add a comment on the line above explaining why this rule is ignored.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

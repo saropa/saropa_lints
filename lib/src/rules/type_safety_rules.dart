@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -39,7 +39,7 @@ class AvoidUnsafeCastRule extends DartLintRule {
     name: 'avoid_unsafe_cast',
     problemMessage: 'Direct cast with "as" may throw at runtime.',
     correctionMessage: 'Use "is" check or pattern matching instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -87,7 +87,7 @@ class PreferConstrainedGenericsRule extends DartLintRule {
     name: 'prefer_constrained_generics',
     problemMessage: 'Generic type parameter has no constraint.',
     correctionMessage: 'Consider adding extends clause to constrain the type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -135,7 +135,7 @@ class RequireCovariantDocumentationRule extends DartLintRule {
     name: 'require_covariant_documentation',
     problemMessage: 'Covariant parameter should be documented.',
     correctionMessage: 'Add documentation explaining why covariant is necessary.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -198,7 +198,7 @@ class RequireSafeJsonParsingRule extends DartLintRule {
     name: 'require_safe_json_parsing',
     problemMessage: 'JSON parsing may throw on missing keys.',
     correctionMessage: 'Use null-aware operators or provide defaults.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -252,7 +252,7 @@ class RequireNullSafeExtensionsRule extends DartLintRule {
     name: 'require_null_safe_extensions',
     problemMessage: 'Extension on nullable type uses null assertion.',
     correctionMessage: 'Use null-aware operators instead of "!".',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -301,7 +301,7 @@ class PreferSpecificNumericTypesRule extends DartLintRule {
     name: 'prefer_specific_numeric_types',
     problemMessage: 'Prefer int or double over num for better type safety.',
     correctionMessage: 'Use int or double instead of num.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -354,7 +354,7 @@ class RequireFutureOrDocumentationRule extends DartLintRule {
     name: 'require_futureor_documentation',
     problemMessage: 'FutureOr return type should be documented.',
     correctionMessage: 'Add documentation explaining when sync vs async.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

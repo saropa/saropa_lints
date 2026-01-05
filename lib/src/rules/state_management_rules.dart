@@ -9,7 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -44,7 +44,7 @@ class RequireNotifyListenersRule extends DartLintRule {
     name: 'require_notify_listeners',
     problemMessage: 'ChangeNotifier method modifies state but does not call notifyListeners.',
     correctionMessage: 'Add notifyListeners() after state modifications.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -149,7 +149,7 @@ class RequireStreamControllerDisposeRule extends DartLintRule {
     name: 'require_stream_controller_dispose',
     problemMessage: 'StreamController is not closed in dispose.',
     correctionMessage: 'Add controller.close() in dispose method.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   @override
@@ -273,7 +273,7 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
     name: 'require_value_notifier_dispose',
     problemMessage: 'ValueNotifier is not disposed.',
     correctionMessage: 'Add notifier.dispose() in dispose method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -396,7 +396,7 @@ class RequireMountedCheckRule extends DartLintRule {
     name: 'require_mounted_check',
     problemMessage: 'setState called after await without mounted check.',
     correctionMessage: 'Add "if (!mounted) return;" before setState.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   @override
@@ -483,7 +483,7 @@ class AvoidWatchInCallbacksRule extends DartLintRule {
     name: 'avoid_watch_in_callbacks',
     problemMessage: 'Avoid using watch inside callbacks.',
     correctionMessage: 'Use read instead of watch in event handlers.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -538,7 +538,7 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
     name: 'avoid_bloc_event_in_constructor',
     problemMessage: 'Avoid adding BLoC events in constructor.',
     correctionMessage: 'Add initial events from the widget that creates the BLoC.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -607,7 +607,7 @@ class RequireUpdateShouldNotifyRule extends DartLintRule {
     name: 'require_update_should_notify',
     problemMessage: 'InheritedWidget should override updateShouldNotify.',
     correctionMessage: 'Add updateShouldNotify to control when dependents rebuild.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -669,7 +669,7 @@ class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
     name: 'avoid_global_riverpod_providers',
     problemMessage: 'Consider scoping Riverpod providers appropriately.',
     correctionMessage: 'Document provider scope or use ProviderScope for isolation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -743,7 +743,7 @@ class AvoidStatefulWithoutStateRule extends DartLintRule {
     name: 'avoid_stateful_without_state',
     problemMessage: 'StatefulWidget has no state fields - consider StatelessWidget.',
     correctionMessage: 'Convert to StatelessWidget if no state is being managed.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -818,7 +818,7 @@ class AvoidGlobalKeyInBuildRule extends DartLintRule {
     name: 'avoid_global_key_in_build',
     problemMessage: 'GlobalKey should not be created in build method.',
     correctionMessage: 'Create GlobalKey as a class field instead.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   @override

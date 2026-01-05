@@ -5,7 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -32,7 +32,7 @@ class AvoidCastingToExtensionTypeRule extends DartLintRule {
     name: 'avoid_casting_to_extension_type',
     problemMessage: 'Avoid casting to extension types.',
     correctionMessage: 'Use the extension type constructor instead of casting.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -80,7 +80,7 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
     name: 'avoid_collection_methods_with_unrelated_types',
     problemMessage: 'Collection method called with unrelated type.',
     correctionMessage: 'The argument type cannot match any element in the collection.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _collectionMethods = <String>{
@@ -185,7 +185,7 @@ class AvoidDynamicRule extends DartLintRule {
     name: 'avoid_dynamic',
     problemMessage: "Avoid using 'dynamic' type.",
     correctionMessage: 'Use a specific type, Object, or a generic type instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -195,7 +195,7 @@ class AvoidDynamicRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
-      if (node.name.lexeme == 'dynamic') {
+      if (node.name2.lexeme == 'dynamic') {
         reporter.atNode(node, code);
       }
     });
@@ -225,7 +225,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
     name: 'avoid_implicitly_nullable_extension_types',
     problemMessage: 'Extension type is implicitly nullable.',
     correctionMessage: 'Add "implements Object" to make it non-nullable.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -241,7 +241,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
       bool implementsObject = false;
       if (implementsClause != null) {
         for (final NamedType type in implementsClause.interfaces) {
-          if (type.name.lexeme == 'Object') {
+          if (type.name2.lexeme == 'Object') {
             implementsObject = true;
             break;
           }
@@ -263,7 +263,7 @@ class AvoidNullableInterpolationRule extends DartLintRule {
     name: 'avoid_nullable_interpolation',
     problemMessage: 'Avoid interpolating nullable values.',
     correctionMessage: 'Add null check or use ?? to provide default value.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -306,7 +306,7 @@ class AvoidNullableParametersWithDefaultValuesRule extends DartLintRule {
     name: 'avoid_nullable_parameters_with_default_values',
     problemMessage: 'Parameter with default value should not be nullable.',
     correctionMessage: 'Remove the ? from the type since it has a non-null default.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -359,7 +359,7 @@ class AvoidNullableToStringRule extends DartLintRule {
     name: 'avoid_nullable_tostring',
     problemMessage: 'Calling toString() on a nullable value.',
     correctionMessage: 'Check for null first or provide a default value.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -422,7 +422,7 @@ class AvoidNullAssertionRule extends DartLintRule {
         'It can cause runtime crashes if the value is null.',
     correctionMessage: 'Use null-safe alternatives: ?? for defaults, '
         'if-null checks, or ?. for optional chaining.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -463,7 +463,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends DartLintRule {
     problemMessage: 'Unnecessary type assertion. '
         'The expression is already known to be of this type.',
     correctionMessage: 'Remove the redundant type check.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -522,7 +522,7 @@ class AvoidUnnecessaryTypeCastsRule extends DartLintRule {
     problemMessage: 'Unnecessary type cast. '
         'The expression is already of this type.',
     correctionMessage: 'Remove the redundant cast.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -577,7 +577,7 @@ class AvoidUnrelatedTypeAssertionsRule extends DartLintRule {
     problemMessage: 'Type assertion can never be true. '
         'The types are unrelated.',
     correctionMessage: 'Remove the impossible type check or fix the types.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -654,7 +654,7 @@ class PreferCorrectTypeNameRule extends DartLintRule {
     name: 'prefer_correct_type_name',
     problemMessage: 'Type name should be UpperCamelCase.',
     correctionMessage: 'Rename to use UpperCamelCase convention.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -742,7 +742,7 @@ class PreferExplicitFunctionTypeRule extends DartLintRule {
     name: 'prefer_explicit_function_type',
     problemMessage: 'Use explicit function type instead of bare "Function".',
     correctionMessage: 'Specify the function signature (e.g., void Function()).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -752,7 +752,7 @@ class PreferExplicitFunctionTypeRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
-      final String name = node.name.lexeme;
+      final String name = node.name2.lexeme;
       if (name == 'Function') {
         // Check if it's the bare Function type (no type arguments)
         if (node.typeArguments == null) {
@@ -787,7 +787,7 @@ class PreferTypeOverVarRule extends DartLintRule {
     name: 'prefer_type_over_var',
     problemMessage: 'Prefer explicit type annotation over var.',
     correctionMessage: 'Replace var with the explicit type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

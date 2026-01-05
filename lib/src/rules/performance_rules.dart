@@ -9,7 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -49,7 +49,7 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
     name: 'require_keys_in_animated_lists',
     problemMessage: 'AnimatedList/AnimatedGrid items should have keys.',
     correctionMessage: 'Add a Key to the returned widget for correct animations.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   static const Set<String> _animatedListWidgets = <String>{
@@ -160,7 +160,7 @@ class AvoidExpensiveBuildRule extends DartLintRule {
     problemMessage: 'Expensive operation in build method.',
     correctionMessage:
         'Move expensive operations to initState, didChangeDependencies, or cache the result.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _expensiveOperations = <String>{
@@ -267,7 +267,7 @@ class PreferConstChildWidgetsRule extends DartLintRule {
     name: 'prefer_const_child_widgets',
     problemMessage: 'Child widgets could be const.',
     correctionMessage: 'Add const to the list literal to prevent unnecessary rebuilds.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -373,7 +373,7 @@ class AvoidSynchronousFileIoRule extends DartLintRule {
     name: 'avoid_synchronous_file_io',
     problemMessage: 'Avoid synchronous file I/O operations.',
     correctionMessage: 'Use async file operations to avoid blocking the UI.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _syncMethods = <String>{
@@ -426,7 +426,7 @@ class PreferComputeForHeavyWorkRule extends DartLintRule {
     name: 'prefer_compute_for_heavy_work',
     problemMessage: 'Heavy computation should use compute() or Isolate.',
     correctionMessage: 'Move heavy work to a separate isolate using compute() or Isolate.run().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _heavyOperations = <String>{
@@ -507,7 +507,7 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
     name: 'avoid_object_creation_in_hot_loops',
     problemMessage: 'Object creation inside loop causes GC pressure.',
     correctionMessage: 'Move object creation outside the loop.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _expensiveTypes = <String>{
@@ -605,7 +605,7 @@ class PreferCachedGetterRule extends DartLintRule {
     name: 'prefer_cached_getter',
     problemMessage: 'Getter called multiple times - consider caching.',
     correctionMessage: 'Store the getter result in a local variable if called multiple times.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -691,7 +691,7 @@ class AvoidExcessiveWidgetDepthRule extends DartLintRule {
     problemMessage: 'Widget tree is too deep.',
     correctionMessage:
         'Extract nested widgets into separate widget classes for better performance.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const int _maxDepth = 10;
@@ -774,7 +774,7 @@ class RequireItemExtentForLargeListsRule extends DartLintRule {
     name: 'require_item_extent_for_large_lists',
     problemMessage: 'Large list should specify itemExtent for performance.',
     correctionMessage: 'Add itemExtent or prototypeItem for better scrolling performance.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _largeListThreshold = 100;
@@ -851,7 +851,7 @@ class RequireImageCacheDimensionsRule extends DartLintRule {
     name: 'require_image_cache_dimensions',
     problemMessage: 'Network image should specify cache dimensions.',
     correctionMessage: 'Add cacheWidth/cacheHeight to reduce memory usage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -910,7 +910,7 @@ class PreferImagePrecacheRule extends DartLintRule {
     name: 'prefer_image_precache',
     problemMessage: 'Consider precaching large or hero images.',
     correctionMessage: 'Use precacheImage() in didChangeDependencies for smoother UX.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _heroIndicators = <String>{
@@ -985,7 +985,7 @@ class AvoidControllerInBuildRule extends DartLintRule {
     name: 'avoid_controller_in_build',
     problemMessage: 'Controller should not be created in build method.',
     correctionMessage: 'Create controllers as class fields and dispose them properly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _controllerTypes = <String>{
@@ -1067,7 +1067,7 @@ class AvoidSetStateInBuildRule extends DartLintRule {
     name: 'avoid_setstate_in_build',
     problemMessage: 'setState should not be called in build method.',
     correctionMessage: 'Use addPostFrameCallback or move state changes to event handlers.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   @override
