@@ -9,7 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -44,13 +44,13 @@ class RequireNotifyListenersRule extends DartLintRule {
     name: 'require_notify_listeners',
     problemMessage: 'ChangeNotifier method modifies state but does not call notifyListeners.',
     correctionMessage: 'Add notifyListeners() after state modifications.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -58,7 +58,7 @@ class RequireNotifyListenersRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (superName != 'ChangeNotifier') return;
 
       // Check each method that modifies state
@@ -70,7 +70,7 @@ class RequireNotifyListenersRule extends DartLintRule {
     });
   }
 
-  void _checkMethod(MethodDeclaration method, ErrorReporter reporter) {
+  void _checkMethod(MethodDeclaration method, DiagnosticReporter reporter) {
     // Skip getters and constructors
     if (method.isGetter || method.isStatic) return;
 
@@ -149,13 +149,13 @@ class RequireStreamControllerDisposeRule extends DartLintRule {
     name: 'require_stream_controller_dispose',
     problemMessage: 'StreamController is not closed in dispose.',
     correctionMessage: 'Add controller.close() in dispose method.',
-    errorSeverity: ErrorSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -163,7 +163,7 @@ class RequireStreamControllerDisposeRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('State')) return;
 
       // Find StreamController fields
@@ -273,13 +273,13 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
     name: 'require_value_notifier_dispose',
     problemMessage: 'ValueNotifier is not disposed.',
     correctionMessage: 'Add notifier.dispose() in dispose method.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -287,7 +287,7 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('State')) return;
 
       // Find ValueNotifier fields
@@ -396,13 +396,13 @@ class RequireMountedCheckRule extends DartLintRule {
     name: 'require_mounted_check',
     problemMessage: 'setState called after await without mounted check.',
     correctionMessage: 'Add "if (!mounted) return;" before setState.',
-    errorSeverity: ErrorSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -416,7 +416,7 @@ class RequireMountedCheckRule extends DartLintRule {
       final ExtendsClause? extendsClause = classDecl.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('State')) return;
 
       // Look for await expressions followed by setState without mounted check
@@ -428,7 +428,7 @@ class RequireMountedCheckRule extends DartLintRule {
 class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
   _AsyncSetStateVisitor(this.reporter, this.code);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
   bool _sawAwait = false;
   bool _hasMountedCheck = false;
@@ -483,13 +483,13 @@ class AvoidWatchInCallbacksRule extends DartLintRule {
     name: 'avoid_watch_in_callbacks',
     problemMessage: 'Avoid using watch inside callbacks.',
     correctionMessage: 'Use read instead of watch in event handlers.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -538,13 +538,13 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
     name: 'avoid_bloc_event_in_constructor',
     problemMessage: 'Avoid adding BLoC events in constructor.',
     correctionMessage: 'Add initial events from the widget that creates the BLoC.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -555,7 +555,7 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
       final ExtendsClause? extendsClause = classDecl.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('Bloc') && !superName.contains('Cubit')) return;
 
       // Check for add() calls in constructor body
@@ -568,7 +568,7 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
 class _AddCallVisitor extends RecursiveAstVisitor<void> {
   _AddCallVisitor(this.reporter, this.code);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -607,13 +607,13 @@ class RequireUpdateShouldNotifyRule extends DartLintRule {
     name: 'require_update_should_notify',
     problemMessage: 'InheritedWidget should override updateShouldNotify.',
     correctionMessage: 'Add updateShouldNotify to control when dependents rebuild.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -621,7 +621,7 @@ class RequireUpdateShouldNotifyRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('InheritedWidget') &&
           !superName.contains('InheritedNotifier') &&
           !superName.contains('InheritedModel')) {
@@ -669,7 +669,7 @@ class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
     name: 'avoid_global_riverpod_providers',
     problemMessage: 'Consider scoping Riverpod providers appropriately.',
     correctionMessage: 'Document provider scope or use ProviderScope for isolation.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -686,7 +686,7 @@ class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTopLevelVariableDeclaration((
@@ -743,13 +743,13 @@ class AvoidStatefulWithoutStateRule extends DartLintRule {
     name: 'avoid_stateful_without_state',
     problemMessage: 'StatefulWidget has no state fields - consider StatelessWidget.',
     correctionMessage: 'Convert to StatelessWidget if no state is being managed.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -757,7 +757,7 @@ class AvoidStatefulWithoutStateRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.startsWith('State')) return;
 
       // Check if has any non-final fields (actual state)
@@ -818,13 +818,13 @@ class AvoidGlobalKeyInBuildRule extends DartLintRule {
     name: 'avoid_global_key_in_build',
     problemMessage: 'GlobalKey should not be created in build method.',
     correctionMessage: 'Create GlobalKey as a class field instead.',
-    errorSeverity: ErrorSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -838,7 +838,7 @@ class AvoidGlobalKeyInBuildRule extends DartLintRule {
 class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
   _GlobalKeyVisitor(this.reporter, this.code);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override

@@ -95,8 +95,24 @@ def enable_ansi_support() -> None:
     if sys.platform == "win32":
         try:
             import ctypes
+            from ctypes import wintypes
+
             kernel32 = ctypes.windll.kernel32
-            kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
+
+            # Constants
+            STD_OUTPUT_HANDLE = -11
+            ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+
+            # Get stdout handle
+            handle = kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+
+            # Get current console mode
+            mode = wintypes.DWORD()
+            kernel32.GetConsoleMode(handle, ctypes.byref(mode))
+
+            # Enable virtual terminal processing
+            new_mode = mode.value | ENABLE_VIRTUAL_TERMINAL_PROCESSING
+            kernel32.SetConsoleMode(handle, new_mode)
         except Exception:
             pass
 
@@ -104,24 +120,24 @@ def enable_ansi_support() -> None:
 # cspell: disable
 def show_saropa_logo() -> None:
     """Display the Saropa 'S' logo in ASCII art."""
-    logo = r"""
-[38;5;208m                               ....[0m
-[38;5;208m                       `-+shdmNMMMMNmdhs+-[0m
-[38;5;209m                    -odMMMNyo/-..````.++:+o+/-[0m
-[38;5;215m                 `/dMMMMMM/`           ``````````[0m
-[38;5;220m                `dMMMMMMMMNdhhhdddmmmNmmddhs+-[0m
-[38;5;226m                /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh/[0m
-[38;5;190m              . :sdmNNNNMMMMMNNNMMMMMMMMMMMMMMMMm+[0m
-[38;5;154m              o     `..~~~::~+==+~:/+sdNMMMMMMMMMMMo[0m
-[38;5;118m              m                        .+NMMMMMMMMMN[0m
-[38;5;123m              m+                         :MMMMMMMMMm[0m
-[38;5;87m              /N:                        :MMMMMMMMM/[0m
-[38;5;51m               oNs.                    `+NMMMMMMMMo[0m
-[38;5;45m                :dNy/.              ./smMMMMMMMMm:[0m
-[38;5;39m                 `/dMNmhyso+++oosydNNMMMMMMMMMd/[0m
-[38;5;33m                    .odMMMMMMMMMMMMMMMMMMMMdo-[0m
-[38;5;57m                       `-+shdNNMMMMNNdhs+-[0m
-[38;5;57m                               ````[0m
+    logo = """
+\033[38;5;208m                               ....\033[0m
+\033[38;5;208m                       `-+shdmNMMMMNmdhs+-\033[0m
+\033[38;5;209m                    -odMMMNyo/-..````.++:+o+/-\033[0m
+\033[38;5;215m                 `/dMMMMMM/`           ``````````\033[0m
+\033[38;5;220m                `dMMMMMMMMNdhhhdddmmmNmmddhs+-\033[0m
+\033[38;5;226m                /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh/\033[0m
+\033[38;5;190m              . :sdmNNNNMMMMMNNNMMMMMMMMMMMMMMMMm+\033[0m
+\033[38;5;154m              o     `..~~~::~+==+~:/+sdNMMMMMMMMMMMo\033[0m
+\033[38;5;118m              m                        .+NMMMMMMMMMN\033[0m
+\033[38;5;123m              m+                         :MMMMMMMMMm\033[0m
+\033[38;5;87m              /N:                        :MMMMMMMMM/\033[0m
+\033[38;5;51m               oNs.                    `+NMMMMMMMMo\033[0m
+\033[38;5;45m                :dNy/.              ./smMMMMMMMMm:\033[0m
+\033[38;5;39m                 `/dMNmhyso+++oosydNNMMMMMMMMMd/\033[0m
+\033[38;5;33m                    .odMMMMMMMMMMMMMMMMMMMMdo-\033[0m
+\033[38;5;57m                       `-+shdNNMMMMNNdhs+-\033[0m
+\033[38;5;57m                               ````\033[0m
 """
     print(logo)
     current_year = datetime.now().year
