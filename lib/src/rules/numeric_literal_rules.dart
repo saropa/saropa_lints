@@ -112,7 +112,8 @@ class AvoidUnnecessaryDigitSeparatorsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_digit_separators',
     problemMessage: 'Unnecessary or poorly placed digit separator.',
-    correctionMessage: 'Use digit separators consistently for large numbers only.',
+    correctionMessage:
+        'Use digit separators consistently for large numbers only.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -335,7 +336,8 @@ class NoMagicStringRule extends DartLintRule {
       if (current is VariableDeclarationList && current.isConst) return true;
       if (current is InstanceCreationExpression && current.isConst) return true;
       if (current is ListLiteral && current.constKeyword != null) return true;
-      if (current is SetOrMapLiteral && current.constKeyword != null) return true;
+      if (current is SetOrMapLiteral && current.constKeyword != null)
+        return true;
       current = current.parent;
     }
     return false;

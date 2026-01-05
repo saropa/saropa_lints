@@ -79,7 +79,8 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_collection_methods_with_unrelated_types',
     problemMessage: 'Collection method called with unrelated type.',
-    correctionMessage: 'The argument type cannot match any element in the collection.',
+    correctionMessage:
+        'The argument type cannot match any element in the collection.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -147,7 +148,10 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
 
   bool _areUnrelatedTypes(String type1, String type2) {
     // Skip dynamic/Object comparisons
-    if (type1 == 'dynamic' || type2 == 'dynamic' || type1 == 'Object' || type2 == 'Object') {
+    if (type1 == 'dynamic' ||
+        type2 == 'dynamic' ||
+        type1 == 'Object' ||
+        type2 == 'Object') {
       return false;
     }
 
@@ -184,7 +188,8 @@ class AvoidDynamicRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic',
     problemMessage: "Avoid using 'dynamic' type.",
-    correctionMessage: 'Use a specific type, Object, or a generic type instead.',
+    correctionMessage:
+        'Use a specific type, Object, or a generic type instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -234,7 +239,8 @@ class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry
+        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final ImplementsClause? implementsClause = node.implementsClause;
 
       // Check if it implements Object
@@ -305,7 +311,8 @@ class AvoidNullableParametersWithDefaultValuesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_parameters_with_default_values',
     problemMessage: 'Parameter with default value should not be nullable.',
-    correctionMessage: 'Remove the ? from the type since it has a non-null default.',
+    correctionMessage:
+        'Remove the ? from the type since it has a non-null default.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -546,7 +553,9 @@ class AvoidUnnecessaryTypeCastsRule extends DartLintRule {
       // Also check by display name for common cases
       final String exprTypeName = expressionType.getDisplayString();
       final String castTypeName = castType.getDisplayString();
-      if (exprTypeName == castTypeName && !castType.isDartCoreObject && castTypeName != 'dynamic') {
+      if (exprTypeName == castTypeName &&
+          !castType.isDartCoreObject &&
+          castTypeName != 'dynamic') {
         reporter.atNode(node, code);
       }
     });
@@ -693,7 +702,8 @@ class PreferCorrectTypeNameRule extends DartLintRule {
       checkName(node.name);
     });
 
-    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry
+        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       checkName(node.name);
     });
 
@@ -741,7 +751,8 @@ class PreferExplicitFunctionTypeRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_function_type',
     problemMessage: 'Use explicit function type instead of bare "Function".',
-    correctionMessage: 'Specify the function signature (e.g., void Function()).',
+    correctionMessage:
+        'Specify the function signature (e.g., void Function()).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

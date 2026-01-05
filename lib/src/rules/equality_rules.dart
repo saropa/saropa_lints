@@ -28,7 +28,8 @@ class AvoidEqualExpressionsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_equal_expressions',
     problemMessage: 'Both sides of the binary expression are identical.',
-    correctionMessage: 'This is likely a bug. Use different expressions on each side.',
+    correctionMessage:
+        'This is likely a bug. Use different expressions on each side.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -119,7 +120,8 @@ class AvoidSelfAssignmentRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_self_assignment',
     problemMessage: 'Variable is assigned to itself.',
-    correctionMessage: 'Remove the self-assignment or assign a different value.',
+    correctionMessage:
+        'Remove the self-assignment or assign a different value.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -218,10 +220,12 @@ class AvoidUnnecessaryCompareToRule extends DartLintRule {
       MethodInvocation? compareToCall;
       IntegerLiteral? zeroLiteral;
 
-      if (node.leftOperand is MethodInvocation && node.rightOperand is IntegerLiteral) {
+      if (node.leftOperand is MethodInvocation &&
+          node.rightOperand is IntegerLiteral) {
         compareToCall = node.leftOperand as MethodInvocation;
         zeroLiteral = node.rightOperand as IntegerLiteral;
-      } else if (node.rightOperand is MethodInvocation && node.leftOperand is IntegerLiteral) {
+      } else if (node.rightOperand is MethodInvocation &&
+          node.leftOperand is IntegerLiteral) {
         compareToCall = node.rightOperand as MethodInvocation;
         zeroLiteral = node.leftOperand as IntegerLiteral;
       }

@@ -52,7 +52,9 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
   ) {
     // Skip test files and generated files
     final String path = resolver.source.fullName;
-    if (path.contains('_test.dart') || path.contains('.g.dart') || path.contains('.freezed.dart')) {
+    if (path.contains('_test.dart') ||
+        path.contains('.g.dart') ||
+        path.contains('.freezed.dart')) {
       return;
     }
 
@@ -138,11 +140,13 @@ class RequireLocaleAwareFormattingRule extends DartLintRule {
       final String methodName = node.methodName.name;
 
       // Check for manual number formatting
-      if (methodName == 'toStringAsFixed' || methodName == 'toStringAsPrecision') {
+      if (methodName == 'toStringAsFixed' ||
+          methodName == 'toStringAsPrecision') {
         // Check if inside a Text widget or string interpolation
         AstNode? current = node.parent;
         while (current != null) {
-          if (current is InterpolationExpression || current is StringInterpolation) {
+          if (current is InterpolationExpression ||
+              current is StringInterpolation) {
             reporter.atNode(node, code);
             return;
           }
@@ -430,7 +434,8 @@ class AvoidStringConcatenationInUiRule extends DartLintRule {
     DiagnosticReporter reporter,
   ) {
     // Check if either operand is a string literal
-    if (expr.leftOperand is SimpleStringLiteral || expr.rightOperand is SimpleStringLiteral) {
+    if (expr.leftOperand is SimpleStringLiteral ||
+        expr.rightOperand is SimpleStringLiteral) {
       reporter.atNode(expr, code);
     }
   }
@@ -459,7 +464,8 @@ class AvoidTextInImagesRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_in_images',
-    problemMessage: 'Image path suggests embedded text that cannot be localized.',
+    problemMessage:
+        'Image path suggests embedded text that cannot be localized.',
     correctionMessage: 'Use locale-specific images or text overlays.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -549,11 +555,14 @@ class AvoidHardcodedAppNameRule extends DartLintRule {
           if (arg.expression is InstanceCreationExpression) {
             final InstanceCreationExpression textWidget =
                 arg.expression as InstanceCreationExpression;
-            final String? textName = textWidget.constructorName.type.element?.name;
+            final String? textName =
+                textWidget.constructorName.type.element?.name;
 
             if (textName == 'Text') {
-              final NodeList<Expression> textArgs = textWidget.argumentList.arguments;
-              if (textArgs.isNotEmpty && textArgs.first is SimpleStringLiteral) {
+              final NodeList<Expression> textArgs =
+                  textWidget.argumentList.arguments;
+              if (textArgs.isNotEmpty &&
+                  textArgs.first is SimpleStringLiteral) {
                 // AppBar title with hardcoded string
                 reporter.atNode(textArgs.first, code);
               }

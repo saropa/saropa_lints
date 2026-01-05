@@ -44,7 +44,8 @@ class AvoidServiceLocatorInWidgetsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_in_widgets',
     problemMessage: 'Avoid accessing service locator directly in widgets.',
-    correctionMessage: 'Inject dependencies through constructor or use Provider/Riverpod.',
+    correctionMessage:
+        'Inject dependencies through constructor or use Provider/Riverpod.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -121,7 +122,8 @@ class AvoidTooManyDependenciesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_too_many_dependencies',
     problemMessage: 'Class has too many constructor dependencies.',
-    correctionMessage: 'Consider splitting into smaller classes or using a facade pattern.',
+    correctionMessage:
+        'Consider splitting into smaller classes or using a facade pattern.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -220,7 +222,8 @@ class AvoidInternalDependencyCreationRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
     problemMessage: 'Dependencies should be injected, not created internally.',
-    correctionMessage: 'Accept the dependency as a constructor parameter instead.',
+    correctionMessage:
+        'Accept the dependency as a constructor parameter instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -250,7 +253,8 @@ class AvoidInternalDependencyCreationRule extends DartLintRule {
         if (initializer == null) continue;
 
         if (initializer is InstanceCreationExpression) {
-          final String? typeName = initializer.constructorName.type.element?.name;
+          final String? typeName =
+              initializer.constructorName.type.element?.name;
           if (typeName != null) {
             for (final String suffix in _dependencySuffixes) {
               if (typeName.endsWith(suffix)) {
@@ -290,8 +294,10 @@ class PreferAbstractDependenciesRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_dependencies',
-    problemMessage: 'Depend on abstractions rather than concrete implementations.',
-    correctionMessage: 'Use an interface or abstract class for better testability.',
+    problemMessage:
+        'Depend on abstractions rather than concrete implementations.',
+    correctionMessage:
+        'Use an interface or abstract class for better testability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -374,7 +380,8 @@ class AvoidSingletonForScopedDependenciesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_for_scoped_dependencies',
     problemMessage: 'This dependency should be scoped, not a singleton.',
-    correctionMessage: 'Use registerFactory or registerLazySingleton with proper scoping.',
+    correctionMessage:
+        'Use registerFactory or registerLazySingleton with proper scoping.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -451,7 +458,8 @@ class AvoidCircularDiDependenciesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_di_dependencies',
     problemMessage: 'Potential circular dependency detected.',
-    correctionMessage: 'Refactor to break the cycle using interfaces or events.',
+    correctionMessage:
+        'Refactor to break the cycle using interfaces or events.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -507,8 +515,10 @@ class AvoidCircularDiDependenciesRule extends DartLintRule {
     for (final String pattern in patterns) {
       if (className.endsWith(pattern) && dependencyType.endsWith(pattern)) {
         // Check if names suggest relationship
-        final String classBase = className.substring(0, className.length - pattern.length);
-        final String depBase = dependencyType.substring(0, dependencyType.length - pattern.length);
+        final String classBase =
+            className.substring(0, className.length - pattern.length);
+        final String depBase =
+            dependencyType.substring(0, dependencyType.length - pattern.length);
 
         if (classBase.contains(depBase) || depBase.contains(classBase)) {
           return true;
@@ -552,7 +562,8 @@ class PreferNullObjectPatternRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_null_object_pattern',
-    problemMessage: 'Consider using null object pattern for optional dependency.',
+    problemMessage:
+        'Consider using null object pattern for optional dependency.',
     correctionMessage: 'Provide a no-op implementation instead of using null.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -613,7 +624,8 @@ class RequireTypedDiRegistrationRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_typed_di_registration',
     problemMessage: 'DI registration should have explicit type parameter.',
-    correctionMessage: 'Add type parameter like registerSingleton<Type>(instance).',
+    correctionMessage:
+        'Add type parameter like registerSingleton<Type>(instance).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

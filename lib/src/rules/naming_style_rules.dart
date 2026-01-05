@@ -302,7 +302,8 @@ class MatchGetterSetterFieldNamesRule extends DartLintRule {
               if (fieldName.startsWith('_')) {
                 // Expected getter name is field without underscore
                 final String expectedName = fieldName.substring(1);
-                if (getterName != expectedName && privateFields.contains(fieldName)) {
+                if (getterName != expectedName &&
+                    privateFields.contains(fieldName)) {
                   reporter.atToken(member.name, code);
                 }
               }
@@ -376,8 +377,10 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'match_positional_field_names_on_assignment',
-    problemMessage: 'Positional field name should match the variable being assigned.',
-    correctionMessage: 'Rename the positional field to match the assignment target.',
+    problemMessage:
+        'Positional field name should match the variable being assigned.',
+    correctionMessage:
+        'Rename the positional field to match the assignment target.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -394,7 +397,8 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
       }
     });
 
-    context.registry.addPatternVariableDeclaration((PatternVariableDeclaration node) {
+    context.registry
+        .addPatternVariableDeclaration((PatternVariableDeclaration node) {
       final DartPattern pattern = node.pattern;
       if (pattern is RecordPattern) {
         _checkRecordPattern(pattern, reporter);
@@ -439,8 +443,10 @@ class PreferBooleanPrefixesRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes',
-    problemMessage: 'Boolean variable should have a prefix (is/has/can/should/will/did).',
-    correctionMessage: 'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+    problemMessage:
+        'Boolean variable should have a prefix (is/has/can/should/will/did).',
+    correctionMessage:
+        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -484,7 +490,8 @@ class PreferBooleanPrefixesRule extends DartLintRule {
 
       final String name = node.name.lexeme;
       // Skip private variables (starting with _)
-      final String checkName = name.startsWith('_') ? name.replaceFirst('_', '') : name;
+      final String checkName =
+          name.startsWith('_') ? name.replaceFirst('_', '') : name;
 
       if (!_hasValidPrefix(checkName)) {
         reporter.atNode(node, code);
@@ -760,7 +767,8 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_identifier_length',
     problemMessage: 'Identifier name length is not ideal.',
-    correctionMessage: 'Use names between 2-30 characters (except common short names).',
+    correctionMessage:
+        'Use names between 2-30 characters (except common short names).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -807,14 +815,16 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
     });
   }
 
-  void _checkIdentifier(String name, AstNode node, DiagnosticReporter reporter) {
+  void _checkIdentifier(
+      String name, AstNode node, DiagnosticReporter reporter) {
     // Skip private names (start with _)
     final String publicName = name.startsWith('_') ? name.substring(1) : name;
 
     if (publicName.isEmpty) return;
 
     // Check minimum length
-    if (publicName.length < _minLength && !_allowedShortNames.contains(publicName)) {
+    if (publicName.length < _minLength &&
+        !_allowedShortNames.contains(publicName)) {
       reporter.atNode(node, code);
       return;
     }
@@ -999,7 +1009,8 @@ class PreferPrefixedGlobalConstantsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_prefixed_global_constants',
     problemMessage: 'Global constant should have a descriptive prefix.',
-    correctionMessage: 'Consider prefixing with "k" or using a descriptive name.',
+    correctionMessage:
+        'Consider prefixing with "k" or using a descriptive name.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1115,7 +1126,8 @@ class PreferNamedExtensionsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_named_extensions',
     problemMessage: 'Anonymous extension should be named.',
-    correctionMessage: 'Add a name to the extension for better debugging and documentation.',
+    correctionMessage:
+        'Add a name to the extension for better debugging and documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1156,7 +1168,8 @@ class PreferTypedefForCallbacksRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typedef_for_callbacks',
     problemMessage: 'Consider using typedef for repeated function types.',
-    correctionMessage: 'Create a typedef for this function type to improve readability.',
+    correctionMessage:
+        'Create a typedef for this function type to improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1167,16 +1180,20 @@ class PreferTypedefForCallbacksRule extends DartLintRule {
     CustomLintContext context,
   ) {
     // Track function type signatures to find repeats
-    final Map<String, List<GenericFunctionType>> signatures = <String, List<GenericFunctionType>>{};
+    final Map<String, List<GenericFunctionType>> signatures =
+        <String, List<GenericFunctionType>>{};
 
     context.registry.addGenericFunctionType((GenericFunctionType node) {
       final String signature = node.toSource();
-      signatures.putIfAbsent(signature, () => <GenericFunctionType>[]).add(node);
+      signatures
+          .putIfAbsent(signature, () => <GenericFunctionType>[])
+          .add(node);
     });
 
     // After traversal, check for repeats (using compilation unit end)
     context.registry.addCompilationUnit((CompilationUnit unit) {
-      for (final MapEntry<String, List<GenericFunctionType>> entry in signatures.entries) {
+      for (final MapEntry<String, List<GenericFunctionType>> entry
+          in signatures.entries) {
         if (entry.value.length >= 3) {
           // Report on the third and subsequent occurrences
           for (int i = 2; i < entry.value.length; i++) {

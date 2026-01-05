@@ -46,7 +46,8 @@ class RequireFileCloseInFinallyRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_file_close_in_finally',
     problemMessage: 'File handle should be closed in finally block.',
-    correctionMessage: 'Use try-finally or convenience methods like readAsString().',
+    correctionMessage:
+        'Use try-finally or convenience methods like readAsString().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -130,7 +131,8 @@ class RequireDatabaseCloseRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_close',
     problemMessage: 'Database connection should be closed.',
-    correctionMessage: 'Close database in finally block or use connection pool.',
+    correctionMessage:
+        'Close database in finally block or use connection pool.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -355,14 +357,16 @@ class RequireWebSocketCloseRule extends DartLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource();
-          if (fieldSource.contains('WebSocket') || fieldSource.contains('WebSocketChannel')) {
+          if (fieldSource.contains('WebSocket') ||
+              fieldSource.contains('WebSocketChannel')) {
             hasWebSocket = true;
           }
         }
 
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.body.toSource();
-          if (disposeSource.contains('.close(') || disposeSource.contains('.sink.close')) {
+          if (disposeSource.contains('.close(') ||
+              disposeSource.contains('.sink.close')) {
             hasDisposeClose = true;
           }
         }
@@ -514,7 +518,8 @@ class RequireIsolateKillRule extends DartLintRule {
       final String classSource = node.toSource();
 
       // Check for Isolate.spawn
-      if (!classSource.contains('Isolate.spawn') && !classSource.contains('Isolate.spawnUri')) {
+      if (!classSource.contains('Isolate.spawn') &&
+          !classSource.contains('Isolate.spawnUri')) {
         return;
       }
 
