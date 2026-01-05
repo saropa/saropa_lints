@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2025-01-05
+
 ### Added
 
 - Test infrastructure with unit tests (`test/`) and lint rule fixtures (`example/lib/`)
@@ -28,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated SECURITY.md for saropa_lints package (was templated for mobile app)
 - Updated links.md with saropa_lints development resources
 - Added `analysis_options.yaml` to exclude `example/` from main project analysis
+
+### Fixed
+
+- Doc reference warnings in rule comments (`[i]`, `[0]`, `[length-1]`)
 
 ## [0.1.7] - 2025-01-05
 
