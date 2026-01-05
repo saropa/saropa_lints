@@ -100,7 +100,67 @@ rules:
   avoid_my_anti_pattern: true
 ```
 
-### 4. Add tests
+### 4. Add quick fixes (optional but recommended)
+
+Quick fixes provide IDE code actions that help developers resolve lint issues.
+
+```dart
+class AvoidMyAntiPatternRule extends DartLintRule {
+  // ... rule implementation ...
+
+  @override
+  List<Fix> getFixes() => <Fix>[_MyAntiPatternFix()];
+}
+
+class _MyAntiPatternFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Find the node and apply the fix
+  }
+}
+```
+
+#### Quick Fix Design Principles
+
+**Comment out, don't delete.** When a fix removes code (like debug statements),
+comment it out instead of deleting it. This preserves the developer's intent
+and provides context during code review about what was there and why it was disabled.
+
+```dart
+// GOOD: Comment out to preserve history
+builder.addSimpleReplacement(
+  SourceRange(statement.offset, statement.length),
+  '// ${statement.toSource()}',
+);
+
+// BAD: Deleting loses context
+builder.addDeletion(SourceRange(statement.offset, statement.length));
+```
+
+This principle helps:
+- Code reviewers understand what was changed and why
+- Developers recover the code if needed
+- Maintain a history of debugging attempts
+- Make the fix reversible without version control
+
+#### Quick Fix Requirements
+
+All rules should have quick fixes when feasible:
+
+1. Add `**Quick fix available:**` to the rule's doc comment describing what it does
+2. Fix type guidelines:
+   - **Simple transformations**: Apply directly (e.g., `!(a == b)` → `a != b`)
+   - **Debug/intentional code**: Comment out to preserve developer history
+   - **Complex issues**: Add `// HACK:` comment for manual attention
+3. **All WARNING/ERROR severity rules must have at least a HACK comment fix**
+
+### 5. Add tests
 
 Create `test/rules/my_rule_test.dart`:
 
@@ -149,3 +209,5 @@ test: add tests for avoid_abc rule
 ## Questions?
 
 Open an issue or discussion. We're happy to help!
+
+**Email**: [dev@saropa.com](mailto:dev@saropa.com)
