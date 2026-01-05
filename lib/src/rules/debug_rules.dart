@@ -14,7 +14,7 @@ class AlwaysFailRule extends DartLintRule {
     name: 'always_fail',
     problemMessage: 'This custom lint always fails (test hook).',
     correctionMessage: 'Disable the rule or remove the test lint trigger.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -25,7 +25,6 @@ class AlwaysFailRule extends DartLintRule {
   ) {
     context.registry.addCompilationUnit((CompilationUnit unit) {
       final Token firstToken = unit.beginToken;
-      // Report at the first token to keep the failure deterministic and minimal.
       reporter.atToken(firstToken, code);
     });
   }

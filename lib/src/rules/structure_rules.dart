@@ -589,8 +589,8 @@ class MemberOrderingRule extends DartLintRule {
 /// ```dart
 /// void foo({required String apple, required String zebra}) { }
 /// ```
-class ParametersOrderingRule extends DartLintRule {
-  const ParametersOrderingRule() : super(code: _code);
+class PreferSortedParametersRule extends DartLintRule {
+  const PreferSortedParametersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
