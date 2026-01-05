@@ -24,47 +24,291 @@
 <header id="title">
   <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
-    <li class="self-crumb">saropa_lints package</li>
+    <li><a href="https://github.com/saropa/saropa_lints">saropa_lints package</a></li>
   </ol>
   <div class="self-name">saropa_lints</div>
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
-  <div class="toggle" id="theme-button" title="Toggle brightness">
-    <label for="theme">
-      <input type="checkbox" id="theme" value="light-theme">
-      <span id="dark-theme-button" class="material-symbols-outlined">
-        dark_mode
-      </span>
-      <span id="light-theme-button" class="material-symbols-outlined">
-        light_mode
-      </span>
-    </label>
-  </div>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
 </header>
 <main>
   <div id="dartdoc-main-content" class="main-content">
       
 <section class="desc markdown">
-  <h1 id="saropa-dart-utils">Saropa Dart Utils</h1>
-<!-- markdownlint-disable MD033 - Disable No HTML -->
-<img src="https://raw.githubusercontent.com/saropa/saropa_dart_utils/main/SaropaLogo2019_contrast-1200.png" alt="saropa company logo" style="filter: drop-shadow(0.2em 0.2em 0.13em rgba(68, 68, 68, 0.35));" width="340">
-<!-- [![Saropa Logo](SaropaLogo2019_contrast-1200.png)](https://saropa.com) -->
-<br>
-<br>
-<p>Extra linters 🚀 for catching code smells 🤖 by <a href="https://saropa.com">Saropa</a> 🎈</p>
-<p>💙 Saropa</p>
+  <h1 id="saropa_lints">saropa_lints</h1>
+<p><a href="https://pub.dev/packages/saropa_lints"><img src="https://img.shields.io/pub/v/saropa_lints.svg" alt="pub package"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a></p>
+<p>497 lint rules for Flutter and Dart. MIT licensed. Free forever - no catches.</p>
+<p>This is an active project and we want your input. Found a bug? Think a rule is wrong? Have a better approach? Open an issue or PR. We'd rather fix a bad rule than defend it.</p>
+<h2 id="quick-start">Quick Start</h2>
+<h3 id="1-add-dependencies">1. Add dependencies</h3>
+<pre class="language-yaml"><code class="language-yaml"># pubspec.yaml
+dev_dependencies:
+  custom_lint: ^0.8.0
+  saropa_lints: ^0.1.0
+</code></pre>
+<h3 id="2-enable-custom_lint">2. Enable custom_lint</h3>
+<pre class="language-yaml"><code class="language-yaml"># analysis_options.yaml
+analyzer:
+  plugins:
+    - custom_lint
+</code></pre>
+<h3 id="3-choose-your-tier">3. Choose your tier</h3>
+<pre class="language-yaml"><code class="language-yaml"># analysis_options.yaml
+include: package:saropa_lints/tiers/recommended.yaml
+</code></pre>
+<h3 id="4-run-the-linter">4. Run the linter</h3>
+<pre class="language-bash"><code class="language-bash">dart run custom_lint
+</code></pre>
+<h2 id="the-5-tiers">The 5 Tiers</h2>
+<p>Pick the tier that matches your team:</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Rules</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Essential</strong></td>
+<td>~50</td>
+<td>Every project. Prevents crashes, memory leaks, security holes.</td>
+</tr>
+<tr>
+<td><strong>Recommended</strong></td>
+<td>~150</td>
+<td>Most teams. Adds performance, accessibility, testing basics.</td>
+</tr>
+<tr>
+<td><strong>Professional</strong></td>
+<td>~300</td>
+<td>Enterprise. Adds architecture, documentation, comprehensive testing.</td>
+</tr>
+<tr>
+<td><strong>Comprehensive</strong></td>
+<td>~400</td>
+<td>Quality obsessed. Best practices everywhere.</td>
+</tr>
+<tr>
+<td><strong>Insanity</strong></td>
+<td>497</td>
+<td>Greenfield projects. Every single rule.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="using-a-tier">Using a tier</h3>
+<pre class="language-yaml"><code class="language-yaml"># analysis_options.yaml
+
+# Pick ONE of these:
+include: package:saropa_lints/tiers/essential.yaml
+include: package:saropa_lints/tiers/recommended.yaml      # Most teams start here
+include: package:saropa_lints/tiers/professional.yaml
+include: package:saropa_lints/tiers/comprehensive.yaml
+include: package:saropa_lints/tiers/insanity.yaml
+</code></pre>
+<h3 id="customizing-rules">Customizing rules</h3>
+<p>After including a tier, you can enable or disable specific rules:</p>
+<pre class="language-yaml"><code class="language-yaml">include: package:saropa_lints/tiers/recommended.yaml
+
+custom_lint:
+  rules:
+    # Disable a rule from the tier
+    avoid_hardcoded_strings_in_ui: false
+
+    # Enable a rule from a higher tier
+    require_public_api_documentation: true
+</code></pre>
+<h2 id="rule-categories">Rule Categories</h2>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Flutter Widgets</strong></td>
+<td>Lifecycle, setState, keys, performance</td>
+</tr>
+<tr>
+<td><strong>State Management</strong></td>
+<td>Provider, Riverpod, Bloc patterns</td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>Build optimization, memory, caching</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Credentials, encryption, input validation</td>
+</tr>
+<tr>
+<td><strong>Accessibility</strong></td>
+<td>Screen readers, touch targets, semantics</td>
+</tr>
+<tr>
+<td><strong>Testing</strong></td>
+<td>Assertions, mocking, flaky test prevention</td>
+</tr>
+<tr>
+<td><strong>Architecture</strong></td>
+<td>Clean architecture, DI, SOLID principles</td>
+</tr>
+<tr>
+<td><strong>Error Handling</strong></td>
+<td>Exceptions, logging, recovery</td>
+</tr>
+<tr>
+<td><strong>Async</strong></td>
+<td>Futures, Streams, cancellation</td>
+</tr>
+<tr>
+<td><strong>API &amp; Network</strong></td>
+<td>Timeouts, retries, caching</td>
+</tr>
+<tr>
+<td><strong>Internationalization</strong></td>
+<td>Localization, RTL, plurals</td>
+</tr>
+<tr>
+<td><strong>Documentation</strong></td>
+<td>Public API, examples, deprecation</td>
+</tr>
+</tbody>
+</table>
+<h2 id="performance">Performance</h2>
+<p>Running all 497 rules uses significant memory. The tier system helps:</p>
+<ul>
+<li>Rules set to <code>false</code> are not loaded</li>
+<li>Start with <code>essential</code> or <code>recommended</code></li>
+<li>Upgrade tiers as you fix warnings</li>
+</ul>
+<pre class="language-yaml"><code class="language-yaml"># GOOD: Start with recommended tier
+include: package:saropa_lints/tiers/recommended.yaml
+
+# BAD: Enabling everything at once on a legacy codebase
+include: package:saropa_lints/tiers/insanity.yaml  # May show thousands of warnings
+</code></pre>
+<h2 id="adoption-strategy">Adoption Strategy</h2>
+<h3 id="new-projects">New Projects</h3>
+<p>Start with <code>professional</code> or <code>comprehensive</code>. Fix issues as you write code.</p>
+<h3 id="existing-projects">Existing Projects</h3>
+<ol>
+<li>Enable <code>essential</code>. Fix critical issues first.</li>
+<li>Move to <code>recommended</code>. Fix warnings as you touch files.</li>
+<li>Enable higher tiers when the noise is manageable.</li>
+</ol>
+<h3 id="suppressing-warnings">Suppressing Warnings</h3>
+<p>When a rule doesn't apply to specific code:</p>
+<pre class="language-dart"><code class="language-dart">// ignore: avoid_hardcoded_strings_in_ui
+const debugText = 'DEBUG MODE';
+
+// For entire files:
+// ignore_for_file: avoid_print_in_production
+</code></pre>
+<p>Always add a comment explaining <strong>why</strong> you're suppressing.</p>
+<h2 id="ide-integration">IDE Integration</h2>
+<p>Works automatically in:</p>
+<ul>
+<li><strong>VS Code</strong> with Dart extension</li>
+<li><strong>Android Studio / IntelliJ</strong> with Dart plugin</li>
+<li><strong>Command line</strong> via <code>dart run custom_lint</code></li>
+</ul>
+<p>Issues appear as you type with quick-fix suggestions.</p>
+<h2 id="contributing">Contributing</h2>
+<p>Contributions are welcome. So is criticism.</p>
+<p>If you think a rule is:</p>
+<ul>
+<li><strong>Wrong</strong> - tell us why, we'll fix it or remove it</li>
+<li><strong>Too strict</strong> - maybe it belongs in a higher tier</li>
+<li><strong>Too lenient</strong> - maybe it should be stricter or have options</li>
+<li><strong>Missing</strong> - propose it, or better yet, implement it</li>
+</ul>
+<p>We don't have all the answers. If you've shipped production Flutter apps and have opinions, we want to hear them.</p>
+<h3 id="how-to-contribute">How to contribute</h3>
+<p>See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> for detailed guidelines.</p>
+<p><strong>Adding a new rule:</strong></p>
+<ol>
+<li>Create rule in appropriate <code>lib/src/rules/*.dart</code> file</li>
+<li>Add to the appropriate tier(s) in <code>lib/tiers/*.yaml</code></li>
+<li>Add tests in <code>test/rules/*_test.dart</code></li>
+<li>Update CHANGELOG.md</li>
+</ol>
+<p><strong>Reporting issues:</strong></p>
+<ul>
+<li>Include a minimal code sample that triggers (or should trigger) the rule</li>
+<li>Explain what you expected vs what happened</li>
+<li>If you disagree with a rule's premise, say so directly</li>
+</ul>
+<h3 id="discussing-rules">Discussing rules</h3>
+<p>Not sure if something is a bug or a design decision? Open a discussion issue. We're happy to explain our reasoning and change our minds when presented with good arguments.</p>
+<h2 id="professional-services">Professional Services</h2>
+<p>Optional paid services for teams that want hands-on help:</p>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reports</strong></td>
+<td>Codebase analysis with prioritized findings</td>
+</tr>
+<tr>
+<td><strong>Remediation</strong></td>
+<td>We fix the issues</td>
+</tr>
+<tr>
+<td><strong>Custom Rules</strong></td>
+<td>Rules specific to your codebase</td>
+</tr>
+<tr>
+<td><strong>Training</strong></td>
+<td>Team workshops</td>
+</tr>
+</tbody>
+</table>
+<p>Contact: <a href="https://saropa.com">saropa.com</a></p>
+<h2 id="license">License</h2>
+<p>MIT - see <a href="LICENSE">LICENSE</a>.</p>
+<h2 id="links">Links</h2>
+<ul>
+<li><a href="https://pub.dev/packages/saropa_lints">pub.dev package</a></li>
+<li><a href="https://github.com/saropa/saropa_lints">GitHub repository</a></li>
+<li><a href="https://github.com/saropa/saropa_lints/issues">Issue tracker</a></li>
+<li><a href="https://saropa.com">Saropa website</a></li>
+</ul>
 </section>
 
 
       <section class="summary">
           <h2>Libraries</h2>
         <dl>
+          <dt id="custom_lint_client">
+  <span class="name"><a href="custom_lint_client/">custom_lint_client</a></span> 
+
+</dt>
+<dd>
+</dd>
+
           <dt id="saropa_lints">
   <span class="name"><a href="saropa_lints/">saropa_lints</a></span> 
 
 </dt>
-<dd>Support for doing something awesome.
+<dd>Custom lint rules for Saropa codebase.
 </dd>
 
         </dl>
@@ -78,12 +322,13 @@
   </form>
 </header>
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
-    <li class="self-crumb">saropa_lints package</li>
+    <li><a href="https://github.com/saropa/saropa_lints">saropa_lints package</a></li>
 </ol>
 
     <h5 class="hidden-xs"><span class="package-name">saropa_lints</span> <span class="package-kind">package</span></h5>
     <ol>
       <li class="section-title">Libraries</li>
+      <li><a href="custom_lint_client/">custom_lint_client</a></li>
       <li><a href="saropa_lints/">saropa_lints</a></li>
 </ol>
 
@@ -94,7 +339,7 @@
 <footer>
   <span class="no-break">
     saropa_lints
-      0.0.1
+      0.1.2
   </span>
   
 </footer>
