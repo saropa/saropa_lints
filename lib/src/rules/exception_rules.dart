@@ -225,7 +225,7 @@ class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
       // Check if the type has a custom toString
       if (type is InterfaceType) {
         final bool hasToString = type.element.methods.any(
-          (MethodElement e) => e.name == 'toString' && e.enclosingElement3 == type.element,
+          (MethodElement e) => e.name == 'toString' && (e as Element).enclosingElement3 == type.element,
         );
         if (hasToString) return;
       }
