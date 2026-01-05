@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -39,7 +39,7 @@ class RequireTestAssertionsRule extends DartLintRule {
     name: 'require_test_assertions',
     problemMessage: 'Test has no assertions.',
     correctionMessage: 'Add expect(), verify(), or other assertions.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _assertionMethods = <String>{
@@ -58,7 +58,7 @@ class RequireTestAssertionsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -120,7 +120,7 @@ class AvoidVagueTestDescriptionsRule extends DartLintRule {
     name: 'avoid_vague_test_descriptions',
     problemMessage: 'Test description is too vague.',
     correctionMessage: 'Use descriptive names like "should [action] when [condition]".',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _vaguePatterns = <String>{
@@ -140,7 +140,7 @@ class AvoidVagueTestDescriptionsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -206,7 +206,7 @@ class AvoidRealNetworkCallsInTestsRule extends DartLintRule {
     name: 'avoid_real_network_calls_in_tests',
     problemMessage: 'Test may be making real network calls.',
     correctionMessage: 'Mock HTTP clients and other external dependencies.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _networkPatterns = <String>{
@@ -226,7 +226,7 @@ class AvoidRealNetworkCallsInTestsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -292,13 +292,13 @@ class AvoidHardcodedTestDelaysRule extends DartLintRule {
     name: 'avoid_hardcoded_test_delays',
     problemMessage: 'Test has hardcoded delay which makes tests slow and flaky.',
     correctionMessage: 'Use pumpAndSettle(), stream matchers, or fake timers instead.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -361,13 +361,13 @@ class RequireTestSetupTeardownRule extends DartLintRule {
     name: 'require_test_setup_teardown',
     problemMessage: 'Test file lacks setUp/tearDown for shared resources.',
     correctionMessage: 'Add setUp() and tearDown() to initialize and clean up test state.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -427,7 +427,7 @@ class RequirePumpAfterInteractionRule extends DartLintRule {
     name: 'require_pump_after_interaction',
     problemMessage: 'Widget test may need pump() or pumpAndSettle() after interaction.',
     correctionMessage: 'Call pump() or pumpAndSettle() after tap(), drag(), or other interactions.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _interactionMethods = <String>{
@@ -442,7 +442,7 @@ class RequirePumpAfterInteractionRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -509,7 +509,7 @@ class AvoidProductionConfigInTestsRule extends DartLintRule {
     name: 'avoid_production_config_in_tests',
     problemMessage: 'Test may be using production configuration.',
     correctionMessage: 'Use test-specific or mocked configuration.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _productionPatterns = <String>{
@@ -526,7 +526,7 @@ class AvoidProductionConfigInTestsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files

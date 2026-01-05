@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -36,7 +36,7 @@ class AvoidDirectDataAccessInUiRule extends DartLintRule {
     name: 'avoid_direct_data_access_in_ui',
     problemMessage: 'UI layer should not directly access data layer.',
     correctionMessage: 'Use a ViewModel, Cubit, or Controller to mediate data access.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _dataLayerPatterns = <String>{
@@ -52,7 +52,7 @@ class AvoidDirectDataAccessInUiRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -60,7 +60,7 @@ class AvoidDirectDataAccessInUiRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('Widget') && !superName.contains('State')) {
         return;
       }
@@ -116,7 +116,7 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
     name: 'avoid_business_logic_in_ui',
     problemMessage: 'Business logic should not be in UI layer.',
     correctionMessage: 'Move calculations and business rules to domain/service layer.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _businessLogicIndicators = <String>{
@@ -136,7 +136,7 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -144,7 +144,7 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('Widget') && !superName.contains('State')) {
         return;
       }
@@ -199,13 +199,13 @@ class AvoidCircularDependenciesRule extends DartLintRule {
     name: 'avoid_circular_dependencies',
     problemMessage: 'Potential circular dependency detected.',
     correctionMessage: 'Break the cycle using interfaces, dependency injection, or events.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -278,7 +278,7 @@ class AvoidGodClassRule extends DartLintRule {
     name: 'avoid_god_class',
     problemMessage: 'Class has too many responsibilities.',
     correctionMessage: 'Split into smaller classes with single responsibilities.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const int _maxFields = 15;
@@ -287,7 +287,7 @@ class AvoidGodClassRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -340,7 +340,7 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
     name: 'avoid_ui_in_domain_layer',
     problemMessage: 'Domain layer should not have UI dependencies.',
     correctionMessage: 'Remove Flutter/UI imports from domain models and services.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _uiTypes = <String>{
@@ -356,7 +356,7 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check if file is in domain layer (heuristic based on path)
@@ -421,13 +421,13 @@ class AvoidCrossFeatureDependenciesRule extends DartLintRule {
     name: 'avoid_cross_feature_dependencies',
     problemMessage: 'Feature module depends on another feature.',
     correctionMessage: 'Move shared code to core/shared layer or use dependency injection.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     final String currentPath = resolver.source.fullName;
@@ -485,13 +485,13 @@ class AvoidSingletonPatternRule extends DartLintRule {
     name: 'avoid_singleton_pattern',
     problemMessage: 'Singleton pattern makes testing difficult.',
     correctionMessage: 'Use dependency injection container instead of static singletons.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {

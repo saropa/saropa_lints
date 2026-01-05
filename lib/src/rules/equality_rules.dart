@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -29,13 +29,13 @@ class AvoidEqualExpressionsRule extends DartLintRule {
     name: 'avoid_equal_expressions',
     problemMessage: 'Both sides of the binary expression are identical.',
     correctionMessage: 'This is likely a bug. Use different expressions on each side.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -75,13 +75,13 @@ class AvoidNegationsInEqualityChecksRule extends DartLintRule {
     name: 'avoid_negations_in_equality_checks',
     problemMessage: 'Use != instead of negating == comparison.',
     correctionMessage: 'Replace !(a == b) with a != b.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -120,13 +120,13 @@ class AvoidSelfAssignmentRule extends DartLintRule {
     name: 'avoid_self_assignment',
     problemMessage: 'Variable is assigned to itself.',
     correctionMessage: 'Remove the self-assignment or assign a different value.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -163,13 +163,13 @@ class AvoidSelfCompareRule extends DartLintRule {
     name: 'avoid_self_compare',
     problemMessage: 'Variable is compared to itself.',
     correctionMessage: 'Use isNaN for NaN checks, or compare different values.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -201,13 +201,13 @@ class AvoidUnnecessaryCompareToRule extends DartLintRule {
     name: 'avoid_unnecessary_compare_to',
     problemMessage: 'Use == instead of compareTo() == 0.',
     correctionMessage: 'Replace compareTo(x) == 0 with == x.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -257,13 +257,13 @@ class NoEqualArgumentsRule extends DartLintRule {
     name: 'no_equal_arguments',
     problemMessage: 'Same argument passed multiple times.',
     correctionMessage: 'Check if this is intentional or a copy-paste error.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addArgumentList((ArgumentList node) {

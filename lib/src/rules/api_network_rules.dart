@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -37,13 +37,13 @@ class RequireHttpStatusCheckRule extends DartLintRule {
     name: 'require_http_status_check',
     problemMessage: 'HTTP response status should be checked.',
     correctionMessage: 'Check response.statusCode before processing body.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -91,13 +91,13 @@ class RequireApiTimeoutRule extends DartLintRule {
     name: 'require_api_timeout',
     problemMessage: 'API call should have a timeout configured.',
     correctionMessage: 'Add .timeout() or configure timeout in options.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -175,7 +175,7 @@ class AvoidHardcodedApiUrlsRule extends DartLintRule {
     name: 'avoid_hardcoded_api_urls',
     problemMessage: 'API URL should not be hardcoded.',
     correctionMessage: 'Use configuration constants for API URLs.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static final RegExp _apiUrlPattern = RegExp(
@@ -186,7 +186,7 @@ class AvoidHardcodedApiUrlsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Skip config files
@@ -234,13 +234,13 @@ class RequireRetryLogicRule extends DartLintRule {
     name: 'require_retry_logic',
     problemMessage: 'Network call should have retry logic for transient failures.',
     correctionMessage: 'Use a retry mechanism for network operations.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -297,13 +297,13 @@ class RequireTypedApiResponseRule extends DartLintRule {
     name: 'require_typed_api_response',
     problemMessage: 'API response should be parsed into a typed model.',
     correctionMessage: 'Create a model class and use fromJson/fromMap.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -385,13 +385,13 @@ class RequireConnectivityCheckRule extends DartLintRule {
     name: 'require_connectivity_check',
     problemMessage: 'Consider checking connectivity before network operations.',
     correctionMessage: 'Use Connectivity package to check network status.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -457,13 +457,13 @@ class RequireApiErrorMappingRule extends DartLintRule {
     name: 'require_api_error_mapping',
     problemMessage: 'API errors should be mapped to domain exceptions.',
     correctionMessage: 'Catch specific exceptions and map to domain errors.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTryStatement((TryStatement node) {

@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -31,13 +31,13 @@ class AvoidBitwiseOperatorsWithBooleansRule extends DartLintRule {
     name: 'avoid_bitwise_operators_with_booleans',
     problemMessage: 'Avoid using bitwise operators with boolean operands.',
     correctionMessage: 'Use && instead of & and || instead of |.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -83,13 +83,13 @@ class AvoidCascadeAfterIfNullRule extends DartLintRule {
     name: 'avoid_cascade_after_if_null',
     problemMessage: 'Cascade after ?? may have unexpected precedence.',
     correctionMessage: 'Wrap the ?? expression in parentheses: (a ?? b)..cascade',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCascadeExpression((CascadeExpression node) {
@@ -129,7 +129,7 @@ class AvoidComplexArithmeticExpressionsRule extends DartLintRule {
     name: 'avoid_complex_arithmetic_expressions',
     problemMessage: 'Arithmetic expression has more than $_maxOperators operators.',
     correctionMessage: 'Extract parts into named variables for clarity.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _arithmeticOperators = <String>{
@@ -144,7 +144,7 @@ class AvoidComplexArithmeticExpressionsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -200,13 +200,13 @@ class AvoidComplexConditionsRule extends DartLintRule {
     name: 'avoid_complex_conditions',
     problemMessage: 'Condition has more than $_maxOperators logical operators.',
     correctionMessage: 'Extract parts into named boolean variables.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -275,13 +275,13 @@ class AvoidDuplicateCascadesRule extends DartLintRule {
     name: 'avoid_duplicate_cascades',
     problemMessage: 'Duplicate cascade operation detected.',
     correctionMessage: 'Remove the duplicate or verify this is intentional.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCascadeExpression((CascadeExpression node) {
@@ -326,13 +326,13 @@ class AvoidExcessiveExpressionsRule extends DartLintRule {
     name: 'avoid_excessive_expressions',
     problemMessage: 'Expression has excessive complexity (>$_maxOperators operators).',
     correctionMessage: 'Break into smaller expressions with named variables.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -388,13 +388,13 @@ class AvoidImmediatelyInvokedFunctionsRule extends DartLintRule {
     name: 'avoid_immediately_invoked_functions',
     problemMessage: 'Function is immediately invoked after definition.',
     correctionMessage: 'Extract the logic inline or to a named function.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
@@ -424,13 +424,13 @@ class AvoidNestedShorthandsRule extends DartLintRule {
     name: 'avoid_nested_shorthands',
     problemMessage: 'Avoid nesting shorthand syntax too deeply.',
     correctionMessage: 'Extract nested expressions to improve readability.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConditionalExpression((ConditionalExpression node) {
@@ -486,13 +486,13 @@ class AvoidMultiAssignmentRule extends DartLintRule {
     name: 'avoid_multi_assignment',
     problemMessage: 'Multiple chained assignments detected.',
     correctionMessage: 'Split into separate assignment statements.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -515,13 +515,13 @@ class BinaryExpressionOperandOrderRule extends DartLintRule {
     name: 'binary_expression_operand_order',
     problemMessage: 'Consider reordering operands for readability.',
     correctionMessage: 'Place the variable on the left side of the comparison.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -548,13 +548,13 @@ class PreferMovingToVariableRule extends DartLintRule {
     name: 'prefer_moving_to_variable',
     problemMessage: 'Consider extracting repeated expression to a variable.',
     correctionMessage: 'Extract to a local variable to avoid repetition.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -621,13 +621,13 @@ class PreferParenthesesWithIfNullRule extends DartLintRule {
     name: 'prefer_parentheses_with_if_null',
     problemMessage: 'Add parentheses to clarify if-null expression precedence.',
     correctionMessage: 'Wrap operands in parentheses for clarity.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
