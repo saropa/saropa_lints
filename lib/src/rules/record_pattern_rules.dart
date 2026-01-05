@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -28,7 +28,7 @@ class AvoidBottomTypeInPatternsRule extends DartLintRule {
     name: 'avoid_bottom_type_in_patterns',
     problemMessage: 'Pattern contains bottom type (void, Never, or Null).',
     correctionMessage: 'Bottom types in patterns usually indicate a mistake.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _bottomTypes = <String>{'void', 'Never', 'Null'};
@@ -42,7 +42,7 @@ class AvoidBottomTypeInPatternsRule extends DartLintRule {
     context.registry.addDeclaredVariablePattern((DeclaredVariablePattern node) {
       final TypeAnnotation? type = node.type;
       if (type is NamedType) {
-        final String typeName = type.name.lexeme;
+        final String typeName = type.name2.lexeme;
         if (_bottomTypes.contains(typeName)) {
           reporter.atNode(type, code);
         }
@@ -50,7 +50,7 @@ class AvoidBottomTypeInPatternsRule extends DartLintRule {
     });
 
     context.registry.addObjectPattern((ObjectPattern node) {
-      final String typeName = node.type.name.lexeme;
+      final String typeName = node.type.name2.lexeme;
       if (_bottomTypes.contains(typeName)) {
         reporter.atNode(node.type, code);
       }
@@ -76,7 +76,7 @@ class AvoidBottomTypeInRecordsRule extends DartLintRule {
     name: 'avoid_bottom_type_in_records',
     problemMessage: 'Record contains bottom type (void, Never, or Null) field.',
     correctionMessage: 'Bottom types in records usually indicate a mistake.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _bottomTypes = <String>{'void', 'Never', 'Null'};
@@ -92,7 +92,7 @@ class AvoidBottomTypeInRecordsRule extends DartLintRule {
       for (final RecordTypeAnnotationPositionalField field in node.positionalFields) {
         final TypeAnnotation type = field.type;
         if (type is NamedType) {
-          final String typeName = type.name.lexeme;
+          final String typeName = type.name2.lexeme;
           if (_bottomTypes.contains(typeName)) {
             reporter.atNode(type, code);
           }
@@ -105,7 +105,7 @@ class AvoidBottomTypeInRecordsRule extends DartLintRule {
         for (final RecordTypeAnnotationNamedField field in namedFields.fields) {
           final TypeAnnotation type = field.type;
           if (type is NamedType) {
-            final String typeName = type.name.lexeme;
+            final String typeName = type.name2.lexeme;
             if (_bottomTypes.contains(typeName)) {
               reporter.atNode(type, code);
             }
@@ -139,7 +139,7 @@ class AvoidExplicitPatternFieldNameRule extends DartLintRule {
     problemMessage: 'Explicit pattern field name matches variable name.',
     correctionMessage: 'Use shorthand syntax: `:fieldName` instead of '
         '`fieldName: fieldName`.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -194,7 +194,7 @@ class AvoidExtensionsOnRecordsRule extends DartLintRule {
     name: 'avoid_extensions_on_records',
     problemMessage: 'Extension defined on a Record type.',
     correctionMessage: 'Consider using a class instead of extending a record.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -237,7 +237,7 @@ class AvoidFunctionTypeInRecordsRule extends DartLintRule {
     name: 'avoid_function_type_in_records',
     problemMessage: 'Avoid using Function types directly in records.',
     correctionMessage: 'Define a typedef for the function type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -286,7 +286,7 @@ class AvoidKeywordsInWildcardPatternRule extends DartLintRule {
     name: 'avoid_keywords_in_wildcard_pattern',
     problemMessage: 'Pattern variable uses a Dart keyword.',
     correctionMessage: 'Use a different variable name.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _keywords = <String>{
@@ -390,7 +390,7 @@ class AvoidLongRecordsRule extends DartLintRule {
     name: 'avoid_long_records',
     problemMessage: 'Record has more than $_maxFields fields.',
     correctionMessage: 'Consider using a class for better readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -442,7 +442,7 @@ class AvoidMixingNamedAndPositionalFieldsRule extends DartLintRule {
     name: 'avoid_mixing_named_and_positional_fields',
     problemMessage: 'Record mixes named and positional fields.',
     correctionMessage: 'Use either all named or all positional fields.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -499,7 +499,7 @@ class AvoidNestedRecordsRule extends DartLintRule {
     name: 'avoid_nested_records',
     problemMessage: 'Avoid nested record types.',
     correctionMessage: 'Flatten the record or use a class/typedef instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -549,7 +549,7 @@ class AvoidOneFieldRecordsRule extends DartLintRule {
     name: 'avoid_one_field_records',
     problemMessage: 'Avoid records with only one field.',
     correctionMessage: 'Use the value type directly instead of a record.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -588,7 +588,7 @@ class AvoidPositionalRecordFieldAccessRule extends DartLintRule {
     name: 'avoid_positional_record_field_access',
     problemMessage: 'Avoid accessing positional record fields with \$1, \$2, etc.',
     correctionMessage: 'Use destructuring or named record fields instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -630,7 +630,7 @@ class AvoidRedundantPositionalFieldNameRule extends DartLintRule {
     name: 'avoid_redundant_positional_field_name',
     problemMessage: 'Positional record field uses redundant default name.',
     correctionMessage: 'Use a meaningful name or omit the name entirely.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -679,7 +679,7 @@ class AvoidSingleFieldDestructuringRule extends DartLintRule {
     name: 'avoid_single_field_destructuring',
     problemMessage: 'Avoid destructuring for a single field.',
     correctionMessage: 'Use direct property access instead: final x = obj.x;',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -735,7 +735,7 @@ class MoveRecordsToTypedefsRule extends DartLintRule {
     name: 'move_records_to_typedefs',
     problemMessage: 'Record with >$_maxInlineFields fields should be a typedef.',
     correctionMessage: 'Extract to a typedef for better readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -783,7 +783,7 @@ class PatternFieldsOrderingRule extends DartLintRule {
     name: 'prefer_sorted_pattern_fields',
     problemMessage: 'Pattern fields should be in alphabetical order.',
     correctionMessage: 'Reorder pattern fields alphabetically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -840,7 +840,7 @@ class PreferSimplerPatternsNullCheckRule extends DartLintRule {
     name: 'prefer_simpler_patterns_null_check',
     problemMessage: 'Consider simpler null check pattern.',
     correctionMessage: 'Use != null or final instead of var for null checks.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -887,7 +887,7 @@ class PreferWildcardPatternRule extends DartLintRule {
     name: 'prefer_wildcard_pattern',
     problemMessage: 'Unused pattern variable should use wildcard (_).',
     correctionMessage: 'Replace with _ if the value is not used.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -937,7 +937,7 @@ class RecordFieldsOrderingRule extends DartLintRule {
     name: 'prefer_sorted_record_fields',
     problemMessage: 'Record named fields should be in alphabetical order.',
     correctionMessage: 'Reorder fields alphabetically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

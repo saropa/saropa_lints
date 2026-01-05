@@ -1,9 +1,9 @@
-// ignore_for_file: depend_on_referenced_packages, deprecated_member_use, always_specify_types
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use, always_specify_types, todo
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, ErrorSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -26,7 +26,7 @@ class AvoidEmptySpreadRule extends DartLintRule {
     name: 'avoid_empty_spread',
     problemMessage: 'Empty spread has no effect.',
     correctionMessage: 'Remove the empty spread expression.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -75,7 +75,7 @@ class AvoidUnnecessaryBlockRule extends DartLintRule {
     name: 'avoid_unnecessary_block',
     problemMessage: 'Unnecessary nested block.',
     correctionMessage: 'Remove the extra braces.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -120,7 +120,7 @@ class AvoidUnnecessaryCallRule extends DartLintRule {
     name: 'avoid_unnecessary_call',
     problemMessage: 'Unnecessary explicit .call() invocation.',
     correctionMessage: 'Use implicit call with () instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -165,7 +165,7 @@ class AvoidUnnecessaryConstructorRule extends DartLintRule {
     name: 'avoid_unnecessary_constructor',
     problemMessage: 'Unnecessary constructor. Dart provides a default constructor.',
     correctionMessage: 'Remove the empty constructor.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -235,7 +235,7 @@ class AvoidUnnecessaryEnumArgumentsRule extends DartLintRule {
     name: 'avoid_unnecessary_enum_arguments',
     problemMessage: 'Enum argument matches default value and can be omitted.',
     correctionMessage: 'Remove the argument to use the default value.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -273,7 +273,7 @@ class AvoidUnnecessaryEnumPrefixRule extends DartLintRule {
     name: 'avoid_unnecessary_enum_prefix',
     problemMessage: 'Unnecessary enum name prefix inside enum declaration.',
     correctionMessage: 'Remove the enum name prefix when referencing values.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -404,7 +404,7 @@ class AvoidUnnecessaryExtendsRule extends DartLintRule {
     name: 'avoid_unnecessary_extends',
     problemMessage: 'Unnecessary extends Object.',
     correctionMessage: 'Remove the extends clause.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -417,7 +417,7 @@ class AvoidUnnecessaryExtendsRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superclass = extendsClause.superclass.name.lexeme;
+      final String superclass = extendsClause.superclass.name2.lexeme;
       if (superclass == 'Object') {
         reporter.atNode(extendsClause, code);
       }
@@ -455,7 +455,7 @@ class AvoidUnnecessaryGetterRule extends DartLintRule {
     name: 'avoid_unnecessary_getter',
     problemMessage: 'Getter just returns a final field without additional logic.',
     correctionMessage: 'Consider making the field public or adding meaningful logic.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -534,7 +534,7 @@ class AvoidUnnecessaryLengthCheckRule extends DartLintRule {
     name: 'avoid_unnecessary_length_check',
     problemMessage: 'Use isNotEmpty instead of length comparison.',
     correctionMessage: 'Replace with .isNotEmpty or .isEmpty.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -620,7 +620,7 @@ class AvoidUnnecessaryNegationsRule extends DartLintRule {
     name: 'avoid_unnecessary_negations',
     problemMessage: 'Unnecessary negation can be simplified.',
     correctionMessage: 'Simplify by using the opposite operator or removing double negation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -682,7 +682,7 @@ class AvoidUnnecessarySuperRule extends DartLintRule {
     name: 'avoid_unnecessary_super',
     problemMessage: 'Unnecessary super() call with no arguments.',
     correctionMessage: 'Remove the super() call - it is implicit.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -725,7 +725,7 @@ class NoEmptyBlockRule extends DartLintRule {
     name: 'no_empty_block',
     problemMessage: 'Empty block detected.',
     correctionMessage: 'Add implementation or a comment explaining why it is empty.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -788,7 +788,7 @@ class NoEmptyStringRule extends DartLintRule {
     name: 'no_empty_string',
     problemMessage: 'Avoid empty string literals.',
     correctionMessage: 'Use .isEmpty for comparisons.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
