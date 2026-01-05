@@ -2,7 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -104,6 +105,8 @@ class AvoidCommentedOutCodeRule extends DartLintRule {
 /// ```dart
 /// logger.info('User logged in: $userId');
 /// ```
+///
+/// **Quick fix available:** Comments out the debugPrint statement.
 class AvoidDebugPrintRule extends DartLintRule {
   const AvoidDebugPrintRule() : super(code: _code);
 
@@ -127,6 +130,54 @@ class AvoidDebugPrintRule extends DartLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutDebugPrintFix()];
+}
+
+class _CommentOutDebugPrintFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'debugPrint') return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the statement containing this invocation
+      final AstNode? statement = _findContainingStatement(node);
+      if (statement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out debugPrint statement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Comment out the statement to preserve developer intent history
+        final String originalCode = statement.toSource();
+        builder.addSimpleReplacement(
+          SourceRange(statement.offset, statement.length),
+          '// $originalCode',
+        );
+      });
+    });
+  }
+
+  AstNode? _findContainingStatement(AstNode node) {
+    AstNode? current = node;
+    while (current != null) {
+      if (current is ExpressionStatement) {
+        return current;
+      }
+      current = current.parent;
+    }
+    return null;
   }
 }
 
