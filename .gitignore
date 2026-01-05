@@ -1,40 +1,24 @@
-# Dart/Flutter package gitignore
+# Generated API documentation (pub.dev generates its own)
+doc/
 
-# Files and directories created by pub
+# Dart/Flutter
 .dart_tool/
 .packages
 build/
 pubspec.lock
 
-# Directory created by dartdoc
-doc/api/
-
-# dotenv environment variables file
-.env*
-
-# Generated Javascript files
-*.dart.js
-*.info.json
-*.js
-*.js_
-*.js.deps
-*.js.map
-
 # IDE
 .idea/
 *.iml
-*.ipr
-*.iws
 .vscode/
 
-# Miscellaneous
-*.log
-*.swp
+# OS
 .DS_Store
-.history
-
-# Custom lint log
-custom_lint.log
-/.claude
+Thumbs.db
 nul
-pubspec.lock
+
+# Logs
+*.log
+
+# Claude Code
+.claude/

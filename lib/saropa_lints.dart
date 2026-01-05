@@ -12,6 +12,9 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'package:saropa_lints/src/rules/all_rules.dart';
 
+// Export all rule classes for documentation
+export 'package:saropa_lints/src/rules/all_rules.dart';
+
 /// Entry point for custom_lint
 PluginBase createPlugin() => _SaropaLints();
 
@@ -205,7 +208,7 @@ const List<LintRule> _allRules = <LintRule>[
   MapKeysOrderingRule(),
   MatchClassNamePatternRule(),
   NewlineBeforeCaseRule(),
-  ParametersOrderingRule(),
+  ParametersOrderingConventionRule(),
   PreferCorrectHandlerNameRule(),
   PreferUniqueTestNamesRule(),
   UnnecessaryTrailingCommaRule(),
@@ -224,6 +227,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferBothInliningAnnotationsRule(),
   PreferCommentingFutureDelayedRule(),
   PreferSimplerPatternsNullCheckRule(),
+  PreferSortedParametersRule(),
   PreferVisibleForTestingOnMembersRule(),
   MatchPositionalFieldNamesOnAssignmentRule(),
   MissingUseResultAnnotationRule(),
@@ -559,26 +563,18 @@ const List<LintRule> _allRules = <LintRule>[
   RequireWebSocketCloseRule(),
   RequirePlatformChannelCleanupRule(),
   RequireIsolateKillRule(),
+
+  // New formatting rules
+  AvoidDigitSeparatorsRule(),
+  FormatCommentFormattingRule(),
+  MemberOrderingFormattingRule(),
+  ParametersOrderingConventionRule(),
 ];
 
 class _SaropaLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
-    // If enableAllLintRules is explicitly false, only return rules that are
-    // explicitly enabled in the config
-    final bool enableAll = configs.enableAllLintRules ?? true;
-
-    return _allRules.where((LintRule rule) {
-      final String ruleName = rule.code.name;
-      final LintOptions? options = configs.rules[ruleName];
-
-      // If rule is explicitly configured, use that setting
-      if (options != null) {
-        return options.enabled;
-      }
-
-      // Otherwise, return based on enableAllLintRules setting
-      return enableAll;
-    }).toList();
+    // Return all rules - filtering is done via configs.rules (set rule: false to disable)
+    return _allRules.toList();
   }
 }
