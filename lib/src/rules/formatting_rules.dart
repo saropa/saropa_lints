@@ -57,8 +57,10 @@ class NewlineBeforeCaseRule extends DartLintRule {
 
         // Check if there's a blank line before current case
         final CompilationUnit unit = node.root as CompilationUnit;
-        final int prevEndLine = unit.lineInfo.getLocation(previous.end).lineNumber;
-        final int currStartLine = unit.lineInfo.getLocation(current.offset).lineNumber;
+        final int prevEndLine =
+            unit.lineInfo.getLocation(previous.end).lineNumber;
+        final int currStartLine =
+            unit.lineInfo.getLocation(current.offset).lineNumber;
 
         if (currStartLine - prevEndLine < 2) {
           // Use beginToken to handle SwitchCase, SwitchDefault, and SwitchPatternCase
@@ -125,8 +127,10 @@ class NewlineBeforeConstructorRule extends DartLintRule {
       if (current is! ConstructorDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine = unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine = unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine =
+          unit.lineInfo.getLocation(previous.end).lineNumber;
+      final int currStartLine =
+          unit.lineInfo.getLocation(current.offset).lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -205,8 +209,10 @@ class NewlineBeforeMethodRule extends DartLintRule {
       if (current is! MethodDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine = unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine = unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine =
+          unit.lineInfo.getLocation(previous.end).lineNumber;
+      final int currStartLine =
+          unit.lineInfo.getLocation(current.offset).lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -248,8 +254,10 @@ class NewlineBeforeReturnRule extends DartLintRule {
 
       // Check if previous statement ends on the line immediately before
       final Statement previous = statements[index - 1];
-      final int prevEndLine = resolver.lineInfo.getLocation(previous.end).lineNumber;
-      final int returnStartLine = resolver.lineInfo.getLocation(node.offset).lineNumber;
+      final int prevEndLine =
+          resolver.lineInfo.getLocation(previous.end).lineNumber;
+      final int returnStartLine =
+          resolver.lineInfo.getLocation(node.offset).lineNumber;
 
       if (returnStartLine - prevEndLine < 2) {
         reporter.atNode(node, code);
@@ -439,8 +447,7 @@ class FormatCommentFormattingRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'format_comment',
     problemMessage: 'Comment does not follow formatting conventions.',
-    correctionMessage:
-        'Start with capital letter and end with punctuation.',
+    correctionMessage: 'Start with capital letter and end with punctuation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -612,7 +619,8 @@ class ParametersOrderingConventionRule extends DartLintRule {
     });
   }
 
-  void _checkParameters(FormalParameterList? params, DiagnosticReporter reporter) {
+  void _checkParameters(
+      FormalParameterList? params, DiagnosticReporter reporter) {
     if (params == null) return;
 
     int lastCategory = -1;

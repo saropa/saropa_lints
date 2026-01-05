@@ -36,7 +36,8 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_logging_sensitive_data',
     problemMessage: 'Potential sensitive data in log statement.',
-    correctionMessage: 'Remove sensitive data from logs. Never log passwords, tokens, or PII.',
+    correctionMessage:
+        'Remove sensitive data from logs. Never log passwords, tokens, or PII.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -149,7 +150,8 @@ class RequireSecureStorageRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_secure_storage',
     problemMessage: 'Sensitive data should not be stored in SharedPreferences.',
-    correctionMessage: 'Use flutter_secure_storage or other encrypted storage for sensitive data.',
+    correctionMessage:
+        'Use flutter_secure_storage or other encrypted storage for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -318,7 +320,8 @@ class RequireInputSanitizationRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_input_sanitization',
     problemMessage: 'User input should be validated or sanitized before use.',
-    correctionMessage: 'Validate and sanitize user input to prevent injection attacks.',
+    correctionMessage:
+        'Validate and sanitize user input to prevent injection attacks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -347,14 +350,18 @@ class RequireInputSanitizationRule extends DartLintRule {
       }
 
       // Check for URL loading
-      if (methodName == 'loadUrl' || methodName == 'loadRequest' || methodName == 'launchUrl') {
+      if (methodName == 'loadUrl' ||
+          methodName == 'loadRequest' ||
+          methodName == 'launchUrl') {
         if (node.argumentList.arguments.isEmpty) return;
 
         final Expression firstArg = node.argumentList.arguments.first;
         // If it's a direct variable without validation, flag it
         if (firstArg is SimpleIdentifier) {
           final String name = firstArg.name.toLowerCase();
-          if (name.contains('user') || name.contains('input') || name.contains('param')) {
+          if (name.contains('user') ||
+              name.contains('input') ||
+              name.contains('param')) {
             reporter.atNode(node, code);
           }
         }
@@ -391,8 +398,10 @@ class AvoidWebViewJavaScriptEnabledRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_webview_javascript_enabled',
-    problemMessage: 'WebView with JavaScript enabled may be vulnerable to XSS attacks.',
-    correctionMessage: 'Consider disabling JavaScript or ensure only trusted content is loaded.',
+    problemMessage:
+        'WebView with JavaScript enabled may be vulnerable to XSS attacks.',
+    correctionMessage:
+        'Consider disabling JavaScript or ensure only trusted content is loaded.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -420,7 +429,8 @@ class AvoidWebViewJavaScriptEnabledRule extends DartLintRule {
               name == 'javaScriptEnabled' ||
               name == 'initialSettings') {
             final String argSource = arg.expression.toSource();
-            if (argSource.contains('unrestricted') || argSource.contains('true')) {
+            if (argSource.contains('unrestricted') ||
+                argSource.contains('true')) {
               reporter.atNode(arg, code);
               return;
             }
@@ -460,8 +470,10 @@ class RequireBiometricFallbackRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_biometric_fallback',
-    problemMessage: 'Biometric authentication should have a fallback mechanism.',
-    correctionMessage: 'Set biometricOnly to false or provide an alternative auth method.',
+    problemMessage:
+        'Biometric authentication should have a fallback mechanism.',
+    correctionMessage:
+        'Set biometricOnly to false or provide an alternative auth method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -527,7 +539,8 @@ class AvoidEvalLikePatternsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_eval_like_patterns',
     problemMessage: 'Dynamic code execution pattern detected.',
-    correctionMessage: 'Avoid dynamic code execution. Use static dispatch or explicit mappings.',
+    correctionMessage:
+        'Avoid dynamic code execution. Use static dispatch or explicit mappings.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -589,7 +602,8 @@ class RequireCertificatePinningRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
     problemMessage: 'HttpClient should implement certificate pinning.',
-    correctionMessage: 'Set badCertificateCallback to validate server certificates.',
+    correctionMessage:
+        'Set badCertificateCallback to validate server certificates.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

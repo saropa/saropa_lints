@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -163,7 +164,8 @@ class AvoidUnnecessaryConstructorRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_constructor',
-    problemMessage: 'Unnecessary constructor. Dart provides a default constructor.',
+    problemMessage:
+        'Unnecessary constructor. Dart provides a default constructor.',
     correctionMessage: 'Remove the empty constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -453,8 +455,10 @@ class AvoidUnnecessaryGetterRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_getter',
-    problemMessage: 'Getter just returns a final field without additional logic.',
-    correctionMessage: 'Consider making the field public or adding meaningful logic.',
+    problemMessage:
+        'Getter just returns a final field without additional logic.',
+    correctionMessage:
+        'Consider making the field public or adding meaningful logic.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -507,7 +511,8 @@ class AvoidUnnecessaryGetterRule extends DartLintRule {
           if (body is BlockFunctionBody) {
             final NodeList<Statement> statements = body.block.statements;
             if (statements.length == 1 && statements.first is ReturnStatement) {
-              final ReturnStatement returnStmt = statements.first as ReturnStatement;
+              final ReturnStatement returnStmt =
+                  statements.first as ReturnStatement;
               final Expression? expr = returnStmt.expression;
               if (expr is SimpleIdentifier) {
                 final String fieldName = expr.name;
@@ -619,7 +624,8 @@ class AvoidUnnecessaryNegationsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_negations',
     problemMessage: 'Unnecessary negation can be simplified.',
-    correctionMessage: 'Simplify by using the opposite operator or removing double negation.',
+    correctionMessage:
+        'Simplify by using the opposite operator or removing double negation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -635,7 +641,8 @@ class AvoidUnnecessaryNegationsRule extends DartLintRule {
       final Expression operand = node.operand;
 
       // Check for double negation: !!x
-      if (operand is PrefixExpression && operand.operator.type == TokenType.BANG) {
+      if (operand is PrefixExpression &&
+          operand.operator.type == TokenType.BANG) {
         reporter.atNode(node, code);
         return;
       }
@@ -695,7 +702,8 @@ class AvoidUnnecessarySuperRule extends DartLintRule {
       for (final ConstructorInitializer initializer in node.initializers) {
         if (initializer is SuperConstructorInvocation) {
           // Check if super() has no arguments and no name
-          if (initializer.constructorName == null && initializer.argumentList.arguments.isEmpty) {
+          if (initializer.constructorName == null &&
+              initializer.argumentList.arguments.isEmpty) {
             reporter.atNode(initializer, code);
           }
         }
@@ -724,7 +732,8 @@ class NoEmptyBlockRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'no_empty_block',
     problemMessage: 'Empty block detected.',
-    correctionMessage: 'Add implementation or a comment explaining why it is empty.',
+    correctionMessage:
+        'Add implementation or a comment explaining why it is empty.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
