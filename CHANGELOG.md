@@ -9,15 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Test infrastructure with unit tests (`test/`) and lint rule fixtures (`example/lib/`)
+- Unit tests for plugin instantiation
+- Lint rule test fixtures for `avoid_hardcoded_credentials`, `avoid_unsafe_collection_methods`, `avoid_unsafe_reduce`
+- `TEST_PLAN.md` documenting testing strategy
 - CI workflow for GitHub Actions (analyze, format, test)
 - Style badge for projects using saropa_lints
 - CI status badge in README
 - Badge section in README with copy-paste markdown for users
+- Migration guide for very_good_analysis users (`docs/migration_from_vga.md`)
 
 ### Changed
 
+- Publish script now runs unit tests and custom_lint tests before publishing
+- README: More welcoming tone, clearer introduction
+- README: Added link to VGA migration guide
+- README: Added link to DCM migration guide
 - Updated SECURITY.md for saropa_lints package (was templated for mobile app)
 - Updated links.md with saropa_lints development resources
+- Added `analysis_options.yaml` to exclude `example/` from main project analysis
 
 ## [0.1.7] - 2025-01-05
 
