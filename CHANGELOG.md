@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- CI workflow for GitHub Actions (analyze, format, test)
+- Style badge for projects using saropa_lints
+- CI status badge in README
+- Badge section in README with copy-paste markdown for users
+
+### Changed
+
+- Updated SECURITY.md for saropa_lints package (was templated for mobile app)
+- Updated links.md with saropa_lints development resources
+
+## [0.1.7] - 2025-01-05
+
+### Fixed
+
+- **Critical**: `getLintRules()` now reads tier configuration from `custom_lint.yaml`
+  - Previously ignored `configs` parameter and used hard-coded 25-rule list
+  - Now respects rules enabled/disabled in tier YAML files (essential, recommended, etc.)
+  - Supports `enable_all_lint_rules: true` to enable all 500+ rules
+
 ## [0.1.6] - 2025-01-05
 
 ### Fixed

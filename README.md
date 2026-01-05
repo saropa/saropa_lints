@@ -1,7 +1,9 @@
 # saropa_lints
 
+[![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
 497 lint rules for Flutter and Dart. MIT licensed. Free forever - no catches.
 
@@ -191,6 +193,16 @@ Optional paid services for teams that want hands-on help:
 | **Training** | Team workshops |
 
 Contact: [saropa.com](https://saropa.com)
+
+## Badge
+
+To indicate your project is using `saropa_lints`:
+
+[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
+
+```md
+[![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
+```
 
 ## License
 
