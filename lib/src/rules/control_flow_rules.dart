@@ -2,7 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -258,8 +259,7 @@ class _SimplifyBooleanComparisonFix extends DartFix {
         final bool isEquals = operator == TokenType.EQ_EQ;
 
         if (node.rightOperand is BooleanLiteral) {
-          final bool literalValue =
-              (node.rightOperand as BooleanLiteral).value;
+          final bool literalValue = (node.rightOperand as BooleanLiteral).value;
           final String expr = node.leftOperand.toSource();
           // x == true -> x, x == false -> !x, x != true -> !x, x != false -> x
           if (isEquals == literalValue) {
