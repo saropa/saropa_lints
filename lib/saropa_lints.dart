@@ -499,7 +499,7 @@ const List<LintRule> _allRules = <LintRule>[
   RequireExceptionDocumentationRule(),
   RequireExampleInDocumentationRule(),
 
-  // Testing best practices rules (NEW)
+  // NOTE: always_fail is intentionally NOT here - it's a test hook only best practices rules (NEW)
   RequireTestAssertionsRule(),
   AvoidVagueTestDescriptionsRule(),
   AvoidRealNetworkCallsInTestsRule(),
@@ -573,8 +573,7 @@ const List<LintRule> _allRules = <LintRule>[
 
 /// Rules that are enabled by default (CRITICAL rules only)
 const Set<String> _enabledRules = <String>{
-  // Testing
-  'always_fail',
+  // NOTE: always_fail is intentionally NOT here - it's a test hook only
   // Security
   'avoid_hardcoded_credentials',
   'avoid_logging_sensitive_data',
@@ -615,9 +614,22 @@ const Set<String> _enabledRules = <String>{
 class _SaropaLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
-    // Only return rules that are in the enabled set
     return _allRules.where((LintRule rule) {
-      return _enabledRules.contains(rule.code.name);
+      final String ruleName = rule.code.name;
+      final LintOptions? options = configs.rules[ruleName];
+
+      // If explicitly configured in custom_lint.yaml, use that setting
+      if (options != null) {
+        return options.enabled;
+      }
+
+      // If enableAllLintRules is true, enable all rules
+      if (configs.enableAllLintRules == true) {
+        return true;
+      }
+
+      // Otherwise, fall back to default critical rules
+      return _enabledRules.contains(ruleName);
     }).toList();
   }
 }

@@ -1,0 +1,14 @@
+name: saropa_lints_test_fixtures
+description: Test fixtures for saropa_lints custom lint rules (Dart only)
+publish_to: none
+
+environment:
+  sdk: ">=3.1.0 <4.0.0"
+
+dependencies:
+  crypto: ^3.0.0
+
+dev_dependencies:
+  custom_lint: ^0.8.0
+  saropa_lints:
+    path: ../

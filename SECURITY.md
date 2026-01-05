@@ -1,36 +1,41 @@
-# Security Policy #
+# Security Policy
 
-## Supported Versions ##
+## Supported Versions
 
-We currently only support the latest version of the Saropa Contacts App
-that is found on the Google Play or Apple App stores. Please always keep
-your app updated to ensure you have the latest security patches.
-
-To keep your account secure, always use a high complexity password. And
-be sure never to reuse that password on another app or website, and of
-course don't share that password with anybody. The staff at Saropa will
-never ask for your password, and they have no ability to access your
-data.
-
-If you feel your account may have been compromised or hacked, then
-immediately reset your password and contact us directly at
-[app.security.support@saropa.com].
+We currently support the latest version of saropa_lints published on
+[pub.dev](https://pub.dev/packages/saropa_lints). Please always use
+the latest version to ensure you have any security patches.
 
 | Version | Supported          |
 |---------|--------------------|
-| 1.1.0   | :white_check_mark: |
-| < 1.1.0 | :x:                |
+| 0.1.x   | :white_check_mark: |
+| < 0.1.0 | :x:                |
 
-## Reporting a Vulnerability ##
+## Scope
 
-At Saropa, security is our primary concern, so we welcome all questions
-and concerns.
+saropa_lints is a static analysis package that runs during development.
+It does not:
+- Collect or transmit any data
+- Execute at runtime in production applications
+- Require network access or external services
 
-Email our team directly at [app.security.support@saropa.com]
+The package analyzes your source code locally to provide lint warnings
+and suggestions.
 
-You should expect a response within 2-24 hours. Please do not include any
-personally identifying information in this, or any, email to Saropa.
+## Reporting a Vulnerability
 
-Unless in unusual circumstances, all patches will be made on Thursdays (ET).
+If you discover a security vulnerability in saropa_lints, please report
+it responsibly.
 
-[app.security@saropa.com](mailto:app.security@saropa.com)
+**For security issues:** Email [security@saropa.com](mailto:security@saropa.com)
+
+**For general bugs:** Open an issue at
+[github.com/saropa/saropa_lints/issues](https://github.com/saropa/saropa_lints/issues)
+
+You should expect a response within 48 hours. Please provide:
+- A description of the vulnerability
+- Steps to reproduce the issue
+- Potential impact assessment
+
+We appreciate responsible disclosure and will acknowledge contributors
+in our release notes (unless you prefer to remain anonymous).

@@ -16,7 +16,12 @@
       "Bash($env:GITHUB_TOKEN = \"\")",
       "Bash(gh auth login:*)",
       "Bash(python:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(wc:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(rm:*)",
+      "Bash(dir:*)"
     ]
   }
 }
