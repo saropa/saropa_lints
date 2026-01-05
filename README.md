@@ -5,9 +5,13 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
-497 lint rules for Flutter and Dart. MIT licensed. Free forever - no catches.
+Developed by [Saropa][saropa_link]. Making the world of Dart & Flutter better, one lint at a time.
 
-This is an active project and we want your input. Found a bug? Think a rule is wrong? Have a better approach? Open an issue or PR. We'd rather fix a bad rule than defend it.
+---
+
+This package provides **500+ custom lint rules** for Dart and Flutter, helping you catch bugs, improve accessibility, and write more maintainable code.
+
+[saropa_link]: https://saropa.com
 
 ## Quick Start
 
@@ -152,7 +156,7 @@ Issues appear as you type with quick-fix suggestions.
 
 ## Contributing
 
-Contributions are welcome. So is criticism.
+We believe great tools are built by communities, not companies. Contributions and feedback are always welcome.
 
 If you think a rule is:
 - **Wrong** - tell us why, we'll fix it or remove it
@@ -206,11 +210,14 @@ To indicate your project is using `saropa_lints`:
 
 ## License
 
-MIT - see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE). Use it however you like.
 
-## Links
+---
 
-- [pub.dev package](https://pub.dev/packages/saropa_lints)
-- [GitHub repository](https://github.com/saropa/saropa_lints)
-- [Issue tracker](https://github.com/saropa/saropa_lints/issues)
-- [Saropa website](https://saropa.com)
+Built with care by the Flutter community. Questions? Ideas? We'd love to hear from you.
+
+[pub.dev][pub_link] | [GitHub][github_link] | [Issues][issues_link] | [Saropa][saropa_link]
+
+[pub_link]: https://pub.dev/packages/saropa_lints
+[github_link]: https://github.com/saropa/saropa_lints
+[issues_link]: https://github.com/saropa/saropa_lints/issues
