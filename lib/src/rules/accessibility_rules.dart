@@ -100,8 +100,10 @@ class AvoidSmallTouchTargetsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
-    problemMessage: 'Touch target may be too small. Minimum recommended size is 48x48.',
-    correctionMessage: 'Increase the size to at least 48x48 for better accessibility.',
+    problemMessage:
+        'Touch target may be too small. Minimum recommended size is 48x48.',
+    correctionMessage:
+        'Increase the size to at least 48x48 for better accessibility.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -224,8 +226,10 @@ class RequireExcludeSemanticsJustificationRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_exclude_semantics_justification',
-    problemMessage: 'ExcludeSemantics should have a comment explaining why content is excluded.',
-    correctionMessage: 'Add a comment above ExcludeSemantics explaining the rationale.',
+    problemMessage:
+        'ExcludeSemantics should have a comment explaining why content is excluded.',
+    correctionMessage:
+        'Add a comment above ExcludeSemantics explaining the rationale.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -249,7 +253,8 @@ class RequireExcludeSemanticsJustificationRule extends DartLintRule {
       }
 
       // Look for comments in the compilation unit
-      final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit =
+          node.thisOrAncestorOfType<CompilationUnit>();
       if (unit == null) {
         reporter.atNode(node.constructorName, code);
         return;
@@ -317,8 +322,10 @@ class AvoidColorOnlyIndicatorsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
-    problemMessage: 'Avoid using color alone to convey information. Add icons or text.',
-    correctionMessage: 'Add an icon, text label, or pattern alongside the color indicator.',
+    problemMessage:
+        'Avoid using color alone to convey information. Add icons or text.',
+    correctionMessage:
+        'Add an icon, text label, or pattern alongside the color indicator.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -393,8 +400,10 @@ class AvoidGestureOnlyInteractionsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
-    problemMessage: 'GestureDetector should have keyboard accessibility alternatives.',
-    correctionMessage: 'Wrap with Focus and handle keyboard events, or use a Button widget.',
+    problemMessage:
+        'GestureDetector should have keyboard accessibility alternatives.',
+    correctionMessage:
+        'Wrap with Focus and handle keyboard events, or use a Button widget.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -430,10 +439,13 @@ class AvoidGestureOnlyInteractionsRule extends DartLintRule {
 
       if (!hasKeyboardSupport) {
         // Check if GestureDetector has interactive callbacks
-        final bool hasInteractiveCallback = node.argumentList.arguments.any((Expression arg) {
+        final bool hasInteractiveCallback =
+            node.argumentList.arguments.any((Expression arg) {
           if (arg is NamedExpression) {
             final String name = arg.name.label.name;
-            return name == 'onTap' || name == 'onDoubleTap' || name == 'onLongPress';
+            return name == 'onTap' ||
+                name == 'onDoubleTap' ||
+                name == 'onLongPress';
           }
           return false;
         });
@@ -471,7 +483,8 @@ class RequireSemanticsLabelRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
-    problemMessage: 'Interactive Semantics widget should have a label for screen readers.',
+    problemMessage:
+        'Interactive Semantics widget should have a label for screen readers.',
     correctionMessage: 'Add a label parameter describing the element.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -558,8 +571,10 @@ class AvoidMergedSemanticsHidingInfoRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
-    problemMessage: 'MergeSemantics may hide important information from assistive technologies.',
-    correctionMessage: 'Review if all merged content should be announced together.',
+    problemMessage:
+        'MergeSemantics may hide important information from assistive technologies.',
+    correctionMessage:
+        'Review if all merged content should be announced together.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -645,8 +660,10 @@ class RequireLiveRegionRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_live_region',
-    problemMessage: 'Dynamic content that changes should use Semantics with liveRegion.',
-    correctionMessage: 'Wrap with Semantics(liveRegion: true) to announce changes.',
+    problemMessage:
+        'Dynamic content that changes should use Semantics with liveRegion.',
+    correctionMessage:
+        'Wrap with Semantics(liveRegion: true) to announce changes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -700,8 +717,10 @@ class RequireLiveRegionRule extends DartLintRule {
         if (current is InstanceCreationExpression) {
           final String? parentName = current.constructorName.type.element?.name;
           if (parentName == 'Semantics') {
-            hasLiveRegion = current.argumentList.arguments.any((Expression arg) {
-              if (arg is NamedExpression && arg.name.label.name == 'liveRegion') {
+            hasLiveRegion =
+                current.argumentList.arguments.any((Expression arg) {
+              if (arg is NamedExpression &&
+                  arg.name.label.name == 'liveRegion') {
                 if (arg.expression is BooleanLiteral) {
                   return (arg.expression as BooleanLiteral).value;
                 }
@@ -750,7 +769,8 @@ class RequireHeadingSemanticsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
     problemMessage: 'Section headers should have Semantics with header: true.',
-    correctionMessage: 'Wrap with Semantics(header: true) for screen reader navigation.',
+    correctionMessage:
+        'Wrap with Semantics(header: true) for screen reader navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -851,8 +871,10 @@ class AvoidImageButtonsWithoutTooltipRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
-    problemMessage: 'Image-based interactive elements need a Tooltip or semanticLabel.',
-    correctionMessage: 'Wrap with Tooltip or add Semantics to describe the action.',
+    problemMessage:
+        'Image-based interactive elements need a Tooltip or semanticLabel.',
+    correctionMessage:
+        'Wrap with Tooltip or add Semantics to describe the action.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -889,9 +911,12 @@ class AvoidImageButtonsWithoutTooltipRule extends DartLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           if (arg.expression is InstanceCreationExpression) {
-            final InstanceCreationExpression child = arg.expression as InstanceCreationExpression;
+            final InstanceCreationExpression child =
+                arg.expression as InstanceCreationExpression;
             final String? childName = child.constructorName.type.element?.name;
-            if (childName == 'Image' || childName == 'Icon' || childName == 'SvgPicture') {
+            if (childName == 'Image' ||
+                childName == 'Icon' ||
+                childName == 'SvgPicture') {
               hasImageChild = true;
             }
           }

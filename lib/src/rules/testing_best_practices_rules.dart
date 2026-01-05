@@ -75,7 +75,8 @@ class RequireTestAssertionsRule extends DartLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test body (second argument, usually a function)
-      final Expression? bodyArg = args.arguments.length >= 2 ? args.arguments[1] : null;
+      final Expression? bodyArg =
+          args.arguments.length >= 2 ? args.arguments[1] : null;
 
       if (bodyArg == null) return;
 
@@ -119,7 +120,8 @@ class AvoidVagueTestDescriptionsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_vague_test_descriptions',
     problemMessage: 'Test description is too vague.',
-    correctionMessage: 'Use descriptive names like "should [action] when [condition]".',
+    correctionMessage:
+        'Use descriptive names like "should [action] when [condition]".',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -150,7 +152,9 @@ class AvoidVagueTestDescriptionsRule extends DartLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      if (methodName != 'test' && methodName != 'testWidgets' && methodName != 'group') {
+      if (methodName != 'test' &&
+          methodName != 'testWidgets' &&
+          methodName != 'group') {
         return;
       }
 
@@ -241,7 +245,8 @@ class AvoidRealNetworkCallsInTestsRule extends DartLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg = args.arguments.length >= 2 ? args.arguments[1] : null;
+      final Expression? bodyArg =
+          args.arguments.length >= 2 ? args.arguments[1] : null;
 
       if (bodyArg == null) return;
 
@@ -290,8 +295,10 @@ class AvoidHardcodedTestDelaysRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_test_delays',
-    problemMessage: 'Test has hardcoded delay which makes tests slow and flaky.',
-    correctionMessage: 'Use pumpAndSettle(), stream matchers, or fake timers instead.',
+    problemMessage:
+        'Test has hardcoded delay which makes tests slow and flaky.',
+    correctionMessage:
+        'Use pumpAndSettle(), stream matchers, or fake timers instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -360,7 +367,8 @@ class RequireTestSetupTeardownRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_setup_teardown',
     problemMessage: 'Test file lacks setUp/tearDown for shared resources.',
-    correctionMessage: 'Add setUp() and tearDown() to initialize and clean up test state.',
+    correctionMessage:
+        'Add setUp() and tearDown() to initialize and clean up test state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -382,12 +390,13 @@ class RequireTestSetupTeardownRule extends DartLintRule {
       final String bodySource = body.toSource();
 
       // Count tests
-      final int testCount =
-          'test('.allMatches(bodySource).length + 'testWidgets('.allMatches(bodySource).length;
+      final int testCount = 'test('.allMatches(bodySource).length +
+          'testWidgets('.allMatches(bodySource).length;
 
       // If multiple tests, check for setUp
       if (testCount > 2) {
-        if (!bodySource.contains('setUp(') && !bodySource.contains('setUpAll(')) {
+        if (!bodySource.contains('setUp(') &&
+            !bodySource.contains('setUpAll(')) {
           reporter.atNode(node, code);
         }
       }
@@ -425,8 +434,10 @@ class RequirePumpAfterInteractionRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pump_after_interaction',
-    problemMessage: 'Widget test may need pump() or pumpAndSettle() after interaction.',
-    correctionMessage: 'Call pump() or pumpAndSettle() after tap(), drag(), or other interactions.',
+    problemMessage:
+        'Widget test may need pump() or pumpAndSettle() after interaction.',
+    correctionMessage:
+        'Call pump() or pumpAndSettle() after tap(), drag(), or other interactions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -457,7 +468,8 @@ class RequirePumpAfterInteractionRule extends DartLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg = args.arguments.length >= 2 ? args.arguments[1] : null;
+      final Expression? bodyArg =
+          args.arguments.length >= 2 ? args.arguments[1] : null;
 
       if (bodyArg == null) return;
 
@@ -467,14 +479,17 @@ class RequirePumpAfterInteractionRule extends DartLintRule {
       for (final String interaction in _interactionMethods) {
         if (bodySource.contains('tester.$interaction')) {
           // Check if pump follows (simple heuristic)
-          final int interactionIndex = bodySource.indexOf('tester.$interaction');
-          final String afterInteraction = bodySource.substring(interactionIndex);
+          final int interactionIndex =
+              bodySource.indexOf('tester.$interaction');
+          final String afterInteraction =
+              bodySource.substring(interactionIndex);
 
           // Look for expect before pump
           final int expectIndex = afterInteraction.indexOf('expect(');
           final int pumpIndex = afterInteraction.indexOf('pump');
 
-          if (expectIndex != -1 && (pumpIndex == -1 || pumpIndex > expectIndex)) {
+          if (expectIndex != -1 &&
+              (pumpIndex == -1 || pumpIndex > expectIndex)) {
             reporter.atNode(node.methodName, code);
             return;
           }

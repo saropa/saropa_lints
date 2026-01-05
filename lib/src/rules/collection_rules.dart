@@ -30,7 +30,8 @@ class AvoidCollectionEqualityChecksRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_collection_equality_checks',
     problemMessage: 'Comparing collections with == uses reference equality.',
-    correctionMessage: 'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality.',
+    correctionMessage:
+        'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -50,7 +51,8 @@ class AvoidCollectionEqualityChecksRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
-      if (node.operator.type != TokenType.EQ_EQ && node.operator.type != TokenType.BANG_EQ) {
+      if (node.operator.type != TokenType.EQ_EQ &&
+          node.operator.type != TokenType.BANG_EQ) {
         return;
       }
 
@@ -140,7 +142,8 @@ class AvoidMapKeysContainsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_map_keys_contains',
     problemMessage: 'Use containsKey() instead of keys.contains().',
-    correctionMessage: 'Replace map.keys.contains(key) with map.containsKey(key).',
+    correctionMessage:
+        'Replace map.keys.contains(key) with map.containsKey(key).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -214,7 +217,8 @@ class AvoidUnnecessaryCollectionsRule extends DartLintRule {
       final String typeName = target.name;
       final String methodName = node.methodName.name;
 
-      if (_collectionTypes.contains(typeName) && _unnecessaryMethods.contains(methodName)) {
+      if (_collectionTypes.contains(typeName) &&
+          _unnecessaryMethods.contains(methodName)) {
         final ArgumentList args = node.argumentList;
         if (args.arguments.length == 1) {
           final Expression arg = args.arguments.first;
@@ -251,7 +255,8 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_collection_methods',
-    problemMessage: 'Using .first or .last on a potentially empty collection is unsafe.',
+    problemMessage:
+        'Using .first or .last on a potentially empty collection is unsafe.',
     correctionMessage: 'Use .firstOrNull/.lastOrNull or check isEmpty first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -323,7 +328,8 @@ class AvoidUnsafeReduceRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_reduce',
     problemMessage: 'reduce() throws on empty collections.',
-    correctionMessage: 'Use fold() with an initial value or check isEmpty first.',
+    correctionMessage:
+        'Use fold() with an initial value or check isEmpty first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -528,7 +534,8 @@ class PreferIterableOfRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String? name = constructorName.name?.name;
 
@@ -582,14 +589,16 @@ class PreferLastRule extends DartLintRule {
             // Check if the target matches
             final Expression? indexTarget = node.target;
             final Expression lengthTarget = left.target!;
-            if (indexTarget != null && indexTarget.toSource() == lengthTarget.toSource()) {
+            if (indexTarget != null &&
+                indexTarget.toSource() == lengthTarget.toSource()) {
               reporter.atNode(node, code);
             }
           }
           // Also check for simple identifier.length pattern
           if (left is PrefixedIdentifier && left.identifier.name == 'length') {
             final Expression? indexTarget = node.target;
-            if (indexTarget is SimpleIdentifier && indexTarget.name == left.prefix.name) {
+            if (indexTarget is SimpleIdentifier &&
+                indexTarget.name == left.prefix.name) {
               reporter.atNode(node, code);
             }
           }
@@ -767,7 +776,8 @@ class PreferSetForLookupRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_set_for_lookup',
-    problemMessage: 'Consider using Set instead of List for contains() lookups.',
+    problemMessage:
+        'Consider using Set instead of List for contains() lookups.',
     correctionMessage: 'Sets have O(1) lookup vs O(n) for Lists.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

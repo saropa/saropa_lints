@@ -249,7 +249,9 @@ class RequireFutureErrorHandlingRule extends DartLintRule {
     while (current != null) {
       if (current is MethodInvocation) {
         final String name = current.methodName.name;
-        if (name == 'catchError' || name == 'onError' || name == 'whenComplete') {
+        if (name == 'catchError' ||
+            name == 'onError' ||
+            name == 'whenComplete') {
           return true;
         }
       }
@@ -334,7 +336,8 @@ class RequireErrorContextRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_context',
     problemMessage: 'Error message lacks context.',
-    correctionMessage: 'Include relevant context like IDs, state, or operation details.',
+    correctionMessage:
+        'Include relevant context like IDs, state, or operation details.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -399,7 +402,8 @@ class PreferResultPatternRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_result_pattern',
     problemMessage: 'Consider using Result pattern for expected failures.',
-    correctionMessage: 'Return Result<T, E> instead of throwing for recoverable errors.',
+    correctionMessage:
+        'Return Result<T, E> instead of throwing for recoverable errors.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -473,8 +477,10 @@ class RequireAsyncErrorDocumentationRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_async_error_documentation',
-    problemMessage: 'Async function with await should document or handle errors.',
-    correctionMessage: 'Add try/catch or document thrown exceptions with /// Throws.',
+    problemMessage:
+        'Async function with await should document or handle errors.',
+    correctionMessage:
+        'Add try/catch or document thrown exceptions with /// Throws.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -573,7 +579,8 @@ class RequireErrorBoundaryRule extends DartLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'MaterialApp' && constructorName != 'CupertinoApp') {
+      if (constructorName != 'MaterialApp' &&
+          constructorName != 'CupertinoApp') {
         return;
       }
 

@@ -41,7 +41,8 @@ class AvoidCommentedOutCodeRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_commented_out_code',
     problemMessage: 'Avoid commented-out code.',
-    correctionMessage: 'Remove commented-out code. Use version control to preserve history.',
+    correctionMessage:
+        'Remove commented-out code. Use version control to preserve history.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -185,7 +186,8 @@ class AvoidUnguardedDebugRule extends DartLintRule {
     CustomLintContext context,
   ) {
     // Check for debug() function calls
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'debug') {
         if (!_isGuarded(node) && !_hasDebugLevel(node.argumentList)) {
@@ -333,8 +335,10 @@ class PreferCommentingAnalyzerIgnoresRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_analyzer_ignores',
-    problemMessage: 'Analyzer ignore comment should have a preceding explanatory comment.',
-    correctionMessage: 'Add a comment on the line above explaining why this rule is ignored.',
+    problemMessage:
+        'Analyzer ignore comment should have a preceding explanatory comment.',
+    correctionMessage:
+        'Add a comment on the line above explaining why this rule is ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -420,7 +424,8 @@ class PreferCommentingAnalyzerIgnoresRule extends DartLintRule {
   int _getIgnoreCommentLength(String line, int start) {
     // Find the ignore comment pattern directly in the full line
     // This avoids substring - ignore comments are ASCII only anyway
-    final RegExpMatch? match = RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+').firstMatch(line);
+    final RegExpMatch? match =
+        RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+').firstMatch(line);
     if (match != null && match.start >= start) {
       return match.end - start;
     }

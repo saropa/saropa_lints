@@ -33,7 +33,8 @@ class AvoidBarrelFilesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_barrel_files',
     problemMessage: 'File contains only export statements (barrel file).',
-    correctionMessage: 'Import specific files where needed instead of using barrel files.',
+    correctionMessage:
+        'Import specific files where needed instead of using barrel files.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -227,7 +228,8 @@ class AvoidDuplicateNamedImportsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_named_imports',
-    problemMessage: 'Import is declared multiple times with different prefixes.',
+    problemMessage:
+        'Import is declared multiple times with different prefixes.',
     correctionMessage: 'Use a single import with one prefix.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -409,7 +411,8 @@ class AvoidLongParameterListRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_parameter_list',
     problemMessage: 'Function has too many parameters (max 5).',
-    correctionMessage: 'Consider using a configuration object or named parameters.',
+    correctionMessage:
+        'Consider using a configuration object or named parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -472,7 +475,8 @@ class AvoidLocalFunctionsRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
+    context.registry
+        .addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
       reporter.atNode(node.functionDeclaration, code);
     });
   }
@@ -676,11 +680,13 @@ class PreferNamedBooleanParametersRule extends DartLintRule {
         if (param.isNamed) continue;
 
         // Check if the parameter type is bool
-        final SimpleFormalParameter? simpleParam = param is SimpleFormalParameter
-            ? param
-            : (param is DefaultFormalParameter && param.parameter is SimpleFormalParameter
-                ? param.parameter as SimpleFormalParameter
-                : null);
+        final SimpleFormalParameter? simpleParam =
+            param is SimpleFormalParameter
+                ? param
+                : (param is DefaultFormalParameter &&
+                        param.parameter is SimpleFormalParameter
+                    ? param.parameter as SimpleFormalParameter
+                    : null);
 
         if (simpleParam == null) continue;
 
@@ -755,7 +761,8 @@ class PreferNamedParametersRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_named_parameters',
     problemMessage: 'Function has too many positional parameters.',
-    correctionMessage: 'Consider using named parameters for better readability.',
+    correctionMessage:
+        'Consider using named parameters for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -793,7 +800,8 @@ class PreferStaticClassRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_static_class',
     problemMessage: 'Class only has static members.',
-    correctionMessage: 'Consider using top-level functions and constants instead.',
+    correctionMessage:
+        'Consider using top-level functions and constants instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1145,7 +1153,8 @@ class AvoidHardcodedColorsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_colors',
     problemMessage: 'Avoid hardcoded color values.',
-    correctionMessage: 'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
+    correctionMessage:
+        'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1155,7 +1164,8 @@ class AvoidHardcodedColorsRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for Color constructor
@@ -1207,7 +1217,8 @@ class AvoidUnusedGenericsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_generics',
     problemMessage: 'Type parameter is declared but never used.',
-    correctionMessage: 'Remove unused type parameter or use it in the declaration.',
+    correctionMessage:
+        'Remove unused type parameter or use it in the declaration.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1242,7 +1253,8 @@ class AvoidUnusedGenericsRule extends DartLintRule {
     });
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      final TypeParameterList? typeParams = node.functionExpression.typeParameters;
+      final TypeParameterList? typeParams =
+          node.functionExpression.typeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {
@@ -1269,7 +1281,8 @@ class AvoidUnusedGenericsRule extends DartLintRule {
       if (found) return true;
     }
     // Check parameters and body
-    node.parameters?.visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.parameters
+        ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
     node.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
@@ -1285,7 +1298,8 @@ class AvoidUnusedGenericsRule extends DartLintRule {
     node.functionExpression.parameters
         ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
-    node.functionExpression.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.functionExpression.body
+        .visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
   }
 }
@@ -1576,7 +1590,8 @@ class AvoidUnnecessaryNullableReturnTypeRule extends DartLintRule {
 }
 
 class _NullReturnFinder extends RecursiveAstVisitor<void> {
-  _NullReturnFinder({required this.onNullReturn, required this.onImplicitReturn});
+  _NullReturnFinder(
+      {required this.onNullReturn, required this.onImplicitReturn});
   final void Function() onNullReturn;
   final void Function() onImplicitReturn;
 

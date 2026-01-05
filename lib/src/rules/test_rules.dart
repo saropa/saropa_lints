@@ -30,7 +30,8 @@ class AvoidDuplicateTestAssertionsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_test_assertions',
     problemMessage: 'Duplicate test assertion detected.',
-    correctionMessage: 'Remove the duplicate assertion or verify different values.',
+    correctionMessage:
+        'Remove the duplicate assertion or verify different values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -143,7 +144,8 @@ class AvoidTopLevelMembersInTestsRule extends DartLintRule {
     context.registry.addCompilationUnit((CompilationUnit unit) {
       for (final CompilationUnitMember declaration in unit.declarations) {
         // Skip main function (test entry point)
-        if (declaration is FunctionDeclaration && declaration.name.lexeme == 'main') {
+        if (declaration is FunctionDeclaration &&
+            declaration.name.lexeme == 'main') {
           continue;
         }
 
@@ -154,7 +156,8 @@ class AvoidTopLevelMembersInTestsRule extends DartLintRule {
         } else if (declaration is ClassDeclaration) {
           name = declaration.name.lexeme;
         } else if (declaration is TopLevelVariableDeclaration) {
-          for (final VariableDeclaration variable in declaration.variables.variables) {
+          for (final VariableDeclaration variable
+              in declaration.variables.variables) {
             final String varName = variable.name.lexeme;
             if (!varName.startsWith('_')) {
               reporter.atNode(variable, code);
@@ -202,7 +205,8 @@ class FormatTestNameRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_test_name',
     problemMessage: 'Test name should be descriptive.',
-    correctionMessage: 'Use a descriptive test name that explains what is being tested.',
+    correctionMessage:
+        'Use a descriptive test name that explains what is being tested.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -274,7 +278,8 @@ class PreferCorrectTestFileNameRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_test_file_name',
     problemMessage: 'Test file naming convention violation.',
-    correctionMessage: 'Test files should end with `_test.dart` and be in test/ directory.',
+    correctionMessage:
+        'Test files should end with `_test.dart` and be in test/ directory.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -287,9 +292,11 @@ class PreferCorrectTestFileNameRule extends DartLintRule {
     final String path = resolver.path;
 
     // Check if file is in test directory but doesn't end with _test.dart
-    final bool isInTestDir = path.contains('/test/') || path.contains('\\test\\');
+    final bool isInTestDir =
+        path.contains('/test/') || path.contains('\\test\\');
     final bool endsWithTest = path.endsWith('_test.dart');
-    final bool isTestHelper = path.contains('test_utils') || path.contains('test_helper');
+    final bool isTestHelper =
+        path.contains('test_utils') || path.contains('test_helper');
 
     if (isInTestDir && !endsWithTest && !isTestHelper) {
       // Only warn if file contains test() or testWidgets() calls
@@ -470,7 +477,8 @@ class PreferUniqueTestNamesRule extends DartLintRule {
     CustomLintContext context,
   ) {
     final Set<String> testNames = <String>{};
-    final List<(StringLiteral, String)> duplicates = <(StringLiteral, String)>[];
+    final List<(StringLiteral, String)> duplicates =
+        <(StringLiteral, String)>[];
 
     context.registry.addCompilationUnit((CompilationUnit unit) {
       testNames.clear();
@@ -589,7 +597,8 @@ class _AssertionFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (MissingTestAssertionRule._assertionMethods.contains(node.methodName.name)) {
+    if (MissingTestAssertionRule._assertionMethods
+        .contains(node.methodName.name)) {
       onFound(node.methodName.name);
     }
     super.visitMethodInvocation(node);

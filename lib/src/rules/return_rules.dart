@@ -70,7 +70,8 @@ class AvoidReturningVoidRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_returning_void',
     problemMessage: 'Avoid explicitly returning void.',
-    correctionMessage: 'Remove the return statement or use return without a value.',
+    correctionMessage:
+        'Remove the return statement or use return without a value.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -189,7 +190,8 @@ class PreferImmediateReturnRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immediate_return',
     problemMessage: 'Variable is declared and immediately returned.',
-    correctionMessage: 'Return the expression directly instead of storing in a variable.',
+    correctionMessage:
+        'Return the expression directly instead of storing in a variable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -271,7 +273,8 @@ class PreferReturningShorthandsRule extends DartLintRule {
     });
   }
 
-  void _checkBody(FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
+  void _checkBody(
+      FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;

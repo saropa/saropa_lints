@@ -15,7 +15,8 @@ class AvoidFutureIgnoreRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_future_ignore',
     problemMessage: 'Avoid using .ignore() on Futures.',
-    correctionMessage: 'Handle the Future properly with await, then, or unawaited().',
+    correctionMessage:
+        'Handle the Future properly with await, then, or unawaited().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -202,7 +203,8 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends DartLintRule {
         // Check if passed as argument
         if (parent is ArgumentList) {
           final AstNode? grandparent = parent.parent;
-          if (grandparent is MethodInvocation || grandparent is InstanceCreationExpression) {
+          if (grandparent is MethodInvocation ||
+              grandparent is InstanceCreationExpression) {
             // Warn when async callback is passed as argument
             // Full implementation would check if parameter type expects Future
             reporter.atNode(node, code);
@@ -257,7 +259,8 @@ class AvoidRedundantAsyncRule extends DartLintRule {
     });
   }
 
-  void _checkAsyncBody(FunctionBody body, AstNode node, DiagnosticReporter reporter) {
+  void _checkAsyncBody(
+      FunctionBody body, AstNode node, DiagnosticReporter reporter) {
     // Only check async functions (not async*)
     if (body.isAsynchronous && !body.isGenerator) {
       // Check if body contains any await expressions
@@ -407,7 +410,8 @@ class PreferAssigningAwaitExpressionsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_assigning_await_expressions',
     problemMessage: 'Prefer assigning await expressions to variables.',
-    correctionMessage: 'Assign the await expression to a variable before using it.',
+    correctionMessage:
+        'Assign the await expression to a variable before using it.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -431,7 +435,9 @@ class PreferAssigningAwaitExpressionsRule extends DartLintRule {
       if (parent is ExpressionStatement) return;
 
       // OK if in a list/set/map literal at top level
-      if (parent is ListLiteral || parent is SetOrMapLiteral || parent is MapLiteralEntry) {
+      if (parent is ListLiteral ||
+          parent is SetOrMapLiteral ||
+          parent is MapLiteralEntry) {
         return;
       }
 
@@ -576,7 +582,8 @@ class PreferCorrectStreamReturnTypeRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_stream_return_type',
-    problemMessage: 'Async* function should have Stream return type annotation.',
+    problemMessage:
+        'Async* function should have Stream return type annotation.',
     correctionMessage: 'Add explicit Stream<T> return type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -639,7 +646,8 @@ class PreferSpecifyingFutureValueTypeRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final NamedType type = constructorName.type;
 
@@ -682,7 +690,8 @@ class PreferReturnAwaitRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_return_await',
-    problemMessage: 'Return await in async functions for proper error handling.',
+    problemMessage:
+        'Return await in async functions for proper error handling.',
     correctionMessage: 'Add await before the returned Future.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

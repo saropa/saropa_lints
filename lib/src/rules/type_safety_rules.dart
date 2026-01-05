@@ -134,7 +134,8 @@ class RequireCovariantDocumentationRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_covariant_documentation',
     problemMessage: 'Covariant parameter should be documented.',
-    correctionMessage: 'Add documentation explaining why covariant is necessary.',
+    correctionMessage:
+        'Add documentation explaining why covariant is necessary.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

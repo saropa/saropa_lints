@@ -164,8 +164,10 @@ class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditions_with_boolean_literals',
-    problemMessage: 'Avoid comparing with boolean literals or using them in logical expressions.',
-    correctionMessage: 'Use the boolean expression directly: x instead of x == true.',
+    problemMessage:
+        'Avoid comparing with boolean literals or using them in logical expressions.',
+    correctionMessage:
+        'Use the boolean expression directly: x instead of x == true.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -180,14 +182,17 @@ class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
 
       // Check for x == true, x == false, x != true, x != false
       if (operator == TokenType.EQ_EQ || operator == TokenType.BANG_EQ) {
-        if (node.leftOperand is BooleanLiteral || node.rightOperand is BooleanLiteral) {
+        if (node.leftOperand is BooleanLiteral ||
+            node.rightOperand is BooleanLiteral) {
           reporter.atNode(node, code);
         }
       }
 
       // Check for x || true, x || false, x && true, x && false
-      if (operator == TokenType.BAR_BAR || operator == TokenType.AMPERSAND_AMPERSAND) {
-        if (node.leftOperand is BooleanLiteral || node.rightOperand is BooleanLiteral) {
+      if (operator == TokenType.BAR_BAR ||
+          operator == TokenType.AMPERSAND_AMPERSAND) {
+        if (node.leftOperand is BooleanLiteral ||
+            node.rightOperand is BooleanLiteral) {
           reporter.atNode(node, code);
         }
       }
@@ -217,7 +222,8 @@ class AvoidConstantAssertConditionsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_constant_assert_conditions',
     problemMessage: 'Assert has a constant condition that is always {0}.',
-    correctionMessage: 'Use a meaningful condition or remove the assert statement.',
+    correctionMessage:
+        'Use a meaningful condition or remove the assert statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -246,7 +252,8 @@ class AvoidConstantAssertConditionsRule extends DartLintRule {
 
         // Check if both sides are the same literal
         if (_areSameLiteral(left, right)) {
-          final String result = condition.operator.type == TokenType.EQ_EQ ? 'true' : 'false';
+          final String result =
+              condition.operator.type == TokenType.EQ_EQ ? 'true' : 'false';
           reporter.atNode(node, code, arguments: <String>[result]);
         }
       }
@@ -292,7 +299,8 @@ class AvoidConstantSwitchesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_constant_switches',
     problemMessage: 'Switch expression is a constant value.',
-    correctionMessage: 'Use a variable or expression, or replace with if statement.',
+    correctionMessage:
+        'Use a variable or expression, or replace with if statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -450,7 +458,8 @@ class AvoidIfWithManyBranchesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_if_with_many_branches',
     problemMessage: 'If statement has too many branches (max 4).',
-    correctionMessage: 'Consider using a switch statement or extracting to methods.',
+    correctionMessage:
+        'Consider using a switch statement or extracting to methods.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -899,7 +908,8 @@ class AvoidRedundantElseRule extends DartLintRule {
     }
 
     // Check for throw expression statement
-    if (statement is ExpressionStatement && statement.expression is ThrowExpression) {
+    if (statement is ExpressionStatement &&
+        statement.expression is ThrowExpression) {
       return true;
     }
 
@@ -935,8 +945,10 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unconditional_break',
-    problemMessage: 'Unconditional break/continue makes loop execute at most once.',
-    correctionMessage: 'Add a condition before break/continue or remove the loop.',
+    problemMessage:
+        'Unconditional break/continue makes loop execute at most once.',
+    correctionMessage:
+        'Add a condition before break/continue or remove the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -951,7 +963,8 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
       _checkLoopBody(node.body, reporter);
     });
 
-    context.registry.addForEachPartsWithDeclaration((ForEachPartsWithDeclaration node) {
+    context.registry
+        .addForEachPartsWithDeclaration((ForEachPartsWithDeclaration node) {
       // The body is in the parent ForStatement
     });
 
@@ -979,7 +992,8 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
     if (firstStatement == null) return;
 
     // Check if first statement is unconditional break/continue
-    if (firstStatement is BreakStatement || firstStatement is ContinueStatement) {
+    if (firstStatement is BreakStatement ||
+        firstStatement is ContinueStatement) {
       reporter.atNode(firstStatement, code);
     }
   }
@@ -1313,19 +1327,24 @@ class PreferConditionalExpressionsRule extends DartLintRule {
       if (elseStatement == null) return;
 
       // Check for simple return statements
-      if (thenStatement is ReturnStatement && elseStatement is ReturnStatement) {
-        if (thenStatement.expression != null && elseStatement.expression != null) {
+      if (thenStatement is ReturnStatement &&
+          elseStatement is ReturnStatement) {
+        if (thenStatement.expression != null &&
+            elseStatement.expression != null) {
           reporter.atNode(node, code);
         }
       }
 
       // Check for simple assignment to same variable
-      if (thenStatement is ExpressionStatement && elseStatement is ExpressionStatement) {
+      if (thenStatement is ExpressionStatement &&
+          elseStatement is ExpressionStatement) {
         final Expression thenExpr = thenStatement.expression;
         final Expression elseExpr = elseStatement.expression;
 
-        if (thenExpr is AssignmentExpression && elseExpr is AssignmentExpression) {
-          if (thenExpr.leftHandSide.toSource() == elseExpr.leftHandSide.toSource()) {
+        if (thenExpr is AssignmentExpression &&
+            elseExpr is AssignmentExpression) {
+          if (thenExpr.leftHandSide.toSource() ==
+              elseExpr.leftHandSide.toSource()) {
             reporter.atNode(node, code);
           }
         }
@@ -1367,7 +1386,8 @@ class PreferCorrectSwitchLengthRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_switch_length',
     problemMessage: 'Switch statement has too few cases.',
-    correctionMessage: 'Consider using an if-else statement for $_minCases or fewer cases.',
+    correctionMessage:
+        'Consider using an if-else statement for $_minCases or fewer cases.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1415,7 +1435,8 @@ class PreferEarlyReturnRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
     problemMessage: 'Consider using early return to reduce nesting.',
-    correctionMessage: 'Invert the condition and return early instead of wrapping the body.',
+    correctionMessage:
+        'Invert the condition and return early instead of wrapping the body.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1601,7 +1622,8 @@ class PreferReturningConditionRule extends DartLintRule {
       if (thenReturnsBool == null || elseReturnsBool == null) return;
 
       // Check if one returns true and the other returns false
-      if ((thenReturnsBool && !elseReturnsBool) || (!thenReturnsBool && elseReturnsBool)) {
+      if ((thenReturnsBool && !elseReturnsBool) ||
+          (!thenReturnsBool && elseReturnsBool)) {
         reporter.atNode(node, code);
       }
     });
