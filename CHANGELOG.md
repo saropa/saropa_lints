@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.10] - 2025-01-05
+
+### Fixed
+
+- Added `license: MIT` field to pubspec.yaml for proper pub.dev display
+
 ## [1.1.9] - 2025-01-05
 
 ### Added
