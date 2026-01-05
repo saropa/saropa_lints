@@ -89,7 +89,8 @@ class AvoidOnlyRethrowRule extends DartLintRule {
       final Block body = node.body;
       if (body.statements.length == 1) {
         final Statement statement = body.statements.first;
-        if (statement is ExpressionStatement && statement.expression is RethrowExpression) {
+        if (statement is ExpressionStatement &&
+            statement.expression is RethrowExpression) {
           reporter.atNode(node, code);
         }
       }
@@ -122,7 +123,8 @@ class AvoidThrowInCatchBlockRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_catch_block',
     problemMessage: 'Throwing in catch block loses the original stack trace.',
-    correctionMessage: 'Use rethrow or Error.throwWithStackTrace to preserve stack trace.',
+    correctionMessage:
+        'Use rethrow or Error.throwWithStackTrace to preserve stack trace.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -178,7 +180,8 @@ class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_throw_objects_without_tostring',
     problemMessage: 'Thrown object may not have a useful toString() method.',
-    correctionMessage: 'Consider throwing an Exception or Error subclass, or implement toString().',
+    correctionMessage:
+        'Consider throwing an Exception or Error subclass, or implement toString().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -225,7 +228,9 @@ class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
       // Check if the type has a custom toString
       if (type is InterfaceType) {
         final bool hasToString = type.element.methods.any(
-          (MethodElement e) => e.name == 'toString' && (e as Element).enclosingElement == type.element,
+          (MethodElement e) =>
+              e.name == 'toString' &&
+              (e as Element).enclosingElement == type.element,
         );
         if (hasToString) return;
       }

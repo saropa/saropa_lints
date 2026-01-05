@@ -61,7 +61,8 @@ class RequireHttpStatusCheckRule extends DartLintRule {
       }
 
       // Check if statusCode is checked
-      if (!bodySource.contains('statusCode') && !bodySource.contains('isSuccessful')) {
+      if (!bodySource.contains('statusCode') &&
+          !bodySource.contains('isSuccessful')) {
         reporter.atNode(node, code);
       }
     });
@@ -128,7 +129,8 @@ class RequireApiTimeoutRule extends DartLintRule {
       bool hasTimeout = false;
 
       while (current != null) {
-        if (current is MethodInvocation && current.methodName.name == 'timeout') {
+        if (current is MethodInvocation &&
+            current.methodName.name == 'timeout') {
           hasTimeout = true;
           break;
         }
@@ -232,7 +234,8 @@ class RequireRetryLogicRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
-    problemMessage: 'Network call should have retry logic for transient failures.',
+    problemMessage:
+        'Network call should have retry logic for transient failures.',
     correctionMessage: 'Use a retry mechanism for network operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -331,7 +334,8 @@ class RequireTypedApiResponseRule extends DartLintRule {
           if (methodBody != null) {
             final String bodySource = methodBody.toSource();
             // Check for dynamic access like data['key']
-            if (bodySource.contains("$variableName['") || bodySource.contains('$variableName["')) {
+            if (bodySource.contains("$variableName['") ||
+                bodySource.contains('$variableName["')) {
               reporter.atNode(node, code);
             }
           }
