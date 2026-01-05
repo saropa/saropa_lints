@@ -39,7 +39,8 @@ class AvoidLargeObjectsInStateRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_objects_in_state',
     problemMessage: 'Large data structures in State may cause memory issues.',
-    correctionMessage: 'Consider pagination, streaming, or external state management.',
+    correctionMessage:
+        'Consider pagination, streaming, or external state management.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -149,7 +150,8 @@ class RequireImageDisposalRule extends DartLintRule {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource();
           if (fieldSource.contains('ui.Image') ||
-              fieldSource.contains('Image ') && fieldSource.contains('dart:ui')) {
+              fieldSource.contains('Image ') &&
+                  fieldSource.contains('dart:ui')) {
             hasUiImageField = true;
           }
         }
@@ -213,7 +215,8 @@ class AvoidCapturingThisInCallbacksRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_capturing_this_in_callbacks',
-    problemMessage: 'Callback may capture entire object, preventing garbage collection.',
+    problemMessage:
+        'Callback may capture entire object, preventing garbage collection.',
     correctionMessage: 'Use method reference or extract only needed values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -363,7 +366,8 @@ class PreferWeakReferencesForCacheRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_weak_references_for_cache',
     problemMessage: 'Consider using WeakReference for cache entries.',
-    correctionMessage: 'WeakReference allows garbage collection under memory pressure.',
+    correctionMessage:
+        'WeakReference allows garbage collection under memory pressure.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -388,7 +392,8 @@ class PreferWeakReferencesForCacheRule extends DartLintRule {
           final String typeSource = type.toSource();
 
           // Check for Map that doesn't use WeakReference
-          if (typeSource.contains('Map<') && !typeSource.contains('WeakReference')) {
+          if (typeSource.contains('Map<') &&
+              !typeSource.contains('WeakReference')) {
             reporter.atNode(member, code);
           }
         }
@@ -429,7 +434,8 @@ class AvoidExpandoCircularReferencesRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expando_circular_references',
     problemMessage: 'Expando value may reference its key, causing memory leak.',
-    correctionMessage: 'Ensure Expando values do not hold references to their keys.',
+    correctionMessage:
+        'Ensure Expando values do not hold references to their keys.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -446,7 +452,8 @@ class AvoidExpandoCircularReferencesRule extends DartLintRule {
 
       // Check if target is likely an Expando
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('expando') && !targetSource.contains('_meta')) {
+      if (!targetSource.contains('expando') &&
+          !targetSource.contains('_meta')) {
         return;
       }
 
@@ -529,7 +536,8 @@ class AvoidLargeIsolateCommunicationRule extends DartLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource().toLowerCase();
-          if (targetSource.contains('port') || targetSource.contains('sendport')) {
+          if (targetSource.contains('port') ||
+              targetSource.contains('sendport')) {
             final NodeList<Expression> args = node.argumentList.arguments;
             if (args.isNotEmpty) {
               final String argSource = args.first.toSource().toLowerCase();

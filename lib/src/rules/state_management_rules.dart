@@ -42,7 +42,8 @@ class RequireNotifyListenersRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_notify_listeners',
-    problemMessage: 'ChangeNotifier method modifies state but does not call notifyListeners.',
+    problemMessage:
+        'ChangeNotifier method modifies state but does not call notifyListeners.',
     correctionMessage: 'Add notifyListeners() after state modifications.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -178,7 +179,8 @@ class RequireStreamControllerDisposeRule extends DartLintRule {
             // Also check initializers
             final Expression? initializer = variable.initializer;
             if (initializer is InstanceCreationExpression) {
-              final String? initTypeName = initializer.constructorName.type.element?.name;
+              final String? initTypeName =
+                  initializer.constructorName.type.element?.name;
               if (initTypeName == 'StreamController') {
                 controllerNames.add(variable.name.lexeme);
               }
@@ -212,7 +214,8 @@ class RequireStreamControllerDisposeRule extends DartLintRule {
           // Find the field to report on
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -302,7 +305,8 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
             // Also check initializers
             final Expression? initializer = variable.initializer;
             if (initializer is InstanceCreationExpression) {
-              final String? initTypeName = initializer.constructorName.type.element?.name;
+              final String? initTypeName =
+                  initializer.constructorName.type.element?.name;
               if (initTypeName == 'ValueNotifier') {
                 notifierNames.add(variable.name.lexeme);
               }
@@ -335,7 +339,8 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
         if (!disposedNotifiers.contains(name)) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -410,7 +415,8 @@ class RequireMountedCheckRule extends DartLintRule {
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
-      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -537,7 +543,8 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
     problemMessage: 'Avoid adding BLoC events in constructor.',
-    correctionMessage: 'Add initial events from the widget that creates the BLoC.',
+    correctionMessage:
+        'Add initial events from the widget that creates the BLoC.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -549,7 +556,8 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
       // Check if in a Bloc class
-      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -606,7 +614,8 @@ class RequireUpdateShouldNotifyRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
     problemMessage: 'InheritedWidget should override updateShouldNotify.',
-    correctionMessage: 'Add updateShouldNotify to control when dependents rebuild.',
+    correctionMessage:
+        'Add updateShouldNotify to control when dependents rebuild.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -631,7 +640,8 @@ class RequireUpdateShouldNotifyRule extends DartLintRule {
       // Check for updateShouldNotify method
       bool hasUpdateShouldNotify = false;
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'updateShouldNotify') {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'updateShouldNotify') {
           hasUpdateShouldNotify = true;
           break;
         }
@@ -668,7 +678,8 @@ class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_riverpod_providers',
     problemMessage: 'Consider scoping Riverpod providers appropriately.',
-    correctionMessage: 'Document provider scope or use ProviderScope for isolation.',
+    correctionMessage:
+        'Document provider scope or use ProviderScope for isolation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -702,7 +713,8 @@ class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
           }
         }
         if (initializer is InstanceCreationExpression) {
-          final String? typeName = initializer.constructorName.type.element?.name;
+          final String? typeName =
+              initializer.constructorName.type.element?.name;
           if (typeName != null && _providerTypes.contains(typeName)) {
             reporter.atNode(variable, code);
           }
@@ -741,8 +753,10 @@ class AvoidStatefulWithoutStateRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_without_state',
-    problemMessage: 'StatefulWidget has no state fields - consider StatelessWidget.',
-    correctionMessage: 'Convert to StatelessWidget if no state is being managed.',
+    problemMessage:
+        'StatefulWidget has no state fields - consider StatelessWidget.',
+    correctionMessage:
+        'Convert to StatelessWidget if no state is being managed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

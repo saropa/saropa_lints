@@ -28,7 +28,8 @@ class AvoidDeclaringCallMethodRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_declaring_call_method',
     problemMessage: 'Avoid declaring a call() method.',
-    correctionMessage: 'Use a more descriptive method name like execute() or invoke().',
+    correctionMessage:
+        'Use a more descriptive method name like execute() or invoke().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -313,7 +314,8 @@ class AvoidShadowingRule extends DartLintRule {
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
       final String functionName = node.name.lexeme;
-      final _ShadowingChecker checker = _ShadowingChecker(reporter, code, <String>{functionName});
+      final _ShadowingChecker checker =
+          _ShadowingChecker(reporter, code, <String>{functionName});
 
       // Collect parameter names
       final FormalParameterList? params = node.functionExpression.parameters;
@@ -331,7 +333,8 @@ class AvoidShadowingRule extends DartLintRule {
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
-      final _ShadowingChecker checker = _ShadowingChecker(reporter, code, <String>{methodName});
+      final _ShadowingChecker checker =
+          _ShadowingChecker(reporter, code, <String>{methodName});
 
       // Collect parameter names
       final FormalParameterList? params = node.parameters;
@@ -453,13 +456,15 @@ class PreferConstStringListRule extends DartLintRule {
         return; // Empty lists are handled by other rules
       }
 
-      final bool allStringLiterals = elements.every((CollectionElement element) {
+      final bool allStringLiterals =
+          elements.every((CollectionElement element) {
         if (element is SimpleStringLiteral) {
           return true;
         }
         if (element is AdjacentStrings) {
           // Adjacent string literals like 'hello' 'world'
-          return element.strings.every((StringLiteral s) => s is SimpleStringLiteral);
+          return element.strings
+              .every((StringLiteral s) => s is SimpleStringLiteral);
         }
         return false;
       });
@@ -610,7 +615,8 @@ class PreferPrivateExtensionTypeFieldRule extends DartLintRule {
     DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry
+        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final RepresentationDeclaration representation = node.representation;
       final Token fieldName = representation.fieldName;
 
@@ -661,7 +667,8 @@ class ProperSuperCallsRule extends DartLintRule {
   static const LintCode _code = LintCode(
     name: 'proper_super_calls',
     problemMessage: 'Super lifecycle method called in wrong order.',
-    correctionMessage: 'super.initState() should be first; super.dispose() should be last.',
+    correctionMessage:
+        'super.initState() should be first; super.dispose() should be last.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -699,7 +706,8 @@ class ProperSuperCallsRule extends DartLintRule {
           final Expression expr = stmt.expression;
           if (expr is MethodInvocation) {
             final Expression? target = expr.target;
-            if (target is SuperExpression && expr.methodName.name == methodName) {
+            if (target is SuperExpression &&
+                expr.methodName.name == methodName) {
               superCallIndex = i;
               break;
             }
