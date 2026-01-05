@@ -19,6 +19,7 @@
   ],
   "useGitignore": true,
   "words": [
+    "apikey",
     "COPPA",
     "dartdoc",
     "datetimes",
@@ -29,6 +30,7 @@
     "maybeof",
     "mediaquery",
     "open-source",
+    "prefs",
     "pubdev",
     "pubspec",
     "rethrowing",
@@ -37,6 +39,7 @@
     "scrollables",
     "setstate",
     "timezone",
+    "Unsanitized",
     "WCAG"
   ],
   // Specify paths/files to ignore.
