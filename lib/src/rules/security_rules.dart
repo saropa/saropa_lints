@@ -303,8 +303,9 @@ class AvoidHardcodedCredentialsRule extends DartLintRule {
   };
 
   // Patterns that look like real credentials
+  // Note: Bearer/Basic tokens should be a single base64-like token without spaces
   static final RegExp _credentialPatterns = RegExp(
-    r'^(sk-|pk-|ghp_|gho_|Bearer |Basic )[a-zA-Z0-9]+',
+    r'^(sk-[a-zA-Z0-9]{20,}|pk-[a-zA-Z0-9]{20,}|ghp_[a-zA-Z0-9]{36,}|gho_[a-zA-Z0-9]{36,}|Bearer [a-zA-Z0-9._-]{20,}$|Basic [a-zA-Z0-9+/=]{10,}$)',
   );
 
   @override

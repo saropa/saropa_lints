@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.12] - 2025-01-05
+
+### Fixed
+
+- `avoid_hardcoded_credentials` - Improved pattern matching to reduce false positives
+  - Added minimum length requirements: sk-/pk- tokens (20+), GitHub tokens (36+), Bearer (20+), Basic (10+)
+  - More accurate character sets for Base64 encoding in Basic auth
+  - End-of-string anchoring for Bearer/Basic tokens
+
 ## [1.1.11] - 2025-01-05
 
 ### Changed
