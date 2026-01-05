@@ -1,11 +1,10 @@
-# Plan: 500 New Lint Rules + Testing Framework
+# Roadmap: 1000 Lint Rules
 
-## Overview
+## Current Status
 
-- **Current state**: 475 rules implemented, 475 configured in `custom_lint.yaml`, 0 enabled, 0 tests
-- **Goal**: Add 500 new rules to reach ~1,000 total + comprehensive testing framework
-- **Tier system**: Rules assigned to 5 tiers (Essential → Insanity)
-- **Package**: `saropa_lints` using `custom_lint_builder: ^0.8.1`
+- **Implemented**: ~500 rules
+- **Goal**: 1000 rules
+- **Remaining**: ~500 new rules
 
 ---
 
@@ -14,9 +13,9 @@
 ### 1.1 Directory Structure
 
 ```
-custom_lints/
+saropa_lints/
 ├── lib/
-│   └── src/rules/          # Existing 20 rule files
+│   └── src/rules/          # Rule implementations
 ├── test/
 │   ├── test_utils/
 │   │   ├── lint_test_helper.dart      # Core test utilities
@@ -153,257 +152,18 @@ Widget build() {
 
       expectNoLint(result);
     });
-
-    test('passes with Semantics wrapper', () async {
-      final result = await analyzeDartCode('''
-import 'package:flutter/material.dart';
-
-Widget build() {
-  return Semantics(
-    label: 'Add item',
-    child: IconButton(
-      icon: Icon(Icons.add),
-      onPressed: () {},
-    ),
-  );
-}
-''', rule);
-
-      expectNoLint(result);
-    });
   });
 }
 ```
 
-### 1.4 Fixture-Based Testing (Alternative)
-
-```dart
-// test/rules/fixture_based_test.dart
-import 'dart:io';
-import 'package:test/test.dart';
-
-void main() {
-  final fixturesDir = Directory('test/fixtures');
-
-  for (final category in fixturesDir.listSync().whereType<Directory>()) {
-    group(category.path.split('/').last, () {
-      for (final file in category.listSync().whereType<File>()) {
-        if (!file.path.endsWith('.dart')) continue;
-
-        final name = file.path.split('/').last;
-        final shouldFail = name.startsWith('bad_');
-
-        test(name, () async {
-          final code = await file.readAsString();
-          // Extract expected rule from file comment
-          // Run analysis
-          // Verify result matches expectation
-        });
-      }
-    });
-  }
-}
-```
-
-### 1.5 Dependencies to Add
-
-```yaml
-# custom_lints/pubspec.yaml
-dev_dependencies:
-  test: ^1.25.0
-  path: ^1.9.0
-```
-
-### 1.6 CI Integration
+### 1.4 CI Integration
 
 - [ ] Add `dart test` to CI pipeline
 - [ ] Add coverage reporting
 
 ---
 
-## Part 1B: Localization Testing Framework
-
-*Merged from PLAN_LOCALIZATION.md*
-
-### The Core Problem
-
-`LocaleEnum.i18n` and any code using `appGlobalContext` will fail in unit tests because:
-
-1. No `MaterialApp` is pumped
-2. No `NavigatorState` is available
-3. `appGlobalNavigatorKey.currentState` is null
-4. Exception thrown: `[appGlobalNavigatorKey] is not available yet.`
-
-### Current Global Context Dependencies
-
-The following patterns create testing difficulties:
-
-| Pattern | Files Affected | Test Impact |
-|---------|----------------|-------------|
-| `LocaleEnum.*.i18n` | 148 files, 225 occurrences | Fails in unit tests |
-| `appGlobalContext` | 127 files | Fails in unit tests |
-| `S.of(appGlobalContext)` | Several | Fails in unit tests |
-
-### Specific Problem Areas
-
-**contact_status_enum.dart** - Uses `LocaleEnum.i18n` in getters:
-```dart
-String get displayName => switch (this) {
-  ContactStatus.Favorite => LocaleEnum.word_Favorite.i18n, // FAILS in tests
-  // ...
-};
-```
-
-This means any test that accesses `ContactStatus.Favorite.displayName` will fail without widget test setup.
-
-### Testing Strategies
-
-**Strategy A: Widget Tests with Localization Setup**
-
-```dart
-Widget buildTestApp({required Widget child}) {
-  return MaterialApp(
-    localizationsDelegates: S.localizationsDelegates,
-    supportedLocales: S.supportedLocales,
-    home: child,
-  );
-}
-
-testWidgets('test with localization', (tester) async {
-  await tester.pumpWidget(buildTestApp(child: MyWidget()));
-  await tester.pumpAndSettle();
-  // Test localized strings
-});
-```
-
-**Strategy B: Context-Accepting Methods**
-
-For testable code, prefer passing context explicitly:
-
-```dart
-// AVOID (untestable in unit tests):
-String get displayName => LocaleEnum.word_Favorite.i18n;
-
-// PREFER (testable):
-String displayName(BuildContext context) => LocaleEnum.word_Favorite.tr(context);
-
-// OR provide fallback for tests:
-String get displayName {
-  if (!hasGlobalContext) return name; // Fallback to enum name
-  return LocaleEnum.word_Favorite.i18n;
-}
-```
-
-**Strategy C: Test Isolation**
-
-For model/enum tests that don't need localization verification:
-- Test the enum values exist
-- Test business logic separately from display strings
-- Accept that display name tests require widget test setup
-- Use `hasGlobalContext` guard to provide fallbacks
-
-**Strategy D: Mock Global Context (Complex)**
-
-```dart
-// In test setup:
-void setupTestLocalization() {
-  // Create a minimal app context for testing
-  // This is complex and fragile
-}
-```
-
-### Recommended Approach
-
-1. **New code:** Always use `context.s` or `LocaleEnum.tr(context)`
-2. **Existing i18n usage:** Add `hasGlobalContext` guards with fallbacks
-3. **Tests:** Use widget tests for UI, accept that some display tests need MaterialApp
-4. **Enums:** Consider keeping `displayName` hardcoded for internal use, add `localizedName(context)` for UI
-
-### Localization Test Categories
-
-**1. Localization Unit Tests (Existing)**
-- File: `test/lib/l10n/localization_test.dart`
-- Tests ARB key existence and values
-- Requires widget test setup
-
-**2. Model Tests That Touch DisplayName**
-- Risk: Will fail if accessing localized displayName
-- Solution: Use widget test wrapper OR test only non-localized properties
-
-**3. Widget Tests**
-- Already have context available
-- Safe to use `context.s` patterns
-
-**4. Integration Tests**
-- Full app context available
-- All localization patterns work
-
-### Localization Test Helper
-
-```dart
-// test/helpers/localization_test_helper.dart
-
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:saropa/l10n/app_localizations.dart';
-
-/// Wraps a widget with localization support for testing
-Widget wrapWithLocalization(Widget child, {Locale locale = const Locale('en')}) {
-  return MaterialApp(
-    locale: locale,
-    localizationsDelegates: const [
-      ...S.localizationsDelegates,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    supportedLocales: S.supportedLocales,
-    home: child,
-  );
-}
-
-/// For unit tests that don't need full widget setup,
-/// provides a fallback-aware way to access display names
-extension TestableDisplayName on ContactStatus {
-  String get testDisplayName {
-    // In tests without context, return enum name
-    // In real app, returns localized string
-    try {
-      return displayName;
-    } catch (_) {
-      return name;
-    }
-  }
-}
-```
-
-### Tests That Need Migration
-
-| Test File | Issue | Solution |
-|-----------|-------|----------|
-| `quick_launch_bar_test.dart` | Accesses `ContactStatus.displayName` | Wrap with `wrapWithLocalization` |
-| Model tests using displayName | Global context not available | Use `testDisplayName` extension or widget test |
-
-### Test Files with Acceptable Hardcoding
-
-These test files use hardcoded strings for assertions - this is correct:
-
-- `quick_launch_order_io_test.dart` - Tests database values
-- `quick_launch_bar_test.dart` - Tests enum contains "Favorite"
-- `contact_pre_processor_test.dart` - Tests group name matching
-- `localization_test.dart` - Tests localized values equal expected strings
-
-### Localization Testing Risk Assessment
-
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Tests fail after localization changes | CI breaks | Add hasGlobalContext guards |
-| Wrong locale shown to users | UX confusion | Thorough QA testing |
-| Missing translations in production | Broken UI | Fallback to English |
-
----
-
-## Part 2: The 500 New Rules
+## Part 2: New Rules by Category
 
 ### Category Distribution
 
@@ -428,8 +188,7 @@ These test files use hardcoded strings for assertions - this is correct:
 | Forms/Validation | 5 | +25 | 30 | Input, validators |
 | Localization | 12 | +18 | 30 | i18n, l10n |
 | DI | 8 | +17 | 25 | GetIt, Injectable |
-| Other | 188 | -78 | 110 | Redistributed to categories |
-| **Total** | **~475** | **+500** | **~975** | |
+| **Total** | **~500** | **+500** | **~1000** | |
 
 ---
 
@@ -835,447 +594,39 @@ These test files use hardcoded strings for assertions - this is correct:
 | 282 | `require_switch_control` | Comprehensive | INFO | Switch control support |
 | 283 | `avoid_hover_only` | Recommended | INFO | Not hover-dependent |
 
-### 3.7 Error Handling Rules (+30 rules)
+### 3.7 - 3.12 Additional Categories
 
-#### Exception Handling (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 284 | `avoid_empty_catch` | Essential | ERROR | Handle or rethrow |
-| 285 | `prefer_typed_catch` | Recommended | INFO | Specific exception types |
-| 286 | `require_error_logging` | Essential | WARNING | Log all errors |
-| 287 | `avoid_catch_generic` | Recommended | WARNING | Don't catch Exception |
-| 288 | `prefer_error_types` | Professional | INFO | Custom error types |
-| 289 | `require_stack_trace_preserve` | Essential | WARNING | Keep stack trace |
-| 290 | `avoid_throw_string` | Essential | ERROR | Throw Error/Exception |
-| 291 | `prefer_result_type` | Professional | INFO | Result over exceptions |
-| 292 | `require_finally_cleanup` | Recommended | INFO | Cleanup in finally |
-| 293 | `avoid_rethrow_modified` | Professional | INFO | Rethrow preserves trace |
-| 294 | `prefer_assert_in_debug` | Recommended | INFO | Assert for debug checks |
-| 295 | `require_error_context` | Professional | INFO | Error includes context |
-| 296 | `avoid_silent_failure` | Essential | ERROR | No silent catch-ignore |
-| 297 | `prefer_error_factory` | Comprehensive | INFO | Factory for errors |
-| 298 | `require_error_recovery` | Professional | INFO | Recovery strategy |
-
-#### Async Error Handling (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 299 | `require_future_error_handler` | Essential | WARNING | Handle Future errors |
-| 300 | `avoid_unhandled_async` | Essential | ERROR | Unawaited throws |
-| 301 | `prefer_async_try_catch` | Recommended | INFO | try-catch for async |
-| 302 | `require_stream_error_handler` | Essential | WARNING | Handle stream errors |
-| 303 | `avoid_completer_error_ignore` | Professional | WARNING | Completer error handling |
-| 304 | `prefer_timeout_for_futures` | Recommended | WARNING | Timeout long futures |
-| 305 | `require_zone_error_handler` | Professional | INFO | Zone error boundaries |
-| 306 | `avoid_catch_async_gap` | Professional | WARNING | Catch across async gap |
-| 307 | `prefer_error_widget_builder` | Essential | WARNING | ErrorWidget.builder |
-| 308 | `require_stream_done_handler` | Recommended | INFO | Handle stream completion |
-| 309 | `avoid_parallel_error_loss` | Professional | WARNING | Future.wait error handling |
-| 310 | `prefer_error_group` | Comprehensive | INFO | ErrorGroup for multi-future |
-| 311 | `require_cancel_on_error` | Professional | INFO | Cancel stream on error |
-| 312 | `avoid_timer_error_ignore` | Recommended | WARNING | Timer callback errors |
-| 313 | `prefer_onError_callback` | Professional | INFO | onError for listeners |
-
-### 3.8 Async/Concurrency Rules (+30 rules)
-
-#### Future/Async Patterns (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 314 | `avoid_nested_futures` | Recommended | WARNING | Flatten future chains |
-| 315 | `prefer_async_await` | Recommended | INFO | async/await over then |
-| 316 | `require_unawaited_annotation` | Professional | INFO | Mark intentional unawaited |
-| 317 | `avoid_future_wait_long` | Professional | WARNING | Too many parallel futures |
-| 318 | `prefer_future_delayed_cancel` | Comprehensive | INFO | Cancelable delays |
-| 319 | `require_async_init_dispose` | Recommended | WARNING | Async init/dispose pattern |
-| 320 | `avoid_sync_over_async` | Professional | INFO | Don't wrap sync in Future |
-| 321 | `prefer_microtask` | Comprehensive | INFO | scheduleMicrotask usage |
-| 322 | `require_loading_states` | Recommended | INFO | Loading/loaded states |
-| 323 | `avoid_future_or_misuse` | Professional | WARNING | FutureOr careful usage |
-| 324 | `prefer_value_future` | Comprehensive | INFO | SynchronousFuture for sync |
-| 325 | `require_cancellation_token` | Professional | INFO | Cancellation support |
-| 326 | `avoid_future_builder_in_build` | Essential | WARNING | FutureBuilder rebuild |
-| 327 | `prefer_async_generator` | Comprehensive | INFO | async* for sequences |
-| 328 | `require_error_future` | Recommended | INFO | Future.error for fails |
-
-#### Stream Patterns (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 329 | `require_stream_cancel` | Essential | ERROR | Cancel subscriptions |
-| 330 | `prefer_stream_controller_close` | Essential | WARNING | Close controllers |
-| 331 | `avoid_broadcast_overhead` | Professional | INFO | Broadcast only when needed |
-| 332 | `prefer_stream_transform` | Professional | INFO | Transform over listen |
-| 333 | `require_stream_first_error` | Recommended | INFO | Handle first value error |
-| 334 | `avoid_nested_listen` | Recommended | WARNING | Flatten nested listens |
-| 335 | `prefer_rxdart_patterns` | Comprehensive | INFO | RxDart for complex |
-| 336 | `require_stream_sync` | Professional | INFO | Sync stream carefully |
-| 337 | `avoid_stream_timeout_infinite` | Recommended | WARNING | Timeout for streams |
-| 338 | `prefer_async_expand` | Comprehensive | INFO | asyncExpand for sequences |
-| 339 | `require_drain_unused` | Recommended | INFO | Drain unused streams |
-| 340 | `avoid_stream_cast` | Professional | WARNING | Type-safe streams |
-| 341 | `prefer_event_sink` | Comprehensive | INFO | EventSink for events |
-| 342 | `require_stream_iterator` | Professional | INFO | StreamIterator pattern |
-| 343 | `avoid_stream_distinct_expensive` | Comprehensive | INFO | distinct equality cost |
-
-### 3.9 Architecture Rules (+40 rules)
-
-#### Clean Architecture (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 344 | `require_layer_separation` | Professional | WARNING | Domain independent |
-| 345 | `avoid_ui_in_domain` | Essential | ERROR | No UI in domain layer |
-| 346 | `prefer_repository_interface` | Professional | INFO | Repository abstraction |
-| 347 | `require_use_case_pattern` | Professional | INFO | Use cases for logic |
-| 348 | `avoid_direct_data_access` | Recommended | WARNING | Access via repository |
-| 349 | `prefer_entity_immutability` | Professional | INFO | Immutable entities |
-| 350 | `require_mapper_pattern` | Professional | INFO | DTO to entity mappers |
-| 351 | `avoid_circular_dependencies` | Essential | ERROR | No circular imports |
-| 352 | `prefer_dependency_injection` | Professional | INFO | DI for dependencies |
-| 353 | `require_interface_segregation` | Comprehensive | INFO | Small focused interfaces |
-| 354 | `avoid_god_class` | Recommended | WARNING | Classes too large |
-| 355 | `prefer_single_responsibility` | Professional | INFO | One responsibility |
-| 356 | `require_feature_folders` | Comprehensive | INFO | Feature-based structure |
-| 357 | `avoid_deep_inheritance` | Professional | INFO | Max 3 levels deep |
-| 358 | `prefer_composition` | Professional | INFO | Composition over inheritance |
-
-#### Design Patterns (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 359 | `prefer_factory_pattern` | Professional | INFO | Factory for creation |
-| 360 | `require_singleton_care` | Recommended | WARNING | Singleton side effects |
-| 361 | `prefer_builder_pattern` | Comprehensive | INFO | Builder for complex objects |
-| 362 | `require_observer_unsubscribe` | Essential | WARNING | Unsubscribe observers |
-| 363 | `prefer_strategy_pattern` | Professional | INFO | Strategy for algorithms |
-| 364 | `require_adapter_consistency` | Professional | INFO | Consistent adapters |
-| 365 | `prefer_decorator_pattern` | Comprehensive | INFO | Decorator for extension |
-| 366 | `require_facade_simplicity` | Professional | INFO | Facade hides complexity |
-| 367 | `prefer_command_pattern` | Comprehensive | INFO | Command for actions |
-| 368 | `require_iterator_pattern` | Comprehensive | INFO | Iterator for collections |
-| 369 | `prefer_mediator_pattern` | Comprehensive | INFO | Mediator for communication |
-| 370 | `require_memento_care` | Comprehensive | INFO | Memento for state |
-| 371 | `prefer_prototype_clone` | Comprehensive | INFO | Prototype pattern |
-| 372 | `require_state_pattern` | Professional | INFO | State pattern |
-| 373 | `prefer_template_method` | Comprehensive | INFO | Template method |
-
-#### Code Organization (10 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 374 | `require_export_barrel` | Professional | INFO | Barrel exports |
-| 375 | `avoid_relative_imports_outside` | Recommended | INFO | Package imports |
-| 376 | `prefer_part_files` | Comprehensive | INFO | Part files for large |
-| 377 | `require_library_doc` | Comprehensive | INFO | Library documentation |
-| 378 | `avoid_wildcard_imports` | Recommended | INFO | No show * imports |
-| 379 | `prefer_sorted_imports` | Comprehensive | INFO | Sorted imports |
-| 380 | `require_feature_test_folder` | Professional | INFO | Tests mirror features |
-| 381 | `avoid_src_exposure` | Professional | INFO | Don't export src |
-| 382 | `prefer_consistent_naming` | Recommended | INFO | Naming conventions |
-| 383 | `require_readme_per_feature` | Comprehensive | INFO | Feature documentation |
-
-### 3.10 Package-Specific Rules (+80 rules)
-
-*See detailed breakdowns in sections 3.2 (Riverpod, Bloc, Provider, GetX) above*
-
-#### Dio/HTTP Rules (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 384 | `require_dio_interceptor` | Professional | INFO | Use interceptors |
-| 385 | `prefer_dio_transformer` | Professional | INFO | Custom transformers |
-| 386 | `require_base_options` | Recommended | INFO | Set base options |
-| 387 | `avoid_dio_instance_per_call` | Essential | WARNING | Reuse Dio instance |
-| 388 | `prefer_cancel_token` | Recommended | INFO | Cancel support |
-| 389 | `require_error_interceptor` | Essential | WARNING | Error handling |
-| 390 | `prefer_log_interceptor` | Professional | INFO | Request logging |
-| 391 | `require_timeout_options` | Essential | WARNING | Set timeouts |
-| 392 | `avoid_form_data_memory` | Professional | WARNING | Stream large files |
-| 393 | `prefer_response_type` | Recommended | INFO | Explicit response type |
-| 394 | `require_retry_interceptor` | Professional | INFO | Retry on failure |
-| 395 | `avoid_cookie_misuse` | Professional | WARNING | Cookie handling |
-| 396 | `prefer_progress_callback` | Comprehensive | INFO | Upload progress |
-| 397 | `require_cache_interceptor` | Professional | INFO | Response caching |
-| 398 | `avoid_dio_test_mock` | Professional | INFO | Mock adapter for tests |
-
-#### Hive/Isar Rules (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 399 | `require_type_adapter` | Essential | ERROR | Register adapters |
-| 400 | `avoid_box_in_widget` | Recommended | WARNING | Box access outside widget |
-| 401 | `prefer_lazy_box` | Professional | INFO | LazyBox for large |
-| 402 | `require_box_close` | Essential | WARNING | Close boxes |
-| 403 | `avoid_watch_in_build` | Recommended | WARNING | box.watch() in build |
-| 404 | `prefer_compact_on_launch` | Professional | INFO | Compact boxes |
-| 405 | `require_encryption_key` | Professional | WARNING | Encrypt sensitive |
-| 406 | `avoid_nested_objects` | Professional | INFO | Flatten for performance |
-| 407 | `prefer_indexes` | Professional | INFO | Index query fields |
-| 408 | `require_migration_strategy` | Professional | WARNING | Handle schema changes |
-| 409 | `avoid_isar_on_main` | Professional | WARNING | Isar queries async |
-| 410 | `prefer_batch_write` | Recommended | INFO | Batch for multiple |
-| 411 | `require_unique_type_id` | Essential | ERROR | Unique type IDs |
-| 412 | `avoid_storing_widgets` | Essential | ERROR | No widget storage |
-| 413 | `prefer_value_equality` | Comprehensive | INFO | Value equality for models |
-
-#### GoRouter Rules (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 414 | `require_route_names` | Recommended | INFO | Named routes |
-| 415 | `avoid_route_string_literal` | Recommended | INFO | Route constants |
-| 416 | `prefer_typed_params` | Professional | INFO | TypedGoRoute |
-| 417 | `require_redirect_guard` | Essential | WARNING | Auth redirect |
-| 418 | `avoid_nested_route_depth` | Professional | INFO | Max nesting depth |
-| 419 | `prefer_shell_route` | Professional | INFO | ShellRoute for tabs |
-| 420 | `require_error_route` | Essential | WARNING | Error page handler |
-| 421 | `avoid_push_replacement_misuse` | Recommended | WARNING | Replace vs push |
-| 422 | `prefer_route_observer` | Comprehensive | INFO | Observer for analytics |
-| 423 | `require_deep_link_config` | Professional | INFO | Deep link setup |
-| 424 | `avoid_context_navigation` | Professional | INFO | Use GoRouter.of |
-| 425 | `prefer_extra_type_safe` | Professional | INFO | Type-safe extra |
-| 426 | `require_refresh_listenable` | Recommended | INFO | Refresh on state change |
-| 427 | `avoid_initial_location_misuse` | Recommended | WARNING | initialLocation use |
-| 428 | `prefer_state_restoration` | Comprehensive | INFO | State restoration |
-
-#### Firebase Rules (20 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 429 | `require_firebase_init` | Essential | ERROR | Firebase.initializeApp |
-| 430 | `avoid_firestore_batch_limit` | Essential | WARNING | 500 doc batch limit |
-| 431 | `prefer_firestore_pagination` | Recommended | INFO | Paginate queries |
-| 432 | `require_auth_state_listener` | Recommended | WARNING | Listen auth changes |
-| 433 | `avoid_storage_large_upload` | Professional | WARNING | Resumable uploads |
-| 434 | `prefer_composite_index` | Professional | INFO | Composite indexes |
-| 435 | `require_security_rules` | Essential | ERROR | Security rules |
-| 436 | `avoid_realtime_db_nesting` | Professional | WARNING | Flatten RTDB |
-| 437 | `prefer_transaction_for_atomic` | Essential | WARNING | Transactions |
-| 438 | `require_offline_persistence` | Professional | INFO | Enable persistence |
-| 439 | `avoid_query_without_limit` | Essential | WARNING | Limit queries |
-| 440 | `prefer_server_timestamp` | Recommended | INFO | Server timestamps |
-| 441 | `require_fcm_token_refresh` | Professional | INFO | Handle token refresh |
-| 442 | `avoid_analytics_pii` | Essential | ERROR | No PII in analytics |
-| 443 | `prefer_remote_config_defaults` | Professional | INFO | Config defaults |
-| 444 | `require_crashlytics_setup` | Recommended | INFO | Crashlytics init |
-| 445 | `avoid_firestore_in_loop` | Essential | WARNING | Batch Firestore ops |
-| 446 | `prefer_where_field_path` | Professional | INFO | FieldPath for where |
-| 447 | `require_cloud_function_timeout` | Professional | INFO | Function timeout |
-| 448 | `avoid_storage_rules_bypass` | Essential | ERROR | Rules not bypassable |
-
-### 3.11 Platform-Specific Rules (+40 rules)
-
-#### Web Platform (15 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 449 | `require_web_url_strategy` | Recommended | INFO | Hash vs path strategy |
-| 450 | `avoid_web_only_packages` | Recommended | WARNING | Cross-platform packages |
-| 451 | `prefer_deferred_loading` | Professional | INFO | Deferred components |
-| 452 | `require_seo_meta` | Professional | INFO | SEO meta tags |
-| 453 | `avoid_canvas_kit_large` | Professional | INFO | CanvasKit bundle size |
-| 454 | `prefer_html_renderer` | Comprehensive | INFO | HTML renderer option |
-| 455 | `require_loading_indicator` | Recommended | INFO | Web loading state |
-| 456 | `avoid_localstorage_sensitive` | Essential | WARNING | LocalStorage insecure |
-| 457 | `prefer_service_worker` | Professional | INFO | Service worker cache |
-| 458 | `require_favicon` | Comprehensive | INFO | Favicon configured |
-| 459 | `avoid_window_location` | Professional | INFO | GoRouter for navigation |
-| 460 | `prefer_responsive_breakpoints` | Recommended | INFO | Responsive design |
-| 461 | `require_keyboard_navigation` | Recommended | WARNING | Keyboard accessible |
-| 462 | `avoid_hover_only_web` | Recommended | INFO | Touch also works |
-| 463 | `prefer_browser_specific_handling` | Comprehensive | INFO | Browser differences |
-
-#### Desktop Platform (10 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 464 | `require_window_title` | Recommended | INFO | Window title set |
-| 465 | `avoid_desktop_fixed_size` | Professional | INFO | Resizable windows |
-| 466 | `prefer_menu_bar` | Professional | INFO | Desktop menu bar |
-| 467 | `require_keyboard_shortcuts` | Recommended | INFO | Keyboard shortcuts |
-| 468 | `avoid_touch_only_ui` | Recommended | WARNING | Mouse-friendly UI |
-| 469 | `prefer_scroll_physics_desktop` | Comprehensive | INFO | Desktop scroll feel |
-| 470 | `require_context_menu` | Professional | INFO | Right-click menu |
-| 471 | `avoid_mobile_patterns` | Professional | INFO | Desktop patterns |
-| 472 | `prefer_native_dialog` | Comprehensive | INFO | Native file dialogs |
-| 473 | `require_tray_support` | Comprehensive | INFO | System tray option |
-
-#### iOS Platform (8 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 474 | `require_ios_permissions` | Essential | WARNING | Info.plist permissions |
-| 475 | `avoid_cupertino_on_android` | Recommended | INFO | Platform-appropriate UI |
-| 476 | `prefer_platform_channel_safety` | Professional | WARNING | Safe platform calls |
-| 477 | `require_notch_safety` | Recommended | INFO | Safe areas |
-| 478 | `avoid_ios_simulator_only` | Professional | WARNING | Test on device |
-| 479 | `prefer_haptic_feedback` | Comprehensive | INFO | Haptics for iOS |
-| 480 | `require_ats_compliance` | Essential | WARNING | App Transport Security |
-| 481 | `avoid_keychain_misuse` | Professional | WARNING | Keychain correctly |
-
-#### Android Platform (7 rules)
-
-| # | Rule Name | Tier | Severity | Description |
-|---|-----------|------|----------|-------------|
-| 482 | `require_android_permissions` | Essential | WARNING | Manifest permissions |
-| 483 | `avoid_material_on_ios` | Recommended | INFO | Platform-appropriate UI |
-| 484 | `prefer_edge_to_edge` | Recommended | INFO | Edge-to-edge display |
-| 485 | `require_back_button_handling` | Essential | WARNING | Back button behavior |
-| 486 | `avoid_legacy_android_api` | Professional | WARNING | Target recent API |
-| 487 | `prefer_splash_screen` | Recommended | INFO | Android 12 splash |
-| 488 | `require_proguard_rules` | Professional | INFO | ProGuard config |
-
-### 3.12 Remaining Categories
-
-#### Documentation Rules (+25)
-Rules 489-513: Covering docstrings, API docs, README, changelogs
-
-#### API/Network Rules (+25)
-Rules 514-538: REST patterns, GraphQL, WebSockets, gRPC
-
-#### Database/Storage Rules (+25)
-Rules 539-563: SQLite, drift, ObjectBox, caching patterns
-
-#### Animation Rules (+20)
-Rules 564-583: Controllers, curves, performance, accessibility
-
-#### Navigation Rules (+20)
-Rules 584-603: Auto-route, Navigator 2.0, deep linking
-
-#### Forms/Validation Rules (+25)
-Rules 604-628: FormField, validators, masks, focus
-
-#### Localization Rules (+18)
-Rules 629-646: ARB files, plural forms, number formats
-
-#### Dependency Injection Rules (+17)
-Rules 647-663: GetIt, Injectable, Provider patterns
+See the full specification for:
+- Error Handling Rules (+30)
+- Async/Concurrency Rules (+30)
+- Architecture Rules (+40)
+- Package-Specific Rules (+80): Dio, Hive/Isar, GoRouter, Firebase
+- Platform-Specific Rules (+40): Web, Desktop, iOS, Android
+- Documentation, API/Network, Database, Animation, Navigation, Forms, Localization, DI
 
 ---
 
 ## Part 4: Tier Assignments
 
-### Tier 1: Essential (~50 rules)
+### Tier 1: Essential (~100 rules)
 
 Critical rules that prevent crashes, data loss, and security holes.
 
-```yaml
-# essential.yaml - ~50 rules
-saropa_lints:
-  rules:
-    # Memory (must dispose)
-    require_dispose_controllers: true
-    require_stream_cancel: true
-    require_scroll_controller_dispose: true
-    require_focus_node_dispose: true
-
-    # Null Safety
-    avoid_bang_after_await: true
-    avoid_unhandled_async: true
-
-    # Security
-    avoid_hardcoded_secrets: true
-    avoid_logging_pii: true
-    avoid_storing_passwords: true
-
-    # Widget Safety
-    avoid_nested_scaffolds: true
-    avoid_multiple_material_apps: true
-
-    # State Management
-    require_riverpod_scope: true
-    require_immutable_bloc_state: true
-
-    # ... ~35 more critical rules
-```
-
-### Tier 2: Recommended (~150 rules)
+### Tier 2: Recommended (~300 rules)
 
 Essential + common mistakes, performance basics, accessibility basics.
 
-```yaml
-# recommended.yaml - ~150 rules
-include: package:saropa_lints/tiers/essential.yaml
-
-saropa_lints:
-  rules:
-    # Performance
-    prefer_const_widgets: true
-    avoid_rebuild_on_scroll: true
-    prefer_listview_builder: true
-
-    # Accessibility
-    require_semantics_label: true
-    avoid_icon_only_buttons: true
-    require_minimum_touch_target: true
-
-    # Testing
-    require_test_assertions: true
-    avoid_test_sleep: true
-
-    # ... ~95 more recommended rules
-```
-
-### Tier 3: Professional (~350 rules)
+### Tier 3: Professional (~600 rules)
 
 Recommended + architecture, testing, maintainability.
 
-```yaml
-# professional.yaml - ~350 rules
-include: package:saropa_lints/tiers/recommended.yaml
-
-saropa_lints:
-  rules:
-    # Architecture
-    require_layer_separation: true
-    prefer_repository_interface: true
-    require_use_case_pattern: true
-
-    # Testing
-    require_arrange_act_assert: true
-    require_mock_verification: true
-
-    # ... ~195 more professional rules
-```
-
-### Tier 4: Comprehensive (~700 rules)
+### Tier 4: Comprehensive (~800 rules)
 
 Professional + documentation, style, edge cases.
 
-```yaml
-# comprehensive.yaml - ~700 rules
-include: package:saropa_lints/tiers/professional.yaml
-
-saropa_lints:
-  rules:
-    # Documentation
-    require_library_doc: true
-    require_readme_per_feature: true
-
-    # Style
-    prefer_sorted_imports: true
-
-    # ... ~345 more comprehensive rules
-```
-
-### Tier 5: Insanity (~1000 rules)
+### Tier 5: Insanity (1000 rules)
 
 Everything. For the truly obsessive.
-
-```yaml
-# insanity.yaml - ALL rules
-include: package:saropa_lints/tiers/comprehensive.yaml
-
-saropa_lints:
-  rules:
-    # Every remaining rule enabled
-    # Many are INFO level and may be noisy
-    prefer_font_weight_as_number: true  # Pedantic but valid
-    prefer_custom_single_child_layout: true  # Rarely needed
-    # ... all remaining rules
-```
 
 ---
 
@@ -1319,103 +670,8 @@ saropa_lints:
 
 ---
 
-## Part 6: File Structure
+## Contributing
 
-### New Rule Files to Create
+Want to help implement these rules? See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-```
-custom_lints/lib/src/rules/
-├── widget/
-│   ├── layout_rules.dart           (15 rules)
-│   ├── text_rules.dart             (10 rules)
-│   ├── image_rules.dart            (10 rules)
-│   ├── input_rules.dart            (15 rules)
-│   └── list_rules.dart             (10 rules)
-├── state/
-│   ├── riverpod_rules.dart         (15 rules)
-│   ├── bloc_rules.dart             (15 rules)
-│   ├── provider_rules.dart         (10 rules)
-│   └── getx_rules.dart             (5 rules)
-├── performance/
-│   ├── build_rules.dart            (20 rules)
-│   ├── memory_rules.dart           (15 rules)
-│   └── network_perf_rules.dart     (15 rules)
-├── testing/
-│   ├── unit_test_rules.dart        (15 rules)
-│   ├── widget_test_rules.dart      (18 rules)
-│   └── integration_test_rules.dart (15 rules)
-├── security/
-│   ├── auth_rules.dart             (15 rules)
-│   ├── data_rules.dart             (15 rules)
-│   └── input_rules.dart            (15 rules)
-├── accessibility/
-│   ├── screen_reader_rules.dart    (15 rules)
-│   ├── visual_rules.dart           (12 rules)
-│   └── motor_rules.dart            (8 rules)
-├── error/
-│   ├── exception_rules.dart        (15 rules)
-│   └── async_error_rules.dart      (15 rules)
-├── async/
-│   ├── future_rules.dart           (15 rules)
-│   └── stream_rules.dart           (15 rules)
-├── architecture/
-│   ├── clean_arch_rules.dart       (15 rules)
-│   ├── pattern_rules.dart          (15 rules)
-│   └── organization_rules.dart     (10 rules)
-├── packages/
-│   ├── dio_rules.dart              (15 rules)
-│   ├── hive_isar_rules.dart        (15 rules)
-│   ├── gorouter_rules.dart         (15 rules)
-│   └── firebase_rules.dart         (20 rules)
-├── platform/
-│   ├── web_rules.dart              (15 rules)
-│   ├── desktop_rules.dart          (10 rules)
-│   ├── ios_rules.dart              (8 rules)
-│   └── android_rules.dart          (7 rules)
-└── tiers/
-    ├── essential.yaml              (~50 rules)
-    ├── recommended.yaml            (~150 rules)
-    ├── professional.yaml           (~350 rules)
-    ├── comprehensive.yaml          (~700 rules)
-    └── insanity.yaml               (~1000 rules)
-```
-
-### Test Files to Create
-
-```
-custom_lints/test/
-├── test_utils/
-│   ├── lint_test_helper.dart
-│   ├── analyze_code.dart
-│   └── lint_expectation.dart
-├── fixtures/
-│   ├── accessibility/
-│   ├── performance/
-│   ├── security/
-│   └── ...
-└── rules/
-    ├── accessibility_rules_test.dart
-    ├── performance_rules_test.dart
-    ├── security_rules_test.dart
-    └── ...
-```
-
----
-
-## Summary
-
-| Metric | Value |
-|--------|-------|
-| Current rules | 475 |
-| New rules to add | 500 |
-| **Total rules** | **~975** |
-| New rule categories | 20+ |
-| New rule files | ~30 |
-| Test files to create | ~12 |
-| Tier configurations | 5 |
-
-This plan provides a comprehensive path to ~1,000 rules with:
-- A testing framework for validating all rules
-- A clear tier system for managing adoption complexity
-- Package-specific rules for the Flutter ecosystem
-- Platform-specific rules for web, desktop, iOS, and Android
+Pick a rule from the list above and submit a PR!

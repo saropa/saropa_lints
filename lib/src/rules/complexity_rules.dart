@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -24,6 +24,8 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// if (a && b) { ... }
 /// bool result = x || y;
 /// ```
+///
+/// **Quick fix available:** Replaces `&` with `&&` or `|` with `||`.
 class AvoidBitwiseOperatorsWithBooleansRule extends DartLintRule {
   const AvoidBitwiseOperatorsWithBooleansRule() : super(code: _code);
 
@@ -58,6 +60,9 @@ class AvoidBitwiseOperatorsWithBooleansRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceBitwiseWithLogicalFix()];
 }
 
 /// Warns when cascade is used after if-null operator without parentheses.
@@ -76,6 +81,8 @@ class AvoidBitwiseOperatorsWithBooleansRule extends DartLintRule {
 /// ```dart
 /// final list = (possibleList ?? <int>[])..add(1);
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCascadeAfterIfNullRule extends DartLintRule {
   const AvoidCascadeAfterIfNullRule() : super(code: _code);
 
@@ -102,6 +109,9 @@ class AvoidCascadeAfterIfNullRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForCascadeAfterIfNullFix()];
 }
 
 /// Warns when arithmetic expressions are too complex.
@@ -271,6 +281,8 @@ class AvoidComplexConditionsRule extends DartLintRule {
 ///   ..add(2)
 ///   ..add(3);
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateCascadesRule extends DartLintRule {
   const AvoidDuplicateCascadesRule() : super(code: _code);
 
@@ -301,6 +313,9 @@ class AvoidDuplicateCascadesRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForDuplicateCascadeFix()];
 }
 
 /// Warns when an expression has excessive complexity.
@@ -668,6 +683,94 @@ class PreferParenthesesWithIfNullRule extends DartLintRule {
           reporter.atNode(node, code);
         }
       }
+    });
+  }
+}
+
+class _ReplaceBitwiseWithLogicalFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final TokenType op = node.operator.type;
+      if (op != TokenType.AMPERSAND && op != TokenType.BAR) return;
+
+      final String newOp = op == TokenType.AMPERSAND ? '&&' : '||';
+      final String left = node.leftOperand.toSource();
+      final String right = node.rightOperand.toSource();
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with $newOp',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          '$left $newOp $right',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForCascadeAfterIfNullFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCascadeExpression((CascadeExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for cascade precedence',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: wrap ?? expression in parentheses\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForDuplicateCascadeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCascadeExpression((CascadeExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for duplicate cascade',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: duplicate cascade - remove or verify intentional\n',
+        );
+      });
     });
   }
 }

@@ -1,14 +1,16 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Warns when calling .ignore() on a Future.
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureIgnoreRule extends DartLintRule {
   const AvoidFutureIgnoreRule() : super(code: _code);
 
@@ -43,9 +45,14 @@ class AvoidFutureIgnoreRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForFutureIgnoreFix()];
 }
 
 /// Warns when calling toString() or using string interpolation on a Future.
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureToStringRule extends DartLintRule {
   const AvoidFutureToStringRule() : super(code: _code);
 
@@ -88,6 +95,9 @@ class AvoidFutureToStringRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForFutureToStringFix()];
 }
 
 /// Warns when `Future<Future<T>>` is used (nested futures).
@@ -101,6 +111,8 @@ class AvoidFutureToStringRule extends DartLintRule {
 /// ```dart
 /// Future<int> simpleFuture() async { ... }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNestedFuturesRule extends DartLintRule {
   const AvoidNestedFuturesRule() : super(code: _code);
 
@@ -129,6 +141,9 @@ class AvoidNestedFuturesRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForNestedFuturesFix()];
 }
 
 /// Warns when `Stream<Future<T>>` or `Future<Stream<T>>` is used.
@@ -142,6 +157,8 @@ class AvoidNestedFuturesRule extends DartLintRule {
 /// ```dart
 /// Stream<int> directStream() async* { ... }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
   const AvoidNestedStreamsAndFuturesRule() : super(code: _code);
 
@@ -174,12 +191,17 @@ class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForNestedStreamsAndFuturesFix()];
 }
 
 /// Warns when an async function is passed where a sync function is expected.
 ///
 /// Passing an async function to a parameter expecting a synchronous function
 /// can lead to unexpected behavior where the returned Future is ignored.
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidPassingAsyncWhenSyncExpectedRule extends DartLintRule {
   const AvoidPassingAsyncWhenSyncExpectedRule() : super(code: _code);
 
@@ -213,6 +235,9 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForAsyncWhenSyncExpectedFix()];
 }
 
 /// Warns when async is used but no await is present in the function body.
@@ -300,6 +325,8 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
 /// ```dart
 /// print(myStream.toString());
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidStreamToStringRule extends DartLintRule {
   const AvoidStreamToStringRule() : super(code: _code);
 
@@ -330,9 +357,14 @@ class AvoidStreamToStringRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForStreamToStringFix()];
 }
 
 /// Warns when .listen() result is not assigned to a variable.
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidUnassignedStreamSubscriptionsRule extends DartLintRule {
   const AvoidUnassignedStreamSubscriptionsRule() : super(code: _code);
 
@@ -374,6 +406,9 @@ class AvoidUnassignedStreamSubscriptionsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForUnassignedSubscriptionFix()];
 }
 
 /// Warns when .then() is used instead of async/await.
@@ -685,6 +720,8 @@ class PreferSpecifyingFutureValueTypeRule extends DartLintRule {
 ///   return fetchData();
 /// }
 /// ```
+///
+/// **Quick fix available:** Adds `await` before the returned expression.
 class PreferReturnAwaitRule extends DartLintRule {
   const PreferReturnAwaitRule() : super(code: _code);
 
@@ -733,5 +770,225 @@ class PreferReturnAwaitRule extends DartLintRule {
       current = current.parent;
     }
     return null;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddAwaitFix()];
+}
+
+class _AddAwaitFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addReturnStatement((ReturnStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression? expression = node.expression;
+      if (expression == null) return;
+      if (expression is AwaitExpression) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add await',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(expression.offset, 'await ');
+      });
+    });
+  }
+}
+
+class _AddHackForFutureIgnoreFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for Future.ignore()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: handle this Future properly with await or unawaited()\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForFutureToStringFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for Future.toString()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: await the Future before converting to string\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForNestedFuturesFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedType((NamedType node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for nested Future',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: flatten nested Future */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForNestedStreamsAndFuturesFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedType((NamedType node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for nested Stream/Future',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: avoid mixing Stream and Future */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForAsyncWhenSyncExpectedFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFunctionExpression((FunctionExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for async callback',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: async callback - ensure caller handles Future */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForStreamToStringFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for Stream.toString()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: use stream.toList() or iterate instead of toString()\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForUnassignedSubscriptionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for unassigned subscription',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: assign subscription to cancel later\n',
+        );
+      });
+    });
   }
 }

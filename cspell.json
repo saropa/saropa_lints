@@ -28,13 +28,16 @@
     "listview",
     "maybeof",
     "mediaquery",
+    "open-source",
     "pubdev",
     "pubspec",
+    "rethrowing",
     "rgba",
     "saropa_dart_utils",
     "scrollables",
     "setstate",
-    "timezone"
+    "timezone",
+    "WCAG"
   ],
   // Specify paths/files to ignore.
   "ignorePaths": [

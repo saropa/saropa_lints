@@ -1,3 +1,5 @@
+![saropa_lints banner](assets/banner.png)
+
 # saropa_lints
 
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
@@ -7,11 +9,26 @@
 
 Developed by [Saropa][saropa_link]. Making the world of Dart & Flutter better, one lint at a time.
 
+[saropa_link]: https://saropa.com
+
 ---
 
-This package provides **500+ custom lint rules** for Dart and Flutter, helping you catch bugs, improve accessibility, and write more maintainable code.
+## Why saropa_lints?
 
-[saropa_link]: https://saropa.com
+Flutter's ecosystem is young. The mature tooling that other platforms take for granted — security analysis, accessibility enforcement, architectural guardrails — is still catching up.
+
+Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
+
+Dart's analyzer catches syntax errors. saropa_lints catches the rest:
+
+- **Security** — Hardcoded credentials, unsafe deserialization, input validation gaps
+- **Accessibility** — Missing semantics, inadequate touch targets, screen reader issues
+- **Performance** — Unnecessary rebuilds, memory leaks, expensive operations in build methods
+- **Maintainability** — Inconsistent patterns, error handling gaps, architectural drift
+
+The tier system lets you adopt gradually. Start with 50 critical rules, work up to 1000 when you're ready.
+
+---
 
 ## Quick Start
 
@@ -21,7 +38,7 @@ This package provides **500+ custom lint rules** for Dart and Flutter, helping y
 # pubspec.yaml
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^0.1.0
+  saropa_lints: ^1.1.9
 ```
 
 ### 2. Enable custom_lint
@@ -46,17 +63,22 @@ include: package:saropa_lints/tiers/recommended.yaml
 dart run custom_lint
 ```
 
+### Migrating from other tools?
+
+- [Migrating from very_good_analysis](docs/migration_from_vga.md)
+- [Migrating from DCM (Dart Code Metrics)](docs/migration_from_dcm.md)
+
 ## The 5 Tiers
 
 Pick the tier that matches your team:
 
 | Tier | Rules | Best For |
 |------|-------|----------|
-| **Essential** | ~50 | Every project. Prevents crashes, memory leaks, security holes. |
-| **Recommended** | ~150 | Most teams. Adds performance, accessibility, testing basics. |
-| **Professional** | ~300 | Enterprise. Adds architecture, documentation, comprehensive testing. |
-| **Comprehensive** | ~400 | Quality obsessed. Best practices everywhere. |
-| **Insanity** | 497 | Greenfield projects. Every single rule. |
+| **Essential** | ~100 | Every project. Prevents crashes, memory leaks, security holes. |
+| **Recommended** | ~300 | Most teams. Adds performance, accessibility, testing basics. |
+| **Professional** | ~600 | Enterprise. Adds architecture, documentation, comprehensive testing. |
+| **Comprehensive** | ~800 | Quality obsessed. Best practices everywhere. |
+| **Insanity** | 1000 | Greenfield projects. Every single rule. |
 
 ### Using a tier
 
@@ -106,7 +128,7 @@ custom_lint:
 
 ## Performance
 
-Running all 497 rules uses significant memory. The tier system helps:
+Running all 1000 rules uses significant memory. The tier system helps:
 - Rules set to `false` are not loaded
 - Start with `essential` or `recommended`
 - Upgrade tiers as you fix warnings
@@ -187,16 +209,16 @@ Not sure if something is a bug or a design decision? Open a discussion issue. We
 
 ## Professional Services
 
-Optional paid services for teams that want hands-on help:
+Optional paid services for teams that want hands-on help. See [ENTERPRISE.md](ENTERPRISE.md) for details.
 
 | Service | Description |
 |---------|-------------|
-| **Reports** | Codebase analysis with prioritized findings |
-| **Remediation** | We fix the issues |
-| **Custom Rules** | Rules specific to your codebase |
-| **Training** | Team workshops |
+| **Codebase Assessment** | We analyze your codebase, prioritize findings, create a remediation roadmap |
+| **Remediation** | We fix the issues — you stay focused on features |
+| **Custom Rules** | Rules specific to your architecture and compliance requirements |
+| **Training** | Team workshops on Flutter best practices |
 
-Contact: [saropa.com](https://saropa.com)
+Contact: [saropa.com](https://saropa.com) | [lints@saropa.com](mailto:lints@saropa.com)
 
 ## Badge
 

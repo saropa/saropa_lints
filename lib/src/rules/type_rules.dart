@@ -5,7 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -25,6 +25,8 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// extension type UserId(int id) implements int {}
 /// final userId = UserId(42);  // Proper construction
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCastingToExtensionTypeRule extends DartLintRule {
   const AvoidCastingToExtensionTypeRule() : super(code: _code);
 
@@ -55,6 +57,9 @@ class AvoidCastingToExtensionTypeRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForExtensionTypeCastFix()];
 }
 
 /// Warns when using collection methods with unrelated types.
@@ -73,6 +78,8 @@ class AvoidCastingToExtensionTypeRule extends DartLintRule {
 /// List<String> items = ['a', 'b'];
 /// items.contains('a');  // Correct type
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
   const AvoidCollectionMethodsWithUnrelatedTypesRule() : super(code: _code);
 
@@ -176,6 +183,9 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
 
     return false;
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForUnrelatedCollectionTypeFix()];
 }
 
 /// Warns when dynamic type is used.
@@ -223,6 +233,8 @@ class AvoidDynamicRule extends DartLintRule {
 /// ```dart
 /// extension type UserId(int id) implements Object { }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
   const AvoidImplicitlyNullableExtensionTypesRule() : super(code: _code);
 
@@ -259,9 +271,14 @@ class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForImplicitlyNullableExtensionFix()];
 }
 
 /// Warns when interpolating a nullable value in a string.
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableInterpolationRule extends DartLintRule {
   const AvoidNullableInterpolationRule() : super(code: _code);
 
@@ -288,6 +305,9 @@ class AvoidNullableInterpolationRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForNullableInterpolationFix()];
 }
 
 /// Warns when nullable parameters have default values that could be non-null.
@@ -305,6 +325,8 @@ class AvoidNullableInterpolationRule extends DartLintRule {
 /// ```dart
 /// void foo({String name = 'default'}) { }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableParametersWithDefaultValuesRule extends DartLintRule {
   const AvoidNullableParametersWithDefaultValuesRule() : super(code: _code);
 
@@ -342,6 +364,9 @@ class AvoidNullableParametersWithDefaultValuesRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForNullableParamWithDefaultFix()];
 }
 
 /// Warns when calling `.toString()` on a nullable value without null check.
@@ -578,6 +603,8 @@ class AvoidUnnecessaryTypeCastsRule extends DartLintRule {
 /// Object x = getValue();
 /// if (x is String) { ... }  // Could be true
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidUnrelatedTypeAssertionsRule extends DartLintRule {
   const AvoidUnrelatedTypeAssertionsRule() : super(code: _code);
 
@@ -637,6 +664,9 @@ class AvoidUnrelatedTypeAssertionsRule extends DartLintRule {
       'bool',
     }.contains(typeName);
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForUnrelatedTypeAssertionFix()];
 }
 
 /// Warns when type names don't follow Dart conventions.
@@ -656,6 +686,8 @@ class AvoidUnrelatedTypeAssertionsRule extends DartLintRule {
 /// class MyClass { }
 /// typedef MyCallback = void Function();
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class PreferCorrectTypeNameRule extends DartLintRule {
   const PreferCorrectTypeNameRule() : super(code: _code);
 
@@ -726,6 +758,9 @@ class PreferCorrectTypeNameRule extends DartLintRule {
 
     return true;
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForIncorrectTypeNameFix()];
 }
 
 /// Warns when using bare 'Function' type instead of specific function type.
@@ -812,6 +847,217 @@ class PreferTypeOverVarRule extends DartLintRule {
       if (node.type == null && node.keyword?.lexeme == 'var') {
         reporter.atNode(node, code);
       }
+    });
+  }
+}
+
+class _AddHackForExtensionTypeCastFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addAsExpression((AsExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for extension type cast',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: use constructor instead of cast */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForUnrelatedCollectionTypeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for unrelated type',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: argument type cannot match collection element type */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForImplicitlyNullableExtensionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for implicitly nullable extension',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: add "implements Object" to make non-nullable\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForNullableInterpolationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInterpolationExpression((InterpolationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for nullable interpolation',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: add null check or default value */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForNullableParamWithDefaultFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addDefaultFormalParameter((DefaultFormalParameter node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for nullable param with default',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: remove ? since it has non-null default */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForUnrelatedTypeAssertionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIsExpression((IsExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for impossible type check',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: type check is always false - fix types */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForIncorrectTypeNameFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    void addFix(AstNode node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for incorrect type name',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: rename to use UpperCamelCase\n',
+        );
+      });
+    }
+
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      addFix(node);
+    });
+
+    context.registry.addMixinDeclaration((MixinDeclaration node) {
+      addFix(node);
+    });
+
+    context.registry.addEnumDeclaration((EnumDeclaration node) {
+      addFix(node);
+    });
+
+    context.registry
+        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+      addFix(node);
+    });
+
+    context.registry.addGenericTypeAlias((GenericTypeAlias node) {
+      addFix(node);
     });
   }
 }
