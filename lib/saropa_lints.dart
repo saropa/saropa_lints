@@ -604,8 +604,7 @@ class _SaropaLints extends PluginBase {
     //   saropa_lints:
     //     tier: recommended
     final LintOptions? saropaConfig = configs.rules['saropa_lints'];
-    final String tier =
-        saropaConfig?.json['tier'] as String? ?? 'essential';
+    final String tier = saropaConfig?.json['tier'] as String? ?? 'essential';
 
     // Get all rules enabled for this tier
     final Set<String> tierRules = getRulesForTier(tier);
