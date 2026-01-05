@@ -4,11 +4,13 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Warns when exception classes have non-final fields.
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
   const AvoidNonFinalExceptionClassFieldsRule() : super(code: _code);
 
@@ -51,6 +53,9 @@ class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForNonFinalExceptionFieldFix()];
 }
 
 /// Warns when a catch clause only contains a rethrow.
@@ -69,6 +74,8 @@ class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
 /// // Remove the try-catch entirely, or add meaningful handling
 /// doSomething();
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidOnlyRethrowRule extends DartLintRule {
   const AvoidOnlyRethrowRule() : super(code: _code);
 
@@ -96,6 +103,9 @@ class AvoidOnlyRethrowRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForOnlyRethrowFix()];
 }
 
 /// Warns when throw is used inside a catch block, which loses the stack trace.
@@ -117,6 +127,8 @@ class AvoidOnlyRethrowRule extends DartLintRule {
 ///   throw Exception('Failed: $e');  // Or use Error.throwWithStackTrace
 /// }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidThrowInCatchBlockRule extends DartLintRule {
   const AvoidThrowInCatchBlockRule() : super(code: _code);
 
@@ -139,6 +151,9 @@ class AvoidThrowInCatchBlockRule extends DartLintRule {
       node.body.visitChildren(_ThrowVisitor(reporter, code));
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForThrowInCatchFix()];
 }
 
 class _ThrowVisitor extends RecursiveAstVisitor<void> {
@@ -272,6 +287,87 @@ class PreferPublicExceptionClassesRule extends DartLintRule {
           superName.endsWith('Error')) {
         reporter.atToken(node.name, code);
       }
+    });
+  }
+}
+
+class _AddHackForNonFinalExceptionFieldFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for non-final field',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: make this field final\n  ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForOnlyRethrowFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for pointless rethrow',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: remove try-catch or add error handling */ ',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForThrowInCatchFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addThrowExpression((ThrowExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for throw in catch',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: use rethrow or Error.throwWithStackTrace */ ',
+        );
+      });
     });
   }
 }

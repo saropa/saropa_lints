@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -24,6 +25,8 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// // or
 /// if (const DeepCollectionEquality().equals(list1, list2)) {}
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCollectionEqualityChecksRule extends DartLintRule {
   const AvoidCollectionEqualityChecksRule() : super(code: _code);
 
@@ -77,6 +80,36 @@ class AvoidCollectionEqualityChecksRule extends DartLintRule {
     return _collectionTypes.any(
       (String collection) => typeName.startsWith(collection),
     );
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackCommentForCollectionEqualityFix()];
+}
+
+class _AddHackCommentForCollectionEqualityFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for collection comparison',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: use listEquals/setEquals/mapEquals */ ',
+        );
+      });
+    });
   }
 }
 
@@ -136,6 +169,8 @@ class AvoidDuplicateMapKeysRule extends DartLintRule {
 /// ```dart
 /// if (map.containsKey(key)) { ... }
 /// ```
+///
+/// **Quick fix available:** Replaces with `map.containsKey(key)`.
 class AvoidMapKeysContainsRule extends DartLintRule {
   const AvoidMapKeysContainsRule() : super(code: _code);
 
@@ -162,6 +197,47 @@ class AvoidMapKeysContainsRule extends DartLintRule {
       if (target.propertyName.name == 'keys') {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseContainsKeyFix()];
+}
+
+class _UseContainsKeyFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'contains') return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression? target = node.target;
+      if (target is! PropertyAccess) return;
+      if (target.propertyName.name != 'keys') return;
+
+      final Expression? mapExpr = target.target;
+      if (mapExpr == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use containsKey()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Replace "map.keys.contains(key)" with "map.containsKey(key)"
+        final String mapSource = mapExpr.toSource();
+        final String argsSource = node.argumentList.toSource();
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '$mapSource.containsKey$argsSource',
+        );
+      });
     });
   }
 }
@@ -304,6 +380,46 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackCommentForUnsafeCollectionFix()];
+}
+
+class _AddHackCommentForUnsafeCollectionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Handle PropertyAccess nodes
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      _addHackComment(reporter, node, node.propertyName.name);
+    });
+
+    // Handle PrefixedIdentifier nodes
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      _addHackComment(reporter, node, node.identifier.name);
+    });
+  }
+
+  void _addHackComment(ChangeReporter reporter, AstNode node, String method) {
+    final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+      message: 'Add HACK comment for unsafe .$method',
+      priority: 2,
+    );
+
+    changeBuilder.addDartFileEdit((builder) {
+      builder.addSimpleInsertion(
+        node.offset,
+        '/* HACK: check empty before .$method */ ',
+      );
+    });
+  }
 }
 
 /// Warns when reduce() is called on a potentially empty collection.
@@ -356,6 +472,37 @@ class AvoidUnsafeReduceRule extends DartLintRule {
           typeName.startsWith('Queue')) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackCommentForReduceFix()];
+}
+
+class _AddHackCommentForReduceFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'reduce') return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for unsafe reduce',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: use fold() or check empty */ ',
+        );
+      });
     });
   }
 }
@@ -457,6 +604,63 @@ class PreferContainsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseContainsFix()];
+}
+
+class _UseContainsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression left = node.leftOperand;
+      if (left is! MethodInvocation) return;
+      if (left.methodName.name != 'indexOf') return;
+
+      final Expression? target = left.target;
+      if (target == null) return;
+
+      final Expression right = node.rightOperand;
+      if (right is! IntegerLiteral) return;
+
+      final String op = node.operator.lexeme;
+      final int? value = right.value;
+      final String args = left.argumentList.arguments.first.toSource();
+      String replacement;
+
+      // indexOf(x) != -1 or indexOf(x) >= 0 means "contains"
+      // indexOf(x) == -1 or indexOf(x) < 0 means "!contains"
+      if ((value == -1 && op == '!=') || (value == 0 && op == '>=')) {
+        replacement = '${target.toSource()}.contains($args)';
+      } else if ((value == -1 && op == '==') || (value == 0 && op == '<')) {
+        replacement = '!${target.toSource()}.contains($args)';
+      } else if (value == -1 && op == '>') {
+        replacement = '${target.toSource()}.contains($args)';
+      } else {
+        return;
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use .contains()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          replacement,
+        );
+      });
+    });
+  }
 }
 
 /// Warns when `list[0]` is used instead of `list.first`.
@@ -470,6 +674,8 @@ class PreferContainsRule extends DartLintRule {
 /// ```dart
 /// final first = list.first;
 /// ```
+///
+/// **Quick fix available:** Replaces `list[0]` with `list.first`.
 class PreferFirstRule extends DartLintRule {
   const PreferFirstRule() : super(code: _code);
 
@@ -491,6 +697,42 @@ class PreferFirstRule extends DartLintRule {
       if (index is IntegerLiteral && index.value == 0) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseFirstFix()];
+}
+
+class _UseFirstFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression index = node.index;
+      if (index is! IntegerLiteral || index.value != 0) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use .first',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '${target.toSource()}.first',
+        );
+      });
     });
   }
 }
@@ -604,6 +846,39 @@ class PreferLastRule extends DartLintRule {
           }
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseLastFix()];
+}
+
+class _UseLastFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use .last',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '${target.toSource()}.last',
+        );
+      });
     });
   }
 }
