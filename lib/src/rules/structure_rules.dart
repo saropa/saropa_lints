@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -34,7 +34,7 @@ class AvoidBarrelFilesRule extends DartLintRule {
     name: 'avoid_barrel_files',
     problemMessage: 'File contains only export statements (barrel file).',
     correctionMessage: 'Import specific files where needed instead of using barrel files.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -90,7 +90,7 @@ class AvoidDoubleSlashImportsRule extends DartLintRule {
     name: 'avoid_double_slash_imports',
     problemMessage: 'Import path contains double slashes.',
     correctionMessage: 'Remove the extra slash from the import path.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -140,7 +140,7 @@ class AvoidDuplicateExportsRule extends DartLintRule {
     name: 'avoid_duplicate_exports',
     problemMessage: 'File is exported multiple times.',
     correctionMessage: 'Remove the duplicate export directive.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -184,7 +184,7 @@ class AvoidDuplicateMixinsRule extends DartLintRule {
     name: 'avoid_duplicate_mixins',
     problemMessage: 'Mixin is applied multiple times.',
     correctionMessage: 'Remove the duplicate mixin application.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -199,7 +199,7 @@ class AvoidDuplicateMixinsRule extends DartLintRule {
 
       final Set<String> seenMixins = <String>{};
       for (final NamedType mixin in withClause.mixinTypes) {
-        final String mixinName = mixin.name.lexeme;
+        final String mixinName = mixin.name2.lexeme;
         if (seenMixins.contains(mixinName)) {
           reporter.atNode(mixin, code);
         } else {
@@ -229,7 +229,7 @@ class AvoidDuplicateNamedImportsRule extends DartLintRule {
     name: 'avoid_duplicate_named_imports',
     problemMessage: 'Import is declared multiple times with different prefixes.',
     correctionMessage: 'Use a single import with one prefix.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -277,7 +277,7 @@ class AvoidGlobalStateRule extends DartLintRule {
     name: 'avoid_global_state',
     problemMessage: 'Avoid mutable global state.',
     correctionMessage: 'Use const, final, or encapsulate in a class.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -320,7 +320,7 @@ class AvoidLongFilesRule extends DartLintRule {
     name: 'avoid_long_files',
     problemMessage: 'File exceeds $_maxLines lines.',
     correctionMessage: 'Consider splitting this file into smaller modules.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -356,7 +356,7 @@ class AvoidLongFunctionsRule extends DartLintRule {
     name: 'avoid_long_functions',
     problemMessage: 'Function body exceeds $_maxLines lines.',
     correctionMessage: 'Consider extracting parts into smaller functions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -410,7 +410,7 @@ class AvoidLongParameterListRule extends DartLintRule {
     name: 'avoid_long_parameter_list',
     problemMessage: 'Function has too many parameters (max 5).',
     correctionMessage: 'Consider using a configuration object or named parameters.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _maxParameters = 5;
@@ -463,7 +463,7 @@ class AvoidLocalFunctionsRule extends DartLintRule {
     name: 'avoid_local_functions',
     problemMessage: 'Avoid declaring local functions.',
     correctionMessage: 'Extract to a private top-level or class method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -493,7 +493,7 @@ class MaxImportsRule extends DartLintRule {
     name: 'max_imports',
     problemMessage: 'File has more than $_maxImports imports.',
     correctionMessage: 'Consider splitting the file or reducing dependencies.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -534,7 +534,7 @@ class MemberOrderingRule extends DartLintRule {
     problemMessage: 'Consider reordering class members.',
     correctionMessage:
         'Order: static fields, instance fields, constructors, static methods, instance methods.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -596,7 +596,7 @@ class PreferSortedParametersRule extends DartLintRule {
     name: 'prefer_sorted_parameters',
     problemMessage: 'Named parameters should be in alphabetical order.',
     correctionMessage: 'Reorder parameters alphabetically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -661,7 +661,7 @@ class PreferNamedBooleanParametersRule extends DartLintRule {
     name: 'prefer_named_boolean_parameters',
     problemMessage: 'Boolean parameter should be named, not positional.',
     correctionMessage: 'Convert to a named parameter for clearer call sites.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -685,7 +685,7 @@ class PreferNamedBooleanParametersRule extends DartLintRule {
         if (simpleParam == null) continue;
 
         final TypeAnnotation? type = simpleParam.type;
-        if (type is NamedType && type.name.lexeme == 'bool') {
+        if (type is NamedType && type.name2.lexeme == 'bool') {
           reporter.atNode(param, code);
         }
       }
@@ -701,7 +701,7 @@ class PreferNamedImportsRule extends DartLintRule {
     name: 'prefer_named_imports',
     problemMessage: 'Consider using named imports (show/hide) for clarity.',
     correctionMessage: 'Use "show" to explicitly list imported symbols.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -756,7 +756,7 @@ class PreferNamedParametersRule extends DartLintRule {
     name: 'prefer_named_parameters',
     problemMessage: 'Function has too many positional parameters.',
     correctionMessage: 'Consider using named parameters for better readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _maxPositionalParams = 3;
@@ -794,7 +794,7 @@ class PreferStaticClassRule extends DartLintRule {
     name: 'prefer_static_class',
     problemMessage: 'Class only has static members.',
     correctionMessage: 'Consider using top-level functions and constants instead.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -867,7 +867,7 @@ class AvoidUnnecessaryLocalVariableRule extends DartLintRule {
     name: 'avoid_unnecessary_local_variable',
     problemMessage: 'Variable is only used once and returned immediately.',
     correctionMessage: 'Return the expression directly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -926,7 +926,7 @@ class AvoidUnnecessaryReassignmentRule extends DartLintRule {
     name: 'avoid_unnecessary_reassignment',
     problemMessage: 'Variable is assigned the same value it already has.',
     correctionMessage: 'Remove the unnecessary reassignment.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -976,7 +976,7 @@ class PreferStaticMethodRule extends DartLintRule {
     name: 'prefer_static_method',
     problemMessage: 'Method does not use instance members and could be static.',
     correctionMessage: 'Make this method static.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1071,7 +1071,7 @@ class PreferAbstractFinalStaticClassRule extends DartLintRule {
     name: 'prefer_abstract_final_static_class',
     problemMessage: 'Class with only static members should be abstract final.',
     correctionMessage: 'Use "abstract final class" to prevent instantiation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1146,7 +1146,7 @@ class AvoidHardcodedColorsRule extends DartLintRule {
     name: 'avoid_hardcoded_colors',
     problemMessage: 'Avoid hardcoded color values.',
     correctionMessage: 'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1208,7 +1208,7 @@ class AvoidUnusedGenericsRule extends DartLintRule {
     name: 'avoid_unused_generics',
     problemMessage: 'Type parameter is declared but never used.',
     correctionMessage: 'Remove unused type parameter or use it in the declaration.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1322,7 +1322,7 @@ class PreferTrailingUnderscoreForUnusedRule extends DartLintRule {
     name: 'prefer_trailing_underscore_for_unused',
     problemMessage: 'Unused parameter should be named with underscore.',
     correctionMessage: 'Rename to _ or _paramName to indicate it is unused.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1386,7 +1386,7 @@ class AvoidUnnecessaryFuturesRule extends DartLintRule {
     name: 'avoid_unnecessary_futures',
     problemMessage: 'Async function has no await expressions.',
     correctionMessage: 'Remove async keyword or add await expressions.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1464,7 +1464,7 @@ class AvoidThrowInFinallyRule extends DartLintRule {
     name: 'avoid_throw_in_finally',
     problemMessage: 'Avoid throw in finally blocks.',
     correctionMessage: 'Throwing in finally can hide the original exception.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1519,7 +1519,7 @@ class AvoidUnnecessaryNullableReturnTypeRule extends DartLintRule {
     name: 'avoid_unnecessary_nullable_return_type',
     problemMessage: 'Return type is nullable but function never returns null.',
     correctionMessage: 'Remove the ? from the return type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

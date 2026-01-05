@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2025-01-05
+
+### Fixed
+
+- **Breaking compatibility fix**: Updated all rule files for analyzer 7.x API changes
+  - Migrated from `DiagnosticSeverity` to `ErrorSeverity` (31 files)
+  - Migrated from `DiagnosticReporter` to `ErrorReporter` (31 files)
+  - Updated `NamedType.name` to `NamedType.name2` for AST type access (12 files)
+  - Updated `enclosingElement` to `enclosingElement3` (2 files)
+  - Fixed `Element2`/`Element` type inference issue
+- Suppressed TODO lint warnings in documentation examples
+
+### Changed
+
+- Now fully compatible with `analyzer ^7.5.0` and `custom_lint ^0.8.0`
+
 ## [0.1.3] - 2025-01-05
 
 ### Fixed

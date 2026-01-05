@@ -8,7 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -41,7 +41,7 @@ class AvoidSwallowingExceptionsRule extends DartLintRule {
     name: 'avoid_swallowing_exceptions',
     problemMessage: 'Catch block swallows exception without handling.',
     correctionMessage: 'Log the error, rethrow, or handle it properly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -123,7 +123,7 @@ class AvoidLosingStackTraceRule extends DartLintRule {
     problemMessage: 'Stack trace is lost when rethrowing.',
     correctionMessage:
         'Capture stack trace parameter and pass it to Error.throwWithStackTrace or include in new exception.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -201,7 +201,7 @@ class RequireFutureErrorHandlingRule extends DartLintRule {
     problemMessage: 'Future called without error handling.',
     correctionMessage:
         'Add .catchError(), wrap in try/catch with await, or use .then() with onError.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -293,7 +293,7 @@ class AvoidGenericExceptionsRule extends DartLintRule {
     name: 'avoid_generic_exceptions',
     problemMessage: 'Avoid throwing generic Exception.',
     correctionMessage: 'Create and throw a specific exception type.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -335,7 +335,7 @@ class RequireErrorContextRule extends DartLintRule {
     name: 'require_error_context',
     problemMessage: 'Error message lacks context.',
     correctionMessage: 'Include relevant context like IDs, state, or operation details.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _minMessageLength = 20;
@@ -400,7 +400,7 @@ class PreferResultPatternRule extends DartLintRule {
     name: 'prefer_result_pattern',
     problemMessage: 'Consider using Result pattern for expected failures.',
     correctionMessage: 'Return Result<T, E> instead of throwing for recoverable errors.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -475,7 +475,7 @@ class RequireAsyncErrorDocumentationRule extends DartLintRule {
     name: 'require_async_error_documentation',
     problemMessage: 'Async function with await should document or handle errors.',
     correctionMessage: 'Add try/catch or document thrown exceptions with /// Throws.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -560,7 +560,7 @@ class RequireErrorBoundaryRule extends DartLintRule {
     problemMessage: 'App should have an error boundary.',
     correctionMessage:
         'Wrap app content in an ErrorBoundary widget or use builder with error handling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

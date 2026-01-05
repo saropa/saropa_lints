@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -31,7 +31,7 @@ class AvoidBitwiseOperatorsWithBooleansRule extends DartLintRule {
     name: 'avoid_bitwise_operators_with_booleans',
     problemMessage: 'Avoid using bitwise operators with boolean operands.',
     correctionMessage: 'Use && instead of & and || instead of |.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -83,7 +83,7 @@ class AvoidCascadeAfterIfNullRule extends DartLintRule {
     name: 'avoid_cascade_after_if_null',
     problemMessage: 'Cascade after ?? may have unexpected precedence.',
     correctionMessage: 'Wrap the ?? expression in parentheses: (a ?? b)..cascade',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -129,7 +129,7 @@ class AvoidComplexArithmeticExpressionsRule extends DartLintRule {
     name: 'avoid_complex_arithmetic_expressions',
     problemMessage: 'Arithmetic expression has more than $_maxOperators operators.',
     correctionMessage: 'Extract parts into named variables for clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _arithmeticOperators = <String>{
@@ -200,7 +200,7 @@ class AvoidComplexConditionsRule extends DartLintRule {
     name: 'avoid_complex_conditions',
     problemMessage: 'Condition has more than $_maxOperators logical operators.',
     correctionMessage: 'Extract parts into named boolean variables.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -275,7 +275,7 @@ class AvoidDuplicateCascadesRule extends DartLintRule {
     name: 'avoid_duplicate_cascades',
     problemMessage: 'Duplicate cascade operation detected.',
     correctionMessage: 'Remove the duplicate or verify this is intentional.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -326,7 +326,7 @@ class AvoidExcessiveExpressionsRule extends DartLintRule {
     name: 'avoid_excessive_expressions',
     problemMessage: 'Expression has excessive complexity (>$_maxOperators operators).',
     correctionMessage: 'Break into smaller expressions with named variables.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -388,7 +388,7 @@ class AvoidImmediatelyInvokedFunctionsRule extends DartLintRule {
     name: 'avoid_immediately_invoked_functions',
     problemMessage: 'Function is immediately invoked after definition.',
     correctionMessage: 'Extract the logic inline or to a named function.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -424,7 +424,7 @@ class AvoidNestedShorthandsRule extends DartLintRule {
     name: 'avoid_nested_shorthands',
     problemMessage: 'Avoid nesting shorthand syntax too deeply.',
     correctionMessage: 'Extract nested expressions to improve readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -486,7 +486,7 @@ class AvoidMultiAssignmentRule extends DartLintRule {
     name: 'avoid_multi_assignment',
     problemMessage: 'Multiple chained assignments detected.',
     correctionMessage: 'Split into separate assignment statements.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -515,7 +515,7 @@ class BinaryExpressionOperandOrderRule extends DartLintRule {
     name: 'binary_expression_operand_order',
     problemMessage: 'Consider reordering operands for readability.',
     correctionMessage: 'Place the variable on the left side of the comparison.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -548,7 +548,7 @@ class PreferMovingToVariableRule extends DartLintRule {
     name: 'prefer_moving_to_variable',
     problemMessage: 'Consider extracting repeated expression to a variable.',
     correctionMessage: 'Extract to a local variable to avoid repetition.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -621,7 +621,7 @@ class PreferParenthesesWithIfNullRule extends DartLintRule {
     name: 'prefer_parentheses_with_if_null',
     problemMessage: 'Add parentheses to clarify if-null expression precedence.',
     correctionMessage: 'Wrap operands in parentheses for clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
