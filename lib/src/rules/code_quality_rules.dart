@@ -6,7 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, ErrorSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -31,13 +31,13 @@ class AvoidAdjacentStringsRule extends DartLintRule {
     name: 'avoid_adjacent_strings',
     problemMessage: 'Avoid using adjacent strings.',
     correctionMessage: 'Combine into a single string or use concatenation.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAdjacentStrings((AdjacentStrings node) {
@@ -54,13 +54,13 @@ class AvoidEnumValuesByIndexRule extends DartLintRule {
     name: 'avoid_enum_values_by_index',
     problemMessage: 'Avoid accessing enum values by index.',
     correctionMessage: 'Use EnumName.byName() or switch on specific values.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -107,13 +107,13 @@ class AvoidIncorrectUriRule extends DartLintRule {
     name: 'avoid_incorrect_uri',
     problemMessage: 'URI string appears to be malformed.',
     correctionMessage: 'Check the URI for syntax errors.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -139,7 +139,7 @@ class AvoidIncorrectUriRule extends DartLintRule {
     });
 
     context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Uri') return;
 
       // Check for Uri() constructor with invalid string argument
@@ -219,7 +219,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
         'if the enum is renamed or reordered.',
     correctionMessage: 'Store the enum as a String field and use an @ignore '
         'getter to parse it. See rule documentation for the pattern.',
-    errorSeverity: ErrorSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   /// Type name suffixes that typically indicate an enum
@@ -256,7 +256,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -297,7 +297,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
   }
 
   /// Check a field declaration for enum type usage
-  void _checkFieldDeclaration(FieldDeclaration node, ErrorReporter reporter) {
+  void _checkFieldDeclaration(FieldDeclaration node, DiagnosticReporter reporter) {
     // Skip if field has @ignore annotation
     if (_hasIgnoreAnnotation(node)) {
       return;
@@ -327,7 +327,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
   /// Extract the base type name from a type annotation
   String _extractTypeName(TypeAnnotation type) {
     if (type is NamedType) {
-      return type.name2.lexeme;
+      return type.name.lexeme;
     }
     return '';
   }
@@ -360,13 +360,13 @@ class AvoidLateKeywordRule extends DartLintRule {
     name: 'avoid_late_keyword',
     problemMessage: "Avoid using 'late' keyword.",
     correctionMessage: 'Use nullable type with null check, or initialize in constructor.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
@@ -406,13 +406,13 @@ class AvoidMissedCallsRule extends DartLintRule {
     name: 'avoid_missed_calls',
     problemMessage: 'Function reference passed to print. Did you mean to call it?',
     correctionMessage: 'Add parentheses () to call the function.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -500,13 +500,13 @@ class AvoidMisusedSetLiteralsRule extends DartLintRule {
         'Empty `{}` without type annotation creates a Map, not a Set.',
     correctionMessage: 'Add explicit type annotation: `<Type>{}` for Set '
         'or `<K, V>{}` for Map.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -548,13 +548,13 @@ class AvoidPassingSelfAsArgumentRule extends DartLintRule {
     name: 'avoid_passing_self_as_argument',
     problemMessage: 'Object is passed as argument to its own method.',
     correctionMessage: 'Avoid passing an object to its own method.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -608,13 +608,13 @@ class AvoidRecursiveCallsRule extends DartLintRule {
     name: 'avoid_recursive_calls',
     problemMessage: 'Function contains a recursive call to itself.',
     correctionMessage: 'Ensure proper base case exists or consider using iteration.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -635,7 +635,7 @@ class AvoidRecursiveCallsRule extends DartLintRule {
   void _checkBodyForRecursion(
     FunctionBody body,
     String functionName,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     final _RecursiveCallVisitor visitor = _RecursiveCallVisitor(functionName, reporter, code);
     body.accept(visitor);
@@ -646,7 +646,7 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
   _RecursiveCallVisitor(this.functionName, this.reporter, this.code);
 
   final String functionName;
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -692,13 +692,13 @@ class AvoidRecursiveToStringRule extends DartLintRule {
     name: 'avoid_recursive_tostring',
     problemMessage: 'toString() method calls itself recursively.',
     correctionMessage: 'Avoid using \$this or this.toString() inside toString().',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -719,7 +719,7 @@ class AvoidRecursiveToStringRule extends DartLintRule {
 class _ToStringRecursionVisitor extends RecursiveAstVisitor<void> {
   _ToStringRecursionVisitor(this.reporter, this.code);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -769,13 +769,13 @@ class AvoidReferencingDiscardedVariablesRule extends DartLintRule {
     name: 'avoid_referencing_discarded_variables',
     problemMessage: 'Avoid referencing variables marked as discarded.',
     correctionMessage: 'Variables starting with _ should not be used. Rename the variable.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleIdentifier((SimpleIdentifier node) {
@@ -837,13 +837,13 @@ class AvoidRedundantPragmaInlineRule extends DartLintRule {
     name: 'avoid_redundant_pragma_inline',
     problemMessage: 'Pragma inline may be redundant for trivial methods.',
     correctionMessage: 'Remove pragma for simple getters/methods that inline automatically.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -909,13 +909,13 @@ class AvoidSubstringRule extends DartLintRule {
         'are out of bounds.',
     correctionMessage: 'Consider bounds checking or using safer string '
         'manipulation methods.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -953,7 +953,7 @@ class AvoidUnknownPragmaRule extends DartLintRule {
     name: 'avoid_unknown_pragma',
     problemMessage: 'Unknown pragma annotation.',
     correctionMessage: 'Use a known pragma value or remove the annotation.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _knownPragmas = <String>{
@@ -979,7 +979,7 @@ class AvoidUnknownPragmaRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAnnotation((Annotation node) {
@@ -1025,13 +1025,13 @@ class AvoidUnusedParametersRule extends DartLintRule {
     name: 'avoid_unused_parameters',
     problemMessage: 'Parameter is never used.',
     correctionMessage: 'Remove the parameter or prefix with underscore if intentionally unused.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -1057,7 +1057,7 @@ class AvoidUnusedParametersRule extends DartLintRule {
   void _checkParameters(
     FormalParameterList? params,
     FunctionBody? body,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     if (params == null || body == null) return;
 
@@ -1121,7 +1121,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends DartLintRule {
     name: 'avoid_weak_cryptographic_algorithms',
     problemMessage: 'Weak cryptographic algorithm detected.',
     correctionMessage: 'Use stronger algorithms like SHA-256 or SHA-512 instead.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _weakAlgorithms = <String>{
@@ -1134,7 +1134,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleIdentifier((SimpleIdentifier node) {
@@ -1153,13 +1153,13 @@ class MissingUseResultAnnotationRule extends DartLintRule {
     name: 'missing_use_result_annotation',
     problemMessage: 'Function returns a value that might be ignored. Consider adding @useResult.',
     correctionMessage: 'Add @useResult annotation to indicate return value should be used.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1227,25 +1227,25 @@ class NoObjectDeclarationRule extends DartLintRule {
     name: 'no_object_declaration',
     problemMessage: 'Avoid declaring members with type Object.',
     correctionMessage: 'Use a more specific type or generics.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
       final TypeAnnotation? type = node.fields.type;
-      if (type is NamedType && type.name2.lexeme == 'Object') {
+      if (type is NamedType && type.name.lexeme == 'Object') {
         reporter.atNode(type, code);
       }
     });
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
-      if (returnType is NamedType && returnType.name2.lexeme == 'Object') {
+      if (returnType is NamedType && returnType.name.lexeme == 'Object') {
         reporter.atNode(returnType, code);
       }
     });
@@ -1277,13 +1277,13 @@ class PreferBothInliningAnnotationsRule extends DartLintRule {
     name: 'prefer_both_inlining_annotations',
     problemMessage: 'Use both VM and dart2js inlining pragmas.',
     correctionMessage: 'Add matching dart2js:tryInline or vm:prefer-inline.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     void checkAnnotations(NodeList<Annotation> metadata, Token reportAt) {
@@ -1346,7 +1346,7 @@ class PreferDedicatedMediaQueryMethodRule extends DartLintRule {
     name: 'prefer_dedicated_media_query_method',
     problemMessage: 'Prefer dedicated MediaQuery method.',
     correctionMessage: 'Use MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), etc.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _dedicatedProperties = <String>{
@@ -1363,7 +1363,7 @@ class PreferDedicatedMediaQueryMethodRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPropertyAccess((PropertyAccess node) {
@@ -1404,13 +1404,13 @@ class PreferEnumsByNameRule extends DartLintRule {
     name: 'prefer_enums_by_name',
     problemMessage: 'Use Enum.values.byName() instead of firstWhere with name comparison.',
     correctionMessage: 'Replace .firstWhere((e) => e.name == x) with .byName(x).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1462,7 +1462,7 @@ class PreferExtractingFunctionCallbacksRule extends DartLintRule {
     name: 'prefer_extracting_function_callbacks',
     problemMessage: 'Consider extracting this callback to a named function.',
     correctionMessage: 'Extract large inline callbacks to improve readability.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxCallbackLines = 10;
@@ -1470,7 +1470,7 @@ class PreferExtractingFunctionCallbacksRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
@@ -1502,13 +1502,13 @@ class PreferNullAwareElementsRule extends DartLintRule {
     name: 'prefer_null_aware_elements',
     problemMessage: 'Use null-aware element syntax (?element) for nullable values.',
     correctionMessage: 'Replace "if (x != null) x" with "?x" in collection.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfElement((IfElement node) {
@@ -1606,13 +1606,13 @@ class PreferNullAwareSpreadRule extends DartLintRule {
     name: 'prefer_null_aware_spread',
     problemMessage: 'Use null-aware spread (...?) for nullable collections.',
     correctionMessage: 'Replace with ...?nullableCollection.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSpreadElement((SpreadElement node) {
@@ -1680,7 +1680,7 @@ class PreferVisibleForTestingOnMembersRule extends DartLintRule {
     name: 'prefer_visible_for_testing_on_members',
     problemMessage: 'Test helper members should use @visibleForTesting.',
     correctionMessage: 'Add @visibleForTesting annotation.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _testIndicators = <String>{
@@ -1699,7 +1699,7 @@ class PreferVisibleForTestingOnMembersRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Skip test files
@@ -1763,13 +1763,13 @@ class AvoidAlwaysNullParametersRule extends DartLintRule {
     name: 'avoid_always_null_parameters',
     problemMessage: 'Parameter is explicitly passed as null.',
     correctionMessage: 'Omit the parameter instead of passing null explicitly.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check each method invocation for null arguments
@@ -1811,13 +1811,13 @@ class AvoidAssigningToStaticFieldRule extends DartLintRule {
     name: 'avoid_assigning_to_static_field',
     problemMessage: 'Instance method should not modify static field.',
     correctionMessage: 'Make the method static or use instance field.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration classNode) {
@@ -1845,7 +1845,7 @@ class AvoidAssigningToStaticFieldRule extends DartLintRule {
   void _checkMethodBody(
     FunctionBody body,
     Set<String> staticFields,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     body.visitChildren(_StaticFieldAssignmentVisitor(staticFields, reporter, _code));
   }
@@ -1855,7 +1855,7 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
   _StaticFieldAssignmentVisitor(this.staticFields, this.reporter, this.code);
 
   final Set<String> staticFields;
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -1904,13 +1904,13 @@ class AvoidAsyncCallInSyncFunctionRule extends DartLintRule {
     name: 'avoid_async_call_in_sync_function',
     problemMessage: 'Async call in sync function without handling the Future.',
     correctionMessage: 'Use await, .then(), or unawaited() for the async call.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1973,7 +1973,7 @@ class AvoidComplexLoopConditionsRule extends DartLintRule {
     name: 'avoid_complex_loop_conditions',
     problemMessage: 'Loop condition is too complex.',
     correctionMessage: 'Extract condition to a boolean variable or method.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxOperators = 2;
@@ -1981,7 +1981,7 @@ class AvoidComplexLoopConditionsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addWhileStatement((WhileStatement node) {
@@ -2003,7 +2003,7 @@ class AvoidComplexLoopConditionsRule extends DartLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, ErrorReporter reporter) {
+  void _checkCondition(Expression condition, DiagnosticReporter reporter) {
     final int operatorCount = _countLogicalOperators(condition);
     if (operatorCount > _maxOperators) {
       reporter.atNode(condition, code);
@@ -2040,13 +2040,13 @@ class AvoidConstantConditionsRule extends DartLintRule {
     name: 'avoid_constant_conditions',
     problemMessage: 'Condition with constant values can be simplified.',
     correctionMessage: 'Evaluate the constant expression at compile time.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -2092,13 +2092,13 @@ class AvoidContradictoryExpressionsRule extends DartLintRule {
     name: 'avoid_contradictory_expressions',
     problemMessage: 'Contradictory conditions detected.',
     correctionMessage: 'Review the logic - conditions may never be satisfied.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -2210,13 +2210,13 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends DartLintRule {
     name: 'avoid_identical_exception_handling_blocks',
     problemMessage: 'Catch blocks have identical code.',
     correctionMessage: 'Combine exception types: on FormatException, IOException catch (e).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTryStatement((TryStatement node) {
@@ -2257,13 +2257,13 @@ class AvoidLateFinalReassignmentRule extends DartLintRule {
     name: 'avoid_late_final_reassignment',
     problemMessage: 'Late final field may be assigned multiple times.',
     correctionMessage: 'Ensure late final fields are only assigned once.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration classNode) {
@@ -2307,7 +2307,7 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
 
   final Set<String> lateFinalFields;
   final Map<String, int> assignments;
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -2342,13 +2342,13 @@ class AvoidMissingCompleterStackTraceRule extends DartLintRule {
     name: 'avoid_missing_completer_stack_trace',
     problemMessage: 'completeError() called without stack trace.',
     correctionMessage: 'Pass the stack trace as second argument.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -2377,13 +2377,13 @@ class AvoidMissingEnumConstantInMapRule extends DartLintRule {
     name: 'avoid_missing_enum_constant_in_map',
     problemMessage: 'Map may be missing enum constant keys.',
     correctionMessage: 'Ensure all enum values are present in the map.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -2432,13 +2432,13 @@ class AvoidMutatingParametersRule extends DartLintRule {
     name: 'avoid_mutating_parameters',
     problemMessage: 'Parameter is being reassigned.',
     correctionMessage: 'Create a local variable instead of mutating the parameter.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -2481,7 +2481,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
   _ParameterMutationVisitor(this.paramNames, this.reporter, this.code);
 
   final Set<String> paramNames;
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -2530,13 +2530,13 @@ class AvoidSimilarNamesRule extends DartLintRule {
     name: 'avoid_similar_names',
     problemMessage: 'Variable name is too similar to another.',
     correctionMessage: 'Use more distinct names to avoid confusion.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -2636,13 +2636,13 @@ class AvoidUnnecessaryNullableParametersRule extends DartLintRule {
     name: 'avoid_unnecessary_nullable_parameters',
     problemMessage: 'Nullable parameter is never passed null.',
     correctionMessage: 'Consider making the parameter non-nullable.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // This is a simplified version - full implementation would track
@@ -2691,13 +2691,13 @@ class FunctionAlwaysReturnsNullRule extends DartLintRule {
     name: 'function_always_returns_null',
     problemMessage: 'Function always returns null.',
     correctionMessage: 'Consider changing return type to void or returning meaningful values.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -2709,7 +2709,7 @@ class FunctionAlwaysReturnsNullRule extends DartLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, Token nameToken, ErrorReporter reporter) {
+  void _checkFunctionBody(FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
     if (body is ExpressionFunctionBody) {
       if (body.expression is NullLiteral) {
         reporter.atToken(nameToken, code);
@@ -2769,13 +2769,13 @@ class AvoidAccessingCollectionsByConstantIndexRule extends DartLintRule {
     name: 'avoid_accessing_collections_by_constant_index',
     problemMessage: 'Accessing collection by constant index inside loop.',
     correctionMessage: 'Use the loop variable or extract the element before the loop.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addForStatement((ForStatement node) {
@@ -2795,7 +2795,7 @@ class AvoidAccessingCollectionsByConstantIndexRule extends DartLintRule {
 class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
   _ConstantIndexVisitor(this.reporter, this.code);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -2825,13 +2825,13 @@ class AvoidDefaultToStringRule extends DartLintRule {
     name: 'avoid_default_tostring',
     problemMessage: 'Class should override toString() for better debugging.',
     correctionMessage: 'Add a toString() method that returns meaningful information.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -2870,13 +2870,13 @@ class AvoidDuplicateConstantValuesRule extends DartLintRule {
     name: 'avoid_duplicate_constant_values',
     problemMessage: 'Duplicate constant value found.',
     correctionMessage: 'Reuse the existing constant instead of duplicating.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit unit) {
@@ -2920,13 +2920,13 @@ class AvoidDuplicateInitializersRule extends DartLintRule {
     name: 'avoid_duplicate_initializers',
     problemMessage: 'Duplicate initializer expression.',
     correctionMessage: 'Extract the common initialization to a variable.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -2968,13 +2968,13 @@ class AvoidUnnecessaryOverridesRule extends DartLintRule {
     name: 'avoid_unnecessary_overrides',
     problemMessage: 'Override only calls super without additional logic.',
     correctionMessage: 'Remove the unnecessary override.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -3034,13 +3034,13 @@ class AvoidUnnecessaryStatementsRule extends DartLintRule {
     name: 'avoid_unnecessary_statements',
     problemMessage: 'Statement has no effect.',
     correctionMessage: 'Remove the unnecessary statement or use its value.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExpressionStatement((ExpressionStatement node) {
@@ -3085,13 +3085,13 @@ class AvoidUnusedAssignmentRule extends DartLintRule {
     name: 'avoid_unused_assignment',
     problemMessage: 'Assignment may be unused.',
     correctionMessage: 'Remove the unused assignment or use the variable.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -3153,13 +3153,13 @@ class AvoidUnusedInstancesRule extends DartLintRule {
     name: 'avoid_unused_instances',
     problemMessage: 'Instance created but not used.',
     correctionMessage: 'Assign the instance to a variable or remove it.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExpressionStatement((ExpressionStatement node) {
@@ -3186,13 +3186,13 @@ class AvoidUnusedAfterNullCheckRule extends DartLintRule {
     name: 'avoid_unused_after_null_check',
     problemMessage: 'Variable is null-checked but not used in the body.',
     correctionMessage: 'Use the variable or simplify the condition.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -3255,13 +3255,13 @@ class AvoidWildcardCasesWithEnumsRule extends DartLintRule {
     name: 'avoid_wildcard_cases_with_enums',
     problemMessage: 'Avoid using default/wildcard case with enums.',
     correctionMessage: 'Handle all enum values explicitly for exhaustiveness checking.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -3311,13 +3311,13 @@ class FunctionAlwaysReturnsSameValueRule extends DartLintRule {
     name: 'function_always_returns_same_value',
     problemMessage: 'Function always returns the same value.',
     correctionMessage: 'Consider returning a constant or simplifying the function.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -3329,7 +3329,7 @@ class FunctionAlwaysReturnsSameValueRule extends DartLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, Token nameToken, ErrorReporter reporter) {
+  void _checkFunctionBody(FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final List<ReturnStatement> returns = <ReturnStatement>[];
@@ -3379,13 +3379,13 @@ class NoEqualNestedConditionsRule extends DartLintRule {
     name: 'no_equal_nested_conditions',
     problemMessage: 'Nested condition is identical to outer condition.',
     correctionMessage: 'Remove the redundant nested condition.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -3399,7 +3399,7 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
   _NestedConditionChecker(this.outerCondition, this.reporter, this.code);
 
   final String outerCondition;
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -3428,13 +3428,13 @@ class NoEqualSwitchCaseRule extends DartLintRule {
     name: 'no_equal_switch_case',
     problemMessage: 'Switch cases have identical bodies.',
     correctionMessage: 'Combine cases or extract common code.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -3478,13 +3478,13 @@ class PreferAnyOrEveryRule extends DartLintRule {
     name: 'prefer_any_or_every',
     problemMessage: 'Use any() or every() instead of where().isEmpty.',
     correctionMessage: 'Replace where().isEmpty with !any() or where().isNotEmpty with any().',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPropertyAccess((PropertyAccess node) {
@@ -3521,13 +3521,13 @@ class PreferForInRule extends DartLintRule {
     name: 'prefer_for_in',
     problemMessage: 'Index-based loop can be replaced with for-in.',
     correctionMessage: 'Use for-in loop for cleaner iteration.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addForStatement((ForStatement node) {
@@ -3586,13 +3586,13 @@ class AvoidDuplicatePatternsRule extends DartLintRule {
     name: 'avoid_duplicate_patterns',
     problemMessage: 'Duplicate pattern detected.',
     correctionMessage: 'Remove or combine the duplicate patterns.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -3637,13 +3637,13 @@ class AvoidNestedExtensionTypesRule extends DartLintRule {
     name: 'avoid_nested_extension_types',
     problemMessage: 'Extension type contains another extension type.',
     correctionMessage: 'Consider using the underlying type directly.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
@@ -3678,13 +3678,13 @@ class AvoidSlowCollectionMethodsRule extends DartLintRule {
     name: 'avoid_slow_collection_methods',
     problemMessage: 'Using sync* generator for simple collection may be slow.',
     correctionMessage: 'Consider returning a List directly for small collections.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -3696,7 +3696,7 @@ class AvoidSlowCollectionMethodsRule extends DartLintRule {
     });
   }
 
-  void _checkForSyncStar(FunctionBody body, Token nameToken, ErrorReporter reporter) {
+  void _checkForSyncStar(FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
     if (body.keyword?.lexeme != 'sync') return;
     if (body.star == null) return;
 
@@ -3743,13 +3743,13 @@ class AvoidUnassignedFieldsRule extends DartLintRule {
     name: 'avoid_unassigned_fields',
     problemMessage: 'Field may never be assigned a value.',
     correctionMessage: 'Initialize the field or ensure it is assigned.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3845,13 +3845,13 @@ class AvoidUnassignedLateFieldsRule extends DartLintRule {
     name: 'avoid_unassigned_late_fields',
     problemMessage: 'Late field may never be assigned.',
     correctionMessage: 'Ensure the late field is assigned before use.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3912,13 +3912,13 @@ class AvoidUnnecessaryLateFieldsRule extends DartLintRule {
     name: 'avoid_unnecessary_late_fields',
     problemMessage: 'Late keyword is unnecessary when field is assigned in constructor.',
     correctionMessage: 'Remove the late keyword.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3996,13 +3996,13 @@ class AvoidUnnecessaryNullableFieldsRule extends DartLintRule {
     name: 'avoid_unnecessary_nullable_fields',
     problemMessage: 'Nullable field appears to always have a non-null value.',
     correctionMessage: 'Consider making the field non-nullable.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -4104,13 +4104,13 @@ class AvoidUnnecessaryPatternsRule extends DartLintRule {
     name: 'avoid_unnecessary_patterns',
     problemMessage: 'Pattern does not affect type narrowing.',
     correctionMessage: 'Remove the unnecessary pattern or use a simple assignment.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -4152,13 +4152,13 @@ class AvoidWildcardCasesWithSealedClassesRule extends DartLintRule {
     name: 'avoid_wildcard_cases_with_sealed_classes',
     problemMessage: 'Avoid using default/wildcard case with sealed classes.',
     correctionMessage: 'Handle all sealed class subtypes explicitly.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -4211,13 +4211,13 @@ class NoEqualSwitchExpressionCasesRule extends DartLintRule {
     name: 'no_equal_switch_expression_cases',
     problemMessage: 'Switch expression cases have identical results.',
     correctionMessage: 'Combine patterns or extract common result.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -4251,13 +4251,13 @@ class PreferBytesBuilderRule extends DartLintRule {
     name: 'prefer_bytes_builder',
     problemMessage: 'Consider using BytesBuilder for byte list operations.',
     correctionMessage: 'BytesBuilder is more efficient for building byte arrays.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -4295,13 +4295,13 @@ class PreferPushingConditionalExpressionsRule extends DartLintRule {
     name: 'prefer_pushing_conditional_expressions',
     problemMessage: 'Conditional expression can be pushed into arguments.',
     correctionMessage: 'Move the condition into the differing argument.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConditionalExpression((ConditionalExpression node) {
@@ -4355,13 +4355,13 @@ class PreferShorthandsWithConstructorsRule extends DartLintRule {
     name: 'prefer_shorthands_with_constructors',
     problemMessage: 'Constructor call can use .new shorthand.',
     correctionMessage: 'Replace lambda with ClassName.new.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
@@ -4411,13 +4411,13 @@ class PreferShorthandsWithEnumsRule extends DartLintRule {
     name: 'prefer_shorthands_with_enums',
     problemMessage: 'Consider using enum shorthand.',
     correctionMessage: 'Simplify the enum access pattern.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -4458,13 +4458,13 @@ class PreferShorthandsWithStaticFieldsRule extends DartLintRule {
     name: 'prefer_shorthands_with_static_fields',
     problemMessage: 'Consider using static field directly.',
     correctionMessage: 'Access the static field directly instead of searching.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -4510,13 +4510,13 @@ class PassCorrectAcceptedTypeRule extends DartLintRule {
     name: 'pass_correct_accepted_type',
     problemMessage: 'Parameter type does not match accepted type annotation.',
     correctionMessage: 'Ensure the parameter type matches the @Accept annotation.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFormalParameter((FormalParameter node) {
@@ -4566,7 +4566,7 @@ class PassOptionalArgumentRule extends DartLintRule {
     name: 'pass_optional_argument',
     problemMessage: 'Consider passing the optional argument explicitly.',
     correctionMessage: 'Passing optional arguments can improve code clarity.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   // Common boolean parameter names that should be passed explicitly
@@ -4582,7 +4582,7 @@ class PassOptionalArgumentRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -4624,13 +4624,13 @@ class PreferSingleDeclarationPerFileRule extends DartLintRule {
     name: 'prefer_single_declaration_per_file',
     problemMessage: 'File contains multiple top-level declarations.',
     correctionMessage: 'Consider splitting into separate files.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -4690,13 +4690,13 @@ class PreferSwitchExpressionRule extends DartLintRule {
     name: 'prefer_switch_expression',
     problemMessage: 'Consider using a switch expression instead.',
     correctionMessage: 'Switch expressions are more concise for value mapping.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -4788,13 +4788,13 @@ class PreferSwitchWithEnumsRule extends DartLintRule {
     name: 'prefer_switch_with_enums',
     problemMessage: 'Consider using switch statement for enum comparisons.',
     correctionMessage: 'Switch provides exhaustiveness checking for enums.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -4897,13 +4897,13 @@ class PreferSwitchWithSealedClassesRule extends DartLintRule {
     name: 'prefer_switch_with_sealed_classes',
     problemMessage: 'Consider using switch with sealed class for exhaustiveness.',
     correctionMessage: 'Switch provides exhaustiveness checking for sealed classes.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -4962,13 +4962,13 @@ class PreferTestMatchersRule extends DartLintRule {
     name: 'prefer_test_matchers',
     problemMessage: 'Use a more specific test matcher.',
     correctionMessage: 'Specific matchers provide better error messages.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -5050,13 +5050,13 @@ class PreferUnwrappingFutureOrRule extends DartLintRule {
     name: 'prefer_unwrapping_future_or',
     problemMessage: 'Consider using async/await instead of FutureOr handling.',
     correctionMessage: 'Async/await simplifies FutureOr handling.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -5067,7 +5067,7 @@ class PreferUnwrappingFutureOrRule extends DartLintRule {
       final TypeAnnotation type = condition.type;
       if (type is! NamedType) return;
 
-      if (type.name2.lexeme == 'Future') {
+      if (type.name.lexeme == 'Future') {
         // This is checking if something is a Future, likely FutureOr handling
         final Expression target = condition.expression;
         if (target is SimpleIdentifier) {
@@ -5079,7 +5079,7 @@ class PreferUnwrappingFutureOrRule extends DartLintRule {
     // Also check for FutureOr return types that could be simplified
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
-      if (returnType is NamedType && returnType.name2.lexeme == 'FutureOr') {
+      if (returnType is NamedType && returnType.name.lexeme == 'FutureOr') {
         // Check if body is simple enough to just be async
         final FunctionBody body = node.functionExpression.body;
         if (body is BlockFunctionBody) {
@@ -5129,13 +5129,13 @@ class AvoidInferrableTypeArgumentsRule extends DartLintRule {
     name: 'avoid_inferrable_type_arguments',
     problemMessage: 'Generic type matches inference.',
     correctionMessage: 'Remove redundant type arguments that can be inferred.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -5202,13 +5202,13 @@ class AvoidPassingDefaultValuesRule extends DartLintRule {
     name: 'avoid_passing_default_values',
     problemMessage: 'Empty collection argument is likely the default value.',
     correctionMessage: 'Omit the argument to use the default value.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -5220,7 +5220,7 @@ class AvoidPassingDefaultValuesRule extends DartLintRule {
     });
   }
 
-  void _checkArguments(ArgumentList argList, ErrorReporter reporter) {
+  void _checkArguments(ArgumentList argList, DiagnosticReporter reporter) {
     for (final Expression arg in argList.arguments) {
       if (arg is! NamedExpression) continue;
 
@@ -5261,13 +5261,13 @@ class AvoidShadowedExtensionMethodsRule extends DartLintRule {
     name: 'avoid_shadowed_extension_methods',
     problemMessage: 'Extension method shadows class method.',
     correctionMessage: 'Rename the extension method to avoid shadowing.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
@@ -5323,13 +5323,13 @@ class AvoidUnnecessaryLocalLateRule extends DartLintRule {
     name: 'avoid_unnecessary_local_late',
     problemMessage: 'Late variable initialized immediately.',
     correctionMessage: 'Remove the late keyword for immediately initialized variables.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclarationStatement((VariableDeclarationStatement node) {
@@ -5379,13 +5379,13 @@ class MatchBaseClassDefaultValueRule extends DartLintRule {
     name: 'match_base_class_default_value',
     problemMessage: 'Override has non-standard default value.',
     correctionMessage: 'Verify this matches the parent class default value.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration classNode) {
@@ -5471,7 +5471,7 @@ class MoveVariableCloserToUsageRule extends DartLintRule {
     name: 'move_variable_closer_to_its_usage',
     problemMessage: 'Scope analysis.',
     correctionMessage: 'Consider moving the variable declaration closer to its first use.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const int _minLineDistance = 10;
@@ -5479,7 +5479,7 @@ class MoveVariableCloserToUsageRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -5565,13 +5565,13 @@ class MoveVariableOutsideIterationRule extends DartLintRule {
     name: 'move_variable_outside_iteration',
     problemMessage: 'Loop invariant code motion.',
     correctionMessage: 'Move the variable declaration outside the loop.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     void checkLoopBody(Statement body) {
@@ -5662,13 +5662,13 @@ class PreferOverridingParentEqualityRule extends DartLintRule {
     name: 'prefer_overriding_parent_equality',
     problemMessage: '== implementation consistency.',
     correctionMessage: 'Consider calling super.== or checking parent class equality.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -5699,7 +5699,7 @@ class PreferOverridingParentEqualityRule extends DartLintRule {
       for (final MethodElement method in superElement.methods) {
         if (method.name == '==' && !method.isAbstract) {
           // Check if it's from Object or a custom implementation
-          final enclosing = (method as Element).enclosingElement3;
+          final enclosing = (method as Element).enclosingElement;
           final String? enclosingName = enclosing is InterfaceElement ? enclosing.name : null;
           if (enclosingName != null && enclosingName != 'Object') {
             parentHasCustomEquals = true;
@@ -5769,13 +5769,13 @@ class PreferSpecificCasesFirstRule extends DartLintRule {
     name: 'prefer_specific_cases_first',
     problemMessage: 'Switch case specificity.',
     correctionMessage: 'Place more specific cases before general ones.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -5796,7 +5796,7 @@ class PreferSpecificCasesFirstRule extends DartLintRule {
     });
   }
 
-  void _checkCaseOrder(List<GuardedPattern> patterns, ErrorReporter reporter) {
+  void _checkCaseOrder(List<GuardedPattern> patterns, DiagnosticReporter reporter) {
     for (int i = 0; i < patterns.length - 1; i++) {
       final GuardedPattern current = patterns[i];
       final GuardedPattern next = patterns[i + 1];
@@ -5852,13 +5852,13 @@ class UseExistingDestructuringRule extends DartLintRule {
     name: 'use_existing_destructuring',
     problemMessage: 'Redundant property access.',
     correctionMessage: 'Use the destructured variable instead of accessing the property.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -5918,7 +5918,7 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
   _DestructuredPropertyAccessChecker(this.destructuredVars, this.reporter, this.code);
 
   final Map<String, Set<String>> destructuredVars;
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -5964,13 +5964,13 @@ class UseExistingVariableRule extends DartLintRule {
     name: 'use_existing_variable',
     problemMessage: 'Redundant variable creation.',
     correctionMessage: 'Use the existing variable instead of creating a duplicate.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {

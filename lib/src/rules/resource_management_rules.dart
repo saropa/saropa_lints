@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -47,7 +47,7 @@ class RequireFileCloseInFinallyRule extends DartLintRule {
     name: 'require_file_close_in_finally',
     problemMessage: 'File handle should be closed in finally block.',
     correctionMessage: 'Use try-finally or convenience methods like readAsString().',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _fileOpenMethods = <String>{
@@ -60,7 +60,7 @@ class RequireFileCloseInFinallyRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -131,13 +131,13 @@ class RequireDatabaseCloseRule extends DartLintRule {
     name: 'require_database_close',
     problemMessage: 'Database connection should be closed.',
     correctionMessage: 'Close database in finally block or use connection pool.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -194,13 +194,13 @@ class RequireHttpClientCloseRule extends DartLintRule {
     name: 'require_http_client_close',
     problemMessage: 'HttpClient should be closed when done.',
     correctionMessage: 'Call client.close() in finally block.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -249,7 +249,7 @@ class RequireNativeResourceCleanupRule extends DartLintRule {
     name: 'require_native_resource_cleanup',
     problemMessage: 'Native resource should be freed.',
     correctionMessage: 'Call free() in finally block for native allocations.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _allocMethods = <String>{
@@ -262,7 +262,7 @@ class RequireNativeResourceCleanupRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -331,13 +331,13 @@ class RequireWebSocketCloseRule extends DartLintRule {
     name: 'require_websocket_close',
     problemMessage: 'WebSocket should be closed in dispose.',
     correctionMessage: 'Add _socket.close() in dispose method.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -416,13 +416,13 @@ class RequirePlatformChannelCleanupRule extends DartLintRule {
     name: 'require_platform_channel_cleanup',
     problemMessage: 'Platform channel handler should be removed in dispose.',
     correctionMessage: 'Set handler to null in dispose method.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -501,13 +501,13 @@ class RequireIsolateKillRule extends DartLintRule {
     name: 'require_isolate_kill',
     problemMessage: 'Spawned Isolate should be killed when done.',
     correctionMessage: 'Call isolate.kill() in cleanup/dispose method.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {

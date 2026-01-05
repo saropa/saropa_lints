@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -29,13 +29,13 @@ class AvoidInconsistentDigitSeparatorsRule extends DartLintRule {
     name: 'avoid_inconsistent_digit_separators',
     problemMessage: 'Digit separators are not grouped consistently.',
     correctionMessage: 'Use consistent groups of 3 digits.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -113,13 +113,13 @@ class AvoidUnnecessaryDigitSeparatorsRule extends DartLintRule {
     name: 'avoid_unnecessary_digit_separators',
     problemMessage: 'Unnecessary or poorly placed digit separator.',
     correctionMessage: 'Use digit separators consistently for large numbers only.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -159,13 +159,13 @@ class DoubleLiteralFormatRule extends DartLintRule {
     name: 'double_literal_format',
     problemMessage: 'Use consistent double literal format.',
     correctionMessage: 'Include leading zero before decimal point (e.g., 0.5).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDoubleLiteral((DoubleLiteral node) {
@@ -193,7 +193,7 @@ class NoMagicNumberRule extends DartLintRule {
     name: 'no_magic_number',
     problemMessage: 'Avoid magic numbers.',
     correctionMessage: 'Extract the number to a named constant.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   // Numbers that are commonly used and don't need constants
@@ -203,7 +203,7 @@ class NoMagicNumberRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -275,7 +275,7 @@ class NoMagicStringRule extends DartLintRule {
     name: 'no_magic_string',
     problemMessage: 'Avoid using magic string literals.',
     correctionMessage: 'Extract the string to a named constant.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   /// Strings that are commonly acceptable as literals
@@ -303,7 +303,7 @@ class NoMagicStringRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
@@ -386,7 +386,7 @@ class PreferAdditionSubtractionAssignmentsRule extends DartLintRule {
     name: 'prefer_addition_subtraction_assignments',
     problemMessage: 'Use compound assignment operator.',
     correctionMessage: 'Replace with +=, -=, *=, /=, etc.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _compoundableOperators = <String>{
@@ -406,7 +406,7 @@ class PreferAdditionSubtractionAssignmentsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -458,13 +458,13 @@ class PreferCompoundAssignmentOperatorsRule extends DartLintRule {
     name: 'prefer_compound_assignment_operators',
     problemMessage: 'Use compound assignment operator.',
     correctionMessage: 'Replace with compound assignment (e.g., &=, |=, ^=).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -516,13 +516,13 @@ class PreferDigitSeparatorsRule extends DartLintRule {
     name: 'prefer_digit_separators',
     problemMessage: 'Large number should use digit separators.',
     correctionMessage: 'Add underscores to group digits (e.g., 1_000_000).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -573,7 +573,7 @@ class AvoidDigitSeparatorsRule extends DartLintRule {
     name: 'avoid_digit_separators',
     problemMessage: 'Unnecessary digit separator in small number.',
     correctionMessage: 'Remove digit separators from small numbers.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const int _minDigitsForSeparator = 5;
@@ -581,7 +581,7 @@ class AvoidDigitSeparatorsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
