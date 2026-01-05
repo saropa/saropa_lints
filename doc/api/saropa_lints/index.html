@@ -31,17 +31,14 @@
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
-  <div class="toggle" id="theme-button" title="Toggle brightness">
-    <label for="theme">
-      <input type="checkbox" id="theme" value="light-theme">
-      <span id="dark-theme-button" class="material-symbols-outlined">
-        dark_mode
-      </span>
-      <span id="light-theme-button" class="material-symbols-outlined">
-        light_mode
-      </span>
-    </label>
-  </div>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
 </header>
 <main>
 <div
@@ -63,11 +60,4040 @@
 
     
 <section class="desc markdown">
-  <p>Support for doing something awesome.</p>
-<p>More dartdocs go here.</p>
+  <p>Custom lint rules for Saropa codebase.</p>
+<p>To use these rules:</p>
+<ol>
+<li>Add <code>custom_lint: ^0.8.0</code> to dev_dependencies in pubspec.yaml</li>
+<li>Add <code>analyzer: plugins: - custom_lint</code> to analysis_options.yaml</li>
+<li>Run <code>dart run custom_lint</code> to check for issues</li>
+</ol>
 </section>
 
 
+    <section class="summary offset-anchor" id="classes">
+      <h2>Classes</h2>
+      <dl>
+          <dt id="AlwaysFailRule">
+  <span class="name "><a href="../saropa_lints/AlwaysFailRule-class.html">AlwaysFailRule</a></span> 
+
+</dt>
+<dd>
+  Test-only rule that always reports a lint at the start of the file.
+</dd>
+
+          <dt id="AlwaysRemoveListenerRule">
+  <span class="name "><a href="../saropa_lints/AlwaysRemoveListenerRule-class.html">AlwaysRemoveListenerRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a listener is added but never removed.
+</dd>
+
+          <dt id="AvoidAccessingCollectionsByConstantIndexRule">
+  <span class="name "><a href="../saropa_lints/AvoidAccessingCollectionsByConstantIndexRule-class.html">AvoidAccessingCollectionsByConstantIndexRule</a></span> 
+
+</dt>
+<dd>
+  Warns when accessing collection elements by constant index in a loop.
+</dd>
+
+          <dt id="AvoidAdjacentStringsRule">
+  <span class="name "><a href="../saropa_lints/AvoidAdjacentStringsRule-class.html">AvoidAdjacentStringsRule</a></span> 
+
+</dt>
+<dd>
+  Warns against any usage of adjacent strings.
+</dd>
+
+          <dt id="AvoidAlwaysNullParametersRule">
+  <span class="name "><a href="../saropa_lints/AvoidAlwaysNullParametersRule-class.html">AvoidAlwaysNullParametersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a named parameter is passed as null explicitly.
+</dd>
+
+          <dt id="AvoidAssigningToStaticFieldRule">
+  <span class="name "><a href="../saropa_lints/AvoidAssigningToStaticFieldRule-class.html">AvoidAssigningToStaticFieldRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an instance method assigns to a static field.
+</dd>
+
+          <dt id="AvoidAssignmentsAsConditionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidAssignmentsAsConditionsRule-class.html">AvoidAssignmentsAsConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an assignment is used inside a condition.
+</dd>
+
+          <dt id="AvoidAsyncCallInSyncFunctionRule">
+  <span class="name "><a href="../saropa_lints/AvoidAsyncCallInSyncFunctionRule-class.html">AvoidAsyncCallInSyncFunctionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an async method is called in a sync function without await.
+</dd>
+
+          <dt id="AvoidBarrelFilesRule">
+  <span class="name "><a href="../saropa_lints/AvoidBarrelFilesRule-class.html">AvoidBarrelFilesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a file only contains export statements (barrel file).
+</dd>
+
+          <dt id="AvoidBitwiseOperatorsWithBooleansRule">
+  <span class="name "><a href="../saropa_lints/AvoidBitwiseOperatorsWithBooleansRule-class.html">AvoidBitwiseOperatorsWithBooleansRule</a></span> 
+
+</dt>
+<dd>
+  Warns when bitwise operators are used with boolean operands.
+</dd>
+
+          <dt id="AvoidBlocEventInConstructorRule">
+  <span class="name "><a href="../saropa_lints/AvoidBlocEventInConstructorRule-class.html">AvoidBlocEventInConstructorRule</a></span> 
+
+</dt>
+<dd>
+  Warns when BLoC events are emitted in constructor.
+</dd>
+
+          <dt id="AvoidBorderAllRule">
+  <span class="name "><a href="../saropa_lints/AvoidBorderAllRule-class.html">AvoidBorderAllRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Border.all is used instead of const Border.fromBorderSide.
+</dd>
+
+          <dt id="AvoidBottomTypeInPatternsRule">
+  <span class="name "><a href="../saropa_lints/AvoidBottomTypeInPatternsRule-class.html">AvoidBottomTypeInPatternsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when pattern contains bottom types (void, Never, Null).
+</dd>
+
+          <dt id="AvoidBottomTypeInRecordsRule">
+  <span class="name "><a href="../saropa_lints/AvoidBottomTypeInRecordsRule-class.html">AvoidBottomTypeInRecordsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when record contains bottom types (void, Never, Null).
+</dd>
+
+          <dt id="AvoidBuildContextInProvidersRule">
+  <span class="name "><a href="../saropa_lints/AvoidBuildContextInProvidersRule-class.html">AvoidBuildContextInProvidersRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-build-context-in-providers
+Warns when BuildContext is stored in providers or state managers.
+</dd>
+
+          <dt id="AvoidBusinessLogicInUiRule">
+  <span class="name "><a href="../saropa_lints/AvoidBusinessLogicInUiRule-class.html">AvoidBusinessLogicInUiRule</a></span> 
+
+</dt>
+<dd>
+  Warns when business logic is in UI layer.
+</dd>
+
+          <dt id="AvoidCapturingThisInCallbacksRule">
+  <span class="name "><a href="../saropa_lints/AvoidCapturingThisInCallbacksRule-class.html">AvoidCapturingThisInCallbacksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when closures capture more context than needed.
+</dd>
+
+          <dt id="AvoidCascadeAfterIfNullRule">
+  <span class="name "><a href="../saropa_lints/AvoidCascadeAfterIfNullRule-class.html">AvoidCascadeAfterIfNullRule</a></span> 
+
+</dt>
+<dd>
+  Warns when cascade is used after if-null operator without parentheses.
+</dd>
+
+          <dt id="AvoidCastingToExtensionTypeRule">
+  <span class="name "><a href="../saropa_lints/AvoidCastingToExtensionTypeRule-class.html">AvoidCastingToExtensionTypeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when casting to an extension type.
+</dd>
+
+          <dt id="AvoidCatchingGenericExceptionRule">
+  <span class="name "><a href="../saropa_lints/AvoidCatchingGenericExceptionRule-class.html">AvoidCatchingGenericExceptionRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-catching-generic-exception
+Warns when catching Exception or Object too broadly.
+</dd>
+
+          <dt id="AvoidCircularDependenciesRule">
+  <span class="name "><a href="../saropa_lints/AvoidCircularDependenciesRule-class.html">AvoidCircularDependenciesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when circular dependencies are detected.
+</dd>
+
+          <dt id="AvoidCircularDiDependenciesRule">
+  <span class="name "><a href="../saropa_lints/AvoidCircularDiDependenciesRule-class.html">AvoidCircularDiDependenciesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when circular dependencies are detected in DI registration.
+</dd>
+
+          <dt id="AvoidCollapsibleIfRule">
+  <span class="name "><a href="../saropa_lints/AvoidCollapsibleIfRule-class.html">AvoidCollapsibleIfRule</a></span> 
+
+</dt>
+<dd>
+  Warns when nested if statements can be collapsed into one.
+</dd>
+
+          <dt id="AvoidCollectionEqualityChecksRule">
+  <span class="name "><a href="../saropa_lints/AvoidCollectionEqualityChecksRule-class.html">AvoidCollectionEqualityChecksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when comparing collections using == operator.
+</dd>
+
+          <dt id="AvoidCollectionMethodsWithUnrelatedTypesRule">
+  <span class="name "><a href="../saropa_lints/AvoidCollectionMethodsWithUnrelatedTypesRule-class.html">AvoidCollectionMethodsWithUnrelatedTypesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using collection methods with unrelated types.
+</dd>
+
+          <dt id="AvoidColorOnlyIndicatorsRule">
+  <span class="name "><a href="../saropa_lints/AvoidColorOnlyIndicatorsRule-class.html">AvoidColorOnlyIndicatorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using color alone to convey information.
+</dd>
+
+          <dt id="AvoidCommentedOutCodeRule">
+  <span class="name "><a href="../saropa_lints/AvoidCommentedOutCodeRule-class.html">AvoidCommentedOutCodeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when commented-out code is detected.
+</dd>
+
+          <dt id="AvoidComplexArithmeticExpressionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidComplexArithmeticExpressionsRule-class.html">AvoidComplexArithmeticExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when arithmetic expressions are too complex.
+</dd>
+
+          <dt id="AvoidComplexConditionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidComplexConditionsRule-class.html">AvoidComplexConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when conditions are too complex.
+</dd>
+
+          <dt id="AvoidComplexLoopConditionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidComplexLoopConditionsRule-class.html">AvoidComplexLoopConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when loop conditions are too complex.
+</dd>
+
+          <dt id="AvoidConditionsWithBooleanLiteralsRule">
+  <span class="name "><a href="../saropa_lints/AvoidConditionsWithBooleanLiteralsRule-class.html">AvoidConditionsWithBooleanLiteralsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when boolean literals are used in conditions.
+</dd>
+
+          <dt id="AvoidConstantAssertConditionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidConstantAssertConditionsRule-class.html">AvoidConstantAssertConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when assert has a constant condition (always true or always false).
+</dd>
+
+          <dt id="AvoidConstantConditionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidConstantConditionsRule-class.html">AvoidConstantConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when both sides of a binary expression are constants.
+</dd>
+
+          <dt id="AvoidConstantSwitchesRule">
+  <span class="name "><a href="../saropa_lints/AvoidConstantSwitchesRule-class.html">AvoidConstantSwitchesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when switch statement has a constant expression.
+</dd>
+
+          <dt id="AvoidContextInInitStateDisposeRule">
+  <span class="name "><a href="../saropa_lints/AvoidContextInInitStateDisposeRule-class.html">AvoidContextInInitStateDisposeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>context</code> is used inside <code>initState</code> or <code>dispose</code> methods.
+</dd>
+
+          <dt id="AvoidContinueRule">
+  <span class="name "><a href="../saropa_lints/AvoidContinueRule-class.html">AvoidContinueRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the continue statement is used.
+</dd>
+
+          <dt id="AvoidContradictoryExpressionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidContradictoryExpressionsRule-class.html">AvoidContradictoryExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when contradicting conditions are used.
+</dd>
+
+          <dt id="AvoidControllerInBuildRule">
+  <span class="name "><a href="../saropa_lints/AvoidControllerInBuildRule-class.html">AvoidControllerInBuildRule</a></span> 
+
+</dt>
+<dd>
+  Warns when ScrollController is created in build method.
+</dd>
+
+          <dt id="AvoidCrossFeatureDependenciesRule">
+  <span class="name "><a href="../saropa_lints/AvoidCrossFeatureDependenciesRule-class.html">AvoidCrossFeatureDependenciesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when feature module has external dependencies.
+</dd>
+
+          <dt id="AvoidDebugPrintRule">
+  <span class="name "><a href="../saropa_lints/AvoidDebugPrintRule-class.html">AvoidDebugPrintRule</a></span> 
+
+</dt>
+<dd>
+  Warns when debugPrint is used.
+</dd>
+
+          <dt id="AvoidDeclaringCallMethodRule">
+  <span class="name "><a href="../saropa_lints/AvoidDeclaringCallMethodRule-class.html">AvoidDeclaringCallMethodRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class declares a call() method.
+</dd>
+
+          <dt id="AvoidDeeplyNestedWidgetsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDeeplyNestedWidgetsRule-class.html">AvoidDeeplyNestedWidgetsRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-deeply-nested-widgets
+Warns when widget tree nesting exceeds a reasonable depth.
+</dd>
+
+          <dt id="AvoidDefaultToStringRule">
+  <span class="name "><a href="../saropa_lints/AvoidDefaultToStringRule-class.html">AvoidDefaultToStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class doesn't override toString().
+</dd>
+
+          <dt id="AvoidDigitSeparatorsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDigitSeparatorsRule-class.html">AvoidDigitSeparatorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when digit separators are used unnecessarily.
+</dd>
+
+          <dt id="AvoidDirectDataAccessInUiRule">
+  <span class="name "><a href="../saropa_lints/AvoidDirectDataAccessInUiRule-class.html">AvoidDirectDataAccessInUiRule</a></span> 
+
+</dt>
+<dd>
+  Warns when UI layer directly accesses data layer.
+</dd>
+
+          <dt id="AvoidDoubleSlashImportsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDoubleSlashImportsRule-class.html">AvoidDoubleSlashImportsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when double slashes are used in import paths.
+</dd>
+
+          <dt id="AvoidDuplicateCascadesRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateCascadesRule-class.html">AvoidDuplicateCascadesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same cascade operation is performed multiple times.
+</dd>
+
+          <dt id="AvoidDuplicateCollectionElementsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateCollectionElementsRule-class.html">AvoidDuplicateCollectionElementsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when duplicate elements appear in collection literals.
+</dd>
+
+          <dt id="AvoidDuplicateConstantValuesRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateConstantValuesRule-class.html">AvoidDuplicateConstantValuesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same constant value is defined multiple times.
+</dd>
+
+          <dt id="AvoidDuplicateExportsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateExportsRule-class.html">AvoidDuplicateExportsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same file is exported multiple times.
+</dd>
+
+          <dt id="AvoidDuplicateInitializersRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateInitializersRule-class.html">AvoidDuplicateInitializersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same initializer expression is used twice.
+</dd>
+
+          <dt id="AvoidDuplicateMapKeysRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateMapKeysRule-class.html">AvoidDuplicateMapKeysRule</a></span> 
+
+</dt>
+<dd>
+  Warns when duplicate keys are used in a map literal.
+</dd>
+
+          <dt id="AvoidDuplicateMixinsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateMixinsRule-class.html">AvoidDuplicateMixinsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same mixin is applied multiple times in a class hierarchy.
+</dd>
+
+          <dt id="AvoidDuplicateNamedImportsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateNamedImportsRule-class.html">AvoidDuplicateNamedImportsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same import is declared with different prefixes.
+</dd>
+
+          <dt id="AvoidDuplicatePatternsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicatePatternsRule-class.html">AvoidDuplicatePatternsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when duplicate patterns appear in pattern matching.
+</dd>
+
+          <dt id="AvoidDuplicateSwitchCaseConditionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateSwitchCaseConditionsRule-class.html">AvoidDuplicateSwitchCaseConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when switch case has duplicate conditions.
+</dd>
+
+          <dt id="AvoidDuplicateTestAssertionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateTestAssertionsRule-class.html">AvoidDuplicateTestAssertionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when duplicate test assertions are made.
+</dd>
+
+          <dt id="AvoidDuplicateWidgetKeysRule">
+  <span class="name "><a href="../saropa_lints/AvoidDuplicateWidgetKeysRule-class.html">AvoidDuplicateWidgetKeysRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-duplicate-keys-in-widget-list
+Warns when widgets in a list have duplicate keys.
+</dd>
+
+          <dt id="AvoidDynamicRule">
+  <span class="name "><a href="../saropa_lints/AvoidDynamicRule-class.html">AvoidDynamicRule</a></span> 
+
+</dt>
+<dd>
+  Warns when dynamic type is used.
+</dd>
+
+          <dt id="AvoidEmptySetStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidEmptySetStateRule-class.html">AvoidEmptySetStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an empty setState callback is used.
+</dd>
+
+          <dt id="AvoidEmptySpreadRule">
+  <span class="name "><a href="../saropa_lints/AvoidEmptySpreadRule-class.html">AvoidEmptySpreadRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an empty spread is used.
+</dd>
+
+          <dt id="AvoidEmptyTestGroupsRule">
+  <span class="name "><a href="../saropa_lints/AvoidEmptyTestGroupsRule-class.html">AvoidEmptyTestGroupsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a test group() has an empty body.
+</dd>
+
+          <dt id="AvoidEnumValuesByIndexRule">
+  <span class="name "><a href="../saropa_lints/AvoidEnumValuesByIndexRule-class.html">AvoidEnumValuesByIndexRule</a></span> 
+
+</dt>
+<dd>
+  Warns when accessing enum values by index (EnumName.values<code>i</code>).
+</dd>
+
+          <dt id="AvoidEqualExpressionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidEqualExpressionsRule-class.html">AvoidEqualExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when comparing an expression to itself (x == x).
+</dd>
+
+          <dt id="AvoidEvalLikePatternsRule">
+  <span class="name "><a href="../saropa_lints/AvoidEvalLikePatternsRule-class.html">AvoidEvalLikePatternsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when eval-like patterns are detected.
+</dd>
+
+          <dt id="AvoidExcessiveExpressionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidExcessiveExpressionsRule-class.html">AvoidExcessiveExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an expression has excessive complexity.
+</dd>
+
+          <dt id="AvoidExcessiveWidgetDepthRule">
+  <span class="name "><a href="../saropa_lints/AvoidExcessiveWidgetDepthRule-class.html">AvoidExcessiveWidgetDepthRule</a></span> 
+
+</dt>
+<dd>
+  Warns when widget tree depth is excessive.
+</dd>
+
+          <dt id="AvoidExpandedAsSpacerRule">
+  <span class="name "><a href="../saropa_lints/AvoidExpandedAsSpacerRule-class.html">AvoidExpandedAsSpacerRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Expanded with empty child is used instead of Spacer.
+</dd>
+
+          <dt id="AvoidExpandoCircularReferencesRule">
+  <span class="name "><a href="../saropa_lints/AvoidExpandoCircularReferencesRule-class.html">AvoidExpandoCircularReferencesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Expando is used without understanding its memory implications.
+</dd>
+
+          <dt id="AvoidExpensiveBuildRule">
+  <span class="name "><a href="../saropa_lints/AvoidExpensiveBuildRule-class.html">AvoidExpensiveBuildRule</a></span> 
+
+</dt>
+<dd>
+  Warns when expensive operations are performed in build methods.
+</dd>
+
+          <dt id="AvoidExplicitPatternFieldNameRule">
+  <span class="name "><a href="../saropa_lints/AvoidExplicitPatternFieldNameRule-class.html">AvoidExplicitPatternFieldNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when explicit field names are used in pattern matching
+when they match the variable name.
+</dd>
+
+          <dt id="AvoidExtensionsOnRecordsRule">
+  <span class="name "><a href="../saropa_lints/AvoidExtensionsOnRecordsRule-class.html">AvoidExtensionsOnRecordsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when extension is defined on a Record type.
+</dd>
+
+          <dt id="AvoidFlexibleOutsideFlexRule">
+  <span class="name "><a href="../saropa_lints/AvoidFlexibleOutsideFlexRule-class.html">AvoidFlexibleOutsideFlexRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Flexible or Expanded is used outside of a Flex widget.
+</dd>
+
+          <dt id="AvoidFormWithoutKeyRule">
+  <span class="name "><a href="../saropa_lints/AvoidFormWithoutKeyRule-class.html">AvoidFormWithoutKeyRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-form-without-key
+Warns when Form widget doesn't have a GlobalKey.
+</dd>
+
+          <dt id="AvoidFunctionTypeInRecordsRule">
+  <span class="name "><a href="../saropa_lints/AvoidFunctionTypeInRecordsRule-class.html">AvoidFunctionTypeInRecordsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Function type is used in record definitions.
+</dd>
+
+          <dt id="AvoidFutureIgnoreRule">
+  <span class="name "><a href="../saropa_lints/AvoidFutureIgnoreRule-class.html">AvoidFutureIgnoreRule</a></span> 
+
+</dt>
+<dd>
+  Warns when calling .ignore() on a Future.
+</dd>
+
+          <dt id="AvoidFutureToStringRule">
+  <span class="name "><a href="../saropa_lints/AvoidFutureToStringRule-class.html">AvoidFutureToStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when calling toString() or using string interpolation on a Future.
+</dd>
+
+          <dt id="AvoidGenericExceptionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidGenericExceptionsRule-class.html">AvoidGenericExceptionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using generic Exception instead of specific types.
+</dd>
+
+          <dt id="AvoidGenericsShadowingRule">
+  <span class="name "><a href="../saropa_lints/AvoidGenericsShadowingRule-class.html">AvoidGenericsShadowingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a generic type parameter shadows a top-level declaration.
+</dd>
+
+          <dt id="AvoidGestureDetectorInScrollViewRule">
+  <span class="name "><a href="../saropa_lints/AvoidGestureDetectorInScrollViewRule-class.html">AvoidGestureDetectorInScrollViewRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-gesture-detector-in-scrollview
+Warns when GestureDetector is used around a scrollable widget.
+</dd>
+
+          <dt id="AvoidGestureOnlyInteractionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidGestureOnlyInteractionsRule-class.html">AvoidGestureOnlyInteractionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when GestureDetector is used without keyboard accessibility.
+</dd>
+
+          <dt id="AvoidGetterPrefixRule">
+  <span class="name "><a href="../saropa_lints/AvoidGetterPrefixRule-class.html">AvoidGetterPrefixRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a getter name starts with 'get'.
+</dd>
+
+          <dt id="AvoidGlobalKeyInBuildRule">
+  <span class="name "><a href="../saropa_lints/AvoidGlobalKeyInBuildRule-class.html">AvoidGlobalKeyInBuildRule</a></span> 
+
+</dt>
+<dd>
+  Warns when GlobalKey is created in build method.
+</dd>
+
+          <dt id="AvoidGlobalRiverpodProvidersRule">
+  <span class="name "><a href="../saropa_lints/AvoidGlobalRiverpodProvidersRule-class.html">AvoidGlobalRiverpodProvidersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Riverpod providers are not properly scoped.
+</dd>
+
+          <dt id="AvoidGlobalStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidGlobalStateRule-class.html">AvoidGlobalStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when mutable global state is declared.
+</dd>
+
+          <dt id="AvoidGodClassRule">
+  <span class="name "><a href="../saropa_lints/AvoidGodClassRule-class.html">AvoidGodClassRule</a></span> 
+
+</dt>
+<dd>
+  Warns when God class is detected (too many responsibilities).
+</dd>
+
+          <dt id="AvoidHardcodedApiUrlsRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedApiUrlsRule-class.html">AvoidHardcodedApiUrlsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when API endpoint URLs are hardcoded.
+</dd>
+
+          <dt id="AvoidHardcodedAppNameRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedAppNameRule-class.html">AvoidHardcodedAppNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when app name or branding is hardcoded.
+</dd>
+
+          <dt id="AvoidHardcodedAssetPathsRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedAssetPathsRule-class.html">AvoidHardcodedAssetPathsRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-hardcoded-asset-paths
+Warns when asset paths are hardcoded as string literals.
+</dd>
+
+          <dt id="AvoidHardcodedColorsRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedColorsRule-class.html">AvoidHardcodedColorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Color values are hardcoded instead of using theme colors.
+</dd>
+
+          <dt id="AvoidHardcodedCredentialsRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedCredentialsRule-class.html">AvoidHardcodedCredentialsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when hardcoded credentials are detected in source code.
+</dd>
+
+          <dt id="AvoidHardcodedLocaleRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedLocaleRule-class.html">AvoidHardcodedLocaleRule</a></span> 
+
+</dt>
+<dd>
+  Warns when locale is hardcoded instead of using device locale.
+</dd>
+
+          <dt id="AvoidHardcodedStringsInUiRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedStringsInUiRule-class.html">AvoidHardcodedStringsInUiRule</a></span> 
+
+</dt>
+<dd>
+  Warns when hardcoded user-facing strings are detected.
+</dd>
+
+          <dt id="AvoidHardcodedTestDelaysRule">
+  <span class="name "><a href="../saropa_lints/AvoidHardcodedTestDelaysRule-class.html">AvoidHardcodedTestDelaysRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test has hardcoded delays.
+</dd>
+
+          <dt id="AvoidIconButtonsWithoutTooltipRule">
+  <span class="name "><a href="../saropa_lints/AvoidIconButtonsWithoutTooltipRule-class.html">AvoidIconButtonsWithoutTooltipRule</a></span> 
+
+</dt>
+<dd>
+  Warns when IconButton is used without a tooltip for accessibility.
+</dd>
+
+          <dt id="AvoidIdenticalExceptionHandlingBlocksRule">
+  <span class="name "><a href="../saropa_lints/AvoidIdenticalExceptionHandlingBlocksRule-class.html">AvoidIdenticalExceptionHandlingBlocksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when catch blocks have identical bodies.
+</dd>
+
+          <dt id="AvoidIfWithManyBranchesRule">
+  <span class="name "><a href="../saropa_lints/AvoidIfWithManyBranchesRule-class.html">AvoidIfWithManyBranchesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an if statement has too many branches.
+</dd>
+
+          <dt id="AvoidImageButtonsWithoutTooltipRule">
+  <span class="name "><a href="../saropa_lints/AvoidImageButtonsWithoutTooltipRule-class.html">AvoidImageButtonsWithoutTooltipRule</a></span> 
+
+</dt>
+<dd>
+  Warns when image-based buttons lack tooltips.
+</dd>
+
+          <dt id="AvoidImageWithoutCacheRule">
+  <span class="name "><a href="../saropa_lints/AvoidImageWithoutCacheRule-class.html">AvoidImageWithoutCacheRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-image-without-cache-headers
+Warns when Image.network is used without cacheWidth/cacheHeight.
+</dd>
+
+          <dt id="AvoidImmediatelyInvokedFunctionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidImmediatelyInvokedFunctionsRule-class.html">AvoidImmediatelyInvokedFunctionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function is immediately invoked after definition.
+</dd>
+
+          <dt id="AvoidImplicitlyNullableExtensionTypesRule">
+  <span class="name "><a href="../saropa_lints/AvoidImplicitlyNullableExtensionTypesRule-class.html">AvoidImplicitlyNullableExtensionTypesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when extension type doesn't implement Object and is implicitly nullable.
+</dd>
+
+          <dt id="AvoidIncompleteCopyWithRule">
+  <span class="name "><a href="../saropa_lints/AvoidIncompleteCopyWithRule-class.html">AvoidIncompleteCopyWithRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a copyWith method is missing fields.
+</dd>
+
+          <dt id="AvoidInconsistentDigitSeparatorsRule">
+  <span class="name "><a href="../saropa_lints/AvoidInconsistentDigitSeparatorsRule-class.html">AvoidInconsistentDigitSeparatorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when digit separators are not grouped consistently.
+</dd>
+
+          <dt id="AvoidIncorrectImageOpacityRule">
+  <span class="name "><a href="../saropa_lints/AvoidIncorrectImageOpacityRule-class.html">AvoidIncorrectImageOpacityRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an Image widget is wrapped in Opacity instead of using Image.color.
+</dd>
+
+          <dt id="AvoidIncorrectUriRule">
+  <span class="name "><a href="../saropa_lints/AvoidIncorrectUriRule-class.html">AvoidIncorrectUriRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Uri constructor is called with an invalid URI string.
+</dd>
+
+          <dt id="AvoidInferrableTypeArgumentsRule">
+  <span class="name "><a href="../saropa_lints/AvoidInferrableTypeArgumentsRule-class.html">AvoidInferrableTypeArgumentsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when type arguments can be inferred and are redundant.
+</dd>
+
+          <dt id="AvoidInheritedWidgetInInitStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidInheritedWidgetInInitStateRule-class.html">AvoidInheritedWidgetInInitStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when dependOnInheritedWidgetOfExactType is called in initState.
+</dd>
+
+          <dt id="AvoidInternalDependencyCreationRule">
+  <span class="name "><a href="../saropa_lints/AvoidInternalDependencyCreationRule-class.html">AvoidInternalDependencyCreationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when dependencies are created inside the class instead of injected.
+</dd>
+
+          <dt id="AvoidInvertedBooleanChecksRule">
+  <span class="name "><a href="../saropa_lints/AvoidInvertedBooleanChecksRule-class.html">AvoidInvertedBooleanChecksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an inverted boolean check is used.
+</dd>
+
+          <dt id="AvoidIsarEnumFieldRule">
+  <span class="name "><a href="../saropa_lints/AvoidIsarEnumFieldRule-class.html">AvoidIsarEnumFieldRule</a></span> 
+
+</dt>
+<dd>
+  Warns when enum types are used directly as fields in Isar <code>@collection</code> classes.
+</dd>
+
+          <dt id="AvoidKeywordsInWildcardPatternRule">
+  <span class="name "><a href="../saropa_lints/AvoidKeywordsInWildcardPatternRule-class.html">AvoidKeywordsInWildcardPatternRule</a></span> 
+
+</dt>
+<dd>
+  Warns when wildcard patterns use Dart keywords.
+</dd>
+
+          <dt id="AvoidLargeIsolateCommunicationRule">
+  <span class="name "><a href="../saropa_lints/AvoidLargeIsolateCommunicationRule-class.html">AvoidLargeIsolateCommunicationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when isolate communication sends large objects.
+</dd>
+
+          <dt id="AvoidLargeObjectsInStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidLargeObjectsInStateRule-class.html">AvoidLargeObjectsInStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when large objects are stored in widget state.
+</dd>
+
+          <dt id="AvoidLateContextRule">
+  <span class="name "><a href="../saropa_lints/AvoidLateContextRule-class.html">AvoidLateContextRule</a></span> 
+
+</dt>
+<dd>
+  Warns when BuildContext is used in a late field initializer.
+</dd>
+
+          <dt id="AvoidLateFinalReassignmentRule">
+  <span class="name "><a href="../saropa_lints/AvoidLateFinalReassignmentRule-class.html">AvoidLateFinalReassignmentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a late final field is assigned twice.
+</dd>
+
+          <dt id="AvoidLateKeywordRule">
+  <span class="name "><a href="../saropa_lints/AvoidLateKeywordRule-class.html">AvoidLateKeywordRule</a></span> 
+
+</dt>
+<dd>
+  Warns when late keyword is used.
+</dd>
+
+          <dt id="AvoidLayoutBuilderMisuseRule">
+  <span class="name "><a href="../saropa_lints/AvoidLayoutBuilderMisuseRule-class.html">AvoidLayoutBuilderMisuseRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-layout-builder-in-build
+Warns when LayoutBuilder is used inefficiently.
+</dd>
+
+          <dt id="AvoidListViewWithoutItemExtentRule">
+  <span class="name "><a href="../saropa_lints/AvoidListViewWithoutItemExtentRule-class.html">AvoidListViewWithoutItemExtentRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-listview-without-item-extent
+Warns when ListView doesn't specify itemExtent for better performance.
+</dd>
+
+          <dt id="AvoidLocalFunctionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidLocalFunctionsRule-class.html">AvoidLocalFunctionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when local functions are declared inside other functions.
+</dd>
+
+          <dt id="AvoidLoggingSensitiveDataRule">
+  <span class="name "><a href="../saropa_lints/AvoidLoggingSensitiveDataRule-class.html">AvoidLoggingSensitiveDataRule</a></span> 
+
+</dt>
+<dd>
+  Warns when sensitive data might be logged.
+</dd>
+
+          <dt id="AvoidLongFilesRule">
+  <span class="name "><a href="../saropa_lints/AvoidLongFilesRule-class.html">AvoidLongFilesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a file exceeds the maximum line count.
+</dd>
+
+          <dt id="AvoidLongFunctionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidLongFunctionsRule-class.html">AvoidLongFunctionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function or method body exceeds the maximum line count.
+</dd>
+
+          <dt id="AvoidLongParameterListRule">
+  <span class="name "><a href="../saropa_lints/AvoidLongParameterListRule-class.html">AvoidLongParameterListRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function has too many parameters.
+</dd>
+
+          <dt id="AvoidLongRecordsRule">
+  <span class="name "><a href="../saropa_lints/AvoidLongRecordsRule-class.html">AvoidLongRecordsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a record type has too many fields.
+</dd>
+
+          <dt id="AvoidLosingStackTraceRule">
+  <span class="name "><a href="../saropa_lints/AvoidLosingStackTraceRule-class.html">AvoidLosingStackTraceRule</a></span> 
+
+</dt>
+<dd>
+  Warns when stack trace is lost in catch block.
+</dd>
+
+          <dt id="AvoidMapKeysContainsRule">
+  <span class="name "><a href="../saropa_lints/AvoidMapKeysContainsRule-class.html">AvoidMapKeysContainsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when .keys.contains() is used instead of .containsKey().
+</dd>
+
+          <dt id="AvoidMediaQueryInBuildRule">
+  <span class="name "><a href="../saropa_lints/AvoidMediaQueryInBuildRule-class.html">AvoidMediaQueryInBuildRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-mediaquery-in-build
+Warns when MediaQuery.of is called directly in build method.
+</dd>
+
+          <dt id="AvoidMergedSemanticsHidingInfoRule">
+  <span class="name "><a href="../saropa_lints/AvoidMergedSemanticsHidingInfoRule-class.html">AvoidMergedSemanticsHidingInfoRule</a></span> 
+
+</dt>
+<dd>
+  Warns when MergeSemantics might hide important information.
+</dd>
+
+          <dt id="AvoidMisleadingDocumentationRule">
+  <span class="name "><a href="../saropa_lints/AvoidMisleadingDocumentationRule-class.html">AvoidMisleadingDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when documentation is outdated or misleading.
+</dd>
+
+          <dt id="AvoidMisnamedPaddingRule">
+  <span class="name "><a href="../saropa_lints/AvoidMisnamedPaddingRule-class.html">AvoidMisnamedPaddingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a widget has a "padding" parameter that is used as margin.
+</dd>
+
+          <dt id="AvoidMissedCallsRule">
+  <span class="name "><a href="../saropa_lints/AvoidMissedCallsRule-class.html">AvoidMissedCallsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a getter is called without parentheses in print/debugPrint.
+</dd>
+
+          <dt id="AvoidMissingCompleterStackTraceRule">
+  <span class="name "><a href="../saropa_lints/AvoidMissingCompleterStackTraceRule-class.html">AvoidMissingCompleterStackTraceRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Completer.completeError is called without stack trace.
+</dd>
+
+          <dt id="AvoidMissingEnumConstantInMapRule">
+  <span class="name "><a href="../saropa_lints/AvoidMissingEnumConstantInMapRule-class.html">AvoidMissingEnumConstantInMapRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a map indexed by enum is missing some enum values.
+</dd>
+
+          <dt id="AvoidMissingImageAltRule">
+  <span class="name "><a href="../saropa_lints/AvoidMissingImageAltRule-class.html">AvoidMissingImageAltRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Image widget is missing semanticLabel (alt text).
+</dd>
+
+          <dt id="AvoidMisusedSetLiteralsRule">
+  <span class="name "><a href="../saropa_lints/AvoidMisusedSetLiteralsRule-class.html">AvoidMisusedSetLiteralsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a set literal is used where another type is expected.
+</dd>
+
+          <dt id="AvoidMixingNamedAndPositionalFieldsRule">
+  <span class="name "><a href="../saropa_lints/AvoidMixingNamedAndPositionalFieldsRule-class.html">AvoidMixingNamedAndPositionalFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when record type mixes named and positional fields.
+</dd>
+
+          <dt id="AvoidMountedInSetStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidMountedInSetStateRule-class.html">AvoidMountedInSetStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>mounted</code> is referenced inside setState callback.
+</dd>
+
+          <dt id="AvoidMultiAssignmentRule">
+  <span class="name "><a href="../saropa_lints/AvoidMultiAssignmentRule-class.html">AvoidMultiAssignmentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when multiple assignments are chained on one line.
+</dd>
+
+          <dt id="AvoidMutatingParametersRule">
+  <span class="name "><a href="../saropa_lints/AvoidMutatingParametersRule-class.html">AvoidMutatingParametersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when function parameters are reassigned.
+</dd>
+
+          <dt id="AvoidNavigatorPushWithoutRouteNameRule">
+  <span class="name "><a href="../saropa_lints/AvoidNavigatorPushWithoutRouteNameRule-class.html">AvoidNavigatorPushWithoutRouteNameRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-navigator-push-without-route-name
+Warns when Navigator.push is used without a route name.
+</dd>
+
+          <dt id="AvoidNegatedConditionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNegatedConditionsRule-class.html">AvoidNegatedConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a negated condition can be simplified.
+</dd>
+
+          <dt id="AvoidNegationsInEqualityChecksRule">
+  <span class="name "><a href="../saropa_lints/AvoidNegationsInEqualityChecksRule-class.html">AvoidNegationsInEqualityChecksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when negation is used in equality checks.
+</dd>
+
+          <dt id="AvoidNestedAssignmentsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedAssignmentsRule-class.html">AvoidNestedAssignmentsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when assignment is used inside another expression.
+</dd>
+
+          <dt id="AvoidNestedConditionalExpressionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedConditionalExpressionsRule-class.html">AvoidNestedConditionalExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when conditional expressions (ternary operators) are nested.
+</dd>
+
+          <dt id="AvoidNestedExtensionTypesRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedExtensionTypesRule-class.html">AvoidNestedExtensionTypesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an extension type contains another extension type.
+</dd>
+
+          <dt id="AvoidNestedFuturesRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedFuturesRule-class.html">AvoidNestedFuturesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>Future&lt;Future&lt;T&gt;&gt;</code> is used (nested futures).
+</dd>
+
+          <dt id="AvoidNestedRecordsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedRecordsRule-class.html">AvoidNestedRecordsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when record types are nested.
+</dd>
+
+          <dt id="AvoidNestedShorthandsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedShorthandsRule-class.html">AvoidNestedShorthandsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when shorthand syntax is nested too deeply.
+</dd>
+
+          <dt id="AvoidNestedStreamsAndFuturesRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedStreamsAndFuturesRule-class.html">AvoidNestedStreamsAndFuturesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>Stream&lt;Future&lt;T&gt;&gt;</code> or <code>Future&lt;Stream&lt;T&gt;&gt;</code> is used.
+</dd>
+
+          <dt id="AvoidNestedSwitchesRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedSwitchesRule-class.html">AvoidNestedSwitchesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when switch statements are nested.
+</dd>
+
+          <dt id="AvoidNestedSwitchExpressionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedSwitchExpressionsRule-class.html">AvoidNestedSwitchExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a switch expression is nested inside another switch.
+</dd>
+
+          <dt id="AvoidNestedTryRule">
+  <span class="name "><a href="../saropa_lints/AvoidNestedTryRule-class.html">AvoidNestedTryRule</a></span> 
+
+</dt>
+<dd>
+  Warns when try statements are nested.
+</dd>
+
+          <dt id="AvoidNonAsciiSymbolsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNonAsciiSymbolsRule-class.html">AvoidNonAsciiSymbolsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when string literals contain non-ASCII characters.
+</dd>
+
+          <dt id="AvoidNonEmptyConstructorBodiesRule">
+  <span class="name "><a href="../saropa_lints/AvoidNonEmptyConstructorBodiesRule-class.html">AvoidNonEmptyConstructorBodiesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when constructor body contains logic.
+</dd>
+
+          <dt id="AvoidNonFinalExceptionClassFieldsRule">
+  <span class="name "><a href="../saropa_lints/AvoidNonFinalExceptionClassFieldsRule-class.html">AvoidNonFinalExceptionClassFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when exception classes have non-final fields.
+</dd>
+
+          <dt id="AvoidNullableInterpolationRule">
+  <span class="name "><a href="../saropa_lints/AvoidNullableInterpolationRule-class.html">AvoidNullableInterpolationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when interpolating a nullable value in a string.
+</dd>
+
+          <dt id="AvoidNullableParametersWithDefaultValuesRule">
+  <span class="name "><a href="../saropa_lints/AvoidNullableParametersWithDefaultValuesRule-class.html">AvoidNullableParametersWithDefaultValuesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when nullable parameters have default values that could be non-null.
+</dd>
+
+          <dt id="AvoidNullableToStringRule">
+  <span class="name "><a href="../saropa_lints/AvoidNullableToStringRule-class.html">AvoidNullableToStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when calling <code>.toString()</code> on a nullable value without null check.
+</dd>
+
+          <dt id="AvoidNullAssertionRule">
+  <span class="name "><a href="../saropa_lints/AvoidNullAssertionRule-class.html">AvoidNullAssertionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the null assertion operator (!) is used.
+</dd>
+
+          <dt id="AvoidObjectCreationInHotLoopsRule">
+  <span class="name "><a href="../saropa_lints/AvoidObjectCreationInHotLoopsRule-class.html">AvoidObjectCreationInHotLoopsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when objects are created inside hot loops.
+</dd>
+
+          <dt id="AvoidOneFieldRecordsRule">
+  <span class="name "><a href="../saropa_lints/AvoidOneFieldRecordsRule-class.html">AvoidOneFieldRecordsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a record has only one field.
+</dd>
+
+          <dt id="AvoidOnlyRethrowRule">
+  <span class="name "><a href="../saropa_lints/AvoidOnlyRethrowRule-class.html">AvoidOnlyRethrowRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a catch clause only contains a rethrow.
+</dd>
+
+          <dt id="AvoidPassingAsyncWhenSyncExpectedRule">
+  <span class="name "><a href="../saropa_lints/AvoidPassingAsyncWhenSyncExpectedRule-class.html">AvoidPassingAsyncWhenSyncExpectedRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an async function is passed where a sync function is expected.
+</dd>
+
+          <dt id="AvoidPassingDefaultValuesRule">
+  <span class="name "><a href="../saropa_lints/AvoidPassingDefaultValuesRule-class.html">AvoidPassingDefaultValuesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an empty collection default value is passed explicitly.
+</dd>
+
+          <dt id="AvoidPassingSelfAsArgumentRule">
+  <span class="name "><a href="../saropa_lints/AvoidPassingSelfAsArgumentRule-class.html">AvoidPassingSelfAsArgumentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an object is passed as an argument to its own method.
+</dd>
+
+          <dt id="AvoidPositionalRecordFieldAccessRule">
+  <span class="name "><a href="../saropa_lints/AvoidPositionalRecordFieldAccessRule-class.html">AvoidPositionalRecordFieldAccessRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a positional record field is accessed with $1, $2, etc.
+</dd>
+
+          <dt id="AvoidPrintInProductionRule">
+  <span class="name "><a href="../saropa_lints/AvoidPrintInProductionRule-class.html">AvoidPrintInProductionRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-print-in-production
+Warns when print() is used outside of debug/test code.
+</dd>
+
+          <dt id="AvoidProductionConfigInTestsRule">
+  <span class="name "><a href="../saropa_lints/AvoidProductionConfigInTestsRule-class.html">AvoidProductionConfigInTestsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test uses production configuration.
+</dd>
+
+          <dt id="AvoidRealNetworkCallsInTestsRule">
+  <span class="name "><a href="../saropa_lints/AvoidRealNetworkCallsInTestsRule-class.html">AvoidRealNetworkCallsInTestsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test uses real network calls.
+</dd>
+
+          <dt id="AvoidRecursiveCallsRule">
+  <span class="name "><a href="../saropa_lints/AvoidRecursiveCallsRule-class.html">AvoidRecursiveCallsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function calls itself directly (recursive call).
+</dd>
+
+          <dt id="AvoidRecursiveToStringRule">
+  <span class="name "><a href="../saropa_lints/AvoidRecursiveToStringRule-class.html">AvoidRecursiveToStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when toString() method calls itself, causing infinite recursion.
+</dd>
+
+          <dt id="AvoidRecursiveWidgetCallsRule">
+  <span class="name "><a href="../saropa_lints/AvoidRecursiveWidgetCallsRule-class.html">AvoidRecursiveWidgetCallsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a widget references itself in its build method.
+</dd>
+
+          <dt id="AvoidRedundantAsyncRule">
+  <span class="name "><a href="../saropa_lints/AvoidRedundantAsyncRule-class.html">AvoidRedundantAsyncRule</a></span> 
+
+</dt>
+<dd>
+  Warns when async is used but no await is present in the function body.
+</dd>
+
+          <dt id="AvoidRedundantElseRule">
+  <span class="name "><a href="../saropa_lints/AvoidRedundantElseRule-class.html">AvoidRedundantElseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when else is redundant after a return/throw/continue/break.
+</dd>
+
+          <dt id="AvoidRedundantPositionalFieldNameRule">
+  <span class="name "><a href="../saropa_lints/AvoidRedundantPositionalFieldNameRule-class.html">AvoidRedundantPositionalFieldNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when positional record field has an explicit name that matches
+the default positional field name pattern ($1, $2, etc.).
+</dd>
+
+          <dt id="AvoidRedundantPragmaInlineRule">
+  <span class="name "><a href="../saropa_lints/AvoidRedundantPragmaInlineRule-class.html">AvoidRedundantPragmaInlineRule</a></span> 
+
+</dt>
+<dd>
+  Warns when @pragma('vm:prefer-inline') is used redundantly.
+</dd>
+
+          <dt id="AvoidReferencingDiscardedVariablesRule">
+  <span class="name "><a href="../saropa_lints/AvoidReferencingDiscardedVariablesRule-class.html">AvoidReferencingDiscardedVariablesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when referencing discarded/underscore-prefixed variables.
+</dd>
+
+          <dt id="AvoidRegexInLoopRule">
+  <span class="name "><a href="../saropa_lints/AvoidRegexInLoopRule-class.html">AvoidRegexInLoopRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-regex-in-loop
+Warns when RegExp is created inside a loop.
+</dd>
+
+          <dt id="AvoidRepaintBoundaryMisuseRule">
+  <span class="name "><a href="../saropa_lints/AvoidRepaintBoundaryMisuseRule-class.html">AvoidRepaintBoundaryMisuseRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-repainting-boundary-misuse
+Warns when RepaintBoundary is used around static content.
+</dd>
+
+          <dt id="AvoidReturningCascadesRule">
+  <span class="name "><a href="../saropa_lints/AvoidReturningCascadesRule-class.html">AvoidReturningCascadesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when returning a cascade expression.
+</dd>
+
+          <dt id="AvoidReturningVoidRule">
+  <span class="name "><a href="../saropa_lints/AvoidReturningVoidRule-class.html">AvoidReturningVoidRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function explicitly returns <code>void</code>.
+</dd>
+
+          <dt id="AvoidReturningWidgetsRule">
+  <span class="name "><a href="../saropa_lints/AvoidReturningWidgetsRule-class.html">AvoidReturningWidgetsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a method returns a Widget.
+</dd>
+
+          <dt id="AvoidScaffoldMessengerAfterAwaitRule">
+  <span class="name "><a href="../saropa_lints/AvoidScaffoldMessengerAfterAwaitRule-class.html">AvoidScaffoldMessengerAfterAwaitRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-scaffold-messenger-of-context
+Warns when using ScaffoldMessenger.of(context) directly instead of storing it.
+</dd>
+
+          <dt id="AvoidSelfAssignmentRule">
+  <span class="name "><a href="../saropa_lints/AvoidSelfAssignmentRule-class.html">AvoidSelfAssignmentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable is assigned to itself.
+</dd>
+
+          <dt id="AvoidSelfCompareRule">
+  <span class="name "><a href="../saropa_lints/AvoidSelfCompareRule-class.html">AvoidSelfCompareRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable is compared to itself.
+</dd>
+
+          <dt id="AvoidServiceLocatorInWidgetsRule">
+  <span class="name "><a href="../saropa_lints/AvoidServiceLocatorInWidgetsRule-class.html">AvoidServiceLocatorInWidgetsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when service locator is accessed directly in widgets.
+</dd>
+
+          <dt id="AvoidServiceLocatorOveruseRule">
+  <span class="name "><a href="../saropa_lints/AvoidServiceLocatorOveruseRule-class.html">AvoidServiceLocatorOveruseRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-service-locator-overuse
+Warns when GetIt.I or similar service locator calls are scattered throughout.
+</dd>
+
+          <dt id="AvoidSetStateInBuildRule">
+  <span class="name "><a href="../saropa_lints/AvoidSetStateInBuildRule-class.html">AvoidSetStateInBuildRule</a></span> 
+
+</dt>
+<dd>
+  Warns when setState is called during build.
+</dd>
+
+          <dt id="AvoidShadowedExtensionMethodsRule">
+  <span class="name "><a href="../saropa_lints/AvoidShadowedExtensionMethodsRule-class.html">AvoidShadowedExtensionMethodsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an extension method shadows a class method.
+</dd>
+
+          <dt id="AvoidShadowingRule">
+  <span class="name "><a href="../saropa_lints/AvoidShadowingRule-class.html">AvoidShadowingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a declaration shadows another declaration in an outer scope.
+</dd>
+
+          <dt id="AvoidShrinkWrapInListsRule">
+  <span class="name "><a href="../saropa_lints/AvoidShrinkWrapInListsRule-class.html">AvoidShrinkWrapInListsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when shrinkWrap is used in nested scrollable lists.
+</dd>
+
+          <dt id="AvoidSimilarNamesRule">
+  <span class="name "><a href="../saropa_lints/AvoidSimilarNamesRule-class.html">AvoidSimilarNamesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when variable names are too similar.
+</dd>
+
+          <dt id="AvoidSingleChildColumnRowRule">
+  <span class="name "><a href="../saropa_lints/AvoidSingleChildColumnRowRule-class.html">AvoidSingleChildColumnRowRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a Column or Row has only a single child.
+</dd>
+
+          <dt id="AvoidSingleChildScrollViewWithColumnRule">
+  <span class="name "><a href="../saropa_lints/AvoidSingleChildScrollViewWithColumnRule-class.html">AvoidSingleChildScrollViewWithColumnRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-singlechildscrollview-with-column
+Warns when SingleChildScrollView wraps a Column with Expanded children.
+</dd>
+
+          <dt id="AvoidSingleFieldDestructuringRule">
+  <span class="name "><a href="../saropa_lints/AvoidSingleFieldDestructuringRule-class.html">AvoidSingleFieldDestructuringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when destructuring is used for only one field.
+</dd>
+
+          <dt id="AvoidSingletonForScopedDependenciesRule">
+  <span class="name "><a href="../saropa_lints/AvoidSingletonForScopedDependenciesRule-class.html">AvoidSingletonForScopedDependenciesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when scoped dependencies are registered as singletons.
+</dd>
+
+          <dt id="AvoidSingletonPatternRule">
+  <span class="name "><a href="../saropa_lints/AvoidSingletonPatternRule-class.html">AvoidSingletonPatternRule</a></span> 
+
+</dt>
+<dd>
+  Warns when singleton pattern is overused.
+</dd>
+
+          <dt id="AvoidSlowCollectionMethodsRule">
+  <span class="name "><a href="../saropa_lints/AvoidSlowCollectionMethodsRule-class.html">AvoidSlowCollectionMethodsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when slow collection methods are used.
+</dd>
+
+          <dt id="AvoidSmallTouchTargetsRule">
+  <span class="name "><a href="../saropa_lints/AvoidSmallTouchTargetsRule-class.html">AvoidSmallTouchTargetsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when touch targets are potentially too small for accessibility.
+</dd>
+
+          <dt id="AvoidStateConstructorsRule">
+  <span class="name "><a href="../saropa_lints/AvoidStateConstructorsRule-class.html">AvoidStateConstructorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a State class has a constructor body.
+</dd>
+
+          <dt id="AvoidStatefulWidgetInListRule">
+  <span class="name "><a href="../saropa_lints/AvoidStatefulWidgetInListRule-class.html">AvoidStatefulWidgetInListRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-stateful-widget-in-list
+Warns when StatefulWidget is created inline in a list builder.
+</dd>
+
+          <dt id="AvoidStatefulWithoutStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidStatefulWithoutStateRule-class.html">AvoidStatefulWithoutStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when StatefulWidget has no state.
+</dd>
+
+          <dt id="AvoidStatelessWidgetInitializedFieldsRule">
+  <span class="name "><a href="../saropa_lints/AvoidStatelessWidgetInitializedFieldsRule-class.html">AvoidStatelessWidgetInitializedFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a StatelessWidget has initialized fields.
+</dd>
+
+          <dt id="AvoidStreamToStringRule">
+  <span class="name "><a href="../saropa_lints/AvoidStreamToStringRule-class.html">AvoidStreamToStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a Stream is converted to String via toString().
+</dd>
+
+          <dt id="AvoidStringConcatenationInUiRule">
+  <span class="name "><a href="../saropa_lints/AvoidStringConcatenationInUiRule-class.html">AvoidStringConcatenationInUiRule</a></span> 
+
+</dt>
+<dd>
+  Warns when string concatenation is used for sentences.
+</dd>
+
+          <dt id="AvoidSubstringRule">
+  <span class="name "><a href="../saropa_lints/AvoidSubstringRule-class.html">AvoidSubstringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when String.substring() is used.
+</dd>
+
+          <dt id="AvoidSwallowingExceptionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidSwallowingExceptionsRule-class.html">AvoidSwallowingExceptionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when catch block swallows exception without logging.
+</dd>
+
+          <dt id="AvoidSynchronousFileIoRule">
+  <span class="name "><a href="../saropa_lints/AvoidSynchronousFileIoRule-class.html">AvoidSynchronousFileIoRule</a></span> 
+
+</dt>
+<dd>
+  Warns when synchronous file I/O is used instead of async.
+</dd>
+
+          <dt id="AvoidTextInImagesRule">
+  <span class="name "><a href="../saropa_lints/AvoidTextInImagesRule-class.html">AvoidTextInImagesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when images contain text that should be localized.
+</dd>
+
+          <dt id="AvoidTextScaleFactorRule">
+  <span class="name "><a href="../saropa_lints/AvoidTextScaleFactorRule-class.html">AvoidTextScaleFactorRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-text-scale-factor
+Warns when using deprecated textScaleFactor instead of textScaler.
+</dd>
+
+          <dt id="AvoidThrowInCatchBlockRule">
+  <span class="name "><a href="../saropa_lints/AvoidThrowInCatchBlockRule-class.html">AvoidThrowInCatchBlockRule</a></span> 
+
+</dt>
+<dd>
+  Warns when throw is used inside a catch block, which loses the stack trace.
+</dd>
+
+          <dt id="AvoidThrowInFinallyRule">
+  <span class="name "><a href="../saropa_lints/AvoidThrowInFinallyRule-class.html">AvoidThrowInFinallyRule</a></span> 
+
+</dt>
+<dd>
+  Warns when throw is used in finally blocks.
+</dd>
+
+          <dt id="AvoidThrowObjectsWithoutToStringRule">
+  <span class="name "><a href="../saropa_lints/AvoidThrowObjectsWithoutToStringRule-class.html">AvoidThrowObjectsWithoutToStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when throwing an object that doesn't have a toString() override.
+</dd>
+
+          <dt id="AvoidTooManyDependenciesRule">
+  <span class="name "><a href="../saropa_lints/AvoidTooManyDependenciesRule-class.html">AvoidTooManyDependenciesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when constructor has too many dependencies.
+</dd>
+
+          <dt id="AvoidTopLevelMembersInTestsRule">
+  <span class="name "><a href="../saropa_lints/AvoidTopLevelMembersInTestsRule-class.html">AvoidTopLevelMembersInTestsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when public top-level members are declared in test files.
+</dd>
+
+          <dt id="AvoidUiInDomainLayerRule">
+  <span class="name "><a href="../saropa_lints/AvoidUiInDomainLayerRule-class.html">AvoidUiInDomainLayerRule</a></span> 
+
+</dt>
+<dd>
+  Warns when presentation logic is in domain layer.
+</dd>
+
+          <dt id="AvoidUnassignedFieldsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnassignedFieldsRule-class.html">AvoidUnassignedFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class field is never assigned a value.
+</dd>
+
+          <dt id="AvoidUnassignedLateFieldsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnassignedLateFieldsRule-class.html">AvoidUnassignedLateFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a late field is never assigned a value.
+</dd>
+
+          <dt id="AvoidUnassignedStreamSubscriptionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnassignedStreamSubscriptionsRule-class.html">AvoidUnassignedStreamSubscriptionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when .listen() result is not assigned to a variable.
+</dd>
+
+          <dt id="AvoidUnconditionalBreakRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnconditionalBreakRule-class.html">AvoidUnconditionalBreakRule</a></span> 
+
+</dt>
+<dd>
+  Warns when break or continue is unconditionally executed.
+</dd>
+
+          <dt id="AvoidUncontrolledTextFieldRule">
+  <span class="name "><a href="../saropa_lints/AvoidUncontrolledTextFieldRule-class.html">AvoidUncontrolledTextFieldRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-uncontrolled-text-field
+Warns when TextField is used without a controller.
+</dd>
+
+          <dt id="AvoidUndisposedInstancesRule">
+  <span class="name "><a href="../saropa_lints/AvoidUndisposedInstancesRule-class.html">AvoidUndisposedInstancesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when disposable instances are created but not disposed.
+</dd>
+
+          <dt id="AvoidUnguardedDebugRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnguardedDebugRule-class.html">AvoidUnguardedDebugRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>debug()</code> or <code>debugPrint()</code> calls are not guarded by a debug check.
+</dd>
+
+          <dt id="AvoidUnknownPragmaRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnknownPragmaRule-class.html">AvoidUnknownPragmaRule</a></span> 
+
+</dt>
+<dd>
+  Warns when unknown pragma annotations are used.
+</dd>
+
+          <dt id="AvoidUnnecessaryBlockRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryBlockRule-class.html">AvoidUnnecessaryBlockRule</a></span> 
+
+</dt>
+<dd>
+  Warns when unnecessary block braces are used.
+</dd>
+
+          <dt id="AvoidUnnecessaryCallRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryCallRule-class.html">AvoidUnnecessaryCallRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>.call()</code> is used explicitly on a callable.
+</dd>
+
+          <dt id="AvoidUnnecessaryCollectionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryCollectionsRule-class.html">AvoidUnnecessaryCollectionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when unnecessary collection wrappers are used.
+</dd>
+
+          <dt id="AvoidUnnecessaryCompareToRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryCompareToRule-class.html">AvoidUnnecessaryCompareToRule</a></span> 
+
+</dt>
+<dd>
+  Warns when compareTo is used for equality instead of ==.
+</dd>
+
+          <dt id="AvoidUnnecessaryConditionalsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryConditionalsRule-class.html">AvoidUnnecessaryConditionalsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a condition is always true or always false.
+</dd>
+
+          <dt id="AvoidUnnecessaryConstructorRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryConstructorRule-class.html">AvoidUnnecessaryConstructorRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class has an empty constructor (no parameters, no body, no initializers).
+</dd>
+
+          <dt id="AvoidUnnecessaryContinueRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryContinueRule-class.html">AvoidUnnecessaryContinueRule</a></span> 
+
+</dt>
+<dd>
+  Warns when continue is redundant (at end of loop body).
+</dd>
+
+          <dt id="AvoidUnnecessaryDigitSeparatorsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryDigitSeparatorsRule-class.html">AvoidUnnecessaryDigitSeparatorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when digit separators are used unnecessarily.
+</dd>
+
+          <dt id="AvoidUnnecessaryEnumArgumentsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryEnumArgumentsRule-class.html">AvoidUnnecessaryEnumArgumentsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when enum arguments match the default and can be omitted.
+</dd>
+
+          <dt id="AvoidUnnecessaryEnumPrefixRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryEnumPrefixRule-class.html">AvoidUnnecessaryEnumPrefixRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using enum name prefix inside the enum declaration.
+</dd>
+
+          <dt id="AvoidUnnecessaryExtendsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryExtendsRule-class.html">AvoidUnnecessaryExtendsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class explicitly extends Object.
+</dd>
+
+          <dt id="AvoidUnnecessaryFuturesRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryFuturesRule-class.html">AvoidUnnecessaryFuturesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when async/await is used unnecessarily.
+</dd>
+
+          <dt id="AvoidUnnecessaryGestureDetectorRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryGestureDetectorRule-class.html">AvoidUnnecessaryGestureDetectorRule</a></span> 
+
+</dt>
+<dd>
+  Warns when GestureDetector has no gesture callbacks defined.
+</dd>
+
+          <dt id="AvoidUnnecessaryGetterRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryGetterRule-class.html">AvoidUnnecessaryGetterRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a getter just returns a final field without any logic.
+</dd>
+
+          <dt id="AvoidUnnecessaryIfRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryIfRule-class.html">AvoidUnnecessaryIfRule</a></span> 
+
+</dt>
+<dd>
+  Warns on patterns like if (condition) return true; return false;
+</dd>
+
+          <dt id="AvoidUnnecessaryLateFieldsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryLateFieldsRule-class.html">AvoidUnnecessaryLateFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when late is used but field is assigned in constructor.
+</dd>
+
+          <dt id="AvoidUnnecessaryLengthCheckRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryLengthCheckRule-class.html">AvoidUnnecessaryLengthCheckRule</a></span> 
+
+</dt>
+<dd>
+  Warns when length &gt; 0 or length != 0 can be replaced with isNotEmpty.
+</dd>
+
+          <dt id="AvoidUnnecessaryLocalLateRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryLocalLateRule-class.html">AvoidUnnecessaryLocalLateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a late local variable is initialized immediately.
+</dd>
+
+          <dt id="AvoidUnnecessaryLocalVariableRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryLocalVariableRule-class.html">AvoidUnnecessaryLocalVariableRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable is declared, used once, and returned immediately.
+</dd>
+
+          <dt id="AvoidUnnecessaryNegationsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryNegationsRule-class.html">AvoidUnnecessaryNegationsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when negation can be simplified.
+</dd>
+
+          <dt id="AvoidUnnecessaryNullableFieldsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryNullableFieldsRule-class.html">AvoidUnnecessaryNullableFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a nullable field is always non-null.
+</dd>
+
+          <dt id="AvoidUnnecessaryNullableParametersRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryNullableParametersRule-class.html">AvoidUnnecessaryNullableParametersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when nullable parameters are never passed null.
+</dd>
+
+          <dt id="AvoidUnnecessaryNullableReturnTypeRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryNullableReturnTypeRule-class.html">AvoidUnnecessaryNullableReturnTypeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function's return type is nullable but never returns null.
+</dd>
+
+          <dt id="AvoidUnnecessaryOverridesInStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryOverridesInStateRule-class.html">AvoidUnnecessaryOverridesInStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when State class has unnecessary overrides.
+</dd>
+
+          <dt id="AvoidUnnecessaryOverridesRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryOverridesRule-class.html">AvoidUnnecessaryOverridesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an override just calls super without additional logic.
+</dd>
+
+          <dt id="AvoidUnnecessaryPatternsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryPatternsRule-class.html">AvoidUnnecessaryPatternsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a pattern doesn't affect type narrowing.
+</dd>
+
+          <dt id="AvoidUnnecessaryReassignmentRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryReassignmentRule-class.html">AvoidUnnecessaryReassignmentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable is assigned the same value it already has.
+</dd>
+
+          <dt id="AvoidUnnecessaryReturnRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryReturnRule-class.html">AvoidUnnecessaryReturnRule</a></span> 
+
+</dt>
+<dd>
+  Warns on unnecessary return statement at end of void function.
+</dd>
+
+          <dt id="AvoidUnnecessarySetStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessarySetStateRule-class.html">AvoidUnnecessarySetStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when setState is called in initState, dispose, or build.
+</dd>
+
+          <dt id="AvoidUnnecessaryStatefulWidgetsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryStatefulWidgetsRule-class.html">AvoidUnnecessaryStatefulWidgetsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a StatefulWidget could be a StatelessWidget.
+</dd>
+
+          <dt id="AvoidUnnecessaryStatementsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryStatementsRule-class.html">AvoidUnnecessaryStatementsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a statement has no effect.
+</dd>
+
+          <dt id="AvoidUnnecessarySuperRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessarySuperRule-class.html">AvoidUnnecessarySuperRule</a></span> 
+
+</dt>
+<dd>
+  Warns when super call is unnecessary in constructor.
+</dd>
+
+          <dt id="AvoidUnnecessaryTypeAssertionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryTypeAssertionsRule-class.html">AvoidUnnecessaryTypeAssertionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a type assertion (is check) is unnecessary.
+</dd>
+
+          <dt id="AvoidUnnecessaryTypeCastsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnnecessaryTypeCastsRule-class.html">AvoidUnnecessaryTypeCastsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a type cast (as) is unnecessary.
+</dd>
+
+          <dt id="AvoidUnrelatedTypeAssertionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnrelatedTypeAssertionsRule-class.html">AvoidUnrelatedTypeAssertionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an 'is' type check can never be true.
+</dd>
+
+          <dt id="AvoidUnremovableCallbacksInListenersRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnremovableCallbacksInListenersRule-class.html">AvoidUnremovableCallbacksInListenersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when anonymous functions are used in listener methods.
+</dd>
+
+          <dt id="AvoidUnrestrictedTextFieldLengthRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnrestrictedTextFieldLengthRule-class.html">AvoidUnrestrictedTextFieldLengthRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-unrestricted-text-field-length
+Warns when TextField doesn't have maxLength set.
+</dd>
+
+          <dt id="AvoidUnsafeCastRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnsafeCastRule-class.html">AvoidUnsafeCastRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>as</code> cast is used without null check.
+</dd>
+
+          <dt id="AvoidUnsafeCollectionMethodsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnsafeCollectionMethodsRule-class.html">AvoidUnsafeCollectionMethodsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using .first or .last on potentially empty collections.
+</dd>
+
+          <dt id="AvoidUnsafeReduceRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnsafeReduceRule-class.html">AvoidUnsafeReduceRule</a></span> 
+
+</dt>
+<dd>
+  Warns when reduce() is called on a potentially empty collection.
+</dd>
+
+          <dt id="AvoidUnsafeSetStateRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnsafeSetStateRule-class.html">AvoidUnsafeSetStateRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>setState()</code> is called without a <code>mounted</code> check.
+</dd>
+
+          <dt id="AvoidUnusedAfterNullCheckRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnusedAfterNullCheckRule-class.html">AvoidUnusedAfterNullCheckRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable is null-checked but not used afterward.
+</dd>
+
+          <dt id="AvoidUnusedAssignmentRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnusedAssignmentRule-class.html">AvoidUnusedAssignmentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an assignment is never used.
+</dd>
+
+          <dt id="AvoidUnusedCallbackParametersRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnusedCallbackParametersRule-class.html">AvoidUnusedCallbackParametersRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: avoid-unused-parameters-in-callbacks
+Warns when callback parameters are declared but not used.
+</dd>
+
+          <dt id="AvoidUnusedGenericsRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnusedGenericsRule-class.html">AvoidUnusedGenericsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when type parameters are declared but never used.
+</dd>
+
+          <dt id="AvoidUnusedInstancesRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnusedInstancesRule-class.html">AvoidUnusedInstancesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an instance is created but never used.
+</dd>
+
+          <dt id="AvoidUnusedParametersRule">
+  <span class="name "><a href="../saropa_lints/AvoidUnusedParametersRule-class.html">AvoidUnusedParametersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function parameter is unused.
+</dd>
+
+          <dt id="AvoidVagueTestDescriptionsRule">
+  <span class="name "><a href="../saropa_lints/AvoidVagueTestDescriptionsRule-class.html">AvoidVagueTestDescriptionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test description is too vague.
+</dd>
+
+          <dt id="AvoidWatchInCallbacksRule">
+  <span class="name "><a href="../saropa_lints/AvoidWatchInCallbacksRule-class.html">AvoidWatchInCallbacksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Provider is watched unnecessarily in callbacks.
+</dd>
+
+          <dt id="AvoidWeakCryptographicAlgorithmsRule">
+  <span class="name "><a href="../saropa_lints/AvoidWeakCryptographicAlgorithmsRule-class.html">AvoidWeakCryptographicAlgorithmsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when weak cryptographic algorithms like MD5 or SHA1 are used.
+</dd>
+
+          <dt id="AvoidWebViewJavaScriptEnabledRule">
+  <span class="name "><a href="../saropa_lints/AvoidWebViewJavaScriptEnabledRule-class.html">AvoidWebViewJavaScriptEnabledRule</a></span> 
+
+</dt>
+<dd>
+  Warns when WebView has JavaScript enabled without consideration.
+</dd>
+
+          <dt id="AvoidWildcardCasesWithEnumsRule">
+  <span class="name "><a href="../saropa_lints/AvoidWildcardCasesWithEnumsRule-class.html">AvoidWildcardCasesWithEnumsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using default/wildcard case with enums.
+</dd>
+
+          <dt id="AvoidWildcardCasesWithSealedClassesRule">
+  <span class="name "><a href="../saropa_lints/AvoidWildcardCasesWithSealedClassesRule-class.html">AvoidWildcardCasesWithSealedClassesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using default/wildcard case with sealed classes.
+</dd>
+
+          <dt id="AvoidWrappingInPaddingRule">
+  <span class="name "><a href="../saropa_lints/AvoidWrappingInPaddingRule-class.html">AvoidWrappingInPaddingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a widget that has its own padding property is wrapped in Padding.
+</dd>
+
+          <dt id="BinaryExpressionOperandOrderRule">
+  <span class="name "><a href="../saropa_lints/BinaryExpressionOperandOrderRule-class.html">BinaryExpressionOperandOrderRule</a></span> 
+
+</dt>
+<dd>
+  Warns when binary expression operands could be reordered for clarity.
+</dd>
+
+          <dt id="CheckForEqualsInRenderObjectSettersRule">
+  <span class="name "><a href="../saropa_lints/CheckForEqualsInRenderObjectSettersRule-class.html">CheckForEqualsInRenderObjectSettersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when RenderObject setters don't check for equality.
+</dd>
+
+          <dt id="ConsistentUpdateRenderObjectRule">
+  <span class="name "><a href="../saropa_lints/ConsistentUpdateRenderObjectRule-class.html">ConsistentUpdateRenderObjectRule</a></span> 
+
+</dt>
+<dd>
+  Warns when updateRenderObject doesn't update all properties set in createRenderObject.
+</dd>
+
+          <dt id="DisposeFieldsRule">
+  <span class="name "><a href="../saropa_lints/DisposeFieldsRule-class.html">DisposeFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when fields that need disposal are not disposed.
+</dd>
+
+          <dt id="DoubleLiteralFormatRule">
+  <span class="name "><a href="../saropa_lints/DoubleLiteralFormatRule-class.html">DoubleLiteralFormatRule</a></span> 
+
+</dt>
+<dd>
+  Warns when double literals don't follow a consistent format.
+</dd>
+
+          <dt id="FormatCommentFormattingRule">
+  <span class="name "><a href="../saropa_lints/FormatCommentFormattingRule-class.html">FormatCommentFormattingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when comments don't follow formatting conventions.
+</dd>
+
+          <dt id="FormatCommentRule">
+  <span class="name "><a href="../saropa_lints/FormatCommentRule-class.html">FormatCommentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when comments don't follow proper formatting.
+</dd>
+
+          <dt id="FormatTestNameRule">
+  <span class="name "><a href="../saropa_lints/FormatTestNameRule-class.html">FormatTestNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test names don't follow the expected format.
+</dd>
+
+          <dt id="FunctionAlwaysReturnsNullRule">
+  <span class="name "><a href="../saropa_lints/FunctionAlwaysReturnsNullRule-class.html">FunctionAlwaysReturnsNullRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function always returns null.
+</dd>
+
+          <dt id="FunctionAlwaysReturnsSameValueRule">
+  <span class="name "><a href="../saropa_lints/FunctionAlwaysReturnsSameValueRule-class.html">FunctionAlwaysReturnsSameValueRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function always returns the same value.
+</dd>
+
+          <dt id="MapKeysOrderingRule">
+  <span class="name "><a href="../saropa_lints/MapKeysOrderingRule-class.html">MapKeysOrderingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when map literal keys are not in alphabetical order.
+</dd>
+
+          <dt id="MatchBaseClassDefaultValueRule">
+  <span class="name "><a href="../saropa_lints/MatchBaseClassDefaultValueRule-class.html">MatchBaseClassDefaultValueRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an overriding method specifies default values that look suspicious.
+</dd>
+
+          <dt id="MatchClassNamePatternRule">
+  <span class="name "><a href="../saropa_lints/MatchClassNamePatternRule-class.html">MatchClassNamePatternRule</a></span> 
+
+</dt>
+<dd>
+  Warns when class names don't match expected patterns.
+</dd>
+
+          <dt id="MatchGetterSetterFieldNamesRule">
+  <span class="name "><a href="../saropa_lints/MatchGetterSetterFieldNamesRule-class.html">MatchGetterSetterFieldNamesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when getter/setter names don't match backing field names.
+</dd>
+
+          <dt id="MatchLibFolderStructureRule">
+  <span class="name "><a href="../saropa_lints/MatchLibFolderStructureRule-class.html">MatchLibFolderStructureRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test files don't match lib folder structure.
+</dd>
+
+          <dt id="MatchPositionalFieldNamesOnAssignmentRule">
+  <span class="name "><a href="../saropa_lints/MatchPositionalFieldNamesOnAssignmentRule-class.html">MatchPositionalFieldNamesOnAssignmentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when positional field names don't match the variable being assigned.
+</dd>
+
+          <dt id="MaxImportsRule">
+  <span class="name "><a href="../saropa_lints/MaxImportsRule-class.html">MaxImportsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a file has too many import statements.
+</dd>
+
+          <dt id="MemberOrderingFormattingRule">
+  <span class="name "><a href="../saropa_lints/MemberOrderingFormattingRule-class.html">MemberOrderingFormattingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when class members are not in the conventional order.
+</dd>
+
+          <dt id="MemberOrderingRule">
+  <span class="name "><a href="../saropa_lints/MemberOrderingRule-class.html">MemberOrderingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when class members are not in a consistent order.
+</dd>
+
+          <dt id="MissingTestAssertionRule">
+  <span class="name "><a href="../saropa_lints/MissingTestAssertionRule-class.html">MissingTestAssertionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a test body doesn't contain any assertions.
+</dd>
+
+          <dt id="MissingUseResultAnnotationRule">
+  <span class="name "><a href="../saropa_lints/MissingUseResultAnnotationRule-class.html">MissingUseResultAnnotationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function returns a value that should have @useResult.
+</dd>
+
+          <dt id="MoveRecordsToTypedefsRule">
+  <span class="name "><a href="../saropa_lints/MoveRecordsToTypedefsRule-class.html">MoveRecordsToTypedefsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when inline record types should be moved to typedefs.
+</dd>
+
+          <dt id="MoveVariableCloserToUsageRule">
+  <span class="name "><a href="../saropa_lints/MoveVariableCloserToUsageRule-class.html">MoveVariableCloserToUsageRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable could be declared closer to its usage.
+</dd>
+
+          <dt id="MoveVariableOutsideIterationRule">
+  <span class="name "><a href="../saropa_lints/MoveVariableOutsideIterationRule-class.html">MoveVariableOutsideIterationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable could be moved outside a loop.
+</dd>
+
+          <dt id="NewlineBeforeCaseRule">
+  <span class="name "><a href="../saropa_lints/NewlineBeforeCaseRule-class.html">NewlineBeforeCaseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when case clauses don't have newlines before them.
+</dd>
+
+          <dt id="NewlineBeforeConstructorRule">
+  <span class="name "><a href="../saropa_lints/NewlineBeforeConstructorRule-class.html">NewlineBeforeConstructorRule</a></span> 
+
+</dt>
+<dd>
+  Warns when constructors don't have blank lines before them.
+</dd>
+
+          <dt id="NewlineBeforeMethodRule">
+  <span class="name "><a href="../saropa_lints/NewlineBeforeMethodRule-class.html">NewlineBeforeMethodRule</a></span> 
+
+</dt>
+<dd>
+  Warns when methods don't have blank lines before them.
+</dd>
+
+          <dt id="NewlineBeforeReturnRule">
+  <span class="name "><a href="../saropa_lints/NewlineBeforeReturnRule-class.html">NewlineBeforeReturnRule</a></span> 
+
+</dt>
+<dd>
+  Warns when there's no blank line before a return statement.
+</dd>
+
+          <dt id="NoEmptyBlockRule">
+  <span class="name "><a href="../saropa_lints/NoEmptyBlockRule-class.html">NoEmptyBlockRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an empty block is used.
+</dd>
+
+          <dt id="NoEmptyStringRule">
+  <span class="name "><a href="../saropa_lints/NoEmptyStringRule-class.html">NoEmptyStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an empty string literal is used.
+</dd>
+
+          <dt id="NoEqualArgumentsRule">
+  <span class="name "><a href="../saropa_lints/NoEqualArgumentsRule-class.html">NoEqualArgumentsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same argument value is passed multiple times.
+</dd>
+
+          <dt id="NoEqualConditionsRule">
+  <span class="name "><a href="../saropa_lints/NoEqualConditionsRule-class.html">NoEqualConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same condition appears multiple times in an if-else chain.
+</dd>
+
+          <dt id="NoEqualNestedConditionsRule">
+  <span class="name "><a href="../saropa_lints/NoEqualNestedConditionsRule-class.html">NoEqualNestedConditionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the same condition appears in nested if statements.
+</dd>
+
+          <dt id="NoEqualSwitchCaseRule">
+  <span class="name "><a href="../saropa_lints/NoEqualSwitchCaseRule-class.html">NoEqualSwitchCaseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when switch cases have identical bodies.
+</dd>
+
+          <dt id="NoEqualSwitchExpressionCasesRule">
+  <span class="name "><a href="../saropa_lints/NoEqualSwitchExpressionCasesRule-class.html">NoEqualSwitchExpressionCasesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when switch expression cases have identical expressions.
+</dd>
+
+          <dt id="NoEqualThenElseRule">
+  <span class="name "><a href="../saropa_lints/NoEqualThenElseRule-class.html">NoEqualThenElseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when if and else branches have identical code.
+</dd>
+
+          <dt id="NoMagicNumberRule">
+  <span class="name "><a href="../saropa_lints/NoMagicNumberRule-class.html">NoMagicNumberRule</a></span> 
+
+</dt>
+<dd>
+  Warns when magic numbers are used instead of named constants.
+</dd>
+
+          <dt id="NoMagicStringRule">
+  <span class="name "><a href="../saropa_lints/NoMagicStringRule-class.html">NoMagicStringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when string literals are used directly (magic strings).
+</dd>
+
+          <dt id="NoObjectDeclarationRule">
+  <span class="name "><a href="../saropa_lints/NoObjectDeclarationRule-class.html">NoObjectDeclarationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a member is declared with type <code>Object</code>.
+</dd>
+
+          <dt id="ParametersOrderingConventionRule">
+  <span class="name "><a href="../saropa_lints/ParametersOrderingConventionRule-class.html">ParametersOrderingConventionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when parameters are not in conventional order.
+</dd>
+
+          <dt id="PassCorrectAcceptedTypeRule">
+  <span class="name "><a href="../saropa_lints/PassCorrectAcceptedTypeRule-class.html">PassCorrectAcceptedTypeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a parameter type doesn't match the accepted type annotation.
+</dd>
+
+          <dt id="PassExistingFutureToFutureBuilderRule">
+  <span class="name "><a href="../saropa_lints/PassExistingFutureToFutureBuilderRule-class.html">PassExistingFutureToFutureBuilderRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a new Future is created inside FutureBuilder.
+</dd>
+
+          <dt id="PassExistingStreamToStreamBuilderRule">
+  <span class="name "><a href="../saropa_lints/PassExistingStreamToStreamBuilderRule-class.html">PassExistingStreamToStreamBuilderRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a new Stream is created inside StreamBuilder.
+</dd>
+
+          <dt id="PassOptionalArgumentRule">
+  <span class="name "><a href="../saropa_lints/PassOptionalArgumentRule-class.html">PassOptionalArgumentRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an optional argument is not passed but could improve clarity.
+</dd>
+
+          <dt id="PatternFieldsOrderingRule">
+  <span class="name "><a href="../saropa_lints/PatternFieldsOrderingRule-class.html">PatternFieldsOrderingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when pattern fields are not in alphabetical order.
+</dd>
+
+          <dt id="PreferAbstractDependenciesRule">
+  <span class="name "><a href="../saropa_lints/PreferAbstractDependenciesRule-class.html">PreferAbstractDependenciesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when abstract class is not used for dependency contracts.
+</dd>
+
+          <dt id="PreferAbstractFinalStaticClassRule">
+  <span class="name "><a href="../saropa_lints/PreferAbstractFinalStaticClassRule-class.html">PreferAbstractFinalStaticClassRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class with only static members could be abstract final.
+</dd>
+
+          <dt id="PreferAddAllRule">
+  <span class="name "><a href="../saropa_lints/PreferAddAllRule-class.html">PreferAddAllRule</a></span> 
+
+</dt>
+<dd>
+  Warns when forEach with add is used instead of addAll.
+</dd>
+
+          <dt id="PreferAdditionSubtractionAssignmentsRule">
+  <span class="name "><a href="../saropa_lints/PreferAdditionSubtractionAssignmentsRule-class.html">PreferAdditionSubtractionAssignmentsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when x = x + 1 could be x += 1 (or similar).
+</dd>
+
+          <dt id="PreferAnyOrEveryRule">
+  <span class="name "><a href="../saropa_lints/PreferAnyOrEveryRule-class.html">PreferAnyOrEveryRule</a></span> 
+
+</dt>
+<dd>
+  Warns when isEmpty/isNotEmpty is used after where().
+</dd>
+
+          <dt id="PreferAssigningAwaitExpressionsRule">
+  <span class="name "><a href="../saropa_lints/PreferAssigningAwaitExpressionsRule-class.html">PreferAssigningAwaitExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when await is used inline instead of assigning to a variable first.
+</dd>
+
+          <dt id="PreferAsyncAwaitRule">
+  <span class="name "><a href="../saropa_lints/PreferAsyncAwaitRule-class.html">PreferAsyncAwaitRule</a></span> 
+
+</dt>
+<dd>
+  Warns when .then() is used instead of async/await.
+</dd>
+
+          <dt id="PreferBooleanPrefixesRule">
+  <span class="name "><a href="../saropa_lints/PreferBooleanPrefixesRule-class.html">PreferBooleanPrefixesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when boolean prefixes are missing (is/has/can/should/will/did).
+</dd>
+
+          <dt id="PreferBothInliningAnnotationsRule">
+  <span class="name "><a href="../saropa_lints/PreferBothInliningAnnotationsRule-class.html">PreferBothInliningAnnotationsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when only one inlining annotation is used.
+</dd>
+
+          <dt id="PreferBytesBuilderRule">
+  <span class="name "><a href="../saropa_lints/PreferBytesBuilderRule-class.html">PreferBytesBuilderRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a BytesBuilder should be used for byte operations.
+</dd>
+
+          <dt id="PreferCachedGetterRule">
+  <span class="name "><a href="../saropa_lints/PreferCachedGetterRule-class.html">PreferCachedGetterRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an expensive getter is called multiple times.
+</dd>
+
+          <dt id="PreferCachedNetworkImageRule">
+  <span class="name "><a href="../saropa_lints/PreferCachedNetworkImageRule-class.html">PreferCachedNetworkImageRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-cached-network-image
+Warns when Image.network is used instead of CachedNetworkImage.
+</dd>
+
+          <dt id="PreferCommentingAnalyzerIgnoresRule">
+  <span class="name "><a href="../saropa_lints/PreferCommentingAnalyzerIgnoresRule-class.html">PreferCommentingAnalyzerIgnoresRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>// ignore:</code> comments don't have a preceding explanatory comment.
+</dd>
+
+          <dt id="PreferCommentingFutureDelayedRule">
+  <span class="name "><a href="../saropa_lints/PreferCommentingFutureDelayedRule-class.html">PreferCommentingFutureDelayedRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Future.delayed doesn't have a comment explaining why.
+</dd>
+
+          <dt id="PreferCompoundAssignmentOperatorsRule">
+  <span class="name "><a href="../saropa_lints/PreferCompoundAssignmentOperatorsRule-class.html">PreferCompoundAssignmentOperatorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when binary operators can be simplified to compound assignment.
+</dd>
+
+          <dt id="PreferComputeForHeavyWorkRule">
+  <span class="name "><a href="../saropa_lints/PreferComputeForHeavyWorkRule-class.html">PreferComputeForHeavyWorkRule</a></span> 
+
+</dt>
+<dd>
+  Warns when compute() should be used for heavy work.
+</dd>
+
+          <dt id="PreferConditionalExpressionsRule">
+  <span class="name "><a href="../saropa_lints/PreferConditionalExpressionsRule-class.html">PreferConditionalExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an if-else could be simplified to a conditional expression.
+</dd>
+
+          <dt id="PreferConstBorderRadiusRule">
+  <span class="name "><a href="../saropa_lints/PreferConstBorderRadiusRule-class.html">PreferConstBorderRadiusRule</a></span> 
+
+</dt>
+<dd>
+  Warns when non-const BorderRadius constructors are used.
+</dd>
+
+          <dt id="PreferConstChildWidgetsRule">
+  <span class="name "><a href="../saropa_lints/PreferConstChildWidgetsRule-class.html">PreferConstChildWidgetsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when child widgets could be const but aren't.
+</dd>
+
+          <dt id="PreferConstrainedGenericsRule">
+  <span class="name "><a href="../saropa_lints/PreferConstrainedGenericsRule-class.html">PreferConstrainedGenericsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when generic type parameter is not constrained.
+</dd>
+
+          <dt id="PreferConstStringListRule">
+  <span class="name "><a href="../saropa_lints/PreferConstStringListRule-class.html">PreferConstStringListRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a <code>&lt;String&gt;[...]</code> list literal with only string literals
+is not marked as <code>const</code>.
+</dd>
+
+          <dt id="PreferConstWidgetsInListsRule">
+  <span class="name "><a href="../saropa_lints/PreferConstWidgetsInListsRule-class.html">PreferConstWidgetsInListsRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-const-widgets-in-lists
+Warns when widget literals in lists could be const.
+</dd>
+
+          <dt id="PreferContainsRule">
+  <span class="name "><a href="../saropa_lints/PreferContainsRule-class.html">PreferContainsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when indexOf is used to check for element presence.
+</dd>
+
+          <dt id="PreferCorrectCallbackFieldNameRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectCallbackFieldNameRule-class.html">PreferCorrectCallbackFieldNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when callback fields don't follow onX naming convention.
+</dd>
+
+          <dt id="PreferCorrectEdgeInsetsConstructorRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectEdgeInsetsConstructorRule-class.html">PreferCorrectEdgeInsetsConstructorRule</a></span> 
+
+</dt>
+<dd>
+  Warns when incorrect EdgeInsets constructor is used.
+</dd>
+
+          <dt id="PreferCorrectErrorNameRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectErrorNameRule-class.html">PreferCorrectErrorNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when catch block parameter is not named 'e' or 'error'.
+</dd>
+
+          <dt id="PreferCorrectFutureReturnTypeRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectFutureReturnTypeRule-class.html">PreferCorrectFutureReturnTypeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Future-returning functions have incorrect return type annotations.
+</dd>
+
+          <dt id="PreferCorrectHandlerNameRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectHandlerNameRule-class.html">PreferCorrectHandlerNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when event handler names don't follow conventions.
+</dd>
+
+          <dt id="PreferCorrectIdentifierLengthRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectIdentifierLengthRule-class.html">PreferCorrectIdentifierLengthRule</a></span> 
+
+</dt>
+<dd>
+  Warns when identifier names are too short or too long.
+</dd>
+
+          <dt id="PreferCorrectSetterParameterNameRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectSetterParameterNameRule-class.html">PreferCorrectSetterParameterNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when setter parameter is not named 'value'.
+</dd>
+
+          <dt id="PreferCorrectStreamReturnTypeRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectStreamReturnTypeRule-class.html">PreferCorrectStreamReturnTypeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Stream-returning functions have incorrect return type annotations.
+</dd>
+
+          <dt id="PreferCorrectSwitchLengthRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectSwitchLengthRule-class.html">PreferCorrectSwitchLengthRule</a></span> 
+
+</dt>
+<dd>
+  Warns when switch statements are too short or too long.
+</dd>
+
+          <dt id="PreferCorrectTestFileNameRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectTestFileNameRule-class.html">PreferCorrectTestFileNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a test file doesn't follow naming conventions.
+</dd>
+
+          <dt id="PreferCorrectTypeNameRule">
+  <span class="name "><a href="../saropa_lints/PreferCorrectTypeNameRule-class.html">PreferCorrectTypeNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when type names don't follow Dart conventions.
+</dd>
+
+          <dt id="PreferDeclaringConstConstructorRule">
+  <span class="name "><a href="../saropa_lints/PreferDeclaringConstConstructorRule-class.html">PreferDeclaringConstConstructorRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class could have a const constructor but doesn't.
+</dd>
+
+          <dt id="PreferDedicatedMediaQueryMethodRule">
+  <span class="name "><a href="../saropa_lints/PreferDedicatedMediaQueryMethodRule-class.html">PreferDedicatedMediaQueryMethodRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using <code>MediaQuery.of(context).size</code> instead of dedicated methods.
+</dd>
+
+          <dt id="PreferDefineHeroTagRule">
+  <span class="name "><a href="../saropa_lints/PreferDefineHeroTagRule-class.html">PreferDefineHeroTagRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Hero widget is used without defining heroTag.
+</dd>
+
+          <dt id="PreferDigitSeparatorsRule">
+  <span class="name "><a href="../saropa_lints/PreferDigitSeparatorsRule-class.html">PreferDigitSeparatorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when large numbers don't use digit separators.
+</dd>
+
+          <dt id="PreferEarlyReturnRule">
+  <span class="name "><a href="../saropa_lints/PreferEarlyReturnRule-class.html">PreferEarlyReturnRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an if statement wraps the entire function body.
+</dd>
+
+          <dt id="PreferEnhancedEnumsRule">
+  <span class="name "><a href="../saropa_lints/PreferEnhancedEnumsRule-class.html">PreferEnhancedEnumsRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-enhanced-enums
+Warns when an enum could use enhanced enum features instead of extensions.
+</dd>
+
+          <dt id="PreferEnumsByNameRule">
+  <span class="name "><a href="../saropa_lints/PreferEnumsByNameRule-class.html">PreferEnumsByNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when enum values are found using firstWhere instead of byName.
+</dd>
+
+          <dt id="PreferExpectLaterRule">
+  <span class="name "><a href="../saropa_lints/PreferExpectLaterRule-class.html">PreferExpectLaterRule</a></span> 
+
+</dt>
+<dd>
+  Warns when expect() is used with a Future instead of expectLater().
+</dd>
+
+          <dt id="PreferExplicitFunctionTypeRule">
+  <span class="name "><a href="../saropa_lints/PreferExplicitFunctionTypeRule-class.html">PreferExplicitFunctionTypeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using bare 'Function' type instead of specific function type.
+</dd>
+
+          <dt id="PreferExplicitParameterNamesRule">
+  <span class="name "><a href="../saropa_lints/PreferExplicitParameterNamesRule-class.html">PreferExplicitParameterNamesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when function type parameters don't have names.
+</dd>
+
+          <dt id="PreferExtractingCallbacksRule">
+  <span class="name "><a href="../saropa_lints/PreferExtractingCallbacksRule-class.html">PreferExtractingCallbacksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when inline callbacks could be extracted to methods.
+</dd>
+
+          <dt id="PreferExtractingFunctionCallbacksRule">
+  <span class="name "><a href="../saropa_lints/PreferExtractingFunctionCallbacksRule-class.html">PreferExtractingFunctionCallbacksRule</a></span> 
+
+</dt>
+<dd>
+  Warns when inline function callbacks should be extracted.
+</dd>
+
+          <dt id="PreferFirstRule">
+  <span class="name "><a href="../saropa_lints/PreferFirstRule-class.html">PreferFirstRule</a></span> 
+
+</dt>
+<dd>
+  Warns when list<code>0</code> is used instead of list.first.
+</dd>
+
+          <dt id="PreferForInRule">
+  <span class="name "><a href="../saropa_lints/PreferForInRule-class.html">PreferForInRule</a></span> 
+
+</dt>
+<dd>
+  Warns when index-based for loop can be replaced with for-in.
+</dd>
+
+          <dt id="PreferGetterOverMethodRule">
+  <span class="name "><a href="../saropa_lints/PreferGetterOverMethodRule-class.html">PreferGetterOverMethodRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-getter-over-method
+Warns when a method with no parameters just returns a value.
+</dd>
+
+          <dt id="PreferImagePrecacheRule">
+  <span class="name "><a href="../saropa_lints/PreferImagePrecacheRule-class.html">PreferImagePrecacheRule</a></span> 
+
+</dt>
+<dd>
+  Warns when images should be precached for smooth display.
+</dd>
+
+          <dt id="PreferImmediateReturnRule">
+  <span class="name "><a href="../saropa_lints/PreferImmediateReturnRule-class.html">PreferImmediateReturnRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable is declared and immediately returned.
+</dd>
+
+          <dt id="PreferIterableOfRule">
+  <span class="name "><a href="../saropa_lints/PreferIterableOfRule-class.html">PreferIterableOfRule</a></span> 
+
+</dt>
+<dd>
+  Warns when List.from/Set.from/Map.from is used instead of .of constructors.
+</dd>
+
+          <dt id="PreferLastRule">
+  <span class="name "><a href="../saropa_lints/PreferLastRule-class.html">PreferLastRule</a></span> 
+
+</dt>
+<dd>
+  Warns when list<code>length-1</code> is used instead of list.last.
+</dd>
+
+          <dt id="PreferMatchFileNameRule">
+  <span class="name "><a href="../saropa_lints/PreferMatchFileNameRule-class.html">PreferMatchFileNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when the file name doesn't match the primary class/type name.
+</dd>
+
+          <dt id="PreferMovingToVariableRule">
+  <span class="name "><a href="../saropa_lints/PreferMovingToVariableRule-class.html">PreferMovingToVariableRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an expression is repeated and could be extracted to a variable.
+</dd>
+
+          <dt id="PreferNamedBooleanParametersRule">
+  <span class="name "><a href="../saropa_lints/PreferNamedBooleanParametersRule-class.html">PreferNamedBooleanParametersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when boolean parameters are positional instead of named.
+</dd>
+
+          <dt id="PreferNamedExtensionsRule">
+  <span class="name "><a href="../saropa_lints/PreferNamedExtensionsRule-class.html">PreferNamedExtensionsRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-named-extensions
+Warns when an anonymous extension should be named.
+</dd>
+
+          <dt id="PreferNamedImportsRule">
+  <span class="name "><a href="../saropa_lints/PreferNamedImportsRule-class.html">PreferNamedImportsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when imports should use named imports for clarity.
+</dd>
+
+          <dt id="PreferNamedParametersRule">
+  <span class="name "><a href="../saropa_lints/PreferNamedParametersRule-class.html">PreferNamedParametersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a function has many positional parameters.
+</dd>
+
+          <dt id="PreferNullAwareElementsRule">
+  <span class="name "><a href="../saropa_lints/PreferNullAwareElementsRule-class.html">PreferNullAwareElementsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when null-aware elements could be used in collections.
+</dd>
+
+          <dt id="PreferNullAwareSpreadRule">
+  <span class="name "><a href="../saropa_lints/PreferNullAwareSpreadRule-class.html">PreferNullAwareSpreadRule</a></span> 
+
+</dt>
+<dd>
+  Warns when spreading a nullable collection without null-aware spread.
+</dd>
+
+          <dt id="PreferNullObjectPatternRule">
+  <span class="name "><a href="../saropa_lints/PreferNullObjectPatternRule-class.html">PreferNullObjectPatternRule</a></span> 
+
+</dt>
+<dd>
+  Warns when optional dependencies use null instead of null object pattern.
+</dd>
+
+          <dt id="PreferOpacityWidgetRule">
+  <span class="name "><a href="../saropa_lints/PreferOpacityWidgetRule-class.html">PreferOpacityWidgetRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-opacity-over-color-alpha
+Warns when Color.withAlpha/withOpacity is used instead of Opacity widget.
+</dd>
+
+          <dt id="PreferOverridingParentEqualityRule">
+  <span class="name "><a href="../saropa_lints/PreferOverridingParentEqualityRule-class.html">PreferOverridingParentEqualityRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class overrides == but not the parent's ==.
+</dd>
+
+          <dt id="PreferParenthesesWithIfNullRule">
+  <span class="name "><a href="../saropa_lints/PreferParenthesesWithIfNullRule-class.html">PreferParenthesesWithIfNullRule</a></span> 
+
+</dt>
+<dd>
+  Warns when if-null operator (??) is used without parentheses in
+potentially ambiguous expressions.
+</dd>
+
+          <dt id="PreferPrefixedGlobalConstantsRule">
+  <span class="name "><a href="../saropa_lints/PreferPrefixedGlobalConstantsRule-class.html">PreferPrefixedGlobalConstantsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when global constants don't have a prefix.
+</dd>
+
+          <dt id="PreferPrivateExtensionTypeFieldRule">
+  <span class="name "><a href="../saropa_lints/PreferPrivateExtensionTypeFieldRule-class.html">PreferPrivateExtensionTypeFieldRule</a></span> 
+
+</dt>
+<dd>
+  Warns when extension type representation fields are public.
+</dd>
+
+          <dt id="PreferPublicExceptionClassesRule">
+  <span class="name "><a href="../saropa_lints/PreferPublicExceptionClassesRule-class.html">PreferPublicExceptionClassesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when exception classes are private.
+</dd>
+
+          <dt id="PreferPushingConditionalExpressionsRule">
+  <span class="name "><a href="../saropa_lints/PreferPushingConditionalExpressionsRule-class.html">PreferPushingConditionalExpressionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a ternary expression can be pushed into arguments.
+</dd>
+
+          <dt id="PreferResultPatternRule">
+  <span class="name "><a href="../saropa_lints/PreferResultPatternRule-class.html">PreferResultPatternRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Result pattern is not used for expected failures.
+</dd>
+
+          <dt id="PreferReturnAwaitRule">
+  <span class="name "><a href="../saropa_lints/PreferReturnAwaitRule-class.html">PreferReturnAwaitRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a Future is returned without await in an async function.
+</dd>
+
+          <dt id="PreferReturningConditionalsRule">
+  <span class="name "><a href="../saropa_lints/PreferReturningConditionalsRule-class.html">PreferReturningConditionalsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when returning a conditional could be simplified.
+</dd>
+
+          <dt id="PreferReturningConditionRule">
+  <span class="name "><a href="../saropa_lints/PreferReturningConditionRule-class.html">PreferReturningConditionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using <code>if (x) return true; else return false;</code> instead of <code>return x;</code>.
+</dd>
+
+          <dt id="PreferReturningShorthandsRule">
+  <span class="name "><a href="../saropa_lints/PreferReturningShorthandsRule-class.html">PreferReturningShorthandsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when arrow function could be used instead of block.
+</dd>
+
+          <dt id="PreferSafeAreaConsumerRule">
+  <span class="name "><a href="../saropa_lints/PreferSafeAreaConsumerRule-class.html">PreferSafeAreaConsumerRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-safe-area-consumer
+Warns when SafeArea is used without considering when it's unnecessary.
+</dd>
+
+          <dt id="PreferScaffoldMessengerMaybeOfRule">
+  <span class="name "><a href="../saropa_lints/PreferScaffoldMessengerMaybeOfRule-class.html">PreferScaffoldMessengerMaybeOfRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-scaffold-messenger-maybeof
+Warns when ScaffoldMessenger.of is used instead of maybeOf.
+</dd>
+
+          <dt id="PreferSemanticWidgetNamesRule">
+  <span class="name "><a href="../saropa_lints/PreferSemanticWidgetNamesRule-class.html">PreferSemanticWidgetNamesRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-semantic-widget-names
+Warns when widgets use generic names like Container instead of semantic alternatives.
+</dd>
+
+          <dt id="PreferSetForLookupRule">
+  <span class="name "><a href="../saropa_lints/PreferSetForLookupRule-class.html">PreferSetForLookupRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a List is used for frequent contains() checks.
+</dd>
+
+          <dt id="PreferShorthandsWithConstructorsRule">
+  <span class="name "><a href="../saropa_lints/PreferShorthandsWithConstructorsRule-class.html">PreferShorthandsWithConstructorsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>.new</code> constructor shorthand can be used.
+</dd>
+
+          <dt id="PreferShorthandsWithEnumsRule">
+  <span class="name "><a href="../saropa_lints/PreferShorthandsWithEnumsRule-class.html">PreferShorthandsWithEnumsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when enum shorthand can be used.
+</dd>
+
+          <dt id="PreferShorthandsWithStaticFieldsRule">
+  <span class="name "><a href="../saropa_lints/PreferShorthandsWithStaticFieldsRule-class.html">PreferShorthandsWithStaticFieldsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when static field shorthand can be used.
+</dd>
+
+          <dt id="PreferSimplerPatternsNullCheckRule">
+  <span class="name "><a href="../saropa_lints/PreferSimplerPatternsNullCheckRule-class.html">PreferSimplerPatternsNullCheckRule</a></span> 
+
+</dt>
+<dd>
+  Warns when pattern null checks can be simplified.
+</dd>
+
+          <dt id="PreferSingleDeclarationPerFileRule">
+  <span class="name "><a href="../saropa_lints/PreferSingleDeclarationPerFileRule-class.html">PreferSingleDeclarationPerFileRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a file contains multiple top-level declarations.
+</dd>
+
+          <dt id="PreferSingleWidgetPerFileRule">
+  <span class="name "><a href="../saropa_lints/PreferSingleWidgetPerFileRule-class.html">PreferSingleWidgetPerFileRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a file contains multiple public widget classes.
+</dd>
+
+          <dt id="PreferSliverListDelegateRule">
+  <span class="name "><a href="../saropa_lints/PreferSliverListDelegateRule-class.html">PreferSliverListDelegateRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-sliver-list-delegate
+Warns when SliverList uses children instead of delegate for large lists.
+</dd>
+
+          <dt id="PreferSliverPrefixRule">
+  <span class="name "><a href="../saropa_lints/PreferSliverPrefixRule-class.html">PreferSliverPrefixRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a Sliver widget class doesn't have 'Sliver' prefix.
+</dd>
+
+          <dt id="PreferSortedParametersRule">
+  <span class="name "><a href="../saropa_lints/PreferSortedParametersRule-class.html">PreferSortedParametersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when function parameters are not in alphabetical order.
+</dd>
+
+          <dt id="PreferSpecificCasesFirstRule">
+  <span class="name "><a href="../saropa_lints/PreferSpecificCasesFirstRule-class.html">PreferSpecificCasesFirstRule</a></span> 
+
+</dt>
+<dd>
+  Warns when more specific switch cases should come before general ones.
+</dd>
+
+          <dt id="PreferSpecificNumericTypesRule">
+  <span class="name "><a href="../saropa_lints/PreferSpecificNumericTypesRule-class.html">PreferSpecificNumericTypesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when num is used instead of int or double.
+</dd>
+
+          <dt id="PreferSpecifyingFutureValueTypeRule">
+  <span class="name "><a href="../saropa_lints/PreferSpecifyingFutureValueTypeRule-class.html">PreferSpecifyingFutureValueTypeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Future.value() is called without explicit type argument.
+</dd>
+
+          <dt id="PreferSplitWidgetConstRule">
+  <span class="name "><a href="../saropa_lints/PreferSplitWidgetConstRule-class.html">PreferSplitWidgetConstRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-split-widget-const
+Warns when large widget trees should be split into const widgets.
+</dd>
+
+          <dt id="PreferStaticClassRule">
+  <span class="name "><a href="../saropa_lints/PreferStaticClassRule-class.html">PreferStaticClassRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a class only has static members and could be a namespace.
+</dd>
+
+          <dt id="PreferStaticMethodRule">
+  <span class="name "><a href="../saropa_lints/PreferStaticMethodRule-class.html">PreferStaticMethodRule</a></span> 
+
+</dt>
+<dd>
+  Warns when an instance method doesn't use <code>this</code> and could be static.
+</dd>
+
+          <dt id="PreferSwitchExpressionRule">
+  <span class="name "><a href="../saropa_lints/PreferSwitchExpressionRule-class.html">PreferSwitchExpressionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a switch statement could be converted to a switch expression.
+</dd>
+
+          <dt id="PreferSwitchWithEnumsRule">
+  <span class="name "><a href="../saropa_lints/PreferSwitchWithEnumsRule-class.html">PreferSwitchWithEnumsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when if-else chains on enum values could use a switch.
+</dd>
+
+          <dt id="PreferSwitchWithSealedClassesRule">
+  <span class="name "><a href="../saropa_lints/PreferSwitchWithSealedClassesRule-class.html">PreferSwitchWithSealedClassesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when if-else chains on sealed class could use exhaustive switch.
+</dd>
+
+          <dt id="PreferTestMatchersRule">
+  <span class="name "><a href="../saropa_lints/PreferTestMatchersRule-class.html">PreferTestMatchersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test assertions could use more specific matchers.
+</dd>
+
+          <dt id="PreferTestStructureRule">
+  <span class="name "><a href="../saropa_lints/PreferTestStructureRule-class.html">PreferTestStructureRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test files don't follow proper structure.
+</dd>
+
+          <dt id="PreferTextRichRule">
+  <span class="name "><a href="../saropa_lints/PreferTextRichRule-class.html">PreferTextRichRule</a></span> 
+
+</dt>
+<dd>
+  Warns when RichText is used instead of Text.rich.
+</dd>
+
+          <dt id="PreferTrailingCommaRule">
+  <span class="name "><a href="../saropa_lints/PreferTrailingCommaRule-class.html">PreferTrailingCommaRule</a></span> 
+
+</dt>
+<dd>
+  Warns when multi-line constructs are missing trailing commas.
+</dd>
+
+          <dt id="PreferTrailingUnderscoreForUnusedRule">
+  <span class="name "><a href="../saropa_lints/PreferTrailingUnderscoreForUnusedRule-class.html">PreferTrailingUnderscoreForUnusedRule</a></span> 
+
+</dt>
+<dd>
+  Warns when unused parameters don't have underscore prefix.
+</dd>
+
+          <dt id="PreferTypedefForCallbacksRule">
+  <span class="name "><a href="../saropa_lints/PreferTypedefForCallbacksRule-class.html">PreferTypedefForCallbacksRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-typedef-for-callbacks
+Warns when inline function types are repeated and should use typedef.
+</dd>
+
+          <dt id="PreferTypeOverVarRule">
+  <span class="name "><a href="../saropa_lints/PreferTypeOverVarRule-class.html">PreferTypeOverVarRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>var</code> is used instead of explicit type.
+</dd>
+
+          <dt id="PreferUniqueTestNamesRule">
+  <span class="name "><a href="../saropa_lints/PreferUniqueTestNamesRule-class.html">PreferUniqueTestNamesRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test names are duplicated within a test file.
+</dd>
+
+          <dt id="PreferUnwrappingFutureOrRule">
+  <span class="name "><a href="../saropa_lints/PreferUnwrappingFutureOrRule-class.html">PreferUnwrappingFutureOrRule</a></span> 
+
+</dt>
+<dd>
+  Warns when <code>FutureOr&lt;T&gt;</code> could be unwrapped for cleaner handling.
+</dd>
+
+          <dt id="PreferUsingListViewRule">
+  <span class="name "><a href="../saropa_lints/PreferUsingListViewRule-class.html">PreferUsingListViewRule</a></span> 
+
+</dt>
+<dd>
+  Warns when using Column inside SingleChildScrollView instead of ListView.
+</dd>
+
+          <dt id="PreferUtcDatetimesRule">
+  <span class="name "><a href="../saropa_lints/PreferUtcDatetimesRule-class.html">PreferUtcDatetimesRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-utc-datetimes
+Warns when DateTime.now() is used where UTC might be more appropriate.
+</dd>
+
+          <dt id="PreferVisibleForTestingOnMembersRule">
+  <span class="name "><a href="../saropa_lints/PreferVisibleForTestingOnMembersRule-class.html">PreferVisibleForTestingOnMembersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when @visibleForTesting should be used on members.
+</dd>
+
+          <dt id="PreferWeakReferencesForCacheRule">
+  <span class="name "><a href="../saropa_lints/PreferWeakReferencesForCacheRule-class.html">PreferWeakReferencesForCacheRule</a></span> 
+
+</dt>
+<dd>
+  Warns when WeakReference should be used for cached references.
+</dd>
+
+          <dt id="PreferWidgetPrivateMembersRule">
+  <span class="name "><a href="../saropa_lints/PreferWidgetPrivateMembersRule-class.html">PreferWidgetPrivateMembersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Widget class has public non-final fields or public methods
+that could be private.
+</dd>
+
+          <dt id="PreferWidgetStateMixinRule">
+  <span class="name "><a href="../saropa_lints/PreferWidgetStateMixinRule-class.html">PreferWidgetStateMixinRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: prefer-widget-state-mixin
+Warns when State class doesn't use WidgetStateMixin for better state management.
+</dd>
+
+          <dt id="PreferWildcardPatternRule">
+  <span class="name "><a href="../saropa_lints/PreferWildcardPatternRule-class.html">PreferWildcardPatternRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a variable could use wildcard pattern (_) instead.
+</dd>
+
+          <dt id="ProperSuperCallsRule">
+  <span class="name "><a href="../saropa_lints/ProperSuperCallsRule-class.html">ProperSuperCallsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when super lifecycle methods are called in wrong order.
+</dd>
+
+          <dt id="RecordFieldsOrderingRule">
+  <span class="name "><a href="../saropa_lints/RecordFieldsOrderingRule-class.html">RecordFieldsOrderingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when record fields are not in alphabetical order.
+</dd>
+
+          <dt id="RequireAnimationDisposalRule">
+  <span class="name "><a href="../saropa_lints/RequireAnimationDisposalRule-class.html">RequireAnimationDisposalRule</a></span> 
+
+</dt>
+<dd>
+  Future rule: require-animation-disposal
+Warns when AnimationController is created without proper disposal.
+</dd>
+
+          <dt id="RequireApiErrorMappingRule">
+  <span class="name "><a href="../saropa_lints/RequireApiErrorMappingRule-class.html">RequireApiErrorMappingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when API errors are not mapped to domain errors.
+</dd>
+
+          <dt id="RequireApiTimeoutRule">
+  <span class="name "><a href="../saropa_lints/RequireApiTimeoutRule-class.html">RequireApiTimeoutRule</a></span> 
+
+</dt>
+<dd>
+  Warns when API calls lack timeout configuration.
+</dd>
+
+          <dt id="RequireAsyncErrorDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequireAsyncErrorDocumentationRule-class.html">RequireAsyncErrorDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when async function doesn't handle errors internally.
+</dd>
+
+          <dt id="RequireBiometricFallbackRule">
+  <span class="name "><a href="../saropa_lints/RequireBiometricFallbackRule-class.html">RequireBiometricFallbackRule</a></span> 
+
+</dt>
+<dd>
+  Warns when biometric authentication lacks a fallback mechanism.
+</dd>
+
+          <dt id="RequireCacheEvictionPolicyRule">
+  <span class="name "><a href="../saropa_lints/RequireCacheEvictionPolicyRule-class.html">RequireCacheEvictionPolicyRule</a></span> 
+
+</dt>
+<dd>
+  Warns when caches lack eviction policies.
+</dd>
+
+          <dt id="RequireCertificatePinningRule">
+  <span class="name "><a href="../saropa_lints/RequireCertificatePinningRule-class.html">RequireCertificatePinningRule</a></span> 
+
+</dt>
+<dd>
+  Warns when certificate pinning is not implemented for HTTPS.
+</dd>
+
+          <dt id="RequireComplexLogicCommentsRule">
+  <span class="name "><a href="../saropa_lints/RequireComplexLogicCommentsRule-class.html">RequireComplexLogicCommentsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when complex methods lack explanatory comments.
+</dd>
+
+          <dt id="RequireConnectivityCheckRule">
+  <span class="name "><a href="../saropa_lints/RequireConnectivityCheckRule-class.html">RequireConnectivityCheckRule</a></span> 
+
+</dt>
+<dd>
+  Warns when connectivity is not checked before network operations.
+</dd>
+
+          <dt id="RequireCovariantDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequireCovariantDocumentationRule-class.html">RequireCovariantDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when covariant keyword is used without documentation.
+</dd>
+
+          <dt id="RequireDatabaseCloseRule">
+  <span class="name "><a href="../saropa_lints/RequireDatabaseCloseRule-class.html">RequireDatabaseCloseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when database connection is not properly closed.
+</dd>
+
+          <dt id="RequireDeprecationMessageRule">
+  <span class="name "><a href="../saropa_lints/RequireDeprecationMessageRule-class.html">RequireDeprecationMessageRule</a></span> 
+
+</dt>
+<dd>
+  Warns when deprecated API lacks migration guidance.
+</dd>
+
+          <dt id="RequireDirectionalWidgetsRule">
+  <span class="name "><a href="../saropa_lints/RequireDirectionalWidgetsRule-class.html">RequireDirectionalWidgetsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when text direction is not considered.
+</dd>
+
+          <dt id="RequireDisposeRule">
+  <span class="name "><a href="../saropa_lints/RequireDisposeRule-class.html">RequireDisposeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a State class has disposable fields that are not properly disposed.
+</dd>
+
+          <dt id="RequireErrorBoundaryRule">
+  <span class="name "><a href="../saropa_lints/RequireErrorBoundaryRule-class.html">RequireErrorBoundaryRule</a></span> 
+
+</dt>
+<dd>
+  Warns when error boundary widget is missing.
+</dd>
+
+          <dt id="RequireErrorContextRule">
+  <span class="name "><a href="../saropa_lints/RequireErrorContextRule-class.html">RequireErrorContextRule</a></span> 
+
+</dt>
+<dd>
+  Warns when error messages don't include context.
+</dd>
+
+          <dt id="RequireExampleInDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequireExampleInDocumentationRule-class.html">RequireExampleInDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when public class lacks example usage in documentation.
+</dd>
+
+          <dt id="RequireExceptionDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequireExceptionDocumentationRule-class.html">RequireExceptionDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when exception documentation is missing.
+</dd>
+
+          <dt id="RequireExcludeSemanticsJustificationRule">
+  <span class="name "><a href="../saropa_lints/RequireExcludeSemanticsJustificationRule-class.html">RequireExcludeSemanticsJustificationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when ExcludeSemantics is used without a comment explaining why.
+</dd>
+
+          <dt id="RequireFileCloseInFinallyRule">
+  <span class="name "><a href="../saropa_lints/RequireFileCloseInFinallyRule-class.html">RequireFileCloseInFinallyRule</a></span> 
+
+</dt>
+<dd>
+  Warns when file handle is not closed in finally block.
+</dd>
+
+          <dt id="RequireFutureErrorHandlingRule">
+  <span class="name "><a href="../saropa_lints/RequireFutureErrorHandlingRule-class.html">RequireFutureErrorHandlingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Future errors are not handled.
+</dd>
+
+          <dt id="RequireFutureOrDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequireFutureOrDocumentationRule-class.html">RequireFutureOrDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when FutureOr is used in public API without documentation.
+</dd>
+
+          <dt id="RequireHeadingSemanticsRule">
+  <span class="name "><a href="../saropa_lints/RequireHeadingSemanticsRule-class.html">RequireHeadingSemanticsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when section headers don't have heading semantics.
+</dd>
+
+          <dt id="RequireHttpClientCloseRule">
+  <span class="name "><a href="../saropa_lints/RequireHttpClientCloseRule-class.html">RequireHttpClientCloseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when HttpClient is not closed.
+</dd>
+
+          <dt id="RequireHttpStatusCheckRule">
+  <span class="name "><a href="../saropa_lints/RequireHttpStatusCheckRule-class.html">RequireHttpStatusCheckRule</a></span> 
+
+</dt>
+<dd>
+  Warns when HTTP response status is not checked.
+</dd>
+
+          <dt id="RequireImageCacheDimensionsRule">
+  <span class="name "><a href="../saropa_lints/RequireImageCacheDimensionsRule-class.html">RequireImageCacheDimensionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Image.network is called without cacheWidth/cacheHeight.
+</dd>
+
+          <dt id="RequireImageDisposalRule">
+  <span class="name "><a href="../saropa_lints/RequireImageDisposalRule-class.html">RequireImageDisposalRule</a></span> 
+
+</dt>
+<dd>
+  Warns when image memory is not properly managed.
+</dd>
+
+          <dt id="RequireInputSanitizationRule">
+  <span class="name "><a href="../saropa_lints/RequireInputSanitizationRule-class.html">RequireInputSanitizationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when user input is used without sanitization.
+</dd>
+
+          <dt id="RequireIsolateKillRule">
+  <span class="name "><a href="../saropa_lints/RequireIsolateKillRule-class.html">RequireIsolateKillRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Isolate is spawned without being killed.
+</dd>
+
+          <dt id="RequireItemExtentForLargeListsRule">
+  <span class="name "><a href="../saropa_lints/RequireItemExtentForLargeListsRule-class.html">RequireItemExtentForLargeListsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when large lists don't specify itemExtent.
+</dd>
+
+          <dt id="RequireKeysInAnimatedListsRule">
+  <span class="name "><a href="../saropa_lints/RequireKeysInAnimatedListsRule-class.html">RequireKeysInAnimatedListsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when AnimatedList or AnimatedGrid items don't have keys.
+</dd>
+
+          <dt id="RequireLiveRegionRule">
+  <span class="name "><a href="../saropa_lints/RequireLiveRegionRule-class.html">RequireLiveRegionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when dynamic content doesn't use live region semantics.
+</dd>
+
+          <dt id="RequireLocaleAwareFormattingRule">
+  <span class="name "><a href="../saropa_lints/RequireLocaleAwareFormattingRule-class.html">RequireLocaleAwareFormattingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when locale-dependent formatting is not used.
+</dd>
+
+          <dt id="RequireMountedCheckRule">
+  <span class="name "><a href="../saropa_lints/RequireMountedCheckRule-class.html">RequireMountedCheckRule</a></span> 
+
+</dt>
+<dd>
+  Warns when setState is called with async gap.
+</dd>
+
+          <dt id="RequireNativeResourceCleanupRule">
+  <span class="name "><a href="../saropa_lints/RequireNativeResourceCleanupRule-class.html">RequireNativeResourceCleanupRule</a></span> 
+
+</dt>
+<dd>
+  Warns when native resources are allocated without cleanup.
+</dd>
+
+          <dt id="RequireNotifyListenersRule">
+  <span class="name "><a href="../saropa_lints/RequireNotifyListenersRule-class.html">RequireNotifyListenersRule</a></span> 
+
+</dt>
+<dd>
+  Warns when ChangeNotifier subclass doesn't call notifyListeners.
+</dd>
+
+          <dt id="RequireNullSafeExtensionsRule">
+  <span class="name "><a href="../saropa_lints/RequireNullSafeExtensionsRule-class.html">RequireNullSafeExtensionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when extension method doesn't handle null receiver.
+</dd>
+
+          <dt id="RequireParameterDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequireParameterDocumentationRule-class.html">RequireParameterDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when parameter documentation is missing for public methods.
+</dd>
+
+          <dt id="RequirePlatformChannelCleanupRule">
+  <span class="name "><a href="../saropa_lints/RequirePlatformChannelCleanupRule-class.html">RequirePlatformChannelCleanupRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Platform Channel is used without cleanup.
+</dd>
+
+          <dt id="RequirePluralHandlingRule">
+  <span class="name "><a href="../saropa_lints/RequirePluralHandlingRule-class.html">RequirePluralHandlingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when plural forms are not handled correctly.
+</dd>
+
+          <dt id="RequirePublicApiDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequirePublicApiDocumentationRule-class.html">RequirePublicApiDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when public API lacks documentation.
+</dd>
+
+          <dt id="RequirePumpAfterInteractionRule">
+  <span class="name "><a href="../saropa_lints/RequirePumpAfterInteractionRule-class.html">RequirePumpAfterInteractionRule</a></span> 
+
+</dt>
+<dd>
+  Warns when widget test doesn't pump the widget tree.
+</dd>
+
+          <dt id="RequireRetryLogicRule">
+  <span class="name "><a href="../saropa_lints/RequireRetryLogicRule-class.html">RequireRetryLogicRule</a></span> 
+
+</dt>
+<dd>
+  Warns when retry logic is missing for network calls.
+</dd>
+
+          <dt id="RequireReturnDocumentationRule">
+  <span class="name "><a href="../saropa_lints/RequireReturnDocumentationRule-class.html">RequireReturnDocumentationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when return value documentation is missing.
+</dd>
+
+          <dt id="RequireSafeJsonParsingRule">
+  <span class="name "><a href="../saropa_lints/RequireSafeJsonParsingRule-class.html">RequireSafeJsonParsingRule</a></span> 
+
+</dt>
+<dd>
+  Warns when fromJson doesn't handle missing keys.
+</dd>
+
+          <dt id="RequireSecureStorageRule">
+  <span class="name "><a href="../saropa_lints/RequireSecureStorageRule-class.html">RequireSecureStorageRule</a></span> 
+
+</dt>
+<dd>
+  Warns when SharedPreferences is used for sensitive data.
+</dd>
+
+          <dt id="RequireSemanticsLabelRule">
+  <span class="name "><a href="../saropa_lints/RequireSemanticsLabelRule-class.html">RequireSemanticsLabelRule</a></span> 
+
+</dt>
+<dd>
+  Warns when Semantics widget is missing the label property.
+</dd>
+
+          <dt id="RequireStreamControllerDisposeRule">
+  <span class="name "><a href="../saropa_lints/RequireStreamControllerDisposeRule-class.html">RequireStreamControllerDisposeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when StreamController is not disposed.
+</dd>
+
+          <dt id="RequireTestAssertionsRule">
+  <span class="name "><a href="../saropa_lints/RequireTestAssertionsRule-class.html">RequireTestAssertionsRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test has no assertions.
+</dd>
+
+          <dt id="RequireTestSetupTeardownRule">
+  <span class="name "><a href="../saropa_lints/RequireTestSetupTeardownRule-class.html">RequireTestSetupTeardownRule</a></span> 
+
+</dt>
+<dd>
+  Warns when test file lacks setUp or tearDown.
+</dd>
+
+          <dt id="RequireTypedApiResponseRule">
+  <span class="name "><a href="../saropa_lints/RequireTypedApiResponseRule-class.html">RequireTypedApiResponseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when API response is not properly typed.
+</dd>
+
+          <dt id="RequireTypedDiRegistrationRule">
+  <span class="name "><a href="../saropa_lints/RequireTypedDiRegistrationRule-class.html">RequireTypedDiRegistrationRule</a></span> 
+
+</dt>
+<dd>
+  Warns when dependency registration lacks type safety.
+</dd>
+
+          <dt id="RequireUpdateShouldNotifyRule">
+  <span class="name "><a href="../saropa_lints/RequireUpdateShouldNotifyRule-class.html">RequireUpdateShouldNotifyRule</a></span> 
+
+</dt>
+<dd>
+  Warns when InheritedWidget is used without updateShouldNotify.
+</dd>
+
+          <dt id="RequireValueNotifierDisposeRule">
+  <span class="name "><a href="../saropa_lints/RequireValueNotifierDisposeRule-class.html">RequireValueNotifierDisposeRule</a></span> 
+
+</dt>
+<dd>
+  Warns when ValueNotifier is used without dispose.
+</dd>
+
+          <dt id="RequireWebSocketCloseRule">
+  <span class="name "><a href="../saropa_lints/RequireWebSocketCloseRule-class.html">RequireWebSocketCloseRule</a></span> 
+
+</dt>
+<dd>
+  Warns when WebSocket is not closed on dispose.
+</dd>
+
+          <dt id="TagNameRule">
+  <span class="name "><a href="../saropa_lints/TagNameRule-class.html">TagNameRule</a></span> 
+
+</dt>
+<dd>
+  Warns when widget tag names don't follow conventions.
+</dd>
+
+          <dt id="UnnecessaryTrailingCommaRule">
+  <span class="name "><a href="../saropa_lints/UnnecessaryTrailingCommaRule-class.html">UnnecessaryTrailingCommaRule</a></span> 
+
+</dt>
+<dd>
+  Warns when trailing commas are unnecessary.
+</dd>
+
+          <dt id="UseExistingDestructuringRule">
+  <span class="name "><a href="../saropa_lints/UseExistingDestructuringRule-class.html">UseExistingDestructuringRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a property is accessed after destructuring provides it.
+</dd>
+
+          <dt id="UseExistingVariableRule">
+  <span class="name "><a href="../saropa_lints/UseExistingVariableRule-class.html">UseExistingVariableRule</a></span> 
+
+</dt>
+<dd>
+  Warns when a new variable is created that duplicates an existing one.
+</dd>
+
+          <dt id="UseSetStateSynchronouslyRule">
+  <span class="name "><a href="../saropa_lints/UseSetStateSynchronouslyRule-class.html">UseSetStateSynchronouslyRule</a></span> 
+
+</dt>
+<dd>
+  Warns when setState is called after an async gap without mounted check.
+</dd>
+
+      </dl>
+    </section>
 
 
 
@@ -75,6 +4101,24 @@
 
 
 
+    <section class="summary offset-anchor" id="functions">
+      <h2>Functions</h2>
+      <dl class="callables">
+          <dt id="createPlugin" class="callable">
+  <span class="name"><a href="../saropa_lints/createPlugin.html">createPlugin</a></span><span class="signature">(<wbr>)
+    <span class="returntype parameter">&#8594; <a href="https://pub.dev/documentation/custom_lint_core/0.8.1/custom_lint_core/PluginBase-class.html">PluginBase</a></span>
+  </span>
+  
+
+</dt>
+<dd>
+  Entry point for custom_lint
+  
+
+</dd>
+
+      </dl>
+    </section>
 
 
   </div> <!-- /.main-content -->
@@ -93,6 +4137,7 @@
     <h5><span class="package-name">saropa_lints</span> <span class="package-kind">package</span></h5>
     <ol>
       <li class="section-title">Libraries</li>
+      <li><a href="../custom_lint_client/">custom_lint_client</a></li>
       <li><a href="../saropa_lints/">saropa_lints</a></li>
 </ol>
 
@@ -104,7 +4149,7 @@
 <footer>
   <span class="no-break">
     saropa_lints
-      0.0.1
+      0.1.2
   </span>
   
 </footer>
