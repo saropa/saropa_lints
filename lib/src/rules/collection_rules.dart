@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -31,7 +31,7 @@ class AvoidCollectionEqualityChecksRule extends DartLintRule {
     name: 'avoid_collection_equality_checks',
     problemMessage: 'Comparing collections with == uses reference equality.',
     correctionMessage: 'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _collectionTypes = <String>{
@@ -46,7 +46,7 @@ class AvoidCollectionEqualityChecksRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -96,13 +96,13 @@ class AvoidDuplicateMapKeysRule extends DartLintRule {
     name: 'avoid_duplicate_map_keys',
     problemMessage: 'Duplicate key in map literal.',
     correctionMessage: 'Remove or rename the duplicate key.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -141,13 +141,13 @@ class AvoidMapKeysContainsRule extends DartLintRule {
     name: 'avoid_map_keys_contains',
     problemMessage: 'Use containsKey() instead of keys.contains().',
     correctionMessage: 'Replace map.keys.contains(key) with map.containsKey(key).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -187,7 +187,7 @@ class AvoidUnnecessaryCollectionsRule extends DartLintRule {
     name: 'avoid_unnecessary_collections',
     problemMessage: 'Unnecessary collection wrapper.',
     correctionMessage: 'Use the collection literal directly.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _unnecessaryMethods = <String>{
@@ -204,7 +204,7 @@ class AvoidUnnecessaryCollectionsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -253,7 +253,7 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
     name: 'avoid_unsafe_collection_methods',
     problemMessage: 'Using .first or .last on a potentially empty collection is unsafe.',
     correctionMessage: 'Use .firstOrNull/.lastOrNull or check isEmpty first.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _unsafeMethods = <String>{'first', 'last', 'single'};
@@ -261,7 +261,7 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPropertyAccess((PropertyAccess node) {
@@ -324,13 +324,13 @@ class AvoidUnsafeReduceRule extends DartLintRule {
     name: 'avoid_unsafe_reduce',
     problemMessage: 'reduce() throws on empty collections.',
     correctionMessage: 'Use fold() with an initial value or check isEmpty first.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -376,13 +376,13 @@ class MapKeysOrderingRule extends DartLintRule {
     name: 'map_keys_ordering',
     problemMessage: 'Map keys should be in alphabetical order.',
     correctionMessage: 'Reorder the map entries alphabetically by key.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -431,13 +431,13 @@ class PreferContainsRule extends DartLintRule {
     name: 'prefer_contains',
     problemMessage: 'Use contains() instead of indexOf() for presence checks.',
     correctionMessage: 'Replace indexOf() comparison with contains().',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -471,13 +471,13 @@ class PreferFirstRule extends DartLintRule {
     name: 'prefer_first',
     problemMessage: 'Use .first instead of [0].',
     correctionMessage: 'Replace [0] with .first or .firstOrNull.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -512,7 +512,7 @@ class PreferIterableOfRule extends DartLintRule {
     name: 'prefer_iterable_of',
     problemMessage: 'Prefer using .of() instead of .from() for collections.',
     correctionMessage: 'Replace .from() with .of() for better type safety.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _collectionTypes = <String>{
@@ -525,7 +525,7 @@ class PreferIterableOfRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
@@ -534,7 +534,7 @@ class PreferIterableOfRule extends DartLintRule {
 
       if (name != 'from') return;
 
-      final String typeName = constructorName.type.name2.lexeme;
+      final String typeName = constructorName.type.name.lexeme;
       if (_collectionTypes.contains(typeName)) {
         reporter.atNode(node, code);
       }
@@ -560,13 +560,13 @@ class PreferLastRule extends DartLintRule {
     name: 'prefer_last',
     problemMessage: 'Use .last instead of [length - 1].',
     correctionMessage: 'Replace list[list.length - 1] with list.last.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -618,13 +618,13 @@ class PreferAddAllRule extends DartLintRule {
     name: 'prefer_add_all',
     problemMessage: 'Use addAll() instead of forEach/for with add().',
     correctionMessage: 'Replace with list.addAll(items).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check forEach pattern: items.forEach((item) => list.add(item))
@@ -706,13 +706,13 @@ class AvoidDuplicateCollectionElementsRule extends DartLintRule {
     name: 'avoid_duplicate_collection_elements',
     problemMessage: 'Duplicate element in collection literal.',
     correctionMessage: 'Remove the duplicate element.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -728,7 +728,7 @@ class AvoidDuplicateCollectionElementsRule extends DartLintRule {
 
   void _checkForDuplicates(
     NodeList<CollectionElement> elements,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     final Set<String> seen = <String>{};
     for (final CollectionElement element in elements) {
@@ -769,13 +769,13 @@ class PreferSetForLookupRule extends DartLintRule {
     name: 'prefer_set_for_lookup',
     problemMessage: 'Consider using Set instead of List for contains() lookups.',
     correctionMessage: 'Sets have O(1) lookup vs O(n) for Lists.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {

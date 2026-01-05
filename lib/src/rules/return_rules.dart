@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -26,13 +26,13 @@ class AvoidReturningCascadesRule extends DartLintRule {
     name: 'avoid_returning_cascades',
     problemMessage: 'Avoid returning cascade expressions.',
     correctionMessage: 'Separate the cascade from the return statement.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {
@@ -71,13 +71,13 @@ class AvoidReturningVoidRule extends DartLintRule {
     name: 'avoid_returning_void',
     problemMessage: 'Avoid explicitly returning void.',
     correctionMessage: 'Remove the return statement or use return without a value.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {
@@ -122,13 +122,13 @@ class AvoidUnnecessaryReturnRule extends DartLintRule {
     name: 'avoid_unnecessary_return',
     problemMessage: 'Unnecessary return statement at end of void function.',
     correctionMessage: 'Remove the redundant return statement.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -147,11 +147,11 @@ class AvoidUnnecessaryReturnRule extends DartLintRule {
   void _checkFunction(
     FunctionBody body,
     TypeAnnotation? returnType,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     // Only check void functions
     if (returnType is! NamedType) return;
-    if (returnType.name2.lexeme != 'void') return;
+    if (returnType.name.lexeme != 'void') return;
 
     if (body is! BlockFunctionBody) return;
 
@@ -190,13 +190,13 @@ class PreferImmediateReturnRule extends DartLintRule {
     name: 'prefer_immediate_return',
     problemMessage: 'Variable is declared and immediately returned.',
     correctionMessage: 'Return the expression directly instead of storing in a variable.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -253,13 +253,13 @@ class PreferReturningShorthandsRule extends DartLintRule {
     name: 'prefer_returning_shorthands',
     problemMessage: 'Use arrow syntax for simple return statements.',
     correctionMessage: 'Convert to expression body with =>.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -271,7 +271,7 @@ class PreferReturningShorthandsRule extends DartLintRule {
     });
   }
 
-  void _checkBody(FunctionBody body, Token nameToken, ErrorReporter reporter) {
+  void _checkBody(FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;

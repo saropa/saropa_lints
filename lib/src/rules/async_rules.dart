@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -16,13 +16,13 @@ class AvoidFutureIgnoreRule extends DartLintRule {
     name: 'avoid_future_ignore',
     problemMessage: 'Avoid using .ignore() on Futures.',
     correctionMessage: 'Handle the Future properly with await, then, or unawaited().',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -52,13 +52,13 @@ class AvoidFutureToStringRule extends DartLintRule {
     name: 'avoid_future_tostring',
     problemMessage: 'Avoid calling toString() on a Future.',
     correctionMessage: 'Await the Future before converting to string.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -107,21 +107,21 @@ class AvoidNestedFuturesRule extends DartLintRule {
     name: 'avoid_nested_futures',
     problemMessage: 'Avoid nested Future types (Future<Future<T>>).',
     correctionMessage: 'Flatten to Future<T> or use async/await properly.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
-      if (node.name2.lexeme == 'Future') {
+      if (node.name.lexeme == 'Future') {
         final TypeArgumentList? typeArgs = node.typeArguments;
         if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
           final TypeAnnotation innerType = typeArgs.arguments.first;
-          if (innerType is NamedType && innerType.name2.lexeme == 'Future') {
+          if (innerType is NamedType && innerType.name.lexeme == 'Future') {
             reporter.atNode(node, code);
           }
         }
@@ -148,17 +148,17 @@ class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
     name: 'avoid_nested_streams_and_futures',
     problemMessage: 'Avoid mixing Stream and Future in nested types.',
     correctionMessage: 'Use async*/await patterns instead of nested types.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
-      final String outerType = node.name2.lexeme;
+      final String outerType = node.name.lexeme;
       if (outerType != 'Stream' && outerType != 'Future') return;
 
       final TypeArgumentList? typeArgs = node.typeArguments;
@@ -167,7 +167,7 @@ class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
       final TypeAnnotation innerType = typeArgs.arguments.first;
       if (innerType is! NamedType) return;
 
-      final String innerTypeName = innerType.name2.lexeme;
+      final String innerTypeName = innerType.name.lexeme;
       if (innerTypeName == 'Stream' || innerTypeName == 'Future') {
         reporter.atNode(node, code);
       }
@@ -186,13 +186,13 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends DartLintRule {
     name: 'avoid_passing_async_when_sync_expected',
     problemMessage: 'Async function passed where sync function expected.',
     correctionMessage: 'Ensure the caller handles the returned Future.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
@@ -239,13 +239,13 @@ class AvoidRedundantAsyncRule extends DartLintRule {
     name: 'avoid_redundant_async',
     problemMessage: 'Async function does not use await.',
     correctionMessage: 'Remove async keyword or add await expression.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -257,7 +257,7 @@ class AvoidRedundantAsyncRule extends DartLintRule {
     });
   }
 
-  void _checkAsyncBody(FunctionBody body, AstNode node, ErrorReporter reporter) {
+  void _checkAsyncBody(FunctionBody body, AstNode node, DiagnosticReporter reporter) {
     // Only check async functions (not async*)
     if (body.isAsynchronous && !body.isGenerator) {
       // Check if body contains any await expressions
@@ -305,13 +305,13 @@ class AvoidStreamToStringRule extends DartLintRule {
     name: 'avoid_stream_tostring',
     problemMessage: 'Stream.toString() returns unhelpful output.',
     correctionMessage: 'Use stream.toList() or iterate over the stream.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -337,13 +337,13 @@ class AvoidUnassignedStreamSubscriptionsRule extends DartLintRule {
     name: 'avoid_unassigned_stream_subscriptions',
     problemMessage: 'Stream subscription should be assigned to a variable.',
     correctionMessage: 'Assign the subscription to cancel it later.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -383,13 +383,13 @@ class PreferAsyncAwaitRule extends DartLintRule {
     name: 'prefer_async_await',
     problemMessage: "Prefer 'async/await' over '.then()'.",
     correctionMessage: 'Refactor to use async/await syntax.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -408,13 +408,13 @@ class PreferAssigningAwaitExpressionsRule extends DartLintRule {
     name: 'prefer_assigning_await_expressions',
     problemMessage: 'Prefer assigning await expressions to variables.',
     correctionMessage: 'Assign the await expression to a variable before using it.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAwaitExpression((AwaitExpression node) {
@@ -469,13 +469,13 @@ class PreferCommentingFutureDelayedRule extends DartLintRule {
     name: 'prefer_commenting_future_delayed',
     problemMessage: 'Future.delayed should have a comment explaining why.',
     correctionMessage: 'Add a comment before the delay explaining its purpose.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -526,13 +526,13 @@ class PreferCorrectFutureReturnTypeRule extends DartLintRule {
     name: 'prefer_correct_future_return_type',
     problemMessage: 'Async function should have Future return type annotation.',
     correctionMessage: 'Add explicit Future<T> return type.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -553,7 +553,7 @@ class PreferCorrectFutureReturnTypeRule extends DartLintRule {
     FunctionBody body,
     TypeAnnotation? returnType,
     Token nameToken,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     if (!body.isAsynchronous) return;
     if (body.star != null) return; // async* is Stream
@@ -578,13 +578,13 @@ class PreferCorrectStreamReturnTypeRule extends DartLintRule {
     name: 'prefer_correct_stream_return_type',
     problemMessage: 'Async* function should have Stream return type annotation.',
     correctionMessage: 'Add explicit Stream<T> return type.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -605,7 +605,7 @@ class PreferCorrectStreamReturnTypeRule extends DartLintRule {
     FunctionBody body,
     TypeAnnotation? returnType,
     Token nameToken,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     if (!body.isAsynchronous) return;
     if (body.star == null) return; // Must be async*
@@ -630,13 +630,13 @@ class PreferSpecifyingFutureValueTypeRule extends DartLintRule {
     name: 'prefer_specifying_future_value_type',
     problemMessage: 'Specify type argument for Future.value().',
     correctionMessage: 'Add explicit type: Future<Type>.value(...).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
@@ -644,7 +644,7 @@ class PreferSpecifyingFutureValueTypeRule extends DartLintRule {
       final NamedType type = constructorName.type;
 
       // Check for Future.value constructor
-      if (type.name2.lexeme != 'Future') return;
+      if (type.name.lexeme != 'Future') return;
       if (constructorName.name?.name != 'value') return;
 
       // Check if type arguments are specified
@@ -684,13 +684,13 @@ class PreferReturnAwaitRule extends DartLintRule {
     name: 'prefer_return_await',
     problemMessage: 'Return await in async functions for proper error handling.',
     correctionMessage: 'Add await before the returned Future.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {

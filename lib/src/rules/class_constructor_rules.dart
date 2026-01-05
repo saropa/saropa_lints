@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -29,13 +29,13 @@ class AvoidDeclaringCallMethodRule extends DartLintRule {
     name: 'avoid_declaring_call_method',
     problemMessage: 'Avoid declaring a call() method.',
     correctionMessage: 'Use a more descriptive method name like execute() or invoke().',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -68,7 +68,7 @@ class AvoidGenericsShadowingRule extends DartLintRule {
     name: 'avoid_generics_shadowing',
     problemMessage: 'Generic type parameter shadows a top-level declaration.',
     correctionMessage: 'Rename the generic parameter to avoid shadowing.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _commonTypes = <String>{
@@ -109,7 +109,7 @@ class AvoidGenericsShadowingRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTypeParameterList((TypeParameterList node) {
@@ -152,13 +152,13 @@ class AvoidIncompleteCopyWithRule extends DartLintRule {
     name: 'avoid_incomplete_copy_with',
     problemMessage: 'copyWith method may be missing fields.',
     correctionMessage: 'Ensure all class fields are included in copyWith.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -231,13 +231,13 @@ class AvoidNonEmptyConstructorBodiesRule extends DartLintRule {
     name: 'avoid_non_empty_constructor_bodies',
     problemMessage: 'Constructor body contains logic.',
     correctionMessage: 'Use initializer list or factory constructor.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -302,13 +302,13 @@ class AvoidShadowingRule extends DartLintRule {
     name: 'avoid_shadowing',
     problemMessage: 'Declaration shadows a declaration from an outer scope.',
     correctionMessage: 'Rename the variable to avoid confusion.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -352,7 +352,7 @@ class AvoidShadowingRule extends DartLintRule {
 class _ShadowingChecker extends RecursiveAstVisitor<void> {
   _ShadowingChecker(this.reporter, this.code, this.outerNames);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
   final Set<String> outerNames;
 
@@ -416,13 +416,13 @@ class PreferConstStringListRule extends DartLintRule {
         'and could be const.',
     correctionMessage: 'Add const before the list literal or use a const '
         'variable declaration.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -519,13 +519,13 @@ class PreferDeclaringConstConstructorRule extends DartLintRule {
     name: 'prefer_declaring_const_constructor',
     problemMessage: 'Class could have a const constructor.',
     correctionMessage: 'Add const keyword to constructor.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -601,13 +601,13 @@ class PreferPrivateExtensionTypeFieldRule extends DartLintRule {
     name: 'prefer_private_extension_type_field',
     problemMessage: 'Extension type representation field should be private.',
     correctionMessage: 'Use a private field with underscore prefix.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
@@ -662,13 +662,13 @@ class ProperSuperCallsRule extends DartLintRule {
     name: 'proper_super_calls',
     problemMessage: 'Super lifecycle method called in wrong order.',
     correctionMessage: 'super.initState() should be first; super.dispose() should be last.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {

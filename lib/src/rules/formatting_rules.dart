@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -36,13 +36,13 @@ class NewlineBeforeCaseRule extends DartLintRule {
     name: 'prefer_blank_line_before_case',
     problemMessage: 'Add a newline before case clause for readability.',
     correctionMessage: 'Add blank line before this case.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -98,13 +98,13 @@ class NewlineBeforeConstructorRule extends DartLintRule {
     name: 'prefer_blank_line_before_constructor',
     problemMessage: 'Add a blank line before constructor declaration.',
     correctionMessage: 'Add blank line for better readability.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -115,7 +115,7 @@ class NewlineBeforeConstructorRule extends DartLintRule {
   void _checkMembers(
     NodeList<ClassMember> members,
     CompilationUnit unit,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     for (int i = 1; i < members.length; i++) {
       final ClassMember current = members[i];
@@ -170,13 +170,13 @@ class NewlineBeforeMethodRule extends DartLintRule {
     name: 'prefer_blank_line_before_method',
     problemMessage: 'Add a blank line before method declaration.',
     correctionMessage: 'Add blank line for better readability.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -195,7 +195,7 @@ class NewlineBeforeMethodRule extends DartLintRule {
   void _checkMembers(
     NodeList<ClassMember> members,
     CompilationUnit unit,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     for (int i = 1; i < members.length; i++) {
       final ClassMember current = members[i];
@@ -227,13 +227,13 @@ class NewlineBeforeReturnRule extends DartLintRule {
     name: 'prefer_blank_line_before_return',
     problemMessage: 'Add a blank line before the return statement.',
     correctionMessage: 'Insert a blank line before return for readability.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {
@@ -288,13 +288,13 @@ class PreferTrailingCommaRule extends DartLintRule {
     name: 'prefer_trailing_comma',
     problemMessage: 'Missing trailing comma in multi-line construct.',
     correctionMessage: 'Add a trailing comma.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addArgumentList((ArgumentList node) {
@@ -317,7 +317,7 @@ class PreferTrailingCommaRule extends DartLintRule {
   void _checkTrailingComma(
     NodeList<AstNode> elements,
     Token closingToken,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     if (elements.isEmpty) return;
 
@@ -381,13 +381,13 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
     name: 'unnecessary_trailing_comma',
     problemMessage: 'Unnecessary trailing comma for single-element collection.',
     correctionMessage: 'Remove trailing comma or keep on single line.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -402,7 +402,7 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
   void _checkTrailingComma(
     NodeList<CollectionElement> elements,
     Token rightBracket,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     if (elements.length != 1) return;
 
@@ -441,13 +441,13 @@ class FormatCommentFormattingRule extends DartLintRule {
     problemMessage: 'Comment does not follow formatting conventions.',
     correctionMessage:
         'Start with capital letter and end with punctuation.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Comments are not part of the AST, so we need to check tokens
@@ -460,7 +460,7 @@ class FormatCommentFormattingRule extends DartLintRule {
     });
   }
 
-  void _checkPrecedingComments(Token token, ErrorReporter reporter) {
+  void _checkPrecedingComments(Token token, DiagnosticReporter reporter) {
     Token? comment = token.precedingComments;
     while (comment != null) {
       final String lexeme = comment.lexeme;
@@ -532,13 +532,13 @@ class MemberOrderingFormattingRule extends DartLintRule {
     problemMessage: 'Class members are not in conventional order.',
     correctionMessage:
         'Order members: static fields, fields, constructors, methods.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -594,13 +594,13 @@ class ParametersOrderingConventionRule extends DartLintRule {
     problemMessage: 'Parameters are not in conventional order.',
     correctionMessage:
         'Order: required positional, optional positional, named.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -612,7 +612,7 @@ class ParametersOrderingConventionRule extends DartLintRule {
     });
   }
 
-  void _checkParameters(FormalParameterList? params, ErrorReporter reporter) {
+  void _checkParameters(FormalParameterList? params, DiagnosticReporter reporter) {
     if (params == null) return;
 
     int lastCategory = -1;
