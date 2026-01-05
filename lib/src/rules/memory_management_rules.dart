@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -40,7 +40,7 @@ class AvoidLargeObjectsInStateRule extends DartLintRule {
     name: 'avoid_large_objects_in_state',
     problemMessage: 'Large data structures in State may cause memory issues.',
     correctionMessage: 'Consider pagination, streaming, or external state management.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _largeTypePatterns = <String>{
@@ -55,7 +55,7 @@ class AvoidLargeObjectsInStateRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -124,13 +124,13 @@ class RequireImageDisposalRule extends DartLintRule {
     name: 'require_image_disposal',
     problemMessage: 'ui.Image objects must be disposed to free memory.',
     correctionMessage: 'Call image.dispose() in the dispose() method.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -215,7 +215,7 @@ class AvoidCapturingThisInCallbacksRule extends DartLintRule {
     name: 'avoid_capturing_this_in_callbacks',
     problemMessage: 'Callback may capture entire object, preventing garbage collection.',
     correctionMessage: 'Use method reference or extract only needed values.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _longLivedCallbacks = <String>{
@@ -229,7 +229,7 @@ class AvoidCapturingThisInCallbacksRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -298,13 +298,13 @@ class RequireCacheEvictionPolicyRule extends DartLintRule {
     name: 'require_cache_eviction_policy',
     problemMessage: 'Cache lacks eviction policy and may grow unbounded.',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -364,13 +364,13 @@ class PreferWeakReferencesForCacheRule extends DartLintRule {
     name: 'prefer_weak_references_for_cache',
     problemMessage: 'Consider using WeakReference for cache entries.',
     correctionMessage: 'WeakReference allows garbage collection under memory pressure.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -430,13 +430,13 @@ class AvoidExpandoCircularReferencesRule extends DartLintRule {
     name: 'avoid_expando_circular_references',
     problemMessage: 'Expando value may reference its key, causing memory leak.',
     correctionMessage: 'Ensure Expando values do not hold references to their keys.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -495,13 +495,13 @@ class AvoidLargeIsolateCommunicationRule extends DartLintRule {
     name: 'avoid_large_isolate_communication',
     problemMessage: 'Sending large objects between isolates is expensive.',
     correctionMessage: 'Use TransferableTypedData or process data in chunks.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {

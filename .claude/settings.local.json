@@ -12,7 +12,11 @@
       "Bash(dart doc:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
-      "Bash(dart:*)"
+      "Bash(dart:*)",
+      "Bash($env:GITHUB_TOKEN = \"\")",
+      "Bash(gh auth login:*)",
+      "Bash(python:*)",
+      "Bash(find:*)"
     ]
   }
 }

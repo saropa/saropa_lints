@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, ErrorSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -26,13 +26,13 @@ class AvoidEmptySpreadRule extends DartLintRule {
     name: 'avoid_empty_spread',
     problemMessage: 'Empty spread has no effect.',
     correctionMessage: 'Remove the empty spread expression.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSpreadElement((SpreadElement node) {
@@ -75,13 +75,13 @@ class AvoidUnnecessaryBlockRule extends DartLintRule {
     name: 'avoid_unnecessary_block',
     problemMessage: 'Unnecessary nested block.',
     correctionMessage: 'Remove the extra braces.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -120,13 +120,13 @@ class AvoidUnnecessaryCallRule extends DartLintRule {
     name: 'avoid_unnecessary_call',
     problemMessage: 'Unnecessary explicit .call() invocation.',
     correctionMessage: 'Use implicit call with () instead.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -165,13 +165,13 @@ class AvoidUnnecessaryConstructorRule extends DartLintRule {
     name: 'avoid_unnecessary_constructor',
     problemMessage: 'Unnecessary constructor. Dart provides a default constructor.',
     correctionMessage: 'Remove the empty constructor.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -235,13 +235,13 @@ class AvoidUnnecessaryEnumArgumentsRule extends DartLintRule {
     name: 'avoid_unnecessary_enum_arguments',
     problemMessage: 'Enum argument matches default value and can be omitted.',
     correctionMessage: 'Remove the argument to use the default value.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addEnumConstantDeclaration((EnumConstantDeclaration node) {
@@ -273,13 +273,13 @@ class AvoidUnnecessaryEnumPrefixRule extends DartLintRule {
     name: 'avoid_unnecessary_enum_prefix',
     problemMessage: 'Unnecessary enum name prefix inside enum declaration.',
     correctionMessage: 'Remove the enum name prefix when referencing values.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addEnumDeclaration((EnumDeclaration node) {
@@ -370,7 +370,7 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
   _EnumPrefixVisitor(this.enumName, this.reporter, this.code);
 
   final String enumName;
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -404,20 +404,20 @@ class AvoidUnnecessaryExtendsRule extends DartLintRule {
     name: 'avoid_unnecessary_extends',
     problemMessage: 'Unnecessary extends Object.',
     correctionMessage: 'Remove the extends clause.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superclass = extendsClause.superclass.name2.lexeme;
+      final String superclass = extendsClause.superclass.name.lexeme;
       if (superclass == 'Object') {
         reporter.atNode(extendsClause, code);
       }
@@ -455,13 +455,13 @@ class AvoidUnnecessaryGetterRule extends DartLintRule {
     name: 'avoid_unnecessary_getter',
     problemMessage: 'Getter just returns a final field without additional logic.',
     correctionMessage: 'Consider making the field public or adding meaningful logic.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -534,13 +534,13 @@ class AvoidUnnecessaryLengthCheckRule extends DartLintRule {
     name: 'avoid_unnecessary_length_check',
     problemMessage: 'Use isNotEmpty instead of length comparison.',
     correctionMessage: 'Replace with .isNotEmpty or .isEmpty.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -620,13 +620,13 @@ class AvoidUnnecessaryNegationsRule extends DartLintRule {
     name: 'avoid_unnecessary_negations',
     problemMessage: 'Unnecessary negation can be simplified.',
     correctionMessage: 'Simplify by using the opposite operator or removing double negation.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -682,13 +682,13 @@ class AvoidUnnecessarySuperRule extends DartLintRule {
     name: 'avoid_unnecessary_super',
     problemMessage: 'Unnecessary super() call with no arguments.',
     correctionMessage: 'Remove the super() call - it is implicit.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -725,13 +725,13 @@ class NoEmptyBlockRule extends DartLintRule {
     name: 'no_empty_block',
     problemMessage: 'Empty block detected.',
     correctionMessage: 'Add implementation or a comment explaining why it is empty.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -788,13 +788,13 @@ class NoEmptyStringRule extends DartLintRule {
     name: 'no_empty_string',
     problemMessage: 'Avoid empty string literals.',
     correctionMessage: 'Use .isEmpty for comparisons.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {

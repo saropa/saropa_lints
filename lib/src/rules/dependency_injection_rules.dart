@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -45,7 +45,7 @@ class AvoidServiceLocatorInWidgetsRule extends DartLintRule {
     name: 'avoid_service_locator_in_widgets',
     problemMessage: 'Avoid accessing service locator directly in widgets.',
     correctionMessage: 'Inject dependencies through constructor or use Provider/Riverpod.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _serviceLocatorPatterns = <String>{
@@ -62,7 +62,7 @@ class AvoidServiceLocatorInWidgetsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -70,7 +70,7 @@ class AvoidServiceLocatorInWidgetsRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('Widget') && !superName.contains('State')) {
         return;
       }
@@ -122,7 +122,7 @@ class AvoidTooManyDependenciesRule extends DartLintRule {
     name: 'avoid_too_many_dependencies',
     problemMessage: 'Class has too many constructor dependencies.',
     correctionMessage: 'Consider splitting into smaller classes or using a facade pattern.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   /// Maximum recommended number of constructor dependencies.
@@ -131,7 +131,7 @@ class AvoidTooManyDependenciesRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -221,7 +221,7 @@ class AvoidInternalDependencyCreationRule extends DartLintRule {
     name: 'avoid_internal_dependency_creation',
     problemMessage: 'Dependencies should be injected, not created internally.',
     correctionMessage: 'Accept the dependency as a constructor parameter instead.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _dependencySuffixes = <String>{
@@ -240,7 +240,7 @@ class AvoidInternalDependencyCreationRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -292,7 +292,7 @@ class PreferAbstractDependenciesRule extends DartLintRule {
     name: 'prefer_abstract_dependencies',
     problemMessage: 'Depend on abstractions rather than concrete implementations.',
     correctionMessage: 'Use an interface or abstract class for better testability.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _concretePrefixes = <String>{
@@ -315,7 +315,7 @@ class PreferAbstractDependenciesRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -375,7 +375,7 @@ class AvoidSingletonForScopedDependenciesRule extends DartLintRule {
     name: 'avoid_singleton_for_scoped_dependencies',
     problemMessage: 'This dependency should be scoped, not a singleton.',
     correctionMessage: 'Use registerFactory or registerLazySingleton with proper scoping.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _scopedTypePatterns = <String>{
@@ -394,7 +394,7 @@ class AvoidSingletonForScopedDependenciesRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -452,13 +452,13 @@ class AvoidCircularDiDependenciesRule extends DartLintRule {
     name: 'avoid_circular_di_dependencies',
     problemMessage: 'Potential circular dependency detected.',
     correctionMessage: 'Refactor to break the cycle using interfaces or events.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -554,7 +554,7 @@ class PreferNullObjectPatternRule extends DartLintRule {
     name: 'prefer_null_object_pattern',
     problemMessage: 'Consider using null object pattern for optional dependency.',
     correctionMessage: 'Provide a no-op implementation instead of using null.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _optionalDependencySuffixes = <String>{
@@ -570,7 +570,7 @@ class PreferNullObjectPatternRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -614,7 +614,7 @@ class RequireTypedDiRegistrationRule extends DartLintRule {
     name: 'require_typed_di_registration',
     problemMessage: 'DI registration should have explicit type parameter.',
     correctionMessage: 'Add type parameter like registerSingleton<Type>(instance).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _registrationMethods = <String>{
@@ -627,7 +627,7 @@ class RequireTypedDiRegistrationRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {

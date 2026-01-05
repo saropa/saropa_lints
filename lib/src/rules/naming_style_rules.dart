@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -14,13 +14,13 @@ class AvoidGetterPrefixRule extends DartLintRule {
     name: 'avoid_getter_prefix',
     problemMessage: "Getter name should not start with 'get'.",
     correctionMessage: "Remove the 'get' prefix from the getter name.",
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -63,13 +63,13 @@ class AvoidNonAsciiSymbolsRule extends DartLintRule {
     name: 'avoid_non_ascii_symbols',
     problemMessage: 'String contains non-ASCII characters.',
     correctionMessage: 'Use only ASCII characters or escape sequences.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
@@ -110,13 +110,13 @@ class FormatCommentRule extends DartLintRule {
     name: 'capitalize_comment',
     problemMessage: 'Comment should start with capital letter.',
     correctionMessage: 'Capitalize the first letter of the comment.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit unit) {
@@ -181,13 +181,13 @@ class MatchClassNamePatternRule extends DartLintRule {
     name: 'match_class_name_pattern',
     problemMessage: 'Class name does not follow expected pattern.',
     correctionMessage: 'Ensure class name follows naming conventions.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -199,7 +199,7 @@ class MatchClassNamePatternRule extends DartLintRule {
       // Check for common suffix patterns that should match superclass
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause != null) {
-        final String superName = extendsClause.superclass.name2.lexeme;
+        final String superName = extendsClause.superclass.name.lexeme;
 
         // Widgets should end with Widget-like suffix
         if (superName.endsWith('Widget') ||
@@ -265,13 +265,13 @@ class MatchGetterSetterFieldNamesRule extends DartLintRule {
     name: 'match_getter_setter_field_names',
     problemMessage: 'Getter/setter name should match the backing field.',
     correctionMessage: 'Rename to match the field name (without underscore).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -338,13 +338,13 @@ class MatchLibFolderStructureRule extends DartLintRule {
     name: 'match_lib_folder_structure',
     problemMessage: 'Test file location should mirror lib folder structure.',
     correctionMessage: 'Move test file to match the lib directory structure.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -378,13 +378,13 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
     name: 'match_positional_field_names_on_assignment',
     problemMessage: 'Positional field name should match the variable being assigned.',
     correctionMessage: 'Rename the positional field to match the assignment target.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPatternAssignment((PatternAssignment node) {
@@ -402,7 +402,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
     });
   }
 
-  void _checkRecordPattern(RecordPattern pattern, ErrorReporter reporter) {
+  void _checkRecordPattern(RecordPattern pattern, DiagnosticReporter reporter) {
     for (final PatternField field in pattern.fields) {
       final PatternFieldName? fieldName = field.name;
       if (fieldName == null) continue;
@@ -441,7 +441,7 @@ class PreferBooleanPrefixesRule extends DartLintRule {
     name: 'prefer_boolean_prefixes',
     problemMessage: 'Boolean variable should have a prefix (is/has/can/should/will/did).',
     correctionMessage: 'Rename to use a boolean prefix like isEnabled, hasData, etc.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const List<String> _validPrefixes = <String>[
@@ -470,7 +470,7 @@ class PreferBooleanPrefixesRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
@@ -480,7 +480,7 @@ class PreferBooleanPrefixesRule extends DartLintRule {
 
       final TypeAnnotation? type = parent.type;
       if (type is! NamedType) return;
-      if (type.name2.lexeme != 'bool') return;
+      if (type.name.lexeme != 'bool') return;
 
       final String name = node.name.lexeme;
       // Skip private variables (starting with _)
@@ -517,13 +517,13 @@ class PreferCorrectCallbackFieldNameRule extends DartLintRule {
     name: 'prefer_correct_callback_field_name',
     problemMessage: "Callback field should be named with 'on' prefix.",
     correctionMessage: "Rename to 'onX' pattern (e.g., onPressed, onChanged).",
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -637,7 +637,7 @@ class PreferCorrectErrorNameRule extends DartLintRule {
     name: 'prefer_correct_error_name',
     problemMessage: 'Catch parameter should be named "e" or "error".',
     correctionMessage: 'Rename to "e" or "error".',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _validNames = <String>{
@@ -652,7 +652,7 @@ class PreferCorrectErrorNameRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
@@ -690,7 +690,7 @@ class PreferCorrectHandlerNameRule extends DartLintRule {
     name: 'prefer_correct_handler_name',
     problemMessage: 'Event handler should start with "on" or "_on".',
     correctionMessage: 'Rename to follow handler naming convention.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _handlerSuffixes = <String>{
@@ -717,7 +717,7 @@ class PreferCorrectHandlerNameRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -761,7 +761,7 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
     name: 'prefer_correct_identifier_length',
     problemMessage: 'Identifier name length is not ideal.',
     correctionMessage: 'Use names between 2-30 characters (except common short names).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   // Common acceptable short names
@@ -792,7 +792,7 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
@@ -807,7 +807,7 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
     });
   }
 
-  void _checkIdentifier(String name, AstNode node, ErrorReporter reporter) {
+  void _checkIdentifier(String name, AstNode node, DiagnosticReporter reporter) {
     // Skip private names (start with _)
     final String publicName = name.startsWith('_') ? name.substring(1) : name;
 
@@ -850,13 +850,13 @@ class PreferCorrectSetterParameterNameRule extends DartLintRule {
     name: 'prefer_correct_setter_parameter_name',
     problemMessage: 'Setter parameter should be named "value".',
     correctionMessage: 'Rename the parameter to "value".',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -906,13 +906,13 @@ class PreferExplicitParameterNamesRule extends DartLintRule {
     name: 'prefer_explicit_parameter_names',
     problemMessage: 'Function type parameters should have names.',
     correctionMessage: 'Add parameter names for better documentation.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addGenericFunctionType((GenericFunctionType node) {
@@ -941,13 +941,13 @@ class PreferMatchFileNameRule extends DartLintRule {
     name: 'prefer_match_file_name',
     problemMessage: 'File name should match the primary class name.',
     correctionMessage: 'Rename the file or class to match.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -1000,13 +1000,13 @@ class PreferPrefixedGlobalConstantsRule extends DartLintRule {
     name: 'prefer_prefixed_global_constants',
     problemMessage: 'Global constant should have a descriptive prefix.',
     correctionMessage: 'Consider prefixing with "k" or using a descriptive name.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTopLevelVariableDeclaration((
@@ -1058,13 +1058,13 @@ class TagNameRule extends DartLintRule {
     name: 'prefer_kebab_tag_name',
     problemMessage: 'Tag name should follow naming conventions.',
     correctionMessage: 'Use kebab-case for tag names.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1116,13 +1116,13 @@ class PreferNamedExtensionsRule extends DartLintRule {
     name: 'prefer_named_extensions',
     problemMessage: 'Anonymous extension should be named.',
     correctionMessage: 'Add a name to the extension for better debugging and documentation.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
@@ -1157,13 +1157,13 @@ class PreferTypedefForCallbacksRule extends DartLintRule {
     name: 'prefer_typedef_for_callbacks',
     problemMessage: 'Consider using typedef for repeated function types.',
     correctionMessage: 'Create a typedef for this function type to improve readability.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Track function type signatures to find repeats
@@ -1217,13 +1217,13 @@ class PreferEnhancedEnumsRule extends DartLintRule {
     name: 'prefer_enhanced_enums',
     problemMessage: 'Consider using enhanced enum instead of extension.',
     correctionMessage: 'Move extension members into the enum itself.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Collect enum names
@@ -1240,7 +1240,7 @@ class PreferEnhancedEnumsRule extends DartLintRule {
 
       final TypeAnnotation extendedType = onClause.extendedType;
       if (extendedType is NamedType) {
-        final String typeName = extendedType.name2.lexeme;
+        final String typeName = extendedType.name.lexeme;
         if (enumNames.contains(typeName)) {
           reporter.atNode(node, code);
         }

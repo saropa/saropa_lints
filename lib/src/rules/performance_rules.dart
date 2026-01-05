@@ -9,7 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -49,7 +49,7 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
     name: 'require_keys_in_animated_lists',
     problemMessage: 'AnimatedList/AnimatedGrid items should have keys.',
     correctionMessage: 'Add a Key to the returned widget for correct animations.',
-    errorSeverity: ErrorSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _animatedListWidgets = <String>{
@@ -62,7 +62,7 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -83,7 +83,7 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
     });
   }
 
-  void _checkBuilderForKey(FunctionBody body, ErrorReporter reporter) {
+  void _checkBuilderForKey(FunctionBody body, DiagnosticReporter reporter) {
     // Find the returned widget
     if (body is ExpressionFunctionBody) {
       _checkExpressionForKey(body.expression, reporter, body);
@@ -98,7 +98,7 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
 
   void _checkExpressionForKey(
     Expression expr,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     AstNode reportNode,
   ) {
     if (expr is InstanceCreationExpression) {
@@ -160,7 +160,7 @@ class AvoidExpensiveBuildRule extends DartLintRule {
     problemMessage: 'Expensive operation in build method.',
     correctionMessage:
         'Move expensive operations to initState, didChangeDependencies, or cache the result.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _expensiveOperations = <String>{
@@ -184,7 +184,7 @@ class AvoidExpensiveBuildRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -197,7 +197,7 @@ class AvoidExpensiveBuildRule extends DartLintRule {
       final ExtendsClause? extendsClause = classDecl.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name2.lexeme;
+      final String superName = extendsClause.superclass.name.lexeme;
       if (!superName.contains('State') && !superName.contains('Widget')) {
         return;
       }
@@ -217,7 +217,7 @@ class AvoidExpensiveBuildRule extends DartLintRule {
 class _ExpensiveOperationVisitor extends RecursiveAstVisitor<void> {
   _ExpensiveOperationVisitor(this.reporter, this.code, this.expensiveOps);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
   final Set<String> expensiveOps;
 
@@ -267,13 +267,13 @@ class PreferConstChildWidgetsRule extends DartLintRule {
     name: 'prefer_const_child_widgets',
     problemMessage: 'Child widgets could be const.',
     correctionMessage: 'Add const to the list literal to prevent unnecessary rebuilds.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -373,7 +373,7 @@ class AvoidSynchronousFileIoRule extends DartLintRule {
     name: 'avoid_synchronous_file_io',
     problemMessage: 'Avoid synchronous file I/O operations.',
     correctionMessage: 'Use async file operations to avoid blocking the UI.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _syncMethods = <String>{
@@ -394,7 +394,7 @@ class AvoidSynchronousFileIoRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -426,7 +426,7 @@ class PreferComputeForHeavyWorkRule extends DartLintRule {
     name: 'prefer_compute_for_heavy_work',
     problemMessage: 'Heavy computation should use compute() or Isolate.',
     correctionMessage: 'Move heavy work to a separate isolate using compute() or Isolate.run().',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _heavyOperations = <String>{
@@ -447,7 +447,7 @@ class PreferComputeForHeavyWorkRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -507,7 +507,7 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
     name: 'avoid_object_creation_in_hot_loops',
     problemMessage: 'Object creation inside loop causes GC pressure.',
     correctionMessage: 'Move object creation outside the loop.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _expensiveTypes = <String>{
@@ -524,7 +524,7 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addForStatement((ForStatement node) {
@@ -548,13 +548,13 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
     });
   }
 
-  void _checkBodyForCreation(Statement body, ErrorReporter reporter) {
+  void _checkBodyForCreation(Statement body, DiagnosticReporter reporter) {
     body.visitChildren(_CreationInLoopVisitor(reporter, code, _expensiveTypes));
   }
 
   void _checkCreation(
     InstanceCreationExpression creation,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     final String? typeName = creation.constructorName.type.element?.name;
     if (typeName != null && _expensiveTypes.contains(typeName)) {
@@ -566,7 +566,7 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
 class _CreationInLoopVisitor extends RecursiveAstVisitor<void> {
   _CreationInLoopVisitor(this.reporter, this.code, this.expensiveTypes);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
   final Set<String> expensiveTypes;
 
@@ -605,13 +605,13 @@ class PreferCachedGetterRule extends DartLintRule {
     name: 'prefer_cached_getter',
     problemMessage: 'Getter called multiple times - consider caching.',
     correctionMessage: 'Store the getter result in a local variable if called multiple times.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -691,7 +691,7 @@ class AvoidExcessiveWidgetDepthRule extends DartLintRule {
     problemMessage: 'Widget tree is too deep.',
     correctionMessage:
         'Extract nested widgets into separate widget classes for better performance.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const int _maxDepth = 10;
@@ -699,7 +699,7 @@ class AvoidExcessiveWidgetDepthRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -774,7 +774,7 @@ class RequireItemExtentForLargeListsRule extends DartLintRule {
     name: 'require_item_extent_for_large_lists',
     problemMessage: 'Large list should specify itemExtent for performance.',
     correctionMessage: 'Add itemExtent or prototypeItem for better scrolling performance.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const int _largeListThreshold = 100;
@@ -782,7 +782,7 @@ class RequireItemExtentForLargeListsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -851,13 +851,13 @@ class RequireImageCacheDimensionsRule extends DartLintRule {
     name: 'require_image_cache_dimensions',
     problemMessage: 'Network image should specify cache dimensions.',
     correctionMessage: 'Add cacheWidth/cacheHeight to reduce memory usage.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -910,7 +910,7 @@ class PreferImagePrecacheRule extends DartLintRule {
     name: 'prefer_image_precache',
     problemMessage: 'Consider precaching large or hero images.',
     correctionMessage: 'Use precacheImage() in didChangeDependencies for smoother UX.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _heroIndicators = <String>{
@@ -925,7 +925,7 @@ class PreferImagePrecacheRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -985,7 +985,7 @@ class AvoidControllerInBuildRule extends DartLintRule {
     name: 'avoid_controller_in_build',
     problemMessage: 'Controller should not be created in build method.',
     correctionMessage: 'Create controllers as class fields and dispose them properly.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _controllerTypes = <String>{
@@ -1001,7 +1001,7 @@ class AvoidControllerInBuildRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1021,7 +1021,7 @@ class AvoidControllerInBuildRule extends DartLintRule {
 class _ControllerCreationVisitor extends RecursiveAstVisitor<void> {
   _ControllerCreationVisitor(this.reporter, this.code, this.controllerTypes);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
   final Set<String> controllerTypes;
 
@@ -1067,13 +1067,13 @@ class AvoidSetStateInBuildRule extends DartLintRule {
     name: 'avoid_setstate_in_build',
     problemMessage: 'setState should not be called in build method.',
     correctionMessage: 'Use addPostFrameCallback or move state changes to event handlers.',
-    errorSeverity: ErrorSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1087,7 +1087,7 @@ class AvoidSetStateInBuildRule extends DartLintRule {
 class _SetStateVisitor extends RecursiveAstVisitor<void> {
   _SetStateVisitor(this.reporter, this.code);
 
-  final ErrorReporter reporter;
+  final DiagnosticReporter reporter;
   final LintCode code;
 
   @override

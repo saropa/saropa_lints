@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -34,7 +34,7 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
     name: 'avoid_hardcoded_strings_in_ui',
     problemMessage: 'Hardcoded string in UI should be localized.',
     correctionMessage: 'Use AppLocalizations or your l10n solution instead.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _textWidgets = <String>{
@@ -47,7 +47,7 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Skip test files and generated files
@@ -87,7 +87,7 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
     });
   }
 
-  void _checkForHardcodedText(Expression expr, ErrorReporter reporter) {
+  void _checkForHardcodedText(Expression expr, DiagnosticReporter reporter) {
     if (expr is InstanceCreationExpression) {
       final String? name = expr.constructorName.type.element?.name;
       if (name == 'Text') {
@@ -125,13 +125,13 @@ class RequireLocaleAwareFormattingRule extends DartLintRule {
     name: 'require_locale_aware_formatting',
     problemMessage: 'Use locale-aware formatting for dates and numbers.',
     correctionMessage: 'Use DateFormat, NumberFormat, or intl package.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -187,13 +187,13 @@ class RequireDirectionalWidgetsRule extends DartLintRule {
     name: 'require_directional_widgets',
     problemMessage: 'Use directional widgets for RTL language support.',
     correctionMessage: 'Use EdgeInsetsDirectional, AlignmentDirectional, etc.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -262,7 +262,7 @@ class RequirePluralHandlingRule extends DartLintRule {
     name: 'require_plural_handling',
     problemMessage: 'Plural forms should use Intl.plural or similar.',
     correctionMessage: 'Use Intl.plural() for proper pluralization.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _pluralIndicators = <String>{
@@ -281,7 +281,7 @@ class RequirePluralHandlingRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addStringInterpolation((StringInterpolation node) {
@@ -354,7 +354,7 @@ class AvoidHardcodedLocaleRule extends DartLintRule {
     name: 'avoid_hardcoded_locale',
     problemMessage: 'Locale should not be hardcoded.',
     correctionMessage: 'Use Localizations.localeOf(context) or similar.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _localePattern = RegExp(r"'[a-z]{2}_[A-Z]{2}'");
@@ -362,7 +362,7 @@ class AvoidHardcodedLocaleRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
@@ -398,13 +398,13 @@ class AvoidStringConcatenationInUiRule extends DartLintRule {
     name: 'avoid_string_concatenation_in_ui',
     problemMessage: 'String concatenation breaks internationalization.',
     correctionMessage: 'Use localized strings with placeholders.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -427,7 +427,7 @@ class AvoidStringConcatenationInUiRule extends DartLintRule {
 
   void _checkBinaryForStringConcat(
     BinaryExpression expr,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
   ) {
     // Check if either operand is a string literal
     if (expr.leftOperand is SimpleStringLiteral || expr.rightOperand is SimpleStringLiteral) {
@@ -461,7 +461,7 @@ class AvoidTextInImagesRule extends DartLintRule {
     name: 'avoid_text_in_images',
     problemMessage: 'Image path suggests embedded text that cannot be localized.',
     correctionMessage: 'Use locale-specific images or text overlays.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const Set<String> _textIndicators = <String>{
@@ -478,7 +478,7 @@ class AvoidTextInImagesRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -529,13 +529,13 @@ class AvoidHardcodedAppNameRule extends DartLintRule {
     name: 'avoid_hardcoded_app_name',
     problemMessage: 'App name should not be hardcoded in UI.',
     correctionMessage: 'Use a configuration constant or localized string.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
