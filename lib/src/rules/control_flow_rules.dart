@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -26,7 +26,7 @@ class AvoidAssignmentsAsConditionsRule extends DartLintRule {
     name: 'avoid_assignments_as_conditions',
     problemMessage: 'Avoid using assignments inside conditions.',
     correctionMessage: 'Move the assignment outside the condition.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -107,7 +107,7 @@ class AvoidCollapsibleIfRule extends DartLintRule {
     name: 'avoid_collapsible_if',
     problemMessage: 'Nested if statements can be collapsed.',
     correctionMessage: 'Combine conditions using && operator.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -166,7 +166,7 @@ class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
     name: 'avoid_conditions_with_boolean_literals',
     problemMessage: 'Avoid comparing with boolean literals or using them in logical expressions.',
     correctionMessage: 'Use the boolean expression directly: x instead of x == true.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -218,7 +218,7 @@ class AvoidConstantAssertConditionsRule extends DartLintRule {
     name: 'avoid_constant_assert_conditions',
     problemMessage: 'Assert has a constant condition that is always {0}.',
     correctionMessage: 'Use a meaningful condition or remove the assert statement.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -293,7 +293,7 @@ class AvoidConstantSwitchesRule extends DartLintRule {
     name: 'avoid_constant_switches',
     problemMessage: 'Switch expression is a constant value.',
     correctionMessage: 'Use a variable or expression, or replace with if statement.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -349,7 +349,7 @@ class AvoidContinueRule extends DartLintRule {
     name: 'avoid_continue',
     problemMessage: 'Avoid using the continue statement.',
     correctionMessage: 'Restructure the loop logic to avoid continue.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -386,7 +386,7 @@ class AvoidDuplicateSwitchCaseConditionsRule extends DartLintRule {
     name: 'avoid_duplicate_switch_case_conditions',
     problemMessage: 'Duplicate switch case condition detected.',
     correctionMessage: 'Remove the duplicate case or use a different value.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -451,7 +451,7 @@ class AvoidIfWithManyBranchesRule extends DartLintRule {
     name: 'avoid_if_with_many_branches',
     problemMessage: 'If statement has too many branches (max 4).',
     correctionMessage: 'Consider using a switch statement or extracting to methods.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _maxBranches = 4;
@@ -501,7 +501,7 @@ class AvoidInvertedBooleanChecksRule extends DartLintRule {
     name: 'avoid_inverted_boolean_checks',
     problemMessage: 'Inverted boolean check can be simplified.',
     correctionMessage: 'Use the opposite operator instead of negating.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -553,7 +553,7 @@ class AvoidNegatedConditionsRule extends DartLintRule {
     name: 'avoid_negated_conditions',
     problemMessage: 'Negated condition can be simplified.',
     correctionMessage: 'Use the positive form (isNotEmpty, != null, etc.).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const List<String> _negateableMethods = <String>[
@@ -620,7 +620,7 @@ class AvoidNestedAssignmentsRule extends DartLintRule {
     name: 'avoid_nested_assignments',
     problemMessage: 'Avoid using assignment inside another expression.',
     correctionMessage: 'Extract the assignment to a separate statement.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -659,7 +659,7 @@ class AvoidNestedConditionalExpressionsRule extends DartLintRule {
     name: 'avoid_nested_conditional_expressions',
     problemMessage: 'Avoid nested conditional expressions.',
     correctionMessage: 'Use if-else statements or extract to a method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -708,7 +708,7 @@ class AvoidNestedSwitchesRule extends DartLintRule {
     name: 'avoid_nested_switches',
     problemMessage: 'Avoid nested switch statements.',
     correctionMessage: 'Extract the inner switch to a separate method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -771,7 +771,7 @@ class AvoidNestedSwitchExpressionsRule extends DartLintRule {
     name: 'avoid_nested_switch_expressions',
     problemMessage: 'Avoid nested switch expressions.',
     correctionMessage: 'Extract the inner switch to a separate function.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -817,7 +817,7 @@ class AvoidNestedTryRule extends DartLintRule {
     name: 'avoid_nested_try',
     problemMessage: 'Avoid nested try statements.',
     correctionMessage: 'Extract the inner try to a separate method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -871,7 +871,7 @@ class AvoidRedundantElseRule extends DartLintRule {
     name: 'avoid_redundant_else',
     problemMessage: 'Else is redundant after return/throw/break/continue.',
     correctionMessage: 'Remove the else clause and un-indent the code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -937,7 +937,7 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
     name: 'avoid_unconditional_break',
     problemMessage: 'Unconditional break/continue makes loop execute at most once.',
     correctionMessage: 'Add a condition before break/continue or remove the loop.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1005,7 +1005,7 @@ class AvoidUnnecessaryConditionalsRule extends DartLintRule {
     name: 'avoid_unnecessary_conditionals',
     problemMessage: 'Condition is unnecessary (always true or always false).',
     correctionMessage: 'Remove the conditional or fix the condition.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1069,7 +1069,7 @@ class AvoidUnnecessaryContinueRule extends DartLintRule {
     name: 'avoid_unnecessary_continue',
     problemMessage: 'Redundant continue statement at end of loop body.',
     correctionMessage: 'Remove the continue statement.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1110,7 +1110,7 @@ class AvoidUnnecessaryIfRule extends DartLintRule {
     name: 'avoid_unnecessary_if',
     problemMessage: 'Unnecessary if statement.',
     correctionMessage: 'Simplify by returning the condition directly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1189,7 +1189,7 @@ class NoEqualConditionsRule extends DartLintRule {
     name: 'no_equal_conditions',
     problemMessage: 'Duplicate condition in if-else chain.',
     correctionMessage: 'This condition was already checked above.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1251,7 +1251,7 @@ class NoEqualThenElseRule extends DartLintRule {
     name: 'no_equal_then_else',
     problemMessage: 'If and else branches have identical code.',
     correctionMessage: 'Remove the condition and keep only the common code.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1296,7 +1296,7 @@ class PreferConditionalExpressionsRule extends DartLintRule {
     name: 'prefer_conditional_expressions',
     problemMessage: 'Consider using a conditional expression.',
     correctionMessage: 'Use condition ? thenValue : elseValue.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1368,7 +1368,7 @@ class PreferCorrectSwitchLengthRule extends DartLintRule {
     name: 'prefer_correct_switch_length',
     problemMessage: 'Switch statement has too few cases.',
     correctionMessage: 'Consider using an if-else statement for $_minCases or fewer cases.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1416,7 +1416,7 @@ class PreferEarlyReturnRule extends DartLintRule {
     name: 'prefer_early_return',
     problemMessage: 'Consider using early return to reduce nesting.',
     correctionMessage: 'Invert the condition and return early instead of wrapping the body.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1484,7 +1484,7 @@ class PreferReturningConditionalsRule extends DartLintRule {
     name: 'prefer_returning_conditionals',
     problemMessage: 'Return the condition directly instead of true/false.',
     correctionMessage: 'Simplify by returning the condition expression.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1580,7 +1580,7 @@ class PreferReturningConditionRule extends DartLintRule {
     name: 'prefer_returning_condition',
     problemMessage: 'Prefer returning the condition directly.',
     correctionMessage: 'Replace if-else with direct return of the condition.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

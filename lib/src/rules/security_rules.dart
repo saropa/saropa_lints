@@ -8,7 +8,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -37,7 +37,7 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
     name: 'avoid_logging_sensitive_data',
     problemMessage: 'Potential sensitive data in log statement.',
     correctionMessage: 'Remove sensitive data from logs. Never log passwords, tokens, or PII.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   static const Set<String> _sensitivePatterns = <String>{
@@ -150,7 +150,7 @@ class RequireSecureStorageRule extends DartLintRule {
     name: 'require_secure_storage',
     problemMessage: 'Sensitive data should not be stored in SharedPreferences.',
     correctionMessage: 'Use flutter_secure_storage or other encrypted storage for sensitive data.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _sensitiveKeys = <String>{
@@ -228,7 +228,7 @@ class AvoidHardcodedCredentialsRule extends DartLintRule {
     problemMessage: 'Potential hardcoded credential detected.',
     correctionMessage:
         'Use environment variables or secure storage instead of hardcoding credentials.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   static const Set<String> _credentialNames = <String>{
@@ -319,7 +319,7 @@ class RequireInputSanitizationRule extends DartLintRule {
     name: 'require_input_sanitization',
     problemMessage: 'User input should be validated or sanitized before use.',
     correctionMessage: 'Validate and sanitize user input to prevent injection attacks.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -393,7 +393,7 @@ class AvoidWebViewJavaScriptEnabledRule extends DartLintRule {
     name: 'avoid_webview_javascript_enabled',
     problemMessage: 'WebView with JavaScript enabled may be vulnerable to XSS attacks.',
     correctionMessage: 'Consider disabling JavaScript or ensure only trusted content is loaded.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -462,7 +462,7 @@ class RequireBiometricFallbackRule extends DartLintRule {
     name: 'require_biometric_fallback',
     problemMessage: 'Biometric authentication should have a fallback mechanism.',
     correctionMessage: 'Set biometricOnly to false or provide an alternative auth method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -528,7 +528,7 @@ class AvoidEvalLikePatternsRule extends DartLintRule {
     name: 'avoid_eval_like_patterns',
     problemMessage: 'Dynamic code execution pattern detected.',
     correctionMessage: 'Avoid dynamic code execution. Use static dispatch or explicit mappings.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   @override
@@ -590,7 +590,7 @@ class RequireCertificatePinningRule extends DartLintRule {
     name: 'require_certificate_pinning',
     problemMessage: 'HttpClient should implement certificate pinning.',
     correctionMessage: 'Set badCertificateCallback to validate server certificates.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override

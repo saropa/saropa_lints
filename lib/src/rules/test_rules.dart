@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -31,7 +31,7 @@ class AvoidDuplicateTestAssertionsRule extends DartLintRule {
     name: 'avoid_duplicate_test_assertions',
     problemMessage: 'Duplicate test assertion detected.',
     correctionMessage: 'Remove the duplicate assertion or verify different values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -68,7 +68,7 @@ class AvoidEmptyTestGroupsRule extends DartLintRule {
     name: 'avoid_empty_test_groups',
     problemMessage: 'Test group has an empty body.',
     correctionMessage: 'Add tests to the group or remove it.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -125,7 +125,7 @@ class AvoidTopLevelMembersInTestsRule extends DartLintRule {
     problemMessage: 'Avoid public top-level members in test files.',
     correctionMessage: 'Make the member private by prefixing with underscore, '
         'or move it to a separate utility file.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -203,7 +203,7 @@ class FormatTestNameRule extends DartLintRule {
     name: 'prefer_descriptive_test_name',
     problemMessage: 'Test name should be descriptive.',
     correctionMessage: 'Use a descriptive test name that explains what is being tested.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _testFunctions = <String>{
@@ -275,7 +275,7 @@ class PreferCorrectTestFileNameRule extends DartLintRule {
     name: 'prefer_correct_test_file_name',
     problemMessage: 'Test file naming convention violation.',
     correctionMessage: 'Test files should end with `_test.dart` and be in test/ directory.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -334,7 +334,7 @@ class PreferExpectLaterRule extends DartLintRule {
     name: 'prefer_expect_later',
     problemMessage: 'Use expectLater() for Future assertions.',
     correctionMessage: 'Replace expect() with expectLater() for Futures.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -372,7 +372,7 @@ class PreferTestStructureRule extends DartLintRule {
     name: 'prefer_test_structure',
     problemMessage: 'Test file should follow proper structure conventions.',
     correctionMessage: 'Wrap tests in group() and use descriptive names.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -460,7 +460,7 @@ class PreferUniqueTestNamesRule extends DartLintRule {
     name: 'prefer_unique_test_names',
     problemMessage: 'Duplicate test name found.',
     correctionMessage: 'Use a unique name for each test.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -523,7 +523,7 @@ class MissingTestAssertionRule extends DartLintRule {
     name: 'missing_test_assertion',
     problemMessage: 'Test body has no assertions.',
     correctionMessage: 'Add expect(), verify(), or other assertion calls.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _assertionMethods = <String>{

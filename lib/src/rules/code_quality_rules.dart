@@ -6,7 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -31,7 +31,7 @@ class AvoidAdjacentStringsRule extends DartLintRule {
     name: 'avoid_adjacent_strings',
     problemMessage: 'Avoid using adjacent strings.',
     correctionMessage: 'Combine into a single string or use concatenation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -54,7 +54,7 @@ class AvoidEnumValuesByIndexRule extends DartLintRule {
     name: 'avoid_enum_values_by_index',
     problemMessage: 'Avoid accessing enum values by index.',
     correctionMessage: 'Use EnumName.byName() or switch on specific values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -107,7 +107,7 @@ class AvoidIncorrectUriRule extends DartLintRule {
     name: 'avoid_incorrect_uri',
     problemMessage: 'URI string appears to be malformed.',
     correctionMessage: 'Check the URI for syntax errors.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -139,7 +139,7 @@ class AvoidIncorrectUriRule extends DartLintRule {
     });
 
     context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme;
+      final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'Uri') return;
 
       // Check for Uri() constructor with invalid string argument
@@ -219,7 +219,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
         'if the enum is renamed or reordered.',
     correctionMessage: 'Store the enum as a String field and use an @ignore '
         'getter to parse it. See rule documentation for the pattern.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: ErrorSeverity.ERROR,
   );
 
   /// Type name suffixes that typically indicate an enum
@@ -327,7 +327,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
   /// Extract the base type name from a type annotation
   String _extractTypeName(TypeAnnotation type) {
     if (type is NamedType) {
-      return type.name.lexeme;
+      return type.name2.lexeme;
     }
     return '';
   }
@@ -360,7 +360,7 @@ class AvoidLateKeywordRule extends DartLintRule {
     name: 'avoid_late_keyword',
     problemMessage: "Avoid using 'late' keyword.",
     correctionMessage: 'Use nullable type with null check, or initialize in constructor.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -406,7 +406,7 @@ class AvoidMissedCallsRule extends DartLintRule {
     name: 'avoid_missed_calls',
     problemMessage: 'Function reference passed to print. Did you mean to call it?',
     correctionMessage: 'Add parentheses () to call the function.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -500,7 +500,7 @@ class AvoidMisusedSetLiteralsRule extends DartLintRule {
         'Empty `{}` without type annotation creates a Map, not a Set.',
     correctionMessage: 'Add explicit type annotation: `<Type>{}` for Set '
         'or `<K, V>{}` for Map.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -548,7 +548,7 @@ class AvoidPassingSelfAsArgumentRule extends DartLintRule {
     name: 'avoid_passing_self_as_argument',
     problemMessage: 'Object is passed as argument to its own method.',
     correctionMessage: 'Avoid passing an object to its own method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -608,7 +608,7 @@ class AvoidRecursiveCallsRule extends DartLintRule {
     name: 'avoid_recursive_calls',
     problemMessage: 'Function contains a recursive call to itself.',
     correctionMessage: 'Ensure proper base case exists or consider using iteration.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -692,7 +692,7 @@ class AvoidRecursiveToStringRule extends DartLintRule {
     name: 'avoid_recursive_tostring',
     problemMessage: 'toString() method calls itself recursively.',
     correctionMessage: 'Avoid using \$this or this.toString() inside toString().',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -769,7 +769,7 @@ class AvoidReferencingDiscardedVariablesRule extends DartLintRule {
     name: 'avoid_referencing_discarded_variables',
     problemMessage: 'Avoid referencing variables marked as discarded.',
     correctionMessage: 'Variables starting with _ should not be used. Rename the variable.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -788,7 +788,7 @@ class AvoidReferencingDiscardedVariablesRule extends DartLintRule {
           !name.startsWith('__') &&
           RegExp(r'^_[a-z]').hasMatch(name)) {
         // Use resolved element to distinguish locals from members/methods
-        final Element? element = node.element;
+        final element = node.element;
 
         // If we cannot resolve the element, be conservative and skip
         if (element == null) return;
@@ -837,7 +837,7 @@ class AvoidRedundantPragmaInlineRule extends DartLintRule {
     name: 'avoid_redundant_pragma_inline',
     problemMessage: 'Pragma inline may be redundant for trivial methods.',
     correctionMessage: 'Remove pragma for simple getters/methods that inline automatically.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -909,7 +909,7 @@ class AvoidSubstringRule extends DartLintRule {
         'are out of bounds.',
     correctionMessage: 'Consider bounds checking or using safer string '
         'manipulation methods.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -953,7 +953,7 @@ class AvoidUnknownPragmaRule extends DartLintRule {
     name: 'avoid_unknown_pragma',
     problemMessage: 'Unknown pragma annotation.',
     correctionMessage: 'Use a known pragma value or remove the annotation.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _knownPragmas = <String>{
@@ -1025,7 +1025,7 @@ class AvoidUnusedParametersRule extends DartLintRule {
     name: 'avoid_unused_parameters',
     problemMessage: 'Parameter is never used.',
     correctionMessage: 'Remove the parameter or prefix with underscore if intentionally unused.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1121,7 +1121,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends DartLintRule {
     name: 'avoid_weak_cryptographic_algorithms',
     problemMessage: 'Weak cryptographic algorithm detected.',
     correctionMessage: 'Use stronger algorithms like SHA-256 or SHA-512 instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _weakAlgorithms = <String>{
@@ -1153,7 +1153,7 @@ class MissingUseResultAnnotationRule extends DartLintRule {
     name: 'missing_use_result_annotation',
     problemMessage: 'Function returns a value that might be ignored. Consider adding @useResult.',
     correctionMessage: 'Add @useResult annotation to indicate return value should be used.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1227,7 +1227,7 @@ class NoObjectDeclarationRule extends DartLintRule {
     name: 'no_object_declaration',
     problemMessage: 'Avoid declaring members with type Object.',
     correctionMessage: 'Use a more specific type or generics.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1238,14 +1238,14 @@ class NoObjectDeclarationRule extends DartLintRule {
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
       final TypeAnnotation? type = node.fields.type;
-      if (type is NamedType && type.name.lexeme == 'Object') {
+      if (type is NamedType && type.name2.lexeme == 'Object') {
         reporter.atNode(type, code);
       }
     });
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       final TypeAnnotation? returnType = node.returnType;
-      if (returnType is NamedType && returnType.name.lexeme == 'Object') {
+      if (returnType is NamedType && returnType.name2.lexeme == 'Object') {
         reporter.atNode(returnType, code);
       }
     });
@@ -1277,7 +1277,7 @@ class PreferBothInliningAnnotationsRule extends DartLintRule {
     name: 'prefer_both_inlining_annotations',
     problemMessage: 'Use both VM and dart2js inlining pragmas.',
     correctionMessage: 'Add matching dart2js:tryInline or vm:prefer-inline.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1346,7 +1346,7 @@ class PreferDedicatedMediaQueryMethodRule extends DartLintRule {
     name: 'prefer_dedicated_media_query_method',
     problemMessage: 'Prefer dedicated MediaQuery method.',
     correctionMessage: 'Use MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), etc.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _dedicatedProperties = <String>{
@@ -1404,7 +1404,7 @@ class PreferEnumsByNameRule extends DartLintRule {
     name: 'prefer_enums_by_name',
     problemMessage: 'Use Enum.values.byName() instead of firstWhere with name comparison.',
     correctionMessage: 'Replace .firstWhere((e) => e.name == x) with .byName(x).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1462,7 +1462,7 @@ class PreferExtractingFunctionCallbacksRule extends DartLintRule {
     name: 'prefer_extracting_function_callbacks',
     problemMessage: 'Consider extracting this callback to a named function.',
     correctionMessage: 'Extract large inline callbacks to improve readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _maxCallbackLines = 10;
@@ -1502,7 +1502,7 @@ class PreferNullAwareElementsRule extends DartLintRule {
     name: 'prefer_null_aware_elements',
     problemMessage: 'Use null-aware element syntax (?element) for nullable values.',
     correctionMessage: 'Replace "if (x != null) x" with "?x" in collection.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1606,7 +1606,7 @@ class PreferNullAwareSpreadRule extends DartLintRule {
     name: 'prefer_null_aware_spread',
     problemMessage: 'Use null-aware spread (...?) for nullable collections.',
     correctionMessage: 'Replace with ...?nullableCollection.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1680,7 +1680,7 @@ class PreferVisibleForTestingOnMembersRule extends DartLintRule {
     name: 'prefer_visible_for_testing_on_members',
     problemMessage: 'Test helper members should use @visibleForTesting.',
     correctionMessage: 'Add @visibleForTesting annotation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _testIndicators = <String>{
@@ -1763,7 +1763,7 @@ class AvoidAlwaysNullParametersRule extends DartLintRule {
     name: 'avoid_always_null_parameters',
     problemMessage: 'Parameter is explicitly passed as null.',
     correctionMessage: 'Omit the parameter instead of passing null explicitly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -1811,7 +1811,7 @@ class AvoidAssigningToStaticFieldRule extends DartLintRule {
     name: 'avoid_assigning_to_static_field',
     problemMessage: 'Instance method should not modify static field.',
     correctionMessage: 'Make the method static or use instance field.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1904,7 +1904,7 @@ class AvoidAsyncCallInSyncFunctionRule extends DartLintRule {
     name: 'avoid_async_call_in_sync_function',
     problemMessage: 'Async call in sync function without handling the Future.',
     correctionMessage: 'Use await, .then(), or unawaited() for the async call.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -1973,7 +1973,7 @@ class AvoidComplexLoopConditionsRule extends DartLintRule {
     name: 'avoid_complex_loop_conditions',
     problemMessage: 'Loop condition is too complex.',
     correctionMessage: 'Extract condition to a boolean variable or method.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _maxOperators = 2;
@@ -2040,7 +2040,7 @@ class AvoidConstantConditionsRule extends DartLintRule {
     name: 'avoid_constant_conditions',
     problemMessage: 'Condition with constant values can be simplified.',
     correctionMessage: 'Evaluate the constant expression at compile time.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -2092,7 +2092,7 @@ class AvoidContradictoryExpressionsRule extends DartLintRule {
     name: 'avoid_contradictory_expressions',
     problemMessage: 'Contradictory conditions detected.',
     correctionMessage: 'Review the logic - conditions may never be satisfied.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -2210,7 +2210,7 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends DartLintRule {
     name: 'avoid_identical_exception_handling_blocks',
     problemMessage: 'Catch blocks have identical code.',
     correctionMessage: 'Combine exception types: on FormatException, IOException catch (e).',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -2257,7 +2257,7 @@ class AvoidLateFinalReassignmentRule extends DartLintRule {
     name: 'avoid_late_final_reassignment',
     problemMessage: 'Late final field may be assigned multiple times.',
     correctionMessage: 'Ensure late final fields are only assigned once.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -2342,7 +2342,7 @@ class AvoidMissingCompleterStackTraceRule extends DartLintRule {
     name: 'avoid_missing_completer_stack_trace',
     problemMessage: 'completeError() called without stack trace.',
     correctionMessage: 'Pass the stack trace as second argument.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -2377,7 +2377,7 @@ class AvoidMissingEnumConstantInMapRule extends DartLintRule {
     name: 'avoid_missing_enum_constant_in_map',
     problemMessage: 'Map may be missing enum constant keys.',
     correctionMessage: 'Ensure all enum values are present in the map.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -2432,7 +2432,7 @@ class AvoidMutatingParametersRule extends DartLintRule {
     name: 'avoid_mutating_parameters',
     problemMessage: 'Parameter is being reassigned.',
     correctionMessage: 'Create a local variable instead of mutating the parameter.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -2530,7 +2530,7 @@ class AvoidSimilarNamesRule extends DartLintRule {
     name: 'avoid_similar_names',
     problemMessage: 'Variable name is too similar to another.',
     correctionMessage: 'Use more distinct names to avoid confusion.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -2636,7 +2636,7 @@ class AvoidUnnecessaryNullableParametersRule extends DartLintRule {
     name: 'avoid_unnecessary_nullable_parameters',
     problemMessage: 'Nullable parameter is never passed null.',
     correctionMessage: 'Consider making the parameter non-nullable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -2691,7 +2691,7 @@ class FunctionAlwaysReturnsNullRule extends DartLintRule {
     name: 'function_always_returns_null',
     problemMessage: 'Function always returns null.',
     correctionMessage: 'Consider changing return type to void or returning meaningful values.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -2769,7 +2769,7 @@ class AvoidAccessingCollectionsByConstantIndexRule extends DartLintRule {
     name: 'avoid_accessing_collections_by_constant_index',
     problemMessage: 'Accessing collection by constant index inside loop.',
     correctionMessage: 'Use the loop variable or extract the element before the loop.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -2825,7 +2825,7 @@ class AvoidDefaultToStringRule extends DartLintRule {
     name: 'avoid_default_tostring',
     problemMessage: 'Class should override toString() for better debugging.',
     correctionMessage: 'Add a toString() method that returns meaningful information.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -2870,7 +2870,7 @@ class AvoidDuplicateConstantValuesRule extends DartLintRule {
     name: 'avoid_duplicate_constant_values',
     problemMessage: 'Duplicate constant value found.',
     correctionMessage: 'Reuse the existing constant instead of duplicating.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -2920,7 +2920,7 @@ class AvoidDuplicateInitializersRule extends DartLintRule {
     name: 'avoid_duplicate_initializers',
     problemMessage: 'Duplicate initializer expression.',
     correctionMessage: 'Extract the common initialization to a variable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -2968,7 +2968,7 @@ class AvoidUnnecessaryOverridesRule extends DartLintRule {
     name: 'avoid_unnecessary_overrides',
     problemMessage: 'Override only calls super without additional logic.',
     correctionMessage: 'Remove the unnecessary override.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3034,7 +3034,7 @@ class AvoidUnnecessaryStatementsRule extends DartLintRule {
     name: 'avoid_unnecessary_statements',
     problemMessage: 'Statement has no effect.',
     correctionMessage: 'Remove the unnecessary statement or use its value.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -3085,7 +3085,7 @@ class AvoidUnusedAssignmentRule extends DartLintRule {
     name: 'avoid_unused_assignment',
     problemMessage: 'Assignment may be unused.',
     correctionMessage: 'Remove the unused assignment or use the variable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3153,7 +3153,7 @@ class AvoidUnusedInstancesRule extends DartLintRule {
     name: 'avoid_unused_instances',
     problemMessage: 'Instance created but not used.',
     correctionMessage: 'Assign the instance to a variable or remove it.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -3186,7 +3186,7 @@ class AvoidUnusedAfterNullCheckRule extends DartLintRule {
     name: 'avoid_unused_after_null_check',
     problemMessage: 'Variable is null-checked but not used in the body.',
     correctionMessage: 'Use the variable or simplify the condition.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3255,7 +3255,7 @@ class AvoidWildcardCasesWithEnumsRule extends DartLintRule {
     name: 'avoid_wildcard_cases_with_enums',
     problemMessage: 'Avoid using default/wildcard case with enums.',
     correctionMessage: 'Handle all enum values explicitly for exhaustiveness checking.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -3311,7 +3311,7 @@ class FunctionAlwaysReturnsSameValueRule extends DartLintRule {
     name: 'function_always_returns_same_value',
     problemMessage: 'Function always returns the same value.',
     correctionMessage: 'Consider returning a constant or simplifying the function.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3379,7 +3379,7 @@ class NoEqualNestedConditionsRule extends DartLintRule {
     name: 'no_equal_nested_conditions',
     problemMessage: 'Nested condition is identical to outer condition.',
     correctionMessage: 'Remove the redundant nested condition.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -3428,7 +3428,7 @@ class NoEqualSwitchCaseRule extends DartLintRule {
     name: 'no_equal_switch_case',
     problemMessage: 'Switch cases have identical bodies.',
     correctionMessage: 'Combine cases or extract common code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3478,7 +3478,7 @@ class PreferAnyOrEveryRule extends DartLintRule {
     name: 'prefer_any_or_every',
     problemMessage: 'Use any() or every() instead of where().isEmpty.',
     correctionMessage: 'Replace where().isEmpty with !any() or where().isNotEmpty with any().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3521,7 +3521,7 @@ class PreferForInRule extends DartLintRule {
     name: 'prefer_for_in',
     problemMessage: 'Index-based loop can be replaced with for-in.',
     correctionMessage: 'Use for-in loop for cleaner iteration.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3586,7 +3586,7 @@ class AvoidDuplicatePatternsRule extends DartLintRule {
     name: 'avoid_duplicate_patterns',
     problemMessage: 'Duplicate pattern detected.',
     correctionMessage: 'Remove or combine the duplicate patterns.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -3637,7 +3637,7 @@ class AvoidNestedExtensionTypesRule extends DartLintRule {
     name: 'avoid_nested_extension_types',
     problemMessage: 'Extension type contains another extension type.',
     correctionMessage: 'Consider using the underlying type directly.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3678,7 +3678,7 @@ class AvoidSlowCollectionMethodsRule extends DartLintRule {
     name: 'avoid_slow_collection_methods',
     problemMessage: 'Using sync* generator for simple collection may be slow.',
     correctionMessage: 'Consider returning a List directly for small collections.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3743,7 +3743,7 @@ class AvoidUnassignedFieldsRule extends DartLintRule {
     name: 'avoid_unassigned_fields',
     problemMessage: 'Field may never be assigned a value.',
     correctionMessage: 'Initialize the field or ensure it is assigned.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3845,7 +3845,7 @@ class AvoidUnassignedLateFieldsRule extends DartLintRule {
     name: 'avoid_unassigned_late_fields',
     problemMessage: 'Late field may never be assigned.',
     correctionMessage: 'Ensure the late field is assigned before use.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -3912,7 +3912,7 @@ class AvoidUnnecessaryLateFieldsRule extends DartLintRule {
     name: 'avoid_unnecessary_late_fields',
     problemMessage: 'Late keyword is unnecessary when field is assigned in constructor.',
     correctionMessage: 'Remove the late keyword.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -3996,7 +3996,7 @@ class AvoidUnnecessaryNullableFieldsRule extends DartLintRule {
     name: 'avoid_unnecessary_nullable_fields',
     problemMessage: 'Nullable field appears to always have a non-null value.',
     correctionMessage: 'Consider making the field non-nullable.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4104,7 +4104,7 @@ class AvoidUnnecessaryPatternsRule extends DartLintRule {
     name: 'avoid_unnecessary_patterns',
     problemMessage: 'Pattern does not affect type narrowing.',
     correctionMessage: 'Remove the unnecessary pattern or use a simple assignment.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4152,7 +4152,7 @@ class AvoidWildcardCasesWithSealedClassesRule extends DartLintRule {
     name: 'avoid_wildcard_cases_with_sealed_classes',
     problemMessage: 'Avoid using default/wildcard case with sealed classes.',
     correctionMessage: 'Handle all sealed class subtypes explicitly.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -4211,7 +4211,7 @@ class NoEqualSwitchExpressionCasesRule extends DartLintRule {
     name: 'no_equal_switch_expression_cases',
     problemMessage: 'Switch expression cases have identical results.',
     correctionMessage: 'Combine patterns or extract common result.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4251,7 +4251,7 @@ class PreferBytesBuilderRule extends DartLintRule {
     name: 'prefer_bytes_builder',
     problemMessage: 'Consider using BytesBuilder for byte list operations.',
     correctionMessage: 'BytesBuilder is more efficient for building byte arrays.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4295,7 +4295,7 @@ class PreferPushingConditionalExpressionsRule extends DartLintRule {
     name: 'prefer_pushing_conditional_expressions',
     problemMessage: 'Conditional expression can be pushed into arguments.',
     correctionMessage: 'Move the condition into the differing argument.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4355,7 +4355,7 @@ class PreferShorthandsWithConstructorsRule extends DartLintRule {
     name: 'prefer_shorthands_with_constructors',
     problemMessage: 'Constructor call can use .new shorthand.',
     correctionMessage: 'Replace lambda with ClassName.new.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4411,7 +4411,7 @@ class PreferShorthandsWithEnumsRule extends DartLintRule {
     name: 'prefer_shorthands_with_enums',
     problemMessage: 'Consider using enum shorthand.',
     correctionMessage: 'Simplify the enum access pattern.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4458,7 +4458,7 @@ class PreferShorthandsWithStaticFieldsRule extends DartLintRule {
     name: 'prefer_shorthands_with_static_fields',
     problemMessage: 'Consider using static field directly.',
     correctionMessage: 'Access the static field directly instead of searching.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4510,7 +4510,7 @@ class PassCorrectAcceptedTypeRule extends DartLintRule {
     name: 'pass_correct_accepted_type',
     problemMessage: 'Parameter type does not match accepted type annotation.',
     correctionMessage: 'Ensure the parameter type matches the @Accept annotation.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -4566,7 +4566,7 @@ class PassOptionalArgumentRule extends DartLintRule {
     name: 'pass_optional_argument',
     problemMessage: 'Consider passing the optional argument explicitly.',
     correctionMessage: 'Passing optional arguments can improve code clarity.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   // Common boolean parameter names that should be passed explicitly
@@ -4624,7 +4624,7 @@ class PreferSingleDeclarationPerFileRule extends DartLintRule {
     name: 'prefer_single_declaration_per_file',
     problemMessage: 'File contains multiple top-level declarations.',
     correctionMessage: 'Consider splitting into separate files.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4690,7 +4690,7 @@ class PreferSwitchExpressionRule extends DartLintRule {
     name: 'prefer_switch_expression',
     problemMessage: 'Consider using a switch expression instead.',
     correctionMessage: 'Switch expressions are more concise for value mapping.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4788,7 +4788,7 @@ class PreferSwitchWithEnumsRule extends DartLintRule {
     name: 'prefer_switch_with_enums',
     problemMessage: 'Consider using switch statement for enum comparisons.',
     correctionMessage: 'Switch provides exhaustiveness checking for enums.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4897,7 +4897,7 @@ class PreferSwitchWithSealedClassesRule extends DartLintRule {
     name: 'prefer_switch_with_sealed_classes',
     problemMessage: 'Consider using switch with sealed class for exhaustiveness.',
     correctionMessage: 'Switch provides exhaustiveness checking for sealed classes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -4962,7 +4962,7 @@ class PreferTestMatchersRule extends DartLintRule {
     name: 'prefer_test_matchers',
     problemMessage: 'Use a more specific test matcher.',
     correctionMessage: 'Specific matchers provide better error messages.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5050,7 +5050,7 @@ class PreferUnwrappingFutureOrRule extends DartLintRule {
     name: 'prefer_unwrapping_future_or',
     problemMessage: 'Consider using async/await instead of FutureOr handling.',
     correctionMessage: 'Async/await simplifies FutureOr handling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5129,7 +5129,7 @@ class AvoidInferrableTypeArgumentsRule extends DartLintRule {
     name: 'avoid_inferrable_type_arguments',
     problemMessage: 'Generic type matches inference.',
     correctionMessage: 'Remove redundant type arguments that can be inferred.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5202,7 +5202,7 @@ class AvoidPassingDefaultValuesRule extends DartLintRule {
     name: 'avoid_passing_default_values',
     problemMessage: 'Empty collection argument is likely the default value.',
     correctionMessage: 'Omit the argument to use the default value.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5261,7 +5261,7 @@ class AvoidShadowedExtensionMethodsRule extends DartLintRule {
     name: 'avoid_shadowed_extension_methods',
     problemMessage: 'Extension method shadows class method.',
     correctionMessage: 'Rename the extension method to avoid shadowing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -5323,7 +5323,7 @@ class AvoidUnnecessaryLocalLateRule extends DartLintRule {
     name: 'avoid_unnecessary_local_late',
     problemMessage: 'Late variable initialized immediately.',
     correctionMessage: 'Remove the late keyword for immediately initialized variables.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5379,7 +5379,7 @@ class MatchBaseClassDefaultValueRule extends DartLintRule {
     name: 'match_base_class_default_value',
     problemMessage: 'Override has non-standard default value.',
     correctionMessage: 'Verify this matches the parent class default value.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5471,7 +5471,7 @@ class MoveVariableCloserToUsageRule extends DartLintRule {
     name: 'move_variable_closer_to_its_usage',
     problemMessage: 'Scope analysis.',
     correctionMessage: 'Consider moving the variable declaration closer to its first use.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _minLineDistance = 10;
@@ -5565,7 +5565,7 @@ class MoveVariableOutsideIterationRule extends DartLintRule {
     name: 'move_variable_outside_iteration',
     problemMessage: 'Loop invariant code motion.',
     correctionMessage: 'Move the variable declaration outside the loop.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5662,7 +5662,7 @@ class PreferOverridingParentEqualityRule extends DartLintRule {
     name: 'prefer_overriding_parent_equality',
     problemMessage: '== implementation consistency.',
     correctionMessage: 'Consider calling super.== or checking parent class equality.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -5699,7 +5699,7 @@ class PreferOverridingParentEqualityRule extends DartLintRule {
       for (final MethodElement method in superElement.methods) {
         if (method.name == '==' && !method.isAbstract) {
           // Check if it's from Object or a custom implementation
-          final Element? enclosing = method.enclosingElement;
+          final Element? enclosing = method.enclosingElement3;
           final String? enclosingName = enclosing is InterfaceElement ? enclosing.name : null;
           if (enclosingName != null && enclosingName != 'Object') {
             parentHasCustomEquals = true;
@@ -5769,7 +5769,7 @@ class PreferSpecificCasesFirstRule extends DartLintRule {
     name: 'prefer_specific_cases_first',
     problemMessage: 'Switch case specificity.',
     correctionMessage: 'Place more specific cases before general ones.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -5852,7 +5852,7 @@ class UseExistingDestructuringRule extends DartLintRule {
     name: 'use_existing_destructuring',
     problemMessage: 'Redundant property access.',
     correctionMessage: 'Use the destructured variable instead of accessing the property.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -5964,7 +5964,7 @@ class UseExistingVariableRule extends DartLintRule {
     name: 'use_existing_variable',
     problemMessage: 'Redundant variable creation.',
     correctionMessage: 'Use the existing variable instead of creating a duplicate.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

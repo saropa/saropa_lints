@@ -8,7 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -41,7 +41,7 @@ class RequirePublicApiDocumentationRule extends DartLintRule {
     name: 'require_public_api_documentation',
     problemMessage: 'Public API should be documented.',
     correctionMessage: 'Add a doc comment explaining the purpose and usage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -102,7 +102,7 @@ class AvoidMisleadingDocumentationRule extends DartLintRule {
     name: 'avoid_misleading_documentation',
     problemMessage: 'Documentation may not match the method name.',
     correctionMessage: 'Ensure documentation accurately describes the code.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -157,7 +157,7 @@ class RequireDeprecationMessageRule extends DartLintRule {
     name: 'require_deprecation_message',
     problemMessage: 'Deprecated annotation should include migration guidance.',
     correctionMessage: 'Use @Deprecated("message") with explanation of what to use instead.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -226,7 +226,7 @@ class RequireComplexLogicCommentsRule extends DartLintRule {
     name: 'require_complex_logic_comments',
     problemMessage: 'Complex method lacks explanatory comments.',
     correctionMessage: 'Add comments explaining the logic, especially for chained operations.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _complexityThreshold = 3;
@@ -291,7 +291,7 @@ class RequireParameterDocumentationRule extends DartLintRule {
     name: 'require_parameter_documentation',
     problemMessage: 'Parameters should be documented.',
     correctionMessage: 'Add [paramName] documentation for each parameter.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const int _paramThreshold = 2;
@@ -366,7 +366,7 @@ class RequireReturnDocumentationRule extends DartLintRule {
     name: 'require_return_documentation',
     problemMessage: 'Return value should be documented.',
     correctionMessage: 'Add documentation explaining what the method returns.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -430,7 +430,7 @@ class RequireExceptionDocumentationRule extends DartLintRule {
     name: 'require_exception_documentation',
     problemMessage: 'Thrown exceptions should be documented.',
     correctionMessage: 'Add "Throws [ExceptionType]" to documentation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -493,7 +493,7 @@ class RequireExampleInDocumentationRule extends DartLintRule {
     name: 'require_example_in_documentation',
     problemMessage: 'Public class documentation should include an example.',
     correctionMessage: 'Add an example code block showing typical usage.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _complexClassSuffixes = <String>{

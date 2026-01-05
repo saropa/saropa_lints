@@ -1,8 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use, todo
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -36,7 +36,7 @@ class NewlineBeforeCaseRule extends DartLintRule {
     name: 'prefer_blank_line_before_case',
     problemMessage: 'Add a newline before case clause for readability.',
     correctionMessage: 'Add blank line before this case.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -98,7 +98,7 @@ class NewlineBeforeConstructorRule extends DartLintRule {
     name: 'prefer_blank_line_before_constructor',
     problemMessage: 'Add a blank line before constructor declaration.',
     correctionMessage: 'Add blank line for better readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -170,7 +170,7 @@ class NewlineBeforeMethodRule extends DartLintRule {
     name: 'prefer_blank_line_before_method',
     problemMessage: 'Add a blank line before method declaration.',
     correctionMessage: 'Add blank line for better readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -227,7 +227,7 @@ class NewlineBeforeReturnRule extends DartLintRule {
     name: 'prefer_blank_line_before_return',
     problemMessage: 'Add a blank line before the return statement.',
     correctionMessage: 'Insert a blank line before return for readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -288,7 +288,7 @@ class PreferTrailingCommaRule extends DartLintRule {
     name: 'prefer_trailing_comma',
     problemMessage: 'Missing trailing comma in multi-line construct.',
     correctionMessage: 'Add a trailing comma.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -381,7 +381,7 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
     name: 'unnecessary_trailing_comma',
     problemMessage: 'Unnecessary trailing comma for single-element collection.',
     correctionMessage: 'Remove trailing comma or keep on single line.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -441,7 +441,7 @@ class FormatCommentFormattingRule extends DartLintRule {
     problemMessage: 'Comment does not follow formatting conventions.',
     correctionMessage:
         'Start with capital letter and end with punctuation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -532,7 +532,7 @@ class MemberOrderingFormattingRule extends DartLintRule {
     problemMessage: 'Class members are not in conventional order.',
     correctionMessage:
         'Order members: static fields, fields, constructors, methods.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -594,7 +594,7 @@ class ParametersOrderingConventionRule extends DartLintRule {
     problemMessage: 'Parameters are not in conventional order.',
     correctionMessage:
         'Order: required positional, optional positional, named.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

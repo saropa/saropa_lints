@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -29,7 +29,7 @@ class AvoidDeclaringCallMethodRule extends DartLintRule {
     name: 'avoid_declaring_call_method',
     problemMessage: 'Avoid declaring a call() method.',
     correctionMessage: 'Use a more descriptive method name like execute() or invoke().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -68,7 +68,7 @@ class AvoidGenericsShadowingRule extends DartLintRule {
     name: 'avoid_generics_shadowing',
     problemMessage: 'Generic type parameter shadows a top-level declaration.',
     correctionMessage: 'Rename the generic parameter to avoid shadowing.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _commonTypes = <String>{
@@ -152,7 +152,7 @@ class AvoidIncompleteCopyWithRule extends DartLintRule {
     name: 'avoid_incomplete_copy_with',
     problemMessage: 'copyWith method may be missing fields.',
     correctionMessage: 'Ensure all class fields are included in copyWith.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -231,7 +231,7 @@ class AvoidNonEmptyConstructorBodiesRule extends DartLintRule {
     name: 'avoid_non_empty_constructor_bodies',
     problemMessage: 'Constructor body contains logic.',
     correctionMessage: 'Use initializer list or factory constructor.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -302,7 +302,7 @@ class AvoidShadowingRule extends DartLintRule {
     name: 'avoid_shadowing',
     problemMessage: 'Declaration shadows a declaration from an outer scope.',
     correctionMessage: 'Rename the variable to avoid confusion.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -416,7 +416,7 @@ class PreferConstStringListRule extends DartLintRule {
         'and could be const.',
     correctionMessage: 'Add const before the list literal or use a const '
         'variable declaration.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -519,7 +519,7 @@ class PreferDeclaringConstConstructorRule extends DartLintRule {
     name: 'prefer_declaring_const_constructor',
     problemMessage: 'Class could have a const constructor.',
     correctionMessage: 'Add const keyword to constructor.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -601,7 +601,7 @@ class PreferPrivateExtensionTypeFieldRule extends DartLintRule {
     name: 'prefer_private_extension_type_field',
     problemMessage: 'Extension type representation field should be private.',
     correctionMessage: 'Use a private field with underscore prefix.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -662,7 +662,7 @@ class ProperSuperCallsRule extends DartLintRule {
     name: 'proper_super_calls',
     problemMessage: 'Super lifecycle method called in wrong order.',
     correctionMessage: 'super.initState() should be first; super.dispose() should be last.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override

@@ -302,7 +302,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidPrintInProductionRule(),
   AvoidCatchingGenericExceptionRule(),
   AvoidServiceLocatorOveruseRule(),
-  PreferUtcDatetimesRule(),
+  PreferUtcDateTimesRule(),
   AvoidRegexInLoopRule(),
   PreferGetterOverMethodRule(),
   PreferNamedExtensionsRule(),

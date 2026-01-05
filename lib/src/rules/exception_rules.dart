@@ -4,7 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -16,7 +16,7 @@ class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
     name: 'avoid_non_final_exception_class_fields',
     problemMessage: 'Exception class fields should be final.',
     correctionMessage: 'Make all fields final in exception classes.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -30,7 +30,7 @@ class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name.lexeme;
+      final String superName = extendsClause.superclass.name2.lexeme;
       if (superName != 'Exception' &&
           superName != 'Error' &&
           !superName.endsWith('Exception') &&
@@ -76,7 +76,7 @@ class AvoidOnlyRethrowRule extends DartLintRule {
     name: 'avoid_only_rethrow',
     problemMessage: 'Catch clause only contains rethrow.',
     correctionMessage: 'Remove the try-catch or add meaningful error handling.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -123,7 +123,7 @@ class AvoidThrowInCatchBlockRule extends DartLintRule {
     name: 'avoid_throw_in_catch_block',
     problemMessage: 'Throwing in catch block loses the original stack trace.',
     correctionMessage: 'Use rethrow or Error.throwWithStackTrace to preserve stack trace.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -179,7 +179,7 @@ class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
     name: 'avoid_throw_objects_without_tostring',
     problemMessage: 'Thrown object may not have a useful toString() method.',
     correctionMessage: 'Consider throwing an Exception or Error subclass, or implement toString().',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   // Types that are known to have useful toString implementations
@@ -225,7 +225,7 @@ class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
       // Check if the type has a custom toString
       if (type is InterfaceType) {
         final bool hasToString = type.element.methods.any(
-          (MethodElement e) => e.name == 'toString' && e.enclosingElement == type.element,
+          (MethodElement e) => e.name == 'toString' && e.enclosingElement3 == type.element,
         );
         if (hasToString) return;
       }
@@ -243,7 +243,7 @@ class PreferPublicExceptionClassesRule extends DartLintRule {
     name: 'prefer_public_exception_classes',
     problemMessage: 'Exception classes should be public.',
     correctionMessage: 'Remove underscore prefix from exception class name.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -260,7 +260,7 @@ class PreferPublicExceptionClassesRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name.lexeme;
+      final String superName = extendsClause.superclass.name2.lexeme;
       if (superName == 'Exception' ||
           superName == 'Error' ||
           superName.endsWith('Exception') ||
