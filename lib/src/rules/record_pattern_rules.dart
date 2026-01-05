@@ -89,7 +89,8 @@ class AvoidBottomTypeInRecordsRule extends DartLintRule {
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       // Check positional fields
-      for (final RecordTypeAnnotationPositionalField field in node.positionalFields) {
+      for (final RecordTypeAnnotationPositionalField field
+          in node.positionalFields) {
         final TypeAnnotation type = field.type;
         if (type is NamedType) {
           final String typeName = type.name.lexeme;
@@ -248,7 +249,8 @@ class AvoidFunctionTypeInRecordsRule extends DartLintRule {
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       // Check positional fields
-      for (final RecordTypeAnnotationPositionalField field in node.positionalFields) {
+      for (final RecordTypeAnnotationPositionalField field
+          in node.positionalFields) {
         if (field.type is GenericFunctionType) {
           reporter.atNode(field.type, code);
         }
@@ -453,7 +455,8 @@ class AvoidMixingNamedAndPositionalFieldsRule extends DartLintRule {
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       final bool hasPositional = node.positionalFields.isNotEmpty;
-      final bool hasNamed = node.namedFields != null && node.namedFields!.fields.isNotEmpty;
+      final bool hasNamed =
+          node.namedFields != null && node.namedFields!.fields.isNotEmpty;
 
       if (hasPositional && hasNamed) {
         reporter.atNode(node, code);
@@ -510,7 +513,8 @@ class AvoidNestedRecordsRule extends DartLintRule {
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       // Check if any positional field is a record
-      for (final RecordTypeAnnotationPositionalField field in node.positionalFields) {
+      for (final RecordTypeAnnotationPositionalField field
+          in node.positionalFields) {
         if (field.type is RecordTypeAnnotation) {
           reporter.atNode(node, code);
           return;
@@ -586,7 +590,8 @@ class AvoidPositionalRecordFieldAccessRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_positional_record_field_access',
-    problemMessage: 'Avoid accessing positional record fields with \$1, \$2, etc.',
+    problemMessage:
+        'Avoid accessing positional record fields with \$1, \$2, etc.',
     correctionMessage: 'Use destructuring or named record fields instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -641,7 +646,8 @@ class AvoidRedundantPositionalFieldNameRule extends DartLintRule {
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
       int position = 1;
-      for (final RecordTypeAnnotationPositionalField field in node.positionalFields) {
+      for (final RecordTypeAnnotationPositionalField field
+          in node.positionalFields) {
         final Token? nameToken = field.name;
         if (nameToken != null) {
           final String name = nameToken.lexeme;
@@ -733,7 +739,8 @@ class MoveRecordsToTypedefsRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'move_records_to_typedefs',
-    problemMessage: 'Record with >$_maxInlineFields fields should be a typedef.',
+    problemMessage:
+        'Record with >$_maxInlineFields fields should be a typedef.',
     correctionMessage: 'Extract to a typedef for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -752,7 +759,8 @@ class MoveRecordsToTypedefsRule extends DartLintRule {
         parent = parent.parent;
       }
 
-      final int fieldCount = node.positionalFields.length + (node.namedFields?.fields.length ?? 0);
+      final int fieldCount =
+          node.positionalFields.length + (node.namedFields?.fields.length ?? 0);
 
       if (fieldCount > _maxInlineFields) {
         reporter.atNode(node, code);
