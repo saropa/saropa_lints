@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.11] - 2025-01-05
+
+### Changed
+
+- **Breaking**: New tier configuration system using Dart code instead of YAML includes
+  - `custom_lint` doesn't follow `include:` directives, so tiers are now defined in Dart
+  - Configure via `custom_lint: saropa_lints: tier: recommended` in analysis_options.yaml
+  - Individual rules can still be overridden on top of tier selection
+  - Tiers: essential, recommended, professional, comprehensive, insanity
+
+### Added
+
+- `lib/src/tiers.dart` with rule sets for each tier defined as Dart constants
+- `getRulesForTier(String tier)` function for tier-based rule resolution
+
+### Removed
+
+- YAML-based tier configuration (include directives were not being followed by custom_lint)
+
 ## [1.1.10] - 2025-01-05
 
 ### Fixed

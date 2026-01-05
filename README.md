@@ -54,7 +54,9 @@ analyzer:
 
 ```yaml
 # analysis_options.yaml
-include: package:saropa_lints/tiers/recommended.yaml
+custom_lint:
+  saropa_lints:
+    tier: recommended  # essential | recommended | professional | comprehensive | insanity
 ```
 
 ### 4. Run the linter
@@ -84,23 +86,21 @@ Pick the tier that matches your team:
 
 ```yaml
 # analysis_options.yaml
-
-# Pick ONE of these:
-include: package:saropa_lints/tiers/essential.yaml
-include: package:saropa_lints/tiers/recommended.yaml      # Most teams start here
-include: package:saropa_lints/tiers/professional.yaml
-include: package:saropa_lints/tiers/comprehensive.yaml
-include: package:saropa_lints/tiers/insanity.yaml
+custom_lint:
+  saropa_lints:
+    tier: recommended  # Most teams start here
 ```
+
+Available tiers: `essential`, `recommended`, `professional`, `comprehensive`, `insanity`
 
 ### Customizing rules
 
-After including a tier, you can enable or disable specific rules:
+After choosing a tier, you can enable or disable specific rules:
 
 ```yaml
-include: package:saropa_lints/tiers/recommended.yaml
-
 custom_lint:
+  saropa_lints:
+    tier: recommended
   rules:
     # Disable a rule from the tier
     avoid_hardcoded_strings_in_ui: false
@@ -135,10 +135,14 @@ Running all 1000 rules uses significant memory. The tier system helps:
 
 ```yaml
 # GOOD: Start with recommended tier
-include: package:saropa_lints/tiers/recommended.yaml
+custom_lint:
+  saropa_lints:
+    tier: recommended
 
 # BAD: Enabling everything at once on a legacy codebase
-include: package:saropa_lints/tiers/insanity.yaml  # May show thousands of warnings
+custom_lint:
+  saropa_lints:
+    tier: insanity  # May show thousands of warnings
 ```
 
 ## Adoption Strategy
