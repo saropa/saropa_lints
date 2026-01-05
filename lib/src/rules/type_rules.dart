@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -425,13 +426,19 @@ class AvoidNullableToStringRule extends DartLintRule {
   }
 }
 
-/// Warns when the null assertion operator (!) is used.
+/// Warns when the null assertion operator (!) is used unsafely.
 ///
 /// The bang operator can cause runtime crashes when the value is unexpectedly null.
 /// Use null-safe alternatives instead:
 /// - `variable ?? defaultValue` - provide a default
 /// - `if (variable != null) { ... }` - null check first
 /// - `variable?.property` - optional chaining
+///
+/// **Safe patterns that are NOT flagged:**
+/// - Ternary with null check: `x == null ? null : x!` or `x != null ? x! : null`
+/// - Inside if-block with null check: `if (x != null) { use(x!); }`
+/// - After `.isNotNullOrEmpty` check: `if (x.isNotNullOrEmpty) { use(x!); }`
+/// - After `.isNotEmpty` check on nullable: `if (list?.isNotEmpty == true) { use(list!); }`
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -445,6 +452,8 @@ class AvoidNullableToStringRule extends DartLintRule {
 /// if (user.name != null) {
 ///   final String name = user.name;
 /// }
+/// // or (safe, not flagged)
+/// onTap: callback == null ? null : () => callback!(),
 /// ```
 class AvoidNullAssertionRule extends DartLintRule {
   const AvoidNullAssertionRule() : super(code: _code);
@@ -458,6 +467,14 @@ class AvoidNullAssertionRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  /// Known extension method/property names that imply non-null when true.
+  static const Set<String> _nullCheckNames = <String>{
+    'isNotNullOrEmpty',
+    'isNotNullOrBlank',
+    'isNeitherNullNorEmpty',
+    'isNotEmpty',
+  };
+
   @override
   void run(
     CustomLintResolver resolver,
@@ -466,10 +483,233 @@ class AvoidNullAssertionRule extends DartLintRule {
   ) {
     context.registry.addPostfixExpression((PostfixExpression node) {
       // Check if this is a null assertion (!)
-      if (node.operator.lexeme == '!') {
-        reporter.atNode(node, code);
-      }
+      if (node.operator.lexeme != '!') return;
+
+      // Check if this is a safe pattern
+      if (_isInSafeTernary(node)) return;
+      if (_isInSafeIfBlock(node)) return;
+
+      reporter.atNode(node, code);
     });
+  }
+
+  /// Checks if the null assertion is inside a ternary that guards against null.
+  ///
+  /// Safe patterns:
+  /// - `x == null ? null : x!`
+  /// - `x == null ? defaultValue : x!`
+  /// - `x != null ? x! : null`
+  /// - `x != null ? x! : defaultValue`
+  /// - `callback == null ? null : () => callback!(args)`
+  bool _isInSafeTernary(PostfixExpression node) {
+    // Walk up to find enclosing ConditionalExpression
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ConditionalExpression) {
+        final Expression condition = current.condition;
+
+        // Get the expression being null-asserted (without the !)
+        final String assertedExpr = _getBaseExpression(node.operand);
+
+        // Check for `x == null ? ... : x!` pattern
+        if (condition is BinaryExpression) {
+          final String? checkedExpr = _getNullCheckedExpression(condition);
+          if (checkedExpr != null && checkedExpr == assertedExpr) {
+            // Verify the ! is on the correct branch
+            if (condition.operator.lexeme == '==' &&
+                _containsNode(current.elseExpression, node)) {
+              return true;
+            }
+            if (condition.operator.lexeme == '!=' &&
+                _containsNode(current.thenExpression, node)) {
+              return true;
+            }
+          }
+        }
+
+        // Don't traverse further up for ternaries
+        break;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if the null assertion is inside an if-block that guards against null.
+  ///
+  /// Safe patterns:
+  /// - `if (x != null) { ... x! ... }`
+  /// - `if (x == null) return; ... x! ...`
+  /// - `if (x.isNotNullOrEmpty) { ... x! ... }`
+  /// - `if (x.isNotEmpty) { ... x! ... }` (for String?)
+  bool _isInSafeIfBlock(PostfixExpression node) {
+    final String assertedExpr = _getBaseExpression(node.operand);
+
+    // Walk up to find enclosing if statements
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final Expression condition = current.expression;
+
+        // Check for `if (x != null)` pattern
+        if (condition is BinaryExpression) {
+          final String? checkedExpr = _getNullCheckedExpression(condition);
+          if (checkedExpr != null && checkedExpr == assertedExpr) {
+            // `if (x != null) { x! }` - safe in then branch
+            if (condition.operator.lexeme == '!=' &&
+                _isInThenBranch(current, node)) {
+              return true;
+            }
+            // `if (x == null) return; x!` - safe after the if
+            if (condition.operator.lexeme == '==' &&
+                _isAfterEarlyReturn(current, node)) {
+              return true;
+            }
+          }
+        }
+
+        // Check for `if (x.isNotNullOrEmpty)` or similar method call patterns
+        if (condition is MethodInvocation) {
+          if (_isNullCheckMethod(condition, assertedExpr)) {
+            return true;
+          }
+        }
+
+        // Check for `if (x.isNotNullOrEmpty)` via PrefixedIdentifier
+        if (condition is PrefixedIdentifier) {
+          if (_isNullCheckProperty(condition, assertedExpr)) {
+            return true;
+          }
+        }
+
+        // Check for property access like `if (x.isNotEmpty)`
+        if (condition is PropertyAccess) {
+          if (_isNullCheckPropertyAccess(condition, assertedExpr)) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Gets the base expression string (for comparison).
+  /// For `widget.callback`, returns `widget.callback`.
+  /// For `list?.first`, returns `list`.
+  String _getBaseExpression(Expression expr) {
+    // Remove any trailing ?. chains for comparison
+    final String source = expr.toSource();
+    // Normalize by removing trailing ?
+    return source.replaceAll('?', '');
+  }
+
+  /// Extracts the expression being null-checked from a binary expression.
+  /// Returns null if not a null check pattern.
+  String? _getNullCheckedExpression(BinaryExpression expr) {
+    final String op = expr.operator.lexeme;
+    if (op != '==' && op != '!=') return null;
+
+    final Expression left = expr.leftOperand;
+    final Expression right = expr.rightOperand;
+
+    if (right is NullLiteral) {
+      return _getBaseExpression(left);
+    }
+    if (left is NullLiteral) {
+      return _getBaseExpression(right);
+    }
+    return null;
+  }
+
+  /// Checks if an AST node contains another node by traversing the tree.
+  bool _containsNode(AstNode container, AstNode target) {
+    if (container == target) return true;
+    final _NodeContainsFinder finder = _NodeContainsFinder(target);
+    container.visitChildren(finder);
+    return finder.found;
+  }
+
+  /// Checks if the node is in the then-branch of an if statement.
+  bool _isInThenBranch(IfStatement ifStmt, AstNode node) {
+    return _containsNode(ifStmt.thenStatement, node);
+  }
+
+  /// Checks if the node comes after an early return in the if statement.
+  bool _isAfterEarlyReturn(IfStatement ifStmt, AstNode node) {
+    final Statement thenStmt = ifStmt.thenStatement;
+
+    // Check if then branch is an early exit (return, throw, break, continue)
+    bool isEarlyExit = false;
+    if (thenStmt is ReturnStatement) {
+      isEarlyExit = true;
+    } else if (thenStmt is ExpressionStatement &&
+        thenStmt.expression is ThrowExpression) {
+      isEarlyExit = true;
+    } else if (thenStmt is Block && thenStmt.statements.isNotEmpty) {
+      final Statement lastStmt = thenStmt.statements.last;
+      if (lastStmt is ReturnStatement) {
+        isEarlyExit = true;
+      } else if (lastStmt is ExpressionStatement &&
+          lastStmt.expression is ThrowExpression) {
+        isEarlyExit = true;
+      }
+    }
+
+    if (!isEarlyExit) return false;
+
+    // The node should NOT be in the then branch
+    return !_containsNode(ifStmt.thenStatement, node);
+  }
+
+  /// Checks if a method invocation is a null-check method on the asserted expression.
+  /// e.g., `x.isNotNullOrEmpty` where x is being asserted.
+  bool _isNullCheckMethod(MethodInvocation method, String assertedExpr) {
+    final String methodName = method.methodName.name;
+    if (!_nullCheckNames.contains(methodName)) return false;
+
+    final Expression? target = method.target;
+    if (target == null) return false;
+
+    return _getBaseExpression(target) == assertedExpr;
+  }
+
+  /// Checks if a prefixed identifier is a null-check property.
+  /// e.g., `x.isNotNullOrEmpty` as a property access.
+  bool _isNullCheckProperty(PrefixedIdentifier prop, String assertedExpr) {
+    final String propertyName = prop.identifier.name;
+    if (!_nullCheckNames.contains(propertyName)) return false;
+    return _getBaseExpression(prop.prefix) == assertedExpr;
+  }
+
+  /// Checks if a property access is a null-check property.
+  /// e.g., `obj.field.isNotEmpty`.
+  bool _isNullCheckPropertyAccess(PropertyAccess prop, String assertedExpr) {
+    final String propertyName = prop.propertyName.name;
+    if (!_nullCheckNames.contains(propertyName)) return false;
+
+    final Expression? target = prop.target;
+    if (target == null) return false;
+
+    return _getBaseExpression(target) == assertedExpr;
+  }
+}
+
+/// Helper visitor to find if a target node exists within a container.
+class _NodeContainsFinder extends GeneralizingAstVisitor<void> {
+  _NodeContainsFinder(this.target);
+
+  final AstNode target;
+  bool found = false;
+
+  @override
+  void visitNode(AstNode node) {
+    if (found) return;
+    if (node == target) {
+      found = true;
+      return;
+    }
+    super.visitNode(node);
   }
 }
 
