@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.14] - 2025-01-05
+
+### Fixed
+
+- `avoid_null_assertion` - Added short-circuit evaluation detection to reduce false positives:
+  - `x == null || x!.length` - safe due to || short-circuit
+  - `x.isListNullOrEmpty || x!.length < 2` - extension method short-circuit
+  - `x != null && x!.doSomething()` - safe due to && short-circuit
+  - Added `isListNullOrEmpty`, `isNullOrEmpty`, `isNullOrBlank` to recognized null checks
+
 ## [1.1.13] - 2025-01-05
 
 ### Changed

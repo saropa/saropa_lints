@@ -438,7 +438,9 @@ class AvoidNullableToStringRule extends DartLintRule {
 /// - Ternary with null check: `x == null ? null : x!` or `x != null ? x! : null`
 /// - Inside if-block with null check: `if (x != null) { use(x!); }`
 /// - After `.isNotNullOrEmpty` check: `if (x.isNotNullOrEmpty) { use(x!); }`
-/// - After `.isNotEmpty` check on nullable: `if (list?.isNotEmpty == true) { use(list!); }`
+/// - Short-circuit `||`: `x == null || x!.length > 0` (x! won't execute if null)
+/// - Short-circuit `||`: `x.isListNullOrEmpty || x!.length < 2`
+/// - Short-circuit `&&`: `x != null && x!.doSomething()`
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -473,6 +475,11 @@ class AvoidNullAssertionRule extends DartLintRule {
     'isNotNullOrBlank',
     'isNeitherNullNorEmpty',
     'isNotEmpty',
+    // Falsy names - these return true when null/empty, used in || short-circuit
+    'isListNullOrEmpty',
+    'isNullOrEmpty',
+    'isNullOrBlank',
+    'isEmpty',
   };
 
   @override
@@ -488,6 +495,7 @@ class AvoidNullAssertionRule extends DartLintRule {
       // Check if this is a safe pattern
       if (_isInSafeTernary(node)) return;
       if (_isInSafeIfBlock(node)) return;
+      if (_isInShortCircuitSafe(node)) return;
 
       reporter.atNode(node, code);
     });
@@ -692,6 +700,152 @@ class AvoidNullAssertionRule extends DartLintRule {
     if (target == null) return false;
 
     return _getBaseExpression(target) == assertedExpr;
+  }
+
+  /// Checks if the null assertion is safe due to short-circuit evaluation.
+  ///
+  /// Safe patterns:
+  /// - `x == null || x!.length` - if x is null, right side won't execute
+  /// - `x.isListNullOrEmpty || x!.length` - same short-circuit logic
+  /// - `x != null && x!.length` - if x is null, right side won't execute
+  /// - Ternary conditions: `(x == null || x!.length > 0) ? a : b`
+  bool _isInShortCircuitSafe(PostfixExpression node) {
+    final String assertedExpr = _getBaseExpression(node.operand);
+
+    // Walk up to find enclosing binary expression with || or &&
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is BinaryExpression) {
+        final String op = current.operator.lexeme;
+
+        if (op == '||') {
+          // For ||, check if left side is a null check and node is on right
+          if (_isNullCheckOnLeft(current.leftOperand, assertedExpr) &&
+              _containsNode(current.rightOperand, node)) {
+            return true;
+          }
+        } else if (op == '&&') {
+          // For &&, check if left side is a non-null check and node is on right
+          if (_isNonNullCheckOnLeft(current.leftOperand, assertedExpr) &&
+              _containsNode(current.rightOperand, node)) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if the expression is a null check for the given variable.
+  /// Returns true for: `x == null`, `x.isListNullOrEmpty`, `x.isNullOrEmpty`
+  bool _isNullCheckOnLeft(Expression expr, String assertedExpr) {
+    // Direct null check: `x == null`
+    if (expr is BinaryExpression && expr.operator.lexeme == '==') {
+      if (expr.rightOperand is NullLiteral) {
+        return _getBaseExpression(expr.leftOperand) == assertedExpr;
+      }
+      if (expr.leftOperand is NullLiteral) {
+        return _getBaseExpression(expr.rightOperand) == assertedExpr;
+      }
+    }
+
+    // Extension method check: `x.isListNullOrEmpty`, `x.isNullOrEmpty`
+    if (expr is MethodInvocation) {
+      final String methodName = expr.methodName.name;
+      if (_nullCheckNames.contains(methodName)) {
+        final Expression? target = expr.target;
+        if (target != null && _getBaseExpression(target) == assertedExpr) {
+          return true;
+        }
+      }
+    }
+
+    // Property access: `x.isListNullOrEmpty`
+    if (expr is PrefixedIdentifier) {
+      final String propertyName = expr.identifier.name;
+      if (_nullCheckNames.contains(propertyName)) {
+        return _getBaseExpression(expr.prefix) == assertedExpr;
+      }
+    }
+
+    if (expr is PropertyAccess) {
+      final String propertyName = expr.propertyName.name;
+      if (_nullCheckNames.contains(propertyName)) {
+        final Expression? target = expr.target;
+        if (target != null && _getBaseExpression(target) == assertedExpr) {
+          return true;
+        }
+      }
+    }
+
+    // Recurse into nested || on the left side
+    // e.g., `a == null || b == null || x == null || x!.foo`
+    if (expr is BinaryExpression && expr.operator.lexeme == '||') {
+      if (_isNullCheckOnLeft(expr.leftOperand, assertedExpr) ||
+          _isNullCheckOnLeft(expr.rightOperand, assertedExpr)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks if the expression is a non-null check for the given variable.
+  /// Returns true for: `x != null`, `x.isNotNullOrEmpty`
+  bool _isNonNullCheckOnLeft(Expression expr, String assertedExpr) {
+    // Direct non-null check: `x != null`
+    if (expr is BinaryExpression && expr.operator.lexeme == '!=') {
+      if (expr.rightOperand is NullLiteral) {
+        return _getBaseExpression(expr.leftOperand) == assertedExpr;
+      }
+      if (expr.leftOperand is NullLiteral) {
+        return _getBaseExpression(expr.rightOperand) == assertedExpr;
+      }
+    }
+
+    // Extension method check: `x.isNotNullOrEmpty`
+    if (expr is MethodInvocation) {
+      final String methodName = expr.methodName.name;
+      // Only truthy checks for && pattern
+      if (<String>{'isNotNullOrEmpty', 'isNotNullOrBlank', 'isNotEmpty'}
+          .contains(methodName)) {
+        final Expression? target = expr.target;
+        if (target != null && _getBaseExpression(target) == assertedExpr) {
+          return true;
+        }
+      }
+    }
+
+    // Property access: `x.isNotNullOrEmpty`
+    if (expr is PrefixedIdentifier) {
+      final String propertyName = expr.identifier.name;
+      if (<String>{'isNotNullOrEmpty', 'isNotNullOrBlank', 'isNotEmpty'}
+          .contains(propertyName)) {
+        return _getBaseExpression(expr.prefix) == assertedExpr;
+      }
+    }
+
+    if (expr is PropertyAccess) {
+      final String propertyName = expr.propertyName.name;
+      if (<String>{'isNotNullOrEmpty', 'isNotNullOrBlank', 'isNotEmpty'}
+          .contains(propertyName)) {
+        final Expression? target = expr.target;
+        if (target != null && _getBaseExpression(target) == assertedExpr) {
+          return true;
+        }
+      }
+    }
+
+    // Recurse into nested && on the left side
+    if (expr is BinaryExpression && expr.operator.lexeme == '&&') {
+      if (_isNonNullCheckOnLeft(expr.leftOperand, assertedExpr) ||
+          _isNonNullCheckOnLeft(expr.rightOperand, assertedExpr)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
