@@ -2,7 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -100,6 +101,8 @@ class AvoidAssignmentsAsConditionsRule extends DartLintRule {
 ///   doSomething();
 /// }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for refactoring.
 class AvoidCollapsibleIfRule extends DartLintRule {
   const AvoidCollapsibleIfRule() : super(code: _code);
 
@@ -142,6 +145,36 @@ class AvoidCollapsibleIfRule extends DartLintRule {
       reporter.atNode(node, code);
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForCollapsibleIfFix()];
+}
+
+class _AddHackForCollapsibleIfFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIfStatement((IfStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment to collapse if statements',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: collapse nested if using && operator\n    ',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when boolean literals are used in conditions.
@@ -159,6 +192,8 @@ class AvoidCollapsibleIfRule extends DartLintRule {
 /// if (y) { }
 /// if (z) { }
 /// ```
+///
+/// **Quick fix available:** Simplifies `x == true` to `x`, `x == false` to `!x`, etc.
 class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
   const AvoidConditionsWithBooleanLiteralsRule() : super(code: _code);
 
@@ -196,6 +231,66 @@ class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
           reporter.atNode(node, code);
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_SimplifyBooleanComparisonFix()];
+}
+
+class _SimplifyBooleanComparisonFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final TokenType operator = node.operator.type;
+      String? replacement;
+
+      // Handle x == true, x == false, x != true, x != false
+      if (operator == TokenType.EQ_EQ || operator == TokenType.BANG_EQ) {
+        final bool isEquals = operator == TokenType.EQ_EQ;
+
+        if (node.rightOperand is BooleanLiteral) {
+          final bool literalValue =
+              (node.rightOperand as BooleanLiteral).value;
+          final String expr = node.leftOperand.toSource();
+          // x == true -> x, x == false -> !x, x != true -> !x, x != false -> x
+          if (isEquals == literalValue) {
+            replacement = expr;
+          } else {
+            replacement = '!$expr';
+          }
+        } else if (node.leftOperand is BooleanLiteral) {
+          final bool literalValue = (node.leftOperand as BooleanLiteral).value;
+          final String expr = node.rightOperand.toSource();
+          if (isEquals == literalValue) {
+            replacement = expr;
+          } else {
+            replacement = '!$expr';
+          }
+        }
+      }
+
+      if (replacement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Simplify boolean comparison',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          replacement!,
+        );
+      });
     });
   }
 }
@@ -503,6 +598,8 @@ class AvoidIfWithManyBranchesRule extends DartLintRule {
 /// if (a != b) { }
 /// if (a <= b) { }
 /// ```
+///
+/// **Quick fix available:** Inverts the operator (e.g., `!(a > b)` → `a <= b`).
 class AvoidInvertedBooleanChecksRule extends DartLintRule {
   const AvoidInvertedBooleanChecksRule() : super(code: _code);
 
@@ -540,6 +637,58 @@ class AvoidInvertedBooleanChecksRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_InvertOperatorFix()];
+}
+
+class _InvertOperatorFix extends DartFix {
+  static const Map<TokenType, String> _oppositeOperators = <TokenType, String>{
+    TokenType.EQ_EQ: '!=',
+    TokenType.BANG_EQ: '==',
+    TokenType.LT: '>=',
+    TokenType.GT: '<=',
+    TokenType.LT_EQ: '>',
+    TokenType.GT_EQ: '<',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addPrefixExpression((PrefixExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.operator.type != TokenType.BANG) return;
+
+      final Expression operand = node.operand;
+      if (operand is! ParenthesizedExpression) return;
+
+      final Expression inner = operand.expression;
+      if (inner is! BinaryExpression) return;
+
+      final String? oppositeOp = _oppositeOperators[inner.operator.type];
+      if (oppositeOp == null) return;
+
+      final String left = inner.leftOperand.toSource();
+      final String right = inner.rightOperand.toSource();
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use $oppositeOp operator',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '$left $oppositeOp $right',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when a negated condition can be simplified.
@@ -555,6 +704,8 @@ class AvoidInvertedBooleanChecksRule extends DartLintRule {
 /// if (list.isNotEmpty) { }
 /// if (condition) { }
 /// ```
+///
+/// **Quick fix available:** Replaces `!x.isEmpty` with `x.isNotEmpty`.
 class AvoidNegatedConditionsRule extends DartLintRule {
   const AvoidNegatedConditionsRule() : super(code: _code);
 
@@ -599,6 +750,60 @@ class AvoidNegatedConditionsRule extends DartLintRule {
           reporter.atNode(node, code);
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UsePositiveFormFix()];
+}
+
+class _UsePositiveFormFix extends DartFix {
+  static const Map<String, String> _positiveAlternatives = <String, String>{
+    'isEmpty': 'isNotEmpty',
+    'isEven': 'isOdd',
+    'isOdd': 'isEven',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addPrefixExpression((PrefixExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.operator.type != TokenType.BANG) return;
+
+      final Expression operand = node.operand;
+      String? targetSource;
+      String? propertyName;
+
+      if (operand is PropertyAccess) {
+        targetSource = operand.target?.toSource();
+        propertyName = operand.propertyName.name;
+      } else if (operand is PrefixedIdentifier) {
+        targetSource = operand.prefix.name;
+        propertyName = operand.identifier.name;
+      }
+
+      if (targetSource == null || propertyName == null) return;
+
+      final String? positiveForm = _positiveAlternatives[propertyName];
+      if (positiveForm == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use $positiveForm',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '$targetSource.$positiveForm',
+        );
+      });
     });
   }
 }
@@ -1076,6 +1281,8 @@ class AvoidUnnecessaryConditionalsRule extends DartLintRule {
 ///   process(item);
 /// }
 /// ```
+///
+/// **Quick fix available:** Comments out the unnecessary continue.
 class AvoidUnnecessaryContinueRule extends DartLintRule {
   const AvoidUnnecessaryContinueRule() : super(code: _code);
 
@@ -1112,6 +1319,36 @@ class AvoidUnnecessaryContinueRule extends DartLintRule {
           }
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutUnnecessaryContinueFix()];
+}
+
+class _CommentOutUnnecessaryContinueFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addContinueStatement((ContinueStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out unnecessary continue',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '// ${node.toSource()}',
+        );
+      });
     });
   }
 }

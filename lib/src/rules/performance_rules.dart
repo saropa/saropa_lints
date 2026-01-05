@@ -9,7 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -114,6 +114,38 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
         reporter.atNode(reportNode, code);
       }
     }
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForMissingKeyFix()];
+}
+
+class _AddHackForMissingKeyFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for missing key',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: add key parameter for proper animations\n',
+        );
+      });
+    });
   }
 }
 
@@ -1094,6 +1126,37 @@ class AvoidSetStateInBuildRule extends DartLintRule {
       if (node.name.lexeme != 'build') return;
 
       node.body.visitChildren(_SetStateVisitor(reporter, code));
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForSetStateInBuildFix()];
+}
+
+class _AddHackForSetStateInBuildFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'setState') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for setState in build',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: wrap in addPostFrameCallback or move to event handler\n',
+        );
+      });
     });
   }
 }

@@ -2,7 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -51,6 +52,36 @@ class AvoidEqualExpressionsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForEqualExpressionsFix()];
+}
+
+class _AddHackForEqualExpressionsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for identical expressions',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: both sides are identical - fix one side\n',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when negation is used in equality checks.
@@ -69,6 +100,8 @@ class AvoidEqualExpressionsRule extends DartLintRule {
 /// ```dart
 /// if (a != b) { ... }
 /// ```
+///
+/// **Quick fix available:** Transforms `!(a == b)` to `a != b`.
 class AvoidNegationsInEqualityChecksRule extends DartLintRule {
   const AvoidNegationsInEqualityChecksRule() : super(code: _code);
 
@@ -97,6 +130,47 @@ class AvoidNegationsInEqualityChecksRule extends DartLintRule {
           reporter.atNode(node, code);
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseNotEqualsFix()];
+}
+
+class _UseNotEqualsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addPrefixExpression((PrefixExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.operator.lexeme != '!') return;
+
+      final Expression operand = node.operand;
+      if (operand is! ParenthesizedExpression) return;
+
+      final Expression inner = operand.expression;
+      if (inner is! BinaryExpression) return;
+      if (inner.operator.lexeme != '==') return;
+
+      final String left = inner.leftOperand.toSource();
+      final String right = inner.rightOperand.toSource();
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with !=',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '$left != $right',
+        );
+      });
     });
   }
 }
@@ -141,6 +215,36 @@ class AvoidSelfAssignmentRule extends DartLintRule {
       if (leftSource == rightSource) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForSelfAssignmentFix()];
+}
+
+class _AddHackForSelfAssignmentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for self-assignment',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: self-assignment - remove or assign different value\n',
+        );
+      });
     });
   }
 }
@@ -193,9 +297,41 @@ class AvoidSelfCompareRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForSelfCompareFix()];
+}
+
+class _AddHackForSelfCompareFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for self-compare',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: comparing to itself - use .isNaN or compare different values\n',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when compareTo is used for equality instead of ==.
+///
+/// **Quick fix available:** Transforms `a.compareTo(b) == 0` to `a == b`.
 class AvoidUnnecessaryCompareToRule extends DartLintRule {
   const AvoidUnnecessaryCompareToRule() : super(code: _code);
 
@@ -235,6 +371,61 @@ class AvoidUnnecessaryCompareToRule extends DartLintRule {
       if (zeroLiteral.value != 0) return;
 
       reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseDirectEqualityFix()];
+}
+
+class _UseDirectEqualityFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String op = node.operator.lexeme;
+      if (op != '==' && op != '!=') return;
+
+      MethodInvocation? compareToCall;
+
+      if (node.leftOperand is MethodInvocation &&
+          node.rightOperand is IntegerLiteral) {
+        compareToCall = node.leftOperand as MethodInvocation;
+      } else if (node.rightOperand is MethodInvocation &&
+          node.leftOperand is IntegerLiteral) {
+        compareToCall = node.rightOperand as MethodInvocation;
+      }
+
+      if (compareToCall == null) return;
+      if (compareToCall.methodName.name != 'compareTo') return;
+      if (compareToCall.argumentList.arguments.isEmpty) return;
+
+      final Expression? target = compareToCall.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      final String argSource =
+          compareToCall.argumentList.arguments.first.toSource();
+      final String newOp = op == '==' ? '==' : '!=';
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with $newOp',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '$targetSource $newOp $argSource',
+        );
+      });
     });
   }
 }
@@ -299,6 +490,36 @@ class NoEqualArgumentsRule extends DartLintRule {
           seen.add(argSource);
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForEqualArgumentsFix()];
+}
+
+class _AddHackForEqualArgumentsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for duplicate argument',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* HACK: duplicate argument - check if intentional */ ',
+        );
+      });
     });
   }
 }

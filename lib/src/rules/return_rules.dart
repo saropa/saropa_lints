@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -116,6 +117,8 @@ class AvoidReturningVoidRule extends DartLintRule {
 ///   print('hello');
 /// }
 /// ```
+///
+/// **Quick fix available:** Comments out the unnecessary return.
 class AvoidUnnecessaryReturnRule extends DartLintRule {
   const AvoidUnnecessaryReturnRule() : super(code: _code);
 
@@ -166,6 +169,37 @@ class AvoidUnnecessaryReturnRule extends DartLintRule {
       reporter.atNode(lastStatement, code);
     }
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutUnnecessaryReturnFix()];
+}
+
+class _CommentOutUnnecessaryReturnFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addReturnStatement((ReturnStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.expression != null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out unnecessary return',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '// ${node.toSource()}',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when a variable is declared and immediately returned.
@@ -184,6 +218,8 @@ class AvoidUnnecessaryReturnRule extends DartLintRule {
 ///   return computeName();
 /// }
 /// ```
+///
+/// **Quick fix available:** Inlines the expression into the return statement.
 class PreferImmediateReturnRule extends DartLintRule {
   const PreferImmediateReturnRule() : super(code: _code);
 
@@ -227,6 +263,52 @@ class PreferImmediateReturnRule extends DartLintRule {
       if (decl.name.lexeme == returnExpr.name && decl.initializer != null) {
         reporter.atNode(secondLast, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_InlineImmediateReturnFix()];
+}
+
+class _InlineImmediateReturnFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBlock((Block node) {
+      final List<Statement> statements = node.statements;
+      if (statements.length < 2) return;
+
+      final Statement secondLast = statements[statements.length - 2];
+      final Statement last = statements[statements.length - 1];
+
+      if (secondLast is! VariableDeclarationStatement) return;
+      if (!secondLast.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (last is! ReturnStatement) return;
+
+      final VariableDeclarationList declList = secondLast.variables;
+      if (declList.variables.length != 1) return;
+
+      final VariableDeclaration decl = declList.variables.first;
+      final Expression? initializer = decl.initializer;
+      if (initializer == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Return expression directly',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Replace both statements with a single return
+        builder.addSimpleReplacement(
+          SourceRange(secondLast.offset, last.end - secondLast.offset),
+          'return ${initializer.toSource()};',
+        );
+      });
     });
   }
 }

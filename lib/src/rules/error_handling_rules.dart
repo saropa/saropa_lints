@@ -8,7 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -34,6 +34,8 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   rethrow;
 /// }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for attention.
 class AvoidSwallowingExceptionsRule extends DartLintRule {
   const AvoidSwallowingExceptionsRule() : super(code: _code);
 
@@ -77,6 +79,36 @@ class AvoidSwallowingExceptionsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackCommentForSwallowedExceptionFix()];
+}
+
+class _AddHackCommentForSwallowedExceptionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for unhandled exception',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: handle or log this exception\n    ',
+        );
+      });
+    });
+  }
 }
 
 class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
@@ -115,6 +147,8 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
 ///   throw CustomException(e.toString(), stackTrace);
 /// }
 /// ```
+///
+/// **Quick fix available:** Adds a stack trace parameter to the catch clause.
 class AvoidLosingStackTraceRule extends DartLintRule {
   const AvoidLosingStackTraceRule() : super(code: _code);
 
@@ -151,6 +185,41 @@ class AvoidLosingStackTraceRule extends DartLintRule {
       if (hasThrow && !hasRethrow && stackTraceParam == null) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddStackTraceParameterFix()];
+}
+
+class _AddStackTraceParameterFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.stackTraceParameter != null) return;
+
+      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
+      if (exceptionParam == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add stackTrace parameter',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert ", stackTrace" after the exception parameter
+        builder.addSimpleInsertion(
+          exceptionParam.end,
+          ', stackTrace',
+        );
+      });
     });
   }
 }
