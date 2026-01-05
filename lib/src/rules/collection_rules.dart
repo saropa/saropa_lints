@@ -453,7 +453,7 @@ class PreferContainsRule extends DartLintRule {
   }
 }
 
-/// Warns when list[0] is used instead of list.first.
+/// Warns when `list[0]` is used instead of `list.first`.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -542,7 +542,7 @@ class PreferIterableOfRule extends DartLintRule {
   }
 }
 
-/// Warns when list[length-1] is used instead of list.last.
+/// Warns when `list[length-1]` is used instead of `list.last`.
 ///
 /// Example of **bad** code:
 /// ```dart
