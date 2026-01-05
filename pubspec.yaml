@@ -2,7 +2,7 @@ name: saropa_lints
 description: >-
   1,000+ custom lint rules for Flutter and Dart. The most comprehensive
   lint package available. Free and open source. 5 tiers from Essential to Insanity.
-version: 0.1.3
+version: 0.1.4
 homepage: https://github.com/saropa/saropa_lints
 repository: https://github.com/saropa/saropa_lints
 issue_tracker: https://github.com/saropa/saropa_lints/issues

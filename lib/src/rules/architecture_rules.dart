@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -36,7 +36,7 @@ class AvoidDirectDataAccessInUiRule extends DartLintRule {
     name: 'avoid_direct_data_access_in_ui',
     problemMessage: 'UI layer should not directly access data layer.',
     correctionMessage: 'Use a ViewModel, Cubit, or Controller to mediate data access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _dataLayerPatterns = <String>{
@@ -116,7 +116,7 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
     name: 'avoid_business_logic_in_ui',
     problemMessage: 'Business logic should not be in UI layer.',
     correctionMessage: 'Move calculations and business rules to domain/service layer.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _businessLogicIndicators = <String>{
@@ -199,7 +199,7 @@ class AvoidCircularDependenciesRule extends DartLintRule {
     name: 'avoid_circular_dependencies',
     problemMessage: 'Potential circular dependency detected.',
     correctionMessage: 'Break the cycle using interfaces, dependency injection, or events.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -278,7 +278,7 @@ class AvoidGodClassRule extends DartLintRule {
     name: 'avoid_god_class',
     problemMessage: 'Class has too many responsibilities.',
     correctionMessage: 'Split into smaller classes with single responsibilities.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const int _maxFields = 15;
@@ -340,7 +340,7 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
     name: 'avoid_ui_in_domain_layer',
     problemMessage: 'Domain layer should not have UI dependencies.',
     correctionMessage: 'Remove Flutter/UI imports from domain models and services.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _uiTypes = <String>{
@@ -421,7 +421,7 @@ class AvoidCrossFeatureDependenciesRule extends DartLintRule {
     name: 'avoid_cross_feature_dependencies',
     problemMessage: 'Feature module depends on another feature.',
     correctionMessage: 'Move shared code to core/shared layer or use dependency injection.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -485,7 +485,7 @@ class AvoidSingletonPatternRule extends DartLintRule {
     name: 'avoid_singleton_pattern',
     problemMessage: 'Singleton pattern makes testing difficult.',
     correctionMessage: 'Use dependency injection container instead of static singletons.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override

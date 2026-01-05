@@ -21,10 +21,18 @@
   "words": [
     "COPPA",
     "dartdoc",
+    "datetimes",
     "dotenv",
     "Github",
+    "initstate",
+    "listview",
+    "maybeof",
+    "mediaquery",
+    "pubdev",
     "rgba",
     "saropa_dart_utils",
+    "scrollables",
+    "setstate",
     "timezone"
   ],
   // Specify paths/files to ignore.

@@ -10,7 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show ErrorSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -42,7 +42,7 @@ class AvoidIconButtonsWithoutTooltipRule extends DartLintRule {
     name: 'avoid_icon_buttons_without_tooltip',
     problemMessage: 'IconButton should have a tooltip for accessibility.',
     correctionMessage: 'Add a tooltip parameter describing the button action.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -102,7 +102,7 @@ class AvoidSmallTouchTargetsRule extends DartLintRule {
     name: 'avoid_small_touch_targets',
     problemMessage: 'Touch target may be too small. Minimum recommended size is 48x48.',
     correctionMessage: 'Increase the size to at least 48x48 for better accessibility.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const double _minTouchTarget = 44.0;
@@ -226,7 +226,7 @@ class RequireExcludeSemanticsJustificationRule extends DartLintRule {
     name: 'require_exclude_semantics_justification',
     problemMessage: 'ExcludeSemantics should have a comment explaining why content is excluded.',
     correctionMessage: 'Add a comment above ExcludeSemantics explaining the rationale.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   @override
@@ -319,7 +319,7 @@ class AvoidColorOnlyIndicatorsRule extends DartLintRule {
     name: 'avoid_color_only_indicators',
     problemMessage: 'Avoid using color alone to convey information. Add icons or text.',
     correctionMessage: 'Add an icon, text label, or pattern alongside the color indicator.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -395,7 +395,7 @@ class AvoidGestureOnlyInteractionsRule extends DartLintRule {
     name: 'avoid_gesture_only_interactions',
     problemMessage: 'GestureDetector should have keyboard accessibility alternatives.',
     correctionMessage: 'Wrap with Focus and handle keyboard events, or use a Button widget.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   @override
@@ -473,7 +473,7 @@ class RequireSemanticsLabelRule extends DartLintRule {
     name: 'require_semantics_label',
     problemMessage: 'Interactive Semantics widget should have a label for screen readers.',
     correctionMessage: 'Add a label parameter describing the element.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _interactiveProperties = <String>{
@@ -560,7 +560,7 @@ class AvoidMergedSemanticsHidingInfoRule extends DartLintRule {
     name: 'avoid_merged_semantics_hiding_info',
     problemMessage: 'MergeSemantics may hide important information from assistive technologies.',
     correctionMessage: 'Review if all merged content should be announced together.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _interactiveWidgets = <String>{
@@ -647,7 +647,7 @@ class RequireLiveRegionRule extends DartLintRule {
     name: 'require_live_region',
     problemMessage: 'Dynamic content that changes should use Semantics with liveRegion.',
     correctionMessage: 'Wrap with Semantics(liveRegion: true) to announce changes.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _dynamicIndicators = <String>{
@@ -751,7 +751,7 @@ class RequireHeadingSemanticsRule extends DartLintRule {
     name: 'require_heading_semantics',
     problemMessage: 'Section headers should have Semantics with header: true.',
     correctionMessage: 'Wrap with Semantics(header: true) for screen reader navigation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+    errorSeverity: ErrorSeverity.INFO,
   );
 
   static const Set<String> _headingStyles = <String>{
@@ -853,7 +853,7 @@ class AvoidImageButtonsWithoutTooltipRule extends DartLintRule {
     name: 'avoid_image_buttons_without_tooltip',
     problemMessage: 'Image-based interactive elements need a Tooltip or semanticLabel.',
     correctionMessage: 'Wrap with Tooltip or add Semantics to describe the action.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+    errorSeverity: ErrorSeverity.WARNING,
   );
 
   static const Set<String> _tapWidgets = <String>{

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dart analyze:*)",
+      "Bash(dart -e \"import ''package:analyzer/error/error.dart''; print\\(ErrorSeverity.values\\);\")",
+      "Bash(powershell -Command \"Get-ChildItem -Path ''lib/src/rules/*.dart'' | ForEach-Object { \\(Get-Content $_FullName\\) -replace ''show DiagnosticSeverity'', ''show ErrorSeverity'' -replace ''DiagnosticSeverity\\\\.WARNING'', ''ErrorSeverity.WARNING'' -replace ''DiagnosticSeverity\\\\.INFO'', ''ErrorSeverity.INFO'' -replace ''DiagnosticSeverity\\\\.ERROR'', ''ErrorSeverity.ERROR'' | Set-Content $_FullName }\")",
+      "Bash(dart pub deps:*)",
+      "Bash(git checkout:*)",
+      "Bash(dart pub get:*)",
+      "Bash(rm \"D:\\\\src\\\\saropa_lints\\\\scripts\\\\publish_pub_dev.ps1\")",
+      "Bash(git add:*)"
+    ]
+  }
+}
