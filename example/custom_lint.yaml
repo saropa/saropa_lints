@@ -1,0 +1,840 @@
+# cspell:ignore Expando expando
+# ============================================================================
+# SAROPA CUSTOM LINT CONFIGURATION
+# ============================================================================
+# This file configures the custom_lint analyzer plugin rules.
+# Total: 475 rules organized by category (431 + 8 i18n + 7 api + 8 DI + 7 memory + 7 type + 7 resource).
+#
+# By default in the plugin, all rules are ENABLED.
+# To DISABLE a rule, set it to false.
+# To ENABLE with custom options, use the nested format.
+#
+# Rule format:
+#   rule_name: false                    # Disable rule
+#   rule_name:                          # Enable with options
+#     option_name: value
+#
+# Importance levels (suffix):
+#   [CRITICAL] - Bugs, crashes, data loss, security issues
+#   [HIGH]     - Likely bugs, performance problems, bad practices
+#   [MEDIUM]   - Code quality, maintainability issues
+#   [LOW]      - Style preferences, minor improvements
+#   [NOISY]    - Valid but generates many warnings, use selectively
+# ============================================================================
+
+custom_lint:
+  enable_all_lint_rules: false
+
+  rules:
+
+    # =========================================================================
+    # TESTING & DEBUG
+    # =========================================================================
+    # Rules for testing utilities and debug-only code.
+    # =========================================================================
+
+    always_fail: false  # Test hook rule that always fails. [LOW]
+
+    # =========================================================================
+    # SECURITY
+    # =========================================================================
+    # Rules that detect security vulnerabilities and unsafe practices.
+    # =========================================================================
+
+    avoid_hardcoded_credentials: false  # Credentials in source code. [CRITICAL]
+    avoid_logging_sensitive_data: false  # PII in log statements. [CRITICAL]
+    avoid_eval_like_patterns: false  # Dynamic code execution patterns. [CRITICAL]
+    avoid_weak_cryptographic_algorithms: false  # Weak cryptographic algorithm detected. [CRITICAL]
+    require_certificate_pinning: false  # HTTPS without cert pinning. [HIGH]
+    require_secure_storage: false  # Sensitive data in SharedPreferences. [HIGH]
+    require_input_sanitization: false  # User input not sanitized. [HIGH]
+    avoid_hardcoded_asset_paths: false  # Asset path should not be hardcoded. [HIGH]
+    avoid_print_in_production: false  # Avoid print() in production code. [HIGH]
+    avoid_webview_javascript_enabled: false  # WebView JavaScript risks. [MEDIUM]
+    avoid_hardcoded_colors: false  # Avoid hardcoded color values. [MEDIUM]
+    avoid_debug_print: false  # Avoid using debugPrint. [MEDIUM]
+    avoid_unguarded_debug: false  # Debug statement is not guarded. [MEDIUM]
+    require_biometric_fallback: false  # Biometric auth needs fallback. [LOW]
+
+    # =========================================================================
+    # ACCESSIBILITY
+    # =========================================================================
+    # Rules ensuring apps are usable by people with disabilities.
+    # =========================================================================
+
+    require_semantics_label: false  # Interactive widgets need semanticLabel. [HIGH]
+    avoid_icon_buttons_without_tooltip: false  # IconButtons need tooltips. [HIGH]
+    avoid_image_buttons_without_tooltip: false  # Image buttons need Tooltip. [HIGH]
+    avoid_gesture_only_interactions: false  # Gestures need keyboard alternatives. [HIGH]
+    avoid_color_only_indicators: false  # Don't rely solely on color for meaning. [MEDIUM]
+    avoid_merged_semantics_hiding_info: false  # MergeSemantics may hide info. [MEDIUM]
+    avoid_small_touch_targets: false  # Touch targets should be >= 48px. [MEDIUM]
+    require_exclude_semantics_justification: false  # ExcludeSemantics needs comment. [LOW]
+    require_live_region: false  # Dynamic content needs liveRegion. [LOW]
+    require_heading_semantics: false  # Section headers need Semantics.header. [LOW]
+
+    # =========================================================================
+    # NULL SAFETY & TYPE SAFETY
+    # =========================================================================
+    # Rules ensuring proper null handling and type correctness.
+    # =========================================================================
+
+    avoid_null_assertion: false  # Avoid the null assertion operator. [HIGH]
+    avoid_nullable_interpolation: false  # Avoid interpolating nullable values. [HIGH]
+    avoid_nullable_tostring: false  # Calling toString() on nullable value. [HIGH]
+    avoid_nullable_parameters_with_default_values: false  # Default param should not be nullable. [MEDIUM]
+    avoid_unnecessary_nullable_fields: false  # Nullable field always has value. [MEDIUM]
+    avoid_unnecessary_nullable_parameters: false  # Nullable parameter is never null. [MEDIUM]
+    avoid_unnecessary_nullable_return_type: false  # Return type nullable but never null. [MEDIUM]
+    avoid_unrelated_type_assertions: false  # Type assertion can never be true. [HIGH]
+    avoid_unnecessary_type_assertions: false  # Unnecessary type assertion. [MEDIUM]
+    avoid_unnecessary_type_casts: false  # Unnecessary type cast. [MEDIUM]
+    avoid_dynamic: false  # Avoid using dynamic type. [NOISY]
+    no_object_declaration: false  # Avoid declaring members with Object. [MEDIUM]
+    avoid_casting_to_extension_type: false  # Avoid casting to extension types. [MEDIUM]
+    avoid_collection_methods_with_unrelated_types: false  # Unrelated type in collection method. [HIGH]
+
+    # =========================================================================
+    # ERROR HANDLING & EXCEPTIONS
+    # =========================================================================
+    # Rules for proper exception handling and error management.
+    # =========================================================================
+
+    avoid_catching_generic_exception: false  # Avoid catching generic exceptions. [HIGH]
+    avoid_only_rethrow: false  # Catch clause only contains rethrow. [MEDIUM]
+    avoid_throw_in_catch_block: false  # Throwing in catch loses stack trace. [HIGH]
+    avoid_throw_in_finally: false  # Avoid throw in finally blocks. [HIGH]
+    avoid_throw_objects_without_tostring: false  # Thrown object may lack toString(). [MEDIUM]
+    avoid_identical_exception_handling_blocks: false  # Catch blocks have identical code. [MEDIUM]
+    avoid_missing_completer_stack_trace: false  # completeError needs stack trace. [HIGH]
+    avoid_non_final_exception_class_fields: false  # Exception fields should be final. [MEDIUM]
+    prefer_public_exception_classes: false  # Exception classes should be public. [LOW]
+
+    # Error handling rules (NEW)
+    avoid_swallowing_exceptions: false  # Catch swallows exception without handling. [HIGH]
+    avoid_losing_stack_trace: false  # Stack trace lost when rethrowing. [HIGH]
+    require_future_error_handling: false  # Future called without error handling. [HIGH]
+    avoid_generic_exceptions: false  # Avoid throwing generic Exception. [MEDIUM]
+    require_error_context: false  # Error message lacks context. [LOW]
+    prefer_result_pattern: false  # Use Result pattern for expected failures. [LOW]
+    require_async_error_documentation: false  # Async function should document errors. [LOW]
+    require_error_boundary: false  # App should have error boundary. [LOW]
+
+    # =========================================================================
+    # ARCHITECTURE & DESIGN
+    # =========================================================================
+    # Rules for clean architecture and design patterns.
+    # =========================================================================
+
+    avoid_direct_data_access_in_ui: false  # UI should not access data layer. [HIGH]
+    avoid_circular_dependencies: false  # Potential circular dependency. [HIGH]
+    avoid_god_class: false  # Class has too many responsibilities. [HIGH]
+    avoid_ui_in_domain_layer: false  # Domain should not have UI deps. [MEDIUM]
+    avoid_business_logic_in_ui: false  # Business logic in UI layer. [MEDIUM]
+    avoid_cross_feature_dependencies: false  # Feature depends on another feature. [LOW]
+    avoid_singleton_pattern: false  # Singleton makes testing difficult. [LOW]
+
+    # =========================================================================
+    # FLUTTER LIFECYCLE & STATE
+    # =========================================================================
+    # Rules for Flutter widget lifecycle and state management.
+    # =========================================================================
+
+    avoid_context_in_initstate_dispose: false  # Avoid context in initState/dispose. [CRITICAL]
+    avoid_inherited_widget_in_initstate: false  # Avoid InheritedWidget in initState. [CRITICAL]
+    avoid_build_context_in_providers: false  # BuildContext in providers causes leaks. [CRITICAL]
+    avoid_late_context: false  # Avoid BuildContext in late field. [HIGH]
+    avoid_unsafe_setstate: false  # setState() without mounted check. [CRITICAL]
+    use_setstate_synchronously: false  # setState after async without mounted. [CRITICAL]
+    avoid_empty_setstate: false  # Empty setState callback has no effect. [HIGH]
+    avoid_mounted_in_setstate: false  # Avoid checking mounted in setState. [MEDIUM]
+    avoid_unnecessary_setstate: false  # setState in lifecycle not needed. [MEDIUM]
+    avoid_state_constructors: false  # State class should not have constructor. [HIGH]
+    avoid_stateless_widget_initialized_fields: false  # StatelessWidget should not init fields. [HIGH]
+    avoid_unnecessary_stateful_widgets: false  # StatefulWidget may be unnecessary. [MEDIUM]
+    avoid_unnecessary_overrides_in_state: false  # State override only calls super. [LOW]
+    proper_super_calls: false  # Super lifecycle method wrong order. [HIGH]
+    always_remove_listener: false  # Listener added but may not be removed. [HIGH]
+    avoid_unremovable_callbacks_in_listeners: false  # Anonymous function cannot be removed. [HIGH]
+
+    # State management rules (NEW)
+    require_mounted_check: false  # setState after await needs mounted check. [CRITICAL]
+    avoid_global_key_in_build: false  # GlobalKey in build causes recreation. [CRITICAL]
+    require_stream_controller_dispose: false  # StreamController not closed. [CRITICAL]
+    require_notify_listeners: false  # ChangeNotifier method needs notifyListeners. [HIGH]
+    require_value_notifier_dispose: false  # ValueNotifier should be disposed. [HIGH]
+    avoid_bloc_event_in_constructor: false  # Bloc event in constructor anti-pattern. [HIGH]
+    require_update_should_notify: false  # InheritedWidget needs updateShouldNotify. [MEDIUM]
+    avoid_watch_in_callbacks: false  # Use read instead of watch in callbacks. [MEDIUM]
+    avoid_stateful_without_state: false  # StatefulWidget has no state fields. [LOW]
+    avoid_global_riverpod_providers: false  # Consider scoping Riverpod providers. [LOW]
+
+    # =========================================================================
+    # FLUTTER DISPOSAL & RESOURCES
+    # =========================================================================
+    # Rules ensuring proper resource cleanup and disposal.
+    # =========================================================================
+
+    require_dispose: false  # Disposable field may not be disposed. [CRITICAL]
+    dispose_fields: false  # Field requires disposal. [CRITICAL]
+    require_animation_disposal: false  # AnimationController should be disposed. [CRITICAL]
+    avoid_undisposed_instances: false  # Disposable may not be properly disposed. [HIGH]
+    avoid_unassigned_stream_subscriptions: false  # Stream subscription should be assigned. [HIGH]
+
+    # =========================================================================
+    # FLUTTER WIDGETS & UI
+    # =========================================================================
+    # Rules for proper Flutter widget usage and UI patterns.
+    # =========================================================================
+
+    avoid_deeply_nested_widgets: false  # Widget tree is too deeply nested. [HIGH]
+    avoid_recursive_widget_calls: false  # Widget creates instance of itself. [CRITICAL]
+    avoid_returning_widgets: false  # Avoid methods that return widgets. [NOISY]
+    avoid_single_child_column_row: false  # Single child Column/Row is unnecessary. [MEDIUM]
+    avoid_expanded_as_spacer: false  # Use Spacer() instead of empty Expanded. [LOW]
+    avoid_flexible_outside_flex: false  # Flexible used outside of Flex widget. [HIGH]
+    avoid_form_without_key: false  # Form should have a GlobalKey. [HIGH]
+    avoid_duplicate_widget_keys: false  # Duplicate widget keys found in list. [CRITICAL]
+    avoid_stateful_widget_in_list: false  # StatefulWidget in list builder. [HIGH]
+    avoid_uncontrolled_text_field: false  # TextField should have a controller. [MEDIUM]
+    avoid_unrestricted_text_field_length: false  # TextField should have maxLength. [LOW]
+    avoid_wrapping_in_padding: false  # Widget has own padding property. [LOW]
+    avoid_border_all: false  # Prefer Border.fromBorderSide for const. [LOW]
+    avoid_incorrect_image_opacity: false  # Use Image color instead of Opacity. [MEDIUM]
+    avoid_image_without_cache: false  # Image.network needs cache dimensions. [MEDIUM]
+    avoid_missing_image_alt: false  # Image missing semanticLabel. [MEDIUM]
+    avoid_text_scale_factor: false  # textScaleFactor is deprecated. [HIGH]
+    prefer_const_border_radius: false  # Prefer const BorderRadius.all. [LOW]
+    prefer_correct_edge_insets_constructor: false  # Use specific EdgeInsets constructor. [LOW]
+    prefer_text_rich: false  # Prefer Text.rich over RichText. [LOW]
+    prefer_define_hero_tag: false  # Hero widget should have explicit tag. [MEDIUM]
+    prefer_using_list_view: false  # Column in ScrollView, use ListView. [HIGH]
+    prefer_safe_area_consumer: false  # SafeArea may be redundant in Scaffold. [LOW]
+    prefer_semantic_widget_names: false  # Consider using semantic widget. [LOW]
+    prefer_opacity_widget: false  # Consider using Opacity widget. [LOW]
+    prefer_widget_private_members: false  # Widget field should be final. [MEDIUM]
+    prefer_widget_state_mixin: false  # Consider WidgetStateMixin. [LOW]
+    prefer_split_widget_const: false  # Large widget could be extracted const. [LOW]
+    prefer_single_widget_per_file: false  # File has multiple public widgets. [NOISY]
+    prefer_sliver_prefix: false  # Sliver widget should have Sliver prefix. [LOW]
+
+    # =========================================================================
+    # FLUTTER NAVIGATION
+    # =========================================================================
+    # Rules for navigation and routing.
+    # =========================================================================
+
+    avoid_navigator_push_without_route_name: false  # Prefer named routes. [MEDIUM]
+    avoid_scaffold_messenger_after_await: false  # ScaffoldMessenger after await risky. [HIGH]
+    prefer_scaffold_messenger_maybeof: false  # Consider ScaffoldMessenger.maybeOf. [MEDIUM]
+
+    # =========================================================================
+    # FLUTTER PERFORMANCE
+    # =========================================================================
+    # Rules for Flutter-specific performance optimizations.
+    # =========================================================================
+
+    avoid_listview_without_item_extent: false  # ListView.builder needs itemExtent. [HIGH]
+    avoid_shrink_wrap_in_lists: false  # Avoid shrinkWrap in lists. [HIGH]
+    avoid_mediaquery_in_build: false  # Use specific MediaQuery methods. [HIGH]
+    prefer_dedicated_media_query_method: false  # Prefer dedicated MediaQuery method. [MEDIUM]
+    avoid_layout_builder_misuse: false  # LayoutBuilder should use constraints. [MEDIUM]
+    avoid_repaint_boundary_misuse: false  # RepaintBoundary around static content. [MEDIUM]
+    avoid_singlechildscrollview_with_column: false  # ScrollView with Column layout issues. [HIGH]
+    avoid_gesture_detector_in_scrollview: false  # GestureDetector in scrollable conflicts. [MEDIUM]
+    avoid_unnecessary_gesture_detector: false  # GestureDetector has no callbacks. [MEDIUM]
+    pass_existing_future_to_future_builder: false  # New Future in FutureBuilder rebuilds. [CRITICAL]
+    pass_existing_stream_to_stream_builder: false  # New Stream in StreamBuilder rebuilds. [CRITICAL]
+    prefer_cached_network_image: false  # Consider CachedNetworkImage. [MEDIUM]
+    prefer_sliver_list_delegate: false  # Use SliverChildBuilderDelegate. [MEDIUM]
+    prefer_const_string_list: false  # String list could be const. [MEDIUM]
+    prefer_const_widgets_in_lists: false  # Widget list could be const. [MEDIUM]
+    check_for_equals_in_render_object_setters: false  # RenderObject setter should check ==. [HIGH]
+    consistent_update_render_object: false  # updateRenderObject may miss updates. [HIGH]
+
+    # =========================================================================
+    # ASYNC & FUTURES
+    # =========================================================================
+    # Rules for asynchronous code and Future/Stream handling.
+    # =========================================================================
+
+    avoid_async_call_in_sync_function: false  # Async call in sync function. [HIGH]
+    avoid_passing_async_when_sync_expected: false  # Async function where sync expected. [NOISY]
+    avoid_redundant_async: false  # Async function does not use await. [MEDIUM]
+    avoid_unnecessary_futures: false  # Async function has no await. [MEDIUM]
+    avoid_future_ignore: false  # Avoid using .ignore() on Futures. [MEDIUM]
+    avoid_future_tostring: false  # Avoid calling toString() on a Future. [HIGH]
+    avoid_stream_tostring: false  # Stream.toString() is unhelpful. [MEDIUM]
+    avoid_nested_futures: false  # Avoid nested Future types. [MEDIUM]
+    avoid_nested_streams_and_futures: false  # Avoid mixing Stream and Future. [MEDIUM]
+    prefer_async_await: false  # Prefer async/await over .then(). [NOISY]
+    prefer_return_await: false  # Return await for proper error handling. [HIGH]
+    prefer_assigning_await_expressions: false  # Prefer assigning await to variables. [LOW]
+    prefer_correct_future_return_type: false  # Async function needs Future return type. [MEDIUM]
+    prefer_correct_stream_return_type: false  # Async* needs Stream return type. [MEDIUM]
+    prefer_unwrapping_future_or: false  # Consider async/await for FutureOr. [LOW]
+    prefer_specifying_future_value_type: false  # Specify type for Future.value(). [LOW]
+    prefer_expect_later: false  # Use expectLater() for Future assertions. [MEDIUM]
+
+    # =========================================================================
+    # COLLECTIONS & DATA STRUCTURES
+    # =========================================================================
+    # Rules for proper collection usage and safety.
+    # =========================================================================
+
+    avoid_unsafe_collection_methods: false  # Using .first/.last on empty collection. [CRITICAL]
+    avoid_unsafe_reduce: false  # reduce() throws on empty collections. [CRITICAL]
+    avoid_map_keys_contains: false  # Use containsKey() not keys.contains(). [HIGH]
+    avoid_collection_equality_checks: false  # Collections use reference equality. [HIGH]
+    avoid_duplicate_collection_elements: false  # Duplicate element in collection literal. [MEDIUM]
+    avoid_duplicate_map_keys: false  # Duplicate key in map literal. [HIGH]
+    avoid_missing_enum_constant_in_map: false  # Map may be missing enum constants. [HIGH]
+    avoid_enum_values_by_index: false  # Avoid accessing enum values by index. [HIGH]
+    avoid_accessing_collections_by_constant_index: false  # Avoid constant index in loop. [MEDIUM]
+    avoid_slow_collection_methods: false  # Sync* generator may be slow. [MEDIUM]
+    prefer_first: false  # Use .first instead of [0]. [LOW]
+    prefer_last: false  # Use .last instead of [length - 1]. [LOW]
+    prefer_contains: false  # Use contains() not indexOf() check. [MEDIUM]
+    prefer_add_all: false  # Use addAll() instead of forEach with add. [LOW]
+    prefer_any_or_every: false  # Use any() or every() instead. [LOW]
+    prefer_for_in: false  # Index-based loop can be for-in. [LOW]
+    prefer_iterable_of: false  # Prefer .of() instead of .from(). [LOW]
+    prefer_set_for_lookup: false  # Consider Set for contains() lookups. [MEDIUM]
+    map_keys_ordering: false  # Map keys should be in alphabetical order. [LOW]
+    avoid_unnecessary_collections: false  # Unnecessary collection wrapper. [LOW]
+
+    # =========================================================================
+    # CONTROL FLOW
+    # =========================================================================
+    # Rules for conditionals, loops, and control flow statements.
+    # =========================================================================
+
+    avoid_constant_conditions: false  # Condition with constant values. [HIGH]
+    avoid_constant_assert_conditions: false  # Assert has a constant condition. [MEDIUM]
+    avoid_constant_switches: false  # Switch expression is a constant value. [HIGH]
+    avoid_contradictory_expressions: false  # Contradictory conditions detected. [HIGH]
+    avoid_conditions_with_boolean_literals: false  # Avoid comparing with boolean literals. [MEDIUM]
+    avoid_unnecessary_conditionals: false  # Condition is always true or false. [HIGH]
+    avoid_inverted_boolean_checks: false  # Inverted boolean can be simplified. [LOW]
+    avoid_negated_conditions: false  # Negated condition can be simplified. [LOW]
+    avoid_negations_in_equality_checks: false  # Use != instead of negating ==. [LOW]
+    avoid_unnecessary_negations: false  # Unnecessary negation can be simplified. [LOW]
+    avoid_collapsible_if: false  # Nested if statements can be collapsed. [LOW]
+    avoid_if_with_many_branches: false  # If statement has too many branches. [MEDIUM]
+    avoid_nested_switch_expressions: false  # Avoid nested switch expressions. [MEDIUM]
+    avoid_nested_switches: false  # Avoid nested switch statements. [MEDIUM]
+    avoid_nested_conditional_expressions: false  # Avoid nested conditional expressions. [NOISY]
+    avoid_nested_try: false  # Avoid nested try statements. [MEDIUM]
+    avoid_redundant_else: false  # Else is redundant after return/throw. [MEDIUM]
+    avoid_unconditional_break: false  # Unconditional break makes loop run once. [HIGH]
+    avoid_continue: false  # Avoid using the continue statement. [LOW]
+    avoid_unnecessary_continue: false  # Redundant continue at end of loop. [MEDIUM]
+    avoid_complex_conditions: false  # Condition has too many logical operators. [MEDIUM]
+    avoid_complex_loop_conditions: false  # Loop condition is too complex. [MEDIUM]
+    avoid_duplicate_switch_case_conditions: false  # Duplicate switch case condition. [HIGH]
+    avoid_wildcard_cases_with_enums: false  # Avoid default case with enums. [HIGH]
+    avoid_wildcard_cases_with_sealed_classes: false  # Avoid default case with sealed classes. [HIGH]
+    no_equal_conditions: false  # Duplicate condition in if-else chain. [HIGH]
+    no_equal_nested_conditions: false  # Nested condition identical to outer. [HIGH]
+    no_equal_then_else: false  # If and else branches are identical. [HIGH]
+    no_equal_switch_case: false  # Switch cases have identical bodies. [MEDIUM]
+    no_equal_switch_expression_cases: false  # Switch expression cases identical. [MEDIUM]
+    prefer_conditional_expressions: false  # Consider using conditional expression. [NOISY]
+    prefer_early_return: false  # Consider using early return. [LOW]
+    prefer_returning_condition: false  # Prefer returning condition directly. [LOW]
+    prefer_returning_conditionals: false  # Return condition instead of true/false. [LOW]
+    prefer_switch_expression: false  # Consider switch expression instead. [LOW]
+    prefer_switch_with_enums: false  # Consider switch for enum comparisons. [MEDIUM]
+    prefer_switch_with_sealed_classes: false  # Consider switch with sealed class. [MEDIUM]
+    prefer_correct_switch_length: false  # Switch statement has too few cases. [LOW]
+    prefer_specific_cases_first: false  # More specific cases should come first. [MEDIUM]
+    prefer_pushing_conditional_expressions: false  # Conditional can be pushed into args. [LOW]
+    avoid_unnecessary_if: false  # Unnecessary if statement. [MEDIUM]
+
+    # =========================================================================
+    # EQUALITY & COMPARISON
+    # =========================================================================
+    # Rules for equality checks and comparisons.
+    # =========================================================================
+
+    avoid_equal_expressions: false  # Both sides of expression are identical. [HIGH]
+    avoid_self_compare: false  # Variable is compared to itself. [HIGH]
+    avoid_self_assignment: false  # Variable is assigned to itself. [HIGH]
+    no_equal_arguments: false  # Same argument passed multiple times. [HIGH]
+    avoid_unnecessary_compare_to: false  # Use == instead of compareTo() == 0. [LOW]
+    binary_expression_operand_order: false  # Consider reordering operands. [NOISY]
+    prefer_overriding_parent_equality: false  # Override parent equals method. [MEDIUM]
+
+    # =========================================================================
+    # FUNCTIONS & METHODS
+    # =========================================================================
+    # Rules for function/method design and usage.
+    # =========================================================================
+
+    avoid_long_functions: false  # Function body exceeds maximum lines. [MEDIUM]
+    avoid_long_parameter_list: false  # Function has too many parameters. [MEDIUM]
+    avoid_local_functions: false  # Avoid declaring local functions. [LOW]
+    avoid_declaring_call_method: false  # Avoid declaring a call() method. [LOW]
+    avoid_recursive_calls: false  # Function contains a recursive call. [LOW]
+    avoid_recursive_tostring: false  # toString() calls itself recursively. [HIGH]
+    avoid_immediately_invoked_functions: false  # Function immediately invoked. [MEDIUM]
+    avoid_missed_calls: false  # Function reference passed, not called. [HIGH]
+    avoid_passing_self_as_argument: false  # Object passed as argument to itself. [HIGH]
+    avoid_always_null_parameters: false  # Parameter is always passed as null. [HIGH]
+    avoid_mutating_parameters: false  # Parameter is being reassigned. [MEDIUM]
+    avoid_unused_parameters: false  # Parameter is never used. [HIGH]
+    avoid_unused_callback_parameters: false  # Callback parameter is not used. [MEDIUM]
+    function_always_returns_null: false  # Function always returns null. [HIGH]
+    function_always_returns_same_value: false  # Function always returns the same value. [HIGH]
+    prefer_getter_over_method: false  # Use getter instead of no-arg method. [LOW]
+    prefer_static_method: false  # Method could be static. [LOW]
+    prefer_named_parameters: false  # Too many positional parameters. [MEDIUM]
+    prefer_named_boolean_parameters: false  # Boolean param should be named. [MEDIUM]
+    prefer_explicit_function_type: false  # Use explicit function type. [LOW]
+    prefer_explicit_parameter_names: false  # Function type params should have names. [LOW]
+    prefer_typedef_for_callbacks: false  # Consider typedef for repeated function. [LOW]
+    prefer_extracting_callbacks: false  # Consider extracting callback to method. [NOISY]
+    prefer_extracting_function_callbacks: false  # Consider extracting to named function. [LOW]
+    pass_correct_accepted_type: false  # Parameter type does not match accepted. [HIGH]
+    pass_optional_argument: false  # Consider passing optional arg explicitly. [LOW]
+    avoid_returning_cascades: false  # Avoid returning cascade expressions. [LOW]
+    avoid_returning_void: false  # Avoid explicitly returning void. [LOW]
+    prefer_returning_shorthands: false  # Use arrow syntax for simple return. [LOW]
+    avoid_unnecessary_return: false  # Unnecessary return at end of void. [LOW]
+    prefer_immediate_return: false  # Variable declared and immediately returned. [LOW]
+
+    # =========================================================================
+    # CLASSES & CONSTRUCTORS
+    # =========================================================================
+    # Rules for class design and constructor usage.
+    # =========================================================================
+
+    avoid_non_empty_constructor_bodies: false  # Constructor body contains logic. [MEDIUM]
+    avoid_unnecessary_constructor: false  # Unnecessary constructor. [LOW]
+    avoid_unnecessary_super: false  # Unnecessary super() call. [LOW]
+    avoid_unnecessary_overrides: false  # Override only calls super. [LOW]
+    avoid_assigning_to_static_field: false  # Instance method modifies static field. [HIGH]
+    avoid_default_tostring: false  # Class should override toString(). [LOW]
+    avoid_incomplete_copy_with: false  # copyWith method may be missing fields. [HIGH]
+    prefer_declaring_const_constructor: false  # Class could have a const constructor. [LOW]
+    prefer_abstract_final_static_class: false  # Static-only class should be abstract final. [LOW]
+    prefer_static_class: false  # Class only has static members. [NOISY]
+    match_class_name_pattern: false  # Class name does not follow pattern. [LOW]
+    match_base_class_default_value: false  # Match base class default values. [MEDIUM]
+    avoid_duplicate_mixins: false  # Mixin is applied multiple times. [HIGH]
+
+    # =========================================================================
+    # VARIABLES & FIELDS
+    # =========================================================================
+    # Rules for variable/field declarations and usage.
+    # =========================================================================
+
+    avoid_late_keyword: false  # Avoid using the late keyword. [NOISY]
+    avoid_late_final_reassignment: false  # Late final may be assigned multiple times. [CRITICAL]
+    avoid_unassigned_fields: false  # Field may never be assigned a value. [HIGH]
+    avoid_unassigned_late_fields: false  # Late field may never be assigned. [HIGH]
+    avoid_unnecessary_late_fields: false  # Late unnecessary when assigned in ctor. [MEDIUM]
+    avoid_unnecessary_local_late: false  # Late local variable unnecessary. [MEDIUM]
+    avoid_global_state: false  # Avoid mutable global state. [HIGH]
+    avoid_shadowing: false  # Declaration shadows outer scope. [MEDIUM]
+    avoid_generics_shadowing: false  # Generic shadows top-level declaration. [MEDIUM]
+    avoid_similar_names: false  # Variable name is too similar to another. [MEDIUM]
+    avoid_unused_assignment: false  # Assignment may be unused. [MEDIUM]
+    avoid_unused_instances: false  # Instance created but not used. [HIGH]
+    avoid_unused_after_null_check: false  # Variable null-checked but not used. [HIGH]
+    avoid_unused_generics: false  # Type parameter is never used. [HIGH]
+    avoid_unnecessary_local_variable: false  # Variable used once and returned. [LOW]
+    avoid_unnecessary_reassignment: false  # Variable assigned same value. [MEDIUM]
+    avoid_multi_assignment: false  # Multiple chained assignments detected. [LOW]
+    avoid_nested_assignments: false  # Avoid assignment inside expression. [MEDIUM]
+    avoid_assignments_as_conditions: false  # Avoid assignments inside conditions. [HIGH]
+    move_variable_closer_to_usage: false  # Variable can be declared closer to use. [LOW]
+    move_variable_outside_iteration: false  # Variable should be outside loop. [MEDIUM]
+    use_existing_variable: false  # Use existing variable instead of recalculating. [MEDIUM]
+    prefer_type_over_var: false  # Prefer explicit type over var. [LOW]
+
+    # =========================================================================
+    # RECORDS & PATTERNS (Dart 3)
+    # =========================================================================
+    # Rules for Dart 3 records and pattern matching features.
+    # =========================================================================
+
+    avoid_one_field_records: false  # Avoid records with only one field. [LOW]
+    avoid_long_records: false  # Record has too many fields. [MEDIUM]
+    avoid_nested_records: false  # Avoid nested record types. [MEDIUM]
+    avoid_mixing_named_and_positional_fields: false  # Record mixes named and positional. [MEDIUM]
+    avoid_function_type_in_records: false  # Avoid Function types in records. [MEDIUM]
+    avoid_bottom_type_in_records: false  # Record contains bottom type field. [HIGH]
+    avoid_extensions_on_records: false  # Extension defined on a Record type. [MEDIUM]
+    avoid_positional_record_field_access: false  # Avoid accessing record fields by $1. [LOW]
+    avoid_redundant_positional_field_name: false  # Positional field uses redundant name. [LOW]
+    avoid_bottom_type_in_patterns: false  # Pattern contains bottom type. [HIGH]
+    avoid_duplicate_patterns: false  # Duplicate pattern detected. [HIGH]
+    avoid_explicit_pattern_field_name: false  # Pattern field name matches variable. [LOW]
+    avoid_keywords_in_wildcard_pattern: false  # Pattern variable uses a Dart keyword. [HIGH]
+    avoid_unnecessary_patterns: false  # Pattern does not affect type narrowing. [LOW]
+    avoid_single_field_destructuring: false  # Avoid destructuring for single field. [LOW]
+    avoid_nested_shorthands: false  # Avoid nesting shorthand syntax. [LOW]
+    prefer_wildcard_pattern: false  # Unused pattern should use wildcard. [LOW]
+    prefer_simpler_patterns_null_check: false  # Consider simpler null check pattern. [LOW]
+    move_records_to_typedefs: false  # Large record should be a typedef. [MEDIUM]
+    match_positional_field_names_on_assignment: false  # Positional field should match variable. [LOW]
+    use_existing_destructuring: false  # Use existing destructuring variable. [MEDIUM]
+    prefer_sorted_record_fields: false  # Record fields should be alphabetical. [LOW]
+    prefer_sorted_pattern_fields: false  # Pattern fields should be alphabetical. [LOW]
+    record_fields_ordering: false  # Record fields ordering convention. [LOW]
+    pattern_fields_ordering: false  # Pattern fields ordering convention. [LOW]
+
+    # =========================================================================
+    # EXTENSION TYPES (Dart 3)
+    # =========================================================================
+    # Rules for Dart 3 extension types.
+    # =========================================================================
+
+    avoid_nested_extension_types: false  # Extension type contains another. [MEDIUM]
+    avoid_implicitly_nullable_extension_types: false  # Extension type is implicitly nullable. [HIGH]
+    prefer_private_extension_type_field: false  # Extension type field should be private. [MEDIUM]
+    avoid_shadowed_extension_methods: false  # Extension method shadows another. [HIGH]
+
+    # =========================================================================
+    # ENUMS
+    # =========================================================================
+    # Rules for enum declarations and usage.
+    # =========================================================================
+
+    prefer_enhanced_enums: false  # Consider enhanced enum instead. [LOW]
+    prefer_enums_by_name: false  # Use Enum.values.byName() instead. [MEDIUM]
+    avoid_unnecessary_enum_prefix: false  # Unnecessary enum name prefix. [LOW]
+    avoid_unnecessary_enum_arguments: false  # Enum argument matches default. [LOW]
+    avoid_isar_enum_field: false  # Enum in Isar can cause data corruption. [CRITICAL]
+    prefer_shorthands_with_enums: false  # Consider using enum shorthand. [LOW]
+
+    # =========================================================================
+    # STRINGS & TEXT
+    # =========================================================================
+    # Rules for string handling and text processing.
+    # =========================================================================
+
+    avoid_adjacent_strings: false  # Avoid using adjacent strings. [MEDIUM]
+    avoid_non_ascii_symbols: false  # String contains non-ASCII characters. [LOW]
+    avoid_substring: false  # Avoid substring() as it can throw. [MEDIUM]
+    avoid_incorrect_uri: false  # URI string appears to be malformed. [HIGH]
+    no_empty_string: false  # Avoid empty string literals. [MEDIUM]
+    no_magic_string: false  # Avoid using magic string literals. [LOW]
+    prefer_bytes_builder: false  # Consider using BytesBuilder. [LOW]
+
+    # =========================================================================
+    # NUMBERS & ARITHMETIC
+    # =========================================================================
+    # Rules for numeric operations and literals.
+    # =========================================================================
+
+    no_magic_number: false  # Avoid magic numbers. [NOISY]
+    avoid_complex_arithmetic_expressions: false  # Arithmetic expression too complex. [MEDIUM]
+    avoid_bitwise_operators_with_booleans: false  # Bitwise operators with booleans. [HIGH]
+    avoid_digit_separators: false  # Unnecessary digit separator. [LOW]
+    avoid_inconsistent_digit_separators: false  # Digit separators not grouped consistently. [LOW]
+    avoid_unnecessary_digit_separators: false  # Unnecessary digit separator. [LOW]
+    prefer_digit_separators: false  # Large number should use separators. [LOW]
+    double_literal_format: false  # Use consistent double literal format. [NOISY]
+    prefer_addition_subtraction_assignments: false  # Use compound assignment operator. [LOW]
+    prefer_compound_assignment_operators: false  # Use compound assignment operator. [LOW]
+
+    # =========================================================================
+    # EXPRESSIONS & COMPLEXITY
+    # =========================================================================
+    # Rules for expression complexity and readability.
+    # =========================================================================
+
+    avoid_excessive_expressions: false  # Expression has excessive complexity. [MEDIUM]
+    avoid_cascade_after_if_null: false  # Cascade after ?? has unexpected precedence. [HIGH]
+    avoid_duplicate_cascades: false  # Duplicate cascade operation detected. [MEDIUM]
+    prefer_parentheses_with_if_null: false  # Add parentheses for if-null clarity. [MEDIUM]
+    prefer_null_aware_spread: false  # Use null-aware spread for nullable. [LOW]
+    prefer_null_aware_elements: false  # Use null-aware element syntax. [LOW]
+    prefer_moving_to_variable: false  # Extract repeated expression to variable. [NOISY]
+
+    # =========================================================================
+    # CODE QUALITY & UNUSED CODE
+    # =========================================================================
+    # Rules detecting dead code and unnecessary constructs.
+    # =========================================================================
+
+    avoid_unnecessary_block: false  # Unnecessary nested block. [LOW]
+    avoid_unnecessary_call: false  # Unnecessary explicit .call() invocation. [LOW]
+    avoid_unnecessary_extends: false  # Unnecessary extends Object. [LOW]
+    avoid_unnecessary_getter: false  # Getter just returns a final field. [LOW]
+    avoid_unnecessary_statements: false  # Statement has no effect. [HIGH]
+    avoid_unnecessary_length_check: false  # Use isNotEmpty instead of length check. [LOW]
+    avoid_referencing_discarded_variables: false  # Avoid referencing discarded variables. [HIGH]
+    avoid_empty_spread: false  # Empty spread has no effect. [LOW]
+    avoid_commented_out_code: false  # Avoid commented-out code. [NOISY]
+    no_empty_block: false  # Empty block detected. [MEDIUM]
+    avoid_duplicate_constant_values: false  # Duplicate constant value found. [MEDIUM]
+    avoid_duplicate_initializers: false  # Duplicate initializer expression. [HIGH]
+    missing_use_result_annotation: false  # Function value might be ignored. [MEDIUM]
+
+    # =========================================================================
+    # NAMING CONVENTIONS
+    # =========================================================================
+    # Rules for identifier naming patterns and conventions.
+    # =========================================================================
+
+    avoid_getter_prefix: false  # Getter name should not start with get. [LOW]
+    prefer_boolean_prefixes: false  # Boolean should have is/has/can prefix. [MEDIUM]
+    prefer_correct_identifier_length: false  # Identifier name length is not ideal. [LOW]
+    prefer_correct_type_name: false  # Type name should be UpperCamelCase. [MEDIUM]
+    prefer_correct_error_name: false  # Catch parameter naming convention. [LOW]
+    prefer_correct_setter_parameter_name: false  # Setter parameter naming convention. [LOW]
+    prefer_correct_callback_field_name: false  # Callback field naming convention. [LOW]
+    prefer_correct_handler_name: false  # Event handler naming convention. [LOW]
+    prefer_prefixed_global_constants: false  # Global constant should have prefix. [LOW]
+    prefer_trailing_underscore_for_unused: false  # Unused param should have underscore. [LOW]
+    match_getter_setter_field_names: false  # Getter/setter should match field. [MEDIUM]
+    tag_name: false  # Tag name should follow conventions. [LOW]
+    prefer_kebab_tag_name: false  # Tag name should follow conventions. [LOW]
+
+    # =========================================================================
+    # EXTENSIONS
+    # =========================================================================
+    # Rules for extension declarations.
+    # =========================================================================
+
+    prefer_named_extensions: false  # Anonymous extension should be named. [LOW]
+
+    # =========================================================================
+    # IMPORTS & EXPORTS
+    # =========================================================================
+    # Rules for import/export statements and organization.
+    # =========================================================================
+
+    avoid_barrel_files: false  # File contains only export statements. [LOW]
+    avoid_double_slash_imports: false  # Import path contains double slashes. [HIGH]
+    avoid_duplicate_exports: false  # File is exported multiple times. [MEDIUM]
+    avoid_duplicate_named_imports: false  # Import declared with different prefixes. [MEDIUM]
+    max_imports: false  # File has too many imports. [MEDIUM]
+    prefer_named_imports: false  # Consider using named imports. [LOW]
+
+    # =========================================================================
+    # FILE & CODE STRUCTURE
+    # =========================================================================
+    # Rules for file organization and code structure.
+    # =========================================================================
+
+    avoid_long_files: false  # File exceeds maximum lines. [MEDIUM]
+    prefer_single_declaration_per_file: false  # File has multiple top-level declarations. [LOW]
+    prefer_match_file_name: false  # File name should match primary class. [NOISY]
+    match_lib_folder_structure: false  # Test file should mirror lib structure. [LOW]
+
+    # =========================================================================
+    # FORMATTING & STYLE
+    # =========================================================================
+    # Rules for code formatting and visual style.
+    # =========================================================================
+
+    format_comment: false  # Comment formatting convention. [LOW]
+    capitalize_comment: false  # Comment should start with capital. [LOW]
+    prefer_commenting_analyzer_ignores: false  # Analyzer ignore needs explanation. [MEDIUM]
+    prefer_commenting_future_delayed: false  # Future.delayed needs comment. [LOW]
+    prefer_trailing_comma: false  # Missing trailing comma. [LOW]
+    unnecessary_trailing_comma: false  # Unnecessary trailing comma. [LOW]
+    newline_before_return: false  # Add blank line before return. [NOISY]
+    newline_before_case: false  # Add newline before case clause. [LOW]
+    newline_before_method: false  # Add blank line before method. [LOW]
+    newline_before_constructor: false  # Add blank line before constructor. [LOW]
+    prefer_blank_line_before_return: false  # Add blank line before return. [LOW]
+    prefer_blank_line_before_case: false  # Add newline before case clause. [LOW]
+    prefer_blank_line_before_method: false  # Add blank line before method. [LOW]
+    prefer_blank_line_before_constructor: false  # Add blank line before constructor. [LOW]
+
+    # =========================================================================
+    # MEMBER ORDERING
+    # =========================================================================
+    # Rules for ordering class members and parameters.
+    # =========================================================================
+
+    member_ordering: false  # Class member ordering convention. [NOISY]
+    prefer_sorted_members: false  # Consider reordering class members. [LOW]
+    prefer_sorted_parameters: false  # Named parameters should be alphabetical. [LOW]
+    parameters_ordering: false  # Parameter ordering convention. [LOW]
+
+    # =========================================================================
+    # PERFORMANCE OPTIMIZATION (General)
+    # =========================================================================
+    # Rules for general performance optimizations.
+    # =========================================================================
+
+    avoid_regex_in_loop: false  # RegExp created inside loop. [HIGH]
+    avoid_service_locator_overuse: false  # Service locator in widget. [MEDIUM]
+
+    # Performance rules (NEW)
+    avoid_setstate_in_build: false  # setState in build causes infinite loops. [CRITICAL]
+    avoid_controller_in_build: false  # Controller created in build leaks memory. [HIGH]
+    require_keys_in_animated_lists: false  # AnimatedList items need keys. [HIGH]
+    avoid_expensive_build: false  # Expensive operations in build method. [HIGH]
+    avoid_synchronous_file_io: false  # Sync file I/O blocks UI. [HIGH]
+    avoid_object_creation_in_hot_loops: false  # Object in loop causes GC pressure. [MEDIUM]
+    avoid_excessive_widget_depth: false  # Widget tree too deep. [MEDIUM]
+    prefer_const_child_widgets: false  # Child widgets could be const. [MEDIUM]
+    prefer_compute_for_heavy_work: false  # Heavy work should use Isolate. [MEDIUM]
+    prefer_cached_getter: false  # Getter called multiple times. [LOW]
+    require_item_extent_for_large_lists: false  # Large lists need itemExtent. [LOW]
+    require_image_cache_dimensions: false  # Network images need cache dimensions. [LOW]
+    prefer_image_precache: false  # Hero images should be precached. [LOW]
+
+    # =========================================================================
+    # INLINING & PRAGMAS
+    # =========================================================================
+    # Rules for pragma annotations and inlining hints.
+    # =========================================================================
+
+    avoid_redundant_pragma_inline: false  # Pragma inline may be redundant. [LOW]
+    avoid_unknown_pragma: false  # Unknown pragma annotation. [MEDIUM]
+    prefer_both_inlining_annotations: false  # Use both VM and dart2js pragmas. [LOW]
+
+    # =========================================================================
+    # DATE & TIME
+    # =========================================================================
+    # Rules for date and time handling.
+    # =========================================================================
+
+    prefer_utc_datetimes: false  # Consider using UTC DateTime. [LOW]
+
+    # =========================================================================
+    # DOCUMENTATION
+    # =========================================================================
+    # Rules for code documentation standards.
+    # =========================================================================
+
+    require_public_api_documentation: false  # Public API should be documented. [MEDIUM]
+    avoid_misleading_documentation: false  # Doc comment may not match code. [MEDIUM]
+    require_deprecation_message: false  # @Deprecated needs migration guidance. [HIGH]
+    require_complex_logic_comments: false  # Complex methods need comments. [LOW]
+    require_parameter_documentation: false  # Parameters should be documented. [LOW]
+    require_return_documentation: false  # Return values should be documented. [LOW]
+    require_exception_documentation: false  # Thrown exceptions should be documented. [LOW]
+    require_example_in_documentation: false  # Complex classes should have examples. [LOW]
+
+    # =========================================================================
+    # TESTING
+    # =========================================================================
+    # Rules for test code quality and structure.
+    # =========================================================================
+
+    avoid_duplicate_test_assertions: false  # Duplicate test assertion detected. [MEDIUM]
+    avoid_empty_test_groups: false  # Test group has an empty body. [HIGH]
+    avoid_top_level_members_in_tests: false  # Avoid public top-level in tests. [LOW]
+    missing_test_assertion: false  # Test body has no assertions. [HIGH]
+    prefer_correct_test_file_name: false  # Test file naming convention. [MEDIUM]
+    prefer_descriptive_test_name: false  # Test name should be descriptive. [MEDIUM]
+    format_test_name: false  # Test name formatting convention. [LOW]
+    prefer_unique_test_names: false  # Duplicate test name found. [MEDIUM]
+    prefer_test_matchers: false  # Use a more specific test matcher. [MEDIUM]
+    prefer_test_structure: false  # Test file should follow conventions. [LOW]
+    prefer_visible_for_testing_on_members: false  # Test helpers should use annotation. [LOW]
+
+    # Testing best practices rules (NEW)
+    require_test_assertions: false  # Test has no assertions. [HIGH]
+    avoid_vague_test_descriptions: false  # Test description too vague. [MEDIUM]
+    avoid_real_network_calls_in_tests: false  # Test may use real network. [HIGH]
+    avoid_hardcoded_test_delays: false  # Hardcoded delay makes tests flaky. [HIGH]
+    require_test_setup_teardown: false  # Tests need setUp/tearDown. [LOW]
+    require_pump_after_interaction: false  # Widget test needs pump after tap. [MEDIUM]
+    avoid_production_config_in_tests: false  # Test using production config. [HIGH]
+
+    # =========================================================================
+    # INTERNATIONALIZATION & LOCALIZATION
+    # =========================================================================
+    # Rules for proper internationalization and localization support.
+    # =========================================================================
+
+    avoid_hardcoded_strings_in_ui: false  # UI strings should be localized. [MEDIUM]
+    require_locale_aware_formatting: false  # Use DateFormat/NumberFormat. [MEDIUM]
+    require_directional_widgets: false  # Use EdgeInsetsDirectional for RTL. [LOW]
+    require_plural_handling: false  # Use Intl.plural for plurals. [LOW]
+    avoid_hardcoded_locale: false  # Locale should not be hardcoded. [MEDIUM]
+    avoid_string_concatenation_in_ui: false  # Concatenation breaks i18n. [MEDIUM]
+    avoid_text_in_images: false  # Image text cannot be localized. [LOW]
+    avoid_hardcoded_app_name: false  # App name should be configurable. [LOW]
+
+    # =========================================================================
+    # API & NETWORK
+    # =========================================================================
+    # Rules for proper API usage and network communication.
+    # =========================================================================
+
+    require_http_status_check: false  # Check response.statusCode. [HIGH]
+    require_api_timeout: false  # API calls need timeout. [HIGH]
+    avoid_hardcoded_api_urls: false  # API URLs should be configured. [HIGH]
+    require_retry_logic: false  # Network calls need retry. [MEDIUM]
+    require_typed_api_response: false  # Parse responses to typed models. [MEDIUM]
+    require_connectivity_check: false  # Check connectivity before sync. [LOW]
+    require_api_error_mapping: false  # Map API errors to domain errors. [LOW]
+
+    # =========================================================================
+    # DEPENDENCY INJECTION
+    # =========================================================================
+    # Rules for proper dependency injection patterns and practices.
+    # =========================================================================
+
+    avoid_service_locator_in_widgets: false  # Widgets should not use GetIt/locator. [HIGH]
+    avoid_too_many_dependencies: false  # Constructor has too many dependencies. [MEDIUM]
+    avoid_internal_dependency_creation: false  # Create dependencies outside class. [MEDIUM]
+    prefer_abstract_dependencies: false  # Depend on abstractions not concretions. [MEDIUM]
+    avoid_singleton_for_scoped_dependencies: false  # Scoped deps shouldn't be singletons. [MEDIUM]
+    avoid_circular_di_dependencies: false  # Circular dependency detected. [HIGH]
+    prefer_null_object_pattern: false  # Use null object instead of null checks. [LOW]
+    require_typed_di_registration: false  # DI registration should specify type. [LOW]
+
+    # =========================================================================
+    # MEMORY MANAGEMENT
+    # =========================================================================
+    # Rules for proper memory management and leak prevention.
+    # =========================================================================
+
+    avoid_large_objects_in_state: false  # Large data in State may cause issues. [MEDIUM]
+    require_image_disposal: false  # ui.Image must be disposed. [HIGH]
+    avoid_capturing_this_in_callbacks: false  # Callbacks may prevent GC. [MEDIUM]
+    require_cache_eviction_policy: false  # Cache needs eviction policy. [HIGH]
+    prefer_weak_references_for_cache: false  # Use WeakReference in caches. [LOW]
+    avoid_expando_circular_references: false  # Expando value references key. [HIGH]
+    avoid_large_isolate_communication: false  # Large objects expensive to send. [LOW]
+
+    # =========================================================================
+    # TYPE SAFETY
+    # =========================================================================
+    # Rules for leveraging Dart's type system effectively.
+    # =========================================================================
+
+    avoid_unsafe_cast: true  # Direct cast may throw at runtime. [HIGH]
+    prefer_constrained_generics: false  # Generic should have constraint. [LOW]
+    require_covariant_documentation: false  # Covariant params need docs. [LOW]
+    require_safe_json_parsing: false  # JSON parsing may throw. [HIGH]
+    require_null_safe_extensions: false  # Nullable extension uses "!". [HIGH]
+    prefer_specific_numeric_types: false  # Use int/double over num. [LOW]
+    require_futureor_documentation: false  # FutureOr needs documentation. [LOW]
+
+    # =========================================================================
+    # RESOURCE MANAGEMENT
+    # =========================================================================
+    # Rules for proper system resource handling and cleanup.
+    # =========================================================================
+
+    require_file_close_in_finally: false  # Close files in finally. [HIGH]
+    require_database_close: false  # Close database connections. [HIGH]
+    require_http_client_close: false  # Close HttpClient when done. [MEDIUM]
+    require_native_resource_cleanup: false  # Free native allocations. [CRITICAL]
+    require_websocket_close: false  # Close WebSocket in dispose. [HIGH]
+    require_platform_channel_cleanup: false  # Remove channel handlers. [MEDIUM]
+    require_isolate_kill: false  # Kill spawned Isolates. [MEDIUM]
+
+    # =========================================================================
+    # ADVANCED & SPECIALIZED
+    # =========================================================================
+    # Rules for advanced patterns and edge cases.
+    # =========================================================================
+
+    prefer_shorthands_with_constructors: false  # Constructor can use .new shorthand. [LOW]
+    prefer_shorthands_with_static_fields: false  # Consider using static field directly. [LOW]
+    avoid_inferrable_type_arguments: false  # Type argument can be inferred. [LOW]
+    avoid_passing_default_values: false  # Passing default value explicitly. [LOW]
