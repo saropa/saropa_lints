@@ -9,6 +9,7 @@ void testHardcodedCredentials() {
   // expect_lint: avoid_hardcoded_credentials
   const apiKey = 'sk-1234567890abcdef';
 
+  // cspell:disable-next-line
   // expect_lint: avoid_hardcoded_credentials
   const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
 

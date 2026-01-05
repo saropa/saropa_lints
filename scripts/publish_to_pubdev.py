@@ -483,25 +483,25 @@ def run_tests(project_dir: Path) -> bool:
     else:
         print_warning("No test directory found, skipping unit tests")
 
-    # Run custom_lint tests on test_fixtures if it exists
-    test_fixtures_dir = project_dir / "test_fixtures"
-    if test_fixtures_dir.exists():
-        print_info("Running custom_lint tests on test fixtures...")
+    # Run custom_lint tests on example/ if it exists
+    example_dir = project_dir / "example"
+    if example_dir.exists() and (example_dir / "pubspec.yaml").exists():
+        print_info("Running custom_lint tests on example fixtures...")
 
         # Install dependencies (pure Dart project, no Flutter)
         result = run_command(
             ["dart", "pub", "get"],
-            test_fixtures_dir,
-            "Installing test fixture dependencies"
+            example_dir,
+            "Installing example dependencies"
         )
         if result.returncode != 0:
-            print_warning("Could not install test fixture dependencies, skipping lint tests")
+            print_warning("Could not install example dependencies, skipping lint tests")
             return True
 
         # Run custom_lint
         result = run_command(
             ["dart", "run", "custom_lint"],
-            test_fixtures_dir,
+            example_dir,
             "Running custom_lint tests",
             allow_failure=True
         )
@@ -509,7 +509,7 @@ def run_tests(project_dir: Path) -> bool:
             print_warning("Custom lint tests found issues (this may be expected for expect_lint tests)")
             # Don't fail on custom_lint issues - they may be expected test failures
     else:
-        print_warning("No test_fixtures directory found, skipping custom_lint tests")
+        print_warning("No example directory with pubspec.yaml found, skipping custom_lint tests")
 
     return True
 
