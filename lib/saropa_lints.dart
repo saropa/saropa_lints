@@ -2,18 +2,43 @@
 
 /// Custom lint rules for Saropa codebase.
 ///
-/// To use these rules:
-/// 1. Add `custom_lint: ^0.8.0` to dev_dependencies in pubspec.yaml
-/// 2. Add `analyzer: plugins: - custom_lint` to analysis_options.yaml
-/// 3. Run `dart run custom_lint` to check for issues
+/// ## Configuration
+///
+/// Add to your `analysis_options.yaml`:
+///
+/// ```yaml
+/// custom_lint:
+///   saropa_lints:
+///     tier: recommended  # essential | recommended | professional | comprehensive | insanity
+/// ```
+///
+/// Available tiers:
+/// - `essential`: Critical rules (~45) - prevents crashes, security issues
+/// - `recommended`: Essential + common mistakes (~150) - default for most teams
+/// - `professional`: Recommended + architecture/testing (~350) - enterprise teams
+/// - `comprehensive`: Professional + thorough coverage (~700) - quality obsessed
+/// - `insanity`: Everything (~475+) - greenfield projects
+///
+/// You can also enable/disable individual rules:
+///
+/// ```yaml
+/// custom_lint:
+///   saropa_lints:
+///     tier: recommended
+///   rules:
+///     avoid_debug_print: false  # disable a rule
+///     no_magic_number: true     # enable a rule not in your tier
+/// ```
 library;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'package:saropa_lints/src/rules/all_rules.dart';
+import 'package:saropa_lints/src/tiers.dart';
 
 // Export all rule classes for documentation
 export 'package:saropa_lints/src/rules/all_rules.dart';
+export 'package:saropa_lints/src/tiers.dart';
 
 /// Entry point for custom_lint
 PluginBase createPlugin() => _SaropaLints();
@@ -571,49 +596,20 @@ const List<LintRule> _allRules = <LintRule>[
   ParametersOrderingConventionRule(),
 ];
 
-/// Rules that are enabled by default (CRITICAL rules only)
-const Set<String> _enabledRules = <String>{
-  // NOTE: always_fail is intentionally NOT here - it's a test hook only
-  // Security
-  'avoid_hardcoded_credentials',
-  'avoid_logging_sensitive_data',
-  'avoid_eval_like_patterns',
-  'avoid_weak_cryptographic_algorithms',
-  // Flutter Lifecycle
-  'avoid_context_in_initstate_dispose',
-  'avoid_inherited_widget_in_initstate',
-  'avoid_build_context_in_providers',
-  'avoid_unsafe_setstate',
-  'use_setstate_synchronously',
-  'avoid_global_key_in_build',
-  'require_stream_controller_dispose',
-  // Flutter Disposal
-  'require_dispose',
-  'dispose_fields',
-  'require_animation_disposal',
-  // Flutter Widgets
-  'avoid_recursive_widget_calls',
-  'avoid_duplicate_widget_keys',
-  'pass_existing_future_to_future_builder',
-  'pass_existing_stream_to_stream_builder',
-  // Collections
-  'avoid_unsafe_collection_methods',
-  'avoid_unsafe_reduce',
-  // Variables
-  'avoid_late_final_reassignment',
-  // Enums
-  'avoid_isar_enum_field',
-  // Performance
-  'avoid_setstate_in_build',
-  // Type Safety
-  'avoid_unsafe_cast',
-  // Resource Management
-  'require_native_resource_cleanup',
-};
-
 class _SaropaLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
+    // Read tier configuration from custom_lint.yaml:
+    // custom_lint:
+    //   saropa_lints:
+    //     tier: recommended
+    final LintOptions? saropaConfig = configs.rules['saropa_lints'];
+    final String tier =
+        saropaConfig?.json['tier'] as String? ?? 'essential';
+
+    // Get all rules enabled for this tier
+    final Set<String> tierRules = getRulesForTier(tier);
+
     return _allRules.where((LintRule rule) {
       final String ruleName = rule.code.name;
       final LintOptions? options = configs.rules[ruleName];
@@ -628,8 +624,8 @@ class _SaropaLints extends PluginBase {
         return true;
       }
 
-      // Otherwise, fall back to default critical rules
-      return _enabledRules.contains(ruleName);
+      // Otherwise, use tier-based rules
+      return tierRules.contains(ruleName);
     }).toList();
   }
 }

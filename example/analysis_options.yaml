@@ -5,3 +5,8 @@ analyzer:
     unused_local_variable: ignore
     unused_field: ignore
     unused_element: ignore
+
+# Configure saropa_lints tier
+custom_lint:
+  saropa_lints:
+    tier: recommended  # essential | recommended | professional | comprehensive | insanity
