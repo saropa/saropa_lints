@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.13] - 2025-01-05
+
+### Changed
+
+- `avoid_null_assertion` - Now recognizes safe null assertion patterns to reduce false positives:
+  - Safe ternaries: `x == null ? null : x!`, `x != null ? x! : default`
+  - Safe if-blocks: `if (x != null) { use(x!) }`
+  - After null-check extensions: `.isNotNullOrEmpty`, `.isNotNullOrBlank`, `.isNotEmpty`
+- `dispose_controllers` - Now recognizes `disposeSafe()` as a valid dispose method
+
 ## [1.1.12] - 2025-01-05
 
 ### Fixed
