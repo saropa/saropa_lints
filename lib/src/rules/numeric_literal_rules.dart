@@ -548,3 +548,62 @@ class PreferDigitSeparatorsRule extends DartLintRule {
     });
   }
 }
+
+/// Warns when digit separators are used unnecessarily.
+///
+/// Digit separators in small numbers don't improve readability.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final n = 1_0; // Unnecessary separator
+/// final m = 10_0; // Unnecessary separator
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final n = 10; // No separator needed
+/// final m = 1_000_000; // Separator improves readability
+/// ```
+class AvoidDigitSeparatorsRule extends DartLintRule {
+  const AvoidDigitSeparatorsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_digit_separators',
+    problemMessage: 'Unnecessary digit separator in small number.',
+    correctionMessage: 'Remove digit separators from small numbers.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const int _minDigitsForSeparator = 5;
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ErrorReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIntegerLiteral((IntegerLiteral node) {
+      final String lexeme = node.literal.lexeme;
+      if (!lexeme.contains('_')) return;
+
+      // Remove separators to count actual digits
+      final String digitsOnly = lexeme.replaceAll('_', '');
+
+      // Skip hex, binary, octal
+      if (digitsOnly.startsWith('0x') ||
+          digitsOnly.startsWith('0X') ||
+          digitsOnly.startsWith('0b') ||
+          digitsOnly.startsWith('0B') ||
+          digitsOnly.startsWith('0o') ||
+          digitsOnly.startsWith('0O')) {
+        return;
+      }
+
+      if (digitsOnly.length < _minDigitsForSeparator) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

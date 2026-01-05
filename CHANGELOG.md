@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2025-01-05
+
+### Added
+
+- New formatting lint rules:
+  - `AvoidDigitSeparatorsRule` - Flag digit separators in numeric literals
+  - `FormatCommentFormattingRule` - Enforce consistent comment formatting
+  - `MemberOrderingFormattingRule` - Enforce class member ordering
+  - `PreferSortedParametersRule` - Prefer sorted parameters in functions
+- Export all rule classes for documentation generation
+- Automated publish script for pub.dev releases
+
+### Changed
+
+- Renamed `ParametersOrderingRule` to `ParametersOrderingConventionRule`
+- Updated README with accurate rule count (497 rules)
+- Simplified README messaging and performance guidance
+
 ## [0.1.1] - 2024-12-27
 
 ### Fixed
