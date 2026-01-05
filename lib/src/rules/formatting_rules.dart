@@ -61,9 +61,8 @@ class NewlineBeforeCaseRule extends DartLintRule {
         final int currStartLine = unit.lineInfo.getLocation(current.offset).lineNumber;
 
         if (currStartLine - prevEndLine < 2) {
-          final Token keyword =
-              current is SwitchCase ? current.keyword : (current as SwitchDefault).keyword;
-          reporter.atToken(keyword, code);
+          // Use beginToken to handle SwitchCase, SwitchDefault, and SwitchPatternCase
+          reporter.atToken(current.beginToken, code);
         }
       }
     });
@@ -414,5 +413,226 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
       // Single element with trailing comma
       reporter.atToken(nextToken, code);
     }
+  }
+}
+
+/// Warns when comments don't follow formatting conventions.
+///
+/// Comments should start with a capital letter and end with punctuation.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// // this is a comment
+/// // TODO fix this
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // This is a comment.
+/// // TODO: Fix this.
+/// ```
+class FormatCommentFormattingRule extends DartLintRule {
+  const FormatCommentFormattingRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'format_comment',
+    problemMessage: 'Comment does not follow formatting conventions.',
+    correctionMessage:
+        'Start with capital letter and end with punctuation.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ErrorReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Comments are not part of the AST, so we need to check tokens
+    context.registry.addCompilationUnit((CompilationUnit node) {
+      Token? token = node.beginToken;
+      while (token != null && token != node.endToken) {
+        _checkPrecedingComments(token, reporter);
+        token = token.next;
+      }
+    });
+  }
+
+  void _checkPrecedingComments(Token token, ErrorReporter reporter) {
+    Token? comment = token.precedingComments;
+    while (comment != null) {
+      final String lexeme = comment.lexeme;
+
+      // Skip doc comments, they have their own rules
+      if (lexeme.startsWith('///') || lexeme.startsWith('/**')) {
+        comment = comment.next;
+        continue;
+      }
+
+      // Check single-line comments
+      if (lexeme.startsWith('//')) {
+        final String content = lexeme.substring(2).trim();
+
+        // Skip empty comments, special markers, and ignore directives
+        if (content.isEmpty ||
+            content.startsWith('ignore') ||
+            content.startsWith('TODO') ||
+            content.startsWith('FIXME') ||
+            content.startsWith('HACK') ||
+            content.startsWith('XXX')) {
+          comment = comment.next;
+          continue;
+        }
+
+        // Check if starts with lowercase (excluding URLs and code)
+        if (content.isNotEmpty &&
+            content[0].toLowerCase() == content[0] &&
+            RegExp(r'^[a-z]').hasMatch(content) &&
+            !content.startsWith('http') &&
+            !content.contains('://')) {
+          reporter.atToken(comment, code);
+        }
+      }
+
+      comment = comment.next;
+    }
+  }
+}
+
+/// Warns when class members are not in the conventional order.
+///
+/// Members should be ordered: fields, constructors, methods.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class Foo {
+///   void doSomething() {}
+///   final int value;
+///   Foo(this.value);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class Foo {
+///   final int value;
+///   Foo(this.value);
+///   void doSomething() {}
+/// }
+/// ```
+class MemberOrderingFormattingRule extends DartLintRule {
+  const MemberOrderingFormattingRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'member_ordering',
+    problemMessage: 'Class members are not in conventional order.',
+    correctionMessage:
+        'Order members: static fields, fields, constructors, methods.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ErrorReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      int lastCategory = -1;
+
+      for (final ClassMember member in node.members) {
+        final int category = _getMemberCategory(member);
+
+        if (category < lastCategory) {
+          reporter.atNode(member, code);
+        }
+
+        if (category > lastCategory) {
+          lastCategory = category;
+        }
+      }
+    });
+  }
+
+  int _getMemberCategory(ClassMember member) {
+    if (member is FieldDeclaration) {
+      return member.isStatic ? 0 : 1;
+    } else if (member is ConstructorDeclaration) {
+      return 2;
+    } else if (member is MethodDeclaration) {
+      return member.isStatic ? 3 : 4;
+    }
+    return 5;
+  }
+}
+
+/// Warns when parameters are not in conventional order.
+///
+/// Parameters should be ordered: required positional, optional positional,
+/// then named parameters (required named before optional named).
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// void foo({String? name}, int count) {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// void foo(int count, {String? name}) {}
+/// ```
+class ParametersOrderingConventionRule extends DartLintRule {
+  const ParametersOrderingConventionRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'parameters_ordering',
+    problemMessage: 'Parameters are not in conventional order.',
+    correctionMessage:
+        'Order: required positional, optional positional, named.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ErrorReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkParameters(node.functionExpression.parameters, reporter);
+    });
+
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkParameters(node.parameters, reporter);
+    });
+  }
+
+  void _checkParameters(FormalParameterList? params, ErrorReporter reporter) {
+    if (params == null) return;
+
+    int lastCategory = -1;
+    for (final FormalParameter param in params.parameters) {
+      final int category = _getParamCategory(param);
+
+      if (category < lastCategory) {
+        reporter.atNode(param, code);
+      }
+
+      if (category > lastCategory) {
+        lastCategory = category;
+      }
+    }
+  }
+
+  int _getParamCategory(FormalParameter param) {
+    if (param.isRequiredPositional) return 0;
+    if (param.isOptionalPositional) return 1;
+    if (param.isRequiredNamed) return 2;
+    return 3; // Optional named
   }
 }
