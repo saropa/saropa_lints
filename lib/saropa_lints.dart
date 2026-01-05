@@ -571,10 +571,53 @@ const List<LintRule> _allRules = <LintRule>[
   ParametersOrderingConventionRule(),
 ];
 
+/// Rules that are enabled by default (CRITICAL rules only)
+const Set<String> _enabledRules = <String>{
+  // Testing
+  'always_fail',
+  // Security
+  'avoid_hardcoded_credentials',
+  'avoid_logging_sensitive_data',
+  'avoid_eval_like_patterns',
+  'avoid_weak_cryptographic_algorithms',
+  // Flutter Lifecycle
+  'avoid_context_in_initstate_dispose',
+  'avoid_inherited_widget_in_initstate',
+  'avoid_build_context_in_providers',
+  'avoid_unsafe_setstate',
+  'use_setstate_synchronously',
+  'avoid_global_key_in_build',
+  'require_stream_controller_dispose',
+  // Flutter Disposal
+  'require_dispose',
+  'dispose_fields',
+  'require_animation_disposal',
+  // Flutter Widgets
+  'avoid_recursive_widget_calls',
+  'avoid_duplicate_widget_keys',
+  'pass_existing_future_to_future_builder',
+  'pass_existing_stream_to_stream_builder',
+  // Collections
+  'avoid_unsafe_collection_methods',
+  'avoid_unsafe_reduce',
+  // Variables
+  'avoid_late_final_reassignment',
+  // Enums
+  'avoid_isar_enum_field',
+  // Performance
+  'avoid_setstate_in_build',
+  // Type Safety
+  'avoid_unsafe_cast',
+  // Resource Management
+  'require_native_resource_cleanup',
+};
+
 class _SaropaLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
-    // Return all rules - filtering is done via configs.rules (set rule: false to disable)
-    return _allRules.toList();
+    // Only return rules that are in the enabled set
+    return _allRules.where((LintRule rule) {
+      return _enabledRules.contains(rule.code.name);
+    }).toList();
   }
 }
