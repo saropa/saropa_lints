@@ -8,7 +8,10 @@
       "Bash(git checkout:*)",
       "Bash(dart pub get:*)",
       "Bash(rm \"D:\\\\src\\\\saropa_lints\\\\scripts\\\\publish_pub_dev.ps1\")",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nRelease v0.1.4 - Analyzer 7.x compatibility update\n\nUpdate all rule files for analyzer package API changes:\n\n- Migrate DiagnosticSeverity → ErrorSeverity \\(31 files\\)\n- Migrate DiagnosticReporter → ErrorReporter \\(31 files\\)  \n- Update NamedType.name → NamedType.name2 for AST access\n- Update enclosingElement → enclosingElement3\n- Fix Element type inference\n\nOther changes:\n- Suppress TODO lint warnings in doc examples\n- Now compatible with analyzer ^7.5.0 and custom_lint ^0.8.0\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(python scripts/publish_to_pubdev.py:*)"
     ]
   }
 }
