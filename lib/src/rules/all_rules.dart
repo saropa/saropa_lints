@@ -1,0 +1,36 @@
+/// Barrel export for all lint rules organized by category
+library;
+
+export 'accessibility_rules.dart';
+export 'api_network_rules.dart';
+export 'architecture_rules.dart';
+export 'async_rules.dart';
+export 'class_constructor_rules.dart';
+export 'code_quality_rules.dart';
+export 'collection_rules.dart';
+export 'complexity_rules.dart';
+export 'control_flow_rules.dart';
+export 'debug_rules.dart';
+export 'dependency_injection_rules.dart';
+export 'documentation_rules.dart';
+export 'equality_rules.dart';
+export 'error_handling_rules.dart';
+export 'exception_rules.dart';
+export 'flutter_widget_rules.dart';
+export 'formatting_rules.dart';
+export 'internationalization_rules.dart';
+export 'memory_management_rules.dart';
+export 'naming_style_rules.dart';
+export 'numeric_literal_rules.dart';
+export 'performance_rules.dart';
+export 'record_pattern_rules.dart';
+export 'resource_management_rules.dart';
+export 'return_rules.dart';
+export 'security_rules.dart';
+export 'type_safety_rules.dart';
+export 'state_management_rules.dart';
+export 'structure_rules.dart';
+export 'test_rules.dart';
+export 'testing_best_practices_rules.dart';
+export 'type_rules.dart';
+export 'unnecessary_code_rules.dart';

@@ -1,0 +1,208 @@
+# Saropa Lints - Professional Tier (~350 rules)
+#
+# Recommended + architecture, testing, maintainability.
+# For enterprise teams and quality-focused projects.
+#
+# Usage in analysis_options.yaml:
+#   include: package:saropa_lints/tiers/professional.yaml
+
+include: package:saropa_lints/tiers/recommended.yaml
+
+custom_lint:
+  rules:
+    # =========================================================================
+    # ARCHITECTURE - Maintainable codebase
+    # =========================================================================
+    avoid_direct_data_access_in_ui: true
+    avoid_business_logic_in_ui: true
+    avoid_god_class: true
+    avoid_ui_in_domain_layer: true
+    avoid_cross_feature_dependencies: true
+
+    # =========================================================================
+    # SECURITY - Enhanced protection
+    # =========================================================================
+    require_certificate_pinning: true
+    require_secure_storage: true
+    require_input_sanitization: true
+    avoid_hardcoded_asset_paths: true
+    avoid_print_in_production: true
+    avoid_webview_javascript_enabled: true
+    require_biometric_fallback: true
+
+    # =========================================================================
+    # ACCESSIBILITY - Full compliance
+    # =========================================================================
+    avoid_merged_semantics_hiding_info: true
+    require_exclude_semantics_justification: true
+    require_live_region: true
+    require_heading_semantics: true
+
+    # =========================================================================
+    # STATE MANAGEMENT - Best practices
+    # =========================================================================
+    require_update_should_notify: true
+    avoid_watch_in_callbacks: true
+    avoid_stateful_without_state: true
+    avoid_global_riverpod_providers: true
+
+    # =========================================================================
+    # ERROR HANDLING - Comprehensive
+    # =========================================================================
+    require_error_context: true
+    prefer_result_pattern: true
+    require_async_error_documentation: true
+    require_error_boundary: true
+
+    # =========================================================================
+    # PERFORMANCE - Optimized
+    # =========================================================================
+    require_keys_in_animated_lists: true
+    avoid_synchronous_file_io: true
+    prefer_compute_for_heavy_work: true
+    avoid_object_creation_in_hot_loops: true
+    prefer_cached_getter: true
+    require_item_extent_for_large_lists: true
+    require_image_cache_dimensions: true
+    prefer_image_precache: true
+    avoid_excessive_widget_depth: true
+    prefer_sliver_list_delegate: true
+    avoid_layout_builder_misuse: true
+    avoid_repaint_boundary_misuse: true
+    avoid_gesture_detector_in_scrollview: true
+    prefer_opacity_widget: true
+
+    # =========================================================================
+    # TESTING - Comprehensive
+    # =========================================================================
+    avoid_vague_test_descriptions: true
+    require_pump_after_interaction: true
+    avoid_production_config_in_tests: true
+    avoid_empty_test_groups: true
+    prefer_correct_test_file_name: true
+    avoid_top_level_members_in_tests: true
+    require_test_setup_teardown: true
+    format_test_name: true
+    prefer_unique_test_names: true
+    prefer_test_structure: true
+    prefer_test_matchers: true
+
+    # =========================================================================
+    # DOCUMENTATION - Complete
+    # =========================================================================
+    require_public_api_documentation: true
+    avoid_misleading_documentation: true
+    require_complex_logic_comments: true
+    require_parameter_documentation: true
+    require_return_documentation: true
+    require_exception_documentation: true
+    require_example_in_documentation: true
+
+    # =========================================================================
+    # DEPENDENCY INJECTION - Clean
+    # =========================================================================
+    avoid_service_locator_in_widgets: true
+    avoid_too_many_dependencies: true
+    avoid_circular_di_dependencies: true
+    avoid_internal_dependency_creation: true
+    prefer_abstract_dependencies: true
+    avoid_singleton_for_scoped_dependencies: true
+    prefer_null_object_pattern: true
+    require_typed_di_registration: true
+
+    # =========================================================================
+    # MEMORY MANAGEMENT - No leaks
+    # =========================================================================
+    require_image_disposal: true
+    require_cache_eviction_policy: true
+    avoid_expando_circular_references: true
+    avoid_large_objects_in_state: true
+    avoid_capturing_this_in_callbacks: true
+    prefer_weak_references_for_cache: true
+    avoid_large_isolate_communication: true
+
+    # =========================================================================
+    # FLUTTER WIDGETS - Professional patterns
+    # =========================================================================
+    avoid_flexible_outside_flex: true
+    proper_super_calls: true
+    avoid_unremovable_callbacks_in_listeners: true
+    avoid_unnecessary_stateful_widgets: true
+    check_for_equals_in_render_object_setters: true
+    consistent_update_render_object: true
+    avoid_unnecessary_overrides_in_state: true
+    prefer_semantic_widget_names: true
+    prefer_widget_state_mixin: true
+    prefer_split_widget_const: true
+    prefer_safe_area_consumer: true
+    avoid_navigator_push_without_route_name: true
+    prefer_scaffold_messenger_maybeof: true
+    avoid_wrapping_in_padding: true
+    avoid_unrestricted_text_field_length: true
+    avoid_expanded_as_spacer: true
+    avoid_unnecessary_gesture_detector: true
+
+    # =========================================================================
+    # ASYNC - Advanced patterns
+    # =========================================================================
+    avoid_nested_futures: true
+    avoid_nested_streams_and_futures: true
+    prefer_correct_future_return_type: true
+    prefer_correct_stream_return_type: true
+    prefer_unwrapping_future_or: true
+    prefer_specifying_future_value_type: true
+    prefer_expect_later: true
+    prefer_assigning_await_expressions: true
+    avoid_unnecessary_futures: true
+
+    # =========================================================================
+    # CODE QUALITY - High standards
+    # =========================================================================
+    avoid_long_functions: true
+    avoid_long_parameter_list: true
+    avoid_shadowing: true
+    avoid_generics_shadowing: true
+    avoid_similar_names: true
+    avoid_unused_parameters: true
+    avoid_duplicate_cascades: true
+    avoid_complex_conditions: true
+    prefer_early_return: true
+    avoid_recursive_calls: true
+    avoid_recursive_tostring: true
+    avoid_missed_calls: true
+    avoid_passing_self_as_argument: true
+
+    # =========================================================================
+    # INTERNATIONALIZATION - Global ready
+    # =========================================================================
+    avoid_hardcoded_strings_in_ui: true
+    require_locale_aware_formatting: true
+    avoid_hardcoded_locale: true
+    avoid_string_concatenation_in_ui: true
+    require_directional_widgets: true
+    require_plural_handling: true
+    avoid_text_in_images: true
+    avoid_hardcoded_app_name: true
+
+    # =========================================================================
+    # API & NETWORK - Production ready
+    # =========================================================================
+    require_retry_logic: true
+    require_typed_api_response: true
+    require_api_error_mapping: true
+    require_connectivity_check: true
+
+    # =========================================================================
+    # RESOURCE MANAGEMENT - Complete
+    # =========================================================================
+    require_http_client_close: true
+    require_platform_channel_cleanup: true
+    require_isolate_kill: true
+
+    # =========================================================================
+    # TYPE SAFETY - Complete
+    # =========================================================================
+    prefer_constrained_generics: true
+    require_covariant_documentation: true
+    prefer_specific_numeric_types: true
+    require_futureor_documentation: true
