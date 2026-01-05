@@ -2,7 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show ErrorSeverity;
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -26,13 +26,13 @@ class AvoidAssignmentsAsConditionsRule extends DartLintRule {
     name: 'avoid_assignments_as_conditions',
     problemMessage: 'Avoid using assignments inside conditions.',
     correctionMessage: 'Move the assignment outside the condition.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check if statements
@@ -67,7 +67,7 @@ class AvoidAssignmentsAsConditionsRule extends DartLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, ErrorReporter reporter) {
+  void _checkCondition(Expression condition, DiagnosticReporter reporter) {
     if (condition is AssignmentExpression) {
       reporter.atNode(condition, code);
     }
@@ -107,13 +107,13 @@ class AvoidCollapsibleIfRule extends DartLintRule {
     name: 'avoid_collapsible_if',
     problemMessage: 'Nested if statements can be collapsed.',
     correctionMessage: 'Combine conditions using && operator.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -166,13 +166,13 @@ class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
     name: 'avoid_conditions_with_boolean_literals',
     problemMessage: 'Avoid comparing with boolean literals or using them in logical expressions.',
     correctionMessage: 'Use the boolean expression directly: x instead of x == true.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -218,13 +218,13 @@ class AvoidConstantAssertConditionsRule extends DartLintRule {
     name: 'avoid_constant_assert_conditions',
     problemMessage: 'Assert has a constant condition that is always {0}.',
     correctionMessage: 'Use a meaningful condition or remove the assert statement.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssertStatement((AssertStatement node) {
@@ -293,13 +293,13 @@ class AvoidConstantSwitchesRule extends DartLintRule {
     name: 'avoid_constant_switches',
     problemMessage: 'Switch expression is a constant value.',
     correctionMessage: 'Use a variable or expression, or replace with if statement.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -349,13 +349,13 @@ class AvoidContinueRule extends DartLintRule {
     name: 'avoid_continue',
     problemMessage: 'Avoid using the continue statement.',
     correctionMessage: 'Restructure the loop logic to avoid continue.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addContinueStatement((ContinueStatement node) {
@@ -386,13 +386,13 @@ class AvoidDuplicateSwitchCaseConditionsRule extends DartLintRule {
     name: 'avoid_duplicate_switch_case_conditions',
     problemMessage: 'Duplicate switch case condition detected.',
     correctionMessage: 'Remove the duplicate case or use a different value.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -451,7 +451,7 @@ class AvoidIfWithManyBranchesRule extends DartLintRule {
     name: 'avoid_if_with_many_branches',
     problemMessage: 'If statement has too many branches (max 4).',
     correctionMessage: 'Consider using a switch statement or extracting to methods.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const int _maxBranches = 4;
@@ -459,7 +459,7 @@ class AvoidIfWithManyBranchesRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -501,13 +501,13 @@ class AvoidInvertedBooleanChecksRule extends DartLintRule {
     name: 'avoid_inverted_boolean_checks',
     problemMessage: 'Inverted boolean check can be simplified.',
     correctionMessage: 'Use the opposite operator instead of negating.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -553,7 +553,7 @@ class AvoidNegatedConditionsRule extends DartLintRule {
     name: 'avoid_negated_conditions',
     problemMessage: 'Negated condition can be simplified.',
     correctionMessage: 'Use the positive form (isNotEmpty, != null, etc.).',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static const List<String> _negateableMethods = <String>[
@@ -569,7 +569,7 @@ class AvoidNegatedConditionsRule extends DartLintRule {
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -620,13 +620,13 @@ class AvoidNestedAssignmentsRule extends DartLintRule {
     name: 'avoid_nested_assignments',
     problemMessage: 'Avoid using assignment inside another expression.',
     correctionMessage: 'Extract the assignment to a separate statement.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -659,13 +659,13 @@ class AvoidNestedConditionalExpressionsRule extends DartLintRule {
     name: 'avoid_nested_conditional_expressions',
     problemMessage: 'Avoid nested conditional expressions.',
     correctionMessage: 'Use if-else statements or extract to a method.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConditionalExpression((ConditionalExpression node) {
@@ -708,13 +708,13 @@ class AvoidNestedSwitchesRule extends DartLintRule {
     name: 'avoid_nested_switches',
     problemMessage: 'Avoid nested switch statements.',
     correctionMessage: 'Extract the inner switch to a separate method.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -771,13 +771,13 @@ class AvoidNestedSwitchExpressionsRule extends DartLintRule {
     name: 'avoid_nested_switch_expressions',
     problemMessage: 'Avoid nested switch expressions.',
     correctionMessage: 'Extract the inner switch to a separate function.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -817,13 +817,13 @@ class AvoidNestedTryRule extends DartLintRule {
     name: 'avoid_nested_try',
     problemMessage: 'Avoid nested try statements.',
     correctionMessage: 'Extract the inner try to a separate method.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTryStatement((TryStatement node) {
@@ -871,13 +871,13 @@ class AvoidRedundantElseRule extends DartLintRule {
     name: 'avoid_redundant_else',
     problemMessage: 'Else is redundant after return/throw/break/continue.',
     correctionMessage: 'Remove the else clause and un-indent the code.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -937,13 +937,13 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
     name: 'avoid_unconditional_break',
     problemMessage: 'Unconditional break/continue makes loop execute at most once.',
     correctionMessage: 'Add a condition before break/continue or remove the loop.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check for loops
@@ -964,7 +964,7 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
     });
   }
 
-  void _checkLoopBody(Statement body, ErrorReporter reporter) {
+  void _checkLoopBody(Statement body, DiagnosticReporter reporter) {
     // Get the first statement
     Statement? firstStatement;
 
@@ -1005,13 +1005,13 @@ class AvoidUnnecessaryConditionalsRule extends DartLintRule {
     name: 'avoid_unnecessary_conditionals',
     problemMessage: 'Condition is unnecessary (always true or always false).',
     correctionMessage: 'Remove the conditional or fix the condition.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check if statements with boolean literal conditions
@@ -1069,13 +1069,13 @@ class AvoidUnnecessaryContinueRule extends DartLintRule {
     name: 'avoid_unnecessary_continue',
     problemMessage: 'Redundant continue statement at end of loop body.',
     correctionMessage: 'Remove the continue statement.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addContinueStatement((ContinueStatement node) {
@@ -1110,13 +1110,13 @@ class AvoidUnnecessaryIfRule extends DartLintRule {
     name: 'avoid_unnecessary_if',
     problemMessage: 'Unnecessary if statement.',
     correctionMessage: 'Simplify by returning the condition directly.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1189,13 +1189,13 @@ class NoEqualConditionsRule extends DartLintRule {
     name: 'no_equal_conditions',
     problemMessage: 'Duplicate condition in if-else chain.',
     correctionMessage: 'This condition was already checked above.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1251,13 +1251,13 @@ class NoEqualThenElseRule extends DartLintRule {
     name: 'no_equal_then_else',
     problemMessage: 'If and else branches have identical code.',
     correctionMessage: 'Remove the condition and keep only the common code.',
-    errorSeverity: ErrorSeverity.WARNING,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1296,13 +1296,13 @@ class PreferConditionalExpressionsRule extends DartLintRule {
     name: 'prefer_conditional_expressions',
     problemMessage: 'Consider using a conditional expression.',
     correctionMessage: 'Use condition ? thenValue : elseValue.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1368,13 +1368,13 @@ class PreferCorrectSwitchLengthRule extends DartLintRule {
     name: 'prefer_correct_switch_length',
     problemMessage: 'Switch statement has too few cases.',
     correctionMessage: 'Consider using an if-else statement for $_minCases or fewer cases.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -1416,13 +1416,13 @@ class PreferEarlyReturnRule extends DartLintRule {
     name: 'prefer_early_return',
     problemMessage: 'Consider using early return to reduce nesting.',
     correctionMessage: 'Invert the condition and return early instead of wrapping the body.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1434,7 +1434,7 @@ class PreferEarlyReturnRule extends DartLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, ErrorReporter reporter) {
+  void _checkFunctionBody(FunctionBody body, DiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;
@@ -1484,13 +1484,13 @@ class PreferReturningConditionalsRule extends DartLintRule {
     name: 'prefer_returning_conditionals',
     problemMessage: 'Return the condition directly instead of true/false.',
     correctionMessage: 'Simplify by returning the condition expression.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1580,13 +1580,13 @@ class PreferReturningConditionRule extends DartLintRule {
     name: 'prefer_returning_condition',
     problemMessage: 'Prefer returning the condition directly.',
     correctionMessage: 'Replace if-else with direct return of the condition.',
-    errorSeverity: ErrorSeverity.INFO,
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
   void run(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    DiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
