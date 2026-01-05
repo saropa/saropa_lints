@@ -15,10 +15,3 @@ pubspec.lock
 # OS
 .DS_Store
 Thumbs.db
-nul
-
-# Logs
-*.log
-
-# Claude Code
-.claude/
