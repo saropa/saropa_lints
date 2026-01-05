@@ -3,13 +3,9 @@
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**1,000+ lint rules for Flutter and Dart. Free. Open source. No catch.**
+497 lint rules for Flutter and Dart. MIT licensed. Free forever - no catches.
 
-Commercial linters charge per developer. We give you more rules for FREE. Forever.
-
-## Why Saropa Lints?
-
-**1,000+ rules. Free. Forever.**
+This is an active project and we want your input. Found a bug? Think a rule is wrong? Have a better approach? Open an issue or PR. We'd rather fix a bad rule than defend it.
 
 ## Quick Start
 
@@ -52,9 +48,9 @@ Pick the tier that matches your team:
 |------|-------|----------|
 | **Essential** | ~50 | Every project. Prevents crashes, memory leaks, security holes. |
 | **Recommended** | ~150 | Most teams. Adds performance, accessibility, testing basics. |
-| **Professional** | ~350 | Enterprise. Adds architecture, documentation, comprehensive testing. |
-| **Comprehensive** | ~700 | Quality obsessed. Best practices everywhere. |
-| **Insanity** | ~1000 | Greenfield projects. Every single rule. |
+| **Professional** | ~300 | Enterprise. Adds architecture, documentation, comprehensive testing. |
+| **Comprehensive** | ~400 | Quality obsessed. Best practices everywhere. |
+| **Insanity** | 497 | Greenfield projects. Every single rule. |
 
 ### Using a tier
 
@@ -102,34 +98,32 @@ custom_lint:
 | **Internationalization** | Localization, RTL, plurals |
 | **Documentation** | Public API, examples, deprecation |
 
-## Performance Warning
+## Performance
 
-**Running all 1000 rules can use significant RAM.**
-
-The tiers are designed to manage this:
-- Rules set to `false` are **not loaded**
-- Start with `essential` or `recommended` tier
-- Upgrade gradually as you fix warnings
+Running all 497 rules uses significant memory. The tier system helps:
+- Rules set to `false` are not loaded
+- Start with `essential` or `recommended`
+- Upgrade tiers as you fix warnings
 
 ```yaml
 # GOOD: Start with recommended tier
 include: package:saropa_lints/tiers/recommended.yaml
 
 # BAD: Enabling everything at once on a legacy codebase
-include: package:saropa_lints/tiers/insanity.yaml  # May show 50,000+ warnings
+include: package:saropa_lints/tiers/insanity.yaml  # May show thousands of warnings
 ```
 
 ## Adoption Strategy
 
 ### New Projects
 
-Start with `professional` or `comprehensive` tier. Fix issues as you write code.
+Start with `professional` or `comprehensive`. Fix issues as you write code.
 
 ### Existing Projects
 
-1. **Week 1**: Enable `essential` tier. Fix critical issues (~50-200 warnings).
-2. **Weeks 2-4**: Enable `recommended` tier. Fix as you touch files.
-3. **Month 2+**: Enable `professional` tier. Fix opportunistically.
+1. Enable `essential`. Fix critical issues first.
+2. Move to `recommended`. Fix warnings as you touch files.
+3. Enable higher tiers when the noise is manageable.
 
 ### Suppressing Warnings
 
@@ -156,33 +150,51 @@ Issues appear as you type with quick-fix suggestions.
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome. So is criticism.
 
-### Adding a new rule
+If you think a rule is:
+- **Wrong** - tell us why, we'll fix it or remove it
+- **Too strict** - maybe it belongs in a higher tier
+- **Too lenient** - maybe it should be stricter or have options
+- **Missing** - propose it, or better yet, implement it
 
+We don't have all the answers. If you've shipped production Flutter apps and have opinions, we want to hear them.
+
+### How to contribute
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+**Adding a new rule:**
 1. Create rule in appropriate `lib/src/rules/*.dart` file
 2. Add to the appropriate tier(s) in `lib/tiers/*.yaml`
 3. Add tests in `test/rules/*_test.dart`
 4. Update CHANGELOG.md
 
+**Reporting issues:**
+- Include a minimal code sample that triggers (or should trigger) the rule
+- Explain what you expected vs what happened
+- If you disagree with a rule's premise, say so directly
+
+### Discussing rules
+
+Not sure if something is a bug or a design decision? Open a discussion issue. We're happy to explain our reasoning and change our minds when presented with good arguments.
+
 ## Professional Services
 
-The rules are free. We offer paid services for teams that need help:
+Optional paid services for teams that want hands-on help:
 
 | Service | Description |
 |---------|-------------|
-| **Reports** | Full codebase analysis with prioritized findings |
-| **Remediation** | We fix the issues for you |
+| **Reports** | Codebase analysis with prioritized findings |
+| **Remediation** | We fix the issues |
 | **Custom Rules** | Rules specific to your codebase |
-| **Training** | Team workshops on code quality |
+| **Training** | Team workshops |
 
 Contact: [saropa.com](https://saropa.com)
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-Free to use, modify, and distribute. No attribution required.
+MIT - see [LICENSE](LICENSE).
 
 ## Links
 
