@@ -49,10 +49,10 @@ custom_lint:
     require_secure_storage: false  # Sensitive data in SharedPreferences. [HIGH]
     require_input_sanitization: false  # User input not sanitized. [HIGH]
     avoid_hardcoded_asset_paths: false  # Asset path should not be hardcoded. [HIGH]
-    avoid_print_in_production: false  # Avoid print() in production code. [HIGH]
+    avoid_print_in_production: true  # Avoid print() in production code. [HIGH]
     avoid_webview_javascript_enabled: false  # WebView JavaScript risks. [MEDIUM]
     avoid_hardcoded_colors: false  # Avoid hardcoded color values. [MEDIUM]
-    avoid_debug_print: false  # Avoid using debugPrint. [MEDIUM]
+    avoid_debug_print: true  # Avoid using debugPrint. [MEDIUM]
     avoid_unguarded_debug: false  # Debug statement is not guarded. [MEDIUM]
     require_biometric_fallback: false  # Biometric auth needs fallback. [LOW]
 

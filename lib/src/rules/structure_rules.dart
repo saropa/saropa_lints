@@ -3,7 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -84,6 +84,8 @@ class AvoidBarrelFilesRule extends DartLintRule {
 /// import 'package:foo/bar.dart';
 /// import 'src/utils.dart';
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDoubleSlashImportsRule extends DartLintRule {
   const AvoidDoubleSlashImportsRule() : super(code: _code);
 
@@ -120,6 +122,9 @@ class AvoidDoubleSlashImportsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForDoubleSlashImportFix()];
 }
 
 /// Warns when the same file is exported multiple times.
@@ -134,6 +139,8 @@ class AvoidDoubleSlashImportsRule extends DartLintRule {
 /// ```dart
 /// export 'utils.dart';
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateExportsRule extends DartLintRule {
   const AvoidDuplicateExportsRule() : super(code: _code);
 
@@ -165,6 +172,9 @@ class AvoidDuplicateExportsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForDuplicateExportFix()];
 }
 
 /// Warns when the same mixin is applied multiple times in a class hierarchy.
@@ -178,6 +188,8 @@ class AvoidDuplicateExportsRule extends DartLintRule {
 /// ```dart
 /// class MyClass extends BaseClass with MixinA, MixinB { }
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateMixinsRule extends DartLintRule {
   const AvoidDuplicateMixinsRule() : super(code: _code);
 
@@ -209,6 +221,9 @@ class AvoidDuplicateMixinsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForDuplicateMixinFix()];
 }
 
 /// Warns when the same import is declared with different prefixes.
@@ -223,6 +238,8 @@ class AvoidDuplicateMixinsRule extends DartLintRule {
 /// ```dart
 /// import 'package:foo/foo.dart' as foo;
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateNamedImportsRule extends DartLintRule {
   const AvoidDuplicateNamedImportsRule() : super(code: _code);
 
@@ -255,6 +272,9 @@ class AvoidDuplicateNamedImportsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForDuplicateNamedImportFix()];
 }
 
 /// Warns when mutable global state is declared.
@@ -272,6 +292,8 @@ class AvoidDuplicateNamedImportsRule extends DartLintRule {
 /// const int maxItems = 100;  // Immutable
 /// final List<String> defaultItems = const ['a', 'b'];  // Immutable
 /// ```
+///
+/// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidGlobalStateRule extends DartLintRule {
   const AvoidGlobalStateRule() : super(code: _code);
 
@@ -304,6 +326,9 @@ class AvoidGlobalStateRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForGlobalStateFix()];
 }
 
 /// Warns when a file exceeds the maximum line count.
@@ -1601,5 +1626,148 @@ class _NullReturnFinder extends RecursiveAstVisitor<void> {
       onNullReturn();
     }
     super.visitReturnStatement(node);
+  }
+}
+
+class _AddHackForDoubleSlashImportFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addImportDirective((ImportDirective node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for double slash import',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: remove extra slash from import path\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForDuplicateExportFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addExportDirective((ExportDirective node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for duplicate export',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: remove this duplicate export\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForDuplicateMixinFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final WithClause? withClause = node.withClause;
+      if (withClause == null) return;
+
+      // Find the duplicate mixin that matches the error
+      for (final NamedType mixin in withClause.mixinTypes) {
+        if (!mixin.sourceRange.intersects(analysisError.sourceRange)) continue;
+
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Add HACK comment for duplicate mixin',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleInsertion(
+            mixin.offset,
+            '/* HACK: duplicate mixin */ ',
+          );
+        });
+        return;
+      }
+    });
+  }
+}
+
+class _AddHackForDuplicateNamedImportFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addImportDirective((ImportDirective node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for duplicate import',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: use single import with one prefix\n',
+        );
+      });
+    });
+  }
+}
+
+class _AddHackForGlobalStateFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for mutable global',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: make const/final or encapsulate in class\n',
+        );
+      });
+    });
   }
 }

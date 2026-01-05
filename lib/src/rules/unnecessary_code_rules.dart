@@ -20,6 +20,8 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// ```dart
 /// final list = [1, 2, 3];
 /// ```
+///
+/// **Quick fix available:** Comments out the empty spread.
 class AvoidEmptySpreadRule extends DartLintRule {
   const AvoidEmptySpreadRule() : super(code: _code);
 
@@ -43,6 +45,36 @@ class AvoidEmptySpreadRule extends DartLintRule {
       } else if (expression is SetOrMapLiteral && expression.elements.isEmpty) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutEmptySpreadFix()];
+}
+
+class _CommentOutEmptySpreadFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSpreadElement((SpreadElement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out empty spread',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '/* ${node.toSource()} */',
+        );
+      });
     });
   }
 }
@@ -114,6 +146,8 @@ class AvoidUnnecessaryBlockRule extends DartLintRule {
 /// final fn = () => print('hello');
 /// fn(); // Implicit call
 /// ```
+///
+/// **Quick fix available:** Replaces `target.call(args)` with `target(args)`.
 class AvoidUnnecessaryCallRule extends DartLintRule {
   const AvoidUnnecessaryCallRule() : super(code: _code);
 
@@ -140,6 +174,45 @@ class AvoidUnnecessaryCallRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveUnnecessaryCallFix()];
+}
+
+class _RemoveUnnecessaryCallFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'call') return;
+      if (!node.methodName.sourceRange.intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove .call()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Replace "target.call(args)" with "target(args)"
+        final String targetSource = target.toSource();
+        final String argsSource = node.argumentList.toSource();
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '$targetSource$argsSource',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when a class has an empty constructor (no parameters, no body, no initializers).
@@ -159,6 +232,8 @@ class AvoidUnnecessaryCallRule extends DartLintRule {
 ///   // No constructor needed, Dart provides default
 /// }
 /// ```
+///
+/// **Quick fix available:** Comments out the unnecessary constructor.
 class AvoidUnnecessaryConstructorRule extends DartLintRule {
   const AvoidUnnecessaryConstructorRule() : super(code: _code);
 
@@ -201,6 +276,36 @@ class AvoidUnnecessaryConstructorRule extends DartLintRule {
 
       // This is an empty constructor
       reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutUnnecessaryConstructorFix()];
+}
+
+class _CommentOutUnnecessaryConstructorFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out unnecessary constructor',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          '// ${node.toSource()}',
+        );
+      });
     });
   }
 }
@@ -399,6 +504,8 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
 /// ```dart
 /// class MyClass { }
 /// ```
+///
+/// **Quick fix available:** Removes the `extends Object` clause.
 class AvoidUnnecessaryExtendsRule extends DartLintRule {
   const AvoidUnnecessaryExtendsRule() : super(code: _code);
 
@@ -423,6 +530,42 @@ class AvoidUnnecessaryExtendsRule extends DartLintRule {
       if (superclass == 'Object') {
         reporter.atNode(extendsClause, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveExtendsObjectFix()];
+}
+
+class _RemoveExtendsObjectFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      if (!extendsClause.sourceRange.intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove extends Object',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the end of the previous element (type parameters or class name)
+        final int previousEnd = node.typeParameters?.end ?? node.name.end;
+        // Delete from end of previous element to end of extends clause
+        builder.addDeletion(
+          SourceRange(previousEnd, extendsClause.end - previousEnd),
+        );
+      });
     });
   }
 }
@@ -532,6 +675,8 @@ class AvoidUnnecessaryGetterRule extends DartLintRule {
 }
 
 /// Warns when length > 0 or length != 0 can be replaced with isNotEmpty.
+///
+/// **Quick fix available:** Replaces with `.isEmpty` or `.isNotEmpty`.
 class AvoidUnnecessaryLengthCheckRule extends DartLintRule {
   const AvoidUnnecessaryLengthCheckRule() : super(code: _code);
 
@@ -589,6 +734,91 @@ class AvoidUnnecessaryLengthCheckRule extends DartLintRule {
       if (lengthAccess != null && (isNotEmptyPattern || isEmptyPattern)) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  bool _isLengthAccess(Expression expr) {
+    if (expr is PropertyAccess) {
+      return expr.propertyName.name == 'length';
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseIsEmptyOrIsNotEmptyFix()];
+}
+
+class _UseIsEmptyOrIsNotEmptyFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String op = node.operator.lexeme;
+      PropertyAccess? lengthAccess;
+      String replacement = '';
+
+      if (_isLengthAccess(node.leftOperand)) {
+        lengthAccess = node.leftOperand as PropertyAccess;
+        final Expression right = node.rightOperand;
+        if (right is IntegerLiteral) {
+          final int? value = right.value;
+          if (value == 0) {
+            if (op == '>' || op == '!=') {
+              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
+            } else if (op == '==' || op == '<=') {
+              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
+            }
+          } else if (value == 1) {
+            if (op == '>=') {
+              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
+            } else if (op == '<') {
+              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
+            }
+          }
+        }
+      } else if (_isLengthAccess(node.rightOperand)) {
+        lengthAccess = node.rightOperand as PropertyAccess;
+        final Expression left = node.leftOperand;
+        if (left is IntegerLiteral) {
+          final int? value = left.value;
+          if (value == 0) {
+            if (op == '<' || op == '!=') {
+              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
+            } else if (op == '==' || op == '>=') {
+              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
+            }
+          } else if (value == 1) {
+            if (op == '<=') {
+              replacement = '${lengthAccess.target!.toSource()}.isNotEmpty';
+            } else if (op == '>') {
+              replacement = '${lengthAccess.target!.toSource()}.isEmpty';
+            }
+          }
+        }
+      }
+
+      if (replacement.isEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: replacement.contains('isNotEmpty')
+            ? 'Use .isNotEmpty'
+            : 'Use .isEmpty',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          replacement,
+        );
+      });
     });
   }
 
@@ -682,6 +912,8 @@ class AvoidUnnecessaryNegationsRule extends DartLintRule {
 ///   Child();  // Implicit super()
 /// }
 /// ```
+///
+/// **Quick fix available:** Removes the `super()` call.
 class AvoidUnnecessarySuperRule extends DartLintRule {
   const AvoidUnnecessarySuperRule() : super(code: _code);
 
@@ -706,6 +938,63 @@ class AvoidUnnecessarySuperRule extends DartLintRule {
               initializer.argumentList.arguments.isEmpty) {
             reporter.atNode(initializer, code);
           }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveUnnecessarySuperFix()];
+}
+
+class _RemoveUnnecessarySuperFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      for (int i = 0; i < node.initializers.length; i++) {
+        final ConstructorInitializer initializer = node.initializers[i];
+        if (initializer is SuperConstructorInvocation) {
+          if (!initializer.sourceRange.intersects(analysisError.sourceRange)) {
+            continue;
+          }
+
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Remove super()',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            if (node.initializers.length == 1) {
+              // Remove colon and super()
+              final int colonOffset = node.separator!.offset;
+              builder.addDeletion(
+                SourceRange(colonOffset, initializer.end - colonOffset),
+              );
+            } else if (i == 0) {
+              // First initializer, remove it and following comma
+              builder.addDeletion(
+                SourceRange(
+                  initializer.offset,
+                  node.initializers[1].offset - initializer.offset,
+                ),
+              );
+            } else {
+              // Not first, remove preceding comma and super()
+              builder.addDeletion(
+                SourceRange(
+                  node.initializers[i - 1].end,
+                  initializer.end - node.initializers[i - 1].end,
+                ),
+              );
+            }
+          });
+          return;
         }
       }
     });

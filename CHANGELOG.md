@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.9] - 2025-01-05
+
+### Added
+
+- Quick fixes for 37+ lint rules (IDE code actions to resolve issues)
+- `ROADMAP.md` with specifications for ~500 new rules to reach 1000 total
+- `ENTERPRISE.md` with business value, adoption strategy, and professional services info
+- "Why saropa_lints?" section in README explaining project motivation
+- Contact emails: `lints@saropa.com` (README), `dev@saropa.com` (CONTRIBUTING), `enterprise@saropa.com` (ENTERPRISE)
+
+### Changed
+
+- README: Updated rule counts to reflect 1000-rule goal
+- README: Tier table now shows target distribution (~100/~300/~600/~800/1000)
+- README: Added migration guide links in Quick Start section
+- Reorganized documentation structure
+- `CONTRIBUTING.md`: Updated quick fix requirements documentation
+- `ENTERPRISE.md`: Added migration FAQ with links to guides
+
+### Removed
+
+- `doc/PLAN_LINT_RULES_AND_TESTING.md` (replaced by `ROADMAP.md`)
+- `doc/SAROPA_LINT_RULES_GUIDE.md` (replaced by `ENTERPRISE.md`)
+
 ## [0.1.8] - 2025-01-05
 
 ### Added
