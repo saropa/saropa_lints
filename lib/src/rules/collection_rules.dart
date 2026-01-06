@@ -425,6 +425,11 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
       return true;
     }
 
+    // Check for collection-if guard: [if (list.isNotEmpty) list.first]
+    if (_isGuardedByCollectionIf(node, collectionName)) {
+      return true;
+    }
+
     return false;
   }
 
@@ -465,6 +470,31 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
         // Check if we're in the "else" branch with inverted condition
         final Statement? elseStatement = current.elseStatement;
         if (elseStatement != null && _isDescendantOf(node, elseStatement)) {
+          if (_isInvertedGuardCondition(current.expression, collectionName)) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if inside a collection-if element with isNotEmpty/length guard.
+  /// e.g., [if (list.isNotEmpty) list.first] or {if (set.length > 0) set.first}
+  bool _isGuardedByCollectionIf(AstNode node, String collectionName) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfElement) {
+        // Check if we're in the "then" element
+        if (_isDescendantOf(node, current.thenElement)) {
+          if (_isValidGuardCondition(current.expression, collectionName)) {
+            return true;
+          }
+        }
+        // Check if we're in the "else" element with inverted condition
+        final CollectionElement? elseElement = current.elseElement;
+        if (elseElement != null && _isDescendantOf(node, elseElement)) {
           if (_isInvertedGuardCondition(current.expression, collectionName)) {
             return true;
           }
