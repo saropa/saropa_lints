@@ -10,14 +10,18 @@ library;
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 const Set<String> essentialRules = <String>{
-  // Memory Leaks
+  // Memory Leaks - Controllers (dispose)
   'require_dispose',
   'dispose_fields',
   'require_animation_disposal',
   'avoid_undisposed_instances',
-  'avoid_unassigned_stream_subscriptions',
-  'require_stream_controller_dispose',
   'require_value_notifier_dispose',
+  // Memory Leaks - Timers & Subscriptions (cancel)
+  'require_timer_cancellation',
+  'avoid_unassigned_stream_subscriptions',
+  // Memory Leaks - Streams (close)
+  'require_stream_controller_dispose',
+  // Memory Leaks - Listeners
   'always_remove_listener',
 
   // Flutter Lifecycle
