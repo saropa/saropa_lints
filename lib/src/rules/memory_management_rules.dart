@@ -158,7 +158,9 @@ class RequireImageDisposalRule extends DartLintRule {
 
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.body.toSource();
-          if (disposeSource.contains('.dispose()')) {
+          // Check for dispose (including *Safe extension variants)
+          if (disposeSource.contains('.dispose()') ||
+              disposeSource.contains('.disposeSafe(')) {
             hasDisposeCall = true;
           }
         }

@@ -469,17 +469,30 @@ class AvoidNullAssertionRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
-  /// Known extension method/property names that imply non-null when true.
-  static const Set<String> _nullCheckNames = <String>{
+  /// Extension names that return `true` when value is NOT null/empty.
+  /// Used for `&&` short-circuit: `x.isNotEmpty && x!.foo`
+  /// Used for if-blocks: `if (x.isNotEmpty) x!`
+  static const Set<String> _truthyNullCheckNames = <String>{
     'isNotNullOrEmpty',
     'isNotNullOrBlank',
     'isNeitherNullNorEmpty',
     'isNotEmpty',
-    // Falsy names - these return true when null/empty, used in || short-circuit
+    'isNotListNullOrEmpty',
+  };
+
+  /// Extension names that return `true` when value IS null/empty.
+  /// Used for `||` short-circuit: `x.isEmpty || x!.foo`
+  static const Set<String> _falsyNullCheckNames = <String>{
     'isListNullOrEmpty',
     'isNullOrEmpty',
     'isNullOrBlank',
     'isEmpty',
+  };
+
+  /// All recognized null-check extension names.
+  static const Set<String> _nullCheckNames = <String>{
+    ..._truthyNullCheckNames,
+    ..._falsyNullCheckNames,
   };
 
   @override
@@ -550,10 +563,11 @@ class AvoidNullAssertionRule extends DartLintRule {
   /// - `if (x == null) return; ... x! ...`
   /// - `if (x.isNotNullOrEmpty) { ... x! ... }`
   /// - `if (x.isNotEmpty) { ... x! ... }` (for String?)
+  /// - `[if (x != null) x!]` (collection if elements)
   bool _isInSafeIfBlock(PostfixExpression node) {
     final String assertedExpr = _getBaseExpression(node.operand);
 
-    // Walk up to find enclosing if statements
+    // Walk up to find enclosing if statements or if elements
     AstNode? current = node.parent;
     while (current != null) {
       if (current is IfStatement) {
@@ -597,6 +611,55 @@ class AvoidNullAssertionRule extends DartLintRule {
           }
         }
       }
+
+      // Handle IfElement in collection literals: [if (x != null) x!]
+      if (current is IfElement) {
+        final Expression condition = current.expression;
+
+        // Check for `if (x != null) x!` pattern in collection
+        if (condition is BinaryExpression) {
+          final String? checkedExpr = _getNullCheckedExpression(condition);
+          if (checkedExpr != null && checkedExpr == assertedExpr) {
+            // `if (x != null) x!` - safe in then element
+            if (condition.operator.lexeme == '!=' &&
+                _containsNode(current.thenElement, node)) {
+              return true;
+            }
+            // `if (x == null) ... else x!` - safe in else element
+            final CollectionElement? elseElement = current.elseElement;
+            if (condition.operator.lexeme == '==' &&
+                elseElement != null &&
+                _containsNode(elseElement, node)) {
+              return true;
+            }
+          }
+        }
+
+        // Check for `if (x.isNotNullOrEmpty)` or similar in collection
+        if (condition is MethodInvocation) {
+          if (_isNullCheckMethod(condition, assertedExpr) &&
+              _containsNode(current.thenElement, node)) {
+            return true;
+          }
+        }
+
+        // Check for `if (x.isNotNullOrEmpty)` via PrefixedIdentifier in collection
+        if (condition is PrefixedIdentifier) {
+          if (_isNullCheckProperty(condition, assertedExpr) &&
+              _containsNode(current.thenElement, node)) {
+            return true;
+          }
+        }
+
+        // Check for property access like `if (x.isNotEmpty)` in collection
+        if (condition is PropertyAccess) {
+          if (_isNullCheckPropertyAccess(condition, assertedExpr) &&
+              _containsNode(current.thenElement, node)) {
+            return true;
+          }
+        }
+      }
+
       current = current.parent;
     }
     return false;
@@ -807,9 +870,7 @@ class AvoidNullAssertionRule extends DartLintRule {
     // Extension method check: `x.isNotNullOrEmpty`
     if (expr is MethodInvocation) {
       final String methodName = expr.methodName.name;
-      // Only truthy checks for && pattern
-      if (<String>{'isNotNullOrEmpty', 'isNotNullOrBlank', 'isNotEmpty'}
-          .contains(methodName)) {
+      if (_truthyNullCheckNames.contains(methodName)) {
         final Expression? target = expr.target;
         if (target != null && _getBaseExpression(target) == assertedExpr) {
           return true;
@@ -820,16 +881,24 @@ class AvoidNullAssertionRule extends DartLintRule {
     // Property access: `x.isNotNullOrEmpty`
     if (expr is PrefixedIdentifier) {
       final String propertyName = expr.identifier.name;
-      if (<String>{'isNotNullOrEmpty', 'isNotNullOrBlank', 'isNotEmpty'}
-          .contains(propertyName)) {
+      if (<String>{
+        'isNotNullOrEmpty',
+        'isNotNullOrBlank',
+        'isNotEmpty',
+        'isNotListNullOrEmpty',
+      }.contains(propertyName)) {
         return _getBaseExpression(expr.prefix) == assertedExpr;
       }
     }
 
     if (expr is PropertyAccess) {
       final String propertyName = expr.propertyName.name;
-      if (<String>{'isNotNullOrEmpty', 'isNotNullOrBlank', 'isNotEmpty'}
-          .contains(propertyName)) {
+      if (<String>{
+        'isNotNullOrEmpty',
+        'isNotNullOrBlank',
+        'isNotEmpty',
+        'isNotListNullOrEmpty',
+      }.contains(propertyName)) {
         final Expression? target = expr.target;
         if (target != null && _getBaseExpression(target) == assertedExpr) {
           return true;
