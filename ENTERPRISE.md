@@ -130,5 +130,5 @@ Yes. We can create a private fork of saropa_lints pre-configured for your organi
 ### We're using another linter. Can we switch?
 
 Yes. See our migration guides:
-- [Migrating from very_good_analysis](docs/migration_from_vga.md)
-- [Migrating from DCM (Dart Code Metrics)](docs/migration_from_dcm.md)
+- [Migrating from very_good_analysis](doc/guides/migration_from_vga.md)
+- [Migrating from DCM (Dart Code Metrics)](doc/guides/migration_from_dcm.md)
