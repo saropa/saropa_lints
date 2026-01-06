@@ -17,7 +17,7 @@ This script automates the complete release workflow for the saropa_lints package
   12. Creates and pushes git tag
   13. Creates GitHub release with release notes
 
-Version:   3.2
+Version:   3.4
 Author:    Saropa
 Copyright: (c) 2025 Saropa
 
@@ -65,6 +65,9 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import NoReturn
+
+
+SCRIPT_VERSION = "3.4"
 
 
 # =============================================================================
@@ -429,7 +432,7 @@ def check_working_tree(project_dir: Path) -> tuple[bool, bool]:
         print_colored(result.stdout, Color.YELLOW)
         print()
         response = input("  These changes will be included in the release commit. Continue? [y/N] ").strip().lower()
-        if response != "y":
+        if not response.startswith("y"):
             return False, True
         return True, True
 
@@ -567,7 +570,7 @@ def validate_changelog(project_dir: Path, version: str) -> tuple[bool, str]:
     if not release_notes:
         print_warning("Version header found but no release notes content.")
         response = input(f"  Use generic message 'Release {version}'? [y/N] ").strip().lower()
-        if response != "y":
+        if not response.startswith("y"):
             return False, ""
         release_notes = f"Release {version}"
     else:
@@ -594,22 +597,31 @@ def generate_docs(project_dir: Path) -> bool:
 
 
 def pre_publish_validation(project_dir: Path) -> bool:
-    """Run dart pub publish --dry-run."""
+    """Run dart pub publish --dry-run silently, only showing output on failure."""
     print_header("STEP 9: PRE-PUBLISH VALIDATION")
 
-    result = run_command(
+    print_info("Running pre-publish validation...")
+    use_shell = get_shell_mode()
+
+    result = subprocess.run(
         ["flutter", "pub", "publish", "--dry-run"],
-        project_dir,
-        "Pre-publish validation",
-        allow_failure=True
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell
     )
 
     # Exit code 0 = success, 65 = warnings but valid
     if result.returncode in (0, 65):
-        if result.returncode == 65:
-            print_warning("Package valid with warnings")
+        print_success("Package validated successfully")
         return True
 
+    # Real failure - show the output
+    print_error("Pre-publish validation failed:")
+    if result.stdout:
+        print(result.stdout)
+    if result.stderr:
+        print(result.stderr)
     return False
 
 
@@ -823,6 +835,8 @@ def main() -> int:
     """Main entry point."""
     enable_ansi_support()
     show_saropa_logo()
+    print_colored(f"  Saropa Lints publisher script v{SCRIPT_VERSION}", Color.MAGENTA)
+    print()
 
     # Find project directory (script is in scripts/)
     script_dir = Path(__file__).parent
@@ -930,7 +944,7 @@ def main() -> int:
     print()
 
     response = input("  Publish to pub.dev and create GitHub release? [y/N] ").strip().lower()
-    if response != "y":
+    if not response.startswith("y"):
         print_warning("Publish cancelled by user.")
         return ExitCode.USER_CANCELLED.value
 
