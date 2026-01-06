@@ -1025,8 +1025,7 @@ class NoEmptyBlockRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: _name,
     problemMessage: 'Empty block detected.',
-    correctionMessage:
-        'Add implementation, a comment inside the block, or use '
+    correctionMessage: 'Add implementation, a comment inside the block, or use '
         '`// ignore: $_name` to suppress.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

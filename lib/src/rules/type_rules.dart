@@ -565,8 +565,7 @@ class AvoidNullAssertionRule extends DartLintRule {
       // Check for ??= assignment
       if (stmt is ExpressionStatement) {
         final Expression expr = stmt.expression;
-        if (expr is AssignmentExpression &&
-            expr.operator.lexeme == '??=') {
+        if (expr is AssignmentExpression && expr.operator.lexeme == '??=') {
           final String assignedExpr = _getBaseExpression(expr.leftHandSide);
           if (assignedExpr == assertedExpr) {
             return true;
