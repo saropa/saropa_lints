@@ -1,4 +1,4 @@
-![saropa_lints banner](assets/banner.png)
+![saropa_lints banner](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner.png)
 
 # saropa_lints
 
@@ -15,18 +15,51 @@ Developed by [Saropa][saropa_link]. Making the world of Dart & Flutter better, o
 
 ## Why saropa_lints?
 
-Flutter's ecosystem is young. The mature tooling that other platforms take for granted — security analysis, accessibility enforcement, architectural guardrails — is still catching up.
+### Linting vs static analysis
+
+`flutter analyze` checks syntax and style. Static analysis checks *behavior*.
+
+Your linter catches unused variables and formatting issues. It doesn't catch undisposed controllers, hardcoded credentials, or `setState` after `dispose` — because these require understanding what the code *does*, not just how it's written.
+
+In mature ecosystems, tools like [SonarQube](https://www.sonarsource.com/products/sonarqube/), [Coverity](https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html), and [Checkmarx](https://checkmarx.com/) fill this gap. Flutter hasn't had an equivalent — until now.
+
+### What it catches
+
+Code that compiles but fails at runtime:
+
+```dart
+// Memory leak — controller never disposed
+final _controller = TextEditingController();
+
+// Crash — setState after widget disposed
+await api.fetchData();
+setState(() => _data = data);  // boom
+
+// State loss — new GlobalKey every build
+Widget build(context) {
+  final key = GlobalKey<FormState>();  // wrong
+  return Form(key: key, ...);
+}
+```
+
+saropa_lints detects these patterns and hundreds more:
+
+- **Security** — Hardcoded credentials, sensitive data in logs, unsafe deserialization
+- **Accessibility** — Missing semantics, inadequate touch targets, screen reader issues
+- **Performance** — Unnecessary rebuilds, memory leaks, expensive operations in build
+- **Lifecycle** — setState after dispose, missing mounted checks, undisposed resources
+
+### Why it matters
+
+The [European Accessibility Act](https://accessible-eu-centre.ec.europa.eu/content-corner/news/eaa-comes-effect-june-2025-are-you-ready-2025-01-31_en) takes effect June 2025, requiring accessible apps in retail, banking, and travel. GitHub detected [39 million leaked secrets](https://github.blog/security/application-security/next-evolution-github-advanced-security/) in repositories during 2024.
+
+These aren't edge cases. They're compliance requirements and security basics that standard linters miss.
+
+### Free and open
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-Dart's analyzer catches syntax errors. saropa_lints catches the rest:
-
-- **Security** — Hardcoded credentials, unsafe deserialization, input validation gaps
-- **Accessibility** — Missing semantics, inadequate touch targets, screen reader issues
-- **Performance** — Unnecessary rebuilds, memory leaks, expensive operations in build methods
-- **Maintainability** — Inconsistent patterns, error handling gaps, architectural drift
-
-The tier system lets you adopt gradually. Start with 50 critical rules, work up to 1000 when you're ready.
+The tier system lets you adopt gradually — start with 50 critical rules, work up to 475 when you're ready.
 
 ---
 
@@ -38,7 +71,7 @@ The tier system lets you adopt gradually. Start with 50 critical rules, work up 
 # pubspec.yaml
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.1.12
+  saropa_lints: ^1.2.0
 ```
 
 ### 2. Enable custom_lint
@@ -67,8 +100,8 @@ dart run custom_lint
 
 ### Migrating from other tools?
 
-- [Migrating from very_good_analysis](doc/guides/migration_from_vga.md)
-- [Migrating from DCM (Dart Code Metrics)](doc/guides/migration_from_dcm.md)
+- [Migrating from very_good_analysis](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_vga.md)
+- [Migrating from DCM (Dart Code Metrics)](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_dcm.md)
 
 ## The 5 Tiers
 
@@ -76,11 +109,11 @@ Pick the tier that matches your team:
 
 | Tier | Rules | Best For |
 |------|-------|----------|
-| **Essential** | ~100 | Every project. Prevents crashes, memory leaks, security holes. |
-| **Recommended** | ~300 | Most teams. Adds performance, accessibility, testing basics. |
-| **Professional** | ~600 | Enterprise. Adds architecture, documentation, comprehensive testing. |
-| **Comprehensive** | ~800 | Quality obsessed. Best practices everywhere. |
-| **Insanity** | 1000 | Greenfield projects. Every single rule. |
+| **Essential** | ~50 | Every project. Prevents crashes, memory leaks, security holes. |
+| **Recommended** | ~150 | Most teams. Adds performance, accessibility, null safety, collection bounds. |
+| **Professional** | ~250 | Enterprise. Adds architecture, documentation, comprehensive testing. |
+| **Comprehensive** | ~400 | Quality obsessed. Best practices everywhere. |
+| **Insanity** | ~475 | Greenfield projects. Every single rule. |
 
 ### Using a tier
 
@@ -279,7 +312,7 @@ We don't have all the answers. If you've shipped production Flutter apps and hav
 
 ### How to contribute
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) for detailed guidelines.
 
 **Adding a new rule:**
 1. Create rule in appropriate `lib/src/rules/*.dart` file
@@ -298,7 +331,7 @@ Not sure if something is a bug or a design decision? Open a discussion issue. We
 
 ## Professional Services
 
-Optional paid services for teams that want hands-on help. See [ENTERPRISE.md](ENTERPRISE.md) for details.
+Optional paid services for teams that want hands-on help. See [ENTERPRISE.md](https://github.com/saropa/saropa_lints/blob/main/ENTERPRISE.md) for details.
 
 | Service | Description |
 |---------|-------------|
@@ -321,7 +354,7 @@ To indicate your project is using `saropa_lints`:
 
 ## License
 
-MIT - see [LICENSE](LICENSE). Use it however you like.
+MIT - see [LICENSE](https://github.com/saropa/saropa_lints/blob/main/LICENSE). Use it however you like.
 
 ---
 
