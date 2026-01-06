@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.18] - 2025-01-06
+
+### Changed
+
+- `avoid_unsafe_collection_methods` - Now recognizes guarded access patterns and won't flag safe usage:
+  - If statements: `if (list.isNotEmpty) { list.first }`, `if (list.length > 0) { ... }`
+  - Ternaries: `list.isNotEmpty ? list.first : fallback`, `list.length > 1 ? list.last : fallback`
+  - Inverted guards: `if (list.isEmpty) { } else { list.first }`
+  - Quick fix now suggests `*OrNull` methods (firstOrNull, lastOrNull, singleOrNull) instead of adding HACK comments
+- `require_future_error_handling` - Now uses actual type checking (`isDartAsyncFuture`) instead of method name heuristics. Added quick fix that adds `.catchError()` handler.
+
+### Fixed
+
+- `avoid_null_assertion` - Added `isNotListNullOrEmpty` to recognized null-check extension methods (truthy check for && patterns and if-blocks)
+- `avoid_undisposed_instances` - Now recognizes `disposeSafe()`, `cancelSafe()`, and `closeSafe()` as valid disposal methods
+- `require_stream_controller_dispose` - Now recognizes `closeSafe()` as valid close method
+- `require_value_notifier_dispose` - Now recognizes `disposeSafe()` as valid dispose method; only checks owned fields (with initializers), not parameters passed in
+- `require_database_close` - Now recognizes `closeSafe()` and `disposeSafe()` as valid cleanup methods
+- `require_http_client_close` - Now recognizes `closeSafe()` as valid close method
+- `require_websocket_close` - Now recognizes `closeSafe()` as valid close method
+- `require_platform_channel_cleanup` - Now recognizes `cancelSafe()` as valid cancel method
+- `require_image_disposal` - Now recognizes `disposeSafe()` as valid dispose method
+
 ## [1.1.17] - 2025-01-06
 
 ### Added
