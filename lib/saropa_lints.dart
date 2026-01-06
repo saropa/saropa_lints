@@ -19,16 +19,20 @@
 /// - `comprehensive`: Professional + thorough coverage (~700) - quality obsessed
 /// - `insanity`: Everything (~475+) - greenfield projects
 ///
-/// You can also enable/disable individual rules:
+/// You can also enable/disable individual rules.
+///
+/// **IMPORTANT:** Rules must use YAML list format (with `-` prefix):
 ///
 /// ```yaml
 /// custom_lint:
 ///   saropa_lints:
 ///     tier: recommended
 ///   rules:
-///     avoid_debug_print: false  # disable a rule
-///     no_magic_number: true     # enable a rule not in your tier
+///     - avoid_debug_print: false  # disable a rule
+///     - no_magic_number: true     # enable a rule not in your tier
 /// ```
+///
+/// Map format (without `-`) is silently ignored by custom_lint!
 library;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
