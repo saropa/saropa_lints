@@ -5,16 +5,19 @@ Publish saropa_lints package to pub.dev and create GitHub release.
 This script automates the complete release workflow for the saropa_lints package:
   1. Checks prerequisites (flutter, git, gh)
   2. Validates working tree and remote sync status
-  3. Runs tests and static analysis
-  4. Validates version exists in CHANGELOG.md
-  5. Generates documentation with dart doc
-  6. Pre-publish validation (dry-run)
-  7. PUBLISHES TO PUB.DEV FIRST
-  8. Commits and pushes changes
-  9. Creates and pushes git tag
-  10. Creates GitHub release with release notes
+  3. Checks remote sync
+  4. Runs tests
+  5. Formats code (ensures CI won't fail on formatting)
+  6. Runs static analysis
+  7. Validates version exists in CHANGELOG.md
+  8. Generates documentation with dart doc
+  9. Pre-publish validation (dry-run)
+  10. PUBLISHES TO PUB.DEV FIRST
+  11. Commits and pushes changes
+  12. Creates and pushes git tag
+  13. Creates GitHub release with release notes
 
-Version:   3.1
+Version:   3.2
 Author:    Saropa
 Copyright: (c) 2025 Saropa
 
@@ -28,6 +31,14 @@ Usage:
 
 The script is fully interactive - no command-line arguments needed.
 It will prompt for confirmation at key steps.
+
+Troubleshooting:
+    GitHub release fails with "Bad credentials":
+        If you have a GITHUB_TOKEN environment variable set (even if invalid),
+        it takes precedence over 'gh auth login' credentials. To fix:
+        - PowerShell: $env:GITHUB_TOKEN = ""
+        - Bash: unset GITHUB_TOKEN
+        Then run 'gh auth status' to verify your keyring credentials are active.
 
 Exit Codes:
     0 - Success
@@ -514,9 +525,22 @@ def run_tests(project_dir: Path) -> bool:
     return True
 
 
+def run_format(project_dir: Path) -> bool:
+    """Run dart format to ensure consistent code style."""
+    print_header("STEP 5: FORMATTING CODE")
+
+    result = run_command(
+        ["dart", "format", "."],
+        project_dir,
+        "Formatting code"
+    )
+
+    return result.returncode == 0
+
+
 def run_analysis(project_dir: Path) -> bool:
     """Run flutter analyze."""
-    print_header("STEP 5: RUNNING STATIC ANALYSIS")
+    print_header("STEP 6: RUNNING STATIC ANALYSIS")
 
     result = run_command(
         ["flutter", "analyze"],
@@ -529,7 +553,7 @@ def run_analysis(project_dir: Path) -> bool:
 
 def validate_changelog(project_dir: Path, version: str) -> tuple[bool, str]:
     """Validate version exists in CHANGELOG and get release notes."""
-    print_header("STEP 6: VALIDATING CHANGELOG")
+    print_header("STEP 7: VALIDATING CHANGELOG")
 
     release_notes = validate_changelog_version(project_dir, version)
 
@@ -558,7 +582,7 @@ def validate_changelog(project_dir: Path, version: str) -> tuple[bool, str]:
 
 def generate_docs(project_dir: Path) -> bool:
     """Generate documentation with dart doc."""
-    print_header("STEP 7: GENERATING DOCUMENTATION")
+    print_header("STEP 8: GENERATING DOCUMENTATION")
 
     result = run_command(
         ["dart", "doc"],
@@ -571,7 +595,7 @@ def generate_docs(project_dir: Path) -> bool:
 
 def pre_publish_validation(project_dir: Path) -> bool:
     """Run dart pub publish --dry-run."""
-    print_header("STEP 8: PRE-PUBLISH VALIDATION")
+    print_header("STEP 9: PRE-PUBLISH VALIDATION")
 
     result = run_command(
         ["flutter", "pub", "publish", "--dry-run"],
@@ -591,7 +615,7 @@ def pre_publish_validation(project_dir: Path) -> bool:
 
 def publish_to_pubdev(project_dir: Path) -> bool:
     """Publish to pub.dev."""
-    print_header("STEP 9: PUBLISHING TO PUB.DEV")
+    print_header("STEP 10: PUBLISHING TO PUB.DEV")
 
     # Clean first
     run_command(["flutter", "clean"], project_dir, "Cleaning project")
@@ -608,7 +632,7 @@ def publish_to_pubdev(project_dir: Path) -> bool:
 
 def git_commit_and_push(project_dir: Path, version: str, branch: str) -> bool:
     """Commit changes and push to remote."""
-    print_header("STEP 10: COMMITTING CHANGES")
+    print_header("STEP 11: COMMITTING CHANGES")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
@@ -653,7 +677,7 @@ def git_commit_and_push(project_dir: Path, version: str, branch: str) -> bool:
 
 def create_git_tag(project_dir: Path, version: str) -> bool:
     """Create and push git tag."""
-    print_header("STEP 11: CREATING GIT TAG")
+    print_header("STEP 12: CREATING GIT TAG")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
@@ -709,7 +733,7 @@ def create_github_release(project_dir: Path, version: str, release_notes: str) -
         (success, error_message) - success is True if release was created or already exists,
         error_message is None on success or contains the error description on failure.
     """
-    print_header("STEP 12: CREATING GITHUB RELEASE")
+    print_header("STEP 13: CREATING GITHUB RELEASE")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
@@ -743,7 +767,12 @@ def create_github_release(project_dir: Path, version: str, release_notes: str) -
     # Check for auth error
     error_output = (result.stderr or "") + (result.stdout or "")
     if "401" in error_output or "Bad credentials" in error_output or "authentication" in error_output.lower():
-        return False, "GitHub CLI not authenticated. Run 'gh auth login' to authenticate."
+        return False, (
+            "GitHub CLI auth failed. If GITHUB_TOKEN env var is set, clear it first:\n"
+            "      PowerShell: $env:GITHUB_TOKEN = \"\"\n"
+            "      Bash: unset GITHUB_TOKEN\n"
+            "      Then run: gh auth status"
+        )
 
     return False, f"GitHub release failed (exit code {result.returncode})"
 
@@ -866,20 +895,24 @@ def main() -> int:
     if not run_tests(project_dir):
         exit_with_error("Tests failed. Fix test failures before publishing.", ExitCode.TEST_FAILED)
 
-    # Step 5: Analysis
+    # Step 5: Format code (ensures CI won't fail on formatting)
+    if not run_format(project_dir):
+        exit_with_error("Code formatting failed.", ExitCode.VALIDATION_FAILED)
+
+    # Step 6: Analysis
     if not run_analysis(project_dir):
         exit_with_error("Static analysis failed. Fix issues before publishing.", ExitCode.ANALYSIS_FAILED)
 
-    # Step 6: Validate changelog
+    # Step 7: Validate changelog
     ok, release_notes = validate_changelog(project_dir, version)
     if not ok:
         exit_with_error("CHANGELOG validation failed", ExitCode.CHANGELOG_FAILED)
 
-    # Step 7: Generate docs
+    # Step 8: Generate docs
     if not generate_docs(project_dir):
         exit_with_error("Documentation generation failed", ExitCode.VALIDATION_FAILED)
 
-    # Step 8: Pre-publish validation
+    # Step 9: Pre-publish validation
     if not pre_publish_validation(project_dir):
         exit_with_error("Pre-publish validation failed", ExitCode.VALIDATION_FAILED)
 
@@ -905,19 +938,19 @@ def main() -> int:
     # PUBLISH AND RELEASE
     # =========================================================================
 
-    # Step 9: Publish to pub.dev FIRST
+    # Step 10: Publish to pub.dev FIRST
     if not publish_to_pubdev(project_dir):
         exit_with_error("Publishing to pub.dev failed", ExitCode.PUBLISH_FAILED)
 
-    # Step 10: Git commit and push (AFTER publish succeeds)
+    # Step 11: Git commit and push (AFTER publish succeeds)
     if not git_commit_and_push(project_dir, version, branch):
         exit_with_error("Git operations failed", ExitCode.GIT_FAILED)
 
-    # Step 11: Create git tag
+    # Step 12: Create git tag
     if not create_git_tag(project_dir, version):
         exit_with_error("Git tag creation failed", ExitCode.GIT_FAILED)
 
-    # Step 12: Create GitHub release (non-blocking - publish already succeeded)
+    # Step 13: Create GitHub release (non-blocking - publish already succeeded)
     gh_success, gh_error = create_github_release(project_dir, version, release_notes)
 
     # =========================================================================
