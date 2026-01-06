@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `no_empty_block` - Added quick fix that inserts an explanatory comment inside the empty block
+
 ## [1.1.18] - 2025-01-06
 
 ### Changed
 
+- `avoid_null_assertion` - Refactored null-check extension names into documented const sets (`_truthyNullCheckNames` for && patterns, `_falsyNullCheckNames` for || patterns) for maintainability
 - `avoid_unsafe_collection_methods` - Now recognizes guarded access patterns and won't flag safe usage:
   - If statements: `if (list.isNotEmpty) { list.first }`, `if (list.length > 0) { ... }`
   - Ternaries: `list.isNotEmpty ? list.first : fallback`, `list.length > 1 ? list.last : fallback`
@@ -20,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- `avoid_null_assertion` - Added `isNotListNullOrEmpty` to recognized null-check extension methods (truthy check for && patterns and if-blocks)
+- `avoid_null_assertion` - Added support for inverted if-blocks (`if (x.isEmpty) { } else { x! }`) and numeric checks (`isPositive`, `isZeroOrNegative`, `isNegativeOrZero`, `isNegative`). Also added `isNotListNullOrEmpty`, `isNotNullOrZero`, `isNullOrZero`
 - `avoid_undisposed_instances` - Now recognizes `disposeSafe()`, `cancelSafe()`, and `closeSafe()` as valid disposal methods
 - `require_stream_controller_dispose` - Now recognizes `closeSafe()` as valid close method
 - `require_value_notifier_dispose` - Now recognizes `disposeSafe()` as valid dispose method; only checks owned fields (with initializers), not parameters passed in
