@@ -65,6 +65,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferContainsRule(),
   PreferFirstRule(),
   RequireDisposeRule(),
+  RequireTimerCancellationRule(),
   NullifyAfterDisposeRule(),
   AvoidMisnamedPaddingRule(),
   AvoidUnsafeSetStateRule(),
