@@ -9,6 +9,8 @@ import 'package:analyzer/source/source_range.dart';
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../saropa_lint_rule.dart';
+
 /// Warns when an empty spread is used.
 ///
 /// Example of **bad** code:
@@ -1015,21 +1017,24 @@ class _RemoveUnnecessarySuperFix extends DartFix {
 ///   // TODO: implement
 /// }
 /// ```
-class NoEmptyBlockRule extends DartLintRule {
+class NoEmptyBlockRule extends SaropaLintRule {
   const NoEmptyBlockRule() : super(code: _code);
 
+  static const String _name = 'no_empty_block';
+
   static const LintCode _code = LintCode(
-    name: 'no_empty_block',
+    name: _name,
     problemMessage: 'Empty block detected.',
     correctionMessage:
-        'Add implementation or a comment explaining why it is empty.',
+        'Add implementation, a comment inside the block, or use '
+        '`// ignore: $_name` to suppress.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -1062,6 +1067,7 @@ class NoEmptyBlockRule extends DartLintRule {
           }
         }
 
+        // Hyphenated ignore comments handled automatically by SaropaLintRule
         reporter.atNode(node, code);
       }
     });

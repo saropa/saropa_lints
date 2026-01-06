@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.19] - 2025-01-06
+
+### Changed
+
+- `avoid_unsafe_collection_methods` - Now recognizes collection-if guards:
+  - `[if (list.isNotEmpty) list.first]` - guarded in collection literal
+  - `{if (set.length > 0) set.first}` - guarded in set literal
+  - `[if (list.isEmpty) 0 else list.first]` - inverted guard in else branch
+- `require_value_notifier_dispose` - Now recognizes loop-based disposal patterns for collections of ValueNotifiers:
+  - `for (final n in _notifiers) { n.dispose(); }` - for-in loop disposal
+  - `_notifiers.forEach((n) => n.dispose())` - forEach disposal
+  - Supports `List<ValueNotifier<T>>`, `Set<ValueNotifier<T>>`, `Iterable<ValueNotifier<T>>`
+- `require_file_close_in_finally` - Reduced false positives by requiring file indicators (File, IOSink, RandomAccessFile) for generic `.open()` calls
+
+### Fixed
+
+- `avoid_null_assertion` - Added additional safe pattern detection to reduce false positives:
+  - Null-coalescing assignment: `x ??= value; x!` - safe after `??=`
+  - Negated null checks: `if (!(x == null)) { x! }`
+  - Compound && conditions: `if (a && x != null) { x! }`
+  - Compound || with early return: `if (a || x == null) return; x!`
+  - Flutter async builder patterns: `if (snapshot.hasData) { snapshot.data! }`, `if (snapshot.hasError) { snapshot.error! }`
+  - While loops: `while (x != null) { x! }`
+  - For loops: `for (; x != null; ) { x! }`
+- `avoid_undisposed_instances` - Fixed type annotation access for analyzer 8.x (`name2.lexeme`); now follows helper method calls to detect indirect disposal patterns
+- `avoid_undisposed_instances` - Enhanced field extraction to handle parenthesized expressions and cascade expressions
+
 ## [1.1.18] - 2025-01-06
 
 ### Added

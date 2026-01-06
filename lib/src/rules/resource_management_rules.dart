@@ -51,11 +51,19 @@ class RequireFileCloseInFinallyRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// File-specific open methods that are unlikely to have false positives.
   static const Set<String> _fileOpenMethods = <String>{
     'openRead',
     'openWrite',
     'openSync',
-    'open',
+  };
+
+  /// Patterns that indicate file-related code is present.
+  static const Set<String> _fileIndicators = <String>{
+    'File(',
+    'IOSink',
+    'RandomAccessFile',
+    'dart:io',
   };
 
   @override
@@ -68,12 +76,23 @@ class RequireFileCloseInFinallyRule extends DartLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for file open calls
+      // Check for file-specific open methods (low false positive risk)
       bool hasFileOpen = false;
       for (final String method in _fileOpenMethods) {
         if (bodySource.contains('.$method(')) {
           hasFileOpen = true;
           break;
+        }
+      }
+
+      // For generic '.open(' we need additional evidence of file handling
+      // to avoid false positives from other classes with open() methods
+      if (!hasFileOpen && bodySource.contains('.open(')) {
+        for (final String indicator in _fileIndicators) {
+          if (bodySource.contains(indicator)) {
+            hasFileOpen = true;
+            break;
+          }
         }
       }
 

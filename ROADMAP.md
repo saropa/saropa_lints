@@ -630,7 +630,85 @@ Everything. For the truly obsessive.
 
 ---
 
-## Part 5: Implementation Priority
+## Part 5: Technical Debt & Improvements
+
+### 5.1 Migrate Rules to SaropaLintRule Base Class
+
+**Status**: In Progress
+**Priority**: High
+**Rationale**: Support hyphenated ignore comments (e.g., `// ignore: no-empty-block`) alongside standard underscore format (`// ignore: no_empty_block`).
+
+**New Infrastructure Created**:
+- `lib/src/ignore_utils.dart` - Utilities for checking ignore comments with hyphen/underscore flexibility
+- `lib/src/saropa_lint_rule.dart` - Base class that wraps `DiagnosticReporter` to automatically handle hyphenated aliases
+
+**Migration Steps for Each Rule**:
+1. Import `saropa_lint_rule.dart`
+2. Change `extends DartLintRule` → `extends SaropaLintRule`
+3. Rename `run(` → `runWithReporter(`
+4. Change `DiagnosticReporter reporter` → `SaropaDiagnosticReporter reporter`
+
+**Files to Migrate** (~35 files, ~500 rules):
+- [ ] `accessibility_rules.dart`
+- [ ] `api_network_rules.dart`
+- [ ] `architecture_rules.dart`
+- [ ] `async_rules.dart`
+- [ ] `class_constructor_rules.dart`
+- [ ] `code_quality_rules.dart`
+- [ ] `collection_rules.dart`
+- [ ] `complexity_rules.dart`
+- [ ] `control_flow_rules.dart`
+- [ ] `debug_rules.dart`
+- [ ] `dependency_injection_rules.dart`
+- [ ] `documentation_rules.dart`
+- [ ] `equality_rules.dart`
+- [ ] `error_handling_rules.dart`
+- [ ] `exception_rules.dart`
+- [ ] `flutter_widget_rules.dart`
+- [ ] `formatting_rules.dart`
+- [ ] `internationalization_rules.dart`
+- [ ] `memory_management_rules.dart`
+- [ ] `naming_style_rules.dart`
+- [ ] `numeric_literal_rules.dart`
+- [ ] `performance_rules.dart`
+- [ ] `record_pattern_rules.dart`
+- [ ] `resource_management_rules.dart`
+- [ ] `return_rules.dart`
+- [ ] `security_rules.dart`
+- [ ] `state_management_rules.dart`
+- [ ] `structure_rules.dart`
+- [ ] `test_rules.dart`
+- [ ] `testing_best_practices_rules.dart`
+- [ ] `type_rules.dart`
+- [ ] `type_safety_rules.dart`
+- [x] `unnecessary_code_rules.dart` (NoEmptyBlockRule migrated as example)
+
+**Example Migration** (NoEmptyBlockRule):
+```dart
+// Before
+class NoEmptyBlockRule extends DartLintRule {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    DiagnosticReporter reporter,
+    CustomLintContext context,
+  ) { ... }
+}
+
+// After
+class NoEmptyBlockRule extends SaropaLintRule {
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) { ... }
+}
+```
+
+---
+
+## Part 6: Implementation Priority
 
 ### Phase 1: Testing Framework
 - [ ] Add test dependencies to `pubspec.yaml`

@@ -57,4 +57,32 @@ void testUnsafeCollectionMethods() {
   } else {
     final guardedInElse = emptyList.first;
   }
+
+  // GOOD: Collection-if guard (should NOT trigger)
+  final collectionIfList = <int>[
+    if (emptyList.isNotEmpty) emptyList.first,
+    if (emptyList.length > 0) emptyList.last,
+    if (!emptyList.isEmpty) emptyList.first,
+  ];
+
+  // GOOD: Collection-if with else inverted guard (should NOT trigger)
+  final collectionIfElse = <int>[
+    if (emptyList.isEmpty) 0 else emptyList.first,
+  ];
+
+  // GOOD: Nested property access with collection-if guard (should NOT trigger)
+  final options = _TestOptions(colors: <int>[1, 2, 3]);
+  final colorList = <int>[
+    if (options.colors.isNotEmpty) options.colors.first,
+    if (options.colors.length > 0) options.colors.last,
+  ];
+
+  // BAD: Collection-if without proper guard (SHOULD trigger)
+  // expect_lint: avoid_unsafe_collection_methods
+  final badCollectionIf = <int>[emptyList.first];
+}
+
+class _TestOptions {
+  const _TestOptions({required this.colors});
+  final List<int> colors;
 }
