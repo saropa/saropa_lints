@@ -2620,9 +2620,10 @@ class RequireDisposeRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
-  /// Map of disposable type names to their disposal method
+  /// Map of disposable type names to their disposal method.
+  /// NOTE: Timer and StreamSubscription are handled by RequireTimerCancellationRule.
   static const Map<String, String> _disposableTypes = <String, String>{
-    // Flutter Framework - Controllers
+    // Flutter Framework - Controllers (dispose)
     'TextEditingController': 'dispose',
     'AnimationController': 'dispose',
     'ScrollController': 'dispose',
@@ -2636,24 +2637,22 @@ class RequireDisposeRule extends DartLintRule {
     'MenuController': 'dispose',
     'OverlayPortalController': 'dispose',
     'RestorableTextEditingController': 'dispose',
-    // Flutter Framework - Focus
+    // Flutter Framework - Focus (dispose)
     'FocusNode': 'dispose',
     'FocusScopeNode': 'dispose',
-    // Flutter Framework - Notifiers
+    // Flutter Framework - Notifiers (dispose)
     'ChangeNotifier': 'dispose',
     'ValueNotifier': 'dispose',
-    // Dart Core
-    'StreamSubscription': 'cancel',
+    // Streams (close)
     'StreamController': 'close',
-    'Timer': 'cancel',
-    // Common Packages
+    // Common Packages (dispose)
     'CameraController': 'dispose',
     'VideoPlayerController': 'dispose',
     'AudioPlayer': 'dispose',
     'WebViewController': 'dispose',
+    // State Management (close)
     'Bloc': 'close',
     'Cubit': 'close',
-    // Riverpod
     'ProviderSubscription': 'close',
   };
 
@@ -2834,6 +2833,231 @@ class _DisposableField {
   final String name;
   final String typeName;
   final String disposeMethod;
+  final FieldDeclaration declaration;
+}
+
+/// Requires Timer and StreamSubscription fields to be cancelled in dispose().
+///
+/// Timers and stream subscriptions that aren't cancelled will continue running
+/// after the widget is disposed, causing:
+/// - Crashes if they call setState on a disposed widget
+/// - Memory leaks from retained references
+/// - Wasted CPU cycles
+///
+/// Example of **bad** code:
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   Timer? _timer;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) {
+///       setState(() => _count++);  // 💥 Crashes after dispose!
+///     });
+///   }
+///
+///   @override
+///   void dispose() {
+///     // Missing: _timer?.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   Timer? _timer;
+///
+///   @override
+///   void dispose() {
+///     _timer?.cancel();
+///     _timer = null;
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireTimerCancellationRule extends DartLintRule {
+  const RequireTimerCancellationRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_timer_cancellation',
+    problemMessage: 'Timer or StreamSubscription must be cancelled in dispose().',
+    correctionMessage:
+        'Add cancel() in dispose() to prevent crashes and memory leaks. '
+        'Uncancelled timers continue firing after widget disposal.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Types that require cancel() to be called
+  static const Map<String, String> _cancellableTypes = <String, String>{
+    'Timer': 'cancel',
+    'StreamSubscription': 'cancel',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    DiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Only check State classes
+      if (!_isStateClass(node)) {
+        return;
+      }
+
+      // Find all cancellable fields
+      final List<_CancellableField> cancellableFields = <_CancellableField>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final _CancellableField? field = _getCancellableField(member);
+          if (field != null) {
+            cancellableFields.add(field);
+          }
+        }
+      }
+
+      if (cancellableFields.isEmpty) {
+        return;
+      }
+
+      // Collect all method bodies for helper method expansion
+      MethodDeclaration? disposeMethod;
+      final Map<String, String> methodBodies = <String, String>{};
+
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration) {
+          final String methodName = member.name.lexeme;
+          methodBodies[methodName] = member.body.toSource();
+          if (methodName == 'dispose') {
+            disposeMethod = member;
+          }
+        }
+      }
+
+      // Expand dispose body to include helper methods
+      String disposeBody = '';
+      if (disposeMethod != null) {
+        disposeBody = _expandMethodCalls(
+          disposeMethod.body.toSource(),
+          methodBodies,
+        );
+      }
+
+      // Check each cancellable field
+      for (final _CancellableField field in cancellableFields) {
+        if (disposeMethod == null) {
+          reporter.atNode(field.declaration.fields, code);
+        } else if (!_isFieldCancelled(field, disposeBody)) {
+          reporter.atNode(field.declaration.fields, code);
+        }
+      }
+    });
+  }
+
+  /// Check if a class extends `State<T>`
+  bool _isStateClass(ClassDeclaration node) {
+    final ExtendsClause? extendsClause = node.extendsClause;
+    if (extendsClause == null) {
+      return false;
+    }
+    return extendsClause.superclass.name.lexeme == 'State';
+  }
+
+  /// Extract cancellable field info from a field declaration
+  _CancellableField? _getCancellableField(FieldDeclaration node) {
+    final TypeAnnotation? type = node.fields.type;
+    if (type == null) {
+      return null;
+    }
+
+    String typeName = '';
+    if (type is NamedType) {
+      typeName = type.name.lexeme;
+    }
+
+    if (!_cancellableTypes.containsKey(typeName)) {
+      return null;
+    }
+
+    if (node.fields.variables.isEmpty) {
+      return null;
+    }
+
+    final String fieldName = node.fields.variables.first.name.lexeme;
+
+    return _CancellableField(
+      name: fieldName,
+      typeName: typeName,
+      declaration: node,
+    );
+  }
+
+  /// Expand helper method calls to include their implementations
+  String _expandMethodCalls(
+    String body,
+    Map<String, String> methodBodies, {
+    int depth = 0,
+  }) {
+    if (depth > 3) {
+      return body;
+    }
+
+    final StringBuffer expanded = StringBuffer(body);
+    final RegExp methodCallPattern = RegExp(r'_(\w+)\s*\(');
+
+    for (final RegExpMatch match in methodCallPattern.allMatches(body)) {
+      final String methodName = '_${match.group(1)}';
+      final String? methodBody = methodBodies[methodName];
+      if (methodBody != null) {
+        final String expandedMethodBody = _expandMethodCalls(
+          methodBody,
+          methodBodies,
+          depth: depth + 1,
+        );
+        expanded.write(' $expandedMethodBody');
+      }
+    }
+
+    return expanded.toString();
+  }
+
+  /// Check if a field is properly cancelled
+  bool _isFieldCancelled(_CancellableField field, String disposeBody) {
+    final String name = field.name;
+
+    // Common cancellation patterns
+    final List<String> patterns = <String>[
+      '$name.cancel(',
+      '$name?.cancel(',
+      '$name..cancel(',
+      '$name.cancelSafe(',
+      '$name?.cancelSafe(',
+      '$name..cancelSafe(',
+    ];
+
+    for (final String pattern in patterns) {
+      if (disposeBody.contains(pattern)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+}
+
+/// Helper class to track cancellable field information
+class _CancellableField {
+  const _CancellableField({
+    required this.name,
+    required this.typeName,
+    required this.declaration,
+  });
+
+  final String name;
+  final String typeName;
   final FieldDeclaration declaration;
 }
 
