@@ -516,9 +516,66 @@ class AvoidNullAssertionRule extends DartLintRule {
       if (_isInSafeTernary(node)) return;
       if (_isInSafeIfBlock(node)) return;
       if (_isInShortCircuitSafe(node)) return;
+      if (_isAfterNullCoalescingAssignment(node)) return;
 
       reporter.atNode(node, code);
     });
+  }
+
+  /// Checks if the null assertion is safe because it follows a ??= assignment.
+  ///
+  /// Safe pattern:
+  /// ```dart
+  /// x ??= defaultValue;
+  /// x!.doSomething();  // Safe - x is guaranteed non-null after ??=
+  /// ```
+  bool _isAfterNullCoalescingAssignment(PostfixExpression node) {
+    final String assertedExpr = _getBaseExpression(node.operand);
+
+    // Find the enclosing block or function body
+    AstNode? current = node.parent;
+    Block? enclosingBlock;
+    while (current != null) {
+      if (current is Block) {
+        enclosingBlock = current;
+        break;
+      }
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+
+    if (enclosingBlock == null) return false;
+
+    // Find the statement containing the node
+    Statement? nodeStatement;
+    for (final Statement stmt in enclosingBlock.statements) {
+      if (_containsNode(stmt, node)) {
+        nodeStatement = stmt;
+        break;
+      }
+    }
+
+    if (nodeStatement == null) return false;
+
+    // Look for ??= assignment before the node's statement
+    for (final Statement stmt in enclosingBlock.statements) {
+      // Stop when we reach the statement containing the node
+      if (stmt == nodeStatement) break;
+
+      // Check for ??= assignment
+      if (stmt is ExpressionStatement) {
+        final Expression expr = stmt.expression;
+        if (expr is AssignmentExpression &&
+            expr.operator.lexeme == '??=') {
+          final String assignedExpr = _getBaseExpression(expr.leftHandSide);
+          if (assignedExpr == assertedExpr) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   /// Checks if the null assertion is inside a ternary that guards against null.
@@ -573,6 +630,10 @@ class AvoidNullAssertionRule extends DartLintRule {
   /// - `[if (x != null) x!]` (collection if elements)
   /// - `if (x?.length == 1) { x!.first }` (null-propagating comparison)
   /// - `if (x!.length == 1) { x!.first }` (prior assertion implies non-null)
+  /// - `if (a && x != null) { x! }` (compound && with null check)
+  /// - `if (a || x == null) return; x!` (compound || with early return)
+  /// - `if (snapshot.hasData) { snapshot.data! }` (Flutter async builder pattern)
+  /// - `if (!(x == null)) { x! }` (negated null check)
   bool _isInSafeIfBlock(PostfixExpression node) {
     final String assertedExpr = _getBaseExpression(node.operand);
 
@@ -581,6 +642,30 @@ class AvoidNullAssertionRule extends DartLintRule {
     while (current != null) {
       if (current is IfStatement) {
         final Expression condition = current.expression;
+
+        // Check for negated condition: `if (!(x == null)) { x! }`
+        if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+          final Expression inner = condition.operand;
+          // `if (!(x == null))` is equivalent to `if (x != null)`
+          if (inner is ParenthesizedExpression) {
+            final Expression innerExpr = inner.expression;
+            if (innerExpr is BinaryExpression) {
+              final String? checkedExpr = _getNullCheckedExpression(innerExpr);
+              if (checkedExpr != null && checkedExpr == assertedExpr) {
+                // `if (!(x == null)) { x! }` - safe in then branch
+                if (innerExpr.operator.lexeme == '==' &&
+                    _isInThenBranch(current, node)) {
+                  return true;
+                }
+                // `if (!(x != null)) return; x!` - safe after early return
+                if (innerExpr.operator.lexeme == '!=' &&
+                    _isAfterEarlyReturn(current, node)) {
+                  return true;
+                }
+              }
+            }
+          }
+        }
 
         // Check for `if (x != null)` pattern
         if (condition is BinaryExpression) {
@@ -593,6 +678,23 @@ class AvoidNullAssertionRule extends DartLintRule {
             }
             // `if (x == null) return; x!` - safe after the if
             if (condition.operator.lexeme == '==' &&
+                _isAfterEarlyReturn(current, node)) {
+              return true;
+            }
+          }
+
+          // Check for compound && conditions: `if (a && x != null) { x! }`
+          if (condition.operator.lexeme == '&&') {
+            if (_containsNonNullCheckFor(condition, assertedExpr) &&
+                _isInThenBranch(current, node)) {
+              return true;
+            }
+          }
+
+          // Check for compound || conditions with early return:
+          // `if (a || x == null) return; x!`
+          if (condition.operator.lexeme == '||') {
+            if (_containsNullCheckFor(condition, assertedExpr) &&
                 _isAfterEarlyReturn(current, node)) {
               return true;
             }
@@ -624,6 +726,39 @@ class AvoidNullAssertionRule extends DartLintRule {
               return true;
             }
           }
+        }
+
+        // Check for Flutter async builder patterns:
+        // `if (snapshot.hasData) { snapshot.data! }`
+        // `if (!snapshot.hasData || snapshot.data == null) return; snapshot.data!`
+        if (_isFlutterAsyncGuard(condition, assertedExpr, current, node)) {
+          return true;
+        }
+      }
+
+      // Handle while loops: `while (x != null) { x! }`
+      if (current is WhileStatement) {
+        final Expression condition = current.condition;
+        if (_isNonNullGuardCondition(condition, assertedExpr) &&
+            _containsNode(current.body, node)) {
+          return true;
+        }
+      }
+
+      // Handle do-while loops: `do { x! } while (x != null)` is NOT safe
+      // (body executes before condition check)
+
+      // Handle for loops: `for (; x != null; ) { x! }`
+      if (current is ForStatement) {
+        final ForLoopParts forLoopParts = current.forLoopParts;
+        Expression? condition;
+        if (forLoopParts is ForParts) {
+          condition = forLoopParts.condition;
+        }
+        if (condition != null &&
+            _isNonNullGuardCondition(condition, assertedExpr) &&
+            _containsNode(current.body, node)) {
+          return true;
         }
       }
 
@@ -891,6 +1026,232 @@ class AvoidNullAssertionRule extends DartLintRule {
 
     // The node should NOT be in the then branch
     return !_containsNode(ifStmt.thenStatement, node);
+  }
+
+  /// Recursively checks if a compound && condition contains a non-null check
+  /// for the given expression.
+  ///
+  /// Handles: `if (a && x != null) { x! }` or `if (a && b && x != null) { x! }`
+  bool _containsNonNullCheckFor(Expression condition, String assertedExpr) {
+    if (condition is BinaryExpression) {
+      final String op = condition.operator.lexeme;
+
+      // Direct non-null check: `x != null`
+      if (op == '!=') {
+        final String? checkedExpr = _getNullCheckedExpression(condition);
+        if (checkedExpr == assertedExpr) {
+          return true;
+        }
+      }
+
+      // Recurse into && operands
+      if (op == '&&') {
+        return _containsNonNullCheckFor(condition.leftOperand, assertedExpr) ||
+            _containsNonNullCheckFor(condition.rightOperand, assertedExpr);
+      }
+    }
+
+    // Check for truthy extension methods: `x.isNotEmpty && ...`
+    final String? methodName = _getExtensionMethodName(condition);
+    if (methodName != null && _truthyNullCheckNames.contains(methodName)) {
+      final String? target = _getExtensionMethodTarget(condition);
+      if (target == assertedExpr) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Recursively checks if a compound || condition contains a null check
+  /// for the given expression.
+  ///
+  /// Handles: `if (a || x == null) return; x!` or `if (a || b || x == null) return; x!`
+  bool _containsNullCheckFor(Expression condition, String assertedExpr) {
+    if (condition is BinaryExpression) {
+      final String op = condition.operator.lexeme;
+
+      // Direct null check: `x == null`
+      if (op == '==') {
+        final String? checkedExpr = _getNullCheckedExpression(condition);
+        if (checkedExpr == assertedExpr) {
+          return true;
+        }
+      }
+
+      // Recurse into || operands
+      if (op == '||') {
+        return _containsNullCheckFor(condition.leftOperand, assertedExpr) ||
+            _containsNullCheckFor(condition.rightOperand, assertedExpr);
+      }
+    }
+
+    // Check for negated truthy check: `!x.isNotEmpty` (equivalent to x.isEmpty)
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      final Expression inner = condition.operand;
+      final String? methodName = _getExtensionMethodName(inner);
+      if (methodName != null && _truthyNullCheckNames.contains(methodName)) {
+        final String? target = _getExtensionMethodTarget(inner);
+        if (target == assertedExpr) {
+          return true;
+        }
+      }
+    }
+
+    // Check for falsy extension methods: `x.isEmpty || ...`
+    final String? methodName = _getExtensionMethodName(condition);
+    if (methodName != null && _falsyNullCheckNames.contains(methodName)) {
+      final String? target = _getExtensionMethodTarget(condition);
+      if (target == assertedExpr) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks if condition is a non-null guard for the given expression.
+  ///
+  /// Returns true for:
+  /// - `x != null`
+  /// - `x.isNotEmpty`
+  /// - `a && x != null`
+  bool _isNonNullGuardCondition(Expression condition, String assertedExpr) {
+    if (condition is BinaryExpression) {
+      final String op = condition.operator.lexeme;
+
+      // Direct non-null check
+      if (op == '!=') {
+        final String? checkedExpr = _getNullCheckedExpression(condition);
+        if (checkedExpr == assertedExpr) {
+          return true;
+        }
+      }
+
+      // Compound condition
+      if (op == '&&') {
+        return _containsNonNullCheckFor(condition, assertedExpr);
+      }
+    }
+
+    // Truthy extension methods
+    final String? methodName = _getExtensionMethodName(condition);
+    if (methodName != null && _truthyNullCheckNames.contains(methodName)) {
+      final String? target = _getExtensionMethodTarget(condition);
+      if (target == assertedExpr) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks for Flutter async builder patterns where a property check guards
+  /// a related nullable property.
+  ///
+  /// Patterns:
+  /// - `if (snapshot.hasData) { snapshot.data! }` - hasData implies data != null
+  /// - `if (snapshot.hasError) { snapshot.error! }` - hasError implies error != null
+  /// - `if (!snapshot.hasData) return; snapshot.data!` - negated early return
+  /// - `if (!snapshot.hasData || snapshot.data == null) return; snapshot.data!`
+  bool _isFlutterAsyncGuard(
+    Expression condition,
+    String assertedExpr,
+    IfStatement ifStmt,
+    AstNode node,
+  ) {
+    // Map of "hasX" properties to their corresponding nullable properties
+    const Map<String, String> hasPropertyMap = <String, String>{
+      'hasData': 'data',
+      'hasError': 'error',
+      'hasValue': 'value',
+    };
+
+    // Extract the property being asserted (e.g., "data" from "snapshot.data")
+    final int lastDot = assertedExpr.lastIndexOf('.');
+    if (lastDot == -1) return false;
+
+    final String targetBase = assertedExpr.substring(0, lastDot);
+    final String assertedProp = assertedExpr.substring(lastDot + 1);
+
+    // Find which "has" property would guard this
+    String? guardProperty;
+    for (final MapEntry<String, String> entry in hasPropertyMap.entries) {
+      if (entry.value == assertedProp) {
+        guardProperty = entry.key;
+        break;
+      }
+    }
+    if (guardProperty == null) return false;
+
+    // Check for `if (snapshot.hasData) { snapshot.data! }`
+    final String? methodName = _getExtensionMethodName(condition);
+    final String? condTarget = _getExtensionMethodTarget(condition);
+
+    if (methodName == guardProperty && condTarget == targetBase) {
+      if (_isInThenBranch(ifStmt, node)) {
+        return true;
+      }
+    }
+
+    // Check for negated pattern: `if (!snapshot.hasData) return; snapshot.data!`
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      final Expression inner = condition.operand;
+      final String? innerMethod = _getExtensionMethodName(inner);
+      final String? innerTarget = _getExtensionMethodTarget(inner);
+
+      if (innerMethod == guardProperty && innerTarget == targetBase) {
+        if (_isAfterEarlyReturn(ifStmt, node)) {
+          return true;
+        }
+      }
+    }
+
+    // Check for compound || with negated hasData and explicit null check:
+    // `if (!snapshot.hasData || snapshot.data == null) return;`
+    if (condition is BinaryExpression && condition.operator.lexeme == '||') {
+      // Check if either operand guards the property
+      if (_containsNullCheckFor(condition, assertedExpr) &&
+          _isAfterEarlyReturn(ifStmt, node)) {
+        return true;
+      }
+
+      // Also check for negated hasData in the || chain
+      if (_containsNegatedHasCheck(condition, targetBase, guardProperty) &&
+          _isAfterEarlyReturn(ifStmt, node)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks if an || chain contains a negated "has" property check.
+  ///
+  /// E.g., `!snapshot.hasData` in `!snapshot.hasData || snapshot.data == null`
+  bool _containsNegatedHasCheck(
+    Expression condition,
+    String targetBase,
+    String guardProperty,
+  ) {
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      final Expression inner = condition.operand;
+      final String? innerMethod = _getExtensionMethodName(inner);
+      final String? innerTarget = _getExtensionMethodTarget(inner);
+
+      if (innerMethod == guardProperty && innerTarget == targetBase) {
+        return true;
+      }
+    }
+
+    if (condition is BinaryExpression && condition.operator.lexeme == '||') {
+      return _containsNegatedHasCheck(
+              condition.leftOperand, targetBase, guardProperty) ||
+          _containsNegatedHasCheck(
+              condition.rightOperand, targetBase, guardProperty);
+    }
+
+    return false;
   }
 
   /// Checks if the null assertion is safe due to short-circuit evaluation.

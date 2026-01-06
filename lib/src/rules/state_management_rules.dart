@@ -306,6 +306,18 @@ class _CloseCallVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
+///
+/// Also recognizes loop-based disposal patterns:
+/// ```dart
+/// final List<ValueNotifier<int>> _notifiers = [];
+///
+/// @override
+/// void dispose() {
+///   for (final n in _notifiers) { n.dispose(); }
+///   // or: _notifiers.forEach((n) => n.dispose());
+///   super.dispose();
+/// }
+/// ```
 class RequireValueNotifierDisposeRule extends DartLintRule {
   const RequireValueNotifierDisposeRule() : super(code: _code);
 
@@ -335,7 +347,10 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
       // Find ValueNotifier fields that are CREATED locally (have initializers).
       // Fields without initializers are parameters passed from outside and should
       // NOT be disposed by this class - the owner is responsible for disposal.
-      final List<String> notifierNames = <String>[];
+      // Track both single notifiers and collections of notifiers separately.
+      final List<String> singleNotifierNames = <String>[];
+      final List<String> collectionNotifierNames = <String>[];
+
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
@@ -344,22 +359,33 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
             if (initializer == null) continue;
 
             final String? typeName = member.fields.type?.toSource();
-            if (typeName != null && typeName.contains('ValueNotifier')) {
-              notifierNames.add(variable.name.lexeme);
+            if (typeName != null) {
+              // Check for collections of ValueNotifiers (List, Set, Iterable, Map values)
+              if (_isCollectionOfValueNotifiers(typeName)) {
+                collectionNotifierNames.add(variable.name.lexeme);
+                continue;
+              }
+              // Check for single ValueNotifier
+              if (typeName.contains('ValueNotifier')) {
+                singleNotifierNames.add(variable.name.lexeme);
+                continue;
+              }
             }
             // Also check initializers for ValueNotifier creation
             if (initializer is InstanceCreationExpression) {
               final String? initTypeName =
                   initializer.constructorName.type.element?.name;
               if (initTypeName == 'ValueNotifier') {
-                notifierNames.add(variable.name.lexeme);
+                singleNotifierNames.add(variable.name.lexeme);
               }
             }
           }
         }
       }
 
-      if (notifierNames.isEmpty) return;
+      if (singleNotifierNames.isEmpty && collectionNotifierNames.isEmpty) {
+        return;
+      }
 
       // Find dispose method
       MethodDeclaration? disposeMethod;
@@ -370,39 +396,166 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
         }
       }
 
-      // Check if notifiers are disposed
+      // Check if notifiers are disposed (directly or via loop)
       final Set<String> disposedNotifiers = <String>{};
+      final Set<String> loopDisposedCollections = <String>{};
+
       if (disposeMethod != null) {
-        disposeMethod.body.visitChildren(
-          _DisposeCallVisitor((String name) => disposedNotifiers.add(name)),
+        final visitor = _ValueNotifierDisposeVisitor(
+          onDirectDispose: (String name) => disposedNotifiers.add(name),
+          onLoopDispose: (String name) => loopDisposedCollections.add(name),
         );
+        disposeMethod.body.visitChildren(visitor);
       }
 
-      // Report undisposed notifiers
-      for (final String name in notifierNames) {
+      // Report undisposed single notifiers
+      for (final String name in singleNotifierNames) {
         if (!disposedNotifiers.contains(name)) {
-          for (final ClassMember member in node.members) {
-            if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
-                if (variable.name.lexeme == name) {
-                  reporter.atNode(variable, code);
-                }
-              }
-            }
-          }
+          _reportUndisposed(node, name, reporter);
+        }
+      }
+
+      // Report undisposed collection notifiers (only if not loop-disposed)
+      for (final String name in collectionNotifierNames) {
+        if (!loopDisposedCollections.contains(name)) {
+          _reportUndisposed(node, name, reporter);
         }
       }
     });
   }
+
+  /// Checks if a type string represents a collection of ValueNotifiers.
+  static bool _isCollectionOfValueNotifiers(String typeName) {
+    // Match patterns like:
+    // - List<ValueNotifier<...>>
+    // - List<SafeValueNotifier<...>>
+    // - Set<ValueNotifier<...>>
+    // - Iterable<ValueNotifier<...>>
+    final collectionPattern = RegExp(
+      r'(List|Set|Iterable)<\s*(Safe)?ValueNotifier<',
+    );
+    return collectionPattern.hasMatch(typeName);
+  }
+
+  void _reportUndisposed(
+    ClassDeclaration classNode,
+    String fieldName,
+    DiagnosticReporter reporter,
+  ) {
+    for (final ClassMember member in classNode.members) {
+      if (member is FieldDeclaration) {
+        for (final VariableDeclaration variable in member.fields.variables) {
+          if (variable.name.lexeme == fieldName) {
+            reporter.atNode(variable, code);
+          }
+        }
+      }
+    }
+  }
 }
 
-class _DisposeCallVisitor extends RecursiveAstVisitor<void> {
-  _DisposeCallVisitor(this.onDispose);
+/// Enhanced visitor that detects both direct disposal and loop-based disposal.
+///
+/// Recognizes patterns like:
+/// - `notifier.dispose()` - direct disposal
+/// - `for (var n in _notifiers) { n.dispose(); }` - for-in loop disposal
+/// - `_notifiers.forEach((n) => n.dispose())` - forEach disposal
+class _ValueNotifierDisposeVisitor extends RecursiveAstVisitor<void> {
+  _ValueNotifierDisposeVisitor({
+    required this.onDirectDispose,
+    required this.onLoopDispose,
+  });
 
-  final void Function(String) onDispose;
+  final void Function(String) onDirectDispose;
+  final void Function(String) onLoopDispose;
 
   /// Methods that dispose resources (including *Safe extension variants).
+  static const Set<String> _disposeMethodNames = <String>{
+    'dispose',
+    'disposeSafe',
+  };
+
+  /// Track loop variables and their source collections.
+  /// Key: loop variable name, Value: collection field name
+  final Map<String, String> _loopVariableToCollection = <String, String>{};
+
+  @override
+  void visitForStatement(ForStatement node) {
+    // Handle: for (var i = 0; i < _list.length; i++) { _list[i].dispose(); }
+    // This is more complex, skip for now - for-in is more common
+    super.visitForStatement(node);
+  }
+
+  @override
+  void visitForEachPartsWithDeclaration(ForEachPartsWithDeclaration node) {
+    // Handle: for (final item in _collection)
+    final String loopVarName = node.loopVariable.name.lexeme;
+    final Expression iterable = node.iterable;
+
+    if (iterable is SimpleIdentifier) {
+      _loopVariableToCollection[loopVarName] = iterable.name;
+    }
+
+    super.visitForEachPartsWithDeclaration(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    // Check for direct dispose: notifier.dispose()
+    if (_disposeMethodNames.contains(methodName)) {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier) {
+        final String targetName = target.name;
+
+        // Check if this is a loop variable being disposed
+        final String? collectionName = _loopVariableToCollection[targetName];
+        if (collectionName != null) {
+          onLoopDispose(collectionName);
+        } else {
+          onDirectDispose(targetName);
+        }
+      }
+    }
+
+    // Check for forEach pattern: _collection.forEach((item) => item.dispose())
+    if (methodName == 'forEach') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier) {
+        final String collectionName = target.name;
+
+        // Check if the forEach callback disposes items
+        final ArgumentList args = node.argumentList;
+        if (args.arguments.isNotEmpty) {
+          final Expression firstArg = args.arguments.first;
+          if (firstArg is FunctionExpression) {
+            // Check if the function body contains a dispose call
+            if (_containsDisposeCall(firstArg.body)) {
+              onLoopDispose(collectionName);
+            }
+          }
+        }
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  /// Checks if a function body contains a dispose call.
+  bool _containsDisposeCall(FunctionBody body) {
+    bool hasDispose = false;
+    body.visitChildren(_SimpleDisposeChecker(() => hasDispose = true));
+    return hasDispose;
+  }
+}
+
+/// Simple visitor that just checks if dispose is called anywhere.
+class _SimpleDisposeChecker extends RecursiveAstVisitor<void> {
+  _SimpleDisposeChecker(this.onFound);
+
+  final void Function() onFound;
+
   static const Set<String> _disposeMethodNames = <String>{
     'dispose',
     'disposeSafe',
@@ -411,10 +564,7 @@ class _DisposeCallVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (_disposeMethodNames.contains(node.methodName.name)) {
-      final Expression? target = node.target;
-      if (target is SimpleIdentifier) {
-        onDispose(target.name);
-      }
+      onFound();
     }
     super.visitMethodInvocation(node);
   }
