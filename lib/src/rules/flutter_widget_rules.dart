@@ -6165,6 +6165,9 @@ class AvoidUndisposedInstancesRule extends DartLintRule {
       final Set<String> disposableFields = <String>{};
       final Set<String> disposedFields = <String>{};
 
+      // Collect all method bodies for helper method analysis
+      final Map<String, FunctionBody?> methodBodies = <String, FunctionBody?>{};
+
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
@@ -6180,20 +6183,30 @@ class AvoidUndisposedInstancesRule extends DartLintRule {
               }
             }
 
-            // Check type annotation
+            // Check type annotation (handles nullable types like Timer?)
             final TypeAnnotation? typeAnnotation = member.fields.type;
             if (typeAnnotation is NamedType) {
-              if (_disposableTypes.contains(typeAnnotation.name.lexeme)) {
+              if (_disposableTypes.contains(typeAnnotation.name2.lexeme)) {
                 disposableFields.add(fieldName);
               }
             }
           }
         }
 
-        // Find dispose method and track what's disposed
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          member.body.accept(_DisposeVisitor(disposedFields));
+        // Collect all method bodies
+        if (member is MethodDeclaration) {
+          methodBodies[member.name.lexeme] = member.body;
         }
+      }
+
+      // Find dispose method and track what's disposed (including helper methods)
+      final FunctionBody? disposeBody = methodBodies['dispose'];
+      if (disposeBody != null) {
+        final _DisposeVisitor visitor = _DisposeVisitor(
+          disposedFields: disposedFields,
+          methodBodies: methodBodies,
+        );
+        disposeBody.accept(visitor);
       }
 
       // Report undisposed fields
@@ -6217,9 +6230,15 @@ class AvoidUndisposedInstancesRule extends DartLintRule {
 }
 
 class _DisposeVisitor extends RecursiveAstVisitor<void> {
-  _DisposeVisitor(this.disposedFields);
+  _DisposeVisitor({
+    required this.disposedFields,
+    required this.methodBodies,
+    Set<String>? visitedMethods,
+  }) : _visitedMethods = visitedMethods ?? <String>{};
 
   final Set<String> disposedFields;
+  final Map<String, FunctionBody?> methodBodies;
+  final Set<String> _visitedMethods;
 
   static const Set<String> _disposeMethodNames = <String>{
     'dispose',
@@ -6234,20 +6253,55 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     super.visitMethodInvocation(node);
 
-    if (_disposeMethodNames.contains(node.methodName.name)) {
+    final String methodName = node.methodName.name;
+
+    // Check if this is a disposal method call on a field
+    if (_disposeMethodNames.contains(methodName)) {
       final Expression? target = node.target;
-      // Handle simple field access: _controller.dispose()
-      if (target is SimpleIdentifier) {
-        disposedFields.add(target.name);
+      _extractFieldName(target);
+    }
+
+    // Check if this is a call to a helper method within the same class
+    // (no target means it's a call to a method in the same class)
+    if (node.target == null && !_visitedMethods.contains(methodName)) {
+      final FunctionBody? helperBody = methodBodies[methodName];
+      if (helperBody != null) {
+        _visitedMethods.add(methodName);
+        // Visit the helper method body to find disposals there
+        helperBody.accept(
+          _DisposeVisitor(
+            disposedFields: disposedFields,
+            methodBodies: methodBodies,
+            visitedMethods: _visitedMethods,
+          ),
+        );
       }
-      // Handle prefixed access: this._controller.dispose()
-      else if (target is PrefixedIdentifier) {
-        disposedFields.add(target.identifier.name);
-      }
-      // Handle property access: this._controller.dispose() (alternate AST)
-      else if (target is PropertyAccess) {
-        disposedFields.add(target.propertyName.name);
-      }
+    }
+  }
+
+  /// Extracts the field name from various target expression types.
+  void _extractFieldName(Expression? target) {
+    if (target == null) return;
+
+    // Handle simple field access: _controller.dispose() or _timer?.cancel()
+    if (target is SimpleIdentifier) {
+      disposedFields.add(target.name);
+    }
+    // Handle prefixed access: this._controller.dispose()
+    else if (target is PrefixedIdentifier) {
+      disposedFields.add(target.identifier.name);
+    }
+    // Handle property access: this._controller.dispose() (alternate AST)
+    else if (target is PropertyAccess) {
+      disposedFields.add(target.propertyName.name);
+    }
+    // Handle parenthesized expressions: (_controller).dispose()
+    else if (target is ParenthesizedExpression) {
+      _extractFieldName(target.expression);
+    }
+    // Handle cascade: _controller..dispose()
+    else if (target is CascadeExpression) {
+      _extractFieldName(target.target);
     }
   }
 }
