@@ -94,7 +94,8 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
     // Check if any safe pattern contains this sensitive pattern
     // and appears in the source
     for (final String safePattern in _safePatterns) {
-      if (safePattern.contains(sensitivePattern) && source.contains(safePattern)) {
+      if (safePattern.contains(sensitivePattern) &&
+          source.contains(safePattern)) {
         return true;
       }
     }
@@ -126,7 +127,8 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
-          if (argSource.contains(pattern) && !_isSafeMatch(argSource, pattern)) {
+          if (argSource.contains(pattern) &&
+              !_isSafeMatch(argSource, pattern)) {
             reporter.atNode(node, code);
             return;
           }
@@ -146,7 +148,8 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
-          if (argSource.contains(pattern) && !_isSafeMatch(argSource, pattern)) {
+          if (argSource.contains(pattern) &&
+              !_isSafeMatch(argSource, pattern)) {
             reporter.atNode(node, code);
             return;
           }
