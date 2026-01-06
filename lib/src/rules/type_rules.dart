@@ -713,7 +713,8 @@ class AvoidNullAssertionRule extends DartLintRule {
   ///
   /// The key insight: if `x?.something == nonNullValue` is true, x cannot be null.
   /// Similarly, if `x!.something` didn't throw, x was not null.
-  bool _isNullPropagatingGuard(BinaryExpression condition, String assertedExpr) {
+  bool _isNullPropagatingGuard(
+      BinaryExpression condition, String assertedExpr) {
     final Expression left = condition.leftOperand;
     final Expression right = condition.rightOperand;
     final String op = condition.operator.lexeme;
