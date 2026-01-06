@@ -1066,6 +1066,39 @@ class NoEmptyBlockRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddEmptyBlockCommentFix()];
+}
+
+class _AddEmptyBlockCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBlock((Block node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.statements.isNotEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add explanatory comment',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert comment after the opening brace
+        final int insertOffset = node.leftBracket.end;
+        builder.addSimpleInsertion(
+          insertOffset,
+          '\n      // TODO: Intentionally empty - explain why\n    ',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when an empty string literal is used.
