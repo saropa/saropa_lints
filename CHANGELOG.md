@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.15] - 2025-01-05
+
+### Fixed
+
+- `require_dispose` - Fixed `disposeSafe` pattern matching (was `xSafe()`, now correctly matches `x.disposeSafe()`)
+- `avoid_logging_sensitive_data` - Added safe pattern detection to avoid false positives on words like `oauth`, `authenticated`, `authorization`, `unauthorized`
+
+### Changed
+
+- README: Clarified that rules must use YAML list format (`- rule: value`) not map format
+- README: Updated IDE integration section with realistic expectations and CLI recommendation
+
 ## [1.1.14] - 2025-01-05
 
 ### Fixed
