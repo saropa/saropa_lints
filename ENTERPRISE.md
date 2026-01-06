@@ -73,6 +73,9 @@ The open source package is free. For teams that want hands-on help:
 | **Custom Rules** | Rules specific to your architecture, patterns, or compliance requirements |
 | **Training** | Team workshops on Flutter best practices and lint-driven development |
 | **Ongoing Support** | We manage your lint configuration as your codebase evolves |
+| **Alpha Access** | Early access to new rules and features before public release |
+| **Priority Support** | Direct communication channel with the saropa_lints team |
+| **Custom Builds** | Private fork of saropa_lints tailored to your organization's standards |
 
 ### Why Pay for Services?
 
@@ -111,6 +114,18 @@ Disable it. Or tell us why — if your argument is good, we'll change the rule o
 ### Do you offer trials?
 
 The package is free and open source. Try it on your codebase. If you want help with adoption or custom rules, contact us.
+
+### Can you build custom rules for our codebase?
+
+Yes. We build rules that enforce your specific patterns — internal API usage, architectural boundaries, naming conventions, deprecated code detection, or any other pattern you want to enforce. Custom rules integrate seamlessly with the existing saropa_lints package.
+
+### Can we get early access to new features?
+
+Yes. Enterprise partners get alpha access to new rules and features before public release. This lets you test changes against your codebase and provide feedback before general availability.
+
+### Can we get a custom build for our organization?
+
+Yes. We can create a private fork of saropa_lints pre-configured for your organization — your tier settings, custom rules, and rule adjustments baked in. Your developers just add the dependency and everything works. We maintain the fork and merge upstream improvements automatically.
 
 ### We're using another linter. Can we switch?
 
