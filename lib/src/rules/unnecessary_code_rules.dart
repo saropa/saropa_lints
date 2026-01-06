@@ -1052,6 +1052,12 @@ class NoEmptyBlockRule extends SaropaLintRule {
           current = current.next;
         }
 
+        // Also check if the right bracket has preceding comments
+        // This catches: { /* comment */ } where no tokens exist between braces
+        if (rightBracket.precedingComments != null) {
+          return; // Has a comment before closing bracket
+        }
+
         // Skip constructor/method initializer lists and abstract methods
         final AstNode? parent = node.parent;
         if (parent is ConstructorDeclaration) return;
@@ -1066,10 +1072,56 @@ class NoEmptyBlockRule extends SaropaLintRule {
           }
         }
 
+        // Check for ignore comment on the same line using source content
+        if (_hasIgnoreCommentOnLine(resolver, node)) {
+          return;
+        }
+
         // Hyphenated ignore comments handled automatically by SaropaLintRule
         reporter.atNode(node, code);
       }
     });
+  }
+
+  /// Checks if there's an ignore comment for this rule on the same line as the node.
+  bool _hasIgnoreCommentOnLine(CustomLintResolver resolver, AstNode node) {
+    try {
+      final String content = resolver.source.contents.data;
+      final List<String> lines = content.split('\n');
+
+      // Check the line where the block ends (the } character)
+      final int blockEndLine =
+          resolver.lineInfo.getLocation(node.end - 1).lineNumber;
+      if (blockEndLine > 0 && blockEndLine <= lines.length) {
+        final String line = lines[blockEndLine - 1];
+        if (line.contains('// ignore: $_name') ||
+            line.contains('// ignore: ${_name.replaceAll('_', '-')}')) {
+          return true;
+        }
+      }
+
+      // Also check the line where the containing statement ends
+      AstNode? statement = node.parent;
+      while (statement != null && statement is! ExpressionStatement) {
+        if (statement is FunctionBody) break;
+        statement = statement.parent;
+      }
+      if (statement is ExpressionStatement) {
+        final int stmtEndLine =
+            resolver.lineInfo.getLocation(statement.end - 1).lineNumber;
+        if (stmtEndLine > 0 && stmtEndLine <= lines.length) {
+          final String line = lines[stmtEndLine - 1];
+          if (line.contains('// ignore: $_name') ||
+              line.contains('// ignore: ${_name.replaceAll('_', '-')}')) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override
