@@ -17,7 +17,7 @@ This script automates the complete release workflow for the saropa_lints package
   12. Creates and pushes git tag
   13. Creates GitHub release with release notes
 
-Version:   3.4
+Version:   3.5
 Author:    Saropa
 Copyright: (c) 2025 Saropa
 
@@ -67,7 +67,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.4"
+SCRIPT_VERSION = "3.5"
 
 
 # =============================================================================
@@ -931,22 +931,22 @@ def main() -> int:
         exit_with_error("Pre-publish validation failed", ExitCode.VALIDATION_FAILED)
 
     # =========================================================================
-    # CONFIRMATION
+    # CONFIRMATION (disabled - uncomment to require manual confirmation)
     # =========================================================================
 
-    print_header("PUBLISH CONFIRMATION")
-
-    print_colored("  Ready to publish:", Color.CYAN)
-    print_colored(f"      Package:    {package_name}", Color.WHITE)
-    print_colored(f"      Version:    {version}", Color.WHITE)
-    print_colored(f"      Tag:        v{version}", Color.WHITE)
-    print_colored(f"      Branch:     {branch}", Color.WHITE)
-    print()
-
-    response = input("  Publish to pub.dev and create GitHub release? [y/N] ").strip().lower()
-    if not response.startswith("y"):
-        print_warning("Publish cancelled by user.")
-        return ExitCode.USER_CANCELLED.value
+    # print_header("PUBLISH CONFIRMATION")
+    #
+    # print_colored("  Ready to publish:", Color.CYAN)
+    # print_colored(f"      Package:    {package_name}", Color.WHITE)
+    # print_colored(f"      Version:    {version}", Color.WHITE)
+    # print_colored(f"      Tag:        v{version}", Color.WHITE)
+    # print_colored(f"      Branch:     {branch}", Color.WHITE)
+    # print()
+    #
+    # response = input("  Publish to pub.dev and create GitHub release? [y/N] ").strip().lower()
+    # if not response.startswith("y"):
+    #     print_warning("Publish cancelled by user.")
+    #     return ExitCode.USER_CANCELLED.value
 
     # =========================================================================
     # PUBLISH AND RELEASE
