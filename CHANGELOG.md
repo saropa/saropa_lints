@@ -7,11 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.18] - 2025-01-06
+
 ### Added
 
 - `no_empty_block` - Added quick fix that inserts an explanatory comment inside the empty block
-
-## [1.1.18] - 2025-01-06
+- `avoid_null_assertion` - Added quick fix that converts `x!.prop` to `x?.prop` in conditions, or adds HACK comment
 
 ### Changed
 
