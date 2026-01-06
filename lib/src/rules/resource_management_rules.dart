@@ -153,8 +153,11 @@ class RequireDatabaseCloseRule extends DartLintRule {
         return;
       }
 
-      // Check for close
-      if (!bodySource.contains('.close(') && !bodySource.contains('dispose')) {
+      // Check for close (including *Safe extension variants)
+      if (!bodySource.contains('.close(') &&
+          !bodySource.contains('.closeSafe(') &&
+          !bodySource.contains('dispose') &&
+          !bodySource.contains('disposeSafe')) {
         reporter.atNode(node, code);
       }
     });
@@ -212,8 +215,10 @@ class RequireHttpClientCloseRule extends DartLintRule {
       // Check for HttpClient creation
       if (!bodySource.contains('HttpClient()')) return;
 
-      // Check for close
-      if (!bodySource.contains('.close(') && !bodySource.contains('.close;')) {
+      // Check for close (including *Safe extension variants)
+      if (!bodySource.contains('.close(') &&
+          !bodySource.contains('.closeSafe(') &&
+          !bodySource.contains('.close;')) {
         reporter.atNode(node, code);
       }
     });
@@ -365,7 +370,9 @@ class RequireWebSocketCloseRule extends DartLintRule {
 
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.body.toSource();
+          // Check for close (including *Safe extension variants)
           if (disposeSource.contains('.close(') ||
+              disposeSource.contains('.closeSafe(') ||
               disposeSource.contains('.sink.close')) {
             hasDisposeClose = true;
           }
@@ -452,8 +459,10 @@ class RequirePlatformChannelCleanupRule extends DartLintRule {
           hasDispose = true;
           final String disposeSource = member.body.toSource();
           // Check if handler is nullified or subscription cancelled
+          // (including *Safe extension variants)
           if (disposeSource.contains('setMethodCallHandler(null)') ||
-              disposeSource.contains('.cancel(')) {
+              disposeSource.contains('.cancel(') ||
+              disposeSource.contains('.cancelSafe(')) {
             return; // Good - cleanup found
           }
         }

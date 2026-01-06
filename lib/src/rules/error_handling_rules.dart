@@ -246,23 +246,80 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Future errors are not handled.
 ///
-/// Unhandled Future errors crash the app or go unnoticed.
+/// Unhandled Future errors crash the app or go unnoticed. When a Future
+/// is "fire and forget" (called without awaiting), any errors it throws
+/// go to the global error handler or are silently lost.
 ///
 /// **BAD:**
 /// ```dart
 /// void initState() {
 ///   super.initState();
-///   loadData(); // Future not awaited or caught
+///   loadData(); // Future not awaited or caught - errors are lost!
 /// }
 /// ```
 ///
-/// **GOOD:**
+/// ## Fix Options (in order of preference)
+///
+/// ### Option 1: Add `.catchError()` (RECOMMENDED)
+///
+/// This ensures errors are caught and logged, so you know when something fails.
+///
 /// ```dart
 /// void initState() {
 ///   super.initState();
-///   loadData().catchError((e) => handleError(e));
+///   loadData().catchError((Object e, StackTrace s) {
+///     debugException(e, s);
+///     return null; // Return type must match Future's type
+///   });
 /// }
 /// ```
+///
+/// ### Option 2: Wrap in try/catch with async helper
+///
+/// Useful when you need more complex error handling logic.
+///
+/// ```dart
+/// void initState() {
+///   super.initState();
+///   _initAsync();
+/// }
+///
+/// Future<void> _initAsync() async {
+///   try {
+///     await loadData();
+///   } catch (e, s) {
+///     debugException(e, s);
+///   }
+/// }
+/// ```
+///
+/// ### Option 3: Use `unawaited()` (NOT RECOMMENDED)
+///
+/// This suppresses the warning but does NOT handle errors - they still go
+/// to the global error handler or are lost silently. Only use this when
+/// you genuinely don't care if the operation fails.
+///
+/// ```dart
+/// import 'dart:async';
+///
+/// void initState() {
+///   super.initState();
+///   unawaited(loadData()); // Errors still lost - just silences the lint
+/// }
+/// ```
+///
+/// ## Why `.catchError()` is preferred over `unawaited()`
+///
+/// | Approach | On Error | Debugging |
+/// |----------|----------|-----------|
+/// | `.catchError()` | Error logged, you know it failed | Easy |
+/// | `unawaited()` | Silent failure, error lost | Impossible |
+///
+/// `unawaited()` is essentially saying "I don't care if this fails" - which
+/// is rarely the actual intent. It just suppresses the lint without fixing
+/// the underlying issue of unhandled errors.
+///
+/// **Quick fix available:** Adds `.catchError()` with `debugPrint`.
 class RequireFutureErrorHandlingRule extends DartLintRule {
   const RequireFutureErrorHandlingRule() : super(code: _code);
 
@@ -270,7 +327,9 @@ class RequireFutureErrorHandlingRule extends DartLintRule {
     name: 'require_future_error_handling',
     problemMessage: 'Future called without error handling.',
     correctionMessage:
-        'Add .catchError(), wrap in try/catch with await, or use .then() with onError.',
+        'Add .catchError() to log errors (recommended), or wrap in try/catch with await.',
+    // WARNING is appropriate now that we use actual type checking instead of
+    // name-based heuristics - if staticType is Future, it really is a Future.
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -285,34 +344,20 @@ class RequireFutureErrorHandlingRule extends DartLintRule {
 
       // Check if it's a method call that returns Future
       if (expr is MethodInvocation) {
+        // Use actual type checking instead of name heuristics
+        final type = expr.staticType;
+        if (type == null || !type.isDartAsyncFuture) return;
+
         // Skip if chained with error handling
         if (_hasErrorHandling(expr)) return;
 
-        // Check if method name suggests async operation
-        final String methodName = expr.methodName.name.toLowerCase();
-        if (_asyncMethodPatterns.any((String p) => methodName.contains(p))) {
-          // Check if in try block
-          if (!_isInTryBlock(node)) {
-            reporter.atNode(node, code);
-          }
+        // Check if in try block
+        if (!_isInTryBlock(node)) {
+          reporter.atNode(node, code);
         }
       }
     });
   }
-
-  static const List<String> _asyncMethodPatterns = <String>[
-    'fetch',
-    'load',
-    'save',
-    'delete',
-    'update',
-    'send',
-    'post',
-    'get',
-    'put',
-    'upload',
-    'download',
-  ];
 
   bool _hasErrorHandling(MethodInvocation node) {
     AstNode? current = node.parent;
@@ -342,6 +387,42 @@ class RequireFutureErrorHandlingRule extends DartLintRule {
       current = current.parent;
     }
     return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddCatchErrorFix()];
+}
+
+class _AddCatchErrorFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addExpressionStatement((ExpressionStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression expr = node.expression;
+      if (expr is! MethodInvocation) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: "Add .catchError() handler",
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert .catchError() before the semicolon
+        builder.addSimpleInsertion(
+          expr.end,
+          ".catchError((Object e, StackTrace s) {\n"
+          "      debugPrint('\$e\\n\$s');\n"
+          "    })",
+        );
+      });
+    });
   }
 }
 
