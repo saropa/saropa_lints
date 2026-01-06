@@ -95,7 +95,9 @@ Available tiers: `essential`, `recommended`, `professional`, `comprehensive`, `i
 
 ### Customizing rules
 
-After choosing a tier, you can enable or disable specific rules:
+After choosing a tier, you can enable or disable specific rules.
+
+**IMPORTANT:** Rules must use YAML list format (with `-` prefix), not map format:
 
 ```yaml
 custom_lint:
@@ -103,10 +105,22 @@ custom_lint:
     tier: recommended
   rules:
     # Disable a rule from the tier
-    avoid_hardcoded_strings_in_ui: false
+    - avoid_hardcoded_strings_in_ui: false
 
     # Enable a rule from a higher tier
-    require_public_api_documentation: true
+    - require_public_api_documentation: true
+```
+
+**Wrong (map format - rules will be silently ignored):**
+```yaml
+rules:
+  avoid_hardcoded_strings_in_ui: false  # NO DASH = NOT PARSED!
+```
+
+**Correct (list format):**
+```yaml
+rules:
+  - avoid_hardcoded_strings_in_ui: false  # DASH = PARSED!
 ```
 
 ## Rule Categories
@@ -171,14 +185,71 @@ const debugText = 'DEBUG MODE';
 
 Always add a comment explaining **why** you're suppressing.
 
-## IDE Integration
+## Running the Linter
 
-Works automatically in:
-- **VS Code** with Dart extension
-- **Android Studio / IntelliJ** with Dart plugin
-- **Command line** via `dart run custom_lint`
+**Command line (recommended - always works):**
+```bash
+dart run custom_lint
+```
 
-Issues appear as you type with quick-fix suggestions.
+**IDE Integration (unreliable):**
+
+custom_lint uses the Dart analyzer plugin system, which has known reliability issues. IDE integration may or may not work depending on your setup. If you don't see warnings in your IDE:
+
+1. Run `flutter pub get`
+2. Restart VS Code completely (not just the analysis server)
+3. Check **View → Output → Dart Analysis Server** for errors
+4. If still not working, use the CLI - it's reliable
+
+**For reliable workflows, use:**
+- Pre-commit hooks
+- CI/CD checks
+- VS Code tasks (see below)
+
+### VS Code Task Setup (Recommended)
+
+Create `.vscode/tasks.json` in your project root:
+
+```json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "custom_lint",
+      "type": "shell",
+      "command": "dart run custom_lint",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": {
+        "owner": "custom_lint",
+        "fileLocation": ["relative", "${workspaceFolder}"],
+        "pattern": {
+          "regexp": "^\\s*(.+):(\\d+):(\\d+)\\s+•\\s+(.+)\\s+•\\s+(\\w+)\\s+•\\s+(ERROR|WARNING|INFO)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "message": 4,
+          "code": 5,
+          "severity": 6
+        }
+      }
+    }
+  ]
+}
+```
+
+**Usage:**
+- Press **Ctrl+Shift+B** (or **Cmd+Shift+B** on Mac) to run custom_lint
+- Warnings appear in the **Problems** panel (Ctrl+Shift+M)
+- Click any warning to jump to that line in your code
+
+This is more reliable than IDE integration because it runs the actual CLI tool rather than depending on the analyzer plugin system.
 
 ## Contributing
 

@@ -2765,7 +2765,9 @@ class RequireDisposeRule extends DartLintRule {
       '$name.$method(',
       '$name?.$method(',
       '$name..$method(',
-      '${name}Safe(',
+      '$name.${method}Safe(',
+      '$name?.${method}Safe(',
+      '$name..${method}Safe(',
     ];
 
     for (final String pattern in patterns) {

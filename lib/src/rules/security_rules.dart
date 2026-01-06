@@ -66,6 +66,19 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
     'privateKey',
   };
 
+  /// Patterns that look sensitive but are actually safe.
+  /// These are checked before flagging to avoid false positives.
+  /// Example: "oauth" contains "auth" but is not sensitive data.
+  static const Set<String> _safePatterns = <String>{
+    'oauth', // OAuth protocol name, not actual auth data
+    'authenticated', // Past tense verb, not a credential
+    'authentication', // Noun describing process, not a credential
+    'authorize', // Verb, not a credential
+    'authorization', // Noun describing process, not a credential
+    'unauthorized', // Error state, not a credential
+    'unauthenticated', // Error state, not a credential
+  };
+
   static const Set<String> _loggingFunctions = <String>{
     'print',
     'debugPrint',
@@ -73,6 +86,20 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
     'logger',
     'Logger',
   };
+
+  /// Checks if a sensitive pattern match is actually a false positive.
+  ///
+  /// Returns true if the match is within a safe pattern (e.g., "auth" in "oauth").
+  static bool _isSafeMatch(String source, String sensitivePattern) {
+    // Check if any safe pattern contains this sensitive pattern
+    // and appears in the source
+    for (final String safePattern in _safePatterns) {
+      if (safePattern.contains(sensitivePattern) && source.contains(safePattern)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   @override
   void run(
@@ -99,7 +126,7 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
-          if (argSource.contains(pattern)) {
+          if (argSource.contains(pattern) && !_isSafeMatch(argSource, pattern)) {
             reporter.atNode(node, code);
             return;
           }
@@ -119,7 +146,7 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
-          if (argSource.contains(pattern)) {
+          if (argSource.contains(pattern) && !_isSafeMatch(argSource, pattern)) {
             reporter.atNode(node, code);
             return;
           }
