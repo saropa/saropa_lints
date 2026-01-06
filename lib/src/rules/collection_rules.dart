@@ -326,6 +326,8 @@ class AvoidUnnecessaryCollectionsRule extends DartLintRule {
 /// if (items.isNotEmpty) {
 ///   final item = items.first;
 /// }
+/// // or
+/// final item = items.length > 1 ? items.last : fallback;
 /// ```
 class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
   const AvoidUnsafeCollectionMethodsRule() : super(code: _code);
@@ -360,6 +362,14 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
           typeName.startsWith('Set') ||
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
+        // Get the collection name for guard checking
+        final String? collectionName = _getCollectionName(node.realTarget);
+
+        // Check if guarded by isNotEmpty/length check
+        if (collectionName != null && _isGuardedAccess(node, collectionName)) {
+          return;
+        }
+
         reporter.atNode(node, code);
       }
     });
@@ -377,16 +387,261 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
           typeName.startsWith('Set') ||
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
+        final String collectionName = node.prefix.name;
+
+        // Check if guarded by isNotEmpty/length check
+        if (_isGuardedAccess(node, collectionName)) {
+          return;
+        }
+
         reporter.atNode(node, code);
       }
     });
   }
 
+  /// Extracts the collection variable name from an expression.
+  String? _getCollectionName(Expression expr) {
+    if (expr is SimpleIdentifier) {
+      return expr.name;
+    }
+    if (expr is PrefixedIdentifier) {
+      return expr.toSource();
+    }
+    if (expr is PropertyAccess) {
+      return expr.toSource();
+    }
+    return null;
+  }
+
+  /// Checks if the access is guarded by an isNotEmpty or length check.
+  bool _isGuardedAccess(AstNode node, String collectionName) {
+    // Check for ternary expression guard: list.length > 0 ? list.first : ...
+    if (_isGuardedByTernary(node, collectionName)) {
+      return true;
+    }
+
+    // Check for if statement guard: if (list.isNotEmpty) { ... list.first ... }
+    if (_isGuardedByIfStatement(node, collectionName)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// Checks if inside a ternary with a length/isEmpty guard.
+  bool _isGuardedByTernary(AstNode node, String collectionName) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ConditionalExpression) {
+        // Check if this node is in the "then" expression (not the "else")
+        if (_isDescendantOf(node, current.thenExpression)) {
+          if (_isValidGuardCondition(current.condition, collectionName)) {
+            return true;
+          }
+        }
+        // For .last in else branch with inverted condition
+        if (_isDescendantOf(node, current.elseExpression)) {
+          if (_isInvertedGuardCondition(current.condition, collectionName)) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if inside an if block with isNotEmpty/length guard.
+  bool _isGuardedByIfStatement(AstNode node, String collectionName) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        // Check if we're in the "then" branch
+        if (_isDescendantOf(node, current.thenStatement)) {
+          if (_isValidGuardCondition(current.expression, collectionName)) {
+            return true;
+          }
+        }
+        // Check if we're in the "else" branch with inverted condition
+        final Statement? elseStatement = current.elseStatement;
+        if (elseStatement != null && _isDescendantOf(node, elseStatement)) {
+          if (_isInvertedGuardCondition(current.expression, collectionName)) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if a condition is a valid guard for the collection.
+  /// Valid guards: list.isNotEmpty, !list.isEmpty, list.length > 0, etc.
+  bool _isValidGuardCondition(Expression condition, String collectionName) {
+    // Handle: list.isNotEmpty
+    if (condition is PrefixedIdentifier) {
+      if (condition.prefix.name == collectionName &&
+          condition.identifier.name == 'isNotEmpty') {
+        return true;
+      }
+    }
+
+    // Handle: list.isNotEmpty (as PropertyAccess)
+    if (condition is PropertyAccess) {
+      final String targetSource = condition.target?.toSource() ?? '';
+      if (targetSource == collectionName &&
+          condition.propertyName.name == 'isNotEmpty') {
+        return true;
+      }
+    }
+
+    // Handle: !list.isEmpty
+    if (condition is PrefixExpression && condition.operator.type == TokenType.BANG) {
+      final Expression operand = condition.operand;
+      if (operand is PrefixedIdentifier) {
+        if (operand.prefix.name == collectionName &&
+            operand.identifier.name == 'isEmpty') {
+          return true;
+        }
+      }
+      if (operand is PropertyAccess) {
+        final String targetSource = operand.target?.toSource() ?? '';
+        if (targetSource == collectionName &&
+            operand.propertyName.name == 'isEmpty') {
+          return true;
+        }
+      }
+    }
+
+    // Handle: list.length > 0, list.length >= 1, list.length != 0
+    if (condition is BinaryExpression) {
+      if (_isLengthComparisonGuard(condition, collectionName)) {
+        return true;
+      }
+      // Handle: list.isNotEmpty && otherCondition
+      if (condition.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+        if (_isValidGuardCondition(condition.leftOperand, collectionName) ||
+            _isValidGuardCondition(condition.rightOperand, collectionName)) {
+          return true;
+        }
+      }
+    }
+
+    // Handle extension methods like .isNotListNullOrEmpty
+    if (condition is PrefixedIdentifier) {
+      final String propName = condition.identifier.name;
+      if (condition.prefix.name == collectionName &&
+          (propName.contains('NotEmpty') || propName.contains('NotNull'))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks for inverted guard (isEmpty check in condition, access in else).
+  bool _isInvertedGuardCondition(Expression condition, String collectionName) {
+    // Handle: list.isEmpty -> access in else is safe
+    if (condition is PrefixedIdentifier) {
+      if (condition.prefix.name == collectionName &&
+          condition.identifier.name == 'isEmpty') {
+        return true;
+      }
+    }
+
+    if (condition is PropertyAccess) {
+      final String targetSource = condition.target?.toSource() ?? '';
+      if (targetSource == collectionName &&
+          condition.propertyName.name == 'isEmpty') {
+        return true;
+      }
+    }
+
+    // Handle: list.length == 0 -> access in else is safe
+    if (condition is BinaryExpression) {
+      if (_isLengthZeroCheck(condition, collectionName)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks if condition is a length comparison that ensures non-empty.
+  /// e.g., list.length > 0, list.length >= 1, list.length != 0, list.length == 1
+  bool _isLengthComparisonGuard(BinaryExpression expr, String collectionName) {
+    final Expression left = expr.leftOperand;
+    final Expression right = expr.rightOperand;
+    final TokenType op = expr.operator.type;
+
+    // Check for: list.length > N or list.length >= N
+    String? lengthTarget;
+    if (left is PrefixedIdentifier && left.identifier.name == 'length') {
+      lengthTarget = left.prefix.name;
+    } else if (left is PropertyAccess && left.propertyName.name == 'length') {
+      lengthTarget = left.target?.toSource();
+    }
+
+    if (lengthTarget == collectionName && right is IntegerLiteral) {
+      final int? value = right.value;
+      if (value != null) {
+        // list.length > 0, list.length > 1, etc.
+        if (op == TokenType.GT && value >= 0) return true;
+        // list.length >= 1, list.length >= 2, etc.
+        if (op == TokenType.GT_EQ && value >= 1) return true;
+        // list.length != 0
+        if (op == TokenType.BANG_EQ && value == 0) return true;
+        // list.length == 1, list.length == 2, etc. (exact positive length)
+        if (op == TokenType.EQ_EQ && value >= 1) return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks if condition is list.length == 0 (for inverted guard).
+  bool _isLengthZeroCheck(BinaryExpression expr, String collectionName) {
+    final Expression left = expr.leftOperand;
+    final Expression right = expr.rightOperand;
+
+    String? lengthTarget;
+    if (left is PrefixedIdentifier && left.identifier.name == 'length') {
+      lengthTarget = left.prefix.name;
+    } else if (left is PropertyAccess && left.propertyName.name == 'length') {
+      lengthTarget = left.target?.toSource();
+    }
+
+    if (lengthTarget == collectionName &&
+        expr.operator.type == TokenType.EQ_EQ &&
+        right is IntegerLiteral &&
+        right.value == 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// Checks if [node] is a descendant of [potentialAncestor].
+  bool _isDescendantOf(AstNode node, AstNode potentialAncestor) {
+    AstNode? current = node;
+    while (current != null) {
+      if (current == potentialAncestor) return true;
+      current = current.parent;
+    }
+    return false;
+  }
+
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForUnsafeCollectionFix()];
+  List<Fix> getFixes() => <Fix>[_UseNullSafeCollectionMethodFix()];
 }
 
-class _AddHackCommentForUnsafeCollectionFix extends DartFix {
+class _UseNullSafeCollectionMethodFix extends DartFix {
+  static const Map<String, String> _replacements = <String, String>{
+    'first': 'firstOrNull',
+    'last': 'lastOrNull',
+    'single': 'singleOrNull',
+  };
+
   @override
   void run(
     CustomLintResolver resolver,
@@ -395,30 +650,44 @@ class _AddHackCommentForUnsafeCollectionFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    // Handle PropertyAccess nodes
+    // Handle PropertyAccess nodes (e.g., someList.first)
     context.registry.addPropertyAccess((PropertyAccess node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      _addHackComment(reporter, node, node.propertyName.name);
+      final String propertyName = node.propertyName.name;
+      final String? replacement = _replacements[propertyName];
+      if (replacement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use .$replacement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.propertyName.offset, node.propertyName.length),
+          replacement,
+        );
+      });
     });
 
-    // Handle PrefixedIdentifier nodes
+    // Handle PrefixedIdentifier nodes (e.g., list.first in simple cases)
     context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-      _addHackComment(reporter, node, node.identifier.name);
-    });
-  }
+      final String propertyName = node.identifier.name;
+      final String? replacement = _replacements[propertyName];
+      if (replacement == null) return;
 
-  void _addHackComment(ChangeReporter reporter, AstNode node, String method) {
-    final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-      message: 'Add HACK comment for unsafe .$method',
-      priority: 2,
-    );
-
-    changeBuilder.addDartFileEdit((builder) {
-      builder.addSimpleInsertion(
-        node.offset,
-        '/* HACK: check empty before .$method */ ',
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use .$replacement',
+        priority: 1,
       );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.identifier.offset, node.identifier.length),
+          replacement,
+        );
+      });
     });
   }
 }
