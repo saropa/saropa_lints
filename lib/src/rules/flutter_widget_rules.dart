@@ -2684,19 +2684,27 @@ class RequireDisposeRule extends DartLintRule {
         return;
       }
 
-      // Find the dispose method
+      // Find the dispose method and collect all method bodies
       MethodDeclaration? disposeMethod;
+      final Map<String, String> methodBodies = <String, String>{};
+
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethod = member;
-          break;
+        if (member is MethodDeclaration) {
+          final String methodName = member.name.lexeme;
+          methodBodies[methodName] = member.body.toSource();
+          if (methodName == 'dispose') {
+            disposeMethod = member;
+          }
         }
       }
 
-      // Get the dispose method body as string for checking
+      // Get the dispose method body and expand helper method calls
       String disposeBody = '';
       if (disposeMethod != null) {
-        disposeBody = disposeMethod.body.toSource();
+        disposeBody = _expandMethodCalls(
+          disposeMethod.body.toSource(),
+          methodBodies,
+        );
       }
 
       // Check each disposable field
@@ -2710,6 +2718,40 @@ class RequireDisposeRule extends DartLintRule {
         }
       }
     });
+  }
+
+  /// Expand helper method calls in the body to include their implementations.
+  /// This allows detecting disposal patterns like `_cancelTimer()` that
+  /// internally call `_timer?.cancel()`.
+  String _expandMethodCalls(
+    String body,
+    Map<String, String> methodBodies, {
+    int depth = 0,
+  }) {
+    // Prevent infinite recursion
+    if (depth > 3) {
+      return body;
+    }
+
+    final StringBuffer expanded = StringBuffer(body);
+
+    // Find method calls to private methods (starting with _)
+    final RegExp methodCallPattern = RegExp(r'_(\w+)\s*\(');
+    for (final RegExpMatch match in methodCallPattern.allMatches(body)) {
+      final String methodName = '_${match.group(1)}';
+      final String? methodBody = methodBodies[methodName];
+      if (methodBody != null) {
+        // Recursively expand nested helper calls
+        final String expandedMethodBody = _expandMethodCalls(
+          methodBody,
+          methodBodies,
+          depth: depth + 1,
+        );
+        expanded.write(' $expandedMethodBody');
+      }
+    }
+
+    return expanded.toString();
   }
 
   /// Check if a class extends `State<T>`
@@ -2793,6 +2835,167 @@ class _DisposableField {
   final String typeName;
   final String disposeMethod;
   final FieldDeclaration declaration;
+}
+
+/// Suggests nullifying nullable disposable fields after disposal.
+///
+/// When a nullable disposable field (Timer?, StreamSubscription?, etc.) is
+/// disposed/cancelled, it's good practice to also set it to null. This:
+/// - Helps garbage collection
+/// - Prevents accidental reuse of disposed resources
+/// - Makes it clear the resource has been cleaned up
+///
+/// Example of **bad** code:
+/// ```dart
+/// void _cancelTimer() {
+///   _timer?.cancel();
+///   // Missing: _timer = null;
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// void _cancelTimer() {
+///   _timer?.cancel();
+///   _timer = null;
+/// }
+/// ```
+class NullifyAfterDisposeRule extends DartLintRule {
+  const NullifyAfterDisposeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'nullify_after_dispose',
+    problemMessage:
+        'Nullable disposable field should be set to null after disposal.',
+    correctionMessage:
+        'Add `fieldName = null;` after disposing to help garbage collection '
+        'and prevent accidental reuse.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Map of disposable type names to their disposal method
+  static const Map<String, String> _disposableTypes = <String, String>{
+    'Timer': 'cancel',
+    'StreamSubscription': 'cancel',
+    'StreamController': 'close',
+    'AnimationController': 'dispose',
+    'TextEditingController': 'dispose',
+    'ScrollController': 'dispose',
+    'TabController': 'dispose',
+    'PageController': 'dispose',
+    'FocusNode': 'dispose',
+    'ChangeNotifier': 'dispose',
+    'ValueNotifier': 'dispose',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    DiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check if this is a disposal method call
+      final String? disposedType = _getDisposedType(methodName);
+      if (disposedType == null) {
+        return;
+      }
+
+      // Get the target (e.g., _timer in _timer?.cancel())
+      final Expression? target = node.realTarget;
+      if (target is! SimpleIdentifier) {
+        return;
+      }
+
+      final String fieldName = target.name;
+
+      // Check if this is a nullable call (?.cancel or ?.dispose)
+      // We only suggest nullification for nullable fields
+      final AstNode? parent = node.parent;
+      if (parent is! ExpressionStatement) {
+        return;
+      }
+
+      // Find the containing block to check for nullification
+      final Block? containingBlock = _findContainingBlock(node);
+      if (containingBlock == null) {
+        return;
+      }
+
+      // Check if the field is nullified after this statement
+      if (_isNullifiedAfter(containingBlock, parent, fieldName)) {
+        return;
+      }
+
+      // Report the issue
+      reporter.atNode(node, code);
+    });
+  }
+
+  /// Get the type being disposed based on the method name
+  String? _getDisposedType(String methodName) {
+    // Check both regular and Safe versions
+    final String baseMethod =
+        methodName.endsWith('Safe') ? methodName.replaceAll('Safe', '') : methodName;
+
+    for (final MapEntry<String, String> entry in _disposableTypes.entries) {
+      if (entry.value == baseMethod) {
+        return entry.key;
+      }
+    }
+    return null;
+  }
+
+  /// Find the containing block statement
+  Block? _findContainingBlock(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is Block) {
+        return current;
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Check if the field is set to null after the given statement
+  bool _isNullifiedAfter(
+    Block block,
+    ExpressionStatement disposeStatement,
+    String fieldName,
+  ) {
+    bool foundDisposeStatement = false;
+
+    for (final Statement statement in block.statements) {
+      if (statement == disposeStatement) {
+        foundDisposeStatement = true;
+        continue;
+      }
+
+      if (!foundDisposeStatement) {
+        continue;
+      }
+
+      // Look for assignment to null: fieldName = null
+      if (statement is ExpressionStatement) {
+        final Expression expression = statement.expression;
+        if (expression is AssignmentExpression) {
+          final Expression leftSide = expression.leftHandSide;
+          final Expression rightSide = expression.rightHandSide;
+
+          if (leftSide is SimpleIdentifier &&
+              leftSide.name == fieldName &&
+              rightSide is NullLiteral) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
 }
 
 /// Warns when setState is called after an async gap without mounted check.
@@ -3280,6 +3483,12 @@ class RequireAnimationDisposalRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Only check State classes - StatelessWidgets receive controllers
+      // as parameters and don't own them (parent disposes)
+      if (!_isStateClass(node)) {
+        return;
+      }
+
       // Find AnimationController fields
       final Set<String> animationControllerFields = <String>{};
 
@@ -3329,6 +3538,17 @@ class RequireAnimationDisposalRule extends DartLintRule {
         }
       }
     });
+  }
+
+  /// Check if a class extends `State<T>`
+  bool _isStateClass(ClassDeclaration node) {
+    final ExtendsClause? extendsClause = node.extendsClause;
+    if (extendsClause == null) {
+      return false;
+    }
+
+    final String superclassName = extendsClause.superclass.name.lexeme;
+    return superclassName == 'State';
   }
 }
 
