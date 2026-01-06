@@ -2883,7 +2883,8 @@ class RequireTimerCancellationRule extends DartLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_timer_cancellation',
-    problemMessage: 'Timer or StreamSubscription must be cancelled in dispose().',
+    problemMessage:
+        'Timer or StreamSubscription must be cancelled in dispose().',
     correctionMessage:
         'Add cancel() in dispose() to prevent crashes and memory leaks. '
         'Uncancelled timers continue firing after widget disposal.',
@@ -3161,8 +3162,9 @@ class NullifyAfterDisposeRule extends DartLintRule {
   /// Get the type being disposed based on the method name
   String? _getDisposedType(String methodName) {
     // Check both regular and Safe versions
-    final String baseMethod =
-        methodName.endsWith('Safe') ? methodName.replaceAll('Safe', '') : methodName;
+    final String baseMethod = methodName.endsWith('Safe')
+        ? methodName.replaceAll('Safe', '')
+        : methodName;
 
     for (final MapEntry<String, String> entry in _disposableTypes.entries) {
       if (entry.value == baseMethod) {
