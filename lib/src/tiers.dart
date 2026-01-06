@@ -71,6 +71,9 @@ const Set<String> essentialRules = <String>{
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 const Set<String> recommendedOnlyRules = <String>{
+  // Memory Management Best Practices
+  'nullify_after_dispose',
+
   // Performance
   'avoid_expensive_build',
   'prefer_const_child_widgets',
