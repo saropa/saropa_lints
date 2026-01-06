@@ -46,6 +46,11 @@ class IgnoreUtils {
   /// ```
   /// The empty block `{}` is nested inside the `listen()` call, so the
   /// ignore comment is on an ancestor node, not the block itself.
+  ///
+  /// Also handles trailing ignore comments on the same line:
+  /// ```dart
+  /// stream.listen((_) {}); // ignore: no-empty-block
+  /// ```
   static bool hasIgnoreComment(AstNode node, String ruleName) {
     // Check the node's own begin token
     if (hasIgnoreCommentOnToken(node.beginToken, ruleName)) return true;
@@ -57,6 +62,48 @@ class IgnoreUtils {
       // Stop at statement level - don't go higher
       if (current is Statement) break;
       current = current.parent;
+    }
+
+    // Check for trailing same-line comments (e.g., `{} // ignore: rule`)
+    // These appear as precedingComments on the next token after the statement
+    if (_hasTrailingIgnoreComment(node, ruleName)) return true;
+
+    return false;
+  }
+
+  /// Checks for a trailing ignore comment on the same line as the node.
+  ///
+  /// Trailing comments like `// ignore: rule` at the end of a line are stored
+  /// as `precedingComments` on the first token of the next line/statement.
+  static bool _hasTrailingIgnoreComment(AstNode node, String ruleName) {
+    // Find the ExpressionStatement containing this node
+    // Note: Block is a Statement subclass, so we need to look for
+    // ExpressionStatement specifically (which ends with `;`)
+    AstNode? statement = node.parent;
+    while (statement != null && statement is! ExpressionStatement) {
+      // Stop if we hit a function/method body - no statement to check
+      if (statement is FunctionBody) return false;
+      statement = statement.parent;
+    }
+    if (statement == null) return false;
+
+    // Get the token after the statement ends (typically first token of next line)
+    final Token? nextToken = statement.endToken.next;
+    if (nextToken == null) return false;
+
+    final String hyphenatedName = toHyphenated(ruleName);
+
+    // Check ALL preceding comments on the next token - any of them could be
+    // a trailing ignore comment from the statement
+    Token? comment = nextToken.precedingComments;
+    while (comment != null) {
+      final String text = comment.lexeme;
+      if (text.contains('ignore:')) {
+        if (text.contains(ruleName) || text.contains(hyphenatedName)) {
+          return true;
+        }
+      }
+      comment = comment.next;
     }
     return false;
   }

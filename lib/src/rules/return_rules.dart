@@ -6,8 +6,9 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when returning a cascade expression.
 ///
@@ -21,7 +22,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// list..add(1)..add(2);
 /// return list;
 /// ```
-class AvoidReturningCascadesRule extends DartLintRule {
+class AvoidReturningCascadesRule extends SaropaLintRule {
   const AvoidReturningCascadesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -32,9 +33,9 @@ class AvoidReturningCascadesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {
@@ -66,7 +67,7 @@ class AvoidReturningCascadesRule extends DartLintRule {
 ///   // Just don't return
 /// }
 /// ```
-class AvoidReturningVoidRule extends DartLintRule {
+class AvoidReturningVoidRule extends SaropaLintRule {
   const AvoidReturningVoidRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -78,9 +79,9 @@ class AvoidReturningVoidRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {
@@ -120,7 +121,7 @@ class AvoidReturningVoidRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Comments out the unnecessary return.
-class AvoidUnnecessaryReturnRule extends DartLintRule {
+class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   const AvoidUnnecessaryReturnRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -131,9 +132,9 @@ class AvoidUnnecessaryReturnRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -152,7 +153,7 @@ class AvoidUnnecessaryReturnRule extends DartLintRule {
   void _checkFunction(
     FunctionBody body,
     TypeAnnotation? returnType,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     // Only check void functions
     if (returnType is! NamedType) return;
@@ -221,7 +222,7 @@ class _CommentOutUnnecessaryReturnFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Inlines the expression into the return statement.
-class PreferImmediateReturnRule extends DartLintRule {
+class PreferImmediateReturnRule extends SaropaLintRule {
   const PreferImmediateReturnRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -233,9 +234,9 @@ class PreferImmediateReturnRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -331,7 +332,7 @@ class _InlineImmediateReturnFix extends DartFix {
 /// ```dart
 /// int getValue() => 42;
 /// ```
-class PreferReturningShorthandsRule extends DartLintRule {
+class PreferReturningShorthandsRule extends SaropaLintRule {
   const PreferReturningShorthandsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -342,9 +343,9 @@ class PreferReturningShorthandsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -357,7 +358,7 @@ class PreferReturningShorthandsRule extends DartLintRule {
   }
 
   void _checkBody(
-      FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
+      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;

@@ -86,3 +86,35 @@ class _TestOptions {
   const _TestOptions({required this.colors});
   final List<int> colors;
 }
+
+// Test enum for .values access
+enum TestEnum { one, two, three }
+
+void testGuaranteedNonEmptyCollections() {
+  // GOOD: String.split() always returns at least one element (should NOT trigger)
+  final String text = 'hello|world';
+  final splitFirst = text.split('|').first;
+  final splitLast = text.split('|').last;
+  final splitSingle = 'single'.split('x').first; // Returns ['single']
+
+  // GOOD: Empty string split still returns one element (should NOT trigger)
+  final emptyStringSplit = ''.split(',').first; // Returns ['']
+
+  // GOOD: Enum.values is never empty (should NOT trigger)
+  final enumFirst = TestEnum.values.first;
+  final enumLast = TestEnum.values.last;
+
+  // GOOD: Chained split access (should NOT trigger)
+  final chainedSplit = 'a.b.c'.split('.').last;
+  final nestedSplit = 'key=value'.split('=').first.split('_').last;
+
+  // BAD: Non-split method results can be empty (SHOULD trigger)
+  final filtered = <int>[1, 2, 3].where((int x) => x > 10);
+  // expect_lint: avoid_unsafe_collection_methods
+  final filteredFirst = filtered.first;
+
+  // BAD: Regular list access without guard (SHOULD trigger)
+  final regularList = <String>[];
+  // expect_lint: avoid_unsafe_collection_methods
+  final regularFirst = regularList.first;
+}

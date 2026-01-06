@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
@@ -362,6 +363,11 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
           typeName.startsWith('Set') ||
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
+        // Check if this is a guaranteed non-empty collection
+        if (_isGuaranteedNonEmpty(node.realTarget)) {
+          return;
+        }
+
         // Get the collection name for guard checking
         final String? collectionName = _getCollectionName(node.realTarget);
 
@@ -387,6 +393,11 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
           typeName.startsWith('Set') ||
           typeName.startsWith('Iterable') ||
           typeName.startsWith('Queue')) {
+        // Check if this is a guaranteed non-empty collection (e.g., EnumType.values)
+        if (_isGuaranteedNonEmptyPrefixed(node)) {
+          return;
+        }
+
         final String collectionName = node.prefix.name;
 
         // Check if guarded by isNotEmpty/length check
@@ -397,6 +408,73 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  /// Checks if an expression is guaranteed to be non-empty.
+  /// This includes:
+  /// - String.split() results (always returns at least one element)
+  /// - EnumType.values (enums must have at least one value)
+  bool _isGuaranteedNonEmpty(Expression expr) {
+    // Check for .split() result - String.split() always returns at least one element
+    if (expr is MethodInvocation && expr.methodName.name == 'split') {
+      return true;
+    }
+
+    // Check for enum .values property access (e.g., MyEnum.values)
+    if (expr is PrefixedIdentifier && expr.identifier.name == 'values') {
+      final DartType? prefixType = expr.prefix.staticType;
+      if (prefixType != null) {
+        // Check if accessing .values on an enum type
+        final Element? element = prefixType.element;
+        if (element is EnumElement) {
+          return true;
+        }
+        // Type<EnumName> indicates it's accessing static members of an enum
+        final String typeStr = prefixType.getDisplayString();
+        if (typeStr.startsWith('Type<')) {
+          return true;
+        }
+      }
+    }
+
+    // Check for PropertyAccess to .values on enum
+    if (expr is PropertyAccess && expr.propertyName.name == 'values') {
+      final Expression? target = expr.target;
+      if (target != null) {
+        final DartType? targetType = target.staticType;
+        if (targetType != null) {
+          final Element? element = targetType.element;
+          if (element is EnumElement) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks if a PrefixedIdentifier represents a guaranteed non-empty collection.
+  /// e.g., EnumType.values.first where the prefix is the "values" property
+  bool _isGuaranteedNonEmptyPrefixed(PrefixedIdentifier node) {
+    // Check the static type of the prefix to see if it's an enum values list
+    final DartType? prefixType = node.prefix.staticType;
+    if (prefixType != null) {
+      final String typeStr = prefixType.getDisplayString();
+      // List<MyEnum> where MyEnum is an enum - this is what .values returns
+      if (typeStr.startsWith('List<')) {
+        // Check the element type to see if it's an enum
+        if (prefixType is InterfaceType && prefixType.typeArguments.isNotEmpty) {
+          final DartType elementType = prefixType.typeArguments.first;
+          final Element? element = elementType.element;
+          if (element is EnumElement) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   /// Extracts the collection variable name from an expression.
@@ -804,6 +882,275 @@ class _AddHackCommentForReduceFix extends DartFix {
           '/* HACK: use fold() or check empty */ ',
         );
       });
+    });
+  }
+}
+
+/// Warns when firstWhere/lastWhere/singleWhere is used without orElse.
+///
+/// These methods throw StateError if no element matches the predicate.
+/// Use firstWhereOrNull/lastWhereOrNull/singleWhereOrNull from
+/// package:collection instead.
+///
+/// Example of **bad** code:
+/// ```dart
+/// final item = items.firstWhere((e) => e.isActive);  // Throws if none match
+/// final last = items.lastWhere((e) => e.id == 5);    // Throws if none match
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// import 'package:collection/collection.dart';
+/// final item = items.firstWhereOrNull((e) => e.isActive);
+/// final last = items.lastWhereOrNull((e) => e.id == 5);
+/// // or with orElse:
+/// final item = items.firstWhere((e) => e.isActive, orElse: () => defaultItem);
+/// ```
+class AvoidUnsafeWhereMethodsRule extends DartLintRule {
+  const AvoidUnsafeWhereMethodsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unsafe_where_methods',
+    problemMessage:
+        'firstWhere/lastWhere/singleWhere throws if no element matches.',
+    correctionMessage:
+        'Use firstWhereOrNull/lastWhereOrNull/singleWhereOrNull from '
+        'package:collection, or provide an orElse callback.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _unsafeMethods = <String>{
+    'firstWhere',
+    'lastWhere',
+    'singleWhere',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    DiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_unsafeMethods.contains(methodName)) return;
+
+      // Check if target is an Iterable type
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+
+      final DartType? targetType = target.staticType;
+      if (targetType == null) return;
+
+      final String typeName = targetType.getDisplayString();
+      if (!typeName.startsWith('List') &&
+          !typeName.startsWith('Set') &&
+          !typeName.startsWith('Iterable') &&
+          !typeName.startsWith('Queue')) {
+        return;
+      }
+
+      // Check if orElse is provided - if so, it's safe
+      final NodeList<Expression> args = node.argumentList.arguments;
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
+          return; // Has orElse callback, safe to use
+        }
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseWhereOrNullFix()];
+}
+
+class _UseWhereOrNullFix extends DartFix {
+  static const Map<String, String> _replacements = <String, String>{
+    'firstWhere': 'firstWhereOrNull',
+    'lastWhere': 'lastWhereOrNull',
+    'singleWhere': 'singleWhereOrNull',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_replacements.containsKey(methodName)) return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String? replacement = _replacements[methodName];
+      if (replacement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use .$replacement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.methodName.offset, node.methodName.length),
+          replacement,
+        );
+      });
+    });
+  }
+}
+
+/// Suggests using *OrNull methods instead of *Where with orElse callback.
+///
+/// While using orElse is safe, the *OrNull pattern from package:collection
+/// is more concise and idiomatic.
+///
+/// Example of **acceptable** code (but can be improved):
+/// ```dart
+/// final item = items.firstWhere((e) => e.isActive, orElse: () => defaultItem);
+/// ```
+///
+/// Example of **preferred** code:
+/// ```dart
+/// import 'package:collection/collection.dart';
+/// final item = items.firstWhereOrNull((e) => e.isActive) ?? defaultItem;
+/// ```
+class PreferWhereOrNullRule extends DartLintRule {
+  const PreferWhereOrNullRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_where_or_null',
+    problemMessage:
+        'Consider using firstWhereOrNull/lastWhereOrNull/singleWhereOrNull '
+        'with ?? instead of orElse callback.',
+    correctionMessage:
+        'Replace .firstWhere(..., orElse: () => x) with '
+        '.firstWhereOrNull(...) ?? x for cleaner code.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _whereMethods = <String>{
+    'firstWhere',
+    'lastWhere',
+    'singleWhere',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    DiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_whereMethods.contains(methodName)) return;
+
+      // Check if target is an Iterable type
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+
+      final DartType? targetType = target.staticType;
+      if (targetType == null) return;
+
+      final String typeName = targetType.getDisplayString();
+      if (!typeName.startsWith('List') &&
+          !typeName.startsWith('Set') &&
+          !typeName.startsWith('Iterable') &&
+          !typeName.startsWith('Queue')) {
+        return;
+      }
+
+      // Only flag if orElse IS provided (otherwise AvoidUnsafeWhereMethodsRule handles it)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      NamedExpression? orElseArg;
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
+          orElseArg = arg;
+          break;
+        }
+      }
+
+      if (orElseArg == null) return; // No orElse, handled by other rule
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceWithWhereOrNullFix()];
+}
+
+class _ReplaceWithWhereOrNullFix extends DartFix {
+  static const Map<String, String> _replacements = <String, String>{
+    'firstWhere': 'firstWhereOrNull',
+    'lastWhere': 'lastWhereOrNull',
+    'singleWhere': 'singleWhereOrNull',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_replacements.containsKey(methodName)) return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find orElse argument and extract its return expression
+      final NodeList<Expression> args = node.argumentList.arguments;
+      NamedExpression? orElseArg;
+      Expression? predicateArg;
+
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
+          orElseArg = arg;
+        } else if (predicateArg == null) {
+          predicateArg = arg;
+        }
+      }
+
+      if (orElseArg == null || predicateArg == null) return;
+
+      // Try to extract the return value from orElse callback
+      String? defaultValue;
+      final Expression orElseExpr = orElseArg.expression;
+      if (orElseExpr is FunctionExpression) {
+        final FunctionBody body = orElseExpr.body;
+        if (body is ExpressionFunctionBody) {
+          defaultValue = body.expression.toSource();
+        }
+      }
+
+      final String? replacement = _replacements[methodName];
+      if (replacement == null) return;
+
+      final Expression? target = node.realTarget;
+      if (target == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use .$replacement ?? $defaultValue',
+        priority: 1,
+      );
+
+      if (defaultValue != null) {
+        changeBuilder.addDartFileEdit((builder) {
+          // Replace entire method call with: target.firstWhereOrNull(predicate) ?? defaultValue
+          final String newCode =
+              '${target.toSource()}.$replacement(${predicateArg!.toSource()}) ?? $defaultValue';
+          builder.addSimpleReplacement(
+            SourceRange(node.offset, node.length),
+            newCode,
+          );
+        });
+      }
     });
   }
 }

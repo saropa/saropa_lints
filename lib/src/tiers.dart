@@ -47,6 +47,7 @@ const Set<String> essentialRules = <String>{
   // Null Safety
   'avoid_null_assertion',
   'avoid_unsafe_collection_methods',
+  'avoid_unsafe_where_methods',
   'avoid_unsafe_reduce',
   'avoid_late_final_reassignment',
 
@@ -151,6 +152,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_contains',
   'prefer_first',
   'prefer_last',
+  'prefer_where_or_null',
 
   // Testing
   'require_test_assertions',
