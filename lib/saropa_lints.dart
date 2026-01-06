@@ -154,6 +154,8 @@ const List<LintRule> _allRules = <LintRule>[
   ConsistentUpdateRenderObjectRule(),
   AvoidSingleFieldDestructuringRule(),
   AvoidUnsafeCollectionMethodsRule(),
+  AvoidUnsafeWhereMethodsRule(),
+  PreferWhereOrNullRule(),
   PreferNamedBooleanParametersRule(),
   PreferEarlyReturnRule(),
   AvoidFlexibleOutsideFlexRule(),
