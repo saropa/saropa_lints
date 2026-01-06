@@ -496,7 +496,8 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
     }
 
     // Handle: !list.isEmpty
-    if (condition is PrefixExpression && condition.operator.type == TokenType.BANG) {
+    if (condition is PrefixExpression &&
+        condition.operator.type == TokenType.BANG) {
       final Expression operand = condition.operand;
       if (operand is PrefixedIdentifier) {
         if (operand.prefix.name == collectionName &&
