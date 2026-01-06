@@ -6221,14 +6221,32 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 
   final Set<String> disposedFields;
 
+  static const Set<String> _disposeMethodNames = <String>{
+    'dispose',
+    'disposeSafe',
+    'cancel',
+    'cancelSafe',
+    'close',
+    'closeSafe',
+  };
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
     super.visitMethodInvocation(node);
 
-    if (node.methodName.name == 'dispose' || node.methodName.name == 'cancel') {
+    if (_disposeMethodNames.contains(node.methodName.name)) {
       final Expression? target = node.target;
+      // Handle simple field access: _controller.dispose()
       if (target is SimpleIdentifier) {
         disposedFields.add(target.name);
+      }
+      // Handle prefixed access: this._controller.dispose()
+      else if (target is PrefixedIdentifier) {
+        disposedFields.add(target.identifier.name);
+      }
+      // Handle property access: this._controller.dispose() (alternate AST)
+      else if (target is PropertyAccess) {
+        disposedFields.add(target.propertyName.name);
       }
     }
   }
