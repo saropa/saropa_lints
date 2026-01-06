@@ -264,9 +264,15 @@ class _CloseCallVisitor extends RecursiveAstVisitor<void> {
 
   final void Function(String) onClose;
 
+  /// Methods that close/cleanup resources (including *Safe extension variants).
+  static const Set<String> _closeMethodNames = <String>{
+    'close',
+    'closeSafe',
+  };
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'close') {
+    if (_closeMethodNames.contains(node.methodName.name)) {
       final Expression? target = node.target;
       if (target is SimpleIdentifier) {
         onClose(target.name);
@@ -317,24 +323,31 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Check if extends State
+      // Check if extends State (not StatefulWidget or StatelessWidget)
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
       final String superName = extendsClause.superclass.name.lexeme;
-      if (!superName.contains('State')) return;
+      // Only match "State" exactly - StatefulWidget/StatelessWidget should not be checked
+      // because their ValueNotifier fields are parameters passed in, not owned by them
+      if (superName != 'State') return;
 
-      // Find ValueNotifier fields
+      // Find ValueNotifier fields that are CREATED locally (have initializers).
+      // Fields without initializers are parameters passed from outside and should
+      // NOT be disposed by this class - the owner is responsible for disposal.
       final List<String> notifierNames = <String>[];
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
+            // Skip fields without initializers - they are parameters, not owned
+            final Expression? initializer = variable.initializer;
+            if (initializer == null) continue;
+
             final String? typeName = member.fields.type?.toSource();
             if (typeName != null && typeName.contains('ValueNotifier')) {
               notifierNames.add(variable.name.lexeme);
             }
-            // Also check initializers
-            final Expression? initializer = variable.initializer;
+            // Also check initializers for ValueNotifier creation
             if (initializer is InstanceCreationExpression) {
               final String? initTypeName =
                   initializer.constructorName.type.element?.name;
@@ -389,9 +402,15 @@ class _DisposeCallVisitor extends RecursiveAstVisitor<void> {
 
   final void Function(String) onDispose;
 
+  /// Methods that dispose resources (including *Safe extension variants).
+  static const Set<String> _disposeMethodNames = <String>{
+    'dispose',
+    'disposeSafe',
+  };
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'dispose') {
+    if (_disposeMethodNames.contains(node.methodName.name)) {
       final Expression? target = node.target;
       if (target is SimpleIdentifier) {
         onDispose(target.name);
