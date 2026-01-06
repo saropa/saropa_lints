@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.16] - 2025-01-05
+
+### Changed
+
+- Renamed `docs/` to `doc/guides/` to follow Dart/Pub package layout conventions
+
 ## [1.1.15] - 2025-01-05
 
 ### Fixed
@@ -109,7 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Style badge for projects using saropa_lints
 - CI status badge in README
 - Badge section in README with copy-paste markdown for users
-- Migration guide for very_good_analysis users (`docs/migration_from_vga.md`)
+- Migration guide for very_good_analysis users (`doc/guides/migration_from_vga.md`)
 
 ### Changed
 
