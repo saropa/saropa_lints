@@ -67,8 +67,8 @@ dart run custom_lint
 
 ### Migrating from other tools?
 
-- [Migrating from very_good_analysis](docs/migration_from_vga.md)
-- [Migrating from DCM (Dart Code Metrics)](docs/migration_from_dcm.md)
+- [Migrating from very_good_analysis](doc/guides/migration_from_vga.md)
+- [Migrating from DCM (Dart Code Metrics)](doc/guides/migration_from_dcm.md)
 
 ## The 5 Tiers
 
