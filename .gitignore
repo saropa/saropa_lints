@@ -1,5 +1,5 @@
 # Generated API documentation (pub.dev generates its own)
-doc/
+doc/api/
 
 # Dart/Flutter
 .dart_tool/
@@ -17,3 +17,6 @@ pubspec.lock
 Thumbs.db
 .claude/settings.local.json
 CLAUDE.md
+
+# Articles (not part of the package)
+articles/
