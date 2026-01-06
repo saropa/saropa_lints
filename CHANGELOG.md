@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-01-06
+
+### Changed
+
+- **README overhaul** - Expanded "Why saropa_lints?" section:
+  - Added "Linting vs static analysis" explanation
+  - Added concrete code examples of bugs it catches
+  - Added comparison to enterprise tools (SonarQube, Coverity, Checkmarx)
+  - Added regulatory context (European Accessibility Act, GitHub leaked secrets stats)
+- **pub.dev compatibility** - Fixed all relative links to use absolute GitHub URLs:
+  - Banner image now uses raw.githubusercontent.com
+  - Migration guides, CONTRIBUTING.md, ENTERPRISE.md, LICENSE all link to GitHub
+- **Accurate tier counts** - Corrected inflated rule counts across all documentation:
+  - Essential: ~50 (was ~100)
+  - Recommended: ~150 (was ~300)
+  - Professional: ~250 (was ~600)
+  - Comprehensive: ~400 (was ~800)
+  - Insanity: ~475 (was 1000)
+- **Tier descriptions** - Updated Recommended tier to highlight null safety and collection bounds checking
+- **Package description** - Updated pub.dev description from "1,000+" to "500+" rules
+
 ## [1.1.19] - 2025-01-06
 
 ### Changed
