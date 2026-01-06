@@ -201,6 +201,20 @@ custom_lint uses the Dart analyzer plugin system, which has known reliability is
 3. Check **View → Output → Dart Analysis Server** for errors
 4. If still not working, use the CLI - it's reliable
 
+**If custom_lint crashes:**
+
+If you see native crashes (e.g., `ExceptionCode=-1073741819` on Windows), clear the analysis cache:
+
+```bash
+# Windows
+rmdir /s /q .dart_tool && flutter pub get
+
+# macOS/Linux
+rm -rf .dart_tool && flutter pub get
+```
+
+Then run `dart run custom_lint` again.
+
 **For reliable workflows, use:**
 - Pre-commit hooks
 - CI/CD checks
