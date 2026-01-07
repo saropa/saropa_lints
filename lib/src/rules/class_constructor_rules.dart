@@ -4,8 +4,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when a class declares a call() method.
 ///
@@ -22,21 +23,22 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   void execute() { }
 /// }
 /// ```
-class AvoidDeclaringCallMethodRule extends DartLintRule {
+class AvoidDeclaringCallMethodRule extends SaropaLintRule {
   const AvoidDeclaringCallMethodRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_declaring_call_method',
-    problemMessage: 'Avoid declaring a call() method.',
+    problemMessage:
+        'call() method makes class callable but hides intent. Code reads ambiguously.',
     correctionMessage:
-        'Use a more descriptive method name like execute() or invoke().',
+        'Use descriptive method name: execute(), invoke(), or run() instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -62,7 +64,7 @@ class AvoidDeclaringCallMethodRule extends DartLintRule {
 /// ```dart
 /// class Container<T> {} // clear generic parameter
 /// ```
-class AvoidGenericsShadowingRule extends DartLintRule {
+class AvoidGenericsShadowingRule extends SaropaLintRule {
   const AvoidGenericsShadowingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -108,9 +110,9 @@ class AvoidGenericsShadowingRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTypeParameterList((TypeParameterList node) {
@@ -146,20 +148,22 @@ class AvoidGenericsShadowingRule extends DartLintRule {
 ///       User(name ?? this.name, age ?? this.age);
 /// }
 /// ```
-class AvoidIncompleteCopyWithRule extends DartLintRule {
+class AvoidIncompleteCopyWithRule extends SaropaLintRule {
   const AvoidIncompleteCopyWithRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_incomplete_copy_with',
-    problemMessage: 'copyWith method may be missing fields.',
-    correctionMessage: 'Ensure all class fields are included in copyWith.',
+    problemMessage:
+        'copyWith() is missing fields. Copied objects will lose data for those fields.',
+    correctionMessage:
+        'Add missing fields as nullable parameters: copyWith({String? name, int? age}).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -225,20 +229,22 @@ class AvoidIncompleteCopyWithRule extends DartLintRule {
 ///   User(String input) : name = input.trim();
 /// }
 /// ```
-class AvoidNonEmptyConstructorBodiesRule extends DartLintRule {
+class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
   const AvoidNonEmptyConstructorBodiesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_empty_constructor_bodies',
-    problemMessage: 'Constructor body contains logic.',
-    correctionMessage: 'Use initializer list or factory constructor.',
+    problemMessage:
+        'Constructor body has logic. Final fields cannot be set in body, only initializers.',
+    correctionMessage:
+        'Move logic to initializer list: MyClass(input) : name = input.trim();',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -296,7 +302,7 @@ class AvoidNonEmptyConstructorBodiesRule extends DartLintRule {
 ///   print(localValue);
 /// }
 /// ```
-class AvoidShadowingRule extends DartLintRule {
+class AvoidShadowingRule extends SaropaLintRule {
   const AvoidShadowingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -307,9 +313,9 @@ class AvoidShadowingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -355,7 +361,7 @@ class AvoidShadowingRule extends DartLintRule {
 class _ShadowingChecker extends RecursiveAstVisitor<void> {
   _ShadowingChecker(this.reporter, this.code, this.outerNames);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
   final Set<String> outerNames;
 
@@ -410,7 +416,7 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
 /// // or
 /// final List<String> countries = const <String>['US', 'CA', 'MX'];
 /// ```
-class PreferConstStringListRule extends DartLintRule {
+class PreferConstStringListRule extends SaropaLintRule {
   const PreferConstStringListRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -423,9 +429,9 @@ class PreferConstStringListRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -517,7 +523,7 @@ class PreferConstStringListRule extends DartLintRule {
 }
 
 /// Warns when a class could have a const constructor but doesn't.
-class PreferDeclaringConstConstructorRule extends DartLintRule {
+class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   const PreferDeclaringConstConstructorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -528,9 +534,9 @@ class PreferDeclaringConstConstructorRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -599,7 +605,7 @@ class PreferDeclaringConstConstructorRule extends DartLintRule {
 ///   factory UserId(String value) => UserId._(value);
 /// }
 /// ```
-class PreferPrivateExtensionTypeFieldRule extends DartLintRule {
+class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
   const PreferPrivateExtensionTypeFieldRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -610,9 +616,9 @@ class PreferPrivateExtensionTypeFieldRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -661,7 +667,7 @@ class PreferPrivateExtensionTypeFieldRule extends DartLintRule {
 ///   super.dispose();
 /// }
 /// ```
-class ProperSuperCallsRule extends DartLintRule {
+class ProperSuperCallsRule extends SaropaLintRule {
   const ProperSuperCallsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -673,9 +679,9 @@ class ProperSuperCallsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -725,6 +731,329 @@ class ProperSuperCallsRule extends DartLintRule {
       // For dispose, super should be last
       if (methodName == 'dispose' && superCallIndex != statements.length - 1) {
         reporter.atNode(statements[superCallIndex], code);
+      }
+    });
+  }
+}
+
+/// Warns when a public class lacks an explicit class modifier.
+///
+/// Dart 3.0 introduced class modifiers (base, final, interface, sealed).
+/// For API stability, public classes should declare their inheritance intent.
+///
+/// Example of **bad** code:
+/// ```dart
+/// class MyService { }  // Can be extended/implemented anywhere
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final class MyService { }  // Cannot be extended
+/// base class MyService { }   // Can only be extended, not implemented
+/// interface class MyService { }  // Can only be implemented
+/// sealed class MyService { }  // Restricted to this library
+/// ```
+class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
+  const AvoidUnmarkedPublicClassRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unmarked_public_class',
+    problemMessage: 'Public class lacks an explicit class modifier.',
+    correctionMessage:
+        'Add base, final, interface, or sealed modifier (Dart 3.0+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme;
+
+      // Skip private classes
+      if (className.startsWith('_')) return;
+
+      // Check for class modifiers
+      final bool hasBase = node.baseKeyword != null;
+      final bool hasFinal = node.finalKeyword != null;
+      final bool hasInterface = node.interfaceKeyword != null;
+      final bool hasSealed = node.sealedKeyword != null;
+      final bool hasMixin = node.mixinKeyword != null;
+      final bool isAbstract = node.abstractKeyword != null;
+
+      // Skip if it already has a modifier (including abstract which implies intent)
+      if (hasBase || hasFinal || hasInterface || hasSealed || hasMixin) {
+        return;
+      }
+
+      // Abstract classes are somewhat explicit about intent, but could still
+      // benefit from base/interface/sealed. We'll skip them to reduce noise.
+      if (isAbstract) return;
+
+      reporter.atToken(node.name, code);
+    });
+  }
+}
+
+/// Warns when a concrete class could be marked `final`.
+///
+/// Dart 3.0 introduced the `final` modifier to prevent subclassing.
+/// Classes that are not designed for extension should be marked `final`.
+///
+/// Example of **bad** code:
+/// ```dart
+/// class ApiService { }  // Can be extended anywhere
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final class ApiService { }  // Cannot be extended
+/// ```
+class PreferFinalClassRule extends SaropaLintRule {
+  const PreferFinalClassRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_final_class',
+    problemMessage: 'Consider marking this class as final.',
+    correctionMessage:
+        'Add final modifier if this class is not designed for extension (Dart 3.0+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme;
+
+      // Skip private classes
+      if (className.startsWith('_')) return;
+
+      // Skip if abstract - abstract classes need different modifiers
+      if (node.abstractKeyword != null) return;
+
+      // Skip if already has a modifier
+      if (node.baseKeyword != null ||
+          node.finalKeyword != null ||
+          node.interfaceKeyword != null ||
+          node.sealedKeyword != null ||
+          node.mixinKeyword != null) {
+        return;
+      }
+
+      // Heuristic: Classes with only private constructors are good candidates
+      bool hasPublicConstructor = false;
+      bool hasAnyConstructor = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration) {
+          hasAnyConstructor = true;
+          final Token? nameToken = member.name;
+          final bool isPrivate =
+              nameToken != null && nameToken.lexeme.startsWith('_');
+          if (!isPrivate && member.factoryKeyword == null) {
+            hasPublicConstructor = true;
+          }
+        }
+      }
+
+      // If no constructors defined, there's an implicit public constructor
+      if (!hasAnyConstructor) {
+        hasPublicConstructor = true;
+      }
+
+      // Only suggest final for classes with private-only constructors
+      // or classes that look like utility/service classes
+      if (!hasPublicConstructor) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when an abstract class with only abstract members could be `interface`.
+///
+/// Dart 3.0 introduced the `interface` modifier for pure contracts.
+/// Abstract classes with no implementation should use `interface class`.
+///
+/// Example of **bad** code:
+/// ```dart
+/// abstract class Repository {
+///   Future<User> getUser(String id);
+///   Future<void> saveUser(User user);
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// interface class Repository {
+///   Future<User> getUser(String id);
+///   Future<void> saveUser(User user);
+/// }
+/// ```
+class PreferInterfaceClassRule extends SaropaLintRule {
+  const PreferInterfaceClassRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_interface_class',
+    problemMessage: 'Abstract class with only abstract members could be interface.',
+    correctionMessage:
+        'Use interface class for pure contracts (Dart 3.0+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Must be abstract
+      if (node.abstractKeyword == null) return;
+
+      // Skip if already has a modifier
+      if (node.baseKeyword != null ||
+          node.finalKeyword != null ||
+          node.interfaceKeyword != null ||
+          node.sealedKeyword != null ||
+          node.mixinKeyword != null) {
+        return;
+      }
+
+      // Skip private classes
+      if (node.name.lexeme.startsWith('_')) return;
+
+      // Check if all members are abstract (no concrete implementations)
+      bool hasConcreteImplementation = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration) {
+          // Check if method has a body (concrete implementation)
+          if (member.body is! EmptyFunctionBody) {
+            hasConcreteImplementation = true;
+            break;
+          }
+        } else if (member is FieldDeclaration) {
+          // Fields with initializers are concrete
+          for (final VariableDeclaration variable in member.fields.variables) {
+            if (variable.initializer != null) {
+              hasConcreteImplementation = true;
+              break;
+            }
+          }
+          if (hasConcreteImplementation) break;
+        } else if (member is ConstructorDeclaration) {
+          // Constructors with bodies are concrete
+          if (member.body is! EmptyFunctionBody) {
+            hasConcreteImplementation = true;
+            break;
+          }
+        }
+      }
+
+      // Only suggest interface if there's no concrete implementation
+      if (!hasConcreteImplementation && node.members.isNotEmpty) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when an abstract class with implementation could be `base`.
+///
+/// Dart 3.0 introduced the `base` modifier for classes meant to be
+/// extended but not implemented directly.
+///
+/// Example of **bad** code:
+/// ```dart
+/// abstract class BaseRepository {
+///   final Database db;
+///   BaseRepository(this.db);
+///
+///   Future<void> close() => db.close();
+///   Future<T> get<T>(String id);  // Abstract
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// abstract base class BaseRepository {
+///   final Database db;
+///   BaseRepository(this.db);
+///
+///   Future<void> close() => db.close();
+///   Future<T> get<T>(String id);  // Abstract
+/// }
+/// ```
+class PreferBaseClassRule extends SaropaLintRule {
+  const PreferBaseClassRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_base_class',
+    problemMessage: 'Abstract class with shared implementation could be base.',
+    correctionMessage:
+        'Use abstract base class to prevent direct implementation (Dart 3.0+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Must be abstract
+      if (node.abstractKeyword == null) return;
+
+      // Skip if already has a modifier
+      if (node.baseKeyword != null ||
+          node.finalKeyword != null ||
+          node.interfaceKeyword != null ||
+          node.sealedKeyword != null ||
+          node.mixinKeyword != null) {
+        return;
+      }
+
+      // Skip private classes
+      if (node.name.lexeme.startsWith('_')) return;
+
+      // Check if class has both abstract and concrete members
+      bool hasAbstractMember = false;
+      bool hasConcreteImplementation = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration) {
+          if (member.body is EmptyFunctionBody) {
+            hasAbstractMember = true;
+          } else {
+            hasConcreteImplementation = true;
+          }
+        } else if (member is FieldDeclaration) {
+          // Non-static fields count as concrete
+          if (!member.isStatic) {
+            hasConcreteImplementation = true;
+          }
+        } else if (member is ConstructorDeclaration) {
+          // Having a constructor with initializers is concrete
+          if (member.initializers.isNotEmpty ||
+              member.body is! EmptyFunctionBody) {
+            hasConcreteImplementation = true;
+          }
+        }
+      }
+
+      // Suggest base for abstract classes with shared implementation
+      // that also have abstract members (mixed abstraction)
+      if (hasAbstractMember && hasConcreteImplementation) {
+        reporter.atToken(node.name, code);
       }
     });
   }

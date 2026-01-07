@@ -5,8 +5,9 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when comparing an expression to itself (x == x).
 ///
@@ -24,7 +25,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// // For NaN checks:
 /// if (value != value) {}  // This is intentional for NaN detection
 /// ```
-class AvoidEqualExpressionsRule extends DartLintRule {
+class AvoidEqualExpressionsRule extends SaropaLintRule {
   const AvoidEqualExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -36,9 +37,9 @@ class AvoidEqualExpressionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -103,7 +104,7 @@ class _AddHackForEqualExpressionsFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Transforms `!(a == b)` to `a != b`.
-class AvoidNegationsInEqualityChecksRule extends DartLintRule {
+class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
   const AvoidNegationsInEqualityChecksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -114,9 +115,9 @@ class AvoidNegationsInEqualityChecksRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -189,7 +190,7 @@ class _UseNotEqualsFix extends DartFix {
 /// x = newValue;
 /// this.value = other.value;
 /// ```
-class AvoidSelfAssignmentRule extends DartLintRule {
+class AvoidSelfAssignmentRule extends SaropaLintRule {
   const AvoidSelfAssignmentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -201,9 +202,9 @@ class AvoidSelfAssignmentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -263,7 +264,7 @@ class _AddHackForSelfAssignmentFix extends DartFix {
 /// if (x == y) { }
 /// if (x.isNaN) { }  // Use isNaN to check for NaN
 /// ```
-class AvoidSelfCompareRule extends DartLintRule {
+class AvoidSelfCompareRule extends SaropaLintRule {
   const AvoidSelfCompareRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -274,9 +275,9 @@ class AvoidSelfCompareRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -333,7 +334,7 @@ class _AddHackForSelfCompareFix extends DartFix {
 /// Warns when compareTo is used for equality instead of ==.
 ///
 /// **Quick fix available:** Transforms `a.compareTo(b) == 0` to `a == b`.
-class AvoidUnnecessaryCompareToRule extends DartLintRule {
+class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
   const AvoidUnnecessaryCompareToRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -344,9 +345,9 @@ class AvoidUnnecessaryCompareToRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -446,7 +447,7 @@ class _UseDirectEqualityFix extends DartFix {
 /// setPosition(x, y);
 /// compare(value, otherValue);
 /// ```
-class NoEqualArgumentsRule extends DartLintRule {
+class NoEqualArgumentsRule extends SaropaLintRule {
   const NoEqualArgumentsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -457,9 +458,9 @@ class NoEqualArgumentsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addArgumentList((ArgumentList node) {

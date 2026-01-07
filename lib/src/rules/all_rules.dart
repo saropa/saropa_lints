@@ -27,6 +27,7 @@ export 'record_pattern_rules.dart';
 export 'resource_management_rules.dart';
 export 'return_rules.dart';
 export 'security_rules.dart';
+export 'stylistic_rules.dart';
 export 'type_safety_rules.dart';
 export 'state_management_rules.dart';
 export 'structure_rules.dart';

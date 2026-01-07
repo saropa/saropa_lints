@@ -8,11 +8,13 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when AnimatedList or AnimatedGrid items don't have keys.
 ///
@@ -43,7 +45,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   },
 /// )
 /// ```
-class RequireKeysInAnimatedListsRule extends DartLintRule {
+class RequireKeysInAnimatedListsRule extends SaropaLintRule {
   const RequireKeysInAnimatedListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -62,9 +64,9 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -85,7 +87,7 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
     });
   }
 
-  void _checkBuilderForKey(FunctionBody body, DiagnosticReporter reporter) {
+  void _checkBuilderForKey(FunctionBody body, SaropaDiagnosticReporter reporter) {
     // Find the returned widget
     if (body is ExpressionFunctionBody) {
       _checkExpressionForKey(body.expression, reporter, body);
@@ -100,7 +102,7 @@ class RequireKeysInAnimatedListsRule extends DartLintRule {
 
   void _checkExpressionForKey(
     Expression expr,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     AstNode reportNode,
   ) {
     if (expr is InstanceCreationExpression) {
@@ -186,7 +188,7 @@ class _ReturnVisitor extends RecursiveAstVisitor<void> {
 ///   return Text(data['name']);
 /// }
 /// ```
-class AvoidExpensiveBuildRule extends DartLintRule {
+class AvoidExpensiveBuildRule extends SaropaLintRule {
   const AvoidExpensiveBuildRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -216,9 +218,9 @@ class AvoidExpensiveBuildRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -252,7 +254,7 @@ class AvoidExpensiveBuildRule extends DartLintRule {
 class _ExpensiveOperationVisitor extends RecursiveAstVisitor<void> {
   _ExpensiveOperationVisitor(this.reporter, this.code, this.expensiveOps);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
   final Set<String> expensiveOps;
 
@@ -295,7 +297,7 @@ class _ExpensiveOperationVisitor extends RecursiveAstVisitor<void> {
 ///   Text('Rating'),
 /// ]
 /// ```
-class PreferConstChildWidgetsRule extends DartLintRule {
+class PreferConstChildWidgetsRule extends SaropaLintRule {
   const PreferConstChildWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -307,9 +309,9 @@ class PreferConstChildWidgetsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -402,7 +404,7 @@ class PreferConstChildWidgetsRule extends DartLintRule {
 /// ```dart
 /// final content = await File('data.txt').readAsString();
 /// ```
-class AvoidSynchronousFileIoRule extends DartLintRule {
+class AvoidSynchronousFileIoRule extends SaropaLintRule {
   const AvoidSynchronousFileIoRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -428,9 +430,9 @@ class AvoidSynchronousFileIoRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -455,7 +457,7 @@ class AvoidSynchronousFileIoRule extends DartLintRule {
 /// ```dart
 /// final result = await compute(heavyCalculation, data);
 /// ```
-class PreferComputeForHeavyWorkRule extends DartLintRule {
+class PreferComputeForHeavyWorkRule extends SaropaLintRule {
   const PreferComputeForHeavyWorkRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -482,9 +484,9 @@ class PreferComputeForHeavyWorkRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -539,7 +541,7 @@ class PreferComputeForHeavyWorkRule extends DartLintRule {
 ///   print(formatter.format(item.date));
 /// }
 /// ```
-class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
+class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
   const AvoidObjectCreationInHotLoopsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -561,9 +563,9 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addForStatement((ForStatement node) {
@@ -588,13 +590,13 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
     });
   }
 
-  void _checkBodyForCreation(Statement body, DiagnosticReporter reporter) {
+  void _checkBodyForCreation(Statement body, SaropaDiagnosticReporter reporter) {
     body.visitChildren(_CreationInLoopVisitor(reporter, code, _expensiveTypes));
   }
 
   void _checkCreation(
     InstanceCreationExpression creation,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     final String? typeName = creation.constructorName.type.element?.name;
     if (typeName != null && _expensiveTypes.contains(typeName)) {
@@ -606,7 +608,7 @@ class AvoidObjectCreationInHotLoopsRule extends DartLintRule {
 class _CreationInLoopVisitor extends RecursiveAstVisitor<void> {
   _CreationInLoopVisitor(this.reporter, this.code, this.expensiveTypes);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
   final Set<String> expensiveTypes;
 
@@ -638,7 +640,7 @@ class _CreationInLoopVisitor extends RecursiveAstVisitor<void> {
 ///   return Text('$result');
 /// }
 /// ```
-class PreferCachedGetterRule extends DartLintRule {
+class PreferCachedGetterRule extends SaropaLintRule {
   const PreferCachedGetterRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -650,9 +652,9 @@ class PreferCachedGetterRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -724,7 +726,7 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
 /// // Extract into separate widgets
 /// MyContentWidget()
 /// ```
-class AvoidExcessiveWidgetDepthRule extends DartLintRule {
+class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
   const AvoidExcessiveWidgetDepthRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -738,9 +740,9 @@ class AvoidExcessiveWidgetDepthRule extends DartLintRule {
   static const int _maxDepth = 10;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -808,7 +810,7 @@ class _DepthVisitor extends RecursiveAstVisitor<void> {
 ///   itemBuilder: (context, index) => ListTile(...),
 /// )
 /// ```
-class RequireItemExtentForLargeListsRule extends DartLintRule {
+class RequireItemExtentForLargeListsRule extends SaropaLintRule {
   const RequireItemExtentForLargeListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -822,9 +824,9 @@ class RequireItemExtentForLargeListsRule extends DartLintRule {
   static const int _largeListThreshold = 100;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -886,7 +888,7 @@ class RequireItemExtentForLargeListsRule extends DartLintRule {
 ///   cacheHeight: 200,
 /// )
 /// ```
-class RequireImageCacheDimensionsRule extends DartLintRule {
+class RequireImageCacheDimensionsRule extends SaropaLintRule {
   const RequireImageCacheDimensionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -897,9 +899,9 @@ class RequireImageCacheDimensionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -946,7 +948,7 @@ class RequireImageCacheDimensionsRule extends DartLintRule {
 /// // In build
 /// Image.asset('assets/hero_image.png')
 /// ```
-class PreferImagePrecacheRule extends DartLintRule {
+class PreferImagePrecacheRule extends SaropaLintRule {
   const PreferImagePrecacheRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -967,9 +969,9 @@ class PreferImagePrecacheRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -1023,7 +1025,7 @@ class PreferImagePrecacheRule extends DartLintRule {
 ///   return ListView(controller: _controller);
 /// }
 /// ```
-class AvoidControllerInBuildRule extends DartLintRule {
+class AvoidControllerInBuildRule extends SaropaLintRule {
   const AvoidControllerInBuildRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1045,9 +1047,9 @@ class AvoidControllerInBuildRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1067,7 +1069,7 @@ class AvoidControllerInBuildRule extends DartLintRule {
 class _ControllerCreationVisitor extends RecursiveAstVisitor<void> {
   _ControllerCreationVisitor(this.reporter, this.code, this.controllerTypes);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
   final Set<String> controllerTypes;
 
@@ -1106,7 +1108,7 @@ class _ControllerCreationVisitor extends RecursiveAstVisitor<void> {
 ///   return Container();
 /// }
 /// ```
-class AvoidSetStateInBuildRule extends DartLintRule {
+class AvoidSetStateInBuildRule extends SaropaLintRule {
   const AvoidSetStateInBuildRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1118,9 +1120,9 @@ class AvoidSetStateInBuildRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1165,7 +1167,7 @@ class _AddHackForSetStateInBuildFix extends DartFix {
 class _SetStateVisitor extends RecursiveAstVisitor<void> {
   _SetStateVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -1197,5 +1199,181 @@ class _SetStateVisitor extends RecursiveAstVisitor<void> {
       reporter.atNode(node, code);
     }
     super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when string concatenation is used inside loops.
+///
+/// String concatenation with + creates new String objects each iteration.
+/// Use StringBuffer for building strings in loops.
+///
+/// Example of **bad** code:
+/// ```dart
+/// String result = '';
+/// for (final item in items) {
+///   result = result + item.name;  // Creates new String each time
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final buffer = StringBuffer();
+/// for (final item in items) {
+///   buffer.write(item.name);
+/// }
+/// final result = buffer.toString();
+/// ```
+class AvoidStringConcatenationLoopRule extends SaropaLintRule {
+  const AvoidStringConcatenationLoopRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_string_concatenation_loop',
+    problemMessage: 'Avoid string concatenation inside loops.',
+    correctionMessage: 'Use StringBuffer for building strings in loops.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      // Check for string + operator
+      if (node.operator.type != TokenType.PLUS) return;
+
+      // Check if we're inside a loop
+      if (!_isInsideLoop(node)) return;
+
+      // Check if operands look like strings
+      final String source = node.toSource();
+      if (_looksLikeStringOperation(source)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      // Check for += operator
+      if (node.operator.type != TokenType.PLUS_EQ) return;
+
+      // Check if we're inside a loop
+      if (!_isInsideLoop(node)) return;
+
+      // Check if it looks like a string operation
+      final String leftSource = node.leftHandSide.toSource();
+      if (_looksLikeStringVariable(leftSource)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideLoop(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ForStatement ||
+          current is ForElement ||
+          current is WhileStatement ||
+          current is DoStatement ||
+          current is ForEachParts) {
+        return true;
+      }
+      // Check for .forEach, .map, etc.
+      if (current is MethodInvocation) {
+        final String name = current.methodName.name;
+        if (name == 'forEach' || name == 'map' || name == 'reduce') {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _looksLikeStringOperation(String source) {
+    return source.contains("'") ||
+        source.contains('"') ||
+        source.toLowerCase().contains('string') ||
+        source.contains('name') ||
+        source.contains('text') ||
+        source.contains('message');
+  }
+
+  bool _looksLikeStringVariable(String name) {
+    final String lower = name.toLowerCase();
+    return lower.contains('string') ||
+        lower.contains('text') ||
+        lower.contains('result') ||
+        lower.contains('output') ||
+        lower.contains('buffer') ||
+        lower.contains('message');
+  }
+}
+
+/// Warns when List.from() or toList() copies large collections.
+///
+/// These methods copy all elements to a new list, which is expensive
+/// for large collections. Consider using lazy operations instead.
+///
+/// Example of **bad** code:
+/// ```dart
+/// final copy = List.from(largeList);
+/// final filtered = largeList.where((e) => e > 0).toList();
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// // Use Iterable operations lazily
+/// final filtered = largeList.where((e) => e > 0);
+/// // Or document the intentional copy
+/// final copy = List<int>.of(largeList); // Explicit copy
+/// ```
+class AvoidLargeListCopyRule extends SaropaLintRule {
+  const AvoidLargeListCopyRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_large_list_copy',
+    problemMessage: 'List.from() and toList() copy all elements.',
+    correctionMessage:
+        'Consider lazy Iterable operations or document intentional copies.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check for List.from()
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'List') return;
+
+      final SimpleIdentifier? constructorName = node.constructorName.name;
+      if (constructorName?.name == 'from') {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+
+    // Check for .toList() after filtering operations
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'toList') return;
+
+      // Check if called on a chain of operations
+      final Expression? target = node.target;
+      if (target is MethodInvocation) {
+        final String methodName = target.methodName.name;
+        // Warn if copying after filter/map operations
+        if (methodName == 'where' ||
+            methodName == 'map' ||
+            methodName == 'expand' ||
+            methodName == 'take' ||
+            methodName == 'skip') {
+          reporter.atNode(node.methodName, code);
+        }
+      }
+    });
   }
 }

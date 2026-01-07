@@ -85,6 +85,10 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidReturningCascadesRule(),
   AvoidPositionalRecordFieldAccessRule(),
   AvoidDeclaringCallMethodRule(),
+  AvoidUnmarkedPublicClassRule(),
+  PreferFinalClassRule(),
+  PreferInterfaceClassRule(),
+  PreferBaseClassRule(),
   AvoidNestedStreamsAndFuturesRule(),
   AvoidIfWithManyBranchesRule(),
   AvoidInvertedBooleanChecksRule(),
@@ -106,6 +110,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidWeakCryptographicAlgorithmsRule(),
   NoObjectDeclarationRule(),
   PreferReturningConditionRule(),
+  PreferWhenGuardOverIfRule(),
   PreferDedicatedMediaQueryMethodRule(),
   AvoidCascadeAfterIfNullRule(),
   AvoidDuplicateExportsRule(),
@@ -253,6 +258,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferPrivateExtensionTypeFieldRule(),
   PreferReturningShorthandsRule(),
   RecordFieldsOrderingRule(),
+  PreferPatternDestructuringRule(),
   MatchLibFolderStructureRule(),
   MoveRecordsToTypedefsRule(),
   NewlineBeforeConstructorRule(),
@@ -341,6 +347,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferNamedExtensionsRule(),
   PreferTypedefForCallbacksRule(),
   PreferEnhancedEnumsRule(),
+  PreferWildcardForUnusedParamRule(),
   AvoidUnusedCallbackParametersRule(),
   PreferConstWidgetsInListsRule(),
   AvoidScaffoldMessengerAfterAwaitRule(),
@@ -453,6 +460,26 @@ const List<LintRule> _allRules = <LintRule>[
   DisposeFieldsRule(),
   PassExistingFutureToFutureBuilderRule(),
   PassExistingStreamToStreamBuilderRule(),
+  AvoidEmptyTextWidgetsRule(),
+  AvoidFontWeightAsNumberRule(),
+  PreferSizedBoxForWhitespaceRule(),
+  AvoidNestedScaffoldsRule(),
+  AvoidMultipleMaterialAppsRule(),
+  AvoidRawKeyboardListenerRule(),
+  AvoidImageRepeatRule(),
+  AvoidIconSizeOverrideRule(),
+  PreferInkwellOverGestureRule(),
+  AvoidFittedBoxForTextRule(),
+  PreferListViewBuilderRule(),
+  AvoidOpacityAnimationRule(),
+  AvoidSizedBoxExpandRule(),
+  PreferSelectableTextRule(),
+  PreferSpacingOverSizedBoxRule(),
+  AvoidMaterial2FallbackRule(),
+  PreferOverlayPortalRule(),
+  PreferCarouselViewRule(),
+  PreferSearchAnchorRule(),
+  PreferTapRegionForDismissRule(),
 
   // Accessibility rules (NEW)
   AvoidIconButtonsWithoutTooltipRule(),
@@ -475,6 +502,9 @@ const List<LintRule> _allRules = <LintRule>[
   RequireBiometricFallbackRule(),
   AvoidEvalLikePatternsRule(),
   RequireCertificatePinningRule(),
+  AvoidTokenInUrlRule(),
+  AvoidClipboardSensitiveRule(),
+  AvoidStoringPasswordsRule(),
 
   // Performance rules (NEW)
   RequireKeysInAnimatedListsRule(),
@@ -490,6 +520,8 @@ const List<LintRule> _allRules = <LintRule>[
   PreferImagePrecacheRule(),
   AvoidControllerInBuildRule(),
   AvoidSetStateInBuildRule(),
+  AvoidStringConcatenationLoopRule(),
+  AvoidLargeListCopyRule(),
 
   // State management rules (NEW)
   RequireNotifyListenersRule(),
@@ -602,6 +634,49 @@ const List<LintRule> _allRules = <LintRule>[
   FormatCommentFormattingRule(),
   MemberOrderingFormattingRule(),
   ParametersOrderingConventionRule(),
+
+  // New widget rules
+  RequireTextOverflowHandlingRule(),
+  RequireImageErrorBuilderRule(),
+  RequireImageDimensionsRule(),
+  RequirePlaceholderForNetworkRule(),
+  RequireScrollControllerDisposeRule(),
+  RequireFocusNodeDisposeRule(),
+  PreferTextThemeRule(),
+  AvoidNestedScrollablesRule(),
+
+  // New test rule
+  PreferPumpAndSettleRule(),
+
+  // New state management rules
+  RequireBlocCloseRule(),
+  PreferConsumerWidgetRule(),
+  RequireAutoDisposeRule(),
+
+  // New security rule
+  AvoidDynamicSqlRule(),
+
+  // Stylistic / Opinionated rules (not in any tier by default)
+  PreferRelativeImportsRule(),
+  PreferOneWidgetPerFileRule(),
+  PreferArrowFunctionsRule(),
+  PreferAllNamedParametersRule(),
+  PreferTrailingCommaAlwaysRule(),
+  PreferPrivateUnderscorePrefixRule(),
+  PreferWidgetMethodsOverClassesRule(),
+  PreferExplicitTypesRule(),
+  PreferClassOverRecordReturnRule(),
+  PreferInlineCallbacksRule(),
+  PreferSingleQuotesRule(),
+  PreferTodoFormatRule(),
+  PreferFixmeFormatRule(),
+  PreferSentenceCaseCommentsRule(),
+  PreferPeriodAfterDocRule(),
+  PreferScreamingCaseConstantsRule(),
+  PreferDescriptiveBoolNamesRule(),
+  PreferSnakeCaseFilesRule(),
+  AvoidSmallTextRule(),
+  PreferDocCommentsOverRegularRule(),
 ];
 
 class _SaropaLints extends PluginBase {
