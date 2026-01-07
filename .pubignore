@@ -1,0 +1,48 @@
+# Exclude files that break pub.dev analysis or shouldn't be published
+
+# Generated API documentation (pub.dev generates its own)
+doc/api/
+dartdoc-log.txt
+dartdoc_options.yaml
+
+# Log files
+*.log
+
+# Example package files (path dependency breaks pana analysis)
+# Keep example/example.md and example/custom_lint.yaml for documentation
+example/pubspec.yaml
+example/pubspec.lock
+example/lib/
+example/analysis_options.yaml
+example/.dart_tool/
+
+# Development files
+.dart_tool/
+.packages
+build/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project management files
+CLAUDE.md
+articles/
+cspell.json
+
+# Scripts not needed for package usage
+scripts/
+
+# Test fixtures (users don't need these)
+test/
+
+# VSCode extension (distributed separately)
+vscode-saropa-lints/
+
+# GitHub workflows
+.github/
