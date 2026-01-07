@@ -1,13 +1,9 @@
 name: publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Dry run (validate only, do not publish)'
-        required: false
-        default: 'false'
-        type: boolean
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.5.3
 
 jobs:
   publish:
@@ -37,5 +33,4 @@ jobs:
         run: dart pub publish --dry-run || [ $? -eq 65 ]
 
       - name: Publish to pub.dev
-        if: ${{ inputs.dry_run != 'true' }}
         run: dart pub publish --force || [ $? -eq 65 ]
