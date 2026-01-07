@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when UI layer directly accesses data layer.
 ///
@@ -29,14 +30,15 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   final UserViewModel viewModel; // Through presentation layer
 /// }
 /// ```
-class AvoidDirectDataAccessInUiRule extends DartLintRule {
+class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
   const AvoidDirectDataAccessInUiRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_direct_data_access_in_ui',
-    problemMessage: 'UI layer should not directly access data layer.',
+    problemMessage:
+        'Widget directly accesses data layer. This couples UI to data implementation.',
     correctionMessage:
-        'Use a ViewModel, Cubit, or Controller to mediate data access.',
+        'Inject a ViewModel, Cubit, or Controller that wraps the data layer.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -51,9 +53,9 @@ class AvoidDirectDataAccessInUiRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -110,7 +112,7 @@ class AvoidDirectDataAccessInUiRule extends DartLintRule {
 ///   Widget build(context) => Text(cart.calculateTotal().toString());
 /// }
 /// ```
-class AvoidBusinessLogicInUiRule extends DartLintRule {
+class AvoidBusinessLogicInUiRule extends SaropaLintRule {
   const AvoidBusinessLogicInUiRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -136,9 +138,9 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -196,21 +198,22 @@ class AvoidBusinessLogicInUiRule extends DartLintRule {
 /// abstract class IUserService { ... }
 /// class OrderService { IUserService users; }
 /// ```
-class AvoidCircularDependenciesRule extends DartLintRule {
+class AvoidCircularDependenciesRule extends SaropaLintRule {
   const AvoidCircularDependenciesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_dependencies',
-    problemMessage: 'Potential circular dependency detected.',
+    problemMessage:
+        'Service depends on another service of the same layer. This may cause circular dependencies.',
     correctionMessage:
-        'Break the cycle using interfaces, dependency injection, or events.',
+        'Extract shared logic to a new service, use interfaces, or communicate via events.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -277,14 +280,15 @@ class AvoidCircularDependenciesRule extends DartLintRule {
 /// class AuthManager { ... }
 /// class CacheManager { ... }
 /// ```
-class AvoidGodClassRule extends DartLintRule {
+class AvoidGodClassRule extends SaropaLintRule {
   const AvoidGodClassRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_god_class',
-    problemMessage: 'Class has too many responsibilities.',
+    problemMessage:
+        'Class has too many members (>15 fields or >20 methods). Violates Single Responsibility.',
     correctionMessage:
-        'Split into smaller classes with single responsibilities.',
+        'Extract related fields and methods into focused helper classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -292,9 +296,9 @@ class AvoidGodClassRule extends DartLintRule {
   static const int _maxMethods = 20;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -340,7 +344,7 @@ class AvoidGodClassRule extends DartLintRule {
 ///   Widget build(context) => Text(user.name);
 /// }
 /// ```
-class AvoidUiInDomainLayerRule extends DartLintRule {
+class AvoidUiInDomainLayerRule extends SaropaLintRule {
   const AvoidUiInDomainLayerRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -362,9 +366,9 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check if file is in domain layer (heuristic based on path)
@@ -424,7 +428,7 @@ class AvoidUiInDomainLayerRule extends DartLintRule {
 /// import 'package:app/core/services/user_service.dart';
 /// // Or use dependency injection
 /// ```
-class AvoidCrossFeatureDependenciesRule extends DartLintRule {
+class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
   const AvoidCrossFeatureDependenciesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -436,9 +440,9 @@ class AvoidCrossFeatureDependenciesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     final String currentPath = resolver.source.fullName;
@@ -489,21 +493,22 @@ class AvoidCrossFeatureDependenciesRule extends DartLintRule {
 /// // Register in DI container
 /// getIt.registerSingleton(UserService(ApiClient()));
 /// ```
-class AvoidSingletonPatternRule extends DartLintRule {
+class AvoidSingletonPatternRule extends SaropaLintRule {
   const AvoidSingletonPatternRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_pattern',
-    problemMessage: 'Singleton pattern makes testing difficult.',
+    problemMessage:
+        'Singleton pattern detected. Cannot mock in tests or have multiple instances.',
     correctionMessage:
-        'Use dependency injection container instead of static singletons.',
+        'Use DI container: getIt.registerSingleton(MyService()) and inject where needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {

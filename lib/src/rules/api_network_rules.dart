@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when HTTP response status is not checked.
 ///
@@ -30,20 +31,22 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   throw HttpException('Failed: ${response.statusCode}');
 /// }
 /// ```
-class RequireHttpStatusCheckRule extends DartLintRule {
+class RequireHttpStatusCheckRule extends SaropaLintRule {
   const RequireHttpStatusCheckRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_http_status_check',
-    problemMessage: 'HTTP response status should be checked.',
-    correctionMessage: 'Check response.statusCode before processing body.',
+    problemMessage:
+        'HTTP response body used without checking status. Errors may be silently ignored.',
+    correctionMessage:
+        'Check if (response.statusCode == 200) before parsing response.body.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -85,20 +88,22 @@ class RequireHttpStatusCheckRule extends DartLintRule {
 /// final response = await dio.get(path,
 ///   options: Options(sendTimeout: 30000, receiveTimeout: 30000));
 /// ```
-class RequireApiTimeoutRule extends DartLintRule {
+class RequireApiTimeoutRule extends SaropaLintRule {
   const RequireApiTimeoutRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_api_timeout',
-    problemMessage: 'API call should have a timeout configured.',
-    correctionMessage: 'Add .timeout() or configure timeout in options.',
+    problemMessage:
+        'API call has no timeout. Request may hang indefinitely on poor networks.',
+    correctionMessage:
+        'Add .timeout(Duration(seconds: 30)) or configure timeout in client options.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -170,13 +175,15 @@ class RequireApiTimeoutRule extends DartLintRule {
 /// final response = await http.get(
 ///   Uri.parse('${ApiConfig.baseUrl}/users'));
 /// ```
-class AvoidHardcodedApiUrlsRule extends DartLintRule {
+class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   const AvoidHardcodedApiUrlsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_api_urls',
-    problemMessage: 'API URL should not be hardcoded.',
-    correctionMessage: 'Use configuration constants for API URLs.',
+    problemMessage:
+        'Hardcoded API URL. Cannot switch between dev/staging/prod environments.',
+    correctionMessage:
+        "Extract to a config constant: Uri.parse('\${ApiConfig.baseUrl}/endpoint').",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -186,9 +193,9 @@ class AvoidHardcodedApiUrlsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Skip config files
@@ -229,21 +236,22 @@ class AvoidHardcodedApiUrlsRule extends DartLintRule {
 ///   );
 /// }
 /// ```
-class RequireRetryLogicRule extends DartLintRule {
+class RequireRetryLogicRule extends SaropaLintRule {
   const RequireRetryLogicRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
     problemMessage:
-        'Network call should have retry logic for transient failures.',
-    correctionMessage: 'Use a retry mechanism for network operations.',
+        'Network call has no retry logic. Transient failures will not recover.',
+    correctionMessage:
+        'Wrap with retry() or implement exponential backoff for SocketException/TimeoutException.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -293,7 +301,7 @@ class RequireRetryLogicRule extends DartLintRule {
 /// final user = User.fromJson(jsonDecode(response.body));
 /// final name = user.name; // Type-safe access
 /// ```
-class RequireTypedApiResponseRule extends DartLintRule {
+class RequireTypedApiResponseRule extends SaropaLintRule {
   const RequireTypedApiResponseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -304,9 +312,9 @@ class RequireTypedApiResponseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -382,7 +390,7 @@ class RequireTypedApiResponseRule extends DartLintRule {
 ///   final response = await http.post(url, body: data);
 /// }
 /// ```
-class RequireConnectivityCheckRule extends DartLintRule {
+class RequireConnectivityCheckRule extends SaropaLintRule {
   const RequireConnectivityCheckRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -393,9 +401,9 @@ class RequireConnectivityCheckRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -454,7 +462,7 @@ class RequireConnectivityCheckRule extends DartLintRule {
 ///   throw ApiException.fromStatusCode(e.statusCode);
 /// }
 /// ```
-class RequireApiErrorMappingRule extends DartLintRule {
+class RequireApiErrorMappingRule extends SaropaLintRule {
   const RequireApiErrorMappingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -465,9 +473,9 @@ class RequireApiErrorMappingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTryStatement((TryStatement node) {

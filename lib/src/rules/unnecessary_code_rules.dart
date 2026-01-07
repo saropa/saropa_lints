@@ -6,7 +6,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -24,7 +23,7 @@ import '../saropa_lint_rule.dart';
 /// ```
 ///
 /// **Quick fix available:** Comments out the empty spread.
-class AvoidEmptySpreadRule extends DartLintRule {
+class AvoidEmptySpreadRule extends SaropaLintRule {
   const AvoidEmptySpreadRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -35,9 +34,9 @@ class AvoidEmptySpreadRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSpreadElement((SpreadElement node) {
@@ -103,7 +102,7 @@ class _CommentOutEmptySpreadFix extends DartFix {
 ///   print('hello');
 /// }
 /// ```
-class AvoidUnnecessaryBlockRule extends DartLintRule {
+class AvoidUnnecessaryBlockRule extends SaropaLintRule {
   const AvoidUnnecessaryBlockRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -114,9 +113,9 @@ class AvoidUnnecessaryBlockRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -150,7 +149,7 @@ class AvoidUnnecessaryBlockRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Replaces `target.call(args)` with `target(args)`.
-class AvoidUnnecessaryCallRule extends DartLintRule {
+class AvoidUnnecessaryCallRule extends SaropaLintRule {
   const AvoidUnnecessaryCallRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -161,9 +160,9 @@ class AvoidUnnecessaryCallRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -236,7 +235,7 @@ class _RemoveUnnecessaryCallFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Comments out the unnecessary constructor.
-class AvoidUnnecessaryConstructorRule extends DartLintRule {
+class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   const AvoidUnnecessaryConstructorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -248,9 +247,9 @@ class AvoidUnnecessaryConstructorRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -337,7 +336,7 @@ class _CommentOutUnnecessaryConstructorFix extends DartFix {
 ///   final bool isEnabled;
 /// }
 /// ```
-class AvoidUnnecessaryEnumArgumentsRule extends DartLintRule {
+class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
   const AvoidUnnecessaryEnumArgumentsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -348,9 +347,9 @@ class AvoidUnnecessaryEnumArgumentsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addEnumConstantDeclaration((EnumConstantDeclaration node) {
@@ -375,7 +374,7 @@ class AvoidUnnecessaryEnumArgumentsRule extends DartLintRule {
 }
 
 /// Warns when using enum name prefix inside the enum declaration.
-class AvoidUnnecessaryEnumPrefixRule extends DartLintRule {
+class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   const AvoidUnnecessaryEnumPrefixRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -386,9 +385,9 @@ class AvoidUnnecessaryEnumPrefixRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addEnumDeclaration((EnumDeclaration node) {
@@ -479,7 +478,7 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
   _EnumPrefixVisitor(this.enumName, this.reporter, this.code);
 
   final String enumName;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -508,7 +507,7 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
 /// ```
 ///
 /// **Quick fix available:** Removes the `extends Object` clause.
-class AvoidUnnecessaryExtendsRule extends DartLintRule {
+class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
   const AvoidUnnecessaryExtendsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -519,9 +518,9 @@ class AvoidUnnecessaryExtendsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -595,7 +594,7 @@ class _RemoveExtendsObjectFix extends DartFix {
 ///   int get value => _value * 2;  // Getter with logic
 /// }
 /// ```
-class AvoidUnnecessaryGetterRule extends DartLintRule {
+class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   const AvoidUnnecessaryGetterRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -608,9 +607,9 @@ class AvoidUnnecessaryGetterRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -679,7 +678,7 @@ class AvoidUnnecessaryGetterRule extends DartLintRule {
 /// Warns when length > 0 or length != 0 can be replaced with isNotEmpty.
 ///
 /// **Quick fix available:** Replaces with `.isEmpty` or `.isNotEmpty`.
-class AvoidUnnecessaryLengthCheckRule extends DartLintRule {
+class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   const AvoidUnnecessaryLengthCheckRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -690,9 +689,9 @@ class AvoidUnnecessaryLengthCheckRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -850,7 +849,7 @@ class _UseIsEmptyOrIsNotEmptyFix extends DartFix {
 /// if (a != b) { ... }
 /// if (a <= b) { ... }
 /// ```
-class AvoidUnnecessaryNegationsRule extends DartLintRule {
+class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
   const AvoidUnnecessaryNegationsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -862,9 +861,9 @@ class AvoidUnnecessaryNegationsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -916,7 +915,7 @@ class AvoidUnnecessaryNegationsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Removes the `super()` call.
-class AvoidUnnecessarySuperRule extends DartLintRule {
+class AvoidUnnecessarySuperRule extends SaropaLintRule {
   const AvoidUnnecessarySuperRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -927,9 +926,9 @@ class AvoidUnnecessarySuperRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -1169,7 +1168,7 @@ class _AddEmptyBlockCommentFix extends DartFix {
 /// ```dart
 /// if (value.isEmpty) { ... }
 /// ```
-class NoEmptyStringRule extends DartLintRule {
+class NoEmptyStringRule extends SaropaLintRule {
   const NoEmptyStringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1180,9 +1179,9 @@ class NoEmptyStringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {

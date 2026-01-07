@@ -8,8 +8,9 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when casting to an extension type.
 ///
@@ -29,7 +30,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidCastingToExtensionTypeRule extends DartLintRule {
+class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
   const AvoidCastingToExtensionTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -40,9 +41,9 @@ class AvoidCastingToExtensionTypeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAsExpression((AsExpression node) {
@@ -82,7 +83,7 @@ class AvoidCastingToExtensionTypeRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
+class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
   const AvoidCollectionMethodsWithUnrelatedTypesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -102,9 +103,9 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -194,7 +195,7 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends DartLintRule {
 ///
 /// Using dynamic bypasses the type system and can lead to runtime errors.
 /// Prefer using specific types or generics.
-class AvoidDynamicRule extends DartLintRule {
+class AvoidDynamicRule extends SaropaLintRule {
   const AvoidDynamicRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -206,9 +207,9 @@ class AvoidDynamicRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
@@ -237,7 +238,7 @@ class AvoidDynamicRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
+class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   const AvoidImplicitlyNullableExtensionTypesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -248,9 +249,9 @@ class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -281,7 +282,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends DartLintRule {
 /// Warns when interpolating a nullable value in a string.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidNullableInterpolationRule extends DartLintRule {
+class AvoidNullableInterpolationRule extends SaropaLintRule {
   const AvoidNullableInterpolationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -292,9 +293,9 @@ class AvoidNullableInterpolationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInterpolationExpression((InterpolationExpression node) {
@@ -329,7 +330,7 @@ class AvoidNullableInterpolationRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidNullableParametersWithDefaultValuesRule extends DartLintRule {
+class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
   const AvoidNullableParametersWithDefaultValuesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -341,9 +342,9 @@ class AvoidNullableParametersWithDefaultValuesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDefaultFormalParameter((DefaultFormalParameter node) {
@@ -386,7 +387,7 @@ class AvoidNullableParametersWithDefaultValuesRule extends DartLintRule {
 /// // or
 /// if (name != null) print(name);
 /// ```
-class AvoidNullableToStringRule extends DartLintRule {
+class AvoidNullableToStringRule extends SaropaLintRule {
   const AvoidNullableToStringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -397,9 +398,9 @@ class AvoidNullableToStringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -457,7 +458,7 @@ class AvoidNullableToStringRule extends DartLintRule {
 /// // or (safe, not flagged)
 /// onTap: callback == null ? null : () => callback!(),
 /// ```
-class AvoidNullAssertionRule extends DartLintRule {
+class AvoidNullAssertionRule extends SaropaLintRule {
   const AvoidNullAssertionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -503,9 +504,9 @@ class AvoidNullAssertionRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPostfixExpression((PostfixExpression node) {
@@ -1561,7 +1562,7 @@ class _NodeContainsFinder extends GeneralizingAstVisitor<void> {
 /// final Object x = getValue();
 /// if (x is String) { ... }  // Useful check
 /// ```
-class AvoidUnnecessaryTypeAssertionsRule extends DartLintRule {
+class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
   const AvoidUnnecessaryTypeAssertionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1573,9 +1574,9 @@ class AvoidUnnecessaryTypeAssertionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIsExpression((IsExpression node) {
@@ -1620,7 +1621,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends DartLintRule {
 /// final Object x = getValue();
 /// final y = x as String;  // Necessary cast
 /// ```
-class AvoidUnnecessaryTypeCastsRule extends DartLintRule {
+class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
   const AvoidUnnecessaryTypeCastsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1632,9 +1633,9 @@ class AvoidUnnecessaryTypeCastsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAsExpression((AsExpression node) {
@@ -1679,7 +1680,7 @@ class AvoidUnnecessaryTypeCastsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidUnrelatedTypeAssertionsRule extends DartLintRule {
+class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
   const AvoidUnrelatedTypeAssertionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1691,9 +1692,9 @@ class AvoidUnrelatedTypeAssertionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIsExpression((IsExpression node) {
@@ -1762,7 +1763,7 @@ class AvoidUnrelatedTypeAssertionsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class PreferCorrectTypeNameRule extends DartLintRule {
+class PreferCorrectTypeNameRule extends SaropaLintRule {
   const PreferCorrectTypeNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1773,9 +1774,9 @@ class PreferCorrectTypeNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     void checkName(Token nameToken) {
@@ -1854,7 +1855,7 @@ class PreferCorrectTypeNameRule extends DartLintRule {
 /// void execute(void Function() callback) { ... }
 /// void Function(String)? handler;
 /// ```
-class PreferExplicitFunctionTypeRule extends DartLintRule {
+class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   const PreferExplicitFunctionTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1866,9 +1867,9 @@ class PreferExplicitFunctionTypeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
@@ -1900,7 +1901,7 @@ class PreferExplicitFunctionTypeRule extends DartLintRule {
 /// // or use final for immutable values
 /// final String name = 'John';
 /// ```
-class PreferTypeOverVarRule extends DartLintRule {
+class PreferTypeOverVarRule extends SaropaLintRule {
   const PreferTypeOverVarRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1911,9 +1912,9 @@ class PreferTypeOverVarRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclarationList((VariableDeclarationList node) {

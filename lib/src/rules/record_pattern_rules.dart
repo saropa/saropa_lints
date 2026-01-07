@@ -2,9 +2,11 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when pattern contains bottom types (void, Never, Null).
 ///
@@ -21,22 +23,24 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   case Null _: // Only matches null
 /// }
 /// ```
-class AvoidBottomTypeInPatternsRule extends DartLintRule {
+class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   const AvoidBottomTypeInPatternsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_patterns',
-    problemMessage: 'Pattern contains bottom type (void, Never, or Null).',
-    correctionMessage: 'Bottom types in patterns usually indicate a mistake.',
+    problemMessage:
+        'Pattern uses bottom type which will never match (void/Never) or only matches null.',
+    correctionMessage:
+        'Replace with the actual expected type, or use Object? for any value.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _bottomTypes = <String>{'void', 'Never', 'Null'};
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaredVariablePattern((DeclaredVariablePattern node) {
@@ -69,22 +73,24 @@ class AvoidBottomTypeInPatternsRule extends DartLintRule {
 /// typedef MyRecord = (void, String); // void field
 /// (Never, int) badRecord; // Never field
 /// ```
-class AvoidBottomTypeInRecordsRule extends DartLintRule {
+class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
   const AvoidBottomTypeInRecordsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_records',
-    problemMessage: 'Record contains bottom type (void, Never, or Null) field.',
-    correctionMessage: 'Bottom types in records usually indicate a mistake.',
+    problemMessage:
+        'Record field uses void/Never/Null which cannot hold useful values.',
+    correctionMessage:
+        'Replace with a meaningful type. Use dynamic or Object? if any type is needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   static const Set<String> _bottomTypes = <String>{'void', 'Never', 'Null'};
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -132,7 +138,7 @@ class AvoidBottomTypeInRecordsRule extends DartLintRule {
 /// // or when renaming:
 /// final Point(x: horizontal, y: vertical) = point;
 /// ```
-class AvoidExplicitPatternFieldNameRule extends DartLintRule {
+class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
   const AvoidExplicitPatternFieldNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -144,9 +150,9 @@ class AvoidExplicitPatternFieldNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPatternField((PatternField node) {
@@ -160,6 +166,46 @@ class AvoidExplicitPatternFieldNameRule extends DartLintRule {
         final String varName = pattern.name.lexeme;
         if (fieldName == varName) {
           reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseShorthandPatternFieldFix()];
+}
+
+class _UseShorthandPatternFieldFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addPatternField((PatternField node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String? fieldName = node.name?.name?.lexeme;
+      final DartPattern pattern = node.pattern;
+      if (fieldName == null) return;
+
+      if (pattern is DeclaredVariablePattern) {
+        final String varName = pattern.name.lexeme;
+        if (fieldName == varName) {
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Use shorthand :$fieldName',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            // Replace "fieldName: fieldName" with ":fieldName"
+            builder.addSimpleReplacement(
+              SourceRange(node.offset, node.length),
+              ':$fieldName',
+            );
+          });
         }
       }
     });
@@ -188,20 +234,22 @@ class AvoidExplicitPatternFieldNameRule extends DartLintRule {
 ///   int get sum => x + y;
 /// }
 /// ```
-class AvoidExtensionsOnRecordsRule extends DartLintRule {
+class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
   const AvoidExtensionsOnRecordsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_extensions_on_records',
-    problemMessage: 'Extension defined on a Record type.',
-    correctionMessage: 'Consider using a class instead of extending a record.',
+    problemMessage:
+        'Extension on record type. Records lack identity for extension discovery.',
+    correctionMessage:
+        'Create a class with named fields and methods, or use a typedef with extension.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
@@ -231,20 +279,22 @@ class AvoidExtensionsOnRecordsRule extends DartLintRule {
 /// typedef StringCallback = void Function(String);
 /// (int, StringCallback) record = (1, print);
 /// ```
-class AvoidFunctionTypeInRecordsRule extends DartLintRule {
+class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
   const AvoidFunctionTypeInRecordsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_function_type_in_records',
-    problemMessage: 'Avoid using Function types directly in records.',
-    correctionMessage: 'Define a typedef for the function type.',
+    problemMessage:
+        'Inline function type in record reduces readability.',
+    correctionMessage:
+        'Create typedef: typedef MyCallback = void Function(String); then use (int, MyCallback).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -281,7 +331,7 @@ class AvoidFunctionTypeInRecordsRule extends DartLintRule {
 ///   case (var class, _): // 'class' is a keyword
 /// }
 /// ```
-class AvoidKeywordsInWildcardPatternRule extends DartLintRule {
+class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
   const AvoidKeywordsInWildcardPatternRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -362,9 +412,9 @@ class AvoidKeywordsInWildcardPatternRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDeclaredVariablePattern((DeclaredVariablePattern node) {
@@ -383,7 +433,7 @@ class AvoidKeywordsInWildcardPatternRule extends DartLintRule {
 ///
 /// ### Configuration
 /// Default maximum: 5 fields
-class AvoidLongRecordsRule extends DartLintRule {
+class AvoidLongRecordsRule extends SaropaLintRule {
   const AvoidLongRecordsRule() : super(code: _code);
 
   static const int _maxFields = 5;
@@ -396,9 +446,9 @@ class AvoidLongRecordsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -437,7 +487,7 @@ class AvoidLongRecordsRule extends DartLintRule {
 /// // or
 /// (int, String) pair;  // All positional
 /// ```
-class AvoidMixingNamedAndPositionalFieldsRule extends DartLintRule {
+class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
   const AvoidMixingNamedAndPositionalFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -448,9 +498,9 @@ class AvoidMixingNamedAndPositionalFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -495,7 +545,7 @@ class AvoidMixingNamedAndPositionalFieldsRule extends DartLintRule {
 /// (int, String, bool) flat;
 /// class MyRecord { int a; String b; bool c; }
 /// ```
-class AvoidNestedRecordsRule extends DartLintRule {
+class AvoidNestedRecordsRule extends SaropaLintRule {
   const AvoidNestedRecordsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -506,9 +556,9 @@ class AvoidNestedRecordsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -546,7 +596,7 @@ class AvoidNestedRecordsRule extends DartLintRule {
 /// ```dart
 /// int value = 42;
 /// ```
-class AvoidOneFieldRecordsRule extends DartLintRule {
+class AvoidOneFieldRecordsRule extends SaropaLintRule {
   const AvoidOneFieldRecordsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -557,9 +607,9 @@ class AvoidOneFieldRecordsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -585,7 +635,7 @@ class AvoidOneFieldRecordsRule extends DartLintRule {
 /// final (number, text) = (1, 'hello');
 /// print(number);
 /// ```
-class AvoidPositionalRecordFieldAccessRule extends DartLintRule {
+class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
   const AvoidPositionalRecordFieldAccessRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -597,9 +647,9 @@ class AvoidPositionalRecordFieldAccessRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPropertyAccess((PropertyAccess node) {
@@ -628,7 +678,7 @@ class AvoidPositionalRecordFieldAccessRule extends DartLintRule {
 /// // or
 /// final (int, String) = record; // No names needed
 /// ```
-class AvoidRedundantPositionalFieldNameRule extends DartLintRule {
+class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
   const AvoidRedundantPositionalFieldNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -639,9 +689,9 @@ class AvoidRedundantPositionalFieldNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -678,7 +728,7 @@ class AvoidRedundantPositionalFieldNameRule extends DartLintRule {
 /// final name = person.name;
 /// print(name);
 /// ```
-class AvoidSingleFieldDestructuringRule extends DartLintRule {
+class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
   const AvoidSingleFieldDestructuringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -689,9 +739,9 @@ class AvoidSingleFieldDestructuringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPatternVariableDeclaration((
@@ -732,7 +782,7 @@ class AvoidSingleFieldDestructuringRule extends DartLintRule {
 /// typedef User = ({String name, int age, String email, bool active});
 /// User getUser() => ...;
 /// ```
-class MoveRecordsToTypedefsRule extends DartLintRule {
+class MoveRecordsToTypedefsRule extends SaropaLintRule {
   const MoveRecordsToTypedefsRule() : super(code: _code);
 
   static const int _maxInlineFields = 3;
@@ -746,9 +796,9 @@ class MoveRecordsToTypedefsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -784,7 +834,7 @@ class MoveRecordsToTypedefsRule extends DartLintRule {
 /// ```dart
 /// if (obj case User(age: a, name: n)) { } // Alphabetical
 /// ```
-class PatternFieldsOrderingRule extends DartLintRule {
+class PatternFieldsOrderingRule extends SaropaLintRule {
   const PatternFieldsOrderingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -795,9 +845,9 @@ class PatternFieldsOrderingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addObjectPattern((ObjectPattern node) {
@@ -841,7 +891,7 @@ class PatternFieldsOrderingRule extends DartLintRule {
 /// // OR
 /// if (value case final x?) { } // When you need the binding, use final
 /// ```
-class PreferSimplerPatternsNullCheckRule extends DartLintRule {
+class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
   const PreferSimplerPatternsNullCheckRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -852,9 +902,9 @@ class PreferSimplerPatternsNullCheckRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addNullCheckPattern((NullCheckPattern node) {
@@ -888,7 +938,7 @@ class PreferSimplerPatternsNullCheckRule extends DartLintRule {
 /// final (first, _) = getRecord();
 /// print(first);
 /// ```
-class PreferWildcardPatternRule extends DartLintRule {
+class PreferWildcardPatternRule extends SaropaLintRule {
   const PreferWildcardPatternRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -899,9 +949,9 @@ class PreferWildcardPatternRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // This rule needs to track variable usage which is complex
@@ -938,7 +988,7 @@ class PreferWildcardPatternRule extends DartLintRule {
 /// ```dart
 /// typedef Person = ({int age, String name}); // Alphabetical
 /// ```
-class RecordFieldsOrderingRule extends DartLintRule {
+class RecordFieldsOrderingRule extends SaropaLintRule {
   const RecordFieldsOrderingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -949,9 +999,9 @@ class RecordFieldsOrderingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addRecordTypeAnnotation((RecordTypeAnnotation node) {
@@ -970,5 +1020,93 @@ class RecordFieldsOrderingRule extends DartLintRule {
         }
       }
     });
+  }
+}
+
+/// Warns when multiple positional record accesses could use destructuring.
+///
+/// When accessing multiple positional fields from the same record variable,
+/// pattern destructuring is clearer and more idiomatic (Dart 3.0+).
+///
+/// Example of **bad** code:
+/// ```dart
+/// final record = getRecord();
+/// print(record.$1);
+/// print(record.$2);
+/// print(record.$3);
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final (first, second, third) = getRecord();
+/// print(first);
+/// print(second);
+/// print(third);
+/// ```
+class PreferPatternDestructuringRule extends SaropaLintRule {
+  const PreferPatternDestructuringRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_pattern_destructuring',
+    problemMessage:
+        'Multiple positional record field accesses could use destructuring.',
+    correctionMessage:
+        'Use pattern destructuring: final (a, b) = record; (Dart 3.0+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track record accesses within each block/function scope
+    context.registry.addBlock((Block node) {
+      _checkBlock(node, reporter);
+    });
+  }
+
+  void _checkBlock(Block block, SaropaDiagnosticReporter reporter) {
+    // Map from variable name to list of positional field accesses
+    final Map<String, List<PropertyAccess>> recordAccesses =
+        <String, List<PropertyAccess>>{};
+
+    // Visit all statements looking for record field accesses
+    for (final Statement statement in block.statements) {
+      _collectRecordAccesses(statement, recordAccesses);
+    }
+
+    // Report variables with multiple positional accesses
+    for (final MapEntry<String, List<PropertyAccess>> entry
+        in recordAccesses.entries) {
+      if (entry.value.length >= 2) {
+        // Report on the first access
+        reporter.atNode(entry.value.first, code);
+      }
+    }
+  }
+
+  void _collectRecordAccesses(
+    AstNode node,
+    Map<String, List<PropertyAccess>> accesses,
+  ) {
+    if (node is PropertyAccess) {
+      final String propertyName = node.propertyName.name;
+      // Check for $1, $2, $3, etc.
+      if (RegExp(r'^\$\d+$').hasMatch(propertyName)) {
+        final Expression? target = node.target;
+        if (target is SimpleIdentifier) {
+          final String varName = target.name;
+          accesses.putIfAbsent(varName, () => <PropertyAccess>[]);
+          accesses[varName]!.add(node);
+        }
+      }
+    }
+
+    // Recursively check children
+    for (final AstNode child in node.childEntities.whereType<AstNode>()) {
+      _collectRecordAccesses(child, accesses);
+    }
   }
 }

@@ -8,8 +8,9 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/source/source_range.dart';
+
+import '../saropa_lint_rule.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 /// Warns against any usage of adjacent strings.
@@ -25,7 +26,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// ```dart
 /// final message = 'HelloWorld';
 /// ```
-class AvoidAdjacentStringsRule extends DartLintRule {
+class AvoidAdjacentStringsRule extends SaropaLintRule {
   const AvoidAdjacentStringsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -36,9 +37,9 @@ class AvoidAdjacentStringsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAdjacentStrings((AdjacentStrings node) {
@@ -48,7 +49,7 @@ class AvoidAdjacentStringsRule extends DartLintRule {
 }
 
 /// Warns when accessing enum values by index (`EnumName.values[i]`).
-class AvoidEnumValuesByIndexRule extends DartLintRule {
+class AvoidEnumValuesByIndexRule extends SaropaLintRule {
   const AvoidEnumValuesByIndexRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -59,9 +60,9 @@ class AvoidEnumValuesByIndexRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -105,7 +106,7 @@ class AvoidEnumValuesByIndexRule extends DartLintRule {
 /// ```dart
 /// final uri = Uri.parse('https://example.com/path');
 /// ```
-class AvoidIncorrectUriRule extends DartLintRule {
+class AvoidIncorrectUriRule extends SaropaLintRule {
   const AvoidIncorrectUriRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -116,9 +117,9 @@ class AvoidIncorrectUriRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -216,7 +217,7 @@ class AvoidIncorrectUriRule extends DartLintRule {
 ///   CountryEnum? get country => _country ??= CountryEnum.tryParse(countryCode);
 /// }
 /// ```
-class AvoidIsarEnumFieldRule extends DartLintRule {
+class AvoidIsarEnumFieldRule extends SaropaLintRule {
   const AvoidIsarEnumFieldRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -260,9 +261,9 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -304,7 +305,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
 
   /// Check a field declaration for enum type usage
   void _checkFieldDeclaration(
-      FieldDeclaration node, DiagnosticReporter reporter) {
+      FieldDeclaration node, SaropaDiagnosticReporter reporter) {
     // Skip if field has @ignore annotation
     if (_hasIgnoreAnnotation(node)) {
       return;
@@ -360,7 +361,7 @@ class AvoidIsarEnumFieldRule extends DartLintRule {
 ///
 /// Late variables can lead to runtime errors if accessed before initialization.
 /// Consider using nullable types or initializing in the constructor.
-class AvoidLateKeywordRule extends DartLintRule {
+class AvoidLateKeywordRule extends SaropaLintRule {
   const AvoidLateKeywordRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -372,9 +373,9 @@ class AvoidLateKeywordRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
@@ -407,7 +408,7 @@ class AvoidLateKeywordRule extends DartLintRule {
 /// ```dart
 /// print(myMethod());  // Method is called
 /// ```
-class AvoidMissedCallsRule extends DartLintRule {
+class AvoidMissedCallsRule extends SaropaLintRule {
   const AvoidMissedCallsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -419,9 +420,9 @@ class AvoidMissedCallsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -500,7 +501,7 @@ class AvoidMissedCallsRule extends DartLintRule {
 /// Map<String, int> map = <String, int>{};  // Explicit Map
 /// Set<int> items = {1, 2, 3};  // Explicit Set type
 /// ```
-class AvoidMisusedSetLiteralsRule extends DartLintRule {
+class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
   const AvoidMisusedSetLiteralsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -513,9 +514,9 @@ class AvoidMisusedSetLiteralsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -550,7 +551,7 @@ class AvoidMisusedSetLiteralsRule extends DartLintRule {
 /// list.add(item);
 /// map[key] = value;
 /// ```
-class AvoidPassingSelfAsArgumentRule extends DartLintRule {
+class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
   const AvoidPassingSelfAsArgumentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -561,9 +562,9 @@ class AvoidPassingSelfAsArgumentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -611,7 +612,7 @@ class AvoidPassingSelfAsArgumentRule extends DartLintRule {
 ///   return result;
 /// }
 /// ```
-class AvoidRecursiveCallsRule extends DartLintRule {
+class AvoidRecursiveCallsRule extends SaropaLintRule {
   const AvoidRecursiveCallsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -623,9 +624,9 @@ class AvoidRecursiveCallsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -646,7 +647,7 @@ class AvoidRecursiveCallsRule extends DartLintRule {
   void _checkBodyForRecursion(
     FunctionBody body,
     String functionName,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     final _RecursiveCallVisitor visitor =
         _RecursiveCallVisitor(functionName, reporter, code);
@@ -658,7 +659,7 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
   _RecursiveCallVisitor(this.functionName, this.reporter, this.code);
 
   final String functionName;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -697,7 +698,7 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
 ///   String toString() => 'User: $name';
 /// }
 /// ```
-class AvoidRecursiveToStringRule extends DartLintRule {
+class AvoidRecursiveToStringRule extends SaropaLintRule {
   const AvoidRecursiveToStringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -709,9 +710,9 @@ class AvoidRecursiveToStringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -733,7 +734,7 @@ class AvoidRecursiveToStringRule extends DartLintRule {
 class _ToStringRecursionVisitor extends RecursiveAstVisitor<void> {
   _ToStringRecursionVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -776,7 +777,7 @@ class _ToStringRecursionVisitor extends RecursiveAstVisitor<void> {
 /// final value = getValue();
 /// print(value);
 /// ```
-class AvoidReferencingDiscardedVariablesRule extends DartLintRule {
+class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
   const AvoidReferencingDiscardedVariablesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -788,9 +789,9 @@ class AvoidReferencingDiscardedVariablesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleIdentifier((SimpleIdentifier node) {
@@ -846,7 +847,7 @@ class AvoidReferencingDiscardedVariablesRule extends DartLintRule {
 /// @pragma('vm:prefer-inline')
 /// Matrix4 computeTransform() => /* complex computation */;
 /// ```
-class AvoidRedundantPragmaInlineRule extends DartLintRule {
+class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
   const AvoidRedundantPragmaInlineRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -858,9 +859,9 @@ class AvoidRedundantPragmaInlineRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -917,7 +918,7 @@ class AvoidRedundantPragmaInlineRule extends DartLintRule {
 /// final result = text.length >= 10 ? text.substring(5, 10) : text;
 /// // or use split/pattern matching for extracting parts
 /// ```
-class AvoidSubstringRule extends DartLintRule {
+class AvoidSubstringRule extends SaropaLintRule {
   const AvoidSubstringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -930,9 +931,9 @@ class AvoidSubstringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -963,7 +964,7 @@ class AvoidSubstringRule extends DartLintRule {
 /// @pragma('vm:prefer-inline')
 /// void foo() { }
 /// ```
-class AvoidUnknownPragmaRule extends DartLintRule {
+class AvoidUnknownPragmaRule extends SaropaLintRule {
   const AvoidUnknownPragmaRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -994,9 +995,9 @@ class AvoidUnknownPragmaRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAnnotation((Annotation node) {
@@ -1035,7 +1036,7 @@ class AvoidUnknownPragmaRule extends DartLintRule {
 /// // Or mark as intentionally unused:
 /// void process(String data, int _) { ... }
 /// ```
-class AvoidUnusedParametersRule extends DartLintRule {
+class AvoidUnusedParametersRule extends SaropaLintRule {
   const AvoidUnusedParametersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1047,9 +1048,9 @@ class AvoidUnusedParametersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -1075,7 +1076,7 @@ class AvoidUnusedParametersRule extends DartLintRule {
   void _checkParameters(
     FormalParameterList? params,
     FunctionBody? body,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     if (params == null || body == null) return;
 
@@ -1132,7 +1133,7 @@ class _IdentifierCollector extends RecursiveAstVisitor<void> {
 /// import 'package:crypto/crypto.dart';
 /// final hash = sha256.convert(utf8.encode('password'));
 /// ```
-class AvoidWeakCryptographicAlgorithmsRule extends DartLintRule {
+class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
   const AvoidWeakCryptographicAlgorithmsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1151,9 +1152,9 @@ class AvoidWeakCryptographicAlgorithmsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleIdentifier((SimpleIdentifier node) {
@@ -1165,7 +1166,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends DartLintRule {
 }
 
 /// Warns when a function returns a value that should have @useResult.
-class MissingUseResultAnnotationRule extends DartLintRule {
+class MissingUseResultAnnotationRule extends SaropaLintRule {
   const MissingUseResultAnnotationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1178,9 +1179,9 @@ class MissingUseResultAnnotationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1241,7 +1242,7 @@ class MissingUseResultAnnotationRule extends DartLintRule {
 ///   T process(T input) => input;
 /// }
 /// ```
-class NoObjectDeclarationRule extends DartLintRule {
+class NoObjectDeclarationRule extends SaropaLintRule {
   const NoObjectDeclarationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1252,9 +1253,9 @@ class NoObjectDeclarationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -1291,7 +1292,7 @@ class NoObjectDeclarationRule extends DartLintRule {
 /// @pragma('dart2js:tryInline')
 /// void foo() { }
 /// ```
-class PreferBothInliningAnnotationsRule extends DartLintRule {
+class PreferBothInliningAnnotationsRule extends SaropaLintRule {
   const PreferBothInliningAnnotationsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1302,9 +1303,9 @@ class PreferBothInliningAnnotationsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     void checkAnnotations(NodeList<Annotation> metadata, Token reportAt) {
@@ -1360,7 +1361,7 @@ class PreferBothInliningAnnotationsRule extends DartLintRule {
 /// final size = MediaQuery.sizeOf(context);
 /// final padding = MediaQuery.paddingOf(context);
 /// ```
-class PreferDedicatedMediaQueryMethodRule extends DartLintRule {
+class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   const PreferDedicatedMediaQueryMethodRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1383,9 +1384,9 @@ class PreferDedicatedMediaQueryMethodRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPropertyAccess((PropertyAccess node) {
@@ -1419,7 +1420,7 @@ class PreferDedicatedMediaQueryMethodRule extends DartLintRule {
 /// ```dart
 /// MyEnum.values.byName('value');
 /// ```
-class PreferEnumsByNameRule extends DartLintRule {
+class PreferEnumsByNameRule extends SaropaLintRule {
   const PreferEnumsByNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1432,9 +1433,9 @@ class PreferEnumsByNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1480,7 +1481,7 @@ class PreferEnumsByNameRule extends DartLintRule {
 }
 
 /// Warns when inline function callbacks should be extracted.
-class PreferExtractingFunctionCallbacksRule extends DartLintRule {
+class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
   const PreferExtractingFunctionCallbacksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1493,9 +1494,9 @@ class PreferExtractingFunctionCallbacksRule extends DartLintRule {
   static const int _maxCallbackLines = 10;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
@@ -1520,7 +1521,7 @@ class PreferExtractingFunctionCallbacksRule extends DartLintRule {
 }
 
 /// Warns when null-aware elements could be used in collections.
-class PreferNullAwareElementsRule extends DartLintRule {
+class PreferNullAwareElementsRule extends SaropaLintRule {
   const PreferNullAwareElementsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1532,9 +1533,9 @@ class PreferNullAwareElementsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfElement((IfElement node) {
@@ -1625,7 +1626,7 @@ class _PreferNullAwareElementsFix extends DartFix {
 /// final list = [...?nullableList];
 /// final combined = [...?items];
 /// ```
-class PreferNullAwareSpreadRule extends DartLintRule {
+class PreferNullAwareSpreadRule extends SaropaLintRule {
   const PreferNullAwareSpreadRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1636,9 +1637,9 @@ class PreferNullAwareSpreadRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSpreadElement((SpreadElement node) {
@@ -1699,7 +1700,7 @@ class PreferNullAwareSpreadRule extends DartLintRule {
 ///   void testHelper() { }
 /// }
 /// ```
-class PreferVisibleForTestingOnMembersRule extends DartLintRule {
+class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
   const PreferVisibleForTestingOnMembersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1723,9 +1724,9 @@ class PreferVisibleForTestingOnMembersRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Skip test files
@@ -1782,7 +1783,7 @@ class PreferVisibleForTestingOnMembersRule extends DartLintRule {
 /// void foo({String? name}) { }
 /// foo();  // Omit the parameter instead of passing null
 /// ```
-class AvoidAlwaysNullParametersRule extends DartLintRule {
+class AvoidAlwaysNullParametersRule extends SaropaLintRule {
   const AvoidAlwaysNullParametersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1793,9 +1794,9 @@ class AvoidAlwaysNullParametersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check each method invocation for null arguments
@@ -1831,7 +1832,7 @@ class AvoidAlwaysNullParametersRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class AvoidAssigningToStaticFieldRule extends DartLintRule {
+class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
   const AvoidAssigningToStaticFieldRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1842,9 +1843,9 @@ class AvoidAssigningToStaticFieldRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration classNode) {
@@ -1872,7 +1873,7 @@ class AvoidAssigningToStaticFieldRule extends DartLintRule {
   void _checkMethodBody(
     FunctionBody body,
     Set<String> staticFields,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     body.visitChildren(
         _StaticFieldAssignmentVisitor(staticFields, reporter, _code));
@@ -1883,7 +1884,7 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
   _StaticFieldAssignmentVisitor(this.staticFields, this.reporter, this.code);
 
   final Set<String> staticFields;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -1925,7 +1926,7 @@ class _StaticFieldAssignmentVisitor extends RecursiveAstVisitor<void> {
 ///   fetchData();  // Async call, result ignored
 /// }
 /// ```
-class AvoidAsyncCallInSyncFunctionRule extends DartLintRule {
+class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
   const AvoidAsyncCallInSyncFunctionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1936,9 +1937,9 @@ class AvoidAsyncCallInSyncFunctionRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1996,7 +1997,7 @@ class AvoidAsyncCallInSyncFunctionRule extends DartLintRule {
 /// ```dart
 /// while (a && b || c && d && e) { }
 /// ```
-class AvoidComplexLoopConditionsRule extends DartLintRule {
+class AvoidComplexLoopConditionsRule extends SaropaLintRule {
   const AvoidComplexLoopConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2009,9 +2010,9 @@ class AvoidComplexLoopConditionsRule extends DartLintRule {
   static const int _maxOperators = 2;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addWhileStatement((WhileStatement node) {
@@ -2033,7 +2034,7 @@ class AvoidComplexLoopConditionsRule extends DartLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, DiagnosticReporter reporter) {
+  void _checkCondition(Expression condition, SaropaDiagnosticReporter reporter) {
     final int operatorCount = _countLogicalOperators(condition);
     if (operatorCount > _maxOperators) {
       reporter.atNode(condition, code);
@@ -2063,7 +2064,7 @@ class AvoidComplexLoopConditionsRule extends DartLintRule {
 /// if (1 > 2) { }  // Always false
 /// final x = 'a' + 'b';  // Should be 'ab'
 /// ```
-class AvoidConstantConditionsRule extends DartLintRule {
+class AvoidConstantConditionsRule extends SaropaLintRule {
   const AvoidConstantConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2074,9 +2075,9 @@ class AvoidConstantConditionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -2115,7 +2116,7 @@ class AvoidConstantConditionsRule extends DartLintRule {
 /// if (x > 5 && x < 3) { }  // Always false
 /// if (x == null && x.length > 0) { }  // Second part throws
 /// ```
-class AvoidContradictoryExpressionsRule extends DartLintRule {
+class AvoidContradictoryExpressionsRule extends SaropaLintRule {
   const AvoidContradictoryExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2126,9 +2127,9 @@ class AvoidContradictoryExpressionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -2239,7 +2240,7 @@ class AvoidContradictoryExpressionsRule extends DartLintRule {
 /// on FormatException catch (e) { print(e); }
 /// on IOException catch (e) { print(e); }  // Same as above
 /// ```
-class AvoidIdenticalExceptionHandlingBlocksRule extends DartLintRule {
+class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
   const AvoidIdenticalExceptionHandlingBlocksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2251,9 +2252,9 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTryStatement((TryStatement node) {
@@ -2287,7 +2288,7 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends DartLintRule {
 ///   value = 2;  // Error at runtime
 /// }
 /// ```
-class AvoidLateFinalReassignmentRule extends DartLintRule {
+class AvoidLateFinalReassignmentRule extends SaropaLintRule {
   const AvoidLateFinalReassignmentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2298,9 +2299,9 @@ class AvoidLateFinalReassignmentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration classNode) {
@@ -2347,7 +2348,7 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
 
   final Set<String> lateFinalFields;
   final Map<String, int> assignments;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -2375,7 +2376,7 @@ class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
 /// ```dart
 /// completer.completeError(error, stackTrace);
 /// ```
-class AvoidMissingCompleterStackTraceRule extends DartLintRule {
+class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
   const AvoidMissingCompleterStackTraceRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2386,9 +2387,9 @@ class AvoidMissingCompleterStackTraceRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -2410,7 +2411,7 @@ class AvoidMissingCompleterStackTraceRule extends DartLintRule {
 /// enum Status { active, inactive, pending }
 /// final map = {Status.active: 'A', Status.inactive: 'I'};  // Missing pending
 /// ```
-class AvoidMissingEnumConstantInMapRule extends DartLintRule {
+class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   const AvoidMissingEnumConstantInMapRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2421,9 +2422,9 @@ class AvoidMissingEnumConstantInMapRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -2467,7 +2468,7 @@ class AvoidMissingEnumConstantInMapRule extends DartLintRule {
 ///   value = value * 2;  // Mutating parameter
 /// }
 /// ```
-class AvoidMutatingParametersRule extends DartLintRule {
+class AvoidMutatingParametersRule extends SaropaLintRule {
   const AvoidMutatingParametersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2479,9 +2480,9 @@ class AvoidMutatingParametersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -2524,7 +2525,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
   _ParameterMutationVisitor(this.paramNames, this.reporter, this.code);
 
   final Set<String> paramNames;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -2566,7 +2567,7 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
 /// final value1 = 1;
 /// final valuel = 2;  // Too similar to value1
 /// ```
-class AvoidSimilarNamesRule extends DartLintRule {
+class AvoidSimilarNamesRule extends SaropaLintRule {
   const AvoidSimilarNamesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2577,9 +2578,9 @@ class AvoidSimilarNamesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -2674,7 +2675,7 @@ class _VariableCollector extends RecursiveAstVisitor<void> {
 /// foo('a');  // Never null
 /// foo('b');  // Never null
 /// ```
-class AvoidUnnecessaryNullableParametersRule extends DartLintRule {
+class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
   const AvoidUnnecessaryNullableParametersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2685,9 +2686,9 @@ class AvoidUnnecessaryNullableParametersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // This is a simplified version - full implementation would track
@@ -2729,7 +2730,7 @@ class AvoidUnnecessaryNullableParametersRule extends DartLintRule {
 ///   return null;  // Always null
 /// }
 /// ```
-class FunctionAlwaysReturnsNullRule extends DartLintRule {
+class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
   const FunctionAlwaysReturnsNullRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2741,9 +2742,9 @@ class FunctionAlwaysReturnsNullRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -2756,7 +2757,7 @@ class FunctionAlwaysReturnsNullRule extends DartLintRule {
   }
 
   void _checkFunctionBody(
-      FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
+      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
     if (body is ExpressionFunctionBody) {
       if (body.expression is NullLiteral) {
         reporter.atToken(nameToken, code);
@@ -2809,7 +2810,7 @@ class _ReturnCollector extends RecursiveAstVisitor<void> {
 ///   print(items[0]);  // Always accessing first element
 /// }
 /// ```
-class AvoidAccessingCollectionsByConstantIndexRule extends DartLintRule {
+class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
   const AvoidAccessingCollectionsByConstantIndexRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2821,9 +2822,9 @@ class AvoidAccessingCollectionsByConstantIndexRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addForStatement((ForStatement node) {
@@ -2843,7 +2844,7 @@ class AvoidAccessingCollectionsByConstantIndexRule extends DartLintRule {
 class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
   _ConstantIndexVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -2866,7 +2867,7 @@ class _ConstantIndexVisitor extends RecursiveAstVisitor<void> {
 ///   // Missing toString override
 /// }
 /// ```
-class AvoidDefaultToStringRule extends DartLintRule {
+class AvoidDefaultToStringRule extends SaropaLintRule {
   const AvoidDefaultToStringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2878,9 +2879,9 @@ class AvoidDefaultToStringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -2912,7 +2913,7 @@ class AvoidDefaultToStringRule extends DartLintRule {
 /// const errorMessage = 'Error occurred';
 /// const failureMessage = 'Error occurred';  // Same value
 /// ```
-class AvoidDuplicateConstantValuesRule extends DartLintRule {
+class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
   const AvoidDuplicateConstantValuesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2923,9 +2924,9 @@ class AvoidDuplicateConstantValuesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit unit) {
@@ -2963,7 +2964,7 @@ class AvoidDuplicateConstantValuesRule extends DartLintRule {
 ///   Foo() : a = compute(), b = compute();  // Same initializer
 /// }
 /// ```
-class AvoidDuplicateInitializersRule extends DartLintRule {
+class AvoidDuplicateInitializersRule extends SaropaLintRule {
   const AvoidDuplicateInitializersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2974,9 +2975,9 @@ class AvoidDuplicateInitializersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -3011,7 +3012,7 @@ class AvoidDuplicateInitializersRule extends DartLintRule {
 ///   super.dispose();  // Just calls super, no additional logic
 /// }
 /// ```
-class AvoidUnnecessaryOverridesRule extends DartLintRule {
+class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
   const AvoidUnnecessaryOverridesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3022,9 +3023,9 @@ class AvoidUnnecessaryOverridesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -3079,7 +3080,7 @@ class AvoidUnnecessaryOverridesRule extends DartLintRule {
 ///   1 + 2;  // Result is not used
 /// }
 /// ```
-class AvoidUnnecessaryStatementsRule extends DartLintRule {
+class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
   const AvoidUnnecessaryStatementsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3090,9 +3091,9 @@ class AvoidUnnecessaryStatementsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExpressionStatement((ExpressionStatement node) {
@@ -3130,7 +3131,7 @@ class AvoidUnnecessaryStatementsRule extends DartLintRule {
 ///   x = 2;  // x is never read after this
 /// }
 /// ```
-class AvoidUnusedAssignmentRule extends DartLintRule {
+class AvoidUnusedAssignmentRule extends SaropaLintRule {
   const AvoidUnusedAssignmentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3141,9 +3142,9 @@ class AvoidUnusedAssignmentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -3198,7 +3199,7 @@ class _AssignmentUsageVisitor extends RecursiveAstVisitor<void> {
 ///   MyClass();  // Instance created but not used
 /// }
 /// ```
-class AvoidUnusedInstancesRule extends DartLintRule {
+class AvoidUnusedInstancesRule extends SaropaLintRule {
   const AvoidUnusedInstancesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3209,9 +3210,9 @@ class AvoidUnusedInstancesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExpressionStatement((ExpressionStatement node) {
@@ -3231,7 +3232,7 @@ class AvoidUnusedInstancesRule extends DartLintRule {
 ///   print('exists');  // x is not used
 /// }
 /// ```
-class AvoidUnusedAfterNullCheckRule extends DartLintRule {
+class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
   const AvoidUnusedAfterNullCheckRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3242,9 +3243,9 @@ class AvoidUnusedAfterNullCheckRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -3303,7 +3304,7 @@ class _IdentifierFinder extends RecursiveAstVisitor<void> {
 ///   default: ...  // May hide unhandled enum values
 /// }
 /// ```
-class AvoidWildcardCasesWithEnumsRule extends DartLintRule {
+class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
   const AvoidWildcardCasesWithEnumsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3315,9 +3316,9 @@ class AvoidWildcardCasesWithEnumsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -3360,7 +3361,7 @@ class AvoidWildcardCasesWithEnumsRule extends DartLintRule {
 ///   return 42;  // Always returns 42
 /// }
 /// ```
-class FunctionAlwaysReturnsSameValueRule extends DartLintRule {
+class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   const FunctionAlwaysReturnsSameValueRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3372,9 +3373,9 @@ class FunctionAlwaysReturnsSameValueRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -3387,7 +3388,7 @@ class FunctionAlwaysReturnsSameValueRule extends DartLintRule {
   }
 
   void _checkFunctionBody(
-      FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
+      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final List<ReturnStatement> returns = <ReturnStatement>[];
@@ -3430,7 +3431,7 @@ class FunctionAlwaysReturnsSameValueRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class NoEqualNestedConditionsRule extends DartLintRule {
+class NoEqualNestedConditionsRule extends SaropaLintRule {
   const NoEqualNestedConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3441,9 +3442,9 @@ class NoEqualNestedConditionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -3458,7 +3459,7 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
   _NestedConditionChecker(this.outerCondition, this.reporter, this.code);
 
   final String outerCondition;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -3480,7 +3481,7 @@ class _NestedConditionChecker extends RecursiveAstVisitor<void> {
 ///   case 2: return 'a';  // Same as case 1
 /// }
 /// ```
-class NoEqualSwitchCaseRule extends DartLintRule {
+class NoEqualSwitchCaseRule extends SaropaLintRule {
   const NoEqualSwitchCaseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3491,9 +3492,9 @@ class NoEqualSwitchCaseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -3531,7 +3532,7 @@ class NoEqualSwitchCaseRule extends DartLintRule {
 /// ```dart
 /// !list.any((e) => e > 5);
 /// ```
-class PreferAnyOrEveryRule extends DartLintRule {
+class PreferAnyOrEveryRule extends SaropaLintRule {
   const PreferAnyOrEveryRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3543,9 +3544,9 @@ class PreferAnyOrEveryRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPropertyAccess((PropertyAccess node) {
@@ -3575,7 +3576,7 @@ class PreferAnyOrEveryRule extends DartLintRule {
 ///   print(item);
 /// }
 /// ```
-class PreferForInRule extends DartLintRule {
+class PreferForInRule extends SaropaLintRule {
   const PreferForInRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3586,9 +3587,9 @@ class PreferForInRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addForStatement((ForStatement node) {
@@ -3640,7 +3641,7 @@ class PreferForInRule extends DartLintRule {
 ///   case (int x, int y) when x > 0:  // Duplicate pattern
 /// }
 /// ```
-class AvoidDuplicatePatternsRule extends DartLintRule {
+class AvoidDuplicatePatternsRule extends SaropaLintRule {
   const AvoidDuplicatePatternsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3651,9 +3652,9 @@ class AvoidDuplicatePatternsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -3691,7 +3692,7 @@ class AvoidDuplicatePatternsRule extends DartLintRule {
 /// extension type Inner(int value) {}
 /// extension type Outer(Inner inner) {}  // Nested extension type
 /// ```
-class AvoidNestedExtensionTypesRule extends DartLintRule {
+class AvoidNestedExtensionTypesRule extends SaropaLintRule {
   const AvoidNestedExtensionTypesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3702,9 +3703,9 @@ class AvoidNestedExtensionTypesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -3733,7 +3734,7 @@ class AvoidNestedExtensionTypesRule extends DartLintRule {
 ///   yield 2;
 /// }
 /// ```
-class AvoidSlowCollectionMethodsRule extends DartLintRule {
+class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
   const AvoidSlowCollectionMethodsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3745,9 +3746,9 @@ class AvoidSlowCollectionMethodsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -3760,7 +3761,7 @@ class AvoidSlowCollectionMethodsRule extends DartLintRule {
   }
 
   void _checkForSyncStar(
-      FunctionBody body, Token nameToken, DiagnosticReporter reporter) {
+      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
     if (body.keyword?.lexeme != 'sync') return;
     if (body.star == null) return;
 
@@ -3800,7 +3801,7 @@ class _YieldCounter extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-class AvoidUnassignedFieldsRule extends DartLintRule {
+class AvoidUnassignedFieldsRule extends SaropaLintRule {
   const AvoidUnassignedFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3811,9 +3812,9 @@ class AvoidUnassignedFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3904,7 +3905,7 @@ class _FieldAssignmentVisitor extends RecursiveAstVisitor<void> {
 ///   late String name;  // Never assigned - will throw at runtime
 /// }
 /// ```
-class AvoidUnassignedLateFieldsRule extends DartLintRule {
+class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
   const AvoidUnassignedLateFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3915,9 +3916,9 @@ class AvoidUnassignedLateFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3971,7 +3972,7 @@ class AvoidUnassignedLateFieldsRule extends DartLintRule {
 ///   Foo(this.name);  // late is unnecessary
 /// }
 /// ```
-class AvoidUnnecessaryLateFieldsRule extends DartLintRule {
+class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
   const AvoidUnnecessaryLateFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3983,9 +3984,9 @@ class AvoidUnnecessaryLateFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -4060,7 +4061,7 @@ class AvoidUnnecessaryLateFieldsRule extends DartLintRule {
 ///   Foo(String n) : name = n;
 /// }
 /// ```
-class AvoidUnnecessaryNullableFieldsRule extends DartLintRule {
+class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
   const AvoidUnnecessaryNullableFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4071,9 +4072,9 @@ class AvoidUnnecessaryNullableFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -4169,7 +4170,7 @@ class _NullAssignmentChecker extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-class AvoidUnnecessaryPatternsRule extends DartLintRule {
+class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
   const AvoidUnnecessaryPatternsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4181,9 +4182,9 @@ class AvoidUnnecessaryPatternsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -4219,7 +4220,7 @@ class AvoidUnnecessaryPatternsRule extends DartLintRule {
 ///   default: ...  // May hide unhandled subclasses
 /// }
 /// ```
-class AvoidWildcardCasesWithSealedClassesRule extends DartLintRule {
+class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
   const AvoidWildcardCasesWithSealedClassesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4230,9 +4231,9 @@ class AvoidWildcardCasesWithSealedClassesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -4278,7 +4279,7 @@ class AvoidWildcardCasesWithSealedClassesRule extends DartLintRule {
 ///   _ => 'other',
 /// };
 /// ```
-class NoEqualSwitchExpressionCasesRule extends DartLintRule {
+class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
   const NoEqualSwitchExpressionCasesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4289,9 +4290,9 @@ class NoEqualSwitchExpressionCasesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -4319,7 +4320,7 @@ class NoEqualSwitchExpressionCasesRule extends DartLintRule {
 /// bytes.addAll([1, 2, 3]);
 /// bytes.addAll([4, 5, 6]);
 /// ```
-class PreferBytesBuilderRule extends DartLintRule {
+class PreferBytesBuilderRule extends SaropaLintRule {
   const PreferBytesBuilderRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4331,9 +4332,9 @@ class PreferBytesBuilderRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -4364,7 +4365,7 @@ class PreferBytesBuilderRule extends DartLintRule {
 /// ```dart
 /// foo(1, condition ? 2 : 3);
 /// ```
-class PreferPushingConditionalExpressionsRule extends DartLintRule {
+class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
   const PreferPushingConditionalExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4375,9 +4376,9 @@ class PreferPushingConditionalExpressionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConditionalExpression((ConditionalExpression node) {
@@ -4426,7 +4427,7 @@ class PreferPushingConditionalExpressionsRule extends DartLintRule {
 /// ```dart
 /// final items = list.map(Item.new);
 /// ```
-class PreferShorthandsWithConstructorsRule extends DartLintRule {
+class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
   const PreferShorthandsWithConstructorsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4437,9 +4438,9 @@ class PreferShorthandsWithConstructorsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
@@ -4482,7 +4483,7 @@ class PreferShorthandsWithConstructorsRule extends DartLintRule {
 /// ```dart
 /// final status = Status.values.where((e) => e == Status.active);
 /// ```
-class PreferShorthandsWithEnumsRule extends DartLintRule {
+class PreferShorthandsWithEnumsRule extends SaropaLintRule {
   const PreferShorthandsWithEnumsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4493,9 +4494,9 @@ class PreferShorthandsWithEnumsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -4531,7 +4532,7 @@ class PreferShorthandsWithEnumsRule extends DartLintRule {
 /// ```dart
 /// final color = Colors.values.firstWhere((c) => c == Colors.red);
 /// ```
-class PreferShorthandsWithStaticFieldsRule extends DartLintRule {
+class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
   const PreferShorthandsWithStaticFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4542,9 +4543,9 @@ class PreferShorthandsWithStaticFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -4585,7 +4586,7 @@ class PreferShorthandsWithStaticFieldsRule extends DartLintRule {
 /// ```dart
 /// void process(@Accept(String) int value) {} // Type mismatch
 /// ```
-class PassCorrectAcceptedTypeRule extends DartLintRule {
+class PassCorrectAcceptedTypeRule extends SaropaLintRule {
   const PassCorrectAcceptedTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4597,9 +4598,9 @@ class PassCorrectAcceptedTypeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFormalParameter((FormalParameter node) {
@@ -4643,7 +4644,7 @@ class PassCorrectAcceptedTypeRule extends DartLintRule {
 /// void process(String name, {bool verbose}) {}
 /// process('test'); // Missing optional verbose arg
 /// ```
-class PassOptionalArgumentRule extends DartLintRule {
+class PassOptionalArgumentRule extends SaropaLintRule {
   const PassOptionalArgumentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4664,9 +4665,9 @@ class PassOptionalArgumentRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -4701,7 +4702,7 @@ class PassOptionalArgumentRule extends DartLintRule {
 /// class Foo {}
 /// class Bar {} // Should be in separate file
 /// ```
-class PreferSingleDeclarationPerFileRule extends DartLintRule {
+class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
   const PreferSingleDeclarationPerFileRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4712,9 +4713,9 @@ class PreferSingleDeclarationPerFileRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -4767,7 +4768,7 @@ class PreferSingleDeclarationPerFileRule extends DartLintRule {
 ///   2 => 'two',
 /// };
 /// ```
-class PreferSwitchExpressionRule extends DartLintRule {
+class PreferSwitchExpressionRule extends SaropaLintRule {
   const PreferSwitchExpressionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4778,9 +4779,9 @@ class PreferSwitchExpressionRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -4865,7 +4866,7 @@ class PreferSwitchExpressionRule extends DartLintRule {
 ///   case Status.pending: // ...
 /// }
 /// ```
-class PreferSwitchWithEnumsRule extends DartLintRule {
+class PreferSwitchWithEnumsRule extends SaropaLintRule {
   const PreferSwitchWithEnumsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4876,9 +4877,9 @@ class PreferSwitchWithEnumsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -4977,7 +4978,7 @@ class PreferSwitchWithEnumsRule extends DartLintRule {
 ///   case Error(): // ...
 /// }
 /// ```
-class PreferSwitchWithSealedClassesRule extends DartLintRule {
+class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
   const PreferSwitchWithSealedClassesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4990,9 +4991,9 @@ class PreferSwitchWithSealedClassesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -5045,7 +5046,7 @@ class PreferSwitchWithSealedClassesRule extends DartLintRule {
 /// expect(list, isEmpty);
 /// expect(string, contains('x'));
 /// ```
-class PreferTestMatchersRule extends DartLintRule {
+class PreferTestMatchersRule extends SaropaLintRule {
   const PreferTestMatchersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5056,9 +5057,9 @@ class PreferTestMatchersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -5136,7 +5137,7 @@ class PreferTestMatchersRule extends DartLintRule {
 ///   print(value);
 /// }
 /// ```
-class PreferUnwrappingFutureOrRule extends DartLintRule {
+class PreferUnwrappingFutureOrRule extends SaropaLintRule {
   const PreferUnwrappingFutureOrRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5147,9 +5148,9 @@ class PreferUnwrappingFutureOrRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -5215,7 +5216,7 @@ class _AwaitFinderVisitor extends RecursiveAstVisitor<void> {
 /// final list = ['a', 'b'];  // Type inferred as List<String>
 /// final map = <String, int>{};  // Explicit when needed
 /// ```
-class AvoidInferrableTypeArgumentsRule extends DartLintRule {
+class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
   const AvoidInferrableTypeArgumentsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5226,9 +5227,9 @@ class AvoidInferrableTypeArgumentsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -5289,7 +5290,7 @@ class AvoidInferrableTypeArgumentsRule extends DartLintRule {
 /// void foo({List<int> items = const []}) {}
 /// foo();  // Omit argument when using default
 /// ```
-class AvoidPassingDefaultValuesRule extends DartLintRule {
+class AvoidPassingDefaultValuesRule extends SaropaLintRule {
   const AvoidPassingDefaultValuesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5300,9 +5301,9 @@ class AvoidPassingDefaultValuesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -5315,7 +5316,7 @@ class AvoidPassingDefaultValuesRule extends DartLintRule {
     });
   }
 
-  void _checkArguments(ArgumentList argList, DiagnosticReporter reporter) {
+  void _checkArguments(ArgumentList argList, SaropaDiagnosticReporter reporter) {
     for (final Expression arg in argList.arguments) {
       if (arg is! NamedExpression) continue;
 
@@ -5349,7 +5350,7 @@ class AvoidPassingDefaultValuesRule extends DartLintRule {
 ///   int get length => 0;  // Shadows String.length
 /// }
 /// ```
-class AvoidShadowedExtensionMethodsRule extends DartLintRule {
+class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
   const AvoidShadowedExtensionMethodsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5360,9 +5361,9 @@ class AvoidShadowedExtensionMethodsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
@@ -5411,7 +5412,7 @@ class AvoidShadowedExtensionMethodsRule extends DartLintRule {
 ///   final x = compute();  // No late needed
 /// }
 /// ```
-class AvoidUnnecessaryLocalLateRule extends DartLintRule {
+class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
   const AvoidUnnecessaryLocalLateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5423,9 +5424,9 @@ class AvoidUnnecessaryLocalLateRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5469,7 +5470,7 @@ class AvoidUnnecessaryLocalLateRule extends DartLintRule {
 ///   void foo({int x = 0}) {}  // Matches parent
 /// }
 /// ```
-class MatchBaseClassDefaultValueRule extends DartLintRule {
+class MatchBaseClassDefaultValueRule extends SaropaLintRule {
   const MatchBaseClassDefaultValueRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5480,9 +5481,9 @@ class MatchBaseClassDefaultValueRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration classNode) {
@@ -5561,7 +5562,7 @@ class MatchBaseClassDefaultValueRule extends DartLintRule {
 ///   print(x);
 /// }
 /// ```
-class MoveVariableCloserToUsageRule extends DartLintRule {
+class MoveVariableCloserToUsageRule extends SaropaLintRule {
   const MoveVariableCloserToUsageRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5575,9 +5576,9 @@ class MoveVariableCloserToUsageRule extends DartLintRule {
   static const int _minLineDistance = 10;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -5661,7 +5662,7 @@ class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
 ///   print(regex.hasMatch('$i'));
 /// }
 /// ```
-class MoveVariableOutsideIterationRule extends DartLintRule {
+class MoveVariableOutsideIterationRule extends SaropaLintRule {
   const MoveVariableOutsideIterationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5672,9 +5673,9 @@ class MoveVariableOutsideIterationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     void checkLoopBody(Statement body) {
@@ -5759,7 +5760,7 @@ class MoveVariableOutsideIterationRule extends DartLintRule {
 ///       other is Child;  // Doesn't call super or check Parent equality
 /// }
 /// ```
-class PreferOverridingParentEqualityRule extends DartLintRule {
+class PreferOverridingParentEqualityRule extends SaropaLintRule {
   const PreferOverridingParentEqualityRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5771,9 +5772,9 @@ class PreferOverridingParentEqualityRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -5872,7 +5873,7 @@ class _SuperEqualityChecker extends RecursiveAstVisitor<void> {
 ///   case int _: print('other int');
 /// }
 /// ```
-class PreferSpecificCasesFirstRule extends DartLintRule {
+class PreferSpecificCasesFirstRule extends SaropaLintRule {
   const PreferSpecificCasesFirstRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5883,9 +5884,9 @@ class PreferSpecificCasesFirstRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -5907,7 +5908,7 @@ class PreferSpecificCasesFirstRule extends DartLintRule {
   }
 
   void _checkCaseOrder(
-      List<GuardedPattern> patterns, DiagnosticReporter reporter) {
+      List<GuardedPattern> patterns, SaropaDiagnosticReporter reporter) {
     for (int i = 0; i < patterns.length - 1; i++) {
       final GuardedPattern current = patterns[i];
       final GuardedPattern next = patterns[i + 1];
@@ -5956,7 +5957,7 @@ class PreferSpecificCasesFirstRule extends DartLintRule {
 /// final (x, y) = point;
 /// print(x);  // Use destructured variable
 /// ```
-class UseExistingDestructuringRule extends DartLintRule {
+class UseExistingDestructuringRule extends SaropaLintRule {
   const UseExistingDestructuringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5968,9 +5969,9 @@ class UseExistingDestructuringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -6031,7 +6032,7 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
       this.destructuredVars, this.reporter, this.code);
 
   final Map<String, Set<String>> destructuredVars;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -6070,7 +6071,7 @@ class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
 /// final name = user.name;
 /// print('$name, $name');
 /// ```
-class UseExistingVariableRule extends DartLintRule {
+class UseExistingVariableRule extends SaropaLintRule {
   const UseExistingVariableRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6082,9 +6083,9 @@ class UseExistingVariableRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {

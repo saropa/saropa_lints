@@ -9,8 +9,9 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when public API lacks documentation.
 ///
@@ -34,7 +35,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   Future<User> getUser(String id) async { ... }
 /// }
 /// ```
-class RequirePublicApiDocumentationRule extends DartLintRule {
+class RequirePublicApiDocumentationRule extends SaropaLintRule {
   const RequirePublicApiDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -45,9 +46,9 @@ class RequirePublicApiDocumentationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -96,7 +97,7 @@ class RequirePublicApiDocumentationRule extends DartLintRule {
 /// /// Returns the user's email address.
 /// String getUserEmail() => user.email;
 /// ```
-class AvoidMisleadingDocumentationRule extends DartLintRule {
+class AvoidMisleadingDocumentationRule extends SaropaLintRule {
   const AvoidMisleadingDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -107,9 +108,9 @@ class AvoidMisleadingDocumentationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -154,7 +155,7 @@ class AvoidMisleadingDocumentationRule extends DartLintRule {
 /// @Deprecated('Use newMethod() instead. Will be removed in v2.0.')
 /// void oldMethod() { ... }
 /// ```
-class RequireDeprecationMessageRule extends DartLintRule {
+class RequireDeprecationMessageRule extends SaropaLintRule {
   const RequireDeprecationMessageRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -166,9 +167,9 @@ class RequireDeprecationMessageRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAnnotation((Annotation node) {
@@ -224,7 +225,7 @@ class RequireDeprecationMessageRule extends DartLintRule {
 ///     .fold(0, (a, b) => a + b);
 /// }
 /// ```
-class RequireComplexLogicCommentsRule extends DartLintRule {
+class RequireComplexLogicCommentsRule extends SaropaLintRule {
   const RequireComplexLogicCommentsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -238,9 +239,9 @@ class RequireComplexLogicCommentsRule extends DartLintRule {
   static const int _complexityThreshold = 3;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -291,7 +292,7 @@ class RequireComplexLogicCommentsRule extends DartLintRule {
 /// /// [age] The user's age in years (must be >= 18).
 /// Future<User> createUser(String name, String email, int age) { ... }
 /// ```
-class RequireParameterDocumentationRule extends DartLintRule {
+class RequireParameterDocumentationRule extends SaropaLintRule {
   const RequireParameterDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -304,9 +305,9 @@ class RequireParameterDocumentationRule extends DartLintRule {
   static const int _paramThreshold = 2;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -367,7 +368,7 @@ class RequireParameterDocumentationRule extends DartLintRule {
 /// /// or error details if processing failed.
 /// OrderResult processOrder(Order order) { ... }
 /// ```
-class RequireReturnDocumentationRule extends DartLintRule {
+class RequireReturnDocumentationRule extends SaropaLintRule {
   const RequireReturnDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -378,9 +379,9 @@ class RequireReturnDocumentationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -432,7 +433,7 @@ class RequireReturnDocumentationRule extends DartLintRule {
 /// /// Throws [UserNotFoundException] if no user with [id] exists.
 /// User getUser(String id) { ... }
 /// ```
-class RequireExceptionDocumentationRule extends DartLintRule {
+class RequireExceptionDocumentationRule extends SaropaLintRule {
   const RequireExceptionDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -443,9 +444,9 @@ class RequireExceptionDocumentationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -496,7 +497,7 @@ class RequireExceptionDocumentationRule extends DartLintRule {
 /// /// ```
 /// class UserRepository { ... }
 /// ```
-class RequireExampleInDocumentationRule extends DartLintRule {
+class RequireExampleInDocumentationRule extends SaropaLintRule {
   const RequireExampleInDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -518,9 +519,9 @@ class RequireExampleInDocumentationRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {

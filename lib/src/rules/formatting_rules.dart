@@ -2,9 +2,11 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when case clauses don't have newlines before them.
 ///
@@ -29,7 +31,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///     return 'two';
 /// }
 /// ```
-class NewlineBeforeCaseRule extends DartLintRule {
+class NewlineBeforeCaseRule extends SaropaLintRule {
   const NewlineBeforeCaseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -40,9 +42,9 @@ class NewlineBeforeCaseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -93,7 +95,7 @@ class NewlineBeforeCaseRule extends DartLintRule {
 ///   Foo(this.value);
 /// }
 /// ```
-class NewlineBeforeConstructorRule extends DartLintRule {
+class NewlineBeforeConstructorRule extends SaropaLintRule {
   const NewlineBeforeConstructorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -104,9 +106,9 @@ class NewlineBeforeConstructorRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -117,7 +119,7 @@ class NewlineBeforeConstructorRule extends DartLintRule {
   void _checkMembers(
     NodeList<ClassMember> members,
     CompilationUnit unit,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     for (int i = 1; i < members.length; i++) {
       final ClassMember current = members[i];
@@ -167,7 +169,7 @@ class NewlineBeforeConstructorRule extends DartLintRule {
 ///   void bar() { }
 /// }
 /// ```
-class NewlineBeforeMethodRule extends DartLintRule {
+class NewlineBeforeMethodRule extends SaropaLintRule {
   const NewlineBeforeMethodRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -178,9 +180,9 @@ class NewlineBeforeMethodRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -199,7 +201,7 @@ class NewlineBeforeMethodRule extends DartLintRule {
   void _checkMembers(
     NodeList<ClassMember> members,
     CompilationUnit unit,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     for (int i = 1; i < members.length; i++) {
       final ClassMember current = members[i];
@@ -226,7 +228,7 @@ class NewlineBeforeMethodRule extends DartLintRule {
 ///
 /// Adding a blank line before return statements can improve readability
 /// by visually separating the return from the preceding logic.
-class NewlineBeforeReturnRule extends DartLintRule {
+class NewlineBeforeReturnRule extends SaropaLintRule {
   const NewlineBeforeReturnRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -237,9 +239,9 @@ class NewlineBeforeReturnRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {
@@ -262,6 +264,33 @@ class NewlineBeforeReturnRule extends DartLintRule {
       if (returnStartLine - prevEndLine < 2) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddBlankLineBeforeReturnFix()];
+}
+
+class _AddBlankLineBeforeReturnFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addReturnStatement((ReturnStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add blank line before return',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.offset, '\n');
+      });
     });
   }
 }
@@ -289,7 +318,7 @@ class NewlineBeforeReturnRule extends DartLintRule {
 ///   'c',  // Has trailing comma
 /// ];
 /// ```
-class PreferTrailingCommaRule extends DartLintRule {
+class PreferTrailingCommaRule extends SaropaLintRule {
   const PreferTrailingCommaRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -300,9 +329,9 @@ class PreferTrailingCommaRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addArgumentList((ArgumentList node) {
@@ -325,7 +354,7 @@ class PreferTrailingCommaRule extends DartLintRule {
   void _checkTrailingComma(
     NodeList<AstNode> elements,
     Token closingToken,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     if (elements.isEmpty) return;
 
@@ -358,6 +387,62 @@ class PreferTrailingCommaRule extends DartLintRule {
       }
     }
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTrailingCommaFix()];
+}
+
+class _AddTrailingCommaFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addListLiteral((ListLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.elements.isEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add trailing comma',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.elements.last.end, ',');
+      });
+    });
+
+    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.elements.isEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add trailing comma',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.elements.last.end, ',');
+      });
+    });
+
+    context.registry.addArgumentList((ArgumentList node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.arguments.isEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add trailing comma',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.arguments.last.end, ',');
+      });
+    });
+  }
 }
 
 /// Warns when trailing commas are unnecessary.
@@ -382,7 +467,7 @@ class PreferTrailingCommaRule extends DartLintRule {
 ///   'item2',
 /// ];
 /// ```
-class UnnecessaryTrailingCommaRule extends DartLintRule {
+class UnnecessaryTrailingCommaRule extends SaropaLintRule {
   const UnnecessaryTrailingCommaRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -393,9 +478,9 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -410,7 +495,7 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
   void _checkTrailingComma(
     NodeList<CollectionElement> elements,
     Token rightBracket,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     if (elements.length != 1) return;
 
@@ -421,6 +506,58 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
       // Single element with trailing comma
       reporter.atToken(nextToken, code);
     }
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveTrailingCommaFix()];
+}
+
+class _RemoveTrailingCommaFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addListLiteral((ListLiteral node) {
+      if (node.elements.length != 1) return;
+      final Token? commaToken = node.elements.first.endToken.next;
+      if (commaToken == null || commaToken.type != TokenType.COMMA) return;
+      if (!SourceRange(commaToken.offset, commaToken.length)
+          .intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove trailing comma',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addDeletion(SourceRange(commaToken.offset, commaToken.length));
+      });
+    });
+
+    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (node.elements.length != 1) return;
+      final Token? commaToken = node.elements.first.endToken.next;
+      if (commaToken == null || commaToken.type != TokenType.COMMA) return;
+      if (!SourceRange(commaToken.offset, commaToken.length)
+          .intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove trailing comma',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addDeletion(SourceRange(commaToken.offset, commaToken.length));
+      });
+    });
   }
 }
 
@@ -441,7 +578,7 @@ class UnnecessaryTrailingCommaRule extends DartLintRule {
 /// // This is a comment.
 /// // TODO: Fix this.
 /// ```
-class FormatCommentFormattingRule extends DartLintRule {
+class FormatCommentFormattingRule extends SaropaLintRule {
   const FormatCommentFormattingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -452,9 +589,9 @@ class FormatCommentFormattingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Comments are not part of the AST, so we need to check tokens
@@ -467,7 +604,7 @@ class FormatCommentFormattingRule extends DartLintRule {
     });
   }
 
-  void _checkPrecedingComments(Token token, DiagnosticReporter reporter) {
+  void _checkPrecedingComments(Token token, SaropaDiagnosticReporter reporter) {
     Token? comment = token.precedingComments;
     while (comment != null) {
       final String lexeme = comment.lexeme;
@@ -531,7 +668,7 @@ class FormatCommentFormattingRule extends DartLintRule {
 ///   void doSomething() {}
 /// }
 /// ```
-class MemberOrderingFormattingRule extends DartLintRule {
+class MemberOrderingFormattingRule extends SaropaLintRule {
   const MemberOrderingFormattingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -543,9 +680,9 @@ class MemberOrderingFormattingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -593,7 +730,7 @@ class MemberOrderingFormattingRule extends DartLintRule {
 /// ```dart
 /// void foo(int count, {String? name}) {}
 /// ```
-class ParametersOrderingConventionRule extends DartLintRule {
+class ParametersOrderingConventionRule extends SaropaLintRule {
   const ParametersOrderingConventionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -605,9 +742,9 @@ class ParametersOrderingConventionRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -620,7 +757,7 @@ class ParametersOrderingConventionRule extends DartLintRule {
   }
 
   void _checkParameters(
-      FormalParameterList? params, DiagnosticReporter reporter) {
+      FormalParameterList? params, SaropaDiagnosticReporter reporter) {
     if (params == null) return;
 
     int lastCategory = -1;

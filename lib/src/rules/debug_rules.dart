@@ -5,11 +5,12 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../saropa_lint_rule.dart';
+
 /// Test-only rule that always reports a lint at the start of the file.
-class AlwaysFailRule extends DartLintRule {
+class AlwaysFailRule extends SaropaLintRule {
   const AlwaysFailRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -20,9 +21,9 @@ class AlwaysFailRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit unit) {
@@ -37,7 +38,7 @@ class AlwaysFailRule extends DartLintRule {
 /// Commented-out code can clutter the codebase and make it harder to read.
 /// It's usually better to delete unused code (it can be retrieved from version
 /// control if needed).
-class AvoidCommentedOutCodeRule extends DartLintRule {
+class AvoidCommentedOutCodeRule extends SaropaLintRule {
   const AvoidCommentedOutCodeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -66,9 +67,9 @@ class AvoidCommentedOutCodeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -108,7 +109,7 @@ class AvoidCommentedOutCodeRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Comments out the debugPrint statement.
-class AvoidDebugPrintRule extends DartLintRule {
+class AvoidDebugPrintRule extends SaropaLintRule {
   const AvoidDebugPrintRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -121,9 +122,9 @@ class AvoidDebugPrintRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -220,7 +221,7 @@ class _CommentOutDebugPrintFix extends DartFix {
 ///   debug('Important warning', level: DebugLevels.Warning);
 /// }
 /// ```
-class AvoidUnguardedDebugRule extends DartLintRule {
+class AvoidUnguardedDebugRule extends SaropaLintRule {
   const AvoidUnguardedDebugRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -231,10 +232,14 @@ class AvoidUnguardedDebugRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Pre-compiled patterns for performance - avoid creating RegExp in loops
+  static final RegExp _isDebugPattern = RegExp(r'\bisDebug\w*\b');
+  static final RegExp _debugSuffixPattern = RegExp(r'\bis\w*Debug\b');
+
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check for debug() function calls
@@ -335,12 +340,12 @@ class AvoidUnguardedDebugRule extends DartLintRule {
     }
 
     // isDebug* local variable patterns
-    if (RegExp(r'\bisDebug\w*\b').hasMatch(source)) {
+    if (_isDebugPattern.hasMatch(source)) {
       return true;
     }
 
     // is*Debug patterns (isAudioDebug, isWidgetDebug, etc.)
-    if (RegExp(r'\bis\w*Debug\b').hasMatch(source)) {
+    if (_debugSuffixPattern.hasMatch(source)) {
       return true;
     }
 
@@ -382,7 +387,7 @@ class AvoidUnguardedDebugRule extends DartLintRule {
 /// // ignore: avoid_print
 /// print('Hello');
 /// ```
-class PreferCommentingAnalyzerIgnoresRule extends DartLintRule {
+class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   const PreferCommentingAnalyzerIgnoresRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -394,10 +399,16 @@ class PreferCommentingAnalyzerIgnoresRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  /// Pre-compiled patterns for performance
+  static final RegExp _ignorePattern = RegExp(r'^//\s*ignore:');
+  static final RegExp _ignoreForFilePattern = RegExp(r'^//\s*ignore_for_file:');
+  static final RegExp _ignoreDirectivePattern =
+      RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+');
+
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -440,8 +451,8 @@ class PreferCommentingAnalyzerIgnoresRule extends DartLintRule {
   bool _isIgnoreComment(String line) {
     // Match // ignore: or // ignore_for_file:
     // But not lines that are already explanatory comments followed by ignore
-    return RegExp(r'^//\s*ignore:').hasMatch(line) ||
-        RegExp(r'^//\s*ignore_for_file:').hasMatch(line);
+    return _ignorePattern.hasMatch(line) ||
+        _ignoreForFilePattern.hasMatch(line);
   }
 
   /// Check if the line before has an explanatory comment
@@ -475,9 +486,7 @@ class PreferCommentingAnalyzerIgnoresRule extends DartLintRule {
   /// Get the length of the ignore comment for reporting
   int _getIgnoreCommentLength(String line, int start) {
     // Find the ignore comment pattern directly in the full line
-    // This avoids substring - ignore comments are ASCII only anyway
-    final RegExpMatch? match =
-        RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+').firstMatch(line);
+    final RegExpMatch? match = _ignoreDirectivePattern.firstMatch(line);
     if (match != null && match.start >= start) {
       return match.end - start;
     }

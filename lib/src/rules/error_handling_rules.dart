@@ -10,8 +10,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when catch block swallows exception without logging.
 ///
@@ -37,7 +38,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for attention.
-class AvoidSwallowingExceptionsRule extends DartLintRule {
+class AvoidSwallowingExceptionsRule extends SaropaLintRule {
   const AvoidSwallowingExceptionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -48,9 +49,9 @@ class AvoidSwallowingExceptionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
@@ -150,7 +151,7 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
 /// ```
 ///
 /// **Quick fix available:** Adds a stack trace parameter to the catch clause.
-class AvoidLosingStackTraceRule extends DartLintRule {
+class AvoidLosingStackTraceRule extends SaropaLintRule {
   const AvoidLosingStackTraceRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -162,9 +163,9 @@ class AvoidLosingStackTraceRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
@@ -320,7 +321,7 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 /// the underlying issue of unhandled errors.
 ///
 /// **Quick fix available:** Adds `.catchError()` with `debugPrint`.
-class RequireFutureErrorHandlingRule extends DartLintRule {
+class RequireFutureErrorHandlingRule extends SaropaLintRule {
   const RequireFutureErrorHandlingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -334,9 +335,9 @@ class RequireFutureErrorHandlingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExpressionStatement((ExpressionStatement node) {
@@ -439,7 +440,7 @@ class _AddCatchErrorFix extends DartFix {
 /// ```dart
 /// throw NetworkException('Failed to connect to server');
 /// ```
-class AvoidGenericExceptionsRule extends DartLintRule {
+class AvoidGenericExceptionsRule extends SaropaLintRule {
   const AvoidGenericExceptionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -450,9 +451,9 @@ class AvoidGenericExceptionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addThrowExpression((ThrowExpression node) {
@@ -481,7 +482,7 @@ class AvoidGenericExceptionsRule extends DartLintRule {
 /// ```dart
 /// throw Exception('Failed to load user $userId: $reason');
 /// ```
-class RequireErrorContextRule extends DartLintRule {
+class RequireErrorContextRule extends SaropaLintRule {
   const RequireErrorContextRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -495,9 +496,9 @@ class RequireErrorContextRule extends DartLintRule {
   static const int _minMessageLength = 20;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addThrowExpression((ThrowExpression node) {
@@ -547,7 +548,7 @@ class RequireErrorContextRule extends DartLintRule {
 ///   return Success(User.fromJson(response.body));
 /// }
 /// ```
-class PreferResultPatternRule extends DartLintRule {
+class PreferResultPatternRule extends SaropaLintRule {
   const PreferResultPatternRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -559,9 +560,9 @@ class PreferResultPatternRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -576,7 +577,7 @@ class PreferResultPatternRule extends DartLintRule {
   void _checkForExpectedThrows(
     FunctionBody body,
     AstNode reportNode,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     int throwCount = 0;
 
@@ -623,7 +624,7 @@ class _ThrowCountVisitor extends RecursiveAstVisitor<void> {
 ///   await saveData(data);
 /// }
 /// ```
-class RequireAsyncErrorDocumentationRule extends DartLintRule {
+class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
   const RequireAsyncErrorDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -636,9 +637,9 @@ class RequireAsyncErrorDocumentationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -709,7 +710,7 @@ class _AsyncAnalysisVisitor extends RecursiveAstVisitor<void> {
 ///   home: MyHomePage(),
 /// )
 /// ```
-class RequireErrorBoundaryRule extends DartLintRule {
+class RequireErrorBoundaryRule extends SaropaLintRule {
   const RequireErrorBoundaryRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -721,9 +722,9 @@ class RequireErrorBoundaryRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((

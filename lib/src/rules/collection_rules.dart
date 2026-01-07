@@ -7,8 +7,9 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when comparing collections using == operator.
 ///
@@ -29,7 +30,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidCollectionEqualityChecksRule extends DartLintRule {
+class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   const AvoidCollectionEqualityChecksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -50,9 +51,9 @@ class AvoidCollectionEqualityChecksRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -126,7 +127,7 @@ class _AddHackCommentForCollectionEqualityFix extends DartFix {
 /// ```dart
 /// final map = {'a': 1, 'b': 2, 'c': 3};
 /// ```
-class AvoidDuplicateMapKeysRule extends DartLintRule {
+class AvoidDuplicateMapKeysRule extends SaropaLintRule {
   const AvoidDuplicateMapKeysRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -137,9 +138,9 @@ class AvoidDuplicateMapKeysRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -173,7 +174,7 @@ class AvoidDuplicateMapKeysRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Replaces with `map.containsKey(key)`.
-class AvoidMapKeysContainsRule extends DartLintRule {
+class AvoidMapKeysContainsRule extends SaropaLintRule {
   const AvoidMapKeysContainsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -185,9 +186,9 @@ class AvoidMapKeysContainsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -261,7 +262,7 @@ class _UseContainsKeyFix extends DartFix {
 /// final list = [1, 2, 3];
 /// final set = {1, 2, 3};
 /// ```
-class AvoidUnnecessaryCollectionsRule extends DartLintRule {
+class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   const AvoidUnnecessaryCollectionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -283,9 +284,9 @@ class AvoidUnnecessaryCollectionsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -330,7 +331,7 @@ class AvoidUnnecessaryCollectionsRule extends DartLintRule {
 /// // or
 /// final item = items.length > 1 ? items.last : fallback;
 /// ```
-class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
+class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   const AvoidUnsafeCollectionMethodsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -344,9 +345,9 @@ class AvoidUnsafeCollectionMethodsRule extends DartLintRule {
   static const Set<String> _unsafeMethods = <String>{'first', 'last', 'single'};
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPropertyAccess((PropertyAccess node) {
@@ -817,7 +818,7 @@ class _UseNullSafeCollectionMethodFix extends DartFix {
 /// // or
 /// final sum = numbers.isEmpty ? 0 : numbers.reduce((a, b) => a + b);
 /// ```
-class AvoidUnsafeReduceRule extends DartLintRule {
+class AvoidUnsafeReduceRule extends SaropaLintRule {
   const AvoidUnsafeReduceRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -829,9 +830,9 @@ class AvoidUnsafeReduceRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -906,7 +907,7 @@ class _AddHackCommentForReduceFix extends DartFix {
 /// // or with orElse:
 /// final item = items.firstWhere((e) => e.isActive, orElse: () => defaultItem);
 /// ```
-class AvoidUnsafeWhereMethodsRule extends DartLintRule {
+class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   const AvoidUnsafeWhereMethodsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -926,9 +927,9 @@ class AvoidUnsafeWhereMethodsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1019,7 +1020,7 @@ class _UseWhereOrNullFix extends DartFix {
 /// import 'package:collection/collection.dart';
 /// final item = items.firstWhereOrNull((e) => e.isActive) ?? defaultItem;
 /// ```
-class PreferWhereOrNullRule extends DartLintRule {
+class PreferWhereOrNullRule extends SaropaLintRule {
   const PreferWhereOrNullRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1040,9 +1041,9 @@ class PreferWhereOrNullRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1170,7 +1171,7 @@ class _ReplaceWithWhereOrNullFix extends DartFix {
 /// ```dart
 /// final map = {'apple': 2, 'banana': 3, 'zebra': 1};
 /// ```
-class MapKeysOrderingRule extends DartLintRule {
+class MapKeysOrderingRule extends SaropaLintRule {
   const MapKeysOrderingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1181,9 +1182,9 @@ class MapKeysOrderingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
@@ -1225,7 +1226,7 @@ class MapKeysOrderingRule extends DartLintRule {
 /// ```dart
 /// if (list.contains(item)) { ... }
 /// ```
-class PreferContainsRule extends DartLintRule {
+class PreferContainsRule extends SaropaLintRule {
   const PreferContainsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1236,9 +1237,9 @@ class PreferContainsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -1324,7 +1325,7 @@ class _UseContainsFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Replaces `list[0]` with `list.first`.
-class PreferFirstRule extends DartLintRule {
+class PreferFirstRule extends SaropaLintRule {
   const PreferFirstRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1335,9 +1336,9 @@ class PreferFirstRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -1401,7 +1402,7 @@ class _UseFirstFix extends DartFix {
 /// final list = List<int>.of(items);
 /// final set = Set<String>.of(names);
 /// ```
-class PreferIterableOfRule extends DartLintRule {
+class PreferIterableOfRule extends SaropaLintRule {
   const PreferIterableOfRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1419,9 +1420,9 @@ class PreferIterableOfRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -1450,7 +1451,7 @@ class PreferIterableOfRule extends DartLintRule {
 /// ```dart
 /// final last = list.last;
 /// ```
-class PreferLastRule extends DartLintRule {
+class PreferLastRule extends SaropaLintRule {
   const PreferLastRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1461,9 +1462,9 @@ class PreferLastRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -1543,7 +1544,7 @@ class _UseLastFix extends DartFix {
 /// ```dart
 /// list.addAll(items);
 /// ```
-class PreferAddAllRule extends DartLintRule {
+class PreferAddAllRule extends SaropaLintRule {
   const PreferAddAllRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1554,9 +1555,9 @@ class PreferAddAllRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check forEach pattern: items.forEach((item) => list.add(item))
@@ -1631,7 +1632,7 @@ class PreferAddAllRule extends DartLintRule {
 /// final list = [1, 2, 3];
 /// final set = {'a', 'b', 'c'};
 /// ```
-class AvoidDuplicateCollectionElementsRule extends DartLintRule {
+class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
   const AvoidDuplicateCollectionElementsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1642,9 +1643,9 @@ class AvoidDuplicateCollectionElementsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -1660,7 +1661,7 @@ class AvoidDuplicateCollectionElementsRule extends DartLintRule {
 
   void _checkForDuplicates(
     NodeList<CollectionElement> elements,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     final Set<String> seen = <String>{};
     for (final CollectionElement element in elements) {
@@ -1694,7 +1695,7 @@ class AvoidDuplicateCollectionElementsRule extends DartLintRule {
 /// final allowedItems = {'a', 'b', 'c'};
 /// if (allowedItems.contains(value)) { ... }  // O(1) lookup
 /// ```
-class PreferSetForLookupRule extends DartLintRule {
+class PreferSetForLookupRule extends SaropaLintRule {
   const PreferSetForLookupRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1706,9 +1707,9 @@ class PreferSetForLookupRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {

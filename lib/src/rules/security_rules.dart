@@ -10,8 +10,9 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when sensitive data might be logged.
 ///
@@ -31,17 +32,21 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// log('Payment processed');
 /// debugPrint('Token refreshed');
 /// ```
-class AvoidLoggingSensitiveDataRule extends DartLintRule {
+class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   const AvoidLoggingSensitiveDataRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_logging_sensitive_data',
-    problemMessage: 'Potential sensitive data in log statement.',
+    problemMessage:
+        'Sensitive data in log. Will appear in crash reports and debug output.',
     correctionMessage:
-        'Remove sensitive data from logs. Never log passwords, tokens, or PII.',
+        'Remove passwords, tokens, and PII from logs. Log a success/failure message instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  /// Sensitive patterns that indicate PII or credentials.
+  /// These should be specific enough to avoid false positives.
+  /// For example, 'pin' is avoided since it matches "spinning", "pinned".
   static const Set<String> _sensitivePatterns = <String>{
     'password',
     'passwd',
@@ -50,7 +55,6 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
     'apikey',
     'api_key',
     'apiKey',
-    'auth',
     'credential',
     'creditcard',
     'credit_card',
@@ -58,9 +62,9 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
     'ssn',
     'social_security',
     'socialSecurity',
-    'pin',
+    'pincode', // More specific than 'pin'
+    'pin_code',
     'cvv',
-    'private',
     'privatekey',
     'private_key',
     'privateKey',
@@ -103,9 +107,9 @@ class AvoidLoggingSensitiveDataRule extends DartLintRule {
   }
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -223,35 +227,41 @@ class _AddHackForSensitiveLoggingFix extends DartFix {
 /// // Use flutter_secure_storage instead
 /// secureStorage.write(key: 'auth_token', value: token);
 /// ```
-class RequireSecureStorageRule extends DartLintRule {
+class RequireSecureStorageRule extends SaropaLintRule {
   const RequireSecureStorageRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_secure_storage',
-    problemMessage: 'Sensitive data should not be stored in SharedPreferences.',
+    problemMessage:
+        'SharedPreferences stores in plain text. Sensitive data will be readable on rooted devices.',
     correctionMessage:
-        'Use flutter_secure_storage or other encrypted storage for sensitive data.',
+        'Use flutter_secure_storage: secureStorage.write(key: k, value: v).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Patterns for sensitive keys - must match as word boundaries.
+  /// Removed overly broad patterns like 'key' that cause false positives.
   static const Set<String> _sensitiveKeys = <String>{
     'token',
-    'auth',
+    'auth_token',
+    'authtoken',
     'password',
     'secret',
-    'key',
+    'api_key',
+    'apikey',
     'credential',
-    'session',
-    'refresh',
-    'access',
-    'api',
-    'private',
+    'session_id',
+    'sessionid',
+    'refresh_token',
+    'access_token',
+    'private_key',
+    'privatekey',
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -301,14 +311,15 @@ class RequireSecureStorageRule extends DartLintRule {
 /// final apiKey = const String.fromEnvironment('API_KEY');
 /// final password = await secureStorage.read(key: 'password');
 /// ```
-class AvoidHardcodedCredentialsRule extends DartLintRule {
+class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   const AvoidHardcodedCredentialsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_credentials',
-    problemMessage: 'Potential hardcoded credential detected.',
+    problemMessage:
+        'Hardcoded credential will be committed to version control and exposed.',
     correctionMessage:
-        'Use environment variables or secure storage instead of hardcoding credentials.',
+        "Use String.fromEnvironment('KEY') or read from secure storage at runtime.",
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -339,9 +350,9 @@ class AvoidHardcodedCredentialsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
@@ -440,7 +451,7 @@ class _AddHackForHardcodedCredentialsFix extends DartFix {
 ///   webView.loadUrl(userProvidedUrl);
 /// }
 /// ```
-class RequireInputSanitizationRule extends DartLintRule {
+class RequireInputSanitizationRule extends SaropaLintRule {
   const RequireInputSanitizationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -452,9 +463,9 @@ class RequireInputSanitizationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -519,7 +530,7 @@ class RequireInputSanitizationRule extends DartLintRule {
 ///   },
 /// )
 /// ```
-class AvoidWebViewJavaScriptEnabledRule extends DartLintRule {
+class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   const AvoidWebViewJavaScriptEnabledRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -532,9 +543,9 @@ class AvoidWebViewJavaScriptEnabledRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -591,7 +602,7 @@ class AvoidWebViewJavaScriptEnabledRule extends DartLintRule {
 ///   showPinDialog();
 /// }
 /// ```
-class RequireBiometricFallbackRule extends DartLintRule {
+class RequireBiometricFallbackRule extends SaropaLintRule {
   const RequireBiometricFallbackRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -604,9 +615,9 @@ class RequireBiometricFallbackRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -659,7 +670,7 @@ class RequireBiometricFallbackRule extends DartLintRule {
 ///   case 'action2': doAction2(); break;
 /// }
 /// ```
-class AvoidEvalLikePatternsRule extends DartLintRule {
+class AvoidEvalLikePatternsRule extends SaropaLintRule {
   const AvoidEvalLikePatternsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -671,12 +682,12 @@ class AvoidEvalLikePatternsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    // Check for Function.apply
+    // Check for Function.apply - dynamic function invocation
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
@@ -687,13 +698,12 @@ class AvoidEvalLikePatternsRule extends DartLintRule {
         }
       }
 
-      // Check for noSuchMethod invocations that might indicate dynamic dispatch
-      if (methodName == 'noSuchMethod') {
-        reporter.atNode(node, code);
-      }
+      // Note: noSuchMethod invocations are NOT flagged because they're
+      // commonly used for mocking/proxying and are not security risks
+      // when the target is controlled by the application.
     });
 
-    // Check for dart:mirrors import
+    // Check for dart:mirrors import - reflection is a security risk
     context.registry.addImportDirective((ImportDirective node) {
       final String? uri = node.uri.stringValue;
       if (uri != null && uri.contains('dart:mirrors')) {
@@ -768,7 +778,7 @@ class _AddHackForEvalPatternFix extends DartFix {
 ///     return cert.sha256 == expectedSha256;
 ///   };
 /// ```
-class RequireCertificatePinningRule extends DartLintRule {
+class RequireCertificatePinningRule extends SaropaLintRule {
   const RequireCertificatePinningRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -780,9 +790,9 @@ class RequireCertificatePinningRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -791,22 +801,321 @@ class RequireCertificatePinningRule extends DartLintRule {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'HttpClient') return;
 
-      // Check if followed by badCertificateCallback assignment
-      final AstNode? parent = node.parent;
-      if (parent is VariableDeclaration) {
-        // Look for cascade or subsequent assignment
-        final AstNode? grandparent = parent.parent?.parent;
-        if (grandparent is VariableDeclarationStatement) {
-          // Check if there's a cascade
-          if (node.parent is! CascadeExpression) {
-            // Simple HttpClient() without configuration
-            reporter.atNode(node.constructorName, code);
+      // Check if part of a cascade expression that configures certificate callback
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is CascadeExpression) {
+          // Check if any cascade section sets badCertificateCallback
+          final String cascadeSource = current.toSource();
+          if (cascadeSource.contains('badCertificateCallback')) {
+            return; // Properly configured
           }
         }
-      } else if (parent is! CascadeExpression) {
-        // HttpClient created without cascade configuration
-        reporter.atNode(node.constructorName, code);
+        current = current.parent;
       }
+
+      // Not configured with certificate pinning
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+/// Warns when tokens or API keys appear in URLs.
+///
+/// Tokens in URLs are logged, cached, and visible in browser history.
+/// Use headers or request body instead.
+///
+/// Example of **bad** code:
+/// ```dart
+/// final url = 'https://api.example.com?token=$apiToken';
+/// final url = 'https://api.example.com?api_key=abc123';
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final response = await http.get(
+///   Uri.parse('https://api.example.com'),
+///   headers: {'Authorization': 'Bearer $apiToken'},
+/// );
+/// ```
+class AvoidTokenInUrlRule extends SaropaLintRule {
+  const AvoidTokenInUrlRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_token_in_url',
+    problemMessage: 'Avoid putting tokens or API keys in URLs.',
+    correctionMessage:
+        'Use Authorization header or request body for sensitive data.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static final RegExp _tokenPattern = RegExp(
+    r'[?&](token|api_key|apikey|api-key|access_token|auth|key|secret|password|bearer)=',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String value = node.value;
+      if (_tokenPattern.hasMatch(value)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final String source = node.toSource().toLowerCase();
+      if (_tokenPattern.hasMatch(source)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when sensitive data is copied to clipboard.
+///
+/// Clipboard contents can be accessed by other apps and may persist
+/// across app sessions. Never copy passwords or tokens to clipboard.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Clipboard.setData(ClipboardData(text: password));
+/// Clipboard.setData(ClipboardData(text: user.secretToken));
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// // Don't copy sensitive data to clipboard
+/// // Use secure input fields with obscureText instead
+/// ```
+class AvoidClipboardSensitiveRule extends SaropaLintRule {
+  const AvoidClipboardSensitiveRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_clipboard_sensitive',
+    problemMessage: 'Avoid copying sensitive data to clipboard.',
+    correctionMessage:
+        'Clipboard can be read by other apps. Never copy passwords or tokens.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _sensitivePatterns = <String>{
+    'password',
+    'passwd',
+    'secret',
+    'token',
+    'apikey',
+    'api_key',
+    'credential',
+    'private',
+    'auth',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'setData') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Clipboard') return;
+
+      // Check arguments for sensitive variable names
+      for (final Expression arg in node.argumentList.arguments) {
+        final String argSource = arg.toSource().toLowerCase();
+        for (final String pattern in _sensitivePatterns) {
+          if (argSource.contains(pattern)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when passwords are stored in SharedPreferences.
+///
+/// SharedPreferences is plain text storage. Use flutter_secure_storage
+/// or other encrypted storage for passwords.
+///
+/// Example of **bad** code:
+/// ```dart
+/// prefs.setString('password', userPassword);
+/// prefs.setString('user_password', value);
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// // Use flutter_secure_storage
+/// await secureStorage.write(key: 'password', value: userPassword);
+/// ```
+class AvoidStoringPasswordsRule extends SaropaLintRule {
+  const AvoidStoringPasswordsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_storing_passwords',
+    problemMessage: 'Never store passwords in SharedPreferences.',
+    correctionMessage:
+        'Use flutter_secure_storage for passwords and sensitive data.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for SharedPreferences set methods
+      if (!methodName.startsWith('set')) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+        return;
+      }
+
+      if (node.argumentList.arguments.isEmpty) return;
+
+      final Expression firstArg = node.argumentList.arguments.first;
+      final String keySource = firstArg.toSource().toLowerCase();
+
+      if (keySource.contains('password') || keySource.contains('passwd')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when SQL queries are built using string interpolation.
+///
+/// Building SQL queries with string interpolation or concatenation
+/// exposes your application to SQL injection attacks. Always use
+/// parameterized queries instead.
+///
+/// **BAD:**
+/// ```dart
+/// db.rawQuery('SELECT * FROM users WHERE id = $userId');
+/// db.execute('DELETE FROM users WHERE name = "$name"');
+/// db.rawQuery('SELECT * FROM users WHERE email = ' + email);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// db.rawQuery('SELECT * FROM users WHERE id = ?', [userId]);
+/// db.query('users', where: 'id = ?', whereArgs: [userId]);
+/// ```
+class AvoidDynamicSqlRule extends SaropaLintRule {
+  const AvoidDynamicSqlRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dynamic_sql',
+    problemMessage:
+        'SQL query built with string interpolation is vulnerable to SQL injection.',
+    correctionMessage:
+        'Use parameterized queries with ? placeholders and arguments list.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// SQL method names that take a raw query string.
+  static const Set<String> _sqlMethods = <String>{
+    'rawQuery',
+    'rawInsert',
+    'rawUpdate',
+    'rawDelete',
+    'execute',
+    'executeSql',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (!_sqlMethods.contains(methodName)) return;
+
+      if (node.argumentList.arguments.isEmpty) return;
+
+      final Expression firstArg = node.argumentList.arguments.first;
+
+      // Check for string interpolation
+      if (firstArg is StringInterpolation) {
+        reporter.atNode(firstArg, code);
+        return;
+      }
+
+      // Check for string concatenation (binary + with strings)
+      if (firstArg is BinaryExpression && firstArg.operator.lexeme == '+') {
+        // Check if either side looks like SQL
+        final String leftSource = firstArg.leftOperand.toSource().toLowerCase();
+        if (leftSource.contains('select') ||
+            leftSource.contains('insert') ||
+            leftSource.contains('update') ||
+            leftSource.contains('delete') ||
+            leftSource.contains('from') ||
+            leftSource.contains('where')) {
+          reporter.atNode(firstArg, code);
+          return;
+        }
+      }
+
+      // Check for adjacent strings with interpolation
+      if (firstArg is AdjacentStrings) {
+        for (final StringLiteral string in firstArg.strings) {
+          if (string is StringInterpolation) {
+            reporter.atNode(firstArg, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackForDynamicSqlFix()];
+}
+
+class _AddHackForDynamicSqlFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Use parameterized query',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Use parameterized query with ? placeholders\n',
+        );
+      });
     });
   }
 }
