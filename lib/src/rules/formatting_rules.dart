@@ -589,6 +589,12 @@ class FormatCommentFormattingRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  /// Annotation markers that have their own formatting conventions.
+  static final RegExp _annotationMarker = RegExp(
+    r'^(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK)\b',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -623,10 +629,7 @@ class FormatCommentFormattingRule extends SaropaLintRule {
         // Skip empty comments, special markers, and ignore directives
         if (content.isEmpty ||
             content.startsWith('ignore') ||
-            content.startsWith('TODO') ||
-            content.startsWith('FIXME') ||
-            content.startsWith('HACK') ||
-            content.startsWith('XXX')) {
+            _annotationMarker.hasMatch(content)) {
           comment = comment.next;
           continue;
         }

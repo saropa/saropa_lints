@@ -849,8 +849,12 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  /// Pattern to detect sensitive tokens in URLs.
+  ///
+  /// Matches specific token parameter names that are clearly sensitive.
+  /// Generic patterns like 'key' and 'auth' are in [AvoidGenericKeyInUrlRule].
   static final RegExp _tokenPattern = RegExp(
-    r'[?&](token|api_key|apikey|api-key|access_token|auth|key|secret|password|bearer)=',
+    r'[?&](token|api_key|apikey|api-key|access_token|secret|password|bearer)=',
     caseSensitive: false,
   );
 
@@ -1116,6 +1120,58 @@ class _AddHackForDynamicSqlFix extends DartFix {
           '// TODO: Use parameterized query with ? placeholders\n',
         );
       });
+    });
+  }
+}
+
+/// Warns when generic key/auth parameters appear in URLs (insanity tier).
+///
+/// This is a stricter variant of [AvoidTokenInUrlRule] that catches
+/// generic parameter names that might contain sensitive data. More prone
+/// to false positives in test code.
+///
+/// Example of flagged code:
+/// ```dart
+/// final url = 'https://api.example.com?key=$apiKey';
+/// final url = 'https://api.example.com?auth=$authValue';
+/// final url = 'https://api.example.com?authtoken=$token';
+/// ```
+class AvoidGenericKeyInUrlRule extends SaropaLintRule {
+  const AvoidGenericKeyInUrlRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_generic_key_in_url',
+    problemMessage: 'Generic key/auth parameter in URL may contain sensitive data.',
+    correctionMessage:
+        'Consider using Authorization header instead of URL parameters.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Generic patterns that might indicate sensitive data but have higher
+  /// false positive rates than the specific patterns in [AvoidTokenInUrlRule].
+  static final RegExp _genericKeyPattern = RegExp(
+    r'[?&](key|auth|authtoken|auth_token|auth-token)=',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String value = node.value;
+      if (_genericKeyPattern.hasMatch(value)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final String source = node.toSource().toLowerCase();
+      if (_genericKeyPattern.hasMatch(source)) {
+        reporter.atNode(node, code);
+      }
     });
   }
 }

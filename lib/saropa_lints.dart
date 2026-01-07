@@ -82,6 +82,8 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidSingleChildColumnRowRule(),
   AvoidLongParameterListRule(),
   PreferBooleanPrefixesRule(),
+  PreferBooleanPrefixesForLocalsRule(),
+  PreferBooleanPrefixesForParamsRule(),
   AvoidReturningCascadesRule(),
   AvoidPositionalRecordFieldAccessRule(),
   AvoidDeclaringCallMethodRule(),
@@ -370,6 +372,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidUnnecessaryFuturesRule(),
   AvoidThrowInFinallyRule(),
   AvoidUnnecessaryNullableReturnTypeRule(),
+  PreferAsyncCallbackRule(),
 
   // Performance rules
   AvoidListViewWithoutItemExtentRule(),
@@ -503,6 +506,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidEvalLikePatternsRule(),
   RequireCertificatePinningRule(),
   AvoidTokenInUrlRule(),
+  AvoidGenericKeyInUrlRule(),
   AvoidClipboardSensitiveRule(),
   AvoidStoringPasswordsRule(),
 

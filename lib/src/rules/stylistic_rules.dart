@@ -1585,8 +1585,63 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
   );
 
   /// Pattern for code-like references at start of comment.
+  /// Matches: identifier followed by space, or identifier in prose context.
   static final RegExp _codeReferencePattern = RegExp(
     r'^[a-z_][a-zA-Z0-9_]*\s',
+  );
+
+  /// Pattern for Dart keywords that typically start code statements.
+  /// These indicate commented-out code rather than prose comments.
+  static final RegExp _dartKeywordPattern = RegExp(
+    r'^(return|if|else|for|while|do|switch|case|break|continue|'
+    r'try|catch|finally|throw|rethrow|assert|'
+    r'var|final|const|late|'
+    r'void|int|double|bool|String|List|Map|Set|Future|Stream|'
+    r'class|extends|implements|with|mixin|abstract|'
+    r'import|export|part|library|'
+    r'await|async|yield|'
+    r'new|super|this|null|true|false|'
+    r'get|set|operator|typedef|enum|extension|'
+    r'static|external|factory|covariant|required|'
+    r'show|hide|as|is|in|on|when)\b',
+  );
+
+  /// Pattern for commented-out code constructs.
+  /// Matches: function calls, assignments, method chains, operators, etc.
+  static final RegExp _commentedOutCodePattern = RegExp(
+    // identifier followed by ( or . or = or ; or < or [ or {
+    r'^[a-z_][a-zA-Z0-9_]*\s*[(.=;<\[{]|'
+    // starts with underscore (private identifier)
+    r'^_[a-zA-Z0-9_]+|'
+    // contains semicolon (likely code)
+    r';$|;\s|'
+    // contains common code operators
+    r'[+\-*/]=|'
+    // arrow functions
+    r'=>|'
+    // generics
+    r'<[A-Z][a-zA-Z0-9_,\s]*>',
+  );
+
+  /// Pattern for standalone code symbols (brackets, braces, etc.).
+  /// These are typically part of commented-out code blocks.
+  static final RegExp _codeSymbolOnlyPattern = RegExp(
+    // Just brackets/braces/parens (with optional trailing content)
+    r'^[\{\}\[\]\(\)]+\s*$|'
+    // Closing bracket with comma or semicolon
+    r'^[\}\]\)][,;]?\s*$|'
+    // Opening bracket possibly with content
+    r'^[\{\[\(]\s*\S|'
+    // Increment/decrement
+    r'\+\+|--|'
+    // Ternary operator parts
+    r'^\s*[?:]|'
+    // Spread operator
+    r'^\.\.\.|'
+    // Null-aware operators
+    r'\?\?|'
+    // Cascade
+    r'^\.\.',
   );
 
   /// Pattern to check if first character is lowercase letter.
@@ -1636,6 +1691,24 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
     // Skip if starts with code-like patterns (variable names, etc.)
     // e.g., "// userId is the..." or "// _privateField holds..."
     if (_codeReferencePattern.hasMatch(trimmed)) {
+      return;
+    }
+
+    // Skip commented-out code: lines starting with Dart keywords
+    // e.g., "// return value;" or "// if (condition) {"
+    if (_dartKeywordPattern.hasMatch(trimmed)) {
+      return;
+    }
+
+    // Skip commented-out code: lines with code constructs
+    // e.g., "// doSomething();" or "// value = 42;"
+    if (_commentedOutCodePattern.hasMatch(trimmed)) {
+      return;
+    }
+
+    // Skip commented-out code: standalone symbols like { } [ ] ( )
+    // These are typically part of multi-line commented-out code blocks
+    if (_codeSymbolOnlyPattern.hasMatch(trimmed)) {
       return;
     }
 
@@ -2412,6 +2485,44 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   /// Pattern to detect if comment starts with a capital letter.
   static final RegExp _startsWithCapital = RegExp(r'^[A-Z]');
 
+  /// Pattern to detect annotation markers like TODO:, FIX:, NOTE:, HACK:, etc.
+  /// Matches uppercase words followed by optional colon at the start.
+  static final RegExp _annotationMarker = RegExp(
+    r'^(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK)\b',
+    caseSensitive: false,
+  );
+
+  /// Pattern to detect commented-out code.
+  /// Matches lines that look like Dart code rather than documentation.
+  static final RegExp _commentedOutCode = RegExp(
+    r'^('
+    // Type declarations with variable names (e.g., "String? get", "int foo")
+    r'(String|int|double|bool|num|void|dynamic|var|final|const|late|List|Map|Set|Future|Stream)\b'
+    r'|'
+    // Return statements
+    r'return\s'
+    r'|'
+    // Control flow
+    r'(if|else|for|while|switch|case|break|continue|try|catch|finally|throw)\s*[\(\{]?'
+    r'|'
+    // Assignment or arrow functions
+    r'\w+\s*(=|=>)\s*'
+    r'|'
+    // Method calls or property access starting a line
+    r'(this|super)\.'
+    r'|'
+    // Closing braces/brackets or semicolons typical of code
+    r'[\}\];]\s*$'
+    r'|'
+    // Import/export statements
+    r"(import|export|part)\s+['" r'"]'
+    r'|'
+    // Class/method modifiers
+    r'(abstract|static|override|async|await)\s'
+    r')',
+    caseSensitive: true,
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -2479,13 +2590,21 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
           !lexeme.contains('ignore_for_file:')) {
         // Check if it looks like a documentation comment (describes the member)
         final String content = lexeme.substring(2).trim();
+        // Skip annotation markers like TODO:, FIX:, NOTE:, HACK:, etc.
+        if (_annotationMarker.hasMatch(content)) {
+          comment = comment.next;
+          continue;
+        }
+
+        // Skip commented-out code
+        if (_commentedOutCode.hasMatch(content)) {
+          comment = comment.next;
+          continue;
+        }
+
+        // Only flag if it looks like a description (starts with capital letter
+        // or common doc patterns)
         if (content.isNotEmpty &&
-            !content.startsWith('TODO') &&
-            !content.startsWith('FIXME') &&
-            !content.startsWith('NOTE') &&
-            !content.startsWith('HACK') &&
-            // Only flag if it looks like a description (starts with capital letter
-            // or common doc patterns)
             (_startsWithCapital.hasMatch(content) ||
                 content.startsWith('Returns') ||
                 content.startsWith('Gets') ||

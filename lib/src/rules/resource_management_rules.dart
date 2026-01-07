@@ -156,6 +156,12 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Patterns that indicate actual database instantiation.
+  /// Uses word boundary patterns to avoid false positives like 'initIsarDatabase('.
+  static final RegExp _dbOpenPattern = RegExp(
+    r'(?:^|[^a-zA-Z])(?:openDatabase|Database\(|SqliteDatabase)',
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -166,10 +172,9 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
       final FunctionBody body = node.body;
       final String bodySource = body.toSource();
 
-      // Check for database open calls
-      if (!bodySource.contains('openDatabase') &&
-          !bodySource.contains('Database(') &&
-          !bodySource.contains('SqliteDatabase')) {
+      // Check for database open calls with word boundary to avoid
+      // false positives from method names like 'initIsarDatabase'
+      if (!_dbOpenPattern.hasMatch(bodySource)) {
         return;
       }
 
