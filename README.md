@@ -4,6 +4,8 @@
 
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
+[![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
+[![rules](https://img.shields.io/badge/rules-650%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -277,20 +279,6 @@ custom_lint uses the Dart analyzer plugin system, which has known reliability is
 3. Check **View → Output → Dart Analysis Server** for errors
 4. If still not working, use the CLI - it's reliable
 
-**If custom_lint crashes:**
-
-If you see native crashes (e.g., `ExceptionCode=-1073741819` on Windows), clear the analysis cache:
-
-```bash
-# Windows
-rmdir /s /q .dart_tool && flutter pub get
-
-# macOS/Linux
-rm -rf .dart_tool && flutter pub get
-```
-
-Then run `dart run custom_lint` again.
-
 **For reliable workflows, use:**
 - Pre-commit hooks
 - CI/CD checks
@@ -356,6 +344,62 @@ Then restart VS Code.
 - A **"Lints"** button in the status bar (bottom of VS Code)
 - A search icon in the editor title bar when viewing Dart files
 - Both trigger `dart run custom_lint` and open the Problems panel
+
+## Troubleshooting
+
+### IDE doesn't show lint warnings
+
+If your IDE isn't automatically detecting lint issues:
+
+1. **Use the keyboard shortcut**: Press **Ctrl+Shift+B** (or **Cmd+Shift+B** on Mac) to run custom_lint manually via the VS Code task
+2. **Use the bug button**: If you installed the status bar extension, click the **"Lints"** button in the status bar or the search icon in the editor title bar
+3. Restart VS Code completely (not just the analysis server)
+4. Check **View → Output → Dart Analysis Server** for errors
+5. If IDE integration remains unreliable, use the CLI directly: `dart run custom_lint`
+
+### Out of Memory errors
+
+If you see errors like:
+```
+../../runtime/vm/zone.cc: 96: error: Out of memory.
+Crash occurred when compiling package:analyzer/... in optimizing JIT mode
+```
+
+**Solution 1: Clear the pub cache** (most effective)
+```bash
+dart pub cache clean
+dart pub get
+dart run custom_lint
+```
+
+**Solution 2: Increase Dart heap size** (PowerShell)
+```powershell
+$env:DART_VM_OPTIONS="--old_gen_heap_size=4096"
+dart run custom_lint
+```
+
+**Solution 3: Delete local build artifacts**
+```bash
+# Windows
+rmdir /s /q .dart_tool && dart pub get
+
+# macOS/Linux
+rm -rf .dart_tool && dart pub get
+```
+
+### Native crashes (Windows)
+
+If you see native crashes with error codes like `ExceptionCode=-1073741819`:
+
+```bash
+# Windows
+rmdir /s /q .dart_tool && flutter pub get
+
+# macOS/Linux
+rm -rf .dart_tool && flutter pub get
+```
+
+Then run `dart run custom_lint` again.
 
 ## Contributing
 
