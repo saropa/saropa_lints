@@ -5,6 +5,144 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-01-07
+
+### Fixed
+
+- **Fixture files in example directory were being skipped** - The `skipFixtureFiles` logic incorrectly skipped all `*_fixture.dart` files, including test fixtures in the `example/` directory that are specifically for validating lint rules. Now fixture files in `example/` and `examples/` directories are analyzed.
+
+- **`avoid_unsafe_collection_methods`** - Fixed enum `.values` detection:
+  - `TestEnum.values.first` was incorrectly flagged as unsafe
+  - Now properly recognizes `List<EnumType>` from `.values` as guaranteed non-empty
+  - Uses `staticType` of the entire expression to detect enum element types
+
+- **`prefer_where_or_null`** - Made type checking more robust:
+  - Changed from `startsWith` to `contains` for type name matching
+  - Now handles cases where type resolution returns null gracefully
+
+- **Removed duplicate rule** - `MissingTestAssertionRule` was duplicating `RequireTestAssertionsRule`. Removed the duplicate from test_rules.dart.
+
+- **`prefer_unique_test_names`** - Fixed potential race condition where `testNames` set was cleared in one callback but used in another. Refactored to use visitor pattern inside single callback.
+
+- **`avoid_unnecessary_return`** - Quick fix now properly deletes the unnecessary return statement instead of commenting it out.
+
+- **Test file detection** - Fixed 4 rules to detect test files in `/test/` and `\test\` directories, not just `_test.dart` suffix:
+  - `AvoidEmptyTestGroupsRule`
+  - `PreferExpectLaterRule`
+  - `PreferTestStructureRule`
+  - `AvoidTopLevelMembersInTestsRule`
+
+- **`no_empty_block`** - Quick fix no longer uses hardcoded 6-space indentation; now uses minimal indentation and relies on formatter.
+
+### Changed
+
+- **`FormatTestNameRule`** - Renamed to `PreferDescriptiveTestNameRule` to match its LintCode name `prefer_descriptive_test_name`.
+
+- **Example analysis_options.yaml** - Explicitly enabled `avoid_debug_print`, `avoid_print_in_production`, and `prefer_where_or_null` for fixture testing (these rules are in higher tiers than the default `recommended` tier)
+
+### Added
+
+- **`prefer_expect_later`** - Added quick fix that replaces `expect` with `expectLater` for Future assertions.
+
+- **`prefer_returning_shorthands`** - Added quick fix that converts `{ return x; }` to `=> x` arrow syntax.
+
+## [1.5.0] - 2026-01-07
+
+### Changed
+
+- **`require_animation_controller_dispose`** - Improved detection accuracy:
+  - Now recognizes `disposeSafe()` as a valid disposal method alongside `dispose()`, supporting safe disposal extension patterns commonly used in Flutter apps
+  - Excludes collection types (`List<>`, `Set<>`, `Map<>`, `Iterable<>`) containing AnimationController from detection, as these require loop-based disposal patterns that the rule cannot validate
+  - Expanded documentation with detection criteria, valid disposal patterns, and collection handling guidance
+
+### Added
+
+- **24 new lint rules** across 7 categories:
+
+  **Animation Rules (5)** - New `animation_rules.dart`:
+  - `require_vsync_mixin` - AnimationController requires vsync parameter; warns when missing [Error tier] (quick-fix)
+  - `avoid_animation_in_build` - AnimationController in build() recreates on every rebuild [Error tier]
+  - `require_animation_controller_dispose` - AnimationController must be disposed to prevent memory leaks [Error tier] (quick-fix)
+  - `require_hero_tag_uniqueness` - Duplicate Hero tags cause "Multiple heroes" runtime error [Error tier]
+  - `avoid_layout_passes` - IntrinsicWidth/Height cause two layout passes, hurting performance [Warning tier]
+
+  **Forms & Validation Rules (4)** - New `forms_rules.dart`:
+  - `prefer_autovalidate_on_interaction` - AutovalidateMode.always validates every keystroke; poor UX [Info tier] (quick-fix)
+  - `require_keyboard_type` - Email/phone fields should use appropriate keyboardType [Info tier]
+  - `require_text_overflow_in_row` - Text in Row without overflow handling may cause overflow errors [Info tier]
+  - `require_secure_keyboard` - Password fields must use obscureText: true [Warning tier] (quick-fix)
+
+  **Navigation Rules (2)** - New `navigation_rules.dart`:
+  - `require_unknown_route_handler` - MaterialApp/CupertinoApp with routes should have onUnknownRoute [Warning tier]
+  - `avoid_context_after_navigation` - Using context after await navigation; widget may be disposed [Warning tier] (quick-fix)
+
+  **Firebase & Database Rules (4)** - New `firebase_rules.dart`:
+  - `avoid_firestore_unbounded_query` - Firestore query without limit() could return excessive data [Warning tier]
+  - `avoid_database_in_build` - Database query in build() runs on every rebuild [Warning tier]
+  - `require_prefs_key_constants` - SharedPreferences keys should be constants, not string literals [Info tier]
+  - `avoid_secure_storage_on_web` - flutter_secure_storage uses localStorage on web (not secure) [Warning tier]
+
+  **Security Rules (3)**:
+  - `prefer_secure_random` - Random() is predictable; use Random.secure() for security-sensitive code [Warning tier] (quick-fix)
+  - `prefer_typed_data` - List<int> for binary data wastes memory; use Uint8List instead [Info tier]
+  - `avoid_unnecessary_to_list` - .toList() may be unnecessary; lazy iterables are more efficient [Info tier]
+
+  **State Management Rules (3)**:
+  - `avoid_provider_of_in_build` - Provider.of in build() causes rebuilds; use context.read() for actions [Info tier]
+  - `avoid_get_find_in_build` - Get.find() in build() is inefficient; use GetBuilder or Obx instead [Info tier]
+  - `avoid_provider_recreate` - Provider created in frequently rebuilding build() loses state [Warning tier]
+
+  **Accessibility Rules (3)**:
+  - `avoid_text_scale_factor_ignore` - Don't ignore textScaleFactor; users need accessibility scaling [Warning tier]
+  - `require_image_semantics` - Decorative images should use excludeFromSemantics: true [Info tier]
+  - `avoid_hidden_interactive` - Interactive elements hidden from screen readers but visible [Warning tier]
+
+### Fixed
+
+- **RequireHeroTagUniquenessRule** - Fixed logic bug where heroTags map was local to runWithReporter callback, preventing duplicate detection across file. Now uses CompilationUnit visitor pattern.
+
+- **Quick fix professionalism** - Replaced all "HACK" comments with "TODO" comments across 10 rule files (34 quick fixes total):
+  - async_rules.dart (7 fixes)
+  - collection_rules.dart (2 fixes)
+  - control_flow_rules.dart (1 fix)
+  - complexity_rules.dart (2 fixes)
+  - error_handling_rules.dart (1 fix)
+  - equality_rules.dart (4 fixes)
+  - exception_rules.dart (3 fixes)
+  - performance_rules.dart (2 fixes)
+  - structure_rules.dart (5 fixes)
+  - type_rules.dart (7 fixes)
+
+## [1.4.4] - 2025-01-07
+
+### Changed
+
+- **ROADMAP.md** - Major documentation expansion:
+  - Expanded all rule descriptions in sections 2.1-2.6 with detailed, actionable explanations
+  - Added 14 new rule categories (sections 2.7-2.20) with 130+ new planned rules:
+    - 2.7 Animation Rules (12 rules)
+    - 2.8 Navigation & Routing Rules (16 rules)
+    - 2.9 Forms & Validation Rules (12 rules)
+    - 2.10 Database & Storage Rules (14 rules)
+    - 2.11 Platform-Specific Rules (24 rules for iOS, Android, Web, Desktop)
+    - 2.12 Firebase Rules (12 rules)
+    - 2.13 Offline-First & Sync Rules (8 rules)
+    - 2.14 Background Processing Rules (6 rules)
+    - 2.15 Push Notification Rules (8 rules)
+    - 2.16 Payment & In-App Purchase Rules (8 rules)
+    - 2.17 Maps & Location Rules (8 rules)
+    - 2.18 Camera & Media Rules (8 rules)
+    - 2.19 Theming & Dark Mode Rules (8 rules)
+    - 2.20 Responsive & Adaptive Design Rules (10 rules)
+  - Total planned rules now 347 (up from ~253)
+
+- **README.md** - Updated rule counts:
+  - Essential tier: 60 critical rules (was 55)
+  - Total implemented: 628 rules (was 500+)
+  - Added planned rule count (347) to project description
+
+- **cspell.json** - Added technical terms: assetlinks, autovalidate, backgrounded, backgrounding, EXIF, geofencing, unfocus, unindexed, vsync, workmanager
+
 ## [1.4.3] - 2025-01-07
 
 ### Added

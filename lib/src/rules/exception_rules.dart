@@ -306,14 +306,14 @@ class _AddHackForNonFinalExceptionFieldFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for non-final field',
+        message: 'Add TODO comment for non-final field',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: make this field final\n  ',
+          '// TODO: make this field final\n  ',
         );
       });
     });
@@ -333,14 +333,14 @@ class _AddHackForOnlyRethrowFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for pointless rethrow',
+        message: 'Add TODO comment for pointless rethrow',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: remove try-catch or add error handling */ ',
+          '/* TODO: remove try-catch or add error handling */ ',
         );
       });
     });
@@ -360,14 +360,14 @@ class _AddHackForThrowInCatchFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for throw in catch',
+        message: 'Add TODO comment for throw in catch',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: use rethrow or Error.throwWithStackTrace */ ',
+          '/* TODO: use rethrow or Error.throwWithStackTrace */ ',
         );
       });
     });

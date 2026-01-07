@@ -19,7 +19,7 @@ Usage:
 
 The extension adds:
     - Status bar button: Click "Lints" to run custom_lint
-    - Editor title icon: Search icon when viewing Dart files
+    - Editor title icon: Bug icon when viewing Dart files
     - Keyboard shortcut: Ctrl+Shift+B (same as build task)
 
 Exit Codes:
@@ -317,7 +317,7 @@ def display_extension_info(source_dir: Path) -> None:
 
     print_colored("  Features:", Color.WHITE)
     print_colored("      - Status bar button: Click 'Lints' to run custom_lint", Color.CYAN)
-    print_colored("      - Editor title icon: Search icon when viewing Dart files", Color.CYAN)
+    print_colored("      - Editor title icon: Bug icon when viewing Dart files", Color.CYAN)
     print_colored("      - Keyboard shortcut: Ctrl+Shift+B (Cmd+Shift+B on Mac)", Color.CYAN)
     print()
 

@@ -19,7 +19,7 @@
       {
         "command": "saropa-lints.run",
         "title": "Run Saropa Lints",
-        "icon": "$(search)",
+        "icon": "$(bug)",
         "category": "Saropa"
       }
     ],

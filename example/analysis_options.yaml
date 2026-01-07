@@ -13,3 +13,8 @@ custom_lint:
   rules:
     # Enable for testing fixture files
     - prefer_async_callback: true
+    # Enable debug rules for testing (they're in higher tiers)
+    - avoid_debug_print: true
+    - avoid_print_in_production: true
+    # Explicitly enable to debug
+    - prefer_where_or_null: true

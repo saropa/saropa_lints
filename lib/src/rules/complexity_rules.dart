@@ -738,14 +738,14 @@ class _AddHackForCascadeAfterIfNullFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for cascade precedence',
+        message: 'Add TODO comment for cascade precedence',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: wrap ?? expression in parentheses\n',
+          '// TODO: wrap ?? expression in parentheses\n',
         );
       });
     });
@@ -765,14 +765,14 @@ class _AddHackForDuplicateCascadeFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for duplicate cascade',
+        message: 'Add TODO comment for duplicate cascade',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: duplicate cascade - remove or verify intentional\n',
+          '// TODO: duplicate cascade - remove or verify intentional\n',
         );
       });
     });
