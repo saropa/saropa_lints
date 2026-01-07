@@ -13,12 +13,12 @@ This script automates the complete release workflow for the saropa_lints package
   8. Validates version exists in CHANGELOG.md
   9. Generates documentation with dart doc
   10. Pre-publish validation (dry-run)
-  11. PUBLISHES TO PUB.DEV FIRST
-  12. Commits and pushes changes
-  13. Creates and pushes git tag
+  11. Commits and pushes changes
+  12. Creates and pushes git tag (triggers GitHub Actions publish workflow)
+  13. GitHub Actions automatically publishes to pub.dev
   14. Creates GitHub release with release notes
 
-Version:   3.5
+Version:   3.9
 Author:    Saropa
 Copyright: (c) 2025 Saropa
 
@@ -68,7 +68,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.8"
+SCRIPT_VERSION = "3.9"
 
 
 # =============================================================================
@@ -796,32 +796,12 @@ def get_pub_account() -> str | None:
 
 
 def publish_to_pubdev(project_dir: Path) -> bool:
-    """Publish to pub.dev via GitHub Actions."""
+    """Notify that publishing happens automatically via GitHub Actions tag trigger."""
     print_header("STEP 12: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
 
-    use_shell = get_shell_mode()
-
-    # Trigger GitHub Actions workflow
-    print_info("Triggering GitHub Actions publish workflow...")
-    result = subprocess.run(
-        ["gh", "workflow", "run", "publish.yml"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell
-    )
-
-    if result.returncode != 0:
-        print_error("Failed to trigger GitHub Actions workflow")
-        if result.stderr:
-            print(result.stderr)
-        print_info("Make sure you have 'gh' CLI installed and authenticated.")
-        print_info("Run: gh auth login")
-        return False
-
-    print_success("GitHub Actions publish workflow triggered!")
+    print_success("Tag push triggered GitHub Actions publish workflow!")
     print()
-    print_colored("  The publish is now running on GitHub Actions.", Color.CYAN)
+    print_colored("  Publishing is now running automatically on GitHub Actions.", Color.CYAN)
     print_colored("  No personal email will be shown on pub.dev.", Color.GREEN)
     print()
 
