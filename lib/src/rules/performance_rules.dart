@@ -139,14 +139,14 @@ class _AddHackForMissingKeyFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for missing key',
+        message: 'Add TODO comment for missing key',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: add key parameter for proper animations\n',
+          '// TODO: add key parameter for proper animations\n',
         );
       });
     });
@@ -1152,14 +1152,14 @@ class _AddHackForSetStateInBuildFix extends DartFix {
       if (node.methodName.name != 'setState') return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for setState in build',
+        message: 'Add TODO comment for setState in build',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: wrap in addPostFrameCallback or move to event handler\n',
+          '// TODO: wrap in addPostFrameCallback or move to event handler\n',
         );
       });
     });

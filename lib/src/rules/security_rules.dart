@@ -163,10 +163,10 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackForSensitiveLoggingFix()];
+  List<Fix> getFixes() => <Fix>[_AddTodoForSensitiveLoggingFix()];
 }
 
-class _AddHackForSensitiveLoggingFix extends DartFix {
+class _AddTodoForSensitiveLoggingFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -179,14 +179,14 @@ class _AddHackForSensitiveLoggingFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for sensitive data logging',
+        message: 'Add TODO comment for sensitive data logging',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: remove sensitive data from this log statement\n',
+          '// TODO: remove sensitive data from this log statement\n',
         );
       });
     });
@@ -197,14 +197,14 @@ class _AddHackForSensitiveLoggingFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for sensitive data logging',
+        message: 'Add TODO comment for sensitive data logging',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: remove sensitive data from this log statement\n',
+          '// TODO: remove sensitive data from this log statement\n',
         );
       });
     });
@@ -385,10 +385,10 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackForHardcodedCredentialsFix()];
+  List<Fix> getFixes() => <Fix>[_AddTodoForHardcodedCredentialsFix()];
 }
 
-class _AddHackForHardcodedCredentialsFix extends DartFix {
+class _AddTodoForHardcodedCredentialsFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -401,14 +401,14 @@ class _AddHackForHardcodedCredentialsFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for hardcoded credential',
+        message: 'Add TODO comment for hardcoded credential',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: use environment variable or secure storage instead\n',
+          '// TODO: use environment variable or secure storage instead\n',
         );
       });
     });
@@ -417,14 +417,14 @@ class _AddHackForHardcodedCredentialsFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for hardcoded credential',
+        message: 'Add TODO comment for hardcoded credential',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: use environment variable or secure storage instead\n',
+          '// TODO: use environment variable or secure storage instead\n',
         );
       });
     });
@@ -713,10 +713,10 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackForEvalPatternFix()];
+  List<Fix> getFixes() => <Fix>[_AddTodoForEvalPatternFix()];
 }
 
-class _AddHackForEvalPatternFix extends DartFix {
+class _AddTodoForEvalPatternFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -729,14 +729,14 @@ class _AddHackForEvalPatternFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for dynamic code execution',
+        message: 'Add TODO comment for dynamic code execution',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: replace with static dispatch or explicit mapping\n',
+          '// TODO: replace with static dispatch or explicit mapping\n',
         );
       });
     });
@@ -745,14 +745,14 @@ class _AddHackForEvalPatternFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for dart:mirrors import',
+        message: 'Add TODO comment for dart:mirrors import',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: remove dart:mirrors usage for security\n',
+          '// TODO: remove dart:mirrors usage for security\n',
         );
       });
     });
@@ -1094,10 +1094,10 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackForDynamicSqlFix()];
+  List<Fix> getFixes() => <Fix>[_AddTodoForDynamicSqlFix()];
 }
 
-class _AddHackForDynamicSqlFix extends DartFix {
+class _AddTodoForDynamicSqlFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -1173,6 +1173,238 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
       if (_genericKeyPattern.hasMatch(source)) {
         reporter.atNode(node, code);
       }
+    });
+  }
+}
+
+/// Warns when Random() is used instead of Random.secure().
+///
+/// Random() uses a predictable pseudo-random number generator that is
+/// not suitable for security-sensitive operations like generating tokens,
+/// passwords, or cryptographic keys.
+///
+/// **BAD:**
+/// ```dart
+/// final random = Random();
+/// final token = List.generate(32, (_) => random.nextInt(256));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final random = Random.secure();
+/// final token = List.generate(32, (_) => random.nextInt(256));
+/// ```
+class PreferSecureRandomRule extends SaropaLintRule {
+  const PreferSecureRandomRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_secure_random',
+    problemMessage:
+        'Random() is predictable. Use Random.secure() for security-sensitive code.',
+    correctionMessage:
+        'Replace Random() with Random.secure() for tokens, passwords, or crypto.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+      if (constructorName != 'Random') return;
+
+      // Check if it's Random() not Random.secure()
+      final String? namedConstructor = node.constructorName.name?.name;
+      if (namedConstructor == 'secure') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseSecureRandomFix()];
+}
+
+class _UseSecureRandomFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use Random.secure()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'Random.secure()',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when List<int> is used for binary data instead of Uint8List.
+///
+/// Uint8List is more memory-efficient for binary data and provides better
+/// interoperability with native code and I/O operations. List<int> uses
+/// 8 bytes per element vs 1 byte for Uint8List.
+///
+/// **BAD:**
+/// ```dart
+/// final List<int> bytes = utf8.encode(text);
+/// final List<int> fileContents = await file.readAsBytes();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final Uint8List bytes = Uint8List.fromList(utf8.encode(text));
+/// final Uint8List fileContents = await file.readAsBytes();
+/// ```
+class PreferTypedDataRule extends SaropaLintRule {
+  const PreferTypedDataRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_typed_data',
+    problemMessage:
+        'List<int> for binary data wastes memory. Use Uint8List instead.',
+    correctionMessage:
+        'Use Uint8List for binary data - 8x more memory efficient.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      // Get the type from the parent VariableDeclarationList
+      final AstNode? parent = node.parent;
+      if (parent is! VariableDeclarationList) return;
+
+      final TypeAnnotation? typeAnnotation = parent.type;
+      if (typeAnnotation == null) return;
+
+      final String typeSource = typeAnnotation.toSource();
+
+      // Check for List<int> pattern
+      if (typeSource == 'List<int>' || typeSource == 'List<int>?') {
+        // Check if this looks like binary data based on variable name
+        final String varName = node.name.lexeme.toLowerCase();
+        if (varName.contains('byte') ||
+            varName.contains('data') ||
+            varName.contains('buffer') ||
+            varName.contains('content') ||
+            varName.contains('binary')) {
+          reporter.atNode(typeAnnotation, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when .toList() is called unnecessarily on iterable operations.
+///
+/// Calling .toList() after .map(), .where(), .take(), etc. creates an
+/// intermediate list that may not be needed. Dart's lazy iterables are
+/// more memory efficient.
+///
+/// **BAD:**
+/// ```dart
+/// final names = users.map((u) => u.name).toList();
+/// for (final name in names) { ... }
+///
+/// final adults = users.where((u) => u.age >= 18).toList();
+/// return adults.length;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final names = users.map((u) => u.name);
+/// for (final name in names) { ... }
+///
+/// final adults = users.where((u) => u.age >= 18);
+/// return adults.length;
+/// ```
+class AvoidUnnecessaryToListRule extends SaropaLintRule {
+  const AvoidUnnecessaryToListRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unnecessary_to_list',
+    problemMessage:
+        '.toList() may be unnecessary here. Lazy iterables are more efficient.',
+    correctionMessage:
+        'Remove .toList() unless you need to modify the list or access by index.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'toList') return;
+
+      // Check if this is chained after an iterable method
+      final Expression? target = node.target;
+      if (target is! MethodInvocation) return;
+
+      final String previousMethod = target.methodName.name;
+      const Set<String> iterableMethods = <String>{
+        'map',
+        'where',
+        'take',
+        'skip',
+        'takeWhile',
+        'skipWhile',
+        'expand',
+        'cast',
+        'whereType',
+      };
+
+      if (!iterableMethods.contains(previousMethod)) return;
+
+      // Check how the result is used
+      final AstNode? parent = node.parent;
+
+      // If it's assigned to a variable, check if the variable type requires List
+      if (parent is VariableDeclaration) {
+        final AstNode? declParent = parent.parent;
+        if (declParent is VariableDeclarationList) {
+          final TypeAnnotation? type = declParent.type;
+          if (type != null && type.toSource().startsWith('List')) {
+            return; // List type is explicitly required
+          }
+        }
+      }
+
+      // If it's returned directly, we can't easily check the return type
+      if (parent is ReturnStatement) return;
+
+      // If passed as argument, we can't easily check parameter type
+      if (parent is ArgumentList) return;
+
+      // Otherwise, suggest removing toList
+      reporter.atNode(node.methodName, code);
     });
   }
 }

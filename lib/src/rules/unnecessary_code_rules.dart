@@ -1146,11 +1146,12 @@ class _AddEmptyBlockCommentFix extends DartFix {
       );
 
       changeBuilder.addDartFileEdit((builder) {
-        // Insert comment after the opening brace
+        // Insert comment after the opening brace with minimal indentation
+        // The formatter will adjust indentation appropriately
         final int insertOffset = node.leftBracket.end;
         builder.addSimpleInsertion(
           insertOffset,
-          '\n      // TODO: Intentionally empty - explain why\n    ',
+          '\n  // TODO: Intentionally empty - explain why\n',
         );
       });
     });
