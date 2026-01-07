@@ -227,7 +227,8 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_prefs_key_constants',
-    problemMessage: 'SharedPreferences key should be a constant, not a string literal.',
+    problemMessage:
+        'SharedPreferences key should be a constant, not a string literal.',
     correctionMessage:
         'Define preference keys as constants to avoid typos and enable refactoring.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -341,8 +342,7 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
         }
         if (current is ConditionalExpression) {
           final String condition = current.condition.toSource();
-          if (condition.contains('kIsWeb') ||
-              condition.contains('Platform.')) {
+          if (condition.contains('kIsWeb') || condition.contains('Platform.')) {
             hasWebCheck = true;
             break;
           }

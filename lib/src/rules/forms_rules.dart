@@ -159,7 +159,8 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'TextFormField' && constructorName != 'TextField') {
+      if (constructorName != 'TextFormField' &&
+          constructorName != 'TextField') {
         return;
       }
 
@@ -357,7 +358,8 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'TextFormField' && constructorName != 'TextField') {
+      if (constructorName != 'TextFormField' &&
+          constructorName != 'TextField') {
         return;
       }
 

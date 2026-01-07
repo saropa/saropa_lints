@@ -44,8 +44,7 @@ class RequireVsyncMixinRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_vsync_mixin',
-    problemMessage:
-        'AnimationController created without vsync parameter.',
+    problemMessage: 'AnimationController created without vsync parameter.',
     correctionMessage:
         'Add vsync: this and use SingleTickerProviderStateMixin or TickerProviderStateMixin.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -457,7 +456,8 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hero_tag_uniqueness',
-    problemMessage: 'Duplicate Hero tag found. This causes "Multiple heroes" error.',
+    problemMessage:
+        'Duplicate Hero tag found. This causes "Multiple heroes" error.',
     correctionMessage:
         'Use unique tags for each Hero widget, e.g., include IDs or indices.',
     errorSeverity: DiagnosticSeverity.ERROR,

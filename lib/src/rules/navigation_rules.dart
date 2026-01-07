@@ -47,7 +47,8 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
     name: 'require_unknown_route_handler',
     problemMessage:
         'App has routes but no onUnknownRoute. Unknown routes will crash.',
-    correctionMessage: 'Add onUnknownRoute to handle undefined routes gracefully.',
+    correctionMessage:
+        'Add onUnknownRoute to handle undefined routes gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

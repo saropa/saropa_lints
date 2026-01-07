@@ -1112,7 +1112,8 @@ class RequireImageSemanticsRule extends SaropaLintRule {
       final Expression? target = node.target;
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
-      if (!<String>{'network', 'asset', 'file', 'memory'}.contains(methodName)) {
+      if (!<String>{'network', 'asset', 'file', 'memory'}
+          .contains(methodName)) {
         return;
       }
 
