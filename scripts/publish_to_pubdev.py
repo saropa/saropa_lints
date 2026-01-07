@@ -4,18 +4,19 @@ Publish saropa_lints package to pub.dev and create GitHub release.
 
 This script automates the complete release workflow for the saropa_lints package:
   1. Checks prerequisites (flutter, git, gh)
-  2. Validates working tree and remote sync status
-  3. Checks remote sync
-  4. Runs tests
-  5. Formats code (ensures CI won't fail on formatting)
-  6. Runs static analysis
-  7. Validates version exists in CHANGELOG.md
-  8. Generates documentation with dart doc
-  9. Pre-publish validation (dry-run)
-  10. PUBLISHES TO PUB.DEV FIRST
-  11. Commits and pushes changes
-  12. Creates and pushes git tag
-  13. Creates GitHub release with release notes
+  2. Validates pubspec.yaml and CHANGELOG.md versions are in sync
+  3. Validates working tree and remote sync status
+  4. Checks remote sync
+  5. Runs tests
+  6. Formats code (ensures CI won't fail on formatting)
+  7. Runs static analysis
+  8. Validates version exists in CHANGELOG.md
+  9. Generates documentation with dart doc
+  10. Pre-publish validation (dry-run)
+  11. PUBLISHES TO PUB.DEV FIRST
+  12. Commits and pushes changes
+  13. Creates and pushes git tag
+  14. Creates GitHub release with release notes
 
 Version:   3.5
 Author:    Saropa
@@ -67,7 +68,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.7"
+SCRIPT_VERSION = "3.8"
 
 
 # =============================================================================
@@ -294,6 +295,21 @@ def get_package_name(pubspec_path: Path) -> str:
     if not match:
         raise ValueError("Could not find name in pubspec.yaml")
     return match.group(1).strip()
+
+
+def get_latest_changelog_version(changelog_path: Path) -> str | None:
+    """Extract the latest version from CHANGELOG.md."""
+    if not changelog_path.exists():
+        return None
+
+    content = changelog_path.read_text(encoding="utf-8")
+
+    # Match the first version header: ## [1.2.3] or ## 1.2.3
+    match = re.search(r"##\s*\[?(\d+\.\d+\.\d+)\]?", content)
+    if match:
+        return match.group(1)
+
+    return None
 
 
 def validate_changelog_version(project_dir: Path, version: str) -> str | None:
@@ -994,6 +1010,22 @@ def main() -> int:
         exit_with_error(
             f"Invalid version format '{version}'. Use semantic versioning: MAJOR.MINOR.PATCH",
             ExitCode.VALIDATION_FAILED
+        )
+
+    # Validate pubspec and changelog versions are in sync
+    changelog_version = get_latest_changelog_version(changelog_path)
+    if changelog_version is None:
+        exit_with_error(
+            "Could not extract version from CHANGELOG.md",
+            ExitCode.CHANGELOG_FAILED
+        )
+
+    if version != changelog_version:
+        exit_with_error(
+            f"Version mismatch: pubspec.yaml has {version}, "
+            f"but CHANGELOG.md latest is {changelog_version}. "
+            "Update one to match the other before publishing.",
+            ExitCode.CHANGELOG_FAILED
         )
 
     print_header("SAROPA LINTS PUBLISHER")
