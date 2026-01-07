@@ -1,9 +1,9 @@
 # Package identity
 name: saropa_lints
 description: >-
-  500+ custom lint rules for Flutter and Dart. Static analysis for security,
-  accessibility, and performance. Free and open source. 5 tiers from Essential to Insanity.
-version: 1.5.2
+  650+ custom lint rules for Flutter and Dart. Static analysis for security,
+  accessibility, and performance. Free and open source. 5 tiers plus optional stylistic rules.
+version: 1.5.3
 license: MIT
 
 # Project links for pub.dev
@@ -26,7 +26,7 @@ environment:
 # Runtime dependencies for lint rule implementation
 dependencies:
   custom_lint_builder: ^0.8.0  # Framework for building custom lint rules
-  analyzer: ">=8.0.0 <10.0.0"  # Dart static analysis engine (8.x+ uses enclosingElement)
+  analyzer: ">=8.0.0 <11.0.0"  # Dart static analysis engine (8.x+ uses enclosingElement)
 
 # Development-only dependencies
 dev_dependencies:
