@@ -714,4 +714,42 @@ Some stylistic rules have valid opposites. Pick what fits your team:
 | Inline callbacks | `prefer_inline_callbacks` | Extracted methods |
 | Extracted methods | (no rule yet) | `prefer_inline_callbacks` |
 
-See [ROADMAP.md](ROADMAP.md) for planned opposing rules.
+See [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) for planned opposing rules.
+
+---
+
+## About This Document
+
+> "Code is read more often than it is written." — Guido van Rossum
+
+> "Any fool can write code that a computer can understand. Good programmers write code that humans can understand." — Martin Fowler
+
+**Stylistic rules** enforce team conventions that have no objectively correct answer. Quote styles, trailing commas, import ordering — these are preferences, not bugs. But consistency matters: it reduces cognitive load during code review, speeds up onboarding, and prevents style debates from derailing productive discussions.
+
+Enable these rules based on your team's consensus. Document your choices. Move on to the work that matters.
+
+**Keywords:** Dart code style, Flutter formatting rules, trailing commas, single quotes vs double quotes, relative imports, explicit types, arrow functions, naming conventions, code consistency, team style guide, Dart linter configuration
+
+**Hashtags:** #Flutter #Dart #CodeStyle #CleanCode #FlutterDev #DartLang #StyleGuide #CodingStandards #TeamConventions #BestPractices
+
+---
+
+## Sources
+
+- **Effective Dart: Style** — Official Dart style recommendations
+  https://dart.dev/effective-dart/style
+
+- **Dart Formatting** — dart format tool documentation
+  https://dart.dev/tools/dart-format
+
+- **Flutter Style Guide** — Flutter team's style conventions
+  https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo
+
+- **Google Dart Style Guide** — Google's internal Dart conventions
+  https://google.github.io/styleguide/
+
+- **Effective Dart: Documentation** — Documentation best practices
+  https://dart.dev/effective-dart/documentation
+
+- **Dart Language Tour** — Language features reference
+  https://dart.dev/language

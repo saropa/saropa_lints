@@ -2,7 +2,7 @@
 
 ## Current Status
 
-See CHANGELOG.md for implemented rules. Goal: 1000 rules.
+See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 1000 rules.
 
 ---
 
@@ -29,7 +29,7 @@ Focus testing on high-impact categories first:
 
 ### How to Add Tests
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) section 5 for the fixture-based testing approach.
+See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) section 5 for the fixture-based testing approach.
 
 ### CI Integration
 
@@ -471,7 +471,7 @@ Everything. For the truly obsessive.
 
 These rules are **not included in any tier** by default. They represent team preferences where there is no objectively "correct" answer. Teams explicitly enable them based on their coding conventions.
 
-> **See [STYLISTIC.md](STYLISTIC.md)** for full documentation on implemented stylistic rules.
+> **See [STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** for full documentation on implemented stylistic rules.
 
 **Planned:**
 
@@ -791,6 +791,50 @@ This section tracks new Dart/Flutter language features that developers should le
 
 ## Contributing
 
-Want to help implement these rules? See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Want to help implement these rules? See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) for guidelines.
 
 Pick a rule from the list above and submit a PR!
+
+---
+
+## About This Document
+
+> "Plans are nothing; planning is everything." — Dwight D. Eisenhower
+
+> "The best time to plant a tree was 20 years ago. The second best time is now." — Chinese Proverb
+
+This **roadmap** outlines our path to 1000 lint rules. The goal is comprehensive coverage of Flutter and Dart best practices — from essential safety rules that prevent crashes to advanced architectural patterns that scale to enterprise applications.
+
+Rules are prioritized by impact: memory safety, security, and accessibility before style preferences. We welcome contributions at any skill level. Pick a rule, implement it, submit a PR. The Flutter community benefits when we all contribute.
+
+**Keywords:** Flutter roadmap, Dart lint rules planned, custom_lint development, Flutter static analysis future, lint rule implementation, open source contribution, Flutter code quality tools, Riverpod lints, Bloc lints, Provider lints, accessibility rules, security rules
+
+**Hashtags:** #Flutter #Dart #OpenSource #Roadmap #Contributing #FlutterDev #DartLang #StaticAnalysis #CodeQuality #Community
+
+---
+
+## Sources
+
+- **Dart 3.x Release Notes** — New language features by version
+  https://dart.dev/guides/language/evolution
+
+- **Flutter Release Notes** — Widget and framework changes
+  https://docs.flutter.dev/release/release-notes
+
+- **custom_lint Documentation** — Building custom lint rules
+  https://pub.dev/packages/custom_lint
+
+- **Dart Analyzer API** — AST visitor documentation
+  https://pub.dev/documentation/analyzer/latest/
+
+- **Riverpod Documentation** — State management patterns
+  https://riverpod.dev/
+
+- **Bloc Documentation** — Bloc pattern best practices
+  https://bloclibrary.dev/
+
+- **WCAG 2.1 Guidelines** — Accessibility success criteria
+  https://www.w3.org/WAI/WCAG21/quickref/
+
+- **OWASP Mobile Security** — Mobile application security testing
+  https://owasp.org/www-project-mobile-security-testing-guide/
