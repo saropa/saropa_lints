@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when file handle is not closed in finally block.
 ///
@@ -40,7 +41,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   await sink.close();
 /// }
 /// ```
-class RequireFileCloseInFinallyRule extends DartLintRule {
+class RequireFileCloseInFinallyRule extends SaropaLintRule {
   const RequireFileCloseInFinallyRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -67,9 +68,9 @@ class RequireFileCloseInFinallyRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -144,7 +145,7 @@ class RequireFileCloseInFinallyRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireDatabaseCloseRule extends DartLintRule {
+class RequireDatabaseCloseRule extends SaropaLintRule {
   const RequireDatabaseCloseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -156,9 +157,9 @@ class RequireDatabaseCloseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -211,7 +212,7 @@ class RequireDatabaseCloseRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireHttpClientCloseRule extends DartLintRule {
+class RequireHttpClientCloseRule extends SaropaLintRule {
   const RequireHttpClientCloseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -222,9 +223,9 @@ class RequireHttpClientCloseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -268,7 +269,7 @@ class RequireHttpClientCloseRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireNativeResourceCleanupRule extends DartLintRule {
+class RequireNativeResourceCleanupRule extends SaropaLintRule {
   const RequireNativeResourceCleanupRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -286,9 +287,9 @@ class RequireNativeResourceCleanupRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -350,7 +351,7 @@ class RequireNativeResourceCleanupRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireWebSocketCloseRule extends DartLintRule {
+class RequireWebSocketCloseRule extends SaropaLintRule {
   const RequireWebSocketCloseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -361,9 +362,9 @@ class RequireWebSocketCloseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -439,7 +440,7 @@ class RequireWebSocketCloseRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequirePlatformChannelCleanupRule extends DartLintRule {
+class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   const RequirePlatformChannelCleanupRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -450,9 +451,9 @@ class RequirePlatformChannelCleanupRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -526,7 +527,7 @@ class RequirePlatformChannelCleanupRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireIsolateKillRule extends DartLintRule {
+class RequireIsolateKillRule extends SaropaLintRule {
   const RequireIsolateKillRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -537,9 +538,9 @@ class RequireIsolateKillRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {

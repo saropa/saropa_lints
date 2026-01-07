@@ -6,27 +6,29 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when calling .ignore() on a Future.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidFutureIgnoreRule extends DartLintRule {
+class AvoidFutureIgnoreRule extends SaropaLintRule {
   const AvoidFutureIgnoreRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_ignore',
-    problemMessage: 'Avoid using .ignore() on Futures.',
+    problemMessage:
+        'Future.ignore() silently discards errors. Failures will go unnoticed.',
     correctionMessage:
-        'Handle the Future properly with await, then, or unawaited().',
+        'Use await to handle, unawaited() if intentional, or add .catchError().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -54,20 +56,22 @@ class AvoidFutureIgnoreRule extends DartLintRule {
 /// Warns when calling toString() or using string interpolation on a Future.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidFutureToStringRule extends DartLintRule {
+class AvoidFutureToStringRule extends SaropaLintRule {
   const AvoidFutureToStringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_tostring',
-    problemMessage: 'Avoid calling toString() on a Future.',
-    correctionMessage: 'Await the Future before converting to string.',
+    problemMessage:
+        "Future.toString() returns 'Instance of Future', not the resolved value.",
+    correctionMessage:
+        'Use await to get the value first: (await future).toString().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -114,7 +118,7 @@ class AvoidFutureToStringRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidNestedFuturesRule extends DartLintRule {
+class AvoidNestedFuturesRule extends SaropaLintRule {
   const AvoidNestedFuturesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -125,9 +129,9 @@ class AvoidNestedFuturesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
@@ -160,7 +164,7 @@ class AvoidNestedFuturesRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
+class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
   const AvoidNestedStreamsAndFuturesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -171,9 +175,9 @@ class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addNamedType((NamedType node) {
@@ -187,6 +191,11 @@ class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
       if (innerType is! NamedType) return;
 
       final String innerTypeName = innerType.name.lexeme;
+
+      // Skip Future<Future> - already handled by AvoidNestedFuturesRule
+      if (outerType == 'Future' && innerTypeName == 'Future') return;
+
+      // Only flag Stream<Future>, Future<Stream>, Stream<Stream>
       if (innerTypeName == 'Stream' || innerTypeName == 'Future') {
         reporter.atNode(node, code);
       }
@@ -203,7 +212,7 @@ class AvoidNestedStreamsAndFuturesRule extends DartLintRule {
 /// can lead to unexpected behavior where the returned Future is ignored.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidPassingAsyncWhenSyncExpectedRule extends DartLintRule {
+class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
   const AvoidPassingAsyncWhenSyncExpectedRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -213,25 +222,42 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Methods known to NOT handle async callbacks properly.
+  /// These expect synchronous functions and will ignore returned Futures.
+  static const Set<String> _syncOnlyMethods = <String>{
+    'forEach', // List.forEach ignores Future returns
+    'map', // Iterable.map doesn't await
+    'where', // Iterable.where doesn't await
+    'any', // Iterable.any doesn't await
+    'every', // Iterable.every doesn't await
+    'reduce', // Iterable.reduce doesn't await
+    'fold', // Iterable.fold doesn't await
+    'sort', // List.sort doesn't await
+    'removeWhere', // List.removeWhere doesn't await
+    'retainWhere', // List.retainWhere doesn't await
+  };
+
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
       // Check if function is async
-      if (node.body.isAsynchronous) {
-        final AstNode? parent = node.parent;
-        // Check if passed as argument
-        if (parent is ArgumentList) {
-          final AstNode? grandparent = parent.parent;
-          if (grandparent is MethodInvocation ||
-              grandparent is InstanceCreationExpression) {
-            // Warn when async callback is passed as argument
-            // Full implementation would check if parameter type expects Future
-            reporter.atNode(node, code);
-          }
+      if (!node.body.isAsynchronous) return;
+
+      final AstNode? parent = node.parent;
+      // Check if passed as argument
+      if (parent is! ArgumentList) return;
+
+      final AstNode? grandparent = parent.parent;
+
+      // Only flag methods known to ignore Future returns
+      if (grandparent is MethodInvocation) {
+        final String methodName = grandparent.methodName.name;
+        if (_syncOnlyMethods.contains(methodName)) {
+          reporter.atNode(node, code);
         }
       }
     });
@@ -260,7 +286,7 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends DartLintRule {
 ///   return await someAsyncOp();
 /// }
 /// ```
-class AvoidRedundantAsyncRule extends DartLintRule {
+class AvoidRedundantAsyncRule extends SaropaLintRule {
   const AvoidRedundantAsyncRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -271,9 +297,9 @@ class AvoidRedundantAsyncRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -286,7 +312,7 @@ class AvoidRedundantAsyncRule extends DartLintRule {
   }
 
   void _checkAsyncBody(
-      FunctionBody body, AstNode node, DiagnosticReporter reporter) {
+      FunctionBody body, AstNode node, SaropaDiagnosticReporter reporter) {
     // Only check async functions (not async*)
     if (body.isAsynchronous && !body.isGenerator) {
       // Check if body contains any await expressions
@@ -328,7 +354,7 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidStreamToStringRule extends DartLintRule {
+class AvoidStreamToStringRule extends SaropaLintRule {
   const AvoidStreamToStringRule() : super(code: _code);
 
   // cspell:ignore tostring
@@ -340,21 +366,25 @@ class AvoidStreamToStringRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'toString') return;
 
-      // Check if target looks like a Stream
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String targetSource = target.toSource().toLowerCase();
-      if (targetSource.contains('stream')) {
-        reporter.atNode(node, code);
+      // Use staticType instead of string matching to avoid false positives
+      // on variables like "upstream", "streamlined", etc.
+      final DartType? type = target.staticType;
+      if (type != null) {
+        final String typeName = type.getDisplayString();
+        if (typeName.startsWith('Stream')) {
+          reporter.atNode(node, code);
+        }
       }
     });
   }
@@ -366,20 +396,22 @@ class AvoidStreamToStringRule extends DartLintRule {
 /// Warns when .listen() result is not assigned to a variable.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidUnassignedStreamSubscriptionsRule extends DartLintRule {
+class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
   const AvoidUnassignedStreamSubscriptionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_stream_subscriptions',
-    problemMessage: 'Stream subscription should be assigned to a variable.',
-    correctionMessage: 'Assign the subscription to cancel it later.',
+    problemMessage:
+        'Stream subscription not assigned. Cannot cancel it, causing memory leaks.',
+    correctionMessage:
+        'Assign to variable: final sub = stream.listen(...); then sub.cancel() in dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -412,49 +444,66 @@ class AvoidUnassignedStreamSubscriptionsRule extends DartLintRule {
   List<Fix> getFixes() => <Fix>[_AddHackForUnassignedSubscriptionFix()];
 }
 
-/// Warns when .then() is used instead of async/await.
+/// Warns when .then() is used instead of async/await in async functions.
 ///
 /// Using async/await is generally more readable than .then() chains.
-class PreferAsyncAwaitRule extends DartLintRule {
+/// Only flags .then() when used inside an async function where await
+/// could be used instead.
+class PreferAsyncAwaitRule extends SaropaLintRule {
   const PreferAsyncAwaitRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_await',
-    problemMessage: "Prefer 'async/await' over '.then()'.",
+    problemMessage: "Prefer 'async/await' over '.then()' in async functions.",
     correctionMessage: 'Refactor to use async/await syntax.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name == 'then') {
-        reporter.atNode(node.methodName, code);
-      }
+      if (node.methodName.name != 'then') return;
+
+      // Only flag if inside an async function where await could be used
+      final FunctionBody? enclosingBody = _findEnclosingFunctionBody(node);
+      if (enclosingBody == null) return;
+      if (!enclosingBody.isAsynchronous) return;
+
+      reporter.atNode(node.methodName, code);
     });
+  }
+
+  FunctionBody? _findEnclosingFunctionBody(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionBody) return current;
+      current = current.parent;
+    }
+    return null;
   }
 }
 
 /// Warns when await is used inline instead of assigning to a variable first.
-class PreferAssigningAwaitExpressionsRule extends DartLintRule {
+class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   const PreferAssigningAwaitExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_assigning_await_expressions',
-    problemMessage: 'Prefer assigning await expressions to variables.',
+    problemMessage:
+        'Inline await expression. Harder to debug and inspect intermediate values.',
     correctionMessage:
-        'Assign the await expression to a variable before using it.',
+        'Extract to variable: final result = await fetch(); then use result.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAwaitExpression((AwaitExpression node) {
@@ -504,7 +553,7 @@ class PreferAssigningAwaitExpressionsRule extends DartLintRule {
 /// // Wait for animation to complete
 /// await Future.delayed(Duration(seconds: 2));
 /// ```
-class PreferCommentingFutureDelayedRule extends DartLintRule {
+class PreferCommentingFutureDelayedRule extends SaropaLintRule {
   const PreferCommentingFutureDelayedRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -515,9 +564,9 @@ class PreferCommentingFutureDelayedRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -527,31 +576,10 @@ class PreferCommentingFutureDelayedRule extends DartLintRule {
       if (target.name != 'Future') return;
       if (node.methodName.name != 'delayed') return;
 
-      // Check if there's a comment before this statement
-      final Token firstToken = node.beginToken;
-      Token? prevToken = firstToken.previous;
-
-      // Look for preceding comment
-      bool hasComment = false;
-      while (prevToken != null) {
-        if (prevToken.type == TokenType.SINGLE_LINE_COMMENT ||
-            prevToken.type == TokenType.MULTI_LINE_COMMENT) {
-          hasComment = true;
-          break;
-        }
-        // Stop if we hit a non-comment, non-whitespace token
-        if (prevToken.type != TokenType.EOF) {
-          break;
-        }
-        prevToken = prevToken.previous;
-      }
-
       // Check preceding comments attached to the token
-      CommentToken? comment = firstToken.precedingComments;
-      while (comment != null) {
-        hasComment = true;
-        comment = comment.next as CommentToken?;
-      }
+      // This is the reliable way to check for comments in Dart AST
+      final Token firstToken = node.beginToken;
+      final bool hasComment = firstToken.precedingComments != null;
 
       if (!hasComment) {
         reporter.atNode(node, code);
@@ -561,7 +589,7 @@ class PreferCommentingFutureDelayedRule extends DartLintRule {
 }
 
 /// Warns when Future-returning functions have incorrect return type annotations.
-class PreferCorrectFutureReturnTypeRule extends DartLintRule {
+class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
   const PreferCorrectFutureReturnTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -572,9 +600,9 @@ class PreferCorrectFutureReturnTypeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -595,7 +623,7 @@ class PreferCorrectFutureReturnTypeRule extends DartLintRule {
     FunctionBody body,
     TypeAnnotation? returnType,
     Token nameToken,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     if (!body.isAsynchronous) return;
     if (body.star != null) return; // async* is Stream
@@ -613,7 +641,7 @@ class PreferCorrectFutureReturnTypeRule extends DartLintRule {
 }
 
 /// Warns when Stream-returning functions have incorrect return type annotations.
-class PreferCorrectStreamReturnTypeRule extends DartLintRule {
+class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
   const PreferCorrectStreamReturnTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -625,9 +653,9 @@ class PreferCorrectStreamReturnTypeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
@@ -648,7 +676,7 @@ class PreferCorrectStreamReturnTypeRule extends DartLintRule {
     FunctionBody body,
     TypeAnnotation? returnType,
     Token nameToken,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     if (!body.isAsynchronous) return;
     if (body.star == null) return; // Must be async*
@@ -666,7 +694,7 @@ class PreferCorrectStreamReturnTypeRule extends DartLintRule {
 }
 
 /// Warns when Future.value() is called without explicit type argument.
-class PreferSpecifyingFutureValueTypeRule extends DartLintRule {
+class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
   const PreferSpecifyingFutureValueTypeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -677,9 +705,9 @@ class PreferSpecifyingFutureValueTypeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -723,7 +751,7 @@ class PreferSpecifyingFutureValueTypeRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds `await` before the returned expression.
-class PreferReturnAwaitRule extends DartLintRule {
+class PreferReturnAwaitRule extends SaropaLintRule {
   const PreferReturnAwaitRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -735,9 +763,9 @@ class PreferReturnAwaitRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addReturnStatement((ReturnStatement node) {

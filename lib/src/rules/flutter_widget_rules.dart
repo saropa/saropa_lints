@@ -6,8 +6,9 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when `context` is used inside `initState` or `dispose` methods.
 ///
@@ -45,7 +46,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   });
 /// }
 /// ```
-class AvoidContextInInitStateDisposeRule extends DartLintRule {
+class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
   const AvoidContextInInitStateDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -59,9 +60,9 @@ class AvoidContextInInitStateDisposeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -201,7 +202,7 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
 ///   _value = newValue;
 /// });
 /// ```
-class AvoidEmptySetStateRule extends DartLintRule {
+class AvoidEmptySetStateRule extends SaropaLintRule {
   const AvoidEmptySetStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -212,9 +213,9 @@ class AvoidEmptySetStateRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -259,7 +260,7 @@ class AvoidEmptySetStateRule extends DartLintRule {
 ///   ],
 /// )
 /// ```
-class AvoidExpandedAsSpacerRule extends DartLintRule {
+class AvoidExpandedAsSpacerRule extends SaropaLintRule {
   const AvoidExpandedAsSpacerRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -271,9 +272,9 @@ class AvoidExpandedAsSpacerRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -328,7 +329,7 @@ class AvoidExpandedAsSpacerRule extends DartLintRule {
 ///   ],
 /// )
 /// ```
-class AvoidFlexibleOutsideFlexRule extends DartLintRule {
+class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
   const AvoidFlexibleOutsideFlexRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -343,9 +344,9 @@ class AvoidFlexibleOutsideFlexRule extends DartLintRule {
   static const Set<String> _flexWidgets = <String>{'Row', 'Column', 'Flex'};
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -396,7 +397,7 @@ class AvoidFlexibleOutsideFlexRule extends DartLintRule {
 ///   colorBlendMode: BlendMode.modulate,
 /// )
 /// ```
-class AvoidIncorrectImageOpacityRule extends DartLintRule {
+class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   const AvoidIncorrectImageOpacityRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -409,9 +410,9 @@ class AvoidIncorrectImageOpacityRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -474,7 +475,7 @@ class AvoidIncorrectImageOpacityRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class AvoidLateContextRule extends DartLintRule {
+class AvoidLateContextRule extends SaropaLintRule {
   const AvoidLateContextRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -486,9 +487,9 @@ class AvoidLateContextRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -581,7 +582,7 @@ class AvoidLateContextRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class AvoidMisnamedPaddingRule extends DartLintRule {
+class AvoidMisnamedPaddingRule extends SaropaLintRule {
   const AvoidMisnamedPaddingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -593,9 +594,9 @@ class AvoidMisnamedPaddingRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -707,7 +708,7 @@ class _PaddingMisuseVisitor extends RecursiveAstVisitor<void> {
 ///   semanticLabel: 'Company logo',
 /// )
 /// ```
-class AvoidMissingImageAltRule extends DartLintRule {
+class AvoidMissingImageAltRule extends SaropaLintRule {
   const AvoidMissingImageAltRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -718,9 +719,9 @@ class AvoidMissingImageAltRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -745,7 +746,7 @@ class AvoidMissingImageAltRule extends DartLintRule {
   }
 
   void _checkForSemanticLabel(
-      InstanceCreationExpression node, DiagnosticReporter reporter) {
+      InstanceCreationExpression node, SaropaDiagnosticReporter reporter) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
       (Expression arg) =>
           arg is NamedExpression && arg.name.label.name == 'semanticLabel',
@@ -757,7 +758,7 @@ class AvoidMissingImageAltRule extends DartLintRule {
   }
 
   void _checkForSemanticLabelInMethod(
-      MethodInvocation node, DiagnosticReporter reporter) {
+      MethodInvocation node, SaropaDiagnosticReporter reporter) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
       (Expression arg) =>
           arg is NamedExpression && arg.name.label.name == 'semanticLabel',
@@ -790,7 +791,7 @@ class AvoidMissingImageAltRule extends DartLintRule {
 ///   _value = newValue;
 /// });
 /// ```
-class AvoidMountedInSetStateRule extends DartLintRule {
+class AvoidMountedInSetStateRule extends SaropaLintRule {
   const AvoidMountedInSetStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -801,9 +802,9 @@ class AvoidMountedInSetStateRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -841,7 +842,7 @@ class _MountedVisitor extends RecursiveAstVisitor<void> {
 ///
 /// Methods that return widgets can cause unnecessary rebuilds. Consider
 /// extracting to a separate widget class.
-class AvoidReturningWidgetsRule extends DartLintRule {
+class AvoidReturningWidgetsRule extends SaropaLintRule {
   const AvoidReturningWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -852,9 +853,9 @@ class AvoidReturningWidgetsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -877,7 +878,7 @@ class AvoidReturningWidgetsRule extends DartLintRule {
 ///
 /// Using shrinkWrap: true in nested scrollables can cause performance issues
 /// as it forces the list to calculate the size of all children.
-class AvoidShrinkWrapInListsRule extends DartLintRule {
+class AvoidShrinkWrapInListsRule extends SaropaLintRule {
   const AvoidShrinkWrapInListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -895,9 +896,9 @@ class AvoidShrinkWrapInListsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -944,7 +945,7 @@ class AvoidShrinkWrapInListsRule extends DartLintRule {
 /// ```dart
 /// Text('Hello')  // or use Align/Center if alignment needed
 /// ```
-class AvoidSingleChildColumnRowRule extends DartLintRule {
+class AvoidSingleChildColumnRowRule extends SaropaLintRule {
   const AvoidSingleChildColumnRowRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -955,9 +956,9 @@ class AvoidSingleChildColumnRowRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -1014,7 +1015,7 @@ class AvoidSingleChildColumnRowRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class AvoidStateConstructorsRule extends DartLintRule {
+class AvoidStateConstructorsRule extends SaropaLintRule {
   const AvoidStateConstructorsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1025,9 +1026,9 @@ class AvoidStateConstructorsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -1067,7 +1068,7 @@ class AvoidStateConstructorsRule extends DartLintRule {
 ///   const MyWidget({required this.items});
 /// }
 /// ```
-class AvoidStatelessWidgetInitializedFieldsRule extends DartLintRule {
+class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   const AvoidStatelessWidgetInitializedFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1078,9 +1079,9 @@ class AvoidStatelessWidgetInitializedFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -1125,7 +1126,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends DartLintRule {
 ///   child: Text('Hello'),
 /// )
 /// ```
-class AvoidUnnecessaryGestureDetectorRule extends DartLintRule {
+class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
   const AvoidUnnecessaryGestureDetectorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1191,9 +1192,9 @@ class AvoidUnnecessaryGestureDetectorRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -1245,7 +1246,7 @@ class AvoidUnnecessaryGestureDetectorRule extends DartLintRule {
 ///   // Update state directly in initState, no setState needed
 /// }
 /// ```
-class AvoidUnnecessarySetStateRule extends DartLintRule {
+class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   const AvoidUnnecessarySetStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1263,9 +1264,9 @@ class AvoidUnnecessarySetStateRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1327,7 +1328,7 @@ class _SetStateCallFinder extends RecursiveAstVisitor<void> {
 ///   Widget build(BuildContext context) => Text('Hello');
 /// }
 /// ```
-class AvoidUnnecessaryStatefulWidgetsRule extends DartLintRule {
+class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
   const AvoidUnnecessaryStatefulWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1339,9 +1340,9 @@ class AvoidUnnecessaryStatefulWidgetsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -1394,7 +1395,7 @@ class _SetStatePresenceChecker extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when anonymous functions are used in listener methods.
-class AvoidUnremovableCallbacksInListenersRule extends DartLintRule {
+class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
   const AvoidUnremovableCallbacksInListenersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1413,9 +1414,9 @@ class AvoidUnremovableCallbacksInListenersRule extends DartLintRule {
   ];
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1465,7 +1466,7 @@ class AvoidUnremovableCallbacksInListenersRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class AvoidUnsafeSetStateRule extends DartLintRule {
+class AvoidUnsafeSetStateRule extends SaropaLintRule {
   const AvoidUnsafeSetStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1477,9 +1478,9 @@ class AvoidUnsafeSetStateRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1639,7 +1640,7 @@ class _NodeFinder extends GeneralizingAstVisitor<void> {
 ///   ...
 /// )
 /// ```
-class AvoidWrappingInPaddingRule extends DartLintRule {
+class AvoidWrappingInPaddingRule extends SaropaLintRule {
   const AvoidWrappingInPaddingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1668,9 +1669,9 @@ class AvoidWrappingInPaddingRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -1715,7 +1716,7 @@ class AvoidWrappingInPaddingRule extends DartLintRule {
 ///   markNeedsPaint();
 /// }
 /// ```
-class CheckForEqualsInRenderObjectSettersRule extends DartLintRule {
+class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
   const CheckForEqualsInRenderObjectSettersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1728,9 +1729,9 @@ class CheckForEqualsInRenderObjectSettersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -1755,7 +1756,7 @@ class CheckForEqualsInRenderObjectSettersRule extends DartLintRule {
     });
   }
 
-  void _checkSetter(MethodDeclaration setter, DiagnosticReporter reporter) {
+  void _checkSetter(MethodDeclaration setter, SaropaDiagnosticReporter reporter) {
     final FunctionBody body = setter.body;
 
     // Check if setter has markNeeds* call
@@ -1853,7 +1854,7 @@ class _RenderObjectSetterVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-class ConsistentUpdateRenderObjectRule extends DartLintRule {
+class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   const ConsistentUpdateRenderObjectRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1873,9 +1874,9 @@ class ConsistentUpdateRenderObjectRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -1969,7 +1970,7 @@ class _PropertyAssignmentFinder extends RecursiveAstVisitor<void> {
 /// ```dart
 /// const BorderRadius.all(Radius.circular(8))
 /// ```
-class PreferConstBorderRadiusRule extends DartLintRule {
+class PreferConstBorderRadiusRule extends SaropaLintRule {
   const PreferConstBorderRadiusRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1981,9 +1982,9 @@ class PreferConstBorderRadiusRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -2028,7 +2029,7 @@ class PreferConstBorderRadiusRule extends DartLintRule {
 /// EdgeInsets.all(8)
 /// EdgeInsets.symmetric(horizontal: 8)
 /// ```
-class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
+class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
   const PreferCorrectEdgeInsetsConstructorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2040,9 +2041,9 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -2061,7 +2062,7 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
   }
 
   void _checkFromLTRB(
-      InstanceCreationExpression node, DiagnosticReporter reporter) {
+      InstanceCreationExpression node, SaropaDiagnosticReporter reporter) {
     final NodeList<Expression> args = node.argumentList.arguments;
     if (args.length != 4) return;
 
@@ -2080,7 +2081,7 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
   }
 
   void _checkOnly(
-      InstanceCreationExpression node, DiagnosticReporter reporter) {
+      InstanceCreationExpression node, SaropaDiagnosticReporter reporter) {
     final NodeList<Expression> args = node.argumentList.arguments;
 
     // Extract named arguments
@@ -2142,7 +2143,7 @@ class PreferCorrectEdgeInsetsConstructorRule extends DartLintRule {
 ///   child: Image.asset('image.png'),
 /// )
 /// ```
-class PreferDefineHeroTagRule extends DartLintRule {
+class PreferDefineHeroTagRule extends SaropaLintRule {
   const PreferDefineHeroTagRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2153,9 +2154,9 @@ class PreferDefineHeroTagRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -2180,7 +2181,7 @@ class PreferDefineHeroTagRule extends DartLintRule {
 ///
 /// Long inline callbacks can make code harder to read. Consider extracting
 /// them to named methods for better readability and testability.
-class PreferExtractingCallbacksRule extends DartLintRule {
+class PreferExtractingCallbacksRule extends SaropaLintRule {
   const PreferExtractingCallbacksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2191,9 +2192,9 @@ class PreferExtractingCallbacksRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
@@ -2217,7 +2218,7 @@ class PreferExtractingCallbacksRule extends DartLintRule {
 ///
 /// Each public widget should generally be in its own file for better
 /// organization and maintainability.
-class PreferSingleWidgetPerFileRule extends DartLintRule {
+class PreferSingleWidgetPerFileRule extends SaropaLintRule {
   const PreferSingleWidgetPerFileRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2228,9 +2229,9 @@ class PreferSingleWidgetPerFileRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -2279,7 +2280,7 @@ class PreferSingleWidgetPerFileRule extends DartLintRule {
 /// class SliverMyList extends SliverChildDelegate {}
 /// class SliverCustomGrid extends SliverGridDelegate {}
 /// ```
-class PreferSliverPrefixRule extends DartLintRule {
+class PreferSliverPrefixRule extends SaropaLintRule {
   const PreferSliverPrefixRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2303,9 +2304,9 @@ class PreferSliverPrefixRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -2369,7 +2370,7 @@ class PreferSliverPrefixRule extends DartLintRule {
 ///   TextSpan(text: 'Hello'),
 /// )
 /// ```
-class PreferTextRichRule extends DartLintRule {
+class PreferTextRichRule extends SaropaLintRule {
   const PreferTextRichRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2381,9 +2382,9 @@ class PreferTextRichRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -2413,7 +2414,7 @@ class PreferTextRichRule extends DartLintRule {
 ///   children: widgets,
 /// )
 /// ```
-class PreferUsingListViewRule extends DartLintRule {
+class PreferUsingListViewRule extends SaropaLintRule {
   const PreferUsingListViewRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2426,9 +2427,9 @@ class PreferUsingListViewRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -2478,7 +2479,7 @@ class PreferUsingListViewRule extends DartLintRule {
 ///   void _helper() {}
 /// }
 /// ```
-class PreferWidgetPrivateMembersRule extends DartLintRule {
+class PreferWidgetPrivateMembersRule extends SaropaLintRule {
   const PreferWidgetPrivateMembersRule() : super(code: _codeField);
 
   static const LintCode _codeField = LintCode(
@@ -2502,9 +2503,9 @@ class PreferWidgetPrivateMembersRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -2609,7 +2610,7 @@ class PreferWidgetPrivateMembersRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireDisposeRule extends DartLintRule {
+class RequireDisposeRule extends SaropaLintRule {
   const RequireDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2657,9 +2658,9 @@ class RequireDisposeRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -2878,7 +2879,7 @@ class _DisposableField {
 ///   }
 /// }
 /// ```
-class RequireTimerCancellationRule extends DartLintRule {
+class RequireTimerCancellationRule extends SaropaLintRule {
   const RequireTimerCancellationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -2898,9 +2899,9 @@ class RequireTimerCancellationRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3085,7 +3086,7 @@ class _CancellableField {
 ///   _timer = null;
 /// }
 /// ```
-class NullifyAfterDisposeRule extends DartLintRule {
+class NullifyAfterDisposeRule extends SaropaLintRule {
   const NullifyAfterDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3114,9 +3115,9 @@ class NullifyAfterDisposeRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -3243,7 +3244,7 @@ class NullifyAfterDisposeRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class UseSetStateSynchronouslyRule extends DartLintRule {
+class UseSetStateSynchronouslyRule extends SaropaLintRule {
   const UseSetStateSynchronouslyRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3254,9 +3255,9 @@ class UseSetStateSynchronouslyRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -3324,7 +3325,7 @@ class UseSetStateSynchronouslyRule extends DartLintRule {
     return found;
   }
 
-  void _reportSetStateInStatement(Statement stmt, DiagnosticReporter reporter) {
+  void _reportSetStateInStatement(Statement stmt, SaropaDiagnosticReporter reporter) {
     stmt.visitChildren(
       _SetStateFinderBatch11((MethodInvocation node) {
         reporter.atNode(node, code);
@@ -3386,7 +3387,7 @@ class _SetStateFinderBatch11 extends RecursiveAstVisitor<void> {
 ///   super.dispose();
 /// }
 /// ```
-class AlwaysRemoveListenerRule extends DartLintRule {
+class AlwaysRemoveListenerRule extends SaropaLintRule {
   const AlwaysRemoveListenerRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3398,9 +3399,9 @@ class AlwaysRemoveListenerRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3522,7 +3523,7 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
 /// ```dart
 /// const Border.fromBorderSide(BorderSide(color: Colors.red, width: 2))
 /// ```
-class AvoidBorderAllRule extends DartLintRule {
+class AvoidBorderAllRule extends SaropaLintRule {
   const AvoidBorderAllRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3534,9 +3535,9 @@ class AvoidBorderAllRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -3583,7 +3584,7 @@ class AvoidBorderAllRule extends DartLintRule {
 ///   ),
 /// );
 /// ```
-class AvoidDeeplyNestedWidgetsRule extends DartLintRule {
+class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
   const AvoidDeeplyNestedWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3597,9 +3598,9 @@ class AvoidDeeplyNestedWidgetsRule extends DartLintRule {
   static const int _maxDepth = 8;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -3617,7 +3618,7 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
   _WidgetDepthVisitor(this.maxDepth, this.reporter, this.code);
 
   final int maxDepth;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
   int _currentDepth = 0;
   bool _reported = false;
@@ -3692,7 +3693,7 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
 ///   super.dispose();
 /// }
 /// ```
-class RequireAnimationDisposalRule extends DartLintRule {
+class RequireAnimationDisposalRule extends SaropaLintRule {
   const RequireAnimationDisposalRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3703,9 +3704,9 @@ class RequireAnimationDisposalRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3816,7 +3817,7 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
 ///   onChanged: (value) { },
 /// )
 /// ```
-class AvoidUncontrolledTextFieldRule extends DartLintRule {
+class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   const AvoidUncontrolledTextFieldRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3828,9 +3829,9 @@ class AvoidUncontrolledTextFieldRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -3868,7 +3869,7 @@ class AvoidUncontrolledTextFieldRule extends DartLintRule {
 /// ```dart
 /// Image.asset(Assets.images.logo)  // Using generated assets class
 /// ```
-class AvoidHardcodedAssetPathsRule extends DartLintRule {
+class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
   const AvoidHardcodedAssetPathsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3880,9 +3881,9 @@ class AvoidHardcodedAssetPathsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -3946,7 +3947,7 @@ class AvoidHardcodedAssetPathsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Comments out the print statement.
-class AvoidPrintInProductionRule extends DartLintRule {
+class AvoidPrintInProductionRule extends SaropaLintRule {
   const AvoidPrintInProductionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -3957,9 +3958,9 @@ class AvoidPrintInProductionRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Skip test files
@@ -4046,7 +4047,7 @@ class _CommentOutPrintFix extends DartFix {
 ///   // Handle specific exception
 /// }
 /// ```
-class AvoidCatchingGenericExceptionRule extends DartLintRule {
+class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   const AvoidCatchingGenericExceptionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4057,9 +4058,9 @@ class AvoidCatchingGenericExceptionRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
@@ -4106,7 +4107,7 @@ class AvoidCatchingGenericExceptionRule extends DartLintRule {
 ///   // Constructor injection
 /// }
 /// ```
-class AvoidServiceLocatorOveruseRule extends DartLintRule {
+class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   const AvoidServiceLocatorOveruseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4118,9 +4119,9 @@ class AvoidServiceLocatorOveruseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -4172,7 +4173,7 @@ class _ServiceLocatorFinder extends RecursiveAstVisitor<void> {
 /// ```dart
 /// final timestamp = DateTime.now();  // Consider DateTime.now().toUtc()
 /// ```
-class PreferUtcDateTimesRule extends DartLintRule {
+class PreferUtcDateTimesRule extends SaropaLintRule {
   const PreferUtcDateTimesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4184,9 +4185,9 @@ class PreferUtcDateTimesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -4230,7 +4231,7 @@ class PreferUtcDateTimesRule extends DartLintRule {
 ///   if (regex.hasMatch(item)) { }
 /// }
 /// ```
-class AvoidRegexInLoopRule extends DartLintRule {
+class AvoidRegexInLoopRule extends SaropaLintRule {
   const AvoidRegexInLoopRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4242,9 +4243,9 @@ class AvoidRegexInLoopRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addForStatement((ForStatement node) {
@@ -4301,7 +4302,7 @@ class _RegExpCreationFinder extends RecursiveAstVisitor<void> {
 /// String get name => _name;
 /// int get count => _count;
 /// ```
-class PreferGetterOverMethodRule extends DartLintRule {
+class PreferGetterOverMethodRule extends SaropaLintRule {
   const PreferGetterOverMethodRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4312,9 +4313,9 @@ class PreferGetterOverMethodRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -4382,7 +4383,7 @@ class PreferGetterOverMethodRule extends DartLintRule {
 ///   print('tapped');
 /// }
 /// ```
-class AvoidUnusedCallbackParametersRule extends DartLintRule {
+class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
   const AvoidUnusedCallbackParametersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4393,9 +4394,9 @@ class AvoidUnusedCallbackParametersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFunctionExpression((FunctionExpression node) {
@@ -4447,7 +4448,7 @@ class _IdentifierCollector extends RecursiveAstVisitor<void> {
 ///   Divider(),
 /// ]
 /// ```
-class PreferConstWidgetsInListsRule extends DartLintRule {
+class PreferConstWidgetsInListsRule extends SaropaLintRule {
   const PreferConstWidgetsInListsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4458,9 +4459,9 @@ class PreferConstWidgetsInListsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -4537,7 +4538,7 @@ class PreferConstWidgetsInListsRule extends DartLintRule {
 ///   messenger.showSnackBar(...);
 /// }
 /// ```
-class AvoidScaffoldMessengerAfterAwaitRule extends DartLintRule {
+class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   const AvoidScaffoldMessengerAfterAwaitRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4549,9 +4550,9 @@ class AvoidScaffoldMessengerAfterAwaitRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlockFunctionBody((BlockFunctionBody node) {
@@ -4625,7 +4626,7 @@ class _ScaffoldMessengerFinderNew extends RecursiveAstVisitor<void> {
 ///   void showMessage(BuildContext context, String msg) {...}
 /// }
 /// ```
-class AvoidBuildContextInProvidersRule extends DartLintRule {
+class AvoidBuildContextInProvidersRule extends SaropaLintRule {
   const AvoidBuildContextInProvidersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4637,9 +4638,9 @@ class AvoidBuildContextInProvidersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -4693,7 +4694,7 @@ class AvoidBuildContextInProvidersRule extends DartLintRule {
 ///   child: child,
 /// )
 /// ```
-class PreferSemanticWidgetNamesRule extends DartLintRule {
+class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   const PreferSemanticWidgetNamesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4705,9 +4706,9 @@ class PreferSemanticWidgetNamesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -4759,7 +4760,7 @@ class PreferSemanticWidgetNamesRule extends DartLintRule {
 /// MediaQuery.textScalerOf(context);
 /// MediaQuery.of(context).textScaler;
 /// ```
-class AvoidTextScaleFactorRule extends DartLintRule {
+class AvoidTextScaleFactorRule extends SaropaLintRule {
   const AvoidTextScaleFactorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4770,9 +4771,9 @@ class AvoidTextScaleFactorRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check for textScaleFactorOf method calls
@@ -4808,7 +4809,7 @@ class AvoidTextScaleFactorRule extends DartLintRule {
 ///   // Use WidgetState for hover, pressed, etc.
 /// }
 /// ```
-class PreferWidgetStateMixinRule extends DartLintRule {
+class PreferWidgetStateMixinRule extends SaropaLintRule {
   const PreferWidgetStateMixinRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4820,9 +4821,9 @@ class PreferWidgetStateMixinRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -4887,7 +4888,7 @@ class PreferWidgetStateMixinRule extends DartLintRule {
 ///   cacheHeight: 200,
 /// )
 /// ```
-class AvoidImageWithoutCacheRule extends DartLintRule {
+class AvoidImageWithoutCacheRule extends SaropaLintRule {
   const AvoidImageWithoutCacheRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4899,9 +4900,9 @@ class AvoidImageWithoutCacheRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -4949,7 +4950,7 @@ class AvoidImageWithoutCacheRule extends DartLintRule {
 /// const _TitleSection();
 /// // or extract to const widget
 /// ```
-class PreferSplitWidgetConstRule extends DartLintRule {
+class PreferSplitWidgetConstRule extends SaropaLintRule {
   const PreferSplitWidgetConstRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -4962,9 +4963,9 @@ class PreferSplitWidgetConstRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5015,7 +5016,7 @@ class _WidgetCounter extends RecursiveAstVisitor<void> {
 /// Navigator.pushNamed(context, '/next');
 /// // or use go_router/auto_route
 /// ```
-class AvoidNavigatorPushWithoutRouteNameRule extends DartLintRule {
+class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
   const AvoidNavigatorPushWithoutRouteNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5026,9 +5027,9 @@ class AvoidNavigatorPushWithoutRouteNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -5063,7 +5064,7 @@ class AvoidNavigatorPushWithoutRouteNameRule extends DartLintRule {
 ///   Container(key: Key('item2')),
 /// ]
 /// ```
-class AvoidDuplicateWidgetKeysRule extends DartLintRule {
+class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   const AvoidDuplicateWidgetKeysRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5074,9 +5075,9 @@ class AvoidDuplicateWidgetKeysRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
@@ -5141,7 +5142,7 @@ class AvoidDuplicateWidgetKeysRule extends DartLintRule {
 ///   body: ListView(...),  // Scaffold handles safe area via appBar, bottomNavigationBar
 /// )
 /// ```
-class PreferSafeAreaConsumerRule extends DartLintRule {
+class PreferSafeAreaConsumerRule extends SaropaLintRule {
   const PreferSafeAreaConsumerRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5154,9 +5155,9 @@ class PreferSafeAreaConsumerRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5196,7 +5197,7 @@ class PreferSafeAreaConsumerRule extends DartLintRule {
 ///   maxLength: 500,
 /// )
 /// ```
-class AvoidUnrestrictedTextFieldLengthRule extends DartLintRule {
+class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   const AvoidUnrestrictedTextFieldLengthRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5208,9 +5209,9 @@ class AvoidUnrestrictedTextFieldLengthRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5247,7 +5248,7 @@ class AvoidUnrestrictedTextFieldLengthRule extends DartLintRule {
 /// ```dart
 /// ScaffoldMessenger.maybeOf(context)?.showSnackBar(...);
 /// ```
-class PreferScaffoldMessengerMaybeOfRule extends DartLintRule {
+class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   const PreferScaffoldMessengerMaybeOfRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5260,9 +5261,9 @@ class PreferScaffoldMessengerMaybeOfRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -5293,7 +5294,7 @@ class PreferScaffoldMessengerMaybeOfRule extends DartLintRule {
 ///   child: Column(...),
 /// )
 /// ```
-class AvoidFormWithoutKeyRule extends DartLintRule {
+class AvoidFormWithoutKeyRule extends SaropaLintRule {
   const AvoidFormWithoutKeyRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5304,9 +5305,9 @@ class AvoidFormWithoutKeyRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5348,7 +5349,7 @@ class AvoidFormWithoutKeyRule extends DartLintRule {
 ///   itemBuilder: (context, index) => ListTile(...),
 /// )
 /// ```
-class AvoidListViewWithoutItemExtentRule extends DartLintRule {
+class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
   const AvoidListViewWithoutItemExtentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5360,9 +5361,9 @@ class AvoidListViewWithoutItemExtentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5408,7 +5409,7 @@ class AvoidListViewWithoutItemExtentRule extends DartLintRule {
 ///   return Container(width: width);
 /// }
 /// ```
-class AvoidMediaQueryInBuildRule extends DartLintRule {
+class AvoidMediaQueryInBuildRule extends SaropaLintRule {
   const AvoidMediaQueryInBuildRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5420,9 +5421,9 @@ class AvoidMediaQueryInBuildRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -5455,7 +5456,7 @@ class AvoidMediaQueryInBuildRule extends DartLintRule {
 ///   ),
 /// )
 /// ```
-class PreferSliverListDelegateRule extends DartLintRule {
+class PreferSliverListDelegateRule extends SaropaLintRule {
   const PreferSliverListDelegateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5468,9 +5469,9 @@ class PreferSliverListDelegateRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5513,7 +5514,7 @@ class PreferSliverListDelegateRule extends DartLintRule {
 ///   },
 /// )
 /// ```
-class AvoidLayoutBuilderMisuseRule extends DartLintRule {
+class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
   const AvoidLayoutBuilderMisuseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5525,9 +5526,9 @@ class AvoidLayoutBuilderMisuseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5589,7 +5590,7 @@ class _SimpleIdentifierCollector extends RecursiveAstVisitor<void> {
 ///   child: AnimatedWidget(),  // Isolates frequently changing content
 /// )
 /// ```
-class AvoidRepaintBoundaryMisuseRule extends DartLintRule {
+class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   const AvoidRepaintBoundaryMisuseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5601,9 +5602,9 @@ class AvoidRepaintBoundaryMisuseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5646,7 +5647,7 @@ class AvoidRepaintBoundaryMisuseRule extends DartLintRule {
 ///   children: [...],
 /// )
 /// ```
-class AvoidSingleChildScrollViewWithColumnRule extends DartLintRule {
+class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   const AvoidSingleChildScrollViewWithColumnRule() : super(code: _code);
 
   // cspell: ignore singlechildscrollview
@@ -5660,9 +5661,9 @@ class AvoidSingleChildScrollViewWithColumnRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5720,7 +5721,7 @@ class AvoidSingleChildScrollViewWithColumnRule extends DartLintRule {
 /// ```dart
 /// CachedNetworkImage(imageUrl: 'https://example.com/image.png')
 /// ```
-class PreferCachedNetworkImageRule extends DartLintRule {
+class PreferCachedNetworkImageRule extends SaropaLintRule {
   const PreferCachedNetworkImageRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5731,9 +5732,9 @@ class PreferCachedNetworkImageRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5767,7 +5768,7 @@ class PreferCachedNetworkImageRule extends DartLintRule {
 ///   ],
 /// )
 /// ```
-class AvoidGestureDetectorInScrollViewRule extends DartLintRule {
+class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
   const AvoidGestureDetectorInScrollViewRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5789,9 +5790,9 @@ class AvoidGestureDetectorInScrollViewRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -5831,7 +5832,7 @@ class AvoidGestureDetectorInScrollViewRule extends DartLintRule {
 ///   itemBuilder: (context, index) => StatelessWidget(key: ValueKey(index)),
 /// )
 /// ```
-class AvoidStatefulWidgetInListRule extends DartLintRule {
+class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   const AvoidStatefulWidgetInListRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5843,9 +5844,9 @@ class AvoidStatefulWidgetInListRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // This would need type resolution to check if widget extends StatefulWidget
@@ -5911,7 +5912,7 @@ class AvoidStatefulWidgetInListRule extends DartLintRule {
 /// )
 /// // Or better, use AnimatedOpacity for animations
 /// ```
-class PreferOpacityWidgetRule extends DartLintRule {
+class PreferOpacityWidgetRule extends SaropaLintRule {
   const PreferOpacityWidgetRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -5923,9 +5924,9 @@ class PreferOpacityWidgetRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -5973,7 +5974,7 @@ class PreferOpacityWidgetRule extends DartLintRule {
 ///   final theme = Theme.of(context); // OK
 /// }
 /// ```
-class AvoidInheritedWidgetInInitStateRule extends DartLintRule {
+class AvoidInheritedWidgetInInitStateRule extends SaropaLintRule {
   const AvoidInheritedWidgetInInitStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6000,9 +6001,9 @@ class AvoidInheritedWidgetInInitStateRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -6017,7 +6018,7 @@ class AvoidInheritedWidgetInInitStateRule extends DartLintRule {
 class _InheritedWidgetVisitor extends RecursiveAstVisitor<void> {
   _InheritedWidgetVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -6052,7 +6053,7 @@ class _InheritedWidgetVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-class AvoidRecursiveWidgetCallsRule extends DartLintRule {
+class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
   const AvoidRecursiveWidgetCallsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6064,9 +6065,9 @@ class AvoidRecursiveWidgetCallsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -6098,7 +6099,7 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
   _RecursiveWidgetVisitor(this.className, this.reporter, this.code);
 
   final String className;
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -6125,7 +6126,7 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
 ///   late final controller = TextEditingController(); // Not disposed
 /// }
 /// ```
-class AvoidUndisposedInstancesRule extends DartLintRule {
+class AvoidUndisposedInstancesRule extends SaropaLintRule {
   const AvoidUndisposedInstancesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6148,9 +6149,9 @@ class AvoidUndisposedInstancesRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -6317,7 +6318,7 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-class AvoidUnnecessaryOverridesInStateRule extends DartLintRule {
+class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
   const AvoidUnnecessaryOverridesInStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6337,9 +6338,9 @@ class AvoidUnnecessaryOverridesInStateRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -6387,7 +6388,7 @@ class AvoidUnnecessaryOverridesInStateRule extends DartLintRule {
 ///   // Missing dispose() override
 /// }
 /// ```
-class DisposeFieldsRule extends DartLintRule {
+class DisposeFieldsRule extends SaropaLintRule {
   const DisposeFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6409,9 +6410,9 @@ class DisposeFieldsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -6475,7 +6476,7 @@ class DisposeFieldsRule extends DartLintRule {
 ///   builder: (context, snapshot) => ...,
 /// )
 /// ```
-class PassExistingFutureToFutureBuilderRule extends DartLintRule {
+class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   const PassExistingFutureToFutureBuilderRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6487,9 +6488,9 @@ class PassExistingFutureToFutureBuilderRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -6536,7 +6537,7 @@ class PassExistingFutureToFutureBuilderRule extends DartLintRule {
 ///   builder: (context, snapshot) => ...,
 /// )
 /// ```
-class PassExistingStreamToStreamBuilderRule extends DartLintRule {
+class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
   const PassExistingStreamToStreamBuilderRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -6548,9 +6549,9 @@ class PassExistingStreamToStreamBuilderRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -6573,6 +6574,2499 @@ class PassExistingStreamToStreamBuilderRule extends DartLintRule {
             reporter.atNode(value, code);
           }
         }
+      }
+    });
+  }
+}
+
+/// Warns when Text widget is created with an empty string.
+///
+/// Empty Text widgets consume resources without displaying anything.
+/// Use SizedBox.shrink() or remove the widget entirely.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Text('')
+/// Text("")
+/// Text('', style: TextStyle())
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// SizedBox.shrink()
+/// // Or simply remove the widget
+/// if (text.isNotEmpty) Text(text)
+/// ```
+class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
+  const AvoidEmptyTextWidgetsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_empty_text_widgets',
+    problemMessage: 'Avoid using Text widget with empty string.',
+    correctionMessage:
+        'Use SizedBox.shrink() or remove the widget if no text is needed.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Text') return;
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      // First argument should be the text string
+      final Expression firstArg = args.first;
+      if (firstArg is NamedExpression) return; // Skip if no positional arg
+
+      // Check for empty string literal
+      if (firstArg is SimpleStringLiteral && firstArg.value.isEmpty) {
+        reporter.atNode(node, code);
+      } else if (firstArg is StringInterpolation &&
+          firstArg.elements.length == 1 &&
+          firstArg.elements.first is InterpolationString) {
+        final InterpolationString str =
+            firstArg.elements.first as InterpolationString;
+        if (str.value.isEmpty) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceEmptyTextWithSizedBoxFix()];
+}
+
+class _ReplaceEmptyTextWithSizedBoxFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Text') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with SizedBox.shrink()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'const SizedBox.shrink()',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when FontWeight is specified using numeric w-values instead of named constants.
+///
+/// While FontWeight supports w100-w900 numeric values, using named constants
+/// like FontWeight.normal or FontWeight.bold is more readable.
+///
+/// Example of **bad** code:
+/// ```dart
+/// TextStyle(fontWeight: FontWeight.w400)
+/// TextStyle(fontWeight: FontWeight.w700)
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// TextStyle(fontWeight: FontWeight.normal)  // w400
+/// TextStyle(fontWeight: FontWeight.bold)    // w700
+/// ```
+class AvoidFontWeightAsNumberRule extends SaropaLintRule {
+  const AvoidFontWeightAsNumberRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_font_weight_as_number',
+    problemMessage: 'Use named FontWeight constants instead of numeric values.',
+    correctionMessage:
+        'Replace FontWeight.w400 with FontWeight.normal, w700 with FontWeight.bold, etc.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Mapping of numeric values to named constants
+  static const Map<String, String> _weightMapping = <String, String>{
+    'w400': 'normal',
+    'w700': 'bold',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name != 'FontWeight') return;
+
+      final String identifier = node.identifier.name;
+      if (_weightMapping.containsKey(identifier)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceFontWeightNumberFix()];
+}
+
+class _ReplaceFontWeightNumberFix extends DartFix {
+  static const Map<String, String> _weightMapping = <String, String>{
+    'w400': 'normal',
+    'w700': 'bold',
+  };
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.prefix.name != 'FontWeight') return;
+
+      final String identifier = node.identifier.name;
+      final String? replacement = _weightMapping[identifier];
+      if (replacement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with FontWeight.$replacement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'FontWeight.$replacement',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when Container is used only for whitespace/spacing.
+///
+/// SizedBox is more efficient than Container when you only need to add
+/// spacing. Container has additional overhead from decoration handling.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Container(width: 16)
+/// Container(height: 8)
+/// Container(width: 10, height: 10)
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// SizedBox(width: 16)
+/// SizedBox(height: 8)
+/// SizedBox.square(dimension: 10)
+/// ```
+class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
+  const PreferSizedBoxForWhitespaceRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sized_box_for_whitespace',
+    problemMessage: 'Use SizedBox instead of Container for whitespace.',
+    correctionMessage:
+        'SizedBox is more efficient for spacing. Use SizedBox(width:) or SizedBox(height:).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      // Check if Container only has width/height arguments (and optionally key)
+      bool hasWidth = false;
+      bool hasHeight = false;
+      bool hasOtherArgs = false;
+
+      for (final Expression arg in args) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'width') {
+            hasWidth = true;
+          } else if (name == 'height') {
+            hasHeight = true;
+          } else if (name == 'key') {
+            // key is fine
+          } else {
+            hasOtherArgs = true;
+          }
+        } else {
+          // Positional argument means child
+          hasOtherArgs = true;
+        }
+      }
+
+      // Warn if Container only has width/height and no other properties
+      if ((hasWidth || hasHeight) && !hasOtherArgs) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceContainerWithSizedBoxFix()];
+}
+
+class _ReplaceContainerWithSizedBoxFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      // Extract width and height values
+      String? widthValue;
+      String? heightValue;
+      String? keyValue;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'width') {
+            widthValue = arg.expression.toSource();
+          } else if (name == 'height') {
+            heightValue = arg.expression.toSource();
+          } else if (name == 'key') {
+            keyValue = arg.expression.toSource();
+          }
+        }
+      }
+
+      // Determine if we should use const
+      final bool hasConst =
+          node.keyword?.lexeme == 'const' || _isInConstContext(node);
+      final String constPrefix = hasConst ? 'const ' : '';
+
+      // Build replacement
+      final StringBuffer replacement = StringBuffer();
+      replacement.write('${constPrefix}SizedBox(');
+
+      final List<String> args = <String>[];
+      if (keyValue != null) args.add('key: $keyValue');
+      if (widthValue != null) args.add('width: $widthValue');
+      if (heightValue != null) args.add('height: $heightValue');
+      replacement.write(args.join(', '));
+      replacement.write(')');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with SizedBox',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          replacement.toString(),
+        );
+      });
+    });
+  }
+
+  bool _isInConstContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ListLiteral && current.constKeyword != null) return true;
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
+        return true;
+      }
+      if (current is InstanceCreationExpression &&
+          current.keyword?.lexeme == 'const') {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when Scaffold widgets are nested inside other Scaffolds.
+///
+/// Nested Scaffolds can cause layout issues, unexpected behavior with
+/// drawers, snackbars, and other Scaffold features.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Scaffold(
+///   body: Scaffold(  // Nested Scaffold
+///     appBar: AppBar(),
+///     body: Container(),
+///   ),
+/// )
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// Scaffold(
+///   appBar: AppBar(),
+///   body: CustomScrollView(...),
+/// )
+/// ```
+class AvoidNestedScaffoldsRule extends SaropaLintRule {
+  const AvoidNestedScaffoldsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_nested_scaffolds',
+    problemMessage: 'Avoid nesting Scaffold widgets inside other Scaffolds.',
+    correctionMessage:
+        'Remove the inner Scaffold and use its content directly.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Scaffold') return;
+
+      // Check if any parent is also a Scaffold
+      if (_hasScaffoldAncestor(node)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  bool _hasScaffoldAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'Scaffold') {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when multiple MaterialApp widgets exist in the widget tree.
+///
+/// Having multiple MaterialApp widgets can cause routing issues,
+/// theme inconsistencies, and memory problems. There should be only
+/// one MaterialApp at the root of your application.
+///
+/// Example of **bad** code:
+/// ```dart
+/// MaterialApp(
+///   home: MaterialApp(  // Multiple MaterialApp!
+///     home: MyHomePage(),
+///   ),
+/// )
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// MaterialApp(
+///   home: MyHomePage(),
+/// )
+/// ```
+class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
+  const AvoidMultipleMaterialAppsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_multiple_material_apps',
+    problemMessage: 'Multiple MaterialApp widgets detected in widget tree.',
+    correctionMessage:
+        'Use only one MaterialApp at the root of your application.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _appWidgets = <String>{
+    'MaterialApp',
+    'CupertinoApp',
+    'WidgetsApp',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_appWidgets.contains(typeName)) return;
+
+      // Check if any parent is also an App widget
+      if (_hasAppAncestor(node)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  bool _hasAppAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (_appWidgets.contains(typeName)) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when deprecated RawKeyboardListener is used.
+///
+/// RawKeyboardListener is deprecated. Use KeyboardListener or Focus widget
+/// with onKeyEvent instead.
+///
+/// Example of **bad** code:
+/// ```dart
+/// RawKeyboardListener(
+///   focusNode: _focusNode,
+///   onKey: (event) { },
+///   child: child,
+/// )
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// KeyboardListener(
+///   focusNode: _focusNode,
+///   onKeyEvent: (event) { },
+///   child: child,
+/// )
+/// ```
+class AvoidRawKeyboardListenerRule extends SaropaLintRule {
+  const AvoidRawKeyboardListenerRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_raw_keyboard_listener',
+    problemMessage:
+        'RawKeyboardListener is deprecated. Use KeyboardListener instead.',
+    correctionMessage:
+        'Replace RawKeyboardListener with KeyboardListener or Focus.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName == 'RawKeyboardListener') {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceRawKeyboardListenerFix()];
+}
+
+class _ReplaceRawKeyboardListenerFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'RawKeyboardListener') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with KeyboardListener',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.constructorName.type.sourceRange,
+          'KeyboardListener',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when ImageRepeat is used on Image widgets.
+///
+/// ImageRepeat is rarely needed and often indicates a design issue.
+/// Consider using a pattern image or tiled background instead.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Image.asset(
+///   'image.png',
+///   repeat: ImageRepeat.repeat,
+/// )
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// Image.asset('image.png')
+/// ```
+class AvoidImageRepeatRule extends SaropaLintRule {
+  const AvoidImageRepeatRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_image_repeat',
+    problemMessage:
+        'ImageRepeat is rarely needed and may indicate a design issue.',
+    correctionMessage: 'Consider removing repeat or using a pattern approach.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name == 'ImageRepeat' &&
+          node.identifier.name != 'noRepeat') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Icon widget has explicit size override.
+///
+/// Instead of overriding icon size on individual Icon widgets,
+/// use IconTheme to set consistent sizing.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Icon(Icons.home, size: 24)
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// IconTheme(
+///   data: IconThemeData(size: 24),
+///   child: Icon(Icons.home),
+/// )
+/// ```
+class AvoidIconSizeOverrideRule extends SaropaLintRule {
+  const AvoidIconSizeOverrideRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_icon_size_override',
+    problemMessage: 'Avoid overriding icon size directly. Use IconTheme.',
+    correctionMessage: 'Wrap icons in IconTheme for consistent sizing.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Icon') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'size') {
+          reporter.atNode(arg, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when GestureDetector is used with only onTap.
+///
+/// For simple tap interactions with Material design feedback,
+/// InkWell provides better UX with ripple effects.
+///
+/// Example of **bad** code:
+/// ```dart
+/// GestureDetector(
+///   onTap: () { },
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// InkWell(
+///   onTap: () { },
+///   child: MyWidget(),
+/// )
+/// ```
+class PreferInkwellOverGestureRule extends SaropaLintRule {
+  const PreferInkwellOverGestureRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_inkwell_over_gesture',
+    problemMessage: 'Use InkWell instead of GestureDetector for tap feedback.',
+    correctionMessage: 'Replace GestureDetector with InkWell for ripple effect.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _simpleGestures = <String>{
+    'onTap',
+    'onTapDown',
+    'onTapUp',
+    'onTapCancel',
+    'onDoubleTap',
+    'onLongPress',
+  };
+
+  static const Set<String> _complexGestures = <String>{
+    'onPanStart',
+    'onPanUpdate',
+    'onPanEnd',
+    'onScaleStart',
+    'onScaleUpdate',
+    'onScaleEnd',
+    'onHorizontalDragStart',
+    'onHorizontalDragUpdate',
+    'onVerticalDragStart',
+    'onVerticalDragUpdate',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector') return;
+
+      bool hasSimple = false;
+      bool hasComplex = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (_simpleGestures.contains(name)) hasSimple = true;
+          if (_complexGestures.contains(name)) hasComplex = true;
+        }
+      }
+
+      if (hasSimple && !hasComplex) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceGestureWithInkWellFix()];
+}
+
+class _ReplaceGestureWithInkWellFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with InkWell',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.constructorName.type.sourceRange,
+          'InkWell',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when FittedBox contains a Text widget.
+///
+/// FittedBox scales its child to fit, which can cause text to become
+/// unreadable or distorted. Use maxLines and overflow instead.
+///
+/// Example of **bad** code:
+/// ```dart
+/// FittedBox(child: Text('Long text'))
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// Text('Long text', maxLines: 2, overflow: TextOverflow.ellipsis)
+/// ```
+class AvoidFittedBoxForTextRule extends SaropaLintRule {
+  const AvoidFittedBoxForTextRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_fitted_box_for_text',
+    problemMessage: 'Avoid using FittedBox to scale Text widgets.',
+    correctionMessage: 'Use maxLines and overflow for text handling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'FittedBox') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          if (_isTextWidget(arg.expression)) {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+
+  bool _isTextWidget(Expression expr) {
+    if (expr is InstanceCreationExpression) {
+      final String name = expr.constructorName.type.name.lexeme;
+      return name == 'Text' || name == 'RichText' || name == 'SelectableText';
+    }
+    return false;
+  }
+}
+
+/// Warns when ListView is used with many children instead of ListView.builder.
+///
+/// ListView with children list builds all items at once.
+/// Use ListView.builder for lazy loading with large lists.
+///
+/// Example of **bad** code:
+/// ```dart
+/// ListView(children: List.generate(100, (i) => ListTile()))
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// ListView.builder(itemCount: 100, itemBuilder: (ctx, i) => ListTile())
+/// ```
+class PreferListViewBuilderRule extends SaropaLintRule {
+  const PreferListViewBuilderRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_listview_builder',
+    problemMessage: 'Use ListView.builder for better performance.',
+    correctionMessage: 'Replace ListView(children:) with ListView.builder.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const int _childThreshold = 10;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ListView') return;
+      if (node.constructorName.name != null) return; // Skip named constructors
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression childrenExpr = arg.expression;
+
+          if (childrenExpr is MethodInvocation &&
+              childrenExpr.methodName.name == 'generate') {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+
+          if (childrenExpr is ListLiteral &&
+              childrenExpr.elements.length >= _childThreshold) {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Opacity widget is animated instead of FadeTransition.
+///
+/// Animating Opacity causes rebuilds. FadeTransition is more performant.
+///
+/// Example of **bad** code:
+/// ```dart
+/// AnimatedBuilder(
+///   builder: (ctx, child) => Opacity(opacity: _ctrl.value, child: child),
+/// )
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// FadeTransition(opacity: _ctrl, child: child)
+/// ```
+class AvoidOpacityAnimationRule extends SaropaLintRule {
+  const AvoidOpacityAnimationRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_opacity_animation',
+    problemMessage: 'Use FadeTransition instead of animating Opacity.',
+    correctionMessage: 'FadeTransition is more performant for animations.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Opacity') return;
+
+      if (_isInsideAnimationBuilder(node)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  bool _isInsideAnimationBuilder(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 10) {
+      if (current is InstanceCreationExpression) {
+        final String name = current.constructorName.type.name.lexeme;
+        if (name == 'AnimatedBuilder' || name == 'TweenAnimationBuilder') {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceOpacityWithFadeTransitionFix()];
+}
+
+class _ReplaceOpacityWithFadeTransitionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with FadeTransition',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.constructorName.type.sourceRange,
+          'FadeTransition',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when SizedBox.expand() is used.
+///
+/// SizedBox.expand() fills all available space which can cause layout issues.
+///
+/// Example of **bad** code:
+/// ```dart
+/// SizedBox.expand(child: MyWidget())
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// SizedBox(width: double.infinity, height: 200, child: MyWidget())
+/// ```
+class AvoidSizedBoxExpandRule extends SaropaLintRule {
+  const AvoidSizedBoxExpandRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_sized_box_expand',
+    problemMessage: 'Avoid SizedBox.expand() as it fills all available space.',
+    correctionMessage: 'Use explicit width/height for predictable layouts.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'SizedBox') return;
+
+      if (node.constructorName.name?.name == 'expand') {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when long Text could be SelectableText.
+///
+/// Long text that users might want to copy should use SelectableText.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Text('Very long paragraph that users might want to copy...')
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// SelectableText('Very long paragraph...')
+/// ```
+class PreferSelectableTextRule extends SaropaLintRule {
+  const PreferSelectableTextRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_selectable_text',
+    problemMessage: 'Consider using SelectableText for long content.',
+    correctionMessage: 'SelectableText allows users to copy text.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const int _minLength = 100;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Text') return;
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+      if (firstArg is NamedExpression) return;
+
+      if (firstArg is SimpleStringLiteral && firstArg.value.length >= _minLength) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceTextWithSelectableFix()];
+}
+
+class _ReplaceTextWithSelectableFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with SelectableText',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.constructorName.type.sourceRange,
+          'SelectableText',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when Row/Column uses SizedBox for spacing instead of spacing param.
+///
+/// Flutter 3.10+ introduced spacing parameter for Row, Column, Wrap, and Flex.
+///
+/// Example of **bad** code:
+/// ```dart
+/// Column(children: [Text('A'), SizedBox(height: 8), Text('B')])
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// Column(spacing: 8, children: [Text('A'), Text('B')])
+/// ```
+class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
+  const PreferSpacingOverSizedBoxRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_spacing_over_sizedbox',
+    problemMessage: 'Use spacing parameter instead of SizedBox for spacing.',
+    correctionMessage: 'Row/Column support spacing since Flutter 3.10.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _flexWidgets = <String>{'Row', 'Column', 'Wrap'};
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_flexWidgets.contains(typeName)) return;
+
+      bool hasSpacing = false;
+      Expression? childrenArg;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'spacing') hasSpacing = true;
+          if (arg.name.label.name == 'children') childrenArg = arg.expression;
+        }
+      }
+
+      if (hasSpacing || childrenArg == null) return;
+
+      if (childrenArg is ListLiteral) {
+        final List<CollectionElement> elements = childrenArg.elements;
+        if (elements.length < 3) return;
+
+        int sizedBoxCount = 0;
+        double? consistentSize;
+        bool isConsistent = true;
+
+        for (final CollectionElement element in elements) {
+          if (element is Expression) {
+            final double? size = _getSizedBoxSize(element, typeName);
+            if (size != null) {
+              sizedBoxCount++;
+              if (consistentSize == null) {
+                consistentSize = size;
+              } else if (consistentSize != size) {
+                isConsistent = false;
+              }
+            }
+          }
+        }
+
+        if (sizedBoxCount >= 2 && isConsistent) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    });
+  }
+
+  double? _getSizedBoxSize(Expression expr, String parentType) {
+    if (expr is! InstanceCreationExpression) return null;
+
+    final String name = expr.constructorName.type.name.lexeme;
+    if (name != 'SizedBox') return null;
+
+    final String expectedArg = parentType == 'Column' ? 'height' : 'width';
+
+    for (final Expression arg in expr.argumentList.arguments) {
+      if (arg is NamedExpression) {
+        if (arg.name.label.name == 'child') return null; // Has child, not spacer
+        if (arg.name.label.name == expectedArg) {
+          final Expression valueExpr = arg.expression;
+          if (valueExpr is IntegerLiteral) {
+            return valueExpr.value?.toDouble();
+          } else if (valueExpr is DoubleLiteral) {
+            return valueExpr.value;
+          }
+        }
+      }
+    }
+    return null;
+  }
+}
+
+/// Warns when Material 2 is explicitly enabled via useMaterial3: false.
+///
+/// Material 3 is the default since Flutter 3.16. Explicitly disabling it
+/// prevents access to M3 features and may cause issues in future Flutter
+/// versions.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// ThemeData(
+///   useMaterial3: false,  // Explicitly disabling M3
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// ThemeData(
+///   // M3 is default, no need to specify
+/// )
+///
+/// ThemeData(
+///   useMaterial3: true,  // Explicitly enabling is fine
+/// )
+/// ```
+class AvoidMaterial2FallbackRule extends SaropaLintRule {
+  const AvoidMaterial2FallbackRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_material2_fallback',
+    problemMessage: 'Avoid explicitly disabling Material 3.',
+    correctionMessage:
+        'Remove useMaterial3: false or set to true. M3 is the default since Flutter 3.16.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ThemeData') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'useMaterial3') {
+            final Expression valueExpr = arg.expression;
+            if (valueExpr is BooleanLiteral && !valueExpr.value) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveMaterial2FallbackFix()];
+}
+
+class _RemoveMaterial2FallbackFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.name.label.name != 'useMaterial3') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove useMaterial3: false',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find and remove the argument including trailing comma if present
+        int startOffset = node.offset;
+        int endOffset = node.end;
+
+        // Check for trailing comma
+        final AstNode? parent = node.parent;
+        if (parent is ArgumentList) {
+          final int index = parent.arguments.indexOf(node);
+          if (index >= 0) {
+            // Check if there's a comma after this argument
+            final String source =
+                resolver.source.contents.data.substring(endOffset);
+            final Match? commaMatch = RegExp(r'^\s*,').firstMatch(source);
+            if (commaMatch != null) {
+              endOffset += commaMatch.end;
+            }
+          }
+        }
+
+        builder.addDeletion(SourceRange(startOffset, endOffset - startOffset));
+      });
+    });
+  }
+}
+
+/// Warns when using OverlayEntry instead of the declarative OverlayPortal.
+///
+/// OverlayPortal (Flutter 3.10+) provides a declarative API for overlays
+/// that integrates better with the widget tree and InheritedWidgets.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// late OverlayEntry _overlayEntry;
+///
+/// void showOverlay() {
+///   _overlayEntry = OverlayEntry(
+///     builder: (context) => MyOverlayWidget(),
+///   );
+///   Overlay.of(context).insert(_overlayEntry);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final _controller = OverlayPortalController();
+///
+/// OverlayPortal(
+///   controller: _controller,
+///   overlayChildBuilder: (context) => MyOverlayWidget(),
+///   child: MyWidget(),
+/// )
+/// ```
+class PreferOverlayPortalRule extends SaropaLintRule {
+  const PreferOverlayPortalRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_overlay_portal',
+    problemMessage: 'Consider using OverlayPortal instead of OverlayEntry.',
+    correctionMessage:
+        'OverlayPortal provides a declarative API that integrates '
+        'with InheritedWidgets (Flutter 3.10+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName == 'OverlayEntry') {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when using third-party carousel packages instead of CarouselView.
+///
+/// CarouselView (Flutter 3.24+) is a built-in Material 3 carousel widget
+/// that provides standard carousel behavior without external dependencies.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// import 'package:carousel_slider/carousel_slider.dart';
+///
+/// CarouselSlider(
+///   items: items,
+///   options: CarouselOptions(),
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// CarouselView(
+///   itemExtent: 300,
+///   children: items,
+/// )
+/// ```
+class PreferCarouselViewRule extends SaropaLintRule {
+  const PreferCarouselViewRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_carousel_view',
+    problemMessage:
+        'Consider using built-in CarouselView instead of third-party carousel.',
+    correctionMessage:
+        'CarouselView is available in Flutter 3.24+ and provides '
+        'standard M3 carousel behavior.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Known third-party carousel packages and their main widgets
+  static const Set<String> _carouselWidgets = <String>{
+    'CarouselSlider',
+    'PagedCarousel',
+    'Carousel',
+    'FlutterCarousel',
+  };
+
+  static const Set<String> _carouselPackages = <String>{
+    'carousel_slider',
+    'flutter_carousel_slider',
+    'flutter_carousel_widget',
+    'card_swiper',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check for carousel widget constructors
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (_carouselWidgets.contains(typeName)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+
+    // Check for carousel package imports
+    context.registry.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+
+      for (final String pkg in _carouselPackages) {
+        if (uri.startsWith('package:$pkg/')) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when using showSearch/SearchDelegate instead of SearchAnchor.
+///
+/// SearchAnchor (Flutter 3.10+) is the Material 3 search component that
+/// provides a modern, declarative search UI pattern.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// IconButton(
+///   icon: Icon(Icons.search),
+///   onPressed: () {
+///     showSearch(
+///       context: context,
+///       delegate: MySearchDelegate(),
+///     );
+///   },
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// SearchAnchor(
+///   builder: (context, controller) {
+///     return IconButton(
+///       icon: Icon(Icons.search),
+///       onPressed: () => controller.openView(),
+///     );
+///   },
+///   suggestionsBuilder: (context, controller) {
+///     return [/* suggestions */];
+///   },
+/// )
+/// ```
+class PreferSearchAnchorRule extends SaropaLintRule {
+  const PreferSearchAnchorRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_search_anchor',
+    problemMessage:
+        'Consider using SearchAnchor instead of showSearch/SearchDelegate.',
+    correctionMessage: 'SearchAnchor provides a modern M3 search pattern '
+        '(Flutter 3.10+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check for showSearch() calls
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name == 'showSearch') {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Check for SearchDelegate subclasses
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName == 'SearchDelegate') {
+          reporter.atNode(extendsClause, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when using GestureDetector for tap-outside-to-dismiss patterns.
+///
+/// TapRegion (Flutter 3.10+) provides a cleaner API for detecting taps
+/// outside a widget, commonly used for dismissing popups, dropdowns, etc.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// Stack(
+///   children: [
+///     GestureDetector(
+///       onTap: () => Navigator.pop(context),
+///       child: Container(color: Colors.black54),
+///     ),
+///     Center(child: MyPopup()),
+///   ],
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// TapRegion(
+///   onTapOutside: (_) => Navigator.pop(context),
+///   child: MyPopup(),
+/// )
+/// ```
+class PreferTapRegionForDismissRule extends SaropaLintRule {
+  const PreferTapRegionForDismissRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_tap_region_for_dismiss',
+    problemMessage:
+        'Consider using TapRegion for tap-outside-to-dismiss patterns.',
+    correctionMessage:
+        'TapRegion provides onTapOutside callback (Flutter 3.10+).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector') return;
+
+      // Check if this looks like a dismiss pattern
+      bool hasOnTap = false;
+      bool hasDismissPattern = false;
+
+      bool looksLikeBarrier = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+
+          // Look for onTap callback
+          if (argName == 'onTap') {
+            hasOnTap = true;
+
+            // Check if the callback contains dismiss-like calls
+            final Expression callback = arg.expression;
+            final String callbackSource = callback.toSource().toLowerCase();
+            if (callbackSource.contains('pop') ||
+                callbackSource.contains('dismiss') ||
+                callbackSource.contains('close') ||
+                callbackSource.contains('hide')) {
+              hasDismissPattern = true;
+            }
+          }
+
+          // Check for barrier-like child (transparent/semi-transparent container)
+          if (argName == 'child') {
+            final Expression childExpr = arg.expression;
+            if (childExpr is InstanceCreationExpression) {
+              final String childName =
+                  childExpr.constructorName.type.name.lexeme;
+              // Container/ColoredBox with color often indicates barrier
+              if (childName == 'Container' || childName == 'ColoredBox') {
+                for (final Expression childArg
+                    in childExpr.argumentList.arguments) {
+                  if (childArg is NamedExpression &&
+                      childArg.name.label.name == 'color') {
+                    // Has a color, likely a barrier
+                    looksLikeBarrier = true;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Report if it's onTap with dismiss pattern, or onTap with barrier-like child
+      if (hasOnTap && (hasDismissPattern || looksLikeBarrier)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Text widgets with dynamic content lack overflow handling.
+///
+/// Text displaying dynamic content (variables, user input) can overflow
+/// unexpectedly. Adding `overflow` or `maxLines` ensures graceful handling.
+///
+/// Only flags Text widgets that:
+/// - Use variable interpolation or non-literal strings
+/// - Are inside Expanded, Flexible, or constrained containers
+///
+/// **BAD:**
+/// ```dart
+/// Text(userName) // Dynamic content may overflow
+/// Text('$firstName $lastName') // Interpolated string
+/// Expanded(child: Text(description)) // Constrained width
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(userName, overflow: TextOverflow.ellipsis, maxLines: 1)
+/// Text('OK') // Static short text is fine
+/// Text('Submit', maxLines: 1) // Has maxLines
+/// ```
+class RequireTextOverflowHandlingRule extends SaropaLintRule {
+  const RequireTextOverflowHandlingRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_text_overflow_handling',
+    problemMessage:
+        'Text with dynamic content should have overflow handling to prevent layout issues.',
+    correctionMessage:
+        'Add overflow: TextOverflow.ellipsis and/or maxLines: 1 parameter.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String constructorName = node.constructorName.type.name.lexeme;
+      if (constructorName != 'Text') return;
+
+      // Check for overflow handling
+      bool hasOverflow = false;
+      bool hasMaxLines = false;
+      bool hasSoftWrap = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'overflow') hasOverflow = true;
+          if (argName == 'maxLines') hasMaxLines = true;
+          if (argName == 'softWrap') hasSoftWrap = true;
+        }
+      }
+
+      // Already has overflow handling
+      if (hasOverflow || hasMaxLines || hasSoftWrap) return;
+
+      // Check if text content is dynamic (not a simple string literal)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+
+      // Skip if it's a short static string (likely a label/button text)
+      if (firstArg is SimpleStringLiteral) {
+        final String value = firstArg.value;
+        // Skip short strings (e.g., buttons, labels) - unlikely to overflow
+        if (value.length <= 30 && !value.contains('\n')) return;
+      }
+
+      // Skip simple string literals without interpolation
+      if (firstArg is SimpleStringLiteral) return;
+
+      // Flag dynamic content: variables, interpolations, method calls
+      if (firstArg is StringInterpolation ||
+          firstArg is SimpleIdentifier ||
+          firstArg is PrefixedIdentifier ||
+          firstArg is MethodInvocation ||
+          firstArg is PropertyAccess ||
+          firstArg is IndexExpression ||
+          firstArg is ConditionalExpression ||
+          firstArg is BinaryExpression) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTextOverflowFix()];
+}
+
+class _AddTextOverflowFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.constructorName.type.name.lexeme != 'Text') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add overflow: TextOverflow.ellipsis, maxLines: 1',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find position before closing parenthesis
+        final int insertOffset = node.argumentList.rightParenthesis.offset;
+        final String comma =
+            node.argumentList.arguments.isEmpty ? '' : ', ';
+        builder.addSimpleInsertion(
+          insertOffset,
+          '${comma}overflow: TextOverflow.ellipsis, maxLines: 1',
+        );
+      });
+    });
+  }
+}
+
+/// Requires Image.network to have an errorBuilder for handling load failures.
+///
+/// Network images can fail to load due to connectivity issues, invalid URLs,
+/// or server errors. Without an errorBuilder, users see broken image icons.
+///
+/// **BAD:**
+/// ```dart
+/// Image.network('https://example.com/image.png')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.network(
+///   'https://example.com/image.png',
+///   errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+/// )
+/// ```
+class RequireImageErrorBuilderRule extends SaropaLintRule {
+  const RequireImageErrorBuilderRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_error_builder',
+    problemMessage: 'Network image should have an errorBuilder.',
+    correctionMessage:
+        'Add errorBuilder to handle image loading failures gracefully.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      final String? constructorName = node.constructorName.name?.name;
+
+      // Check for Image.network
+      if (typeName != 'Image') return;
+      if (constructorName != 'network') return;
+
+      bool hasErrorBuilder = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'errorBuilder') {
+          hasErrorBuilder = true;
+          break;
+        }
+      }
+
+      if (!hasErrorBuilder) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Requires network images to specify width and height for layout stability.
+///
+/// Network images without dimensions cause layout shifts (CLS) when they load,
+/// leading to poor user experience. Specifying dimensions reserves space
+/// before the image loads.
+///
+/// Only applies to:
+/// - `Image.network()`
+/// - `CachedNetworkImage()`
+///
+/// Does NOT flag:
+/// - `Image.asset()` - dimensions are typically known at build time
+/// - Images with `fit` parameter - usually sized by parent container
+/// - Images inside `SizedBox`, `Container` with dimensions
+///
+/// **BAD:**
+/// ```dart
+/// Image.network('https://example.com/image.png')
+/// CachedNetworkImage(imageUrl: url)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.network(
+///   'https://example.com/image.png',
+///   width: 200,
+///   height: 150,
+/// )
+/// SizedBox(
+///   width: 200,
+///   height: 150,
+///   child: Image.network(url, fit: BoxFit.cover),
+/// )
+/// ```
+class RequireImageDimensionsRule extends SaropaLintRule {
+  const RequireImageDimensionsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_dimensions',
+    problemMessage:
+        'Network image should specify width and height to prevent layout shifts.',
+    correctionMessage:
+        'Add width and height, or wrap in SizedBox with dimensions.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      final String? constructorName = node.constructorName.name?.name;
+
+      // Only check network images
+      bool isNetworkImage = false;
+      if (typeName == 'Image' && constructorName == 'network') {
+        isNetworkImage = true;
+      }
+      if (typeName == 'CachedNetworkImage') {
+        isNetworkImage = true;
+      }
+
+      if (!isNetworkImage) return;
+
+      bool hasWidth = false;
+      bool hasHeight = false;
+      bool hasFit = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'width') hasWidth = true;
+          if (argName == 'height') hasHeight = true;
+          if (argName == 'fit') hasFit = true;
+        }
+      }
+
+      // Allow if BoxFit is specified (usually means parent provides dimensions)
+      if (hasFit) return;
+
+      // Allow if has at least one dimension (aspect ratio can determine other)
+      if (hasWidth || hasHeight) return;
+
+      // Check if parent is a sizing widget (SizedBox, Container with size)
+      if (_hasParentWithDimensions(node)) return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  /// Checks if an ancestor provides dimensions (SizedBox, Container, etc.)
+  bool _hasParentWithDimensions(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+    const int maxDepth = 5; // Don't look too far up
+
+    while (current != null && depth < maxDepth) {
+      if (current is InstanceCreationExpression) {
+        final String parentType = current.constructorName.type.name.lexeme;
+
+        // SizedBox, Container, ConstrainedBox typically provide dimensions
+        if (parentType == 'SizedBox' ||
+            parentType == 'Container' ||
+            parentType == 'ConstrainedBox' ||
+            parentType == 'AspectRatio') {
+          // Check if the parent has width/height
+          for (final Expression arg in current.argumentList.arguments) {
+            if (arg is NamedExpression) {
+              final String argName = arg.name.label.name;
+              if (argName == 'width' ||
+                  argName == 'height' ||
+                  argName == 'constraints' ||
+                  argName == 'aspectRatio') {
+                return true;
+              }
+            }
+          }
+        }
+
+        // Expanded/Flexible in Row/Column will provide constraints
+        if (parentType == 'Expanded' || parentType == 'Flexible') {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+}
+
+/// Requires network images to have a placeholder or loadingBuilder.
+///
+/// Without a placeholder, users see nothing while images load,
+/// leading to poor perceived performance.
+///
+/// **BAD:**
+/// ```dart
+/// Image.network('https://example.com/image.png')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.network(
+///   'https://example.com/image.png',
+///   loadingBuilder: (context, child, progress) =>
+///       progress == null ? child : CircularProgressIndicator(),
+/// )
+/// // Or with CachedNetworkImage:
+/// CachedNetworkImage(
+///   imageUrl: url,
+///   placeholder: (context, url) => CircularProgressIndicator(),
+/// )
+/// ```
+class RequirePlaceholderForNetworkRule extends SaropaLintRule {
+  const RequirePlaceholderForNetworkRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_placeholder_for_network',
+    problemMessage: 'Network image should have a placeholder or loadingBuilder.',
+    correctionMessage:
+        'Add loadingBuilder or placeholder to show feedback during loading.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      final String? constructorName = node.constructorName.name?.name;
+
+      // Check for Image.network
+      bool isNetworkImage = false;
+      if (typeName == 'Image' && constructorName == 'network') {
+        isNetworkImage = true;
+      }
+      if (typeName == 'CachedNetworkImage') {
+        isNetworkImage = true;
+      }
+
+      if (!isNetworkImage) return;
+
+      bool hasPlaceholder = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'loadingBuilder' ||
+              argName == 'placeholder' ||
+              argName == 'progressIndicatorBuilder') {
+            hasPlaceholder = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasPlaceholder) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Requires ScrollController fields to be disposed in State classes.
+///
+/// ScrollController allocates native resources and listeners that must be
+/// released by calling dispose(). Failing to do so causes memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   final _scrollController = ScrollController();
+///   // Missing dispose - MEMORY LEAK!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   final _scrollController = ScrollController();
+///
+///   @override
+///   void dispose() {
+///     _scrollController.dispose();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireScrollControllerDisposeRule extends SaropaLintRule {
+  const RequireScrollControllerDisposeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_scroll_controller_dispose',
+    problemMessage:
+        'ScrollController is not disposed. This causes memory leaks.',
+    correctionMessage:
+        'Add _controller.dispose() in the dispose() method before super.dispose().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      // Must be exactly "State" with type argument (State<MyWidget>)
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Find ScrollController fields (including late fields)
+      final List<String> controllerNames = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            final String? typeName = member.fields.type?.toSource();
+            if (typeName != null && typeName.contains('ScrollController')) {
+              controllerNames.add(variable.name.lexeme);
+              continue;
+            }
+            // Check initializer for inferred types
+            final Expression? initializer = variable.initializer;
+            if (initializer is InstanceCreationExpression) {
+              final String initType =
+                  initializer.constructorName.type.name.lexeme;
+              if (initType == 'ScrollController') {
+                if (!controllerNames.contains(variable.name.lexeme)) {
+                  controllerNames.add(variable.name.lexeme);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (controllerNames.isEmpty) return;
+
+      // Find dispose method body
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check if each controller is disposed
+      for (final String name in controllerNames) {
+        final bool isDisposed = disposeBody != null &&
+            (disposeBody.contains('$name.dispose(') ||
+                disposeBody.contains('$name?.dispose(') ||
+                disposeBody.contains('$name.disposeSafe(') ||
+                disposeBody.contains('$name?.disposeSafe(') ||
+                disposeBody.contains('$name..dispose('));
+
+        if (!isDisposed) {
+          // Find and report the field declaration
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == name) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddScrollControllerDisposeFix()];
+}
+
+class _AddScrollControllerDisposeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: dispose ${node.name.lexeme} in dispose()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add ${node.name.lexeme}.dispose() in dispose() method\n  ',
+        );
+      });
+    });
+  }
+}
+
+/// Requires FocusNode fields to be disposed in State classes.
+///
+/// FocusNode allocates focus tree resources that must be released by calling
+/// dispose(). Failing to do so causes memory leaks and focus management issues.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   final _focusNode = FocusNode();
+///   // Missing dispose - MEMORY LEAK!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   final _focusNode = FocusNode();
+///
+///   @override
+///   void dispose() {
+///     _focusNode.dispose();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireFocusNodeDisposeRule extends SaropaLintRule {
+  const RequireFocusNodeDisposeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_focus_node_dispose',
+    problemMessage: 'FocusNode is not disposed. This causes memory leaks.',
+    correctionMessage:
+        'Add _focusNode.dispose() in the dispose() method before super.dispose().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      // Must be exactly "State" with type argument (State<MyWidget>)
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Find FocusNode fields (including late fields)
+      final List<String> nodeNames = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            final String? typeName = member.fields.type?.toSource();
+            if (typeName != null &&
+                (typeName.contains('FocusNode') ||
+                    typeName.contains('FocusScopeNode'))) {
+              nodeNames.add(variable.name.lexeme);
+              continue;
+            }
+            // Check initializer for inferred types
+            final Expression? initializer = variable.initializer;
+            if (initializer is InstanceCreationExpression) {
+              final String initType =
+                  initializer.constructorName.type.name.lexeme;
+              if (initType == 'FocusNode' || initType == 'FocusScopeNode') {
+                if (!nodeNames.contains(variable.name.lexeme)) {
+                  nodeNames.add(variable.name.lexeme);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (nodeNames.isEmpty) return;
+
+      // Find dispose method body
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check if each node is disposed
+      for (final String name in nodeNames) {
+        final bool isDisposed = disposeBody != null &&
+            (disposeBody.contains('$name.dispose(') ||
+                disposeBody.contains('$name?.dispose(') ||
+                disposeBody.contains('$name.disposeSafe(') ||
+                disposeBody.contains('$name?.disposeSafe(') ||
+                disposeBody.contains('$name..dispose('));
+
+        if (!isDisposed) {
+          // Find and report the field declaration
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == name) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddFocusNodeDisposeFix()];
+}
+
+class _AddFocusNodeDisposeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: dispose ${node.name.lexeme} in dispose()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add ${node.name.lexeme}.dispose() in dispose() method\n  ',
+        );
+      });
+    });
+  }
+}
+
+/// Suggests using Theme.textTheme instead of hardcoded TextStyle.
+///
+/// Hardcoded text styles make it difficult to maintain consistent
+/// typography and support theming/dark mode.
+///
+/// **BAD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: Theme.of(context).textTheme.headlineLarge,
+/// )
+/// ```
+class PreferTextThemeRule extends SaropaLintRule {
+  const PreferTextThemeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_text_theme',
+    problemMessage: 'Consider using Theme.textTheme instead of hardcoded TextStyle.',
+    correctionMessage:
+        'Use Theme.of(context).textTheme.* for consistent typography.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TextStyle') return;
+
+      // Check if inside a Text widget's style argument
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is NamedExpression && current.name.label.name == 'style') {
+          // Check if parent is Text widget
+          final AstNode? namedParent = current.parent;
+          if (namedParent is ArgumentList) {
+            final AstNode? argListParent = namedParent.parent;
+            if (argListParent is InstanceCreationExpression) {
+              final String parentType =
+                  argListParent.constructorName.type.name.lexeme;
+              if (parentType == 'Text' || parentType == 'RichText') {
+                reporter.atNode(node, code);
+                return;
+              }
+            }
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when scrollable widgets are nested without NestedScrollView.
+///
+/// Nested scrollables (ListView inside ListView) cause gestures to be
+/// ambiguous and can lead to poor scroll performance and UX issues.
+///
+/// **BAD:**
+/// ```dart
+/// ListView(
+///   children: [
+///     ListView.builder(...), // Nested scrollable!
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// NestedScrollView(
+///   headerSliverBuilder: (context, innerBoxIsScrolled) => [
+///     SliverAppBar(...),
+///   ],
+///   body: ListView.builder(...),
+/// )
+/// // Or use shrinkWrap + NeverScrollableScrollPhysics for inner list
+/// ```
+class AvoidNestedScrollablesRule extends SaropaLintRule {
+  const AvoidNestedScrollablesRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_nested_scrollables',
+    problemMessage: 'Nested scrollable widgets can cause scroll conflicts.',
+    correctionMessage:
+        'Use NestedScrollView, or add shrinkWrap: true and NeverScrollableScrollPhysics().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _scrollableWidgets = <String>{
+    'ListView',
+    'GridView',
+    'SingleChildScrollView',
+    'CustomScrollView',
+    'PageView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_scrollableWidgets.contains(typeName)) return;
+
+      // Check if this scrollable has shrinkWrap + NeverScrollableScrollPhysics
+      bool hasShrinkWrap = false;
+      bool hasNeverScrollPhysics = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'shrinkWrap') {
+            final String value = arg.expression.toSource();
+            if (value == 'true') hasShrinkWrap = true;
+          }
+          if (argName == 'physics') {
+            final String value = arg.expression.toSource();
+            if (value.contains('NeverScrollableScrollPhysics')) {
+              hasNeverScrollPhysics = true;
+            }
+          }
+        }
+      }
+
+      // If properly configured, it's fine
+      if (hasShrinkWrap && hasNeverScrollPhysics) return;
+
+      // Check if inside another scrollable
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType =
+              current.constructorName.type.name.lexeme;
+          if (_scrollableWidgets.contains(parentType) &&
+              parentType != 'NestedScrollView') {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+          // NestedScrollView is the proper solution
+          if (parentType == 'NestedScrollView') {
+            return;
+          }
+        }
+        current = current.parent;
       }
     });
   }

@@ -11,8 +11,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when ChangeNotifier subclass doesn't call notifyListeners.
 ///
@@ -38,7 +39,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   }
 /// }
 /// ```
-class RequireNotifyListenersRule extends DartLintRule {
+class RequireNotifyListenersRule extends SaropaLintRule {
   const RequireNotifyListenersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -50,9 +51,9 @@ class RequireNotifyListenersRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -72,7 +73,7 @@ class RequireNotifyListenersRule extends DartLintRule {
     });
   }
 
-  void _checkMethod(MethodDeclaration method, DiagnosticReporter reporter) {
+  void _checkMethod(MethodDeclaration method, SaropaDiagnosticReporter reporter) {
     // Skip getters and constructors
     if (method.isGetter || method.isStatic) return;
 
@@ -144,7 +145,7 @@ class _StateModificationVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-class RequireStreamControllerDisposeRule extends DartLintRule {
+class RequireStreamControllerDisposeRule extends SaropaLintRule {
   const RequireStreamControllerDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -155,9 +156,9 @@ class RequireStreamControllerDisposeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -165,8 +166,12 @@ class RequireStreamControllerDisposeRule extends DartLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name.lexeme;
-      if (!superName.contains('State')) return;
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      // Must be exactly "State" with type argument (not StatefulWidget, StateManager, etc.)
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
 
       // Find StreamController fields
       final List<String> controllerNames = <String>[];
@@ -318,7 +323,7 @@ class _CloseCallVisitor extends RecursiveAstVisitor<void> {
 ///   super.dispose();
 /// }
 /// ```
-class RequireValueNotifierDisposeRule extends DartLintRule {
+class RequireValueNotifierDisposeRule extends SaropaLintRule {
   const RequireValueNotifierDisposeRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -329,9 +334,9 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -440,7 +445,7 @@ class RequireValueNotifierDisposeRule extends DartLintRule {
   void _reportUndisposed(
     ClassDeclaration classNode,
     String fieldName,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     for (final ClassMember member in classNode.members) {
       if (member is FieldDeclaration) {
@@ -594,7 +599,7 @@ class _SimpleDisposeChecker extends RecursiveAstVisitor<void> {
 ///   });
 /// }
 /// ```
-class RequireMountedCheckRule extends DartLintRule {
+class RequireMountedCheckRule extends SaropaLintRule {
   const RequireMountedCheckRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -605,9 +610,9 @@ class RequireMountedCheckRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -622,8 +627,12 @@ class RequireMountedCheckRule extends DartLintRule {
       final ExtendsClause? extendsClause = classDecl.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name.lexeme;
-      if (!superName.contains('State')) return;
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      // Must be exactly "State" with type argument (not StateManager, etc.)
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
 
       // Look for await expressions followed by setState without mounted check
       node.body.visitChildren(_AsyncSetStateVisitor(reporter, code));
@@ -665,7 +674,7 @@ class _AddHackForMountedCheckFix extends DartFix {
 class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
   _AsyncSetStateVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
   bool _sawAwait = false;
   bool _hasMountedCheck = false;
@@ -713,7 +722,7 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 ///   final count = context.read<Counter>().value;
 /// }
 /// ```
-class AvoidWatchInCallbacksRule extends DartLintRule {
+class AvoidWatchInCallbacksRule extends SaropaLintRule {
   const AvoidWatchInCallbacksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -724,9 +733,9 @@ class AvoidWatchInCallbacksRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -768,7 +777,7 @@ class AvoidWatchInCallbacksRule extends DartLintRule {
 /// }
 /// // Add event from outside: bloc.add(LoadEvent());
 /// ```
-class AvoidBlocEventInConstructorRule extends DartLintRule {
+class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   const AvoidBlocEventInConstructorRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -780,9 +789,9 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -807,7 +816,7 @@ class AvoidBlocEventInConstructorRule extends DartLintRule {
 class _AddCallVisitor extends RecursiveAstVisitor<void> {
   _AddCallVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -839,7 +848,7 @@ class _AddCallVisitor extends RecursiveAstVisitor<void> {
 ///   }
 /// }
 /// ```
-class RequireUpdateShouldNotifyRule extends DartLintRule {
+class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   const RequireUpdateShouldNotifyRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -851,9 +860,9 @@ class RequireUpdateShouldNotifyRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -903,7 +912,7 @@ class RequireUpdateShouldNotifyRule extends DartLintRule {
 ///   child: MyApp(),
 /// )
 /// ```
-class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
+class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   const AvoidGlobalRiverpodProvidersRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -926,9 +935,9 @@ class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTopLevelVariableDeclaration((
@@ -979,7 +988,7 @@ class AvoidGlobalRiverpodProvidersRule extends DartLintRule {
 ///   Widget build(BuildContext context) => Text('Hello');
 /// }
 /// ```
-class AvoidStatefulWithoutStateRule extends DartLintRule {
+class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   const AvoidStatefulWithoutStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -992,18 +1001,22 @@ class AvoidStatefulWithoutStateRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Check if extends State
+      // Check if extends State<T>
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superName = extendsClause.superclass.name.lexeme;
-      if (!superName.startsWith('State')) return;
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      // Must be exactly "State" with type argument (not StateManager, etc.)
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
 
       // Check if has any non-final fields (actual state)
       bool hasState = false;
@@ -1056,7 +1069,7 @@ class AvoidStatefulWithoutStateRule extends DartLintRule {
 ///   return Form(key: _formKey, ...);
 /// }
 /// ```
-class AvoidGlobalKeyInBuildRule extends DartLintRule {
+class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   const AvoidGlobalKeyInBuildRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1067,9 +1080,9 @@ class AvoidGlobalKeyInBuildRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1115,7 +1128,7 @@ class _AddHackForGlobalKeyInBuildFix extends DartFix {
 class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
   _GlobalKeyVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -1125,5 +1138,341 @@ class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
       reporter.atNode(node, code);
     }
     super.visitInstanceCreationExpression(node);
+  }
+}
+
+/// Requires Bloc/Cubit fields to be closed in dispose.
+///
+/// Bloc and Cubit instances created in a State class must be closed when
+/// the widget is disposed to prevent memory leaks and cancel active
+/// stream subscriptions.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   final _counterBloc = CounterBloc();
+///   // Missing close - MEMORY LEAK!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   final _counterBloc = CounterBloc();
+///
+///   @override
+///   void dispose() {
+///     _counterBloc.close();
+///     super.dispose();
+///   }
+/// }
+/// ```
+///
+/// Note: Blocs provided via BlocProvider or dependency injection
+/// are typically managed externally and don't need to be closed here.
+class RequireBlocCloseRule extends SaropaLintRule {
+  const RequireBlocCloseRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_close',
+    problemMessage:
+        'Bloc/Cubit is not closed in dispose(). This causes memory leaks.',
+    correctionMessage:
+        'Add _bloc.close() in the dispose() method before super.dispose().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      // Must be exactly "State" with type argument
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Find Bloc/Cubit fields that are CREATED locally (have initializers)
+      // Fields without initializers are typically injected and managed elsewhere
+      final List<String> blocNames = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            // Only check fields with initializers (locally created)
+            final Expression? initializer = variable.initializer;
+            if (initializer == null) continue;
+
+            final String? typeName = member.fields.type?.toSource();
+            if (typeName != null &&
+                (typeName.endsWith('Bloc') ||
+                    typeName.endsWith('Cubit') ||
+                    typeName.contains('Bloc<') ||
+                    typeName.contains('Cubit<'))) {
+              blocNames.add(variable.name.lexeme);
+              continue;
+            }
+
+            // Check initializer type
+            if (initializer is InstanceCreationExpression) {
+              final String initType =
+                  initializer.constructorName.type.name.lexeme;
+              if (initType.endsWith('Bloc') || initType.endsWith('Cubit')) {
+                if (!blocNames.contains(variable.name.lexeme)) {
+                  blocNames.add(variable.name.lexeme);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (blocNames.isEmpty) return;
+
+      // Find dispose method body
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check if each bloc is closed
+      for (final String name in blocNames) {
+        final bool isClosed = disposeBody != null &&
+            (disposeBody.contains('$name.close(') ||
+                disposeBody.contains('$name?.close(') ||
+                disposeBody.contains('$name.closeSafe(') ||
+                disposeBody.contains('$name?.closeSafe(') ||
+                disposeBody.contains('$name..close('));
+
+        if (!isClosed) {
+          // Find and report the field declaration
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == name) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddBlocCloseFix()];
+}
+
+class _AddBlocCloseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: close ${node.name.lexeme} in dispose()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add ${node.name.lexeme}.close() in dispose() method\n  ',
+        );
+      });
+    });
+  }
+}
+
+/// Suggests using ConsumerWidget instead of Consumer.
+///
+/// ConsumerWidget provides a cleaner API than wrapping your build
+/// method with Consumer widget. It's the recommended approach in Riverpod.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     return Consumer(
+///       builder: (context, ref, child) {
+///         final value = ref.watch(myProvider);
+///         return Text(value);
+///       },
+///     );
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends ConsumerWidget {
+///   @override
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     final value = ref.watch(myProvider);
+///     return Text(value);
+///   }
+/// }
+/// ```
+class PreferConsumerWidgetRule extends SaropaLintRule {
+  const PreferConsumerWidgetRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_consumer_widget',
+    problemMessage:
+        'Consider using ConsumerWidget instead of Consumer for cleaner code.',
+    correctionMessage:
+        'Extend ConsumerWidget instead of wrapping with Consumer.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Consumer') return;
+
+      // Check if this Consumer is the root of a build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is ReturnStatement) {
+          final AstNode? returnParent = current.parent;
+          if (returnParent is Block) {
+            final AstNode? blockParent = returnParent.parent;
+            if (blockParent is BlockFunctionBody) {
+              final AstNode? bodyParent = blockParent.parent;
+              if (bodyParent is MethodDeclaration &&
+                  bodyParent.name.lexeme == 'build') {
+                reporter.atNode(node, code);
+                return;
+              }
+            }
+          }
+        }
+        // Also check for expression body: Widget build(...) => Consumer(...)
+        if (current is ExpressionFunctionBody) {
+          final AstNode? bodyParent = current.parent;
+          if (bodyParent is MethodDeclaration &&
+              bodyParent.name.lexeme == 'build') {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Suggests using autoDispose modifier on Riverpod providers.
+///
+/// Providers without autoDispose will stay in memory forever once created.
+/// Using autoDispose ensures the provider is disposed when no longer watched.
+///
+/// **BAD:**
+/// ```dart
+/// final myProvider = StateProvider<int>((ref) => 0);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final myProvider = StateProvider.autoDispose<int>((ref) => 0);
+/// // Or with @riverpod annotation:
+/// @riverpod
+/// class MyNotifier extends _$MyNotifier { ... }
+/// ```
+class RequireAutoDisposeRule extends SaropaLintRule {
+  const RequireAutoDisposeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_auto_dispose',
+    problemMessage:
+        'Riverpod provider should use autoDispose to prevent memory leaks.',
+    correctionMessage:
+        'Use Provider.autoDispose, StateProvider.autoDispose, etc.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _providerTypes = <String>{
+    'Provider',
+    'StateProvider',
+    'FutureProvider',
+    'StreamProvider',
+    'NotifierProvider',
+    'AsyncNotifierProvider',
+    'StateNotifierProvider',
+    'ChangeNotifierProvider',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addTopLevelVariableDeclaration((
+      TopLevelVariableDeclaration node,
+    ) {
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final Expression? initializer = variable.initializer;
+
+        // Handle method invocations like Provider.family(...) or Provider.autoDispose(...)
+        if (initializer is MethodInvocation) {
+          final String methodName = initializer.methodName.name;
+          final Expression? target = initializer.target;
+
+          // Skip if already using autoDispose
+          if (methodName == 'autoDispose') continue;
+
+          // Check if target is a provider type (e.g., Provider.family)
+          if (target is SimpleIdentifier) {
+            final String targetName = target.name;
+            if (_providerTypes.contains(targetName)) {
+              // It's a provider modifier (like .family) without autoDispose
+              reporter.atNode(variable, code);
+            }
+          }
+        }
+
+        // Handle direct construction like StateProvider<int>((ref) => 0)
+        if (initializer is InstanceCreationExpression) {
+          final String typeName = initializer.constructorName.type.name.lexeme;
+          final String? constructorName = initializer.constructorName.name?.name;
+
+          // Check if it's a provider without autoDispose
+          if (_providerTypes.contains(typeName)) {
+            // Check if it uses autoDispose constructor
+            if (constructorName != 'autoDispose' &&
+                !typeName.contains('AutoDispose')) {
+              reporter.atNode(variable, code);
+            }
+          }
+        }
+      }
+    });
   }
 }

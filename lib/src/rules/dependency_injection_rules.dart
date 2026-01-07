@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when service locator is accessed directly in widgets.
 ///
@@ -38,14 +39,15 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   }
 /// }
 /// ```
-class AvoidServiceLocatorInWidgetsRule extends DartLintRule {
+class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
   const AvoidServiceLocatorInWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_in_widgets',
-    problemMessage: 'Avoid accessing service locator directly in widgets.',
+    problemMessage:
+        'Service locator in widget hides dependencies. Cannot mock in widget tests.',
     correctionMessage:
-        'Inject dependencies through constructor or use Provider/Riverpod.',
+        'Add required constructor parameter: MyWidget({required this.service}).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -61,9 +63,9 @@ class AvoidServiceLocatorInWidgetsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -116,14 +118,15 @@ class AvoidServiceLocatorInWidgetsRule extends DartLintRule {
 ///   final OrderNotifier orderNotifier;
 /// }
 /// ```
-class AvoidTooManyDependenciesRule extends DartLintRule {
+class AvoidTooManyDependenciesRule extends SaropaLintRule {
   const AvoidTooManyDependenciesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_too_many_dependencies',
-    problemMessage: 'Class has too many constructor dependencies.',
+    problemMessage:
+        'Constructor has >5 dependencies. Class likely violates Single Responsibility.',
     correctionMessage:
-        'Consider splitting into smaller classes or using a facade pattern.',
+        'Group related dependencies into a facade class, or split this class.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -131,9 +134,9 @@ class AvoidTooManyDependenciesRule extends DartLintRule {
   static const int _maxDependencies = 5;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -216,14 +219,15 @@ class AvoidTooManyDependenciesRule extends DartLintRule {
 ///   final ApiClient _api;
 /// }
 /// ```
-class AvoidInternalDependencyCreationRule extends DartLintRule {
+class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   const AvoidInternalDependencyCreationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
-    problemMessage: 'Dependencies should be injected, not created internally.',
+    problemMessage:
+        'Dependency created internally. Cannot substitute mock for testing.',
     correctionMessage:
-        'Accept the dependency as a constructor parameter instead.',
+        'Add constructor parameter: MyClass(this._repo); then inject from outside.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -241,9 +245,9 @@ class AvoidInternalDependencyCreationRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -289,15 +293,15 @@ class AvoidInternalDependencyCreationRule extends DartLintRule {
 ///   final UserRepository repo; // Depends on abstraction
 /// }
 /// ```
-class PreferAbstractDependenciesRule extends DartLintRule {
+class PreferAbstractDependenciesRule extends SaropaLintRule {
   const PreferAbstractDependenciesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_dependencies',
     problemMessage:
-        'Depend on abstractions rather than concrete implementations.',
+        'Depends on concrete implementation. Tight coupling prevents substitution.',
     correctionMessage:
-        'Use an interface or abstract class for better testability.',
+        'Use abstract type: replace PostgresUserRepo with UserRepository interface.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -319,9 +323,9 @@ class PreferAbstractDependenciesRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -374,14 +378,15 @@ class PreferAbstractDependenciesRule extends DartLintRule {
 /// getIt.registerFactory(() => UserSession());
 /// getIt.registerFactoryParam((userId, _) => ShoppingCart(userId));
 /// ```
-class AvoidSingletonForScopedDependenciesRule extends DartLintRule {
+class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   const AvoidSingletonForScopedDependenciesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_for_scoped_dependencies',
-    problemMessage: 'This dependency should be scoped, not a singleton.',
+    problemMessage:
+        'Scoped data as singleton. State will persist across sessions/screens.',
     correctionMessage:
-        'Use registerFactory or registerLazySingleton with proper scoping.',
+        'Use registerFactory(() => MySession()) for fresh instance per scope.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -399,9 +404,9 @@ class AvoidSingletonForScopedDependenciesRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -452,7 +457,7 @@ class AvoidSingletonForScopedDependenciesRule extends DartLintRule {
 ///   final DataProvider dataProvider;
 /// }
 /// ```
-class AvoidCircularDiDependenciesRule extends DartLintRule {
+class AvoidCircularDiDependenciesRule extends SaropaLintRule {
   const AvoidCircularDiDependenciesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -464,9 +469,9 @@ class AvoidCircularDiDependenciesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -557,7 +562,7 @@ class AvoidCircularDiDependenciesRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class PreferNullObjectPatternRule extends DartLintRule {
+class PreferNullObjectPatternRule extends SaropaLintRule {
   const PreferNullObjectPatternRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -579,9 +584,9 @@ class PreferNullObjectPatternRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -618,7 +623,7 @@ class PreferNullObjectPatternRule extends DartLintRule {
 /// getIt.registerSingleton<UserService>(UserService());
 /// getIt.registerSingleton<IUserService>(UserServiceImpl());
 /// ```
-class RequireTypedDiRegistrationRule extends DartLintRule {
+class RequireTypedDiRegistrationRule extends SaropaLintRule {
   const RequireTypedDiRegistrationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -637,9 +642,9 @@ class RequireTypedDiRegistrationRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {

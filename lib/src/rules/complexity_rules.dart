@@ -6,8 +6,9 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when bitwise operators are used with boolean operands.
 ///
@@ -27,20 +28,22 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// ```
 ///
 /// **Quick fix available:** Replaces `&` with `&&` or `|` with `||`.
-class AvoidBitwiseOperatorsWithBooleansRule extends DartLintRule {
+class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   const AvoidBitwiseOperatorsWithBooleansRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_bitwise_operators_with_booleans',
-    problemMessage: 'Avoid using bitwise operators with boolean operands.',
-    correctionMessage: 'Use && instead of & and || instead of |.',
+    problemMessage:
+        'Bitwise operator on boolean. Unlike &&/||, this does not short-circuit.',
+    correctionMessage:
+        'Use && instead of & and || instead of | for boolean logic.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -84,7 +87,7 @@ class AvoidBitwiseOperatorsWithBooleansRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidCascadeAfterIfNullRule extends DartLintRule {
+class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   const AvoidCascadeAfterIfNullRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -96,9 +99,9 @@ class AvoidCascadeAfterIfNullRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCascadeExpression((CascadeExpression node) {
@@ -133,7 +136,7 @@ class AvoidCascadeAfterIfNullRule extends DartLintRule {
 /// final quotient = c / d;
 /// final result = product + quotient - e % f + g * h;
 /// ```
-class AvoidComplexArithmeticExpressionsRule extends DartLintRule {
+class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   const AvoidComplexArithmeticExpressionsRule() : super(code: _code);
 
   static const int _maxOperators = 4;
@@ -156,9 +159,9 @@ class AvoidComplexArithmeticExpressionsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -205,7 +208,7 @@ class AvoidComplexArithmeticExpressionsRule extends DartLintRule {
 /// final isSecondCondition = c && d;
 /// if (isFirstCondition || isSecondCondition || e && f) { ... }
 /// ```
-class AvoidComplexConditionsRule extends DartLintRule {
+class AvoidComplexConditionsRule extends SaropaLintRule {
   const AvoidComplexConditionsRule() : super(code: _code);
 
   static const int _maxOperators = 3;
@@ -218,9 +221,9 @@ class AvoidComplexConditionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -284,7 +287,7 @@ class AvoidComplexConditionsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidDuplicateCascadesRule extends DartLintRule {
+class AvoidDuplicateCascadesRule extends SaropaLintRule {
   const AvoidDuplicateCascadesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -295,9 +298,9 @@ class AvoidDuplicateCascadesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCascadeExpression((CascadeExpression node) {
@@ -336,7 +339,7 @@ class AvoidDuplicateCascadesRule extends DartLintRule {
 /// final condition2 = c && d;
 /// if (condition1 || condition2) { }
 /// ```
-class AvoidExcessiveExpressionsRule extends DartLintRule {
+class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   const AvoidExcessiveExpressionsRule() : super(code: _code);
 
   static const int _maxOperators = 5;
@@ -350,9 +353,9 @@ class AvoidExcessiveExpressionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -403,7 +406,7 @@ class AvoidExcessiveExpressionsRule extends DartLintRule {
 ///   return temp * 2;
 /// }
 /// ```
-class AvoidImmediatelyInvokedFunctionsRule extends DartLintRule {
+class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   const AvoidImmediatelyInvokedFunctionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -414,9 +417,9 @@ class AvoidImmediatelyInvokedFunctionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry
@@ -440,7 +443,7 @@ class AvoidImmediatelyInvokedFunctionsRule extends DartLintRule {
 }
 
 /// Warns when shorthand syntax is nested too deeply.
-class AvoidNestedShorthandsRule extends DartLintRule {
+class AvoidNestedShorthandsRule extends SaropaLintRule {
   const AvoidNestedShorthandsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -451,9 +454,9 @@ class AvoidNestedShorthandsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConditionalExpression((ConditionalExpression node) {
@@ -502,7 +505,7 @@ class AvoidNestedShorthandsRule extends DartLintRule {
 /// b = 0;
 /// c = 0;
 /// ```
-class AvoidMultiAssignmentRule extends DartLintRule {
+class AvoidMultiAssignmentRule extends SaropaLintRule {
   const AvoidMultiAssignmentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -513,9 +516,9 @@ class AvoidMultiAssignmentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -531,7 +534,7 @@ class AvoidMultiAssignmentRule extends DartLintRule {
 ///
 /// Prefer having the variable on the left side of comparisons for readability.
 /// Example: Prefer `x == 5` over `5 == x`.
-class BinaryExpressionOperandOrderRule extends DartLintRule {
+class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   const BinaryExpressionOperandOrderRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -542,9 +545,9 @@ class BinaryExpressionOperandOrderRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -564,7 +567,7 @@ class BinaryExpressionOperandOrderRule extends DartLintRule {
 ///
 /// Repeated expressions can be error-prone and inefficient. Consider
 /// extracting them to a local variable.
-class PreferMovingToVariableRule extends DartLintRule {
+class PreferMovingToVariableRule extends SaropaLintRule {
   const PreferMovingToVariableRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -575,9 +578,9 @@ class PreferMovingToVariableRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -639,7 +642,7 @@ class _ExpressionCollector extends RecursiveAstVisitor<void> {
 /// final x = a ?? (b + c);
 /// final y = (a * b) ?? c;
 /// ```
-class PreferParenthesesWithIfNullRule extends DartLintRule {
+class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   const PreferParenthesesWithIfNullRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -650,9 +653,9 @@ class PreferParenthesesWithIfNullRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {

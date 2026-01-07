@@ -2,12 +2,15 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../saropa_lint_rule.dart';
+
 /// Warns when a getter name starts with 'get'.
-class AvoidGetterPrefixRule extends DartLintRule {
+class AvoidGetterPrefixRule extends SaropaLintRule {
   const AvoidGetterPrefixRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -18,9 +21,9 @@ class AvoidGetterPrefixRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -56,7 +59,7 @@ class AvoidGetterPrefixRule extends DartLintRule {
 /// ```dart
 /// final text = 'Hello World';
 /// ```
-class AvoidNonAsciiSymbolsRule extends DartLintRule {
+class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   const AvoidNonAsciiSymbolsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -67,9 +70,9 @@ class AvoidNonAsciiSymbolsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
@@ -103,7 +106,9 @@ class AvoidNonAsciiSymbolsRule extends DartLintRule {
 /// // This is a good comment.
 /// /// Returns the value.
 /// ```
-class FormatCommentRule extends DartLintRule {
+class FormatCommentRule extends SaropaLintRule {
+  /// Pre-compiled pattern for performance
+  static final RegExp _lowercaseStartPattern = RegExp(r'^[a-z]');
   const FormatCommentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -114,9 +119,9 @@ class FormatCommentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit unit) {
@@ -144,7 +149,7 @@ class FormatCommentRule extends DartLintRule {
             final String content = lexeme.substring(2).trim();
             if (content.isNotEmpty && content[0].toLowerCase() == content[0]) {
               // First char is lowercase
-              if (RegExp(r'^[a-z]').hasMatch(content)) {
+              if (_lowercaseStartPattern.hasMatch(content)) {
                 reporter.atToken(commentToken, code);
               }
             }
@@ -174,7 +179,7 @@ class FormatCommentRule extends DartLintRule {
 /// ```dart
 /// class UserWidget extends StatelessWidget { }
 /// ```
-class MatchClassNamePatternRule extends DartLintRule {
+class MatchClassNamePatternRule extends SaropaLintRule {
   const MatchClassNamePatternRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -185,9 +190,9 @@ class MatchClassNamePatternRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -258,7 +263,7 @@ class MatchClassNamePatternRule extends DartLintRule {
 /// int _count;
 /// int get count => _count;
 /// ```
-class MatchGetterSetterFieldNamesRule extends DartLintRule {
+class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
   const MatchGetterSetterFieldNamesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -269,9 +274,9 @@ class MatchGetterSetterFieldNamesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -332,7 +337,7 @@ class MatchGetterSetterFieldNamesRule extends DartLintRule {
 /// lib/src/utils/helper.dart
 /// test/src/utils/helper_test.dart
 /// ```
-class MatchLibFolderStructureRule extends DartLintRule {
+class MatchLibFolderStructureRule extends SaropaLintRule {
   const MatchLibFolderStructureRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -343,9 +348,9 @@ class MatchLibFolderStructureRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -372,7 +377,7 @@ class MatchLibFolderStructureRule extends DartLintRule {
 }
 
 /// Warns when positional field names don't match the variable being assigned.
-class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
+class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   const MatchPositionalFieldNamesOnAssignmentRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -385,9 +390,9 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPatternAssignment((PatternAssignment node) {
@@ -406,7 +411,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
     });
   }
 
-  void _checkRecordPattern(RecordPattern pattern, DiagnosticReporter reporter) {
+  void _checkRecordPattern(RecordPattern pattern, SaropaDiagnosticReporter reporter) {
     for (final PatternField field in pattern.fields) {
       final PatternFieldName? fieldName = field.name;
       if (fieldName == null) continue;
@@ -438,7 +443,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends DartLintRule {
 /// bool isEnabled = true;
 /// bool isVisible = false;
 /// ```
-class PreferBooleanPrefixesRule extends DartLintRule {
+class PreferBooleanPrefixesRule extends SaropaLintRule {
   const PreferBooleanPrefixesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -474,9 +479,9 @@ class PreferBooleanPrefixesRule extends DartLintRule {
   ];
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
@@ -517,7 +522,7 @@ class PreferBooleanPrefixesRule extends DartLintRule {
 }
 
 /// Warns when callback fields don't follow onX naming convention.
-class PreferCorrectCallbackFieldNameRule extends DartLintRule {
+class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   const PreferCorrectCallbackFieldNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -528,9 +533,9 @@ class PreferCorrectCallbackFieldNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
@@ -637,7 +642,7 @@ class PreferCorrectCallbackFieldNameRule extends DartLintRule {
 /// } catch (error) {
 /// }
 /// ```
-class PreferCorrectErrorNameRule extends DartLintRule {
+class PreferCorrectErrorNameRule extends SaropaLintRule {
   const PreferCorrectErrorNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -657,9 +662,9 @@ class PreferCorrectErrorNameRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
@@ -690,7 +695,7 @@ class PreferCorrectErrorNameRule extends DartLintRule {
 /// void onButtonClicked() { }
 /// void _onTap() { }
 /// ```
-class PreferCorrectHandlerNameRule extends DartLintRule {
+class PreferCorrectHandlerNameRule extends SaropaLintRule {
   const PreferCorrectHandlerNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -722,9 +727,9 @@ class PreferCorrectHandlerNameRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -761,7 +766,7 @@ class PreferCorrectHandlerNameRule extends DartLintRule {
 /// int count = 5;
 /// String userName = '';
 /// ```
-class PreferCorrectIdentifierLengthRule extends DartLintRule {
+class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
   const PreferCorrectIdentifierLengthRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -798,9 +803,9 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
   static const int _maxLength = 40;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
@@ -816,7 +821,7 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
   }
 
   void _checkIdentifier(
-      String name, AstNode node, DiagnosticReporter reporter) {
+      String name, AstNode node, SaropaDiagnosticReporter reporter) {
     // Skip private names (start with _)
     final String publicName = name.startsWith('_') ? name.substring(1) : name;
 
@@ -853,7 +858,7 @@ class PreferCorrectIdentifierLengthRule extends DartLintRule {
 /// set name(String value) => _name = value;
 /// set count(int value) => _count = value;
 /// ```
-class PreferCorrectSetterParameterNameRule extends DartLintRule {
+class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
   const PreferCorrectSetterParameterNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -864,9 +869,9 @@ class PreferCorrectSetterParameterNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -909,7 +914,7 @@ class PreferCorrectSetterParameterNameRule extends DartLintRule {
 /// ```dart
 /// typedef Callback = void Function(String message, int count);
 /// ```
-class PreferExplicitParameterNamesRule extends DartLintRule {
+class PreferExplicitParameterNamesRule extends SaropaLintRule {
   const PreferExplicitParameterNamesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -920,9 +925,9 @@ class PreferExplicitParameterNamesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addGenericFunctionType((GenericFunctionType node) {
@@ -944,7 +949,7 @@ class PreferExplicitParameterNamesRule extends DartLintRule {
 ///
 /// By convention, the file name should match the main class or type defined
 /// in the file to make it easier to locate code.
-class PreferMatchFileNameRule extends DartLintRule {
+class PreferMatchFileNameRule extends SaropaLintRule {
   const PreferMatchFileNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -955,9 +960,9 @@ class PreferMatchFileNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCompilationUnit((CompilationUnit node) {
@@ -1003,7 +1008,7 @@ class PreferMatchFileNameRule extends DartLintRule {
 /// // OR
 /// const maxRetriesCount = 3; // Descriptive name
 /// ```
-class PreferPrefixedGlobalConstantsRule extends DartLintRule {
+class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
   const PreferPrefixedGlobalConstantsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1015,9 +1020,9 @@ class PreferPrefixedGlobalConstantsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTopLevelVariableDeclaration((
@@ -1062,7 +1067,7 @@ class PreferPrefixedGlobalConstantsRule extends DartLintRule {
 }
 
 /// Warns when widget tag names don't follow conventions.
-class TagNameRule extends DartLintRule {
+class TagNameRule extends SaropaLintRule {
   const TagNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1073,9 +1078,9 @@ class TagNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -1120,7 +1125,7 @@ class TagNameRule extends DartLintRule {
 ///   bool get isBlank => trim().isEmpty;
 /// }
 /// ```
-class PreferNamedExtensionsRule extends DartLintRule {
+class PreferNamedExtensionsRule extends SaropaLintRule {
   const PreferNamedExtensionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1132,9 +1137,9 @@ class PreferNamedExtensionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
@@ -1162,7 +1167,7 @@ class PreferNamedExtensionsRule extends DartLintRule {
 /// StringCallback onError;
 /// StringCallback onProgress;
 /// ```
-class PreferTypedefForCallbacksRule extends DartLintRule {
+class PreferTypedefForCallbacksRule extends SaropaLintRule {
   const PreferTypedefForCallbacksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1174,9 +1179,9 @@ class PreferTypedefForCallbacksRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Track function type signatures to find repeats
@@ -1227,7 +1232,7 @@ class PreferTypedefForCallbacksRule extends DartLintRule {
 ///   String get displayName => name.toUpperCase();
 /// }
 /// ```
-class PreferEnhancedEnumsRule extends DartLintRule {
+class PreferEnhancedEnumsRule extends SaropaLintRule {
   const PreferEnhancedEnumsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1238,9 +1243,9 @@ class PreferEnhancedEnumsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Collect enum names
@@ -1263,5 +1268,177 @@ class PreferEnhancedEnumsRule extends DartLintRule {
         }
       }
     });
+  }
+}
+
+/// Warns when a parameter is unused and could use wildcard `_`.
+///
+/// Dart 3.7 introduced true wildcard variables where `_` doesn't bind.
+/// Unused parameters should use `_` to signal intent.
+///
+/// Example of **bad** code:
+/// ```dart
+/// void onClick(BuildContext context, int index) {
+///   print('Clicked'); // context and index not used
+/// }
+///
+/// list.map((item) => 42); // item not used
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// void onClick(BuildContext _, int __) {
+///   print('Clicked');
+/// }
+///
+/// list.map((_) => 42);
+/// ```
+class PreferWildcardForUnusedParamRule extends SaropaLintRule {
+  const PreferWildcardForUnusedParamRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_wildcard_for_unused_param',
+    problemMessage: 'Parameter is unused. Consider using _ wildcard (Dart 3.7+).',
+    correctionMessage: 'Replace with _ to indicate the parameter is intentionally unused.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check function declarations
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      final FormalParameterList? params = node.functionExpression.parameters;
+      if (params == null) return;
+
+      final FunctionBody body = node.functionExpression.body;
+      _checkUnusedParams(params.parameters, body, reporter);
+    });
+
+    // Check method declarations
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final FormalParameterList? params = node.parameters;
+      if (params == null) return;
+
+      _checkUnusedParams(params.parameters, node.body, reporter);
+    });
+
+    // Check function expressions (lambdas, callbacks)
+    context.registry.addFunctionExpression((FunctionExpression node) {
+      // Skip if it's part of a function declaration (handled above)
+      if (node.parent is FunctionDeclaration) return;
+
+      final FormalParameterList? params = node.parameters;
+      if (params == null) return;
+
+      _checkUnusedParams(params.parameters, node.body, reporter);
+    });
+  }
+
+  void _checkUnusedParams(
+    NodeList<FormalParameter> params,
+    FunctionBody body,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final FormalParameter param in params) {
+      final Token? nameToken = param.name;
+      if (nameToken == null) continue;
+
+      final String name = nameToken.lexeme;
+
+      // Skip if already a wildcard pattern
+      if (name == '_' || name.startsWith('_') && name.replaceAll('_', '').isEmpty) {
+        continue;
+      }
+
+      // Skip 'this.' and 'super.' parameters - they're always "used"
+      if (param is FieldFormalParameter || param is SuperFormalParameter) {
+        continue;
+      }
+
+      // Check if the parameter is used in the body
+      final bool isUsed = _isIdentifierUsedInBody(name, body);
+
+      if (!isUsed) {
+        reporter.atToken(nameToken, code);
+      }
+    }
+  }
+
+  bool _isIdentifierUsedInBody(String name, AstNode body) {
+    final _IdentifierUsageVisitor visitor = _IdentifierUsageVisitor(name);
+    body.accept(visitor);
+    return visitor.isUsed;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceWithWildcardFix()];
+}
+
+class _ReplaceWithWildcardFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Handle all parameter types
+    void handleParam(FormalParameter param) {
+      final Token? nameToken = param.name;
+      if (nameToken == null) return;
+      if (!SourceRange(nameToken.offset, nameToken.length)
+          .intersects(analysisError.sourceRange)) {
+        return;
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with _',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(nameToken.offset, nameToken.length),
+          '_',
+        );
+      });
+    }
+
+    context.registry.addSimpleFormalParameter((SimpleFormalParameter node) {
+      handleParam(node);
+    });
+
+    context.registry.addDefaultFormalParameter((DefaultFormalParameter node) {
+      handleParam(node.parameter);
+    });
+
+    context.registry
+        .addFunctionTypedFormalParameter((FunctionTypedFormalParameter node) {
+      handleParam(node);
+    });
+  }
+}
+
+class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
+  _IdentifierUsageVisitor(this.name);
+
+  final String name;
+  bool isUsed = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == name) {
+      // Make sure it's not a declaration, just a reference
+      final AstNode? parent = node.parent;
+      if (parent is! VariableDeclaration || parent.name != node.token) {
+        isUsed = true;
+      }
+    }
+    super.visitSimpleIdentifier(node);
   }
 }

@@ -6,13 +6,14 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when exception classes have non-final fields.
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
+class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
   const AvoidNonFinalExceptionClassFieldsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -23,9 +24,9 @@ class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -77,7 +78,7 @@ class AvoidNonFinalExceptionClassFieldsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidOnlyRethrowRule extends DartLintRule {
+class AvoidOnlyRethrowRule extends SaropaLintRule {
   const AvoidOnlyRethrowRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -88,9 +89,9 @@ class AvoidOnlyRethrowRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
@@ -130,7 +131,7 @@ class AvoidOnlyRethrowRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
-class AvoidThrowInCatchBlockRule extends DartLintRule {
+class AvoidThrowInCatchBlockRule extends SaropaLintRule {
   const AvoidThrowInCatchBlockRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -142,9 +143,9 @@ class AvoidThrowInCatchBlockRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
@@ -160,7 +161,7 @@ class AvoidThrowInCatchBlockRule extends DartLintRule {
 class _ThrowVisitor extends RecursiveAstVisitor<void> {
   _ThrowVisitor(this.reporter, this.code);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
   @override
@@ -190,7 +191,7 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 /// }
 /// throw MyError('Something went wrong');
 /// ```
-class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
+class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
   const AvoidThrowObjectsWithoutToStringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -219,9 +220,9 @@ class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addThrowExpression((ThrowExpression node) {
@@ -257,7 +258,7 @@ class AvoidThrowObjectsWithoutToStringRule extends DartLintRule {
 }
 
 /// Warns when exception classes are private.
-class PreferPublicExceptionClassesRule extends DartLintRule {
+class PreferPublicExceptionClassesRule extends SaropaLintRule {
   const PreferPublicExceptionClassesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -268,9 +269,9 @@ class PreferPublicExceptionClassesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {

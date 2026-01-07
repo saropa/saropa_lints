@@ -11,8 +11,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when IconButton is used without a tooltip for accessibility.
 ///
@@ -35,20 +36,22 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   tooltip: 'Add item',
 /// )
 /// ```
-class AvoidIconButtonsWithoutTooltipRule extends DartLintRule {
+class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   const AvoidIconButtonsWithoutTooltipRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_icon_buttons_without_tooltip',
-    problemMessage: 'IconButton should have a tooltip for accessibility.',
-    correctionMessage: 'Add a tooltip parameter describing the button action.',
+    problemMessage:
+        'IconButton lacks a tooltip. Screen readers cannot announce its purpose.',
+    correctionMessage:
+        "Add tooltip: 'Description of action' to describe what the button does.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -95,7 +98,7 @@ class AvoidIconButtonsWithoutTooltipRule extends DartLintRule {
 ///   child: IconButton(...),
 /// )
 /// ```
-class AvoidSmallTouchTargetsRule extends DartLintRule {
+class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   const AvoidSmallTouchTargetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -123,9 +126,9 @@ class AvoidSmallTouchTargetsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -221,7 +224,7 @@ class _InteractiveWidgetVisitor extends RecursiveAstVisitor<void> {
 ///   child: DecorativeImage(),
 /// )
 /// ```
-class RequireExcludeSemanticsJustificationRule extends DartLintRule {
+class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   const RequireExcludeSemanticsJustificationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -234,9 +237,9 @@ class RequireExcludeSemanticsJustificationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -317,7 +320,7 @@ class RequireExcludeSemanticsJustificationRule extends DartLintRule {
 ///   ],
 /// )
 /// ```
-class AvoidColorOnlyIndicatorsRule extends DartLintRule {
+class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   const AvoidColorOnlyIndicatorsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -330,9 +333,9 @@ class AvoidColorOnlyIndicatorsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -395,7 +398,7 @@ class AvoidColorOnlyIndicatorsRule extends DartLintRule {
 ///   ),
 /// )
 /// ```
-class AvoidGestureOnlyInteractionsRule extends DartLintRule {
+class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   const AvoidGestureOnlyInteractionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -408,9 +411,9 @@ class AvoidGestureOnlyInteractionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -478,14 +481,15 @@ class AvoidGestureOnlyInteractionsRule extends DartLintRule {
 ///   child: MyCustomButton(),
 /// )
 /// ```
-class RequireSemanticsLabelRule extends DartLintRule {
+class RequireSemanticsLabelRule extends SaropaLintRule {
   const RequireSemanticsLabelRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
     problemMessage:
-        'Interactive Semantics widget should have a label for screen readers.',
-    correctionMessage: 'Add a label parameter describing the element.',
+        'Interactive Semantics widget lacks a label. Screen readers cannot describe it.',
+    correctionMessage:
+        "Add label: 'Description' to describe the interactive element's purpose.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -498,9 +502,9 @@ class RequireSemanticsLabelRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -566,15 +570,15 @@ class RequireSemanticsLabelRule extends DartLintRule {
 ///   ],
 /// )
 /// ```
-class AvoidMergedSemanticsHidingInfoRule extends DartLintRule {
+class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
   const AvoidMergedSemanticsHidingInfoRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
     problemMessage:
-        'MergeSemantics may hide important information from assistive technologies.',
+        'MergeSemantics contains interactive widgets. Buttons/inputs may become inaccessible.',
     correctionMessage:
-        'Review if all merged content should be announced together.',
+        'Move interactive widgets outside MergeSemantics, or wrap only related text content.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -594,9 +598,9 @@ class AvoidMergedSemanticsHidingInfoRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -655,7 +659,7 @@ class _InteractiveCountVisitor extends RecursiveAstVisitor<void> {
 ///   child: Text(errorMessage),
 /// )
 /// ```
-class RequireLiveRegionRule extends DartLintRule {
+class RequireLiveRegionRule extends SaropaLintRule {
   const RequireLiveRegionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -679,9 +683,9 @@ class RequireLiveRegionRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -763,7 +767,7 @@ class RequireLiveRegionRule extends DartLintRule {
 ///   ),
 /// )
 /// ```
-class RequireHeadingSemanticsRule extends DartLintRule {
+class RequireHeadingSemanticsRule extends SaropaLintRule {
   const RequireHeadingSemanticsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -786,9 +790,9 @@ class RequireHeadingSemanticsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -866,7 +870,7 @@ class RequireHeadingSemanticsRule extends DartLintRule {
 ///   ),
 /// )
 /// ```
-class AvoidImageButtonsWithoutTooltipRule extends DartLintRule {
+class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   const AvoidImageButtonsWithoutTooltipRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -885,9 +889,9 @@ class AvoidImageButtonsWithoutTooltipRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((

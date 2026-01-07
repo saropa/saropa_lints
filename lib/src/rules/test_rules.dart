@@ -4,8 +4,9 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when duplicate test assertions are made.
 ///
@@ -24,7 +25,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   expect(otherValue, equals(2));
 /// });
 /// ```
-class AvoidDuplicateTestAssertionsRule extends DartLintRule {
+class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
   const AvoidDuplicateTestAssertionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -36,9 +37,9 @@ class AvoidDuplicateTestAssertionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBlock((Block node) {
@@ -62,7 +63,7 @@ class AvoidDuplicateTestAssertionsRule extends DartLintRule {
 }
 
 /// Warns when a test group() has an empty body.
-class AvoidEmptyTestGroupsRule extends DartLintRule {
+class AvoidEmptyTestGroupsRule extends SaropaLintRule {
   const AvoidEmptyTestGroupsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -73,9 +74,9 @@ class AvoidEmptyTestGroupsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -118,7 +119,7 @@ class AvoidEmptyTestGroupsRule extends DartLintRule {
 /// // In my_test.dart
 /// String _helperFunction() => 'test';  // Private helper
 /// ```
-class AvoidTopLevelMembersInTestsRule extends DartLintRule {
+class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
   const AvoidTopLevelMembersInTestsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -130,9 +131,9 @@ class AvoidTopLevelMembersInTestsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only run in test files
@@ -199,7 +200,7 @@ class AvoidTopLevelMembersInTestsRule extends DartLintRule {
 /// test('should return true when input is valid', () { });
 /// test('returns empty list for null input', () { });
 /// ```
-class FormatTestNameRule extends DartLintRule {
+class FormatTestNameRule extends SaropaLintRule {
   const FormatTestNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -217,9 +218,9 @@ class FormatTestNameRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -272,7 +273,7 @@ class FormatTestNameRule extends DartLintRule {
 /// test/widget_test.dart
 /// test/unit/my_class_test.dart
 /// ```
-class PreferCorrectTestFileNameRule extends DartLintRule {
+class PreferCorrectTestFileNameRule extends SaropaLintRule {
   const PreferCorrectTestFileNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -284,9 +285,9 @@ class PreferCorrectTestFileNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     final String path = resolver.path;
@@ -334,7 +335,7 @@ class _TestCallFinder extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when expect() is used with a Future instead of expectLater().
-class PreferExpectLaterRule extends DartLintRule {
+class PreferExpectLaterRule extends SaropaLintRule {
   const PreferExpectLaterRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -345,9 +346,9 @@ class PreferExpectLaterRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -372,7 +373,7 @@ class PreferExpectLaterRule extends DartLintRule {
 }
 
 /// Warns when test files don't follow proper structure.
-class PreferTestStructureRule extends DartLintRule {
+class PreferTestStructureRule extends SaropaLintRule {
   const PreferTestStructureRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -383,9 +384,9 @@ class PreferTestStructureRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -418,7 +419,7 @@ class PreferTestStructureRule extends DartLintRule {
 class _TestStructureVisitor extends RecursiveAstVisitor<void> {
   _TestStructureVisitor(this.reporter, this.code, this.onTopLevelTestFound);
 
-  final DiagnosticReporter reporter;
+  final SaropaDiagnosticReporter reporter;
   final LintCode code;
   final void Function(bool) onTopLevelTestFound;
   int _groupDepth = 0;
@@ -460,7 +461,7 @@ class _TestStructureVisitor extends RecursiveAstVisitor<void> {
 /// test('returns true for valid input', () { });
 /// test('returns true for empty input', () { });
 /// ```
-class PreferUniqueTestNamesRule extends DartLintRule {
+class PreferUniqueTestNamesRule extends SaropaLintRule {
   const PreferUniqueTestNamesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -471,9 +472,9 @@ class PreferUniqueTestNamesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     final Set<String> testNames = <String>{};
@@ -524,7 +525,7 @@ class PreferUniqueTestNamesRule extends DartLintRule {
 ///   expect(value, equals(42));
 /// });
 /// ```
-class MissingTestAssertionRule extends DartLintRule {
+class MissingTestAssertionRule extends SaropaLintRule {
   const MissingTestAssertionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -550,9 +551,9 @@ class MissingTestAssertionRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files

@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when test has no assertions.
 ///
@@ -32,7 +33,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   expect(order.status, OrderStatus.processed);
 /// });
 /// ```
-class RequireTestAssertionsRule extends DartLintRule {
+class RequireTestAssertionsRule extends SaropaLintRule {
   const RequireTestAssertionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -56,9 +57,9 @@ class RequireTestAssertionsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -114,7 +115,7 @@ class RequireTestAssertionsRule extends DartLintRule {
 /// test('should return user when valid ID is provided', () { ... });
 /// test('throws ArgumentError when email is invalid', () { ... });
 /// ```
-class AvoidVagueTestDescriptionsRule extends DartLintRule {
+class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   const AvoidVagueTestDescriptionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -140,9 +141,9 @@ class AvoidVagueTestDescriptionsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -175,8 +176,9 @@ class AvoidVagueTestDescriptionsRule extends DartLintRule {
         }
       }
 
-      // Check for too short descriptions
-      if (description.length < 10) {
+      // Only flag very short descriptions (< 5 chars) as those are always vague
+      // Don't flag moderately short names like "bug fix" which may be intentional
+      if (description.length < 5) {
         reporter.atNode(firstArg, code);
       }
     });
@@ -203,7 +205,7 @@ class AvoidVagueTestDescriptionsRule extends DartLintRule {
 ///   final user = await client.get('https://api.example.com/users/1');
 /// });
 /// ```
-class AvoidRealNetworkCallsInTestsRule extends DartLintRule {
+class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   const AvoidRealNetworkCallsInTestsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -213,6 +215,9 @@ class AvoidRealNetworkCallsInTestsRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Network patterns that indicate real HTTP calls.
+  /// Removed Uri.parse/Uri.https/Uri.http as these are just URL construction,
+  /// not actual network calls.
   static const Set<String> _networkPatterns = <String>{
     'HttpClient(',
     'http.get(',
@@ -222,15 +227,14 @@ class AvoidRealNetworkCallsInTestsRule extends DartLintRule {
     'Dio(',
     'dio.get(',
     'dio.post(',
-    'Uri.parse(',
-    'Uri.https(',
-    'Uri.http(',
+    'dio.put(',
+    'dio.delete(',
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -290,7 +294,7 @@ class AvoidRealNetworkCallsInTestsRule extends DartLintRule {
 ///   );
 /// });
 /// ```
-class AvoidHardcodedTestDelaysRule extends DartLintRule {
+class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   const AvoidHardcodedTestDelaysRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -303,9 +307,9 @@ class AvoidHardcodedTestDelaysRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -361,7 +365,7 @@ class AvoidHardcodedTestDelaysRule extends DartLintRule {
 ///   test('test 2', () { ... });
 /// }
 /// ```
-class RequireTestSetupTeardownRule extends DartLintRule {
+class RequireTestSetupTeardownRule extends SaropaLintRule {
   const RequireTestSetupTeardownRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -373,9 +377,9 @@ class RequireTestSetupTeardownRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -429,7 +433,7 @@ class RequireTestSetupTeardownRule extends DartLintRule {
 ///   expect(find.text('Tapped'), findsOneWidget);
 /// });
 /// ```
-class RequirePumpAfterInteractionRule extends DartLintRule {
+class RequirePumpAfterInteractionRule extends SaropaLintRule {
   const RequirePumpAfterInteractionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -451,9 +455,9 @@ class RequirePumpAfterInteractionRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -517,7 +521,7 @@ class RequirePumpAfterInteractionRule extends DartLintRule {
 ///   // or use mock
 /// });
 /// ```
-class AvoidProductionConfigInTestsRule extends DartLintRule {
+class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   const AvoidProductionConfigInTestsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -527,21 +531,24 @@ class AvoidProductionConfigInTestsRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Production URL patterns. Should be specific enough to avoid false positives
+  /// when tests are validating URL formats or rejection logic.
   static const Set<String> _productionPatterns = <String>{
     'production',
-    'prod.',
-    '.prod',
-    'api.com',
-    'api.io',
+    'prod.', // prod. prefix like prod.api.example.com
+    '.prod.', // .prod. in the middle
     'amazonaws.com',
     'firebaseio.com',
     'supabase.co',
+    'googleapis.com',
+    // Note: 'api.com' and 'api.io' removed as they cause false positives
+    // in tests that validate URL rejection logic
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Only check test files
@@ -555,6 +562,107 @@ class AvoidProductionConfigInTestsRule extends DartLintRule {
         if (value.contains(pattern)) {
           reporter.atNode(node, code);
           return;
+        }
+      }
+    });
+  }
+}
+
+/// Suggests using pumpAndSettle() after user interactions in widget tests.
+///
+/// After tap(), drag(), or other interactions, using pumpAndSettle() ensures
+/// all animations complete before assertions. Using pump() alone may miss
+/// animations or scheduled frames.
+///
+/// Note: This rule only triggers when pump() follows an interaction method.
+/// Using pump() with explicit duration for frame-by-frame control is valid.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('should animate', (tester) async {
+///   await tester.pumpWidget(AnimatedWidget());
+///   await tester.tap(find.byType(Button));
+///   await tester.pump(); // May not wait for animation
+///   expect(find.text('Done'), findsOneWidget);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('should animate', (tester) async {
+///   await tester.pumpWidget(AnimatedWidget());
+///   await tester.tap(find.byType(Button));
+///   await tester.pumpAndSettle(); // Waits for animations
+///   expect(find.text('Done'), findsOneWidget);
+/// });
+/// ```
+class PreferPumpAndSettleRule extends SaropaLintRule {
+  const PreferPumpAndSettleRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_pump_and_settle',
+    problemMessage:
+        'Consider using pumpAndSettle() after interactions to wait for animations.',
+    correctionMessage:
+        'Use pumpAndSettle() after tap/drag/etc. to ensure animations complete.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _interactionMethods = <String>{
+    'tap',
+    'longPress',
+    'drag',
+    'dragFrom',
+    'dragUntilVisible',
+    'fling',
+    'flingFrom',
+    'enterText',
+    'sendKeyEvent',
+    'sendKeyDownEvent',
+    'sendKeyUpEvent',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only check test files
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') && !path.contains('/test/')) return;
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for tester.pump() calls (not pumpWidget or pumpAndSettle)
+      if (methodName == 'pump') {
+        final Expression? target = node.target;
+        if (target is SimpleIdentifier && target.name == 'tester') {
+          // Skip if pump has arguments (explicit duration = intentional)
+          if (node.argumentList.arguments.isNotEmpty) return;
+
+          // Check if there's an interaction method nearby in the same test
+          // Look at the parent function body
+          AstNode? current = node.parent;
+          while (current != null) {
+            if (current is FunctionExpression || current is FunctionBody) {
+              final String bodySource = current.toSource();
+
+              // Check if any interaction method appears in this test
+              for (final String interaction in _interactionMethods) {
+                final pattern = 'tester.$interaction(';
+                final interactionIndex = bodySource.indexOf(pattern);
+                if (interactionIndex != -1) {
+                  // Found an interaction - this pump() may need to be pumpAndSettle
+                  reporter.atNode(node, code);
+                  return;
+                }
+              }
+              break;
+            }
+            current = current.parent;
+          }
         }
       }
     });

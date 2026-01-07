@@ -16,6 +16,9 @@ const Set<String> essentialRules = <String>{
   'require_animation_disposal',
   'avoid_undisposed_instances',
   'require_value_notifier_dispose',
+  'require_scroll_controller_dispose',
+  'require_focus_node_dispose',
+  'require_bloc_close',
   // Memory Leaks - Timers & Subscriptions (cancel)
   'require_timer_cancellation',
   'avoid_unassigned_stream_subscriptions',
@@ -43,6 +46,10 @@ const Set<String> essentialRules = <String>{
   'avoid_logging_sensitive_data',
   'avoid_eval_like_patterns',
   'avoid_weak_cryptographic_algorithms',
+  'avoid_token_in_url',
+  'avoid_clipboard_sensitive',
+  'avoid_storing_passwords',
+  'avoid_dynamic_sql',
 
   // Null Safety
   'avoid_null_assertion',
@@ -72,12 +79,17 @@ const Set<String> essentialRules = <String>{
   'avoid_swallowing_exceptions',
   'avoid_losing_stack_trace',
   'no_empty_block',
+
+  // Widget Structure
+  'avoid_nested_scaffolds',
+  'avoid_multiple_material_apps',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 const Set<String> recommendedOnlyRules = <String>{
   // Memory Management Best Practices
   'nullify_after_dispose',
+  'require_auto_dispose',
 
   // Performance
   'avoid_expensive_build',
@@ -114,6 +126,9 @@ const Set<String> recommendedOnlyRules = <String>{
   // Flutter Widgets
   'avoid_deeply_nested_widgets',
   'avoid_single_child_column_row',
+  'avoid_nested_scrollables',
+  'require_text_overflow_handling',
+  'require_image_error_builder',
   'avoid_form_without_key',
   'avoid_uncontrolled_text_field',
   'avoid_text_scale_factor',
@@ -123,6 +138,17 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_unnecessary_setstate',
   'avoid_stateless_widget_initialized_fields',
   'avoid_state_constructors',
+  'avoid_empty_text_widgets',
+  'prefer_sized_box_for_whitespace',
+  'prefer_inkwell_over_gesture',
+  'prefer_listview_builder',
+  'avoid_opacity_animation',
+  'prefer_spacing_over_sizedbox',
+  'avoid_material2_fallback',
+
+  // Performance
+  'avoid_string_concatenation_loop',
+  'avoid_large_list_copy',
 
   // Async
   'avoid_async_call_in_sync_function',
@@ -180,6 +206,7 @@ const Set<String> recommendedOnlyRules = <String>{
   // Naming & Style
   'prefer_boolean_prefixes',
   'avoid_getter_prefix',
+  'prefer_wildcard_for_unused_param',
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -211,6 +238,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_watch_in_callbacks',
   'avoid_stateful_without_state',
   'avoid_global_riverpod_providers',
+  'prefer_consumer_widget',
 
   // Error Handling
   'require_error_context',
@@ -246,6 +274,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_unique_test_names',
   'prefer_test_structure',
   'prefer_test_matchers',
+  'prefer_pump_and_settle',
 
   // Documentation
   'require_public_api_documentation',
@@ -280,6 +309,9 @@ const Set<String> professionalOnlyRules = <String>{
   'proper_super_calls',
   'avoid_unremovable_callbacks_in_listeners',
   'avoid_unnecessary_stateful_widgets',
+  'require_image_dimensions',
+  'require_placeholder_for_network',
+  'prefer_text_theme',
   'check_for_equals_in_render_object_setters',
   'consistent_update_render_object',
   'avoid_unnecessary_overrides_in_state',
@@ -293,6 +325,10 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_unrestricted_text_field_length',
   'avoid_expanded_as_spacer',
   'avoid_unnecessary_gesture_detector',
+  'prefer_overlay_portal',
+  'prefer_carousel_view',
+  'prefer_search_anchor',
+  'prefer_tap_region_for_dismiss',
 
   // Async
   'avoid_nested_futures',
@@ -310,6 +346,10 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_long_parameter_list',
   'avoid_shadowing',
   'avoid_generics_shadowing',
+  'avoid_unmarked_public_class',
+  'prefer_final_class',
+  'prefer_interface_class',
+  'prefer_base_class',
   'avoid_similar_names',
   'avoid_unused_parameters',
   'avoid_duplicate_cascades',
@@ -356,14 +396,20 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // Flutter Widgets
   'avoid_border_all',
+  'avoid_fitted_box_for_text',
+  'avoid_icon_size_override',
+  'avoid_image_repeat',
   'avoid_incorrect_image_opacity',
   'avoid_image_without_cache',
   'avoid_missing_image_alt',
+  'avoid_raw_keyboard_listener',
+  'avoid_sized_box_expand',
   'prefer_const_border_radius',
   'prefer_correct_edge_insets_constructor',
-  'prefer_text_rich',
   'prefer_define_hero_tag',
+  'prefer_selectable_text',
   'prefer_sliver_prefix',
+  'prefer_text_rich',
   'prefer_widget_private_members',
 
   // Async
@@ -421,6 +467,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_unconditional_break',
   'avoid_continue',
   'avoid_unnecessary_continue',
+  'prefer_when_guard_over_if',
 
   // Naming
   'prefer_correct_identifier_length',
@@ -457,6 +504,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'use_existing_destructuring',
   'record_fields_ordering',
   'pattern_fields_ordering',
+  'prefer_pattern_destructuring',
 
   // Formatting
   'format_comment',
@@ -596,6 +644,7 @@ const Set<String> insanityOnlyRules = <String>{
   'prefer_static_method',
   'prefer_named_parameters',
   'prefer_named_boolean_parameters',
+  'avoid_font_weight_as_number',
   'prefer_explicit_function_type',
   'prefer_explicit_parameter_names',
   'prefer_typedef_for_callbacks',

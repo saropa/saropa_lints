@@ -1,9 +1,11 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when digit separators are not grouped consistently.
 ///
@@ -22,7 +24,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// final n = 1_000_000; // Consistent groups of 3
 /// final m = 10_000;
 /// ```
-class AvoidInconsistentDigitSeparatorsRule extends DartLintRule {
+class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
   const AvoidInconsistentDigitSeparatorsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -33,9 +35,9 @@ class AvoidInconsistentDigitSeparatorsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -106,7 +108,7 @@ class AvoidInconsistentDigitSeparatorsRule extends DartLintRule {
 /// final value = 10;
 /// final amount = 1_000_000;
 /// ```
-class AvoidUnnecessaryDigitSeparatorsRule extends DartLintRule {
+class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
   const AvoidUnnecessaryDigitSeparatorsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -118,9 +120,9 @@ class AvoidUnnecessaryDigitSeparatorsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -153,7 +155,7 @@ class AvoidUnnecessaryDigitSeparatorsRule extends DartLintRule {
 ///
 /// Double literals should be formatted consistently, e.g., always include
 /// a digit before the decimal point (0.5 instead of .5).
-class DoubleLiteralFormatRule extends DartLintRule {
+class DoubleLiteralFormatRule extends SaropaLintRule {
   const DoubleLiteralFormatRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -164,9 +166,9 @@ class DoubleLiteralFormatRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addDoubleLiteral((DoubleLiteral node) {
@@ -187,7 +189,7 @@ class DoubleLiteralFormatRule extends DartLintRule {
 ///
 /// Magic numbers make code harder to understand and maintain. Use named
 /// constants to give meaning to numeric values.
-class NoMagicNumberRule extends DartLintRule {
+class NoMagicNumberRule extends SaropaLintRule {
   const NoMagicNumberRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -202,9 +204,9 @@ class NoMagicNumberRule extends DartLintRule {
   static const List<double> _allowedDoubles = <double>[0.0, 1.0, 0.5];
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -269,7 +271,7 @@ class NoMagicNumberRule extends DartLintRule {
 /// const kErrorMessage = 'Error: Something went wrong';
 /// print(kErrorMessage);
 /// ```
-class NoMagicStringRule extends DartLintRule {
+class NoMagicStringRule extends SaropaLintRule {
   const NoMagicStringRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -302,9 +304,9 @@ class NoMagicStringRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
@@ -381,7 +383,7 @@ class NoMagicStringRule extends DartLintRule {
 /// y -= 5;
 /// z *= 2;
 /// ```
-class PreferAdditionSubtractionAssignmentsRule extends DartLintRule {
+class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
   const PreferAdditionSubtractionAssignmentsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -406,9 +408,9 @@ class PreferAdditionSubtractionAssignmentsRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -453,7 +455,7 @@ class PreferAdditionSubtractionAssignmentsRule extends DartLintRule {
 /// x &= mask;
 /// y |= flag;
 /// ```
-class PreferCompoundAssignmentOperatorsRule extends DartLintRule {
+class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
   const PreferCompoundAssignmentOperatorsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -464,9 +466,9 @@ class PreferCompoundAssignmentOperatorsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -509,7 +511,7 @@ class PreferCompoundAssignmentOperatorsRule extends DartLintRule {
 /// final million = 1_000_000;
 /// final bigNumber = 123_456_789;
 /// ```
-class PreferDigitSeparatorsRule extends DartLintRule {
+class PreferDigitSeparatorsRule extends SaropaLintRule {
   const PreferDigitSeparatorsRule() : super(code: _code);
 
   static const int _threshold = 10000; // Numbers >= 10000 should use separators
@@ -522,9 +524,9 @@ class PreferDigitSeparatorsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
@@ -549,6 +551,74 @@ class PreferDigitSeparatorsRule extends DartLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDigitSeparatorsFix()];
+
+  /// Formats a number with digit separators (groups of 3).
+  static String formatWithSeparators(String lexeme) {
+    // Handle negative numbers
+    final bool isNegative = lexeme.startsWith('-');
+    String digits = isNegative ? lexeme.substring(1) : lexeme;
+
+    // Build result from right to left with groups of 3
+    final StringBuffer result = StringBuffer();
+    int count = 0;
+    for (int i = digits.length - 1; i >= 0; i--) {
+      if (count > 0 && count % 3 == 0) {
+        result.write('_');
+      }
+      result.write(digits[i]);
+      count++;
+    }
+
+    final String reversed =
+        result.toString().split('').reversed.join();
+    return isNegative ? '-$reversed' : reversed;
+  }
+}
+
+class _AddDigitSeparatorsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIntegerLiteral((IntegerLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String lexeme = node.literal.lexeme;
+
+      // Skip if already has separators or is non-decimal
+      if (lexeme.contains('_')) return;
+      if (lexeme.startsWith('0x') ||
+          lexeme.startsWith('0X') ||
+          lexeme.startsWith('0b') ||
+          lexeme.startsWith('0B') ||
+          lexeme.startsWith('0o') ||
+          lexeme.startsWith('0O')) {
+        return;
+      }
+
+      final String formatted =
+          PreferDigitSeparatorsRule.formatWithSeparators(lexeme);
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add digit separators',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.offset, node.length),
+          formatted,
+        );
+      });
+    });
+  }
 }
 
 /// Warns when digit separators are used unnecessarily.
@@ -568,7 +638,7 @@ class PreferDigitSeparatorsRule extends DartLintRule {
 /// final n = 10; // No separator needed
 /// final m = 1_000_000; // Separator improves readability
 /// ```
-class AvoidDigitSeparatorsRule extends DartLintRule {
+class AvoidDigitSeparatorsRule extends SaropaLintRule {
   const AvoidDigitSeparatorsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -581,9 +651,9 @@ class AvoidDigitSeparatorsRule extends DartLintRule {
   static const int _minDigitsForSeparator = 5;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIntegerLiteral((IntegerLiteral node) {
