@@ -902,9 +902,9 @@ class PreferInterfaceClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_interface_class',
-    problemMessage: 'Abstract class with only abstract members could be interface.',
-    correctionMessage:
-        'Use interface class for pure contracts (Dart 3.0+).',
+    problemMessage:
+        'Abstract class with only abstract members could be interface.',
+    correctionMessage: 'Use interface class for pure contracts (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

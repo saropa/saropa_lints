@@ -87,7 +87,8 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
     });
   }
 
-  void _checkBuilderForKey(FunctionBody body, SaropaDiagnosticReporter reporter) {
+  void _checkBuilderForKey(
+      FunctionBody body, SaropaDiagnosticReporter reporter) {
     // Find the returned widget
     if (body is ExpressionFunctionBody) {
       _checkExpressionForKey(body.expression, reporter, body);
@@ -590,7 +591,8 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
     });
   }
 
-  void _checkBodyForCreation(Statement body, SaropaDiagnosticReporter reporter) {
+  void _checkBodyForCreation(
+      Statement body, SaropaDiagnosticReporter reporter) {
     body.visitChildren(_CreationInLoopVisitor(reporter, code, _expensiveTypes));
   }
 
