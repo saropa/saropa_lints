@@ -5,43 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0] - Unreleased
+## [1.3.1] - 2025-01-06
+
+### Fixed
+
+- **License detection on pub.dev** - LICENSE file now uses LF line endings instead of CRLF, fixing the "(pending)" license display in the pub.dev sidebar
+- **CI failures during publish** - Publish script now handles unpushed commits gracefully, ensuring code is formatted before push so CI passes on release commits
+
+### Changed
+
+- **Documentation cross-references** - All markdown files now use full GitHub URLs instead of relative paths for better discoverability on pub.dev:
+  - README.md: Updated Documentation table and STYLISTIC.md references
+  - STYLISTIC.md: Updated ROADMAP.md reference
+  - ROADMAP.md: Updated CHANGELOG.md, CONTRIBUTING.md, and STYLISTIC.md references
+  - CONTRIBUTING.md: Updated STYLISTIC.md reference
+  - ENTERPRISE.md: Updated migration guide references
 
 ### Added
 
-- **14 new lint rules**:
-
-  **Memory Leak Prevention (3 - Essential)**:
-  - `require_scroll_controller_dispose` - ScrollController fields must be disposed to prevent memory leaks
-  - `require_focus_node_dispose` - FocusNode fields must be disposed to prevent memory leaks
-  - `require_bloc_close` - Bloc/Cubit fields must be closed in dispose
-
-  **Security (1 - Essential)**:
-  - `avoid_dynamic_sql` - SQL queries built with string interpolation are vulnerable to injection attacks
-
-  **Widget Best Practices (5 - Recommended/Professional)**:
-  - `require_text_overflow_handling` - Text widgets with dynamic content should have overflow handling
-  - `require_image_error_builder` - Network images should have errorBuilder for graceful failure
-  - `require_image_dimensions` - Network images should specify dimensions to prevent layout shifts
-  - `require_placeholder_for_network` - Network images should have loading placeholders
-  - `avoid_nested_scrollables` - Nested scrollables cause gesture conflicts; use NestedScrollView
-
-  **State Management (3 - Recommended/Professional)**:
-  - `require_auto_dispose` - Riverpod providers should use autoDispose to prevent memory leaks
-  - `prefer_consumer_widget` - Prefer ConsumerWidget over wrapping with Consumer
-  - `prefer_text_theme` - Prefer Theme.textTheme over hardcoded TextStyle for consistency
-
-  **Testing (1 - Recommended)**:
-  - `prefer_pump_and_settle` - Use pumpAndSettle() after interactions to wait for animations
-
-### Improved
-
-- **Rule logic fixes**:
-  - `require_text_overflow_handling` - Now only flags dynamic content (variables, interpolation), not static strings
-  - `require_image_dimensions` - Now only flags network images, checks parent containers for sizing
-  - All State class detection rules - Now use exact `State<T>` matching instead of `contains('State')` to avoid false positives on classes like StateManager
-  - `require_auto_dispose` - Fixed method invocation detection for `Provider.family()` patterns
-  - `prefer_pump_and_settle` - Now only suggests when pump() follows interaction methods, skips explicit duration calls
+- **.gitattributes** - Enforces LF line endings for LICENSE file to prevent future license detection issues
 
 ## [1.3.0] - 2025-01-06
 

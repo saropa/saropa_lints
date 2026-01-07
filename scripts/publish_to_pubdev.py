@@ -67,7 +67,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.6"
+SCRIPT_VERSION = "3.7"
 
 
 # =============================================================================
@@ -587,7 +587,23 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
             print_info(f"Pull changes first with: git pull origin {branch}")
             return False
 
-    print_success("Local branch is up-to-date with remote")
+    # Check if ahead (unpushed commits) - warn but don't block
+    result = subprocess.run(
+        ["git", "rev-list", "--count", f"origin/{branch}..HEAD"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell
+    )
+
+    if result.returncode == 0 and result.stdout.strip():
+        ahead_count = int(result.stdout.strip())
+        if ahead_count > 0:
+            print_warning(f"You have {ahead_count} unpushed commit(s) that will be included.")
+            print_success("Local branch is ahead of remote (will push with release)")
+            return True
+
+    print_success("Local branch is in sync with remote")
     return True
 
 

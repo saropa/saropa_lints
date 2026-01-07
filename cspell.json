@@ -20,7 +20,9 @@
   "useGitignore": true,
   "words": [
     "apikey",
+    "Checkmarx",
     "COPPA",
+    "Coverity",
     "Cupertino",
     "dartdoc",
     "datetimes",
@@ -46,9 +48,12 @@
     "setstate",
     "shouty",
     "sizedbox",
+    "SonarQube",
     "timezone",
     "Unsanitized",
-    "WCAG"
+    "unpushed",
+    "WCAG",
+    "Wiegers"
   ],
   // Specify paths/files to ignore.
   "ignorePaths": [
