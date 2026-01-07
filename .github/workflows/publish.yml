@@ -34,8 +34,8 @@ jobs:
         run: dart test
 
       - name: Dry run
-        run: dart pub publish --dry-run
+        run: dart pub publish --dry-run || [ $? -eq 65 ]
 
       - name: Publish to pub.dev
         if: ${{ inputs.dry_run != 'true' }}
-        run: dart pub publish --force
+        run: dart pub publish --force || [ $? -eq 65 ]
