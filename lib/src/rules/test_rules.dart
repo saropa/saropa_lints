@@ -565,4 +565,3 @@ class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
   }
 }
-
