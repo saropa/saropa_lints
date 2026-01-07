@@ -92,7 +92,8 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
     });
   }
 
-  void _checkForHardcodedText(Expression expr, SaropaDiagnosticReporter reporter) {
+  void _checkForHardcodedText(
+      Expression expr, SaropaDiagnosticReporter reporter) {
     if (expr is InstanceCreationExpression) {
       final String? name = expr.constructorName.type.element?.name;
       if (name == 'Text') {
@@ -365,8 +366,7 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale',
-    problemMessage:
-        "Hardcoded locale ignores user's device settings.",
+    problemMessage: "Hardcoded locale ignores user's device settings.",
     correctionMessage:
         'Use Localizations.localeOf(context).toString() to get device locale.',
     errorSeverity: DiagnosticSeverity.INFO,

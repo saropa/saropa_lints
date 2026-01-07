@@ -73,7 +73,8 @@ class RequireNotifyListenersRule extends SaropaLintRule {
     });
   }
 
-  void _checkMethod(MethodDeclaration method, SaropaDiagnosticReporter reporter) {
+  void _checkMethod(
+      MethodDeclaration method, SaropaDiagnosticReporter reporter) {
     // Skip getters and constructors
     if (method.isGetter || method.isStatic) return;
 
@@ -1461,7 +1462,8 @@ class RequireAutoDisposeRule extends SaropaLintRule {
         // Handle direct construction like StateProvider<int>((ref) => 0)
         if (initializer is InstanceCreationExpression) {
           final String typeName = initializer.constructorName.type.name.lexeme;
-          final String? constructorName = initializer.constructorName.name?.name;
+          final String? constructorName =
+              initializer.constructorName.name?.name;
 
           // Check if it's a provider without autoDispose
           if (_providerTypes.contains(typeName)) {

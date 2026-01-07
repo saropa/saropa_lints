@@ -465,7 +465,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
       // List<MyEnum> where MyEnum is an enum - this is what .values returns
       if (typeStr.startsWith('List<')) {
         // Check the element type to see if it's an enum
-        if (prefixType is InterfaceType && prefixType.typeArguments.isNotEmpty) {
+        if (prefixType is InterfaceType &&
+            prefixType.typeArguments.isNotEmpty) {
           final DartType elementType = prefixType.typeArguments.first;
           final Element? element = elementType.element;
           if (element is EnumElement) {
@@ -1028,8 +1029,7 @@ class PreferWhereOrNullRule extends SaropaLintRule {
     problemMessage:
         'Consider using firstWhereOrNull/lastWhereOrNull/singleWhereOrNull '
         'with ?? instead of orElse callback.',
-    correctionMessage:
-        'Replace .firstWhere(..., orElse: () => x) with '
+    correctionMessage: 'Replace .firstWhere(..., orElse: () => x) with '
         '.firstWhereOrNull(...) ?? x for cleaner code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

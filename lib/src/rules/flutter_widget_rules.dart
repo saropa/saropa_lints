@@ -1756,7 +1756,8 @@ class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
     });
   }
 
-  void _checkSetter(MethodDeclaration setter, SaropaDiagnosticReporter reporter) {
+  void _checkSetter(
+      MethodDeclaration setter, SaropaDiagnosticReporter reporter) {
     final FunctionBody body = setter.body;
 
     // Check if setter has markNeeds* call
@@ -3325,7 +3326,8 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
     return found;
   }
 
-  void _reportSetStateInStatement(Statement stmt, SaropaDiagnosticReporter reporter) {
+  void _reportSetStateInStatement(
+      Statement stmt, SaropaDiagnosticReporter reporter) {
     stmt.visitChildren(
       _SetStateFinderBatch11((MethodInvocation node) {
         reporter.atNode(node, code);
@@ -7262,7 +7264,8 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inkwell_over_gesture',
     problemMessage: 'Use InkWell instead of GestureDetector for tap feedback.',
-    correctionMessage: 'Replace GestureDetector with InkWell for ripple effect.',
+    correctionMessage:
+        'Replace GestureDetector with InkWell for ripple effect.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7639,7 +7642,8 @@ class PreferSelectableTextRule extends SaropaLintRule {
       final Expression firstArg = args.first;
       if (firstArg is NamedExpression) return;
 
-      if (firstArg is SimpleStringLiteral && firstArg.value.length >= _minLength) {
+      if (firstArg is SimpleStringLiteral &&
+          firstArg.value.length >= _minLength) {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -7764,7 +7768,8 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
     for (final Expression arg in expr.argumentList.arguments) {
       if (arg is NamedExpression) {
-        if (arg.name.label.name == 'child') return null; // Has child, not spacer
+        if (arg.name.label.name == 'child')
+          return null; // Has child, not spacer
         if (arg.name.label.name == expectedArg) {
           final Expression valueExpr = arg.expression;
           if (valueExpr is IntegerLiteral) {
@@ -8323,8 +8328,7 @@ class _AddTextOverflowFix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         // Find position before closing parenthesis
         final int insertOffset = node.argumentList.rightParenthesis.offset;
-        final String comma =
-            node.argumentList.arguments.isEmpty ? '' : ', ';
+        final String comma = node.argumentList.arguments.isEmpty ? '' : ', ';
         builder.addSimpleInsertion(
           insertOffset,
           '${comma}overflow: TextOverflow.ellipsis, maxLines: 1',
@@ -8558,7 +8562,8 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_placeholder_for_network',
-    problemMessage: 'Network image should have a placeholder or loadingBuilder.',
+    problemMessage:
+        'Network image should have a placeholder or loadingBuilder.',
     correctionMessage:
         'Add loadingBuilder or placeholder to show feedback during loading.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8930,7 +8935,8 @@ class PreferTextThemeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_theme',
-    problemMessage: 'Consider using Theme.textTheme instead of hardcoded TextStyle.',
+    problemMessage:
+        'Consider using Theme.textTheme instead of hardcoded TextStyle.',
     correctionMessage:
         'Use Theme.of(context).textTheme.* for consistent typography.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -9054,8 +9060,7 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is InstanceCreationExpression) {
-          final String parentType =
-              current.constructorName.type.name.lexeme;
+          final String parentType = current.constructorName.type.name.lexeme;
           if (_scrollableWidgets.contains(parentType) &&
               parentType != 'NestedScrollView') {
             reporter.atNode(node.constructorName, code);

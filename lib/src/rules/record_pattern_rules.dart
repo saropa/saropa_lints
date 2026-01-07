@@ -2,7 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -284,8 +285,7 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_function_type_in_records',
-    problemMessage:
-        'Inline function type in record reduces readability.',
+    problemMessage: 'Inline function type in record reduces readability.',
     correctionMessage:
         'Create typedef: typedef MyCallback = void Function(String); then use (int, MyCallback).',
     errorSeverity: DiagnosticSeverity.INFO,
