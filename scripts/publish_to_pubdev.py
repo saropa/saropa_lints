@@ -67,7 +67,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.5"
+SCRIPT_VERSION = "3.6"
 
 
 # =============================================================================
@@ -368,7 +368,8 @@ def count_rules(project_dir: Path) -> int:
         if dart_file.name == "all_rules.dart":
             continue
         content = dart_file.read_text(encoding="utf-8")
-        count += len(re.findall(r"class \w+ extends DartLintRule", content))
+        # Match both SaropaLintRule (preferred) and DartLintRule (legacy)
+        count += len(re.findall(r"class \w+ extends (?:SaropaLintRule|DartLintRule)", content))
 
     return count
 
@@ -386,6 +387,116 @@ def count_categories(project_dir: Path) -> int:
             count += 1
 
     return count
+
+
+def count_test_fixtures(project_dir: Path) -> int:
+    """Count the number of test fixture files."""
+    example_dir = project_dir / "example" / "lib"
+
+    if not example_dir.exists():
+        return 0
+
+    count = 0
+    for fixture_file in example_dir.rglob("*_fixture.dart"):
+        count += 1
+
+    return count
+
+
+def get_test_coverage_report(project_dir: Path) -> tuple[int, int, float, list[tuple[str, int, int]]]:
+    """
+    Get test coverage statistics.
+
+    Returns:
+        (total_rules, total_fixtures, coverage_pct, category_details)
+        category_details is a list of (category_name, rule_count, fixture_count)
+    """
+    rules_dir = project_dir / "lib" / "src" / "rules"
+    example_dir = project_dir / "example" / "lib"
+
+    if not rules_dir.exists():
+        return 0, 0, 0.0, []
+
+    category_details = []
+
+    for dart_file in sorted(rules_dir.glob("*_rules.dart")):
+        if dart_file.name == "all_rules.dart":
+            continue
+
+        # Get category name from filename (e.g., "collection_rules.dart" -> "collection")
+        category = dart_file.stem.replace("_rules", "")
+
+        # Count rules in this category
+        content = dart_file.read_text(encoding="utf-8")
+        rule_count = len(re.findall(r"class \w+ extends (?:SaropaLintRule|DartLintRule)", content))
+
+        # Count fixtures for this category
+        fixture_count = 0
+        category_fixture_dir = example_dir / category
+        if category_fixture_dir.exists():
+            fixture_count = len(list(category_fixture_dir.glob("*_fixture.dart")))
+
+        # Also check plural form (e.g., "collections" vs "collection")
+        if fixture_count == 0:
+            category_fixture_dir_plural = example_dir / f"{category}s"
+            if category_fixture_dir_plural.exists():
+                fixture_count = len(list(category_fixture_dir_plural.glob("*_fixture.dart")))
+
+        category_details.append((category, rule_count, fixture_count))
+
+    total_rules = sum(c[1] for c in category_details)
+    total_fixtures = sum(c[2] for c in category_details)
+    coverage_pct = (total_fixtures / total_rules * 100) if total_rules > 0 else 0.0
+
+    return total_rules, total_fixtures, coverage_pct, category_details
+
+
+def display_test_coverage(project_dir: Path) -> None:
+    """Display test coverage report with emphasis on low coverage."""
+    total_rules, total_fixtures, coverage_pct, category_details = get_test_coverage_report(project_dir)
+
+    print()
+    print_colored("  Test Coverage Report:", Color.WHITE)
+    print_colored("  " + "-" * 50, Color.CYAN)
+
+    # Overall stats with color based on coverage
+    if coverage_pct < 10:
+        color = Color.RED
+        status = "CRITICAL"
+    elif coverage_pct < 30:
+        color = Color.YELLOW
+        status = "LOW"
+    elif coverage_pct < 70:
+        color = Color.CYAN
+        status = "MODERATE"
+    else:
+        color = Color.GREEN
+        status = "GOOD"
+
+    print_colored(f"      Overall: {total_fixtures}/{total_rules} rules tested ({coverage_pct:.1f}%) - {status}", color)
+    print()
+
+    # Show categories with fixtures (success)
+    tested_categories = [(c, r, f) for c, r, f in category_details if f > 0]
+    if tested_categories:
+        print_colored("      Categories with tests:", Color.GREEN)
+        for category, rules, fixtures in sorted(tested_categories, key=lambda x: x[2], reverse=True):
+            pct = fixtures / rules * 100 if rules > 0 else 0
+            print_colored(f"        {category}: {fixtures}/{rules} ({pct:.0f}%)", Color.GREEN)
+
+    # Show categories without fixtures (shame!)
+    untested_categories = [(c, r, f) for c, r, f in category_details if f == 0 and r > 0]
+    if untested_categories:
+        print()
+        print_colored("      Categories needing tests:", Color.YELLOW)
+        for category, rules, _ in sorted(untested_categories, key=lambda x: x[1], reverse=True)[:10]:
+            print_colored(f"        {category}: 0/{rules} (0%)", Color.YELLOW)
+        if len(untested_categories) > 10:
+            remaining = len(untested_categories) - 10
+            print_colored(f"        ... and {remaining} more categories", Color.YELLOW)
+
+    print_colored("  " + "-" * 50, Color.CYAN)
+    print()
 
 
 # =============================================================================
@@ -887,6 +998,9 @@ def main() -> int:
 
     # Display changelog
     display_changelog(project_dir)
+
+    # Display test coverage (shame developers if low!)
+    display_test_coverage(project_dir)
 
     # =========================================================================
     # WORKFLOW STEPS
