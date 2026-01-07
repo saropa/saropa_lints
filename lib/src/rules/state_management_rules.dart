@@ -1769,7 +1769,8 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
       if (withClause != null) {
         for (final NamedType mixin in withClause.mixinTypes) {
           final String mixinName = mixin.name.lexeme;
-          if (mixinName == 'EquatableMixin' || mixinName.contains('Equatable')) {
+          if (mixinName == 'EquatableMixin' ||
+              mixinName.contains('Equatable')) {
             hasEquatable = true;
             break;
           }
