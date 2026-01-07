@@ -1,0 +1,51 @@
+{
+  "name": "saropa-lints-runner",
+  "displayName": "Saropa Lints Runner",
+  "description": "Quick button to run Saropa custom lints",
+  "version": "1.0.0",
+  "publisher": "saropa",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Linters"
+  ],
+  "activationEvents": [
+    "workspaceContains:**/pubspec.yaml"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "saropa-lints.run",
+        "title": "Run Saropa Lints",
+        "icon": "$(search)",
+        "category": "Saropa"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "saropa-lints.run",
+        "key": "ctrl+shift+b",
+        "mac": "cmd+shift+b",
+        "when": "editorTextFocus && resourceExtname == .dart"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "saropa-lints.run",
+          "group": "navigation",
+          "when": "resourceExtname == .dart"
+        }
+      ],
+      "editor/title/run": [
+        {
+          "command": "saropa-lints.run",
+          "group": "navigation",
+          "when": "resourceExtname == .dart"
+        }
+      ]
+    }
+  }
+}
