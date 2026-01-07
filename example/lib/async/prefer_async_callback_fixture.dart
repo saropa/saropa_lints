@@ -1,13 +1,21 @@
 // ignore_for_file: unused_field, unused_element, prefer_typing_uninitialized_variables
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 /// Test fixture for prefer_async_callback rule.
 ///
 /// This rule warns when VoidCallback is used for callbacks that likely
-/// perform async operations (based on naming patterns like onSubmit, onSave, etc.)
+/// perform async operations (based on naming patterns like onSubmit, onSave,
+/// etc.)
+///
+/// The quick-fix replaces:
+/// - `VoidCallback` → `Future<void> Function()`
+/// - `VoidCallback?` → `Future<void> Function()?`
+///
+/// We use explicit function types instead of `AsyncCallback` because:
+/// 1. No extra import required (AsyncCallback needs flutter/foundation.dart)
+/// 2. Self-documenting - the signature is immediately clear
+/// 3. Consistent with parameterized async callbacks
 
 // BAD: Field declarations with async-suggesting names
 class BadFieldExamples {
@@ -113,15 +121,15 @@ class BadPrefixedNameExamples {
   });
 }
 
-// GOOD: Using AsyncCallback for async operations
-class GoodAsyncCallbackExamples {
-  final AsyncCallback? onSubmit;
-  final AsyncCallback? onSave;
-  final AsyncCallback? onLoad;
-  final AsyncCallback? onFetch;
-  final AsyncCallback? onRefresh;
+// GOOD: Using explicit Future<void> Function() for async operations
+class GoodExplicitFunctionTypeExamples {
+  final Future<void> Function()? onSubmit;
+  final Future<void> Function()? onSave;
+  final Future<void> Function()? onLoad;
+  final Future<void> Function()? onFetch;
+  final Future<void> Function()? onRefresh;
 
-  GoodAsyncCallbackExamples({
+  GoodExplicitFunctionTypeExamples({
     this.onSubmit,
     this.onSave,
     this.onLoad,
@@ -159,15 +167,15 @@ class GoodVoidCallbackExamples {
   });
 }
 
-// GOOD: Custom function types for async
-class GoodCustomFunctionTypes {
-  final Future<void> Function()? onSubmit;
-  final Future<bool> Function()? onSave;
-  final Future<void> Function()? onLoad;
+// GOOD: Parameterized async callbacks (consistent pattern)
+class GoodParameterizedAsyncCallbacks {
+  final Future<void> Function(String id)? onDeleteItem;
+  final Future<void> Function(Map<String, dynamic> data)? onSubmitForm;
+  final Future<bool> Function()? onValidate; // Can return result
 
-  GoodCustomFunctionTypes({
-    this.onSubmit,
-    this.onSave,
-    this.onLoad,
+  GoodParameterizedAsyncCallbacks({
+    this.onDeleteItem,
+    this.onSubmitForm,
+    this.onValidate,
   });
 }

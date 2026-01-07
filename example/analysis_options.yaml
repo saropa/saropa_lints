@@ -10,3 +10,6 @@ analyzer:
 custom_lint:
   saropa_lints:
     tier: recommended  # essential | recommended | professional | comprehensive | insanity
+  rules:
+    # Enable for testing fixture files
+    - prefer_async_callback: true
