@@ -2,164 +2,39 @@
 
 ## Current Status
 
-- **Implemented**: ~500 rules
-- **Goal**: 1000 rules
-- **Remaining**: ~500 new rules
+See CHANGELOG.md for implemented rules. Goal: 1000 rules.
 
 ---
 
-## Part 1: Testing Framework
+## Part 1: Test Coverage
 
-### 1.1 Directory Structure
+### Current Status
 
-```
-saropa_lints/
-├── lib/
-│   └── src/rules/          # Rule implementations
-├── test/
-│   ├── test_utils/
-│   │   ├── lint_test_helper.dart      # Core test utilities
-│   │   ├── analyze_code.dart          # Code analysis helper
-│   │   └── lint_expectation.dart      # Matcher utilities
-│   ├── fixtures/
-│   │   ├── accessibility/             # Bad/good examples per category
-│   │   ├── performance/
-│   │   ├── security/
-│   │   └── ...
-│   └── rules/
-│       ├── accessibility_rules_test.dart
-│       ├── performance_rules_test.dart
-│       ├── security_rules_test.dart
-│       └── ...
-```
+| Category | Rules | Fixtures | Coverage |
+|----------|-------|----------|----------|
+| collection | 16 | 3 | 19% |
+| security | 12 | 1 | 8% |
+| debug | 5 | 1 | 20% |
+| *31 other categories* | 534 | 0 | 0% |
+| **Total** | **567** | **5** | **<1%** |
 
-### 1.2 Test Helper Implementation
+### Priority Categories
 
-```dart
-// test/test_utils/lint_test_helper.dart
-import 'package:analyzer/dart/analysis/utilities.dart';
-import 'package:analyzer/dart/analysis/results.dart';
-import 'package:custom_lint_builder/custom_lint_builder.dart';
-import 'package:test/test.dart';
+Focus testing on high-impact categories first:
 
-/// Result of analyzing code with a lint rule
-class LintTestResult {
-  final List<LintMatch> matches;
-  final String source;
+1. **error_handling** (8 rules) - prevent silent failures
+2. **async** (15 rules) - common source of bugs
+3. **security** (12 rules) - 1 fixture, need more
+4. **flutter_widget** (107 rules) - largest category
 
-  LintTestResult(this.matches, this.source);
+### How to Add Tests
 
-  bool get hasLints => matches.isNotEmpty;
-  int get lintCount => matches.length;
-}
+See [CONTRIBUTING.md](CONTRIBUTING.md) section 5 for the fixture-based testing approach.
 
-class LintMatch {
-  final String ruleName;
-  final int line;
-  final int column;
-  final String message;
+### CI Integration
 
-  LintMatch({
-    required this.ruleName,
-    required this.line,
-    required this.column,
-    required this.message,
-  });
-}
-
-/// Analyzes Dart code with the specified rule
-Future<LintTestResult> analyzeDartCode(
-  String code,
-  DartLintRule rule,
-) async {
-  final matches = <LintMatch>[];
-
-  final result = parseString(
-    content: code,
-    throwIfDiagnostics: false,
-  );
-
-  // Create mock reporter that captures lints
-  final reporter = _TestErrorReporter((lint, node) {
-    matches.add(LintMatch(
-      ruleName: lint.name,
-      line: node.offset, // Simplified - real impl needs line calc
-      column: 0,
-      message: lint.problemMessage,
-    ));
-  });
-
-  // Run the rule
-  // Note: Real implementation needs CustomLintResolver mock
-
-  return LintTestResult(matches, code);
-}
-
-/// Test that code triggers the lint
-void expectLint(LintTestResult result, {int count = 1}) {
-  expect(result.hasLints, isTrue,
-    reason: 'Expected lint to trigger but it did not');
-  expect(result.lintCount, count,
-    reason: 'Expected $count lint(s) but got ${result.lintCount}');
-}
-
-/// Test that code does NOT trigger the lint
-void expectNoLint(LintTestResult result) {
-  expect(result.hasLints, isFalse,
-    reason: 'Expected no lint but got: ${result.matches.map((m) => m.message)}');
-}
-```
-
-### 1.3 Test Pattern
-
-```dart
-// test/rules/accessibility_rules_test.dart
-import 'package:test/test.dart';
-import 'package:saropa_lints/src/rules/accessibility_rules.dart';
-import '../test_utils/lint_test_helper.dart';
-
-void main() {
-  group('RequireSemanticsLabelRule', () {
-    final rule = RequireSemanticsLabelRule();
-
-    test('triggers on IconButton without tooltip', () async {
-      final result = await analyzeDartCode('''
-import 'package:flutter/material.dart';
-
-Widget build() {
-  return IconButton(
-    icon: Icon(Icons.add),
-    onPressed: () {},
-  );
-}
-''', rule);
-
-      expectLint(result);
-    });
-
-    test('passes with tooltip', () async {
-      final result = await analyzeDartCode('''
-import 'package:flutter/material.dart';
-
-Widget build() {
-  return IconButton(
-    icon: Icon(Icons.add),
-    onPressed: () {},
-    tooltip: 'Add item',
-  );
-}
-''', rule);
-
-      expectNoLint(result);
-    });
-  });
-}
-```
-
-### 1.4 CI Integration
-
-- [ ] Add `dart test` to CI pipeline
-- [ ] Add coverage reporting
+- [ ] Add `dart run custom_lint` to CI pipeline for example/ folder
+- [ ] Fail CI if expected lints don't fire
 
 ---
 
@@ -194,29 +69,25 @@ Widget build() {
 
 ## Part 3: Detailed Rule Specifications
 
-### 3.1 Widget Rules (+60 rules)
+### 3.1 Widget Rules
 
-#### Layout & Composition (15 rules)
+#### Layout & Composition
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 1 | `avoid_nested_scaffolds` | Essential | ERROR | Scaffolds inside Scaffolds cause issues |
 | 2 | `avoid_unbounded_constraints` | Essential | WARNING | Column/Row inside unconstrained widget |
-| 3 | `prefer_sized_box_for_whitespace` | Recommended | INFO | SizedBox over Container for spacing |
 | 4 | `avoid_deep_widget_nesting` | Professional | INFO | Widget depth > 15 levels |
 | 5 | `prefer_wrap_over_overflow` | Recommended | WARNING | Use Wrap instead of overflow |
 | 6 | `avoid_hardcoded_layout_values` | Comprehensive | INFO | Magic numbers in layout |
 | 7 | `prefer_fractional_sizing` | Comprehensive | INFO | FractionallySizedBox for responsive |
 | 8 | `avoid_layout_builder_in_scrollable` | Professional | WARNING | LayoutBuilder perf in scrollable |
 | 9 | `prefer_intrinsic_dimensions` | Comprehensive | INFO | IntrinsicWidth/Height when needed |
-| 10 | `avoid_multiple_material_apps` | Essential | ERROR | Only one MaterialApp per tree |
 | 11 | `prefer_safe_area_aware` | Recommended | INFO | SafeArea for edge content |
 | 12 | `avoid_unconstrained_box_misuse` | Professional | WARNING | UnconstrainedBox causing overflow |
 | 13 | `require_overflow_box_rationale` | Comprehensive | INFO | Document OverflowBox usage |
 | 14 | `prefer_custom_single_child_layout` | Insanity | INFO | CustomSingleChildLayout for complex |
-| 15 | `avoid_fitted_box_for_text` | Comprehensive | INFO | FittedBox scaling text issues |
 
-#### Text & Typography (10 rules)
+#### Text & Typography
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -226,38 +97,30 @@ Widget build() {
 | 19 | `prefer_rich_text_for_complex` | Comprehensive | INFO | RichText for mixed styles |
 | 20 | `avoid_text_scale_factor_ignore` | Recommended | WARNING | Respect textScaleFactor |
 | 21 | `require_default_text_style` | Professional | INFO | DefaultTextStyle for consistency |
-| 22 | `prefer_selectable_text` | Comprehensive | INFO | SelectableText for copyable |
-| 23 | `avoid_font_weight_as_number` | Insanity | INFO | Use FontWeight constants |
 | 24 | `require_locale_for_text` | Professional | INFO | Locale affects text rendering |
-| 25 | `avoid_empty_text_widgets` | Recommended | INFO | Text('') wastes resources |
 
-#### Images & Media (10 rules)
+#### Images & Media
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
 | 26 | `require_image_error_builder` | Essential | WARNING | Handle image loading errors |
-| 27 | `prefer_cached_network_image` | Recommended | INFO | Cache network images |
 | 28 | `avoid_large_images_in_memory` | Essential | WARNING | Resize large images |
 | 29 | `require_image_semantics` | Recommended | WARNING | Alt text for accessibility |
 | 30 | `prefer_asset_image_for_local` | Professional | INFO | AssetImage for bundled images |
-| 31 | `avoid_image_repeat` | Comprehensive | INFO | ImageRepeat rarely needed |
 | 32 | `require_placeholder_for_network` | Recommended | INFO | Show loading placeholder |
 | 33 | `prefer_fit_cover_for_background` | Comprehensive | INFO | BoxFit.cover for backgrounds |
-| 34 | `avoid_icon_size_override` | Comprehensive | INFO | Use IconTheme instead |
 | 35 | `require_image_dimensions` | Professional | INFO | Specify width/height |
 
-#### Input & Interaction (15 rules)
+#### Input & Interaction
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
 | 36 | `require_button_loading_state` | Recommended | INFO | Show loading during async |
 | 37 | `avoid_gesture_conflict` | Essential | WARNING | Overlapping gesture detectors |
-| 38 | `prefer_inkwell_over_gesture` | Recommended | INFO | InkWell for material feedback |
 | 39 | `require_disabled_state` | Professional | INFO | Buttons need disabled state |
 | 40 | `avoid_double_tap_submit` | Essential | WARNING | Prevent double form submit |
 | 41 | `prefer_cursor_for_buttons` | Comprehensive | INFO | Mouse cursor on web |
 | 42 | `require_focus_node_dispose` | Essential | ERROR | FocusNode must be disposed |
-| 43 | `avoid_raw_keyboard_listener` | Comprehensive | INFO | Deprecated, use KeyboardListener |
 | 44 | `prefer_actions_and_shortcuts` | Professional | INFO | Use Actions/Shortcuts system |
 | 45 | `require_hover_states` | Comprehensive | INFO | Hover feedback on web/desktop |
 | 46 | `avoid_absorb_pointer_misuse` | Professional | WARNING | AbsorbPointer blocks all input |
@@ -266,11 +129,10 @@ Widget build() {
 | 49 | `avoid_gesture_without_behavior` | Recommended | INFO | Set HitTestBehavior |
 | 50 | `require_long_press_callback` | Comprehensive | INFO | Handle onLongPress for context |
 
-#### Lists & Scrolling (10 rules)
+#### Lists & Scrolling
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 51 | `prefer_listview_builder` | Recommended | WARNING | Builder for long lists |
 | 52 | `require_scroll_controller_dispose` | Essential | ERROR | ScrollController must dispose |
 | 53 | `avoid_nested_scrollables` | Professional | WARNING | NestedScrollView for nesting |
 | 54 | `prefer_sliver_list` | Professional | INFO | SliverList for mixed content |
@@ -281,9 +143,9 @@ Widget build() {
 | 59 | `avoid_find_child_in_build` | Professional | WARNING | findChildIndexCallback in build |
 | 60 | `prefer_keep_alive` | Comprehensive | INFO | AutomaticKeepAliveClientMixin |
 
-### 3.2 State Management (+45 rules)
+### 3.2 State Management
 
-#### Riverpod Rules (15 rules)
+#### Riverpod Rules
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -303,7 +165,7 @@ Widget build() {
 | 74 | `prefer_consumer_widget` | Recommended | INFO | ConsumerWidget over Consumer |
 | 75 | `require_provider_scope` | Essential | ERROR | ProviderScope at root |
 
-#### Bloc/Cubit Rules (15 rules)
+#### Bloc/Cubit Rules
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -323,7 +185,7 @@ Widget build() {
 | 89 | `prefer_bloc_observer` | Professional | INFO | Use BlocObserver for debug |
 | 90 | `require_error_state` | Recommended | INFO | Handle error states |
 
-#### Provider Package Rules (10 rules)
+#### Provider Package Rules
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -338,7 +200,7 @@ Widget build() {
 | 99 | `require_update_callback` | Comprehensive | INFO | Handle updates explicitly |
 | 100 | `avoid_listen_in_async` | Essential | WARNING | context.read in async |
 
-#### GetX Rules (5 rules)
+#### GetX Rules
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -348,9 +210,9 @@ Widget build() {
 | 104 | `require_getx_binding` | Professional | INFO | Use Bindings pattern |
 | 105 | `avoid_obs_outside_controller` | Recommended | WARNING | .obs in controllers only |
 
-### 3.3 Performance Rules (+50 rules)
+### 3.3 Performance Rules
 
-#### Build Optimization (20 rules)
+#### Build Optimization
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -358,9 +220,7 @@ Widget build() {
 | 107 | `prefer_const_widgets` | Recommended | INFO | Mark widgets const |
 | 108 | `avoid_expensive_computation_in_build` | Essential | WARNING | Heavy work in build |
 | 109 | `require_repaint_boundary` | Professional | INFO | RepaintBoundary for isolation |
-| 110 | `avoid_opacity_animation` | Recommended | WARNING | FadeTransition over Opacity |
 | 111 | `prefer_builder_for_conditional` | Professional | INFO | Builder widget pattern |
-| 112 | `avoid_media_query_in_build` | Recommended | INFO | Cache MediaQuery results |
 | 113 | `require_widget_key_strategy` | Professional | INFO | Key strategy for lists |
 | 114 | `avoid_layout_passes` | Professional | WARNING | Multiple layout passes |
 | 115 | `prefer_value_listenable_builder` | Recommended | INFO | ValueListenable for single value |
@@ -370,12 +230,11 @@ Widget build() {
 | 119 | `require_should_rebuild` | Professional | INFO | shouldRebuild optimization |
 | 120 | `avoid_widget_creation_in_loop` | Essential | WARNING | Create widgets once |
 | 121 | `prefer_element_rebuild` | Comprehensive | INFO | Element rebuild optimization |
-| 122 | `avoid_sized_box_expand` | Comprehensive | INFO | SizedBox.expand impact |
 | 123 | `require_build_context_scope` | Recommended | WARNING | BuildContext invalid after |
 | 124 | `prefer_selector_over_consumer` | Professional | INFO | More granular rebuilds |
 | 125 | `avoid_global_key_misuse` | Essential | WARNING | GlobalKey causes rebuild |
 
-#### Memory Optimization (15 rules)
+#### Memory Optimization
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -383,7 +242,6 @@ Widget build() {
 | 127 | `avoid_memory_intensive_operations` | Essential | WARNING | Large allocations |
 | 128 | `prefer_weak_reference` | Comprehensive | INFO | WeakReference for cache |
 | 129 | `require_list_preallocate` | Professional | INFO | List.filled for known size |
-| 130 | `avoid_string_concatenation_loop` | Recommended | INFO | StringBuffer in loops |
 | 131 | `prefer_typed_data` | Professional | INFO | Uint8List over List<int> |
 | 132 | `require_isolate_for_heavy` | Professional | WARNING | compute() for heavy work |
 | 133 | `avoid_finalizer_misuse` | Comprehensive | INFO | Finalizer rarely needed |
@@ -392,10 +250,9 @@ Widget build() {
 | 136 | `avoid_closure_memory_leak` | Essential | WARNING | Closures holding references |
 | 137 | `prefer_static_const_widgets` | Professional | INFO | Static const for reuse |
 | 138 | `require_expando_cleanup` | Comprehensive | INFO | Clean Expando objects |
-| 139 | `avoid_large_list_copy` | Recommended | WARNING | List.from() copies all |
 | 140 | `prefer_iterable_operations` | Professional | INFO | Lazy iteration |
 
-#### Network Performance (15 rules)
+#### Network Performance
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -415,14 +272,12 @@ Widget build() {
 | 154 | `prefer_binary_format` | Comprehensive | INFO | Protocol buffers option |
 | 155 | `require_network_status_check` | Recommended | INFO | Check connectivity first |
 
-### 3.4 Testing Rules (+48 rules)
+### 3.4 Testing Rules
 
-#### Unit Testing (15 rules)
+#### Unit Testing
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 156 | `require_test_assertions` | Essential | WARNING | Test must have assertions |
-| 157 | `avoid_vague_test_names` | Recommended | INFO | Descriptive test names |
 | 158 | `require_arrange_act_assert` | Professional | INFO | AAA pattern |
 | 159 | `avoid_test_coupling` | Essential | WARNING | Tests independent |
 | 160 | `prefer_single_assertion` | Professional | INFO | One assertion per test |
@@ -437,11 +292,10 @@ Widget build() {
 | 169 | `prefer_matcher_over_equals` | Comprehensive | INFO | Rich matchers |
 | 170 | `require_test_isolation` | Essential | WARNING | Clean state per test |
 
-#### Widget Testing (18 rules)
+#### Widget Testing
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 171 | `require_pump_after_action` | Essential | ERROR | pump after tap/enter |
 | 172 | `prefer_pump_and_settle` | Recommended | INFO | pumpAndSettle for anim |
 | 173 | `avoid_find_by_text` | Professional | INFO | Find by key/type instead |
 | 174 | `require_test_keys` | Professional | INFO | Keys for testability |
@@ -460,7 +314,7 @@ Widget build() {
 | 187 | `prefer_fake_platform` | Comprehensive | INFO | Fake platform channels |
 | 188 | `require_animation_tests` | Comprehensive | INFO | Test animations |
 
-#### Integration Testing (15 rules)
+#### Integration Testing
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -480,18 +334,14 @@ Widget build() {
 | 202 | `prefer_parallel_tests` | Comprehensive | INFO | Parallel execution |
 | 203 | `require_test_documentation` | Comprehensive | INFO | Document complex tests |
 
-### 3.5 Security Rules (+45 rules)
+### 3.5 Security Rules
 
-#### Authentication & Authorization (15 rules)
+#### Authentication & Authorization
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
 | 204 | `require_auth_check` | Essential | ERROR | Protected routes check auth |
-| 205 | `avoid_storing_passwords` | Essential | ERROR | Never store plain passwords |
-| 206 | `require_secure_storage` | Essential | WARNING | Use flutter_secure_storage |
-| 207 | `avoid_token_in_url` | Essential | ERROR | Tokens in headers only |
 | 208 | `require_token_refresh` | Recommended | WARNING | Handle token expiry |
-| 209 | `prefer_biometric_with_fallback` | Professional | INFO | Fallback for biometric |
 | 210 | `avoid_auth_state_in_prefs` | Essential | WARNING | Secure storage for auth |
 | 211 | `require_logout_cleanup` | Essential | WARNING | Clear data on logout |
 | 212 | `prefer_oauth_pkce` | Professional | INFO | PKCE for mobile OAuth |
@@ -502,18 +352,14 @@ Widget build() {
 | 217 | `require_multi_factor` | Comprehensive | INFO | Consider MFA |
 | 218 | `avoid_auth_in_query_params` | Essential | ERROR | Auth not in URL |
 
-#### Data Protection (15 rules)
+#### Data Protection
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 219 | `avoid_logging_pii` | Essential | ERROR | No PII in logs |
 | 220 | `require_data_encryption` | Essential | WARNING | Encrypt sensitive data |
 | 221 | `prefer_secure_random` | Recommended | WARNING | SecureRandom for crypto |
-| 222 | `avoid_hardcoded_secrets` | Essential | ERROR | No secrets in code |
 | 223 | `require_keychain_access` | Professional | INFO | iOS keychain properly |
 | 224 | `prefer_encrypted_prefs` | Recommended | INFO | Encrypt SharedPrefs |
-| 225 | `avoid_clipboard_sensitive` | Essential | WARNING | Don't copy passwords |
-| 226 | `require_certificate_pinning` | Professional | WARNING | SSL pinning |
 | 227 | `prefer_data_masking` | Professional | INFO | Mask sensitive display |
 | 228 | `avoid_screenshot_sensitive` | Recommended | WARNING | Prevent screenshots |
 | 229 | `require_secure_keyboard` | Professional | INFO | Secure keyboard input |
@@ -522,14 +368,12 @@ Widget build() {
 | 232 | `require_backup_exclusion` | Professional | INFO | Exclude from backup |
 | 233 | `prefer_root_detection` | Professional | INFO | Detect rooted devices |
 
-#### Input Validation & Injection (15 rules)
+#### Input Validation & Injection
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 234 | `require_input_sanitization` | Essential | WARNING | Sanitize user input |
 | 235 | `avoid_dynamic_sql` | Essential | ERROR | Parameterized queries |
 | 236 | `prefer_html_escape` | Recommended | WARNING | Escape HTML output |
-| 237 | `avoid_eval_patterns` | Essential | ERROR | No dynamic code exec |
 | 238 | `require_url_validation` | Essential | WARNING | Validate URLs |
 | 239 | `prefer_regex_validation` | Recommended | INFO | Regex for format check |
 | 240 | `avoid_path_traversal` | Essential | ERROR | Validate file paths |
@@ -538,18 +382,15 @@ Widget build() {
 | 243 | `avoid_redirect_injection` | Essential | WARNING | Validate redirects |
 | 244 | `require_content_type_check` | Professional | INFO | Check response types |
 | 245 | `prefer_csrf_protection` | Professional | WARNING | CSRF tokens |
-| 246 | `avoid_webview_js_interface` | Recommended | WARNING | WebView JS bridge risk |
 | 247 | `require_deep_link_validation` | Essential | WARNING | Validate deep links |
 | 248 | `prefer_intent_filter_export` | Professional | INFO | Limit intent filters |
 
-### 3.6 Accessibility Rules (+35 rules)
+### 3.6 Accessibility Rules
 
-#### Screen Reader Support (15 rules)
+#### Screen Reader Support
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 249 | `require_semantics_label` | Essential | WARNING | Interactive needs label |
-| 250 | `avoid_icon_only_buttons` | Essential | WARNING | Icon buttons need tooltip |
 | 251 | `prefer_explicit_semantics` | Recommended | INFO | Explicit semantics |
 | 252 | `require_image_description` | Essential | WARNING | Images need alt text |
 | 253 | `avoid_semantics_exclusion` | Recommended | WARNING | Justify excludeSemantics |
@@ -564,7 +405,7 @@ Widget build() {
 | 262 | `avoid_semantics_in_animation` | Comprehensive | INFO | Static semantics tree |
 | 263 | `prefer_announce_for_changes` | Comprehensive | INFO | Announce important changes |
 
-#### Visual Accessibility (12 rules)
+#### Visual Accessibility
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
@@ -581,12 +422,10 @@ Widget build() {
 | 274 | `avoid_flashing_content` | Essential | WARNING | No seizure triggers |
 | 275 | `prefer_outlined_icons` | Comprehensive | INFO | Outlined over filled |
 
-#### Motor Accessibility (8 rules)
+#### Motor Accessibility
 
 | # | Rule Name | Tier | Severity | Description |
 |---|-----------|------|----------|-------------|
-| 276 | `require_minimum_touch_target` | Essential | WARNING | 48dp minimum tap target |
-| 277 | `avoid_gesture_only` | Recommended | WARNING | Keyboard alternative |
 | 278 | `prefer_adequate_spacing` | Recommended | INFO | Spacing between targets |
 | 279 | `require_drag_alternatives` | Professional | INFO | Alternative to drag |
 | 280 | `avoid_time_limits` | Recommended | INFO | No strict time limits |
@@ -597,112 +436,257 @@ Widget build() {
 ### 3.7 - 3.12 Additional Categories
 
 See the full specification for:
-- Error Handling Rules (+30)
-- Async/Concurrency Rules (+30)
-- Architecture Rules (+40)
-- Package-Specific Rules (+80): Dio, Hive/Isar, GoRouter, Firebase
-- Platform-Specific Rules (+40): Web, Desktop, iOS, Android
+- Error Handling Rules
+- Async/Concurrency Rules
+- Architecture Rules
+- Package-Specific Rules: Dio, Hive/Isar, GoRouter, Firebase
+- Platform-Specific Rules: Web, Desktop, iOS, Android
 - Documentation, API/Network, Database, Animation, Navigation, Forms, Localization, DI
 
 ---
 
 ## Part 4: Tier Assignments
 
-### Tier 1: Essential (~100 rules)
+### Tier 1: Essential
 
 Critical rules that prevent crashes, data loss, and security holes.
 
-### Tier 2: Recommended (~300 rules)
+### Tier 2: Recommended
 
 Essential + common mistakes, performance basics, accessibility basics.
 
-### Tier 3: Professional (~600 rules)
+### Tier 3: Professional
 
 Recommended + architecture, testing, maintainability.
 
-### Tier 4: Comprehensive (~800 rules)
+### Tier 4: Comprehensive
 
 Professional + documentation, style, edge cases.
 
-### Tier 5: Insanity (1000 rules)
+### Tier 5: Insanity
 
 Everything. For the truly obsessive.
+
+### Stylistic / Opinionated Rules (No Tier)
+
+These rules are **not included in any tier** by default. They represent team preferences where there is no objectively "correct" answer. Teams explicitly enable them based on their coding conventions.
+
+> **See [STYLISTIC.md](STYLISTIC.md)** for full documentation on implemented stylistic rules.
+
+**Planned:**
+
+#### Import & File Organization
+
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_sorted_imports` | Alphabetically sort imports within groups |
+| `prefer_import_groups` | Group imports: dart, package, relative (with blank lines) |
+| `prefer_absolute_imports` | Use absolute `package:` imports (opposite of prefer_relative_imports) |
+| `prefer_deferred_imports` | Use deferred imports for large libraries |
+| `prefer_show_hide` | Explicit `show`/`hide` on imports |
+| `prefer_part_over_import` | Use `part`/`part of` for tightly coupled files |
+| `prefer_import_over_part` | Use imports instead of `part`/`part of` |
+
+#### Naming Conventions
+
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_lowercase_constants` | Constants in `lowerCamelCase` (Dart style guide) |
+| `prefer_verb_method_names` | Methods start with verbs (`get`, `set`, `fetch`, `compute`) |
+| `prefer_noun_class_names` | Class names are nouns or noun phrases |
+| `prefer_adjective_bool_getters` | Boolean getters as adjectives (`isEmpty` vs `getIsEmpty`) |
+| `prefer_i_prefix_interfaces` | Interface classes use `I` prefix (`IRepository`) |
+| `prefer_no_i_prefix_interfaces` | Interface classes without `I` prefix |
+| `prefer_impl_suffix` | Implementation classes use `Impl` suffix |
+| `prefer_base_prefix` | Base classes use `Base` prefix |
+| `prefer_mixin_prefix` | Mixins use `Mixin` suffix or no suffix |
+| `prefer_extension_suffix` | Extensions use `Extension` or `X` suffix |
+
+#### Member Ordering
+
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_public_members_first` | Public members before private in classes |
+| `prefer_private_members_first` | Private members before public in classes |
+| `prefer_fields_before_methods` | Field declarations at top of class |
+| `prefer_methods_before_fields` | Methods before field declarations |
+| `prefer_constructors_first` | Constructors before other members |
+| `prefer_getters_before_setters` | Getters immediately before their setters |
+| `prefer_static_before_instance` | Static members before instance members |
+| `prefer_factory_before_named` | Factory constructors before named constructors |
+| `prefer_overrides_last` | `@override` methods at bottom of class |
+
+#### Comments & Documentation
+
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_no_commented_code` | Disallow commented-out code blocks |
+| `prefer_inline_comments_sparingly` | Limit inline comments; prefer self-documenting code |
+
+#### String Preferences
+
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_double_quotes` | Double quotes `"string"` for strings |
+| `prefer_raw_strings` | Raw strings `r'...'` when escapes are heavy |
+| `prefer_adjacent_strings` | Adjacent strings over `+` concatenation |
+| `prefer_interpolation_to_compose` | String interpolation `${}` over concatenation |
+
+#### Function & Method Style
+
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_function_over_static_method` | Top-level functions over static methods |
+| `prefer_static_method_over_function` | Static methods over top-level functions |
+| `prefer_expression_body_getters` | Arrow `=>` for simple getters |
+| `prefer_block_body_setters` | Block body `{}` for setters |
+| `prefer_positional_bool_params` | Boolean parameters as positional |
+| `prefer_named_bool_params` | Boolean parameters as named |
+| `prefer_optional_positional_params` | `[optional]` over `{named}` |
+| `prefer_optional_named_params` | `{named}` over `[positional]` |
+
+#### Type & Class Style
+
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_final_fields_always` | All instance fields should be `final` |
+| `prefer_mixin_over_abstract` | Mixins over abstract classes when appropriate |
+| `prefer_extension_over_utility_class` | Extension methods over static utility classes |
+| `prefer_typedef_for_callbacks` | `typedef` for function type aliases |
+| `prefer_inline_function_types` | Inline function types over `typedef` |
+| `prefer_sealed_classes` | Sealed classes for closed type hierarchies |
+
+**Usage:**
+
+```yaml
+custom_lint:
+  rules:
+    - prefer_relative_imports: true
+    - prefer_explicit_types: true
+```
 
 ---
 
 ## Part 5: Technical Debt & Improvements
 
-### 5.1 Migrate Rules to SaropaLintRule Base Class
+### 5.0 SaropaLintRule Base Class Enhancements
 
-**Status**: In Progress
-**Priority**: High
-**Rationale**: Support hyphenated ignore comments (e.g., `// ignore: no-empty-block`) alongside standard underscore format (`// ignore: no_empty_block`).
+The `SaropaLintRule` base class provides enhanced features for all lint rules.
 
-**New Infrastructure Created**:
-- `lib/src/ignore_utils.dart` - Utilities for checking ignore comments with hyphen/underscore flexibility
-- `lib/src/saropa_lint_rule.dart` - Base class that wraps `DiagnosticReporter` to automatically handle hyphenated aliases
+#### Planned Enhancements
 
-**Migration Steps for Each Rule**:
-1. Import `saropa_lint_rule.dart`
-2. Change `extends DartLintRule` → `extends SaropaLintRule`
-3. Rename `run(` → `runWithReporter(`
-4. Change `DiagnosticReporter reporter` → `SaropaDiagnosticReporter reporter`
+| # | Feature | Priority | Description |
+|---|---------|----------|-------------|
+| 1 | **Diagnostic Statistics** | Medium | Track hit counts per rule for metrics/reporting |
+| 2 | **Related Rules** | Low | Link related rules together, suggest complementary rules |
+| 3 | **Suppression Tracking** | High | Audit trail of suppressed lints for tech debt tracking |
+| 4 | **Batch Deduplication** | Low | Prevent duplicate reports at same offset |
+| 5 | **Custom Ignore Prefixes** | Low | Support `// saropa-ignore:`, `// tech-debt:` prefixes |
+| 6 | **Performance Tracking** | Medium | Measure rule execution time for optimization |
+| 7 | **Tier-Based Filtering** | Medium | Enable/disable rules by tier at runtime |
 
-**Files to Migrate** (~35 files, ~500 rules):
-- [ ] `accessibility_rules.dart`
-- [ ] `api_network_rules.dart`
-- [ ] `architecture_rules.dart`
-- [ ] `async_rules.dart`
-- [ ] `class_constructor_rules.dart`
-- [ ] `code_quality_rules.dart`
-- [ ] `collection_rules.dart`
-- [ ] `complexity_rules.dart`
-- [ ] `control_flow_rules.dart`
-- [ ] `debug_rules.dart`
-- [ ] `dependency_injection_rules.dart`
-- [ ] `documentation_rules.dart`
-- [ ] `equality_rules.dart`
-- [ ] `error_handling_rules.dart`
-- [ ] `exception_rules.dart`
-- [ ] `flutter_widget_rules.dart`
-- [ ] `formatting_rules.dart`
-- [ ] `internationalization_rules.dart`
-- [ ] `memory_management_rules.dart`
-- [ ] `naming_style_rules.dart`
-- [ ] `numeric_literal_rules.dart`
-- [ ] `performance_rules.dart`
-- [ ] `record_pattern_rules.dart`
-- [ ] `resource_management_rules.dart`
-- [ ] `return_rules.dart`
-- [ ] `security_rules.dart`
-- [ ] `state_management_rules.dart`
-- [ ] `structure_rules.dart`
-- [ ] `test_rules.dart`
-- [ ] `testing_best_practices_rules.dart`
-- [ ] `type_rules.dart`
-- [ ] `type_safety_rules.dart`
-- [x] `unnecessary_code_rules.dart` (NoEmptyBlockRule migrated as example)
+##### 5.0.1 Diagnostic Statistics (#1)
 
-**Example Migration** (NoEmptyBlockRule):
+Track how many times each rule fires across a codebase for:
+- Prioritizing fixes ("847 `avoid_print` vs 3 `avoid_hardcoded_credentials`")
+- Measuring progress over time
+- Identifying problem files
+- Tuning overly aggressive rules
+
 ```dart
-// Before
-class NoEmptyBlockRule extends DartLintRule {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    DiagnosticReporter reporter,
-    CustomLintContext context,
-  ) { ... }
-}
+abstract class SaropaLintRule extends DartLintRule {
+  static final Map<String, int> hitCounts = {};
+  static final Map<String, Set<String>> fileHits = {};
 
-// After
-class NoEmptyBlockRule extends SaropaLintRule {
+  int get hitCount => hitCounts[code.name] ?? 0;
+}
+```
+
+##### 5.0.2 Related Rules (#2)
+
+Link rules together for better discoverability:
+
+```dart
+class RequireDisposeRule extends SaropaLintRule {
   @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) { ... }
+  List<String> get relatedRules => [
+    'require_stream_controller_dispose',
+    'require_animation_controller_dispose',
+  ];
+}
+```
+
+##### 5.0.3 Suppression Tracking (#3)
+
+Record every time a lint is suppressed for tech debt auditing:
+
+```dart
+class SaropaDiagnosticReporter {
+  static final List<SuppressionRecord> suppressions = [];
+
+  // Output: "avoid_print: 12 suppressions in 5 files"
+}
+```
+
+Use cases:
+- Tech debt tracking
+- Security audits ("are security rules being suppressed?")
+- Cleanup campaigns
+
+##### 5.0.4 Batch Deduplication (#4)
+
+Prevent the same issue from being reported multiple times when AST visitors traverse nodes from multiple angles:
+
+```dart
+class SaropaDiagnosticReporter {
+  final Set<int> _reportedOffsets = {};
+
+  void atNode(AstNode node, LintCode code) {
+    if (_reportedOffsets.contains(node.offset)) return;
+    _reportedOffsets.add(node.offset);
+    // ...
+  }
+}
+```
+
+##### 5.0.5 Custom Ignore Prefixes (#5)
+
+Support project-specific ignore comment styles:
+
+```dart
+// All of these would suppress the lint:
+// ignore: avoid_print
+// saropa-ignore: avoid_print
+// tech-debt: avoid_print (tracked separately for auditing)
+```
+
+##### 5.0.6 Performance Tracking (#6)
+
+Measure rule execution time to identify slow rules:
+
+```dart
+abstract class SaropaLintRule extends DartLintRule {
+  static final Map<String, Duration> executionTimes = {};
+
+  // Output report:
+  // avoid_excessive_widget_depth: 2.3s (needs optimization!)
+  // require_dispose: 0.1s
+}
+```
+
+##### 5.0.7 Tier-Based Filtering (#7)
+
+Enable/disable rules based on strictness tiers at runtime:
+
+```dart
+// Configure via environment or analysis_options.yaml
+// SAROPA_TIER=recommended dart analyze
+
+abstract class SaropaLintRule extends DartLintRule {
+  SaropaTier get tier;
+
+  bool shouldRunForTier(SaropaTier activeTier) =>
+    tier.index <= activeTier.index;
 }
 ```
 
@@ -710,41 +694,98 @@ class NoEmptyBlockRule extends SaropaLintRule {
 
 ## Part 6: Implementation Priority
 
-### Phase 1: Testing Framework
-- [ ] Add test dependencies to `pubspec.yaml`
-- [ ] Create `test/test_utils/lint_test_helper.dart`
-- [ ] Create `test/test_utils/analyze_code.dart`
-- [ ] Create test directory structure
-- [ ] Write tests for 10 existing rules (validation)
-- [ ] Add `dart test` to CI pipeline
-- [ ] Add coverage reporting
+### Phase 1: Test Coverage
+- [ ] Add fixtures for error_handling rules (8 rules)
+- [ ] Add fixtures for async rules (15 rules)
+- [ ] Add fixtures for remaining security rules (11 rules)
+- [ ] Add `dart run custom_lint` to CI for example/ folder
 
-### Phase 2: Highest Impact (Rules 1-100)
-- Widget Rules (60)
-- Essential State Management (20)
-- Core Performance (20)
+### Phase 2: Highest Impact
+- Widget Rules
+- Essential State Management
+- Core Performance
 
-### Phase 3: Common Needs (Rules 101-200)
-- Testing Rules (48)
-- Security Fundamentals (30)
-- Accessibility Core (22)
+### Phase 3: Common Needs
+- Testing Rules
+- Security Fundamentals
+- Accessibility Core
 
-### Phase 4: Advanced Patterns (Rules 201-300)
-- Advanced State Management (25)
-- Error Handling (30)
-- Async Patterns (30)
-- More Testing (15)
+### Phase 4: Advanced Patterns
+- Advanced State Management
+- Error Handling
+- Async Patterns
+- More Testing
 
-### Phase 5: Enterprise (Rules 301-400)
-- Architecture Rules (40)
-- More Security (15)
-- Accessibility Complete (13)
-- Platform-Specific Start (32)
+### Phase 5: Enterprise
+- Architecture Rules
+- More Security
+- Accessibility Complete
+- Platform-Specific Start
 
-### Phase 6: Package Ecosystem (Rules 401-500)
-- Package-Specific (80)
-- Platform Complete (8)
-- Remaining Categories (12)
+### Phase 6: Package Ecosystem
+- Package-Specific
+- Platform Complete
+- Remaining Categories
+
+---
+
+## Part 7: Modern Dart & Flutter Language Features
+
+This section tracks new Dart/Flutter language features that developers should learn, and corresponding lint rules to help adopt them.
+
+### 7.1 Dart Language Features
+
+| Version | Date | Feature | Description | Lint Rule | Status |
+|---------|------|---------|-------------|-----------|--------|
+| 3.10 | Nov 2025 | Dot Shorthands | Write `.center` instead of `MainAxisAlignment.center` | `prefer_dot_shorthand` | Planned |
+| 3.10 | Nov 2025 | Analyzer Plugin System | Official plugin architecture for custom analysis | Consider migration | Research |
+| 3.10 | Nov 2025 | Specific Deprecation Annotations | Finer-grained deprecation control | `use_specific_deprecation` | Planned |
+| 3.9 | Aug 2025 | Improved Type Promotion | Null safety assumed for type promotion/reachability | `avoid_redundant_null_check` | Planned |
+| 3.9 | Aug 2025 | Sound Null Safety Only | `--no-sound-null-safety` flag removed | N/A | - |
+| 3.8 | May 2025 | Null-Aware Elements | `?item` in collections - include only if non-null | `prefer_null_aware_elements` | Planned |
+| 3.8 | May 2025 | Auto Trailing Commas | Formatter handles commas automatically | N/A (formatter) | - |
+| 3.7 | Feb 2025 | Tall Style Formatter | New vertical formatting style | N/A (formatter) | - |
+| 3.6 | Dec 2024 | Pub Workspaces | Monorepo support | N/A (tooling) | - |
+| 3.5 | Aug 2024 | Web Interop APIs (Stable) | `dart:js_interop` at 1.0 | `prefer_js_interop_over_dart_js` | Planned |
+| 3.5 | Aug 2024 | JNIgen (Preview) | Java/Kotlin interop generator | Interop rules | Research |
+| 3.3 | Feb 2024 | Extension Types | Zero-cost wrappers for types | `prefer_extension_type_for_wrapper` | Planned |
+| 3.0 | May 2023 | Records | Tuple-like data: `(String, int)` | `prefer_record_over_tuple_class` | Planned |
+| 3.0 | May 2023 | Sealed Classes | Exhaustive type hierarchies | `prefer_sealed_for_state` | Planned |
+| 3.0 | May 2023 | Switch Expressions | Expression-based switching | `prefer_switch_expression` | Planned |
+
+---
+
+### 7.2 Flutter Widget Features
+
+| Version | Date | Feature | Description | Lint Rule | Status |
+|---------|------|---------|-------------|-----------|--------|
+| 3.38 | Nov 2025 | OverlayPortal.overlayChildLayoutBuilder | Render overlays outside parent constraints | `prefer_overlay_portal_layout_builder` | Planned |
+| 3.27 | Dec 2024 | Cupertino widget updates | CupertinoCheckbox, CupertinoRadio | Cupertino rules | Planned |
+| 3.27 | Dec 2024 | Impeller default on Android | New rendering engine | N/A (engine) | - |
+| 3.24 | Aug 2024 | Impeller API | Low-level graphics API | N/A (engine) | - |
+| 3.24 | Aug 2024 | Swift Package Manager (Preview) | iOS package management | N/A (tooling) | - |
+| 3.22 | May 2024 | WebAssembly (Wasm) Support | Near-native web performance | N/A (platform) | - |
+| 3.19 | Feb 2024 | Material 2 to 3 Migration | Theme migration guidance | `prefer_material3_theme` | Planned |
+
+---
+
+### 7.3 Modern Dart Rules Summary
+
+#### High Priority (Widely Applicable)
+
+| Rule Name | Tier | Description | Version |
+|-----------|------|-------------|---------|
+| `prefer_dot_shorthand` | Recommended | Use `.value` instead of `EnumType.value` | Dart 3.10 |
+| `prefer_null_aware_elements` | Recommended | Use `?item` in collections | Dart 3.8 |
+| `prefer_switch_expression` | Recommended | Use switch expressions over statements | Dart 3.0 |
+
+#### Medium Priority (Architecture/Design)
+
+| Rule Name | Tier | Description | Version |
+|-----------|------|-------------|---------|
+| `prefer_sealed_for_state` | Professional | Use sealed classes for state | Dart 3.0 |
+| `prefer_extension_type_for_wrapper` | Professional | Zero-cost wrappers | Dart 3.3 |
+| `require_exhaustive_sealed_switch` | Essential | Exhaustive switches on sealed types | Dart 3.0 |
 
 ---
 
