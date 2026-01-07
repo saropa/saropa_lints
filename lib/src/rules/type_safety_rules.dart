@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when `as` cast is used without null check.
 ///
@@ -32,7 +33,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   // Use widget
 /// }
 /// ```
-class AvoidUnsafeCastRule extends DartLintRule {
+class AvoidUnsafeCastRule extends SaropaLintRule {
   const AvoidUnsafeCastRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -43,9 +44,9 @@ class AvoidUnsafeCastRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAsExpression((AsExpression node) {
@@ -80,7 +81,7 @@ class AvoidUnsafeCastRule extends DartLintRule {
 ///   T? _cached;
 /// }
 /// ```
-class PreferConstrainedGenericsRule extends DartLintRule {
+class PreferConstrainedGenericsRule extends SaropaLintRule {
   const PreferConstrainedGenericsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -91,9 +92,9 @@ class PreferConstrainedGenericsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -128,7 +129,7 @@ class PreferConstrainedGenericsRule extends DartLintRule {
 ///   void eat(covariant Food food) {}
 /// }
 /// ```
-class RequireCovariantDocumentationRule extends DartLintRule {
+class RequireCovariantDocumentationRule extends SaropaLintRule {
   const RequireCovariantDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -140,9 +141,9 @@ class RequireCovariantDocumentationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -192,7 +193,7 @@ class RequireCovariantDocumentationRule extends DartLintRule {
 ///   );
 /// }
 /// ```
-class RequireSafeJsonParsingRule extends DartLintRule {
+class RequireSafeJsonParsingRule extends SaropaLintRule {
   const RequireSafeJsonParsingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -202,10 +203,17 @@ class RequireSafeJsonParsingRule extends DartLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  /// Regex to match unsafe casts in JSON parsing.
+  /// Matches: map['key'] as Type, json['key'] as Type, data['key'] as Type
+  /// Excludes: Type? (nullable cast) and as Type?
+  static final RegExp _unsafeCastPattern = RegExp(
+    r"\w+\['[^']+'\]\s+as\s+(?!(\w+\?|dynamic))(\w+)",
+  );
+
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
@@ -217,9 +225,8 @@ class RequireSafeJsonParsingRule extends DartLintRule {
       final String bodySource = body.toSource();
 
       // Look for direct casts without null handling
-      // Pattern: json['key'] as Type (not Type?)
-      final RegExp unsafeCast = RegExp(r"json\['[^']+'\]\s+as\s+(?!.*\?)(\w+)");
-      if (unsafeCast.hasMatch(bodySource)) {
+      // Pattern: map['key'] as Type (not Type? or dynamic)
+      if (_unsafeCastPattern.hasMatch(bodySource)) {
         // Check if there's null handling nearby
         if (!bodySource.contains('??') && !bodySource.contains('?[')) {
           reporter.atNode(node, code);
@@ -246,7 +253,7 @@ class RequireSafeJsonParsingRule extends DartLintRule {
 ///   String? get upper => this?.toUpperCase();
 /// }
 /// ```
-class RequireNullSafeExtensionsRule extends DartLintRule {
+class RequireNullSafeExtensionsRule extends SaropaLintRule {
   const RequireNullSafeExtensionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -257,9 +264,9 @@ class RequireNullSafeExtensionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addExtensionDeclaration((ExtensionDeclaration node) {
@@ -295,7 +302,7 @@ class RequireNullSafeExtensionsRule extends DartLintRule {
 /// ```dart
 /// double calculate(double a, double b) => a + b;
 /// ```
-class PreferSpecificNumericTypesRule extends DartLintRule {
+class PreferSpecificNumericTypesRule extends SaropaLintRule {
   const PreferSpecificNumericTypesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -306,9 +313,9 @@ class PreferSpecificNumericTypesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -348,7 +355,7 @@ class PreferSpecificNumericTypesRule extends DartLintRule {
 /// /// Returns cached value sync, or fetches async if not cached.
 /// FutureOr<String> getValue();
 /// ```
-class RequireFutureOrDocumentationRule extends DartLintRule {
+class RequireFutureOrDocumentationRule extends SaropaLintRule {
   const RequireFutureOrDocumentationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -359,9 +366,9 @@ class RequireFutureOrDocumentationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {

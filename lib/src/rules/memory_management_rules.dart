@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when large objects are stored in widget state.
 ///
@@ -33,7 +34,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 ///   // Or use external cache with LRU eviction
 /// }
 /// ```
-class AvoidLargeObjectsInStateRule extends DartLintRule {
+class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   const AvoidLargeObjectsInStateRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -54,9 +55,9 @@ class AvoidLargeObjectsInStateRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -118,7 +119,7 @@ class AvoidLargeObjectsInStateRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireImageDisposalRule extends DartLintRule {
+class RequireImageDisposalRule extends SaropaLintRule {
   const RequireImageDisposalRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -129,9 +130,9 @@ class RequireImageDisposalRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -212,7 +213,7 @@ class RequireImageDisposalRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class AvoidCapturingThisInCallbacksRule extends DartLintRule {
+class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   const AvoidCapturingThisInCallbacksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -232,9 +233,9 @@ class AvoidCapturingThisInCallbacksRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -296,7 +297,7 @@ class AvoidCapturingThisInCallbacksRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class RequireCacheEvictionPolicyRule extends DartLintRule {
+class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   const RequireCacheEvictionPolicyRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -307,9 +308,9 @@ class RequireCacheEvictionPolicyRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -362,7 +363,7 @@ class RequireCacheEvictionPolicyRule extends DartLintRule {
 ///   Widget? get(String key) => _widgets[key]?.target;
 /// }
 /// ```
-class PreferWeakReferencesForCacheRule extends DartLintRule {
+class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   const PreferWeakReferencesForCacheRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -374,9 +375,9 @@ class PreferWeakReferencesForCacheRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -430,7 +431,7 @@ class PreferWeakReferencesForCacheRule extends DartLintRule {
 ///   ); // No reference back to widget
 /// }
 /// ```
-class AvoidExpandoCircularReferencesRule extends DartLintRule {
+class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
   const AvoidExpandoCircularReferencesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -442,9 +443,9 @@ class AvoidExpandoCircularReferencesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
@@ -497,7 +498,7 @@ class AvoidExpandoCircularReferencesRule extends DartLintRule {
 ///   await compute(processChunk, chunk);
 /// }
 /// ```
-class AvoidLargeIsolateCommunicationRule extends DartLintRule {
+class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   const AvoidLargeIsolateCommunicationRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -508,9 +509,9 @@ class AvoidLargeIsolateCommunicationRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {

@@ -8,8 +8,9 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when hardcoded user-facing strings are detected.
 ///
@@ -27,13 +28,15 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// Text(AppLocalizations.of(context).welcome)
 /// ElevatedButton(child: Text(l10n.submit))
 /// ```
-class AvoidHardcodedStringsInUiRule extends DartLintRule {
+class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
   const AvoidHardcodedStringsInUiRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_strings_in_ui',
-    problemMessage: 'Hardcoded string in UI should be localized.',
-    correctionMessage: 'Use AppLocalizations or your l10n solution instead.',
+    problemMessage:
+        'Hardcoded user-facing string. Cannot be translated to other languages.',
+    correctionMessage:
+        'Replace with l10n.yourKey or AppLocalizations.of(context).yourKey.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -45,9 +48,9 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Skip test files and generated files
@@ -89,7 +92,7 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
     });
   }
 
-  void _checkForHardcodedText(Expression expr, DiagnosticReporter reporter) {
+  void _checkForHardcodedText(Expression expr, SaropaDiagnosticReporter reporter) {
     if (expr is InstanceCreationExpression) {
       final String? name = expr.constructorName.type.element?.name;
       if (name == 'Text') {
@@ -120,20 +123,22 @@ class AvoidHardcodedStringsInUiRule extends DartLintRule {
 /// Text(NumberFormat.currency(locale: locale).format(price))
 /// Text(DateFormat.yMd(locale).format(date))
 /// ```
-class RequireLocaleAwareFormattingRule extends DartLintRule {
+class RequireLocaleAwareFormattingRule extends SaropaLintRule {
   const RequireLocaleAwareFormattingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_locale_aware_formatting',
-    problemMessage: 'Use locale-aware formatting for dates and numbers.',
-    correctionMessage: 'Use DateFormat, NumberFormat, or intl package.',
+    problemMessage:
+        'Manual date/number formatting ignores locale. Will display wrong format for users.',
+    correctionMessage:
+        'Use NumberFormat.currency(locale: locale).format(n) or DateFormat.yMd(locale).format(d).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -184,20 +189,22 @@ class RequireLocaleAwareFormattingRule extends DartLintRule {
 /// Padding(padding: EdgeInsetsDirectional.only(start: 16))
 /// Row(children: [icon, Text(label)], textDirection: TextDirection.ltr)
 /// ```
-class RequireDirectionalWidgetsRule extends DartLintRule {
+class RequireDirectionalWidgetsRule extends SaropaLintRule {
   const RequireDirectionalWidgetsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_directional_widgets',
-    problemMessage: 'Use directional widgets for RTL language support.',
-    correctionMessage: 'Use EdgeInsetsDirectional, AlignmentDirectional, etc.',
+    problemMessage:
+        'Non-directional widget. Layout will be wrong for RTL languages (Arabic, Hebrew).',
+    correctionMessage:
+        'Replace left/right with start/end: EdgeInsetsDirectional.only(start: 16).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -259,13 +266,15 @@ class RequireDirectionalWidgetsRule extends DartLintRule {
 ///   other: '$count items',
 /// ))
 /// ```
-class RequirePluralHandlingRule extends DartLintRule {
+class RequirePluralHandlingRule extends SaropaLintRule {
   const RequirePluralHandlingRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'require_plural_handling',
-    problemMessage: 'Plural forms should use Intl.plural or similar.',
-    correctionMessage: 'Use Intl.plural() for proper pluralization.',
+    problemMessage:
+        'Simple plural logic fails for many languages (Russian, Arabic have complex plural rules).',
+    correctionMessage:
+        "Use Intl.plural(count, zero: '...', one: '...', other: '...').",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -283,9 +292,9 @@ class RequirePluralHandlingRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addStringInterpolation((StringInterpolation node) {
@@ -351,22 +360,24 @@ class RequirePluralHandlingRule extends DartLintRule {
 /// DateFormat('yyyy-MM-dd', Localizations.localeOf(context).toString())
 /// NumberFormat.currency(locale: locale).format(price)
 /// ```
-class AvoidHardcodedLocaleRule extends DartLintRule {
+class AvoidHardcodedLocaleRule extends SaropaLintRule {
   const AvoidHardcodedLocaleRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale',
-    problemMessage: 'Locale should not be hardcoded.',
-    correctionMessage: 'Use Localizations.localeOf(context) or similar.',
+    problemMessage:
+        "Hardcoded locale ignores user's device settings.",
+    correctionMessage:
+        'Use Localizations.localeOf(context).toString() to get device locale.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   static final RegExp _localePattern = RegExp(r"'[a-z]{2}_[A-Z]{2}'");
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
@@ -395,7 +406,7 @@ class AvoidHardcodedLocaleRule extends DartLintRule {
 /// Text(l10n.greeting(userName))
 /// Text(l10n.newMessages(count))
 /// ```
-class AvoidStringConcatenationInUiRule extends DartLintRule {
+class AvoidStringConcatenationInUiRule extends SaropaLintRule {
   const AvoidStringConcatenationInUiRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -406,9 +417,9 @@ class AvoidStringConcatenationInUiRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((
@@ -431,7 +442,7 @@ class AvoidStringConcatenationInUiRule extends DartLintRule {
 
   void _checkBinaryForStringConcat(
     BinaryExpression expr,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
   ) {
     // Check if either operand is a string literal
     if (expr.leftOperand is SimpleStringLiteral ||
@@ -459,7 +470,7 @@ class AvoidStringConcatenationInUiRule extends DartLintRule {
 ///   Text(l10n.welcomeMessage),
 /// ])
 /// ```
-class AvoidTextInImagesRule extends DartLintRule {
+class AvoidTextInImagesRule extends SaropaLintRule {
   const AvoidTextInImagesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -482,9 +493,9 @@ class AvoidTextInImagesRule extends DartLintRule {
   };
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
@@ -528,7 +539,7 @@ class AvoidTextInImagesRule extends DartLintRule {
 /// AppBar(title: Text(AppConfig.appName))
 /// Text(l10n.welcomeToApp(AppConfig.appName))
 /// ```
-class AvoidHardcodedAppNameRule extends DartLintRule {
+class AvoidHardcodedAppNameRule extends SaropaLintRule {
   const AvoidHardcodedAppNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -539,9 +550,9 @@ class AvoidHardcodedAppNameRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((

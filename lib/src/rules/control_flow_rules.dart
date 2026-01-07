@@ -5,8 +5,9 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
-import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
 
 /// Warns when an assignment is used inside a condition.
 ///
@@ -21,20 +22,22 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// x = 5;
 /// if (x != 0) { }
 /// ```
-class AvoidAssignmentsAsConditionsRule extends DartLintRule {
+class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
   const AvoidAssignmentsAsConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_assignments_as_conditions',
-    problemMessage: 'Avoid using assignments inside conditions.',
-    correctionMessage: 'Move the assignment outside the condition.',
+    problemMessage:
+        'Assignment in condition. Likely meant == comparison, not = assignment.',
+    correctionMessage:
+        'Use == for comparison, or move assignment before the condition.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check if statements
@@ -69,7 +72,7 @@ class AvoidAssignmentsAsConditionsRule extends DartLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, DiagnosticReporter reporter) {
+  void _checkCondition(Expression condition, SaropaDiagnosticReporter reporter) {
     if (condition is AssignmentExpression) {
       reporter.atNode(condition, code);
     }
@@ -104,20 +107,22 @@ class AvoidAssignmentsAsConditionsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Adds a comment to flag for refactoring.
-class AvoidCollapsibleIfRule extends DartLintRule {
+class AvoidCollapsibleIfRule extends SaropaLintRule {
   const AvoidCollapsibleIfRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_collapsible_if',
-    problemMessage: 'Nested if statements can be collapsed.',
-    correctionMessage: 'Combine conditions using && operator.',
+    problemMessage:
+        'Nested if without else. Extra nesting reduces readability.',
+    correctionMessage:
+        'Combine into single if: if (a && b) { ... }.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -195,7 +200,7 @@ class _AddHackForCollapsibleIfFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Simplifies `x == true` to `x`, `x == false` to `!x`, etc.
-class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
+class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
   const AvoidConditionsWithBooleanLiteralsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -208,9 +213,9 @@ class AvoidConditionsWithBooleanLiteralsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
@@ -311,7 +316,7 @@ class _SimplifyBooleanComparisonFix extends DartFix {
 /// assert(value != null);
 /// assert(list.isNotEmpty);
 /// ```
-class AvoidConstantAssertConditionsRule extends DartLintRule {
+class AvoidConstantAssertConditionsRule extends SaropaLintRule {
   const AvoidConstantAssertConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -323,20 +328,16 @@ class AvoidConstantAssertConditionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssertStatement((AssertStatement node) {
       final Expression condition = node.condition;
 
       if (condition is BooleanLiteral) {
-        reporter.atNode(
-          node,
-          code,
-          arguments: <String>[condition.value ? 'true' : 'false'],
-        );
+        reporter.atNode(node, code);
         return;
       }
 
@@ -347,9 +348,7 @@ class AvoidConstantAssertConditionsRule extends DartLintRule {
 
         // Check if both sides are the same literal
         if (_areSameLiteral(left, right)) {
-          final String result =
-              condition.operator.type == TokenType.EQ_EQ ? 'true' : 'false';
-          reporter.atNode(node, code, arguments: <String>[result]);
+          reporter.atNode(node, code);
         }
       }
     });
@@ -388,7 +387,7 @@ class AvoidConstantAssertConditionsRule extends DartLintRule {
 /// switch (variable) { ... }
 /// switch (getValue()) { ... }
 /// ```
-class AvoidConstantSwitchesRule extends DartLintRule {
+class AvoidConstantSwitchesRule extends SaropaLintRule {
   const AvoidConstantSwitchesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -400,9 +399,9 @@ class AvoidConstantSwitchesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -445,7 +444,7 @@ class AvoidConstantSwitchesRule extends DartLintRule {
 ///   }
 /// }
 /// ```
-class AvoidContinueRule extends DartLintRule {
+class AvoidContinueRule extends SaropaLintRule {
   const AvoidContinueRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -456,9 +455,9 @@ class AvoidContinueRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addContinueStatement((ContinueStatement node) {
@@ -482,7 +481,7 @@ class AvoidContinueRule extends DartLintRule {
 ///     break;
 /// }
 /// ```
-class AvoidDuplicateSwitchCaseConditionsRule extends DartLintRule {
+class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
   const AvoidDuplicateSwitchCaseConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -493,9 +492,9 @@ class AvoidDuplicateSwitchCaseConditionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -547,7 +546,7 @@ class AvoidDuplicateSwitchCaseConditionsRule extends DartLintRule {
 ///   case b: ...
 /// }
 /// ```
-class AvoidIfWithManyBranchesRule extends DartLintRule {
+class AvoidIfWithManyBranchesRule extends SaropaLintRule {
   const AvoidIfWithManyBranchesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -561,14 +560,16 @@ class AvoidIfWithManyBranchesRule extends DartLintRule {
   static const int _maxBranches = 4;
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
       // Only check top-level if statements (not else-if)
-      if (node.parent is IfStatement) return;
+      // Check if this if is the else branch of another if
+      final AstNode? parent = node.parent;
+      if (parent is IfStatement && parent.elseStatement == node) return;
 
       int branches = 1;
       Statement? current = node.elseStatement;
@@ -600,7 +601,7 @@ class AvoidIfWithManyBranchesRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Inverts the operator (e.g., `!(a > b)` → `a <= b`).
-class AvoidInvertedBooleanChecksRule extends DartLintRule {
+class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
   const AvoidInvertedBooleanChecksRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -611,9 +612,9 @@ class AvoidInvertedBooleanChecksRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -706,7 +707,7 @@ class _InvertOperatorFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Replaces `!x.isEmpty` with `x.isNotEmpty`.
-class AvoidNegatedConditionsRule extends DartLintRule {
+class AvoidNegatedConditionsRule extends SaropaLintRule {
   const AvoidNegatedConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -727,9 +728,9 @@ class AvoidNegatedConditionsRule extends DartLintRule {
   ];
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addPrefixExpression((PrefixExpression node) {
@@ -827,7 +828,7 @@ class _UsePositiveFormFix extends DartFix {
 /// y = compute();
 /// list.add(y);
 /// ```
-class AvoidNestedAssignmentsRule extends DartLintRule {
+class AvoidNestedAssignmentsRule extends SaropaLintRule {
   const AvoidNestedAssignmentsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -838,9 +839,9 @@ class AvoidNestedAssignmentsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addAssignmentExpression((AssignmentExpression node) {
@@ -866,7 +867,7 @@ class AvoidNestedAssignmentsRule extends DartLintRule {
 ///
 /// Nested ternary operators can be hard to read. Consider using if-else
 /// statements or extracting logic into separate methods.
-class AvoidNestedConditionalExpressionsRule extends DartLintRule {
+class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
   const AvoidNestedConditionalExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -877,17 +878,18 @@ class AvoidNestedConditionalExpressionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addConditionalExpression((ConditionalExpression node) {
+      // Only report on the OUTERMOST conditional to avoid double reporting
       // Check if this conditional is nested inside another conditional
       AstNode? parent = node.parent;
       while (parent != null) {
         if (parent is ConditionalExpression) {
-          reporter.atNode(node, code);
+          // This is an inner conditional - don't report, let outer one report
           return;
         }
         // Stop at statement level
@@ -895,7 +897,7 @@ class AvoidNestedConditionalExpressionsRule extends DartLintRule {
         parent = parent.parent;
       }
 
-      // Also check if children contain conditional expressions
+      // Now check if this outermost conditional has nested conditionals
       if (node.thenExpression is ConditionalExpression ||
           node.elseExpression is ConditionalExpression) {
         reporter.atNode(node, code);
@@ -915,7 +917,7 @@ class AvoidNestedConditionalExpressionsRule extends DartLintRule {
 ///     }
 /// }
 /// ```
-class AvoidNestedSwitchesRule extends DartLintRule {
+class AvoidNestedSwitchesRule extends SaropaLintRule {
   const AvoidNestedSwitchesRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -926,9 +928,9 @@ class AvoidNestedSwitchesRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -978,7 +980,7 @@ class AvoidNestedSwitchesRule extends DartLintRule {
 ///   _ => 'other',
 /// };
 /// ```
-class AvoidNestedSwitchExpressionsRule extends DartLintRule {
+class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
   const AvoidNestedSwitchExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -989,9 +991,9 @@ class AvoidNestedSwitchExpressionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
@@ -1024,7 +1026,7 @@ class AvoidNestedSwitchExpressionsRule extends DartLintRule {
 ///   } catch (e) { }
 /// } catch (e) { }
 /// ```
-class AvoidNestedTryRule extends DartLintRule {
+class AvoidNestedTryRule extends SaropaLintRule {
   const AvoidNestedTryRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1035,9 +1037,9 @@ class AvoidNestedTryRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addTryStatement((TryStatement node) {
@@ -1078,7 +1080,7 @@ class AvoidNestedTryRule extends DartLintRule {
 /// }
 /// return 2;
 /// ```
-class AvoidRedundantElseRule extends DartLintRule {
+class AvoidRedundantElseRule extends SaropaLintRule {
   const AvoidRedundantElseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1089,9 +1091,9 @@ class AvoidRedundantElseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1145,7 +1147,7 @@ class AvoidRedundantElseRule extends DartLintRule {
 ///   process(item);
 /// }
 /// ```
-class AvoidUnconditionalBreakRule extends DartLintRule {
+class AvoidUnconditionalBreakRule extends SaropaLintRule {
   const AvoidUnconditionalBreakRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1158,9 +1160,9 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check for loops
@@ -1182,7 +1184,7 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
     });
   }
 
-  void _checkLoopBody(Statement body, DiagnosticReporter reporter) {
+  void _checkLoopBody(Statement body, SaropaDiagnosticReporter reporter) {
     // Get the first statement
     Statement? firstStatement;
 
@@ -1217,7 +1219,7 @@ class AvoidUnconditionalBreakRule extends DartLintRule {
 /// ```dart
 /// if (someCondition) { }
 /// ```
-class AvoidUnnecessaryConditionalsRule extends DartLintRule {
+class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
   const AvoidUnnecessaryConditionalsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1228,9 +1230,9 @@ class AvoidUnnecessaryConditionalsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     // Check if statements with boolean literal conditions
@@ -1283,7 +1285,7 @@ class AvoidUnnecessaryConditionalsRule extends DartLintRule {
 /// ```
 ///
 /// **Quick fix available:** Comments out the unnecessary continue.
-class AvoidUnnecessaryContinueRule extends DartLintRule {
+class AvoidUnnecessaryContinueRule extends SaropaLintRule {
   const AvoidUnnecessaryContinueRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1294,30 +1296,26 @@ class AvoidUnnecessaryContinueRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addContinueStatement((ContinueStatement node) {
       // Check if this is the last statement in a block
       final AstNode? parent = node.parent;
-      if (parent is Block) {
-        final List<Statement> statements = parent.statements;
-        if (statements.isNotEmpty && statements.last == node) {
-          // Check if the block is directly inside a loop
-          final AstNode? blockParent = parent.parent;
-          if (blockParent is ForStatement ||
-              blockParent is ForEachPartsWithDeclaration ||
-              blockParent is WhileStatement ||
-              blockParent is DoStatement) {
-            reporter.atNode(node, code);
-          }
-          // Also check for-each
-          if (blockParent is ForElement) {
-            reporter.atNode(node, code);
-          }
-        }
+      if (parent is! Block) return;
+
+      final List<Statement> statements = parent.statements;
+      if (statements.isEmpty || statements.last != node) return;
+
+      // Check if the block is directly inside a loop
+      final AstNode? blockParent = parent.parent;
+      if (blockParent is ForStatement ||
+          blockParent is WhileStatement ||
+          blockParent is DoStatement ||
+          blockParent is ForElement) {
+        reporter.atNode(node, code);
       }
     });
   }
@@ -1354,7 +1352,7 @@ class _CommentOutUnnecessaryContinueFix extends DartFix {
 }
 
 /// Warns on patterns like if (condition) return true; return false;
-class AvoidUnnecessaryIfRule extends DartLintRule {
+class AvoidUnnecessaryIfRule extends SaropaLintRule {
   const AvoidUnnecessaryIfRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1365,9 +1363,9 @@ class AvoidUnnecessaryIfRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1433,7 +1431,7 @@ class AvoidUnnecessaryIfRule extends DartLintRule {
 ///   doB();
 /// }
 /// ```
-class NoEqualConditionsRule extends DartLintRule {
+class NoEqualConditionsRule extends SaropaLintRule {
   const NoEqualConditionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1444,9 +1442,9 @@ class NoEqualConditionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1495,7 +1493,7 @@ class NoEqualConditionsRule extends DartLintRule {
 /// ```dart
 /// doSomething();  // No need for the condition
 /// ```
-class NoEqualThenElseRule extends DartLintRule {
+class NoEqualThenElseRule extends SaropaLintRule {
   const NoEqualThenElseRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1506,9 +1504,9 @@ class NoEqualThenElseRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1540,7 +1538,7 @@ class NoEqualThenElseRule extends DartLintRule {
 ///
 /// Simple if-else statements that assign to the same variable or return
 /// values can often be replaced with a ternary operator.
-class PreferConditionalExpressionsRule extends DartLintRule {
+class PreferConditionalExpressionsRule extends SaropaLintRule {
   const PreferConditionalExpressionsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1551,9 +1549,9 @@ class PreferConditionalExpressionsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1615,7 +1613,7 @@ class PreferConditionalExpressionsRule extends DartLintRule {
 ///   case 3: return 'three';
 /// }
 /// ```
-class PreferCorrectSwitchLengthRule extends DartLintRule {
+class PreferCorrectSwitchLengthRule extends SaropaLintRule {
   const PreferCorrectSwitchLengthRule() : super(code: _code);
 
   static const int _minCases = 2;
@@ -1629,9 +1627,9 @@ class PreferCorrectSwitchLengthRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addSwitchStatement((SwitchStatement node) {
@@ -1666,7 +1664,7 @@ class PreferCorrectSwitchLengthRule extends DartLintRule {
 ///   doSomething(value);
 /// }
 /// ```
-class PreferEarlyReturnRule extends DartLintRule {
+class PreferEarlyReturnRule extends SaropaLintRule {
   const PreferEarlyReturnRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1678,9 +1676,9 @@ class PreferEarlyReturnRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
@@ -1692,7 +1690,7 @@ class PreferEarlyReturnRule extends DartLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, DiagnosticReporter reporter) {
+  void _checkFunctionBody(FunctionBody body, SaropaDiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;
@@ -1717,7 +1715,8 @@ class PreferEarlyReturnRule extends DartLintRule {
 
 /// Warns when returning a conditional could be simplified.
 ///
-/// Instead of returning true/false based on a condition, return the condition.
+/// Handles the pattern: `if (cond) return true; return false;`
+/// For if-else patterns, see PreferReturningConditionRule.
 ///
 /// ### Example
 ///
@@ -1735,7 +1734,7 @@ class PreferEarlyReturnRule extends DartLintRule {
 /// ```dart
 /// bool isValid(int x) => x > 0;
 /// ```
-class PreferReturningConditionalsRule extends DartLintRule {
+class PreferReturningConditionalsRule extends SaropaLintRule {
   const PreferReturningConditionalsRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1746,55 +1745,48 @@ class PreferReturningConditionalsRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
-      // Check for pattern: if (cond) return true; return false;
-      // or: if (cond) return true; else return false;
+      // Only handle pattern: if (cond) return true; return false;
+      // Skip if-else patterns - handled by PreferReturningConditionRule
+      if (node.elseStatement != null) return;
 
       final Statement thenStmt = node.thenStatement;
-      final Statement? elseStmt = node.elseStatement;
 
       // Check if then branch returns true
       if (!_returnsBoolLiteral(thenStmt, true)) return;
 
-      // Check else branch or next statement
-      if (elseStmt != null) {
-        if (_returnsBoolLiteral(elseStmt, false)) {
-          reporter.atToken(node.ifKeyword, code);
-        }
-      } else {
-        // Check next statement after the if
-        final AstNode? parent = node.parent;
-        if (parent is Block) {
-          final List<Statement> statements = parent.statements;
-          final int index = statements.indexOf(node);
-          if (index >= 0 && index < statements.length - 1) {
-            final Statement next = statements[index + 1];
-            if (_returnsBoolLiteral(next, false)) {
-              reporter.atToken(node.ifKeyword, code);
-            }
-          }
-        }
+      // Check next statement after the if
+      final AstNode? parent = node.parent;
+      if (parent is! Block) return;
+
+      final List<Statement> statements = parent.statements;
+      final int index = statements.indexOf(node);
+      if (index < 0 || index >= statements.length - 1) return;
+
+      final Statement next = statements[index + 1];
+      if (_returnsBoolLiteral(next, false)) {
+        reporter.atToken(node.ifKeyword, code);
       }
     });
 
     // Also check ternary: return cond ? true : false;
     context.registry.addReturnStatement((ReturnStatement node) {
       final Expression? expr = node.expression;
-      if (expr is ConditionalExpression) {
-        final Expression thenExpr = expr.thenExpression;
-        final Expression elseExpr = expr.elseExpression;
+      if (expr is! ConditionalExpression) return;
 
-        if (thenExpr is BooleanLiteral &&
-            thenExpr.value &&
-            elseExpr is BooleanLiteral &&
-            !elseExpr.value) {
-          reporter.atNode(expr, code);
-        }
+      final Expression thenExpr = expr.thenExpression;
+      final Expression elseExpr = expr.elseExpression;
+
+      if (thenExpr is BooleanLiteral &&
+          thenExpr.value &&
+          elseExpr is BooleanLiteral &&
+          !elseExpr.value) {
+        reporter.atNode(expr, code);
       }
     });
   }
@@ -1831,7 +1823,7 @@ class PreferReturningConditionalsRule extends DartLintRule {
 ///   return x > 0;
 /// }
 /// ```
-class PreferReturningConditionRule extends DartLintRule {
+class PreferReturningConditionRule extends SaropaLintRule {
   const PreferReturningConditionRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
@@ -1842,9 +1834,9 @@ class PreferReturningConditionRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    DiagnosticReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addIfStatement((IfStatement node) {
@@ -1888,5 +1880,92 @@ class PreferReturningConditionRule extends DartLintRule {
     }
 
     return null;
+  }
+}
+
+/// Warns when a switch case uses a nested if statement that could be a when guard.
+///
+/// Dart 3.0 introduced `when` guards for switch cases, which provide a cleaner
+/// syntax for conditional case matching.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// switch (shape) {
+///   case Circle(radius: var r):
+///     if (r > 0) {
+///       print('Positive radius');
+///     }
+///     break;
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// switch (shape) {
+///   case Circle(radius: var r) when r > 0:
+///     print('Positive radius');
+/// }
+/// ```
+class PreferWhenGuardOverIfRule extends SaropaLintRule {
+  const PreferWhenGuardOverIfRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_when_guard_over_if',
+    problemMessage: 'Switch case with if statement could use a when guard.',
+    correctionMessage:
+        'Use "case pattern when condition:" instead of nested if.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSwitchPatternCase((SwitchPatternCase node) {
+      // Check if the case body is just an if statement (possibly in a block)
+      final List<Statement> statements = node.statements;
+      if (statements.isEmpty) return;
+
+      Statement? firstStatement;
+      if (statements.length == 1) {
+        firstStatement = statements.first;
+      } else if (statements.length == 2 &&
+          statements.last is BreakStatement) {
+        // Allow if + break pattern
+        firstStatement = statements.first;
+      }
+
+      if (firstStatement == null) return;
+
+      // Check if it's an if statement or a block with just an if
+      IfStatement? ifStmt;
+      if (firstStatement is IfStatement) {
+        ifStmt = firstStatement;
+      } else if (firstStatement is Block && firstStatement.statements.length == 1) {
+        final Statement inner = firstStatement.statements.first;
+        if (inner is IfStatement) {
+          ifStmt = inner;
+        }
+      }
+
+      if (ifStmt == null) return;
+
+      // Check that the if statement doesn't already have a when guard on the case
+      if (node.guardedPattern.whenClause != null) return;
+
+      // Check that the if has no else branch (simpler to convert)
+      if (ifStmt.elseStatement != null) return;
+
+      // The if condition could be moved to a when guard
+      reporter.atNode(ifStmt, code);
+    });
+
+    // Note: Traditional SwitchCase (`case 1:`) does NOT support when guards.
+    // Only SwitchPatternCase (`case int n:`, `case Circle():`) supports when.
+    // We intentionally do not flag traditional SwitchCase.
   }
 }
