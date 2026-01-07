@@ -1,6 +1,6 @@
 ![saropa_lints banner](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner.png)
 
-# saropa_lints
+# Saropa Lints
 
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
