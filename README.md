@@ -117,7 +117,7 @@ Pick the tier that matches your team:
 | **Comprehensive** | Quality obsessed. Best practices everywhere. |
 | **Insanity** | Greenfield projects. Every single rule. |
 
-**Plus 20 optional [stylistic rules](STYLISTIC.md)** — team preferences, not in any tier.
+**Plus 20 optional [stylistic rules](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** — team preferences, not in any tier.
 
 ### Using a tier
 
@@ -197,7 +197,7 @@ Each rule has a fixed severity (ERROR, WARNING, or INFO) defined in the rule its
 
 Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`
 
-**See [STYLISTIC.md](STYLISTIC.md)** for the full list with examples, pros/cons, and quick fixes.
+**See [STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** for the full list with examples, pros/cons, and quick fixes.
 
 ## Performance
 
@@ -389,12 +389,12 @@ Contact: [saropa.com](https://saropa.com) | [lints@saropa.com](mailto:lints@saro
 
 | Document | Description |
 |----------|-------------|
-| [STYLISTIC.md](STYLISTIC.md) | 20 optional stylistic rules with examples and quick fixes |
-| [ROADMAP.md](ROADMAP.md) | Planned rules and project direction |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute rules and report issues |
-| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
-| [SECURITY.md](SECURITY.md) | Security policy and reporting vulnerabilities |
-| [ENTERPRISE.md](ENTERPRISE.md) | Professional services and custom rules |
+| [STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md) | 20 optional stylistic rules with examples and quick fixes |
+| [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) | Planned rules and project direction |
+| [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) | How to contribute rules and report issues |
+| [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) | Version history and release notes |
+| [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md) | Security policy and reporting vulnerabilities |
+| [ENTERPRISE.md](https://github.com/saropa/saropa_lints/blob/main/ENTERPRISE.md) | Professional services and custom rules |
 
 ## Badge
 
@@ -419,3 +419,51 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 [pub_link]: https://pub.dev/packages/saropa_lints
 [github_link]: https://github.com/saropa/saropa_lints
 [issues_link]: https://github.com/saropa/saropa_lints/issues
+
+---
+
+## About This Project
+
+> "The bitterness of poor quality remains long after the sweetness of meeting the schedule has been forgotten." — Karl Wiegers
+
+> "Quality is not an act, it is a habit." — Aristotle
+
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 500+ lint rules organized into 5 progressive tiers, it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+
+**Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
+
+**Hashtags:** #Flutter #Dart #StaticAnalysis #CodeQuality #FlutterDev #DartLang #Linting #DevTools #OpenSource #Accessibility #Security #BestPractices
+
+---
+
+## Sources
+
+- **custom_lint** — Plugin framework for custom Dart analysis rules
+  https://pub.dev/packages/custom_lint
+
+- **Dart Analyzer** — Dart's static analysis engine
+  https://dart.dev/tools/analysis
+
+- **Flutter Accessibility** — Flutter accessibility documentation
+  https://docs.flutter.dev/ui/accessibility-and-internationalization/accessibility
+
+- **WCAG 2.1 Guidelines** — Web Content Accessibility Guidelines
+  https://www.w3.org/WAI/standards-guidelines/wcag/
+
+- **European Accessibility Act** — EU accessibility legislation effective June 2025
+  https://accessible-eu-centre.ec.europa.eu/content-corner/news/eaa-comes-effect-june-2025-are-you-ready-2025-01-31_en
+
+- **GitHub Secret Scanning** — Leaked credentials detection report
+  https://github.blog/security/application-security/next-evolution-github-advanced-security/
+
+- **OWASP Top 10** — Application security vulnerabilities
+  https://owasp.org/www-project-top-ten/
+
+- **SonarQube** — Static analysis platform
+  https://www.sonarsource.com/products/sonarqube/
+
+- **Effective Dart** — Official Dart style guide
+  https://dart.dev/effective-dart
+
+- **Flutter Performance** — Performance best practices
+  https://docs.flutter.dev/perf
