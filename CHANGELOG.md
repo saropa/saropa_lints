@@ -5,6 +5,161 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - 2025-01-07
+
+### Added
+
+- **7 new high-impact lint rules**:
+
+  **Flutter Widget Rules (3)**:
+  - `avoid_shrink_wrap_in_scroll` - Detects ListView/GridView/SingleChildScrollView with shrinkWrap: true, which causes O(n) layout cost and defeats lazy loading [Warning tier]
+  - `avoid_deep_widget_nesting` - Warns when widget build methods have depth > 15 levels; extract to separate widgets for maintainability [Info tier]
+  - `prefer_safe_area_aware` - Scaffold body content should be wrapped in SafeArea for edge content handling [Info tier]
+
+  **State Management Rules (2)**:
+  - `avoid_ref_in_build_body` - Detects ref.read() inside build() method body; use ref.watch() for reactive updates in Riverpod [Warning tier]
+  - `require_immutable_bloc_state` - BLoC state classes should be annotated with @immutable or extend Equatable [Error tier]
+
+  **API & Network Rules (1)**:
+  - `require_request_timeout` - HTTP requests (http.get/post/etc, Dio) should have timeout configured to prevent hanging requests [Warning tier]
+
+  **Testing Best Practices Rules (1)**:
+  - `avoid_flaky_tests` - Detects flaky test patterns: unseeded Random(), DateTime.now(), File/Directory operations, and network calls without mocking [Warning tier]
+
+### Changed
+
+- **`prefer_async_callback` rule**: Quick fix now replaces `VoidCallback` with
+  `Future<void> Function()` instead of `AsyncCallback`. This eliminates the need
+  for an extra import (`package:flutter/foundation.dart`) and is consistent with
+  how parameterized async callbacks are written (e.g., `Future<void> Function(String)`).
+
+- **`prefer_safe_area_aware`**: Reduced false positives - now skips Scaffolds with:
+  - `extendBody: true` or `extendBodyBehindAppBar: true` (intentional fullscreen)
+  - Body wrapped in `CustomScrollView`, `NestedScrollView`, or `MediaQuery`
+
+- **`require_request_timeout`**: Reduced false positives - now more specific about
+  HTTP client detection, no longer matches generic 'api' prefix (e.g., `apiResponse.get()`)
+
+- **`require_focus_node_dispose`**: Now recognizes iteration-based disposal patterns
+  for `List<FocusNode>` and `Map<..., FocusNode>` (matching ScrollController rule)
+
+- **`avoid_ref_in_build_body`**: Added more callback methods where `ref.read()` is
+  acceptable: `onDismissed`, `onEnd`, `onStatusChanged`, `onComplete`, `onError`,
+  `onDoubleTap`, `onPanUpdate`, `onDragEnd`, `onSaved`, `addPostFrameCallback`
+
+### Improved
+
+- **All testing rules**: Added Windows path support (`\test\` in addition to `/test/`)
+  for test file detection. Now correctly identifies test files on Windows.
+
+- **`avoid_flaky_tests`**: Enhanced detection accuracy:
+  - Added `Process.run(` and `Platform.environment` to flaky patterns
+  - Improved seeded Random detection using regex (any numeric seed, not just 1/42)
+  - Added `withClock` and `TestWidgetsFlutterBinding` to safe patterns
+
+- **`require_scroll_controller_dispose`, `require_focus_node_dispose`, and `require_bloc_close` quick fixes**:
+  Rewrote to actually fix the issue instead of adding TODO comments:
+  - If `dispose()` exists: inserts `.dispose()` or `.close()` call before `super.dispose()`
+  - If `dispose()` missing: creates full `@override void dispose()` method
+
+- **`prefer_async_callback` documentation**: Comprehensive rewrite explaining:
+  - Why `VoidCallback` silently discards Futures (lost errors, race conditions)
+  - Which callback names trigger detection (onSubmit, onDelete, onRefresh, etc.)
+  - Why `Future<void> Function()` is preferred over `AsyncCallback`
+  - Clear BAD/GOOD code examples
+
+- **`prefer_async_callback` prefix detection**: Added missing prefixes for better
+  detection of compound names like `onProcessPayment`, `onConfirmDelete`,
+  `onBackupData`, etc.
+
+## [1.4.2] - 2025-01-07
+
+### Added
+
+- **50 new lint rules**:
+
+  **Flutter Widget Rules - UX & Interaction (10)**:
+  - `avoid_hardcoded_layout_values` - Extract magic numbers to named constants [Info tier]
+  - `prefer_ignore_pointer` - Suggests IgnorePointer when AbsorbPointer may block unintentionally [Info tier]
+  - `avoid_gesture_without_behavior` - GestureDetector should specify HitTestBehavior [Info tier]
+  - `avoid_double_tap_submit` - Submit buttons should prevent double-tap [Warning tier]
+  - `prefer_cursor_for_buttons` - Interactive widgets should specify mouse cursor for web [Info tier]
+  - `require_hover_states` - Interactive widgets should handle hover for web/desktop [Info tier]
+  - `require_button_loading_state` - Async buttons should show loading state [Info tier]
+  - `avoid_hardcoded_text_styles` - Use Theme.of(context).textTheme instead of inline TextStyle [Info tier]
+  - `prefer_page_storage_key` - Scrollables should use PageStorageKey to preserve position [Info tier]
+  - `require_refresh_indicator` - Lists with remote data should have pull-to-refresh [Info tier]
+
+  **Flutter Widget Rules - Scrolling & Lists (9)**:
+  - `require_scroll_physics` - Scrollables should specify physics for consistent behavior [Info tier]
+  - `prefer_sliver_list` - Use SliverList instead of ListView inside CustomScrollView [Warning tier]
+  - `prefer_keep_alive` - State classes in tabs should use AutomaticKeepAliveClientMixin [Info tier]
+  - `require_default_text_style` - Multiple Text widgets with same style should use DefaultTextStyle [Info tier]
+  - `prefer_wrap_over_overflow` - Row with many small widgets should use Wrap [Info tier]
+  - `prefer_asset_image_for_local` - Use AssetImage for bundled assets, not FileImage [Warning tier]
+  - `prefer_fit_cover_for_background` - Background images should use BoxFit.cover [Info tier]
+  - `require_disabled_state` - Buttons with conditional onPressed should customize disabled style [Info tier]
+  - `require_drag_feedback` - Draggable should have feedback widget [Info tier]
+
+  **Flutter Widget Rules - Layout & Performance (8)**:
+  - `avoid_gesture_conflict` - Nested GestureDetector widgets may cause conflicts [Warning tier]
+  - `avoid_large_images_in_memory` - Images should specify size constraints [Info tier]
+  - `avoid_layout_builder_in_scrollable` - LayoutBuilder in scrollables causes rebuilds [Warning tier]
+  - `prefer_intrinsic_dimensions` - Use IntrinsicWidth/Height for dynamic sizing [Info tier]
+  - `prefer_actions_and_shortcuts` - Use Actions/Shortcuts for keyboard handling [Info tier]
+  - `require_long_press_callback` - Important actions should have onLongPress alternative [Info tier]
+  - `avoid_find_child_in_build` - Don't traverse widget tree in build() [Warning tier]
+  - `avoid_unbounded_constraints` - Avoid widgets with unbounded constraints in scrollables [Warning tier]
+
+  **Flutter Widget Rules - Advanced (10)**:
+  - `prefer_fractional_sizing` - Use FractionallySizedBox instead of MediaQuery * 0.x [Info tier]
+  - `avoid_unconstrained_box_misuse` - UnconstrainedBox in constrained parent may overflow [Warning tier]
+  - `require_error_widget` - FutureBuilder/StreamBuilder should handle error state [Warning tier]
+  - `prefer_sliver_app_bar` - Use SliverAppBar in CustomScrollView, not AppBar [Info tier]
+  - `avoid_opacity_misuse` - Use AnimatedOpacity when opacity uses variables [Info tier]
+  - `prefer_clip_behavior` - Specify clipBehavior on Stack/Container for performance [Info tier]
+  - `require_scroll_controller` - ListView.builder should have ScrollController [Info tier]
+  - `prefer_positioned_directional` - Use PositionedDirectional for RTL support [Info tier]
+  - `avoid_stack_overflow` - Stack children should use Positioned/Align [Info tier]
+  - `require_form_validation` - TextFormField inside Form should have validator [Warning tier]
+
+  **Testing Best Practices Rules (13)**:
+  - `avoid_test_sleep` - Tests should use fakeAsync/pumpAndSettle, not sleep() [Warning tier]
+  - `avoid_find_by_text` - Prefer find.byKey() for widget interactions [Info tier]
+  - `require_test_keys` - Interactive widgets in tests should have Keys [Info tier]
+  - `require_arrange_act_assert` - Tests should follow AAA pattern [Info tier]
+  - `prefer_mock_navigator` - Navigator usage should be mocked for verification [Info tier]
+  - `avoid_real_timer_in_widget_test` - Use fakeAsync instead of Timer [Warning tier]
+  - `require_mock_verification` - Stubbed mocks should be verified [Info tier]
+  - `prefer_matcher_over_equals` - Use matchers (isTrue, isNull, hasLength) [Info tier]
+  - `prefer_test_wrapper` - Widget tests should wrap with MaterialApp [Info tier]
+  - `require_screen_size_tests` - Responsive widgets should test multiple sizes [Info tier]
+  - `avoid_stateful_test_setup` - setUp should not mutate shared state [Warning tier]
+  - `prefer_mock_http` - Use MockClient instead of real HTTP [Warning tier]
+  - `require_golden_test` - Visual tests should use golden comparison [Info tier]
+
+### Changed
+
+- `prefer_ignore_pointer` - Improved documentation explaining when to use AbsorbPointer vs IgnorePointer
+- `require_disabled_state` - Clarified that Flutter buttons have default disabled styling; rule suggests customization
+- `require_refresh_indicator` - Now only triggers for lists that appear to show remote data
+- `avoid_find_by_text` - Now only warns when find.text() is used for interactions (tap/drag), not content verification
+
+### Fixed
+
+- `prefer_mock_http` - Consolidated duplicate InstanceCreationExpression registrations into single handler
+
+## [1.4.1] - 2025-01-07
+
+### Changed
+
+- `prefer_boolean_prefixes`, `prefer_boolean_prefixes_for_locals`, `prefer_boolean_prefixes_for_params` - **Enhanced boolean naming validation**:
+  - Now supports leading underscores (strips `_` prefix before validation)
+  - Added 23 new action verb prefixes: `add`, `animate`, `apply`, `block`, `collapse`, `expand`, `filter`, `load`, `lock`, `log`, `merge`, `mute`, `pin`, `remove`, `reverse`, `save`, `send`, `sort`, `split`, `sync`, `track`, `trim`, `validate`, `wrap`
+  - Added valid suffixes: `Active`, `Checked`, `Disabled`, `Enabled`, `Hidden`, `Loaded`, `Loading`, `Required`, `Selected`, `Valid`, `Visibility`, `Visible`
+  - Added allowed exact names: `value` (Flutter Checkbox/Switch convention)
+  - Examples now passing: `_deviceEnabled`, `sortAlphabetically`, `filterCountryHasContacts`, `applyScrollView`, `defaultHideIcons`
+
 ## [1.4.0] - 2025-01-07
 
 ### Added

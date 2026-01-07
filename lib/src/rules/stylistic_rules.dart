@@ -2515,7 +2515,8 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
     r'[\}\];]\s*$'
     r'|'
     // Import/export statements
-    r"(import|export|part)\s+['" r'"]'
+    r"(import|export|part)\s+['"
+    r'"]'
     r'|'
     // Class/method modifiers
     r'(abstract|static|override|async|await)\s'
