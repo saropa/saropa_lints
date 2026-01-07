@@ -8706,12 +8706,24 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
 
       // Check if each controller is disposed
       for (final String name in controllerNames) {
-        final bool isDisposed = disposeBody != null &&
+        // Direct disposal patterns
+        final bool isDirectlyDisposed = disposeBody != null &&
             (disposeBody.contains('$name.dispose(') ||
                 disposeBody.contains('$name?.dispose(') ||
                 disposeBody.contains('$name.disposeSafe(') ||
                 disposeBody.contains('$name?.disposeSafe(') ||
                 disposeBody.contains('$name..dispose('));
+
+        // Iteration-based disposal for List<ScrollController> or
+        // Map<..., ScrollController>
+        // Patterns like: "for (... in _name) { ...dispose()" or
+        // "for (... in _name.values) { ...dispose()"
+        final bool isIterationDisposed = disposeBody != null &&
+            (disposeBody.contains('in $name)') ||
+                disposeBody.contains('in $name.values)')) &&
+            disposeBody.contains('.dispose()');
+
+        final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
 
         if (!isDisposed) {
           // Find and report the field declaration

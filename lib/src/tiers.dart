@@ -210,6 +210,7 @@ const Set<String> recommendedOnlyRules = <String>{
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
+/// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
   // Architecture
   'avoid_direct_data_access_in_ui',
@@ -340,6 +341,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_expect_later',
   'prefer_assigning_await_expressions',
   'avoid_unnecessary_futures',
+  'prefer_async_callback',
 
   // Code Quality
   'avoid_long_functions',
@@ -386,6 +388,9 @@ const Set<String> professionalOnlyRules = <String>{
   'require_covariant_documentation',
   'prefer_specific_numeric_types',
   'require_futureor_documentation',
+
+  // Naming & Style
+  'prefer_boolean_prefixes_for_params',
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
@@ -615,10 +620,16 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_unguarded_debug',
   'match_lib_folder_structure',
   'prefer_utc_datetimes',
+
+  // Naming & Style
+  'prefer_boolean_prefixes_for_locals',
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.
 const Set<String> insanityOnlyRules = <String>{
+  // Security - high false positive rates
+  'avoid_generic_key_in_url',
+
   // Noisy but valuable
   'avoid_commented_out_code',
   'avoid_dynamic',

@@ -66,6 +66,12 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
     multiLine: true,
   );
 
+  /// Annotation markers that should not be treated as commented-out code.
+  static final RegExp _annotationMarker = RegExp(
+    r'^\s*//\s*(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK)\b',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -78,6 +84,10 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
       for (int i = 0; i < lines.length; i++) {
         final String line = lines[i];
+        // Skip annotation markers (see _annotationMarker pattern)
+        if (_annotationMarker.hasMatch(line)) {
+          continue;
+        }
         if (_codePattern.hasMatch(line)) {
           // This is a heuristic - we report at the compilation unit level
           // In practice, you'd want more sophisticated detection
