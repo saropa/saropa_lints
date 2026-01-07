@@ -1,7 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -572,8 +573,7 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
       count++;
     }
 
-    final String reversed =
-        result.toString().split('').reversed.join();
+    final String reversed = result.toString().split('').reversed.join();
     return isNegative ? '-$reversed' : reversed;
   }
 }

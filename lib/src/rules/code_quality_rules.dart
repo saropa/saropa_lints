@@ -2034,7 +2034,8 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, SaropaDiagnosticReporter reporter) {
+  void _checkCondition(
+      Expression condition, SaropaDiagnosticReporter reporter) {
     final int operatorCount = _countLogicalOperators(condition);
     if (operatorCount > _maxOperators) {
       reporter.atNode(condition, code);
@@ -5316,7 +5317,8 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
     });
   }
 
-  void _checkArguments(ArgumentList argList, SaropaDiagnosticReporter reporter) {
+  void _checkArguments(
+      ArgumentList argList, SaropaDiagnosticReporter reporter) {
     for (final Expression arg in argList.arguments) {
       if (arg is! NamedExpression) continue;
 

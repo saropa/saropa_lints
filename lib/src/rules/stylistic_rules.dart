@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -121,17 +122,15 @@ class _ConvertToRelativeImportFix extends DartFix {
       final String importedFilePath = importPath.substring(firstSlash + 1);
 
       // Get the current file's path relative to lib/
-      final String currentPath =
-          resolver.source.fullName.replaceAll('\\', '/');
+      final String currentPath = resolver.source.fullName.replaceAll('\\', '/');
       final RegExp libPattern = RegExp(r'/lib/(.*)$');
       final RegExpMatch? match = libPattern.firstMatch(currentPath);
       if (match == null) return;
 
       final String currentFilePath = match.group(1) ?? '';
-      final String currentDir =
-          currentFilePath.contains('/')
-              ? currentFilePath.substring(0, currentFilePath.lastIndexOf('/'))
-              : '';
+      final String currentDir = currentFilePath.contains('/')
+          ? currentFilePath.substring(0, currentFilePath.lastIndexOf('/'))
+          : '';
 
       // Calculate relative path
       final String relativePath = _calculateRelativePath(
@@ -1109,7 +1108,8 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
-    problemMessage: 'Method returns a record; consider using a dedicated class.',
+    problemMessage:
+        'Method returns a record; consider using a dedicated class.',
     correctionMessage:
         'Create a class with named fields for better maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1350,9 +1350,8 @@ class _ConvertToSingleQuotesFix extends DartFix {
       if (node.value.contains("'")) return;
 
       // Escape any existing backslashes and single quotes in the value
-      final String escaped = node.value
-          .replaceAll(r'\', r'\\')
-          .replaceAll("'", r"\'");
+      final String escaped =
+          node.value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
 
       final String newLexeme = "'$escaped'";
 
@@ -1403,7 +1402,8 @@ class PreferTodoFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
-    problemMessage: 'TODO comment should follow format: TODO(author): description',
+    problemMessage:
+        'TODO comment should follow format: TODO(author): description',
     correctionMessage: 'Add author name in parentheses: TODO(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1489,7 +1489,8 @@ class PreferFixmeFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
-    problemMessage: 'FIXME comment should follow format: FIXME(author): description',
+    problemMessage:
+        'FIXME comment should follow format: FIXME(author): description',
     correctionMessage: 'Add author name in parentheses: FIXME(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1774,8 +1775,8 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
     });
 
     // Check top-level variables
-    context.registry.addTopLevelVariableDeclaration(
-        (TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       _checkDocComment(node.documentationComment, reporter);
     });
 
@@ -2026,8 +2027,10 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
-    problemMessage: 'Boolean should use a descriptive prefix (is, has, can, should, etc.).',
-    correctionMessage: 'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
+    problemMessage:
+        'Boolean should use a descriptive prefix (is, has, can, should, etc.).',
+    correctionMessage:
+        'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
