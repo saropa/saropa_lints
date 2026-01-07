@@ -109,12 +109,17 @@ abstract class SaropaLintRule extends DartLintRule {
       }
     }
 
-    // Check fixture files
+    // Check fixture files - but NOT in example/ directory
+    // (example fixtures are specifically for testing the linter rules)
     if (skipFixtureFiles) {
-      if (normalizedPath.contains('/fixture/') ||
-          normalizedPath.contains('/fixtures/') ||
-          normalizedPath.contains('_fixture.dart')) {
-        return true;
+      final isInExample = normalizedPath.contains('/example/') ||
+          normalizedPath.contains('/examples/');
+      if (!isInExample) {
+        if (normalizedPath.contains('/fixture/') ||
+            normalizedPath.contains('/fixtures/') ||
+            normalizedPath.contains('_fixture.dart')) {
+          return true;
+        }
       }
     }
 

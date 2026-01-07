@@ -6,31 +6,9 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 ---
 
-## Part 1: Test Coverage
+## Part 1: Detailed Rule Specifications
 
-### Priority Categories
-
-Focus testing on high-impact categories first:
-
-1. **error_handling** (8 rules) - prevent silent failures
-2. **async** (15 rules) - common source of bugs
-3. **security** (12 rules) - 1 fixture, need more
-4. **flutter_widget** (107 rules) - largest category
-
-### How to Add Tests
-
-See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) section 5 for the fixture-based testing approach.
-
-### CI Integration
-
-- [ ] Add `dart run custom_lint` to CI pipeline for example/ folder
-- [ ] Fail CI if expected lints don't fire
-
----
-
-## Part 2: Detailed Rule Specifications
-
-### 2.1 Widget Rules
+### 1.1 Widget Rules
 
 #### Layout & Composition
 
@@ -54,7 +32,7 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_image_semantics` | Recommended | WARNING | Images without `semanticLabel` are invisible to screen readers. Provide descriptive alt text for accessibility compliance. |
-| `require_image_dimensions` | Professional | INFO | Images without explicit width/height cause layout shifts when they load. Specify dimensions to reserve space and prevent content jumping. |
+| `avoid_unconstrained_images` | Professional | INFO | Images without sizing constraints cause layout shifts when they load. Acceptable constraints include: explicit dimensions, AspectRatio parent, Expanded/Flexible parent, FractionallySizedBox, or SizedBox. Images with `fit` property in unconstrained contexts still need bounds. |
 
 #### Input & Interaction
 
@@ -62,7 +40,7 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 |-----------|------|----------|-------------|
 | `avoid_absorb_pointer_misuse` | Professional | WARNING | AbsorbPointer blocks ALL touch events including scrolling. Often IgnorePointer (which allows events to pass through) is the correct choice. |
 
-### 2.2 State Management
+### 1.2 State Management
 
 #### Riverpod Rules
 
@@ -126,7 +104,7 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 | `require_getx_binding` | Professional | INFO | Bindings ensure controllers are created and disposed at the right time. Without them, manual Get.put/delete calls are error-prone. |
 | `avoid_obs_outside_controller` | Recommended | WARNING | `.obs` reactive variables outside GetxController aren't disposed automatically. This causes memory leaks when the widget is destroyed. |
 
-### 2.3 Performance Rules
+### 1.3 Performance Rules
 
 #### Build Optimization
 
@@ -187,7 +165,7 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 | `prefer_binary_format` | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
 | `require_network_status_check` | Recommended | INFO | Check connectivity before making requests that will obviously fail. Show appropriate offline UI instead of timeout errors. |
 
-### 2.4 Testing Rules
+### 1.4 Testing Rules
 
 #### Unit Testing
 
@@ -236,7 +214,7 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 | `prefer_parallel_tests` | Comprehensive | INFO | Independent integration tests can run in parallel with `--concurrency`. Reduces total CI time significantly for large test suites. |
 | `require_test_documentation` | Comprehensive | INFO | Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters. |
 
-### 2.5 Security Rules
+### 1.5 Security Rules
 
 #### Authentication & Authorization
 
@@ -287,7 +265,7 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 | `require_deep_link_validation` | Essential | WARNING | Deep links can pass arbitrary data to your app. Validate and sanitize all deep link parameters before using them. |
 | `prefer_intent_filter_export` | Professional | INFO | Android intent filters should be exported only when necessary. Unexported components can't be invoked by malicious apps. |
 
-### 2.6 Accessibility Rules
+### 1.6 Accessibility Rules
 
 #### Screen Reader Support
 
@@ -335,19 +313,264 @@ See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUT
 | `require_switch_control` | Comprehensive | INFO | Switch control users navigate sequentially. Ensure logical focus order and that all interactive elements are focusable. |
 | `avoid_hover_only` | Recommended | INFO | Touch devices and screen readers don't have hover. Never hide essential information or actions behind hover states. |
 
-### 2.7 - 2.12 Additional Categories
+### 1.7 Animation Rules
 
-See the full specification for:
-- Error Handling Rules
-- Async/Concurrency Rules
-- Architecture Rules
-- Package-Specific Rules: Dio, Hive/Isar, GoRouter, Firebase
-- Platform-Specific Rules: Web, Desktop, iOS, Android
-- Documentation, API/Network, Database, Animation, Navigation, Forms, Localization, DI
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_animation_curve` | Recommended | INFO | Linear animations feel robotic. Use Curves (easeInOut, bounceIn, etc.) for natural motion that matches platform conventions. |
+| `avoid_animation_in_build` | Essential | WARNING | Creating AnimationController in build() creates new controllers every frame. Initialize in initState and dispose properly. |
+| `require_vsync_mixin` | Essential | ERROR | AnimationController without vsync wastes battery animating when widget is off-screen. Add SingleTickerProviderStateMixin. |
+| `prefer_tween_sequence` | Professional | INFO | Complex multi-stage animations should use TweenSequence rather than chaining multiple controllers or delayed futures. |
+| `avoid_hardcoded_duration` | Recommended | INFO | Animation durations should come from theme or constants for consistency. 300ms buttons and 500ms page transitions are common defaults. |
+| `require_animation_status_listener` | Professional | INFO | One-shot animations need StatusListener to know when complete. Without it, you can't trigger follow-up actions reliably. |
+| `prefer_implicit_animations` | Recommended | INFO | AnimatedContainer, AnimatedOpacity are simpler than explicit controllers for basic transitions. Use implicit when possible. |
+| `avoid_overlapping_animations` | Professional | WARNING | Multiple animations on same property conflict. Use AnimationController.stop() before starting new animation on same widget. |
+| `require_hero_tag_uniqueness` | Essential | ERROR | Duplicate Hero tags cause "Multiple heroes" crash. Ensure unique tags, especially in lists where items might share structure. |
+| `prefer_physics_simulation` | Comprehensive | INFO | SpringSimulation and FrictionSimulation create more natural feel than fixed curves for drag-release and momentum scrolling. |
+| `avoid_animation_rebuild_waste` | Professional | WARNING | AnimatedBuilder should wrap only the animating subtree. Wrapping entire screen rebuilds everything 60fps. |
+| `require_staggered_animation_delays` | Professional | INFO | List item animations should stagger (50-100ms delay between items). Simultaneous animations look jarring and hurt performance. |
+
+### 1.8 Navigation & Routing Rules
+
+#### Navigator & GoRouter
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_navigator_push_unnamed` | Recommended | INFO | `Navigator.push(MaterialPageRoute(...))` bypasses named routes, breaking deep links and analytics. Use named routes or GoRouter. |
+| `require_route_guards` | Essential | WARNING | Protected routes must check auth before rendering. GoRouter's redirect or Navigator observers prevent unauthorized access. |
+| `avoid_nested_navigators_misuse` | Professional | WARNING | Nested Navigators (tabs with own stacks) need careful WillPopScope handling. Back button behavior confuses users when done wrong. |
+| `require_deep_link_testing` | Professional | INFO | Every route should be testable via deep link. Routes only reachable through navigation chains break when users share links. |
+| `prefer_go_router_redirect` | Professional | INFO | Auth checks in redirect() run before build, preventing flash of protected content. Checking in build shows then redirects. |
+| `avoid_context_after_navigation` | Essential | ERROR | Context is invalid after Navigator.pop(). Using context in .then() after navigation causes "Looking up deactivated widget" crash. |
+| `require_route_transition_consistency` | Recommended | INFO | Mix of slide, fade, and no transitions feels broken. Define consistent page transitions in theme or router config. |
+| `prefer_typed_route_params` | Professional | INFO | Route parameters as strings require parsing and can fail silently. Use typed extras (GoRouter) or arguments with type checking. |
+| `avoid_circular_redirects` | Essential | ERROR | Route A redirecting to B which redirects to A causes infinite loop. Track redirect chain and break cycles. |
+| `require_unknown_route_handler` | Essential | WARNING | Unhandled routes show red error screen. Define onUnknownRoute (Navigator) or errorBuilder (GoRouter) for graceful 404. |
+| `prefer_shell_route_for_persistent_ui` | Professional | INFO | Bottom nav bars and side drawers should use ShellRoute (GoRouter) to persist across child routes without rebuilding. |
+| `avoid_pop_without_result` | Professional | INFO | Screens expecting results from pushed routes should handle null (user pressed back). Always check Navigator.pop result. |
+
+#### Deep Linking
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_universal_link_validation` | Essential | WARNING | iOS Universal Links and Android App Links need server-side apple-app-site-association and assetlinks.json. Test on real devices. |
+| `avoid_deep_link_sensitive_params` | Essential | ERROR | Passwords and tokens in deep links appear in system logs and can be intercepted. Use one-time codes that expire quickly. |
+| `require_deep_link_fallback` | Recommended | INFO | Deep links should gracefully degrade when target content doesn't exist (deleted item, expired link). Show helpful error, not crash. |
+| `prefer_branch_io_or_firebase_links` | Professional | INFO | Raw deep links break when app not installed. Branch.io or Firebase Dynamic Links provide install-then-open flow. |
+
+### 1.9 Forms & Validation Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_form_key` | Essential | ERROR | Forms without GlobalKey can't call validate() or save(). The FormState is inaccessible without a key. |
+| `prefer_autovalidate_on_interaction` | Recommended | INFO | AutovalidateMode.always shows errors before user types. Use onUserInteraction to validate after first input. |
+| `require_form_field_controller` | Professional | INFO | TextFormField without controller loses value on rebuild. Either use controller or onSaved, but be consistent. |
+| `avoid_validation_in_build` | Essential | WARNING | Complex validation (regex, API calls) in validator runs on every keystroke. Debounce or validate on submit only. |
+| `require_error_message_context` | Recommended | INFO | "Invalid input" is useless. Error messages should explain what's wrong and how to fix it: "Email must contain @". |
+| `prefer_form_bloc_for_complex` | Professional | INFO | Forms with >5 fields, conditional logic, or multi-step flows benefit from form state management (FormBloc, Reactive Forms). |
+| `avoid_clearing_form_on_error` | Essential | WARNING | Clearing fields when validation fails forces users to re-enter everything. Preserve input and highlight errors. |
+| `require_keyboard_type` | Recommended | INFO | Email fields need TextInputType.emailAddress, phone needs .phone, numbers need .number. Wrong keyboard frustrates users. |
+| `prefer_input_formatters` | Professional | INFO | Phone numbers, credit cards, dates should auto-format as user types using TextInputFormatter for better UX. |
+| `require_submit_button_state` | Recommended | INFO | Submit buttons should disable during submission and show loading indicator. Prevents double-submit and shows progress. |
+| `avoid_form_without_unfocus` | Professional | INFO | Forms should unfocus (FocusScope.of(context).unfocus()) on submit. Keyboard staying open after submit feels broken. |
+| `require_form_restoration` | Professional | INFO | Long forms should survive app backgrounding. Use RestorationMixin or persist draft state to avoid losing user input. |
+
+### 1.10 Database & Storage Rules
+
+#### Local Database (Hive/Isar/Drift)
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_database_migration` | Essential | ERROR | Schema changes without migration corrupt data or crash. Define migration strategy before shipping v1. |
+| `avoid_blocking_database_ui` | Essential | WARNING | Database operations block UI if run on main isolate. Use compute() or database's async APIs for large queries. |
+| `require_database_index` | Professional | INFO | Queries filtering/sorting on unindexed fields are O(n). Add indexes for fields used in where clauses. |
+| `prefer_lazy_box_for_large` | Professional | INFO | Hive's regular Box loads all data into memory. Use LazyBox for large collections to load entries on demand. |
+| `avoid_storing_sensitive_unencrypted` | Essential | ERROR | Hive/Isar store data as readable files. Use encrypted box or flutter_secure_storage for tokens and passwords. |
+| `require_database_close` | Essential | WARNING | Database connections must close on logout/dispose. Open connections leak memory and can lock files. |
+| `prefer_transaction_for_batch` | Professional | INFO | Multiple writes should use transactions. Individual writes have overhead and can leave partial state on crash. |
+| `avoid_database_in_widget` | Recommended | WARNING | Database access directly in widgets couples UI to storage. Use repository pattern for testability and flexibility. |
+| `require_type_adapter_registration` | Essential | ERROR | Hive custom types need TypeAdapter registered before use. Missing adapter causes "Adapter not found" crash. |
+| `prefer_isar_for_complex_queries` | Comprehensive | INFO | Hive's query capabilities are limited. Isar supports complex queries, full-text search, and links between objects. |
+
+#### SharedPreferences & Secure Storage
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_prefs_for_large_data` | Recommended | WARNING | SharedPreferences loads entire file on first access. Keep it small (<100 keys, simple values). Use database for collections. |
+| `require_prefs_key_constants` | Recommended | INFO | String literals for pref keys cause typos. Define keys as constants in one place for autocomplete and refactoring. |
+| `prefer_typed_prefs_wrapper` | Professional | INFO | Raw SharedPreferences returns dynamic. Wrap in typed class with getters/setters for type safety and documentation. |
+| `avoid_secure_storage_on_web` | Essential | WARNING | flutter_secure_storage uses localStorage on web, which isn't secure. Use different strategy for web platform. |
+
+### 1.11 Platform-Specific Rules
+
+#### iOS-Specific
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_ios_permission_description` | Essential | ERROR | iOS rejects apps without Info.plist usage descriptions for camera, location, etc. Add NSCameraUsageDescription etc. |
+| `avoid_http_without_ats_exception` | Essential | ERROR | iOS blocks non-HTTPS by default (App Transport Security). Add exception in Info.plist only if absolutely necessary. |
+| `prefer_cupertino_for_ios_feel` | Recommended | INFO | Material widgets look foreign on iOS. Use CupertinoPageRoute, CupertinoAlertDialog for native feel, or adaptive widgets. |
+| `require_ios_background_mode` | Professional | INFO | Background tasks need specific capabilities in Xcode: background fetch, remote notifications, audio, location. |
+| `avoid_ios_13_deprecations` | Recommended | WARNING | iOS 13+ deprecates UIWebView, UIAlertView, and others. Use WKWebView and modern APIs to avoid App Store rejection. |
+| `require_apple_sign_in` | Essential | ERROR | Apps with third-party login (Google, Facebook) must also offer Sign in with Apple per App Store guidelines. |
+
+#### Android-Specific
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_android_permission_request` | Essential | ERROR | Android 6+ requires runtime permission requests. Declaring in manifest isn't enough; call requestPermission(). |
+| `avoid_android_task_affinity_default` | Professional | INFO | Multiple activities with default taskAffinity can cause confusing back stack. Set explicit affinity for each activity. |
+| `require_android_12_splash` | Recommended | INFO | Android 12+ enforces system splash screen. Customize via themes to avoid double splash (system + Flutter). |
+| `prefer_pending_intent_flags` | Essential | ERROR | PendingIntent without FLAG_IMMUTABLE or FLAG_MUTABLE crashes on Android 12+. Specify flag explicitly. |
+| `avoid_android_cleartext_traffic` | Essential | WARNING | Android 9+ blocks HTTP by default. Enable cleartextTrafficPermitted only for specific debug domains, never production. |
+| `require_android_backup_rules` | Professional | INFO | Define backup_rules.xml to control what's backed up. Sensitive data in shared_prefs backs up by default. |
+
+#### Web-Specific
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_platform_channel_on_web` | Essential | ERROR | MethodChannel doesn't work on web. Use conditional imports and dart:js_interop for web-specific functionality. |
+| `require_web_renderer_awareness` | Professional | INFO | CanvasKit vs HTML renderer have different capabilities and bundle sizes. Test on both; choose based on needs. |
+| `prefer_url_strategy_for_web` | Recommended | INFO | Hash URLs (/#/page) look ugly and break SEO. Use PathUrlStrategy for clean URLs in production web apps. |
+| `avoid_large_assets_on_web` | Recommended | WARNING | Web has no app install; assets download on demand. Lazy-load images and use appropriate formats (WebP) for faster loads. |
+| `require_cors_handling` | Essential | ERROR | Web apps face CORS restrictions desktop/mobile don't have. API must send proper headers or use proxy for third-party APIs. |
+| `prefer_deferred_loading_web` | Professional | INFO | Web bundle size matters for initial load. Use deferred imports to split code and load features on demand. |
+
+#### Desktop-Specific (Windows/macOS/Linux)
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_window_size_constraints` | Recommended | INFO | Desktop apps need minimum window size to prevent unusable layouts. Set constraints in main() or platform runner. |
+| `prefer_keyboard_shortcuts` | Recommended | INFO | Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and Actions for standard keyboard interactions. |
+| `require_menu_bar_for_desktop` | Professional | INFO | macOS apps need menu bar. Use PlatformMenuBar for standard menus (File, Edit, View) on desktop platforms. |
+| `avoid_touch_only_gestures` | Recommended | WARNING | Desktop has mouse, not touch. GestureDetector works, but also handle mouse hover, right-click, scroll wheel. |
+| `require_window_close_confirmation` | Professional | INFO | Unsaved changes should prompt on window close. Handle windowShouldClose callback to prevent data loss. |
+| `prefer_native_file_dialogs` | Professional | INFO | Use file_picker or file_selector for native open/save dialogs. Custom dialogs feel out of place on desktop. |
+
+### 1.12 Firebase Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_firebase_init_before_use` | Essential | ERROR | Firebase.initializeApp() must complete before accessing any Firebase service. Await it in main() before runApp(). |
+| `avoid_firestore_unbounded_query` | Essential | WARNING | Firestore without limit() fetches entire collection, costing money and time. Always limit results or use pagination. |
+| `require_firestore_index` | Essential | ERROR | Compound queries need composite indexes. Firestore throws error with link to create index; don't ignore in dev. |
+| `prefer_firestore_batch_write` | Professional | INFO | Multiple writes should use batch() or transaction(). Individual writes have higher latency and cost. |
+| `avoid_firestore_in_widget_build` | Essential | WARNING | StreamBuilder with Firestore query in build() creates new listener on every rebuild. Cache stream reference. |
+| `require_firebase_auth_state_listener` | Essential | WARNING | Checking currentUser once misses sign-out events. Use authStateChanges() stream to react to auth state. |
+| `prefer_firebase_auth_persistence` | Recommended | INFO | Web Firebase Auth defaults to session persistence. Set persistence to LOCAL for "remember me" functionality. |
+| `avoid_storing_user_data_in_auth` | Recommended | WARNING | Firebase Auth custom claims are limited (1000 bytes). Store user profiles in Firestore, not in auth token. |
+| `require_crashlytics_user_id` | Professional | INFO | Set Crashlytics userIdentifier to correlate crashes with users. Helps debug user-reported issues. |
+| `prefer_firebase_remote_config_defaults` | Recommended | INFO | Remote Config returns null if fetch fails. Set in-app defaults so app works offline on first launch. |
+| `avoid_firebase_storage_public_rules` | Essential | ERROR | Storage rules "allow read, write: if true" lets anyone upload anything. Require auth and validate file types. |
+| `require_firebase_app_check` | Professional | WARNING | Firebase App Check prevents abuse from non-app clients. Enable for production to protect backend resources. |
+
+### 1.13 Offline-First & Sync Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_offline_indicator` | Recommended | INFO | Users should know when they're offline. Show banner or icon when connectivity is lost; don't silently fail. |
+| `prefer_optimistic_updates` | Professional | INFO | Update local state immediately, sync to server in background. Waiting for server makes UI feel slow. |
+| `require_conflict_resolution_strategy` | Professional | WARNING | Offline edits that conflict with server need resolution: last-write-wins, merge, or user prompt. Define strategy upfront. |
+| `avoid_sync_on_every_change` | Professional | WARNING | Syncing each keystroke wastes battery and bandwidth. Batch changes and sync on intervals or app background. |
+| `require_pending_changes_indicator` | Recommended | INFO | Users should see when local changes haven't synced. Show "Saving..." or pending count to set expectations. |
+| `prefer_background_sync` | Professional | INFO | Use WorkManager (Android) or BGTaskScheduler (iOS) to sync when app is backgrounded, not just when open. |
+| `require_sync_error_recovery` | Essential | WARNING | Failed syncs must retry with exponential backoff. Unrecoverable errors should notify user, not silently lose data. |
+| `avoid_full_sync_on_every_launch` | Professional | WARNING | Downloading entire dataset on launch is slow and expensive. Use delta sync with timestamps or change feeds. |
+
+### 1.14 Background Processing Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_workmanager_for_background` | Essential | WARNING | Dart isolates die when app backgrounds. Use workmanager package for reliable background tasks on Android/iOS. |
+| `avoid_long_running_isolates` | Professional | WARNING | iOS kills background tasks after ~30 seconds. Design tasks to be short or use background fetch appropriately. |
+| `require_notification_for_long_tasks` | Recommended | INFO | Long operations (uploads, processing) should show progress notification. Silent background work gets killed by OS. |
+| `prefer_foreground_service_android` | Professional | INFO | Android kills background services aggressively. Use foreground service with notification for ongoing work. |
+| `avoid_compute_for_quick_tasks` | Recommended | INFO | compute() has overhead for spawning isolate. For tasks under 10ms, just run on main isolate. |
+| `require_isolate_error_handling` | Essential | WARNING | Errors in isolates don't propagate to main. Set up error port or use compute() which handles errors properly. |
+
+### 1.15 Push Notification Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_notification_permission_request` | Essential | ERROR | iOS and Android 13+ require explicit notification permission. Request before sending; denied = no notifications ever. |
+| `prefer_delayed_permission_prompt` | Recommended | INFO | Don't ask for notification permission on first launch. Wait until user sees value, then explain why before asking. |
+| `require_fcm_token_refresh_handler` | Essential | WARNING | FCM tokens can change. Listen to onTokenRefresh and update server. Stale tokens mean undelivered notifications. |
+| `avoid_notification_payload_sensitive` | Essential | ERROR | Push payloads may be logged or visible in notification center. Never include passwords, full messages, or tokens. |
+| `require_background_message_handler` | Essential | WARNING | FCM background messages need top-level handler function. Instance methods don't work when app is killed. |
+| `prefer_local_notification_for_immediate` | Recommended | INFO | flutter_local_notifications is better for app-generated notifications. FCM is for server-triggered messages. |
+| `require_notification_channel_android` | Essential | ERROR | Android 8+ requires notification channels. Define channels with appropriate importance level for different notification types. |
+| `avoid_notification_spam` | Recommended | WARNING | Too many notifications cause users to disable all notifications or uninstall. Batch, dedupe, and respect user preferences. |
+
+### 1.16 Payment & In-App Purchase Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_purchase_verification` | Essential | ERROR | Verify purchases server-side with Apple/Google receipts. Client-side verification can be bypassed by attackers. |
+| `prefer_revenue_cat` | Professional | INFO | In-app purchases are complex (subscriptions, restores, receipt validation). RevenueCat handles cross-platform edge cases. |
+| `require_purchase_restoration` | Essential | ERROR | App Store requires "Restore Purchases" button for non-consumables and subscriptions. Users switching devices need it. |
+| `avoid_purchase_in_sandbox_production` | Essential | ERROR | Sandbox purchases in production or vice versa fail validation. Use correct environment configuration. |
+| `require_subscription_status_check` | Essential | WARNING | Subscriptions can be cancelled, refunded, or expired. Check status on app launch, not just after purchase. |
+| `prefer_grace_period_handling` | Professional | INFO | Users with expired cards get billing grace period. Handle "grace period" status to avoid locking out paying customers. |
+| `require_price_localization` | Recommended | INFO | Show prices from store (with currency) not hardcoded. $4.99 in US might be €5.49 in EU. Use productDetails.price. |
+| `avoid_entitlement_without_server` | Professional | WARNING | Client-side entitlement checks can be bypassed. Verify subscription status server-side for valuable content. |
+
+### 1.17 Maps & Location Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_location_permission_rationale` | Essential | WARNING | Explain why you need location before requesting. "Weather app needs location for local forecast." Improves grant rate. |
+| `prefer_coarse_location_when_sufficient` | Recommended | INFO | Precise location isn't always needed. City-level (coarse) location uses less battery and feels less invasive. |
+| `avoid_continuous_location_updates` | Professional | WARNING | GPS polling drains battery fast. Use significant location changes or geofencing when you don't need real-time updates. |
+| `require_location_timeout` | Essential | WARNING | Location requests can hang indefinitely on airplane mode. Set timeout and handle failure gracefully. |
+| `prefer_geocoding_cache` | Professional | INFO | Reverse geocoding (coords to address) costs API calls. Cache results; coordinates rarely change for same address. |
+| `avoid_map_markers_in_build` | Professional | WARNING | Creating map markers in build() causes flicker and performance issues. Cache marker instances and update selectively. |
+| `require_map_idle_callback` | Professional | INFO | Fetching data for visible map region should wait for onCameraIdle, not onCameraMove. Move fires continuously while panning. |
+| `prefer_marker_clustering` | Professional | INFO | Thousands of markers crash or slow the map. Use clustering to group nearby markers at low zoom levels. |
+
+### 1.18 Camera & Media Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_camera_permission_check` | Essential | ERROR | Camera access without permission crashes on iOS, throws on Android. Check and request permission before initializing. |
+| `prefer_camera_resolution_selection` | Recommended | INFO | Max resolution isn't always best. Profile photos don't need 4K. Select resolution appropriate for use case to save storage. |
+| `require_camera_dispose` | Essential | ERROR | CameraController must be disposed. Undisposed camera keeps hardware locked, preventing other apps from using camera. |
+| `avoid_image_picker_without_source` | Essential | WARNING | ImagePicker without specifying source shows confusing blank picker on some devices. Always specify camera or gallery. |
+| `require_image_compression` | Recommended | WARNING | Phone cameras produce 5-20MB images. Compress before upload (quality 70-85% is usually indistinguishable) to save bandwidth. |
+| `prefer_image_cropping` | Recommended | INFO | Profile photos should be cropped to square. Offer cropping UI after selection rather than forcing users to pre-crop. |
+| `avoid_loading_full_images_in_memory` | Essential | WARNING | Loading multiple full-resolution images causes OOM. Use ResizeImage or cacheWidth/cacheHeight for display. |
+| `require_exif_handling` | Professional | INFO | Image orientation is in EXIF metadata. Failure to read EXIF results in sideways or upside-down images on some devices. |
+
+### 1.19 Theming & Dark Mode Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_theme_color_from_scheme` | Recommended | INFO | Hardcoded Colors ignore theme. Use Theme.of(context).colorScheme.primary etc. for colors that adapt to light/dark mode. |
+| `prefer_color_scheme_from_seed` | Recommended | INFO | ColorScheme.fromSeed generates harmonious palette from single color. Easier than defining all scheme colors manually. |
+| `avoid_brightness_check_for_theme` | Recommended | WARNING | Don't check brightness to pick colors. Use colorScheme which already provides appropriate colors for current theme. |
+| `require_dark_mode_testing` | Essential | WARNING | Many apps look broken in dark mode (black text on black background). Test both modes; don't just invert colors. |
+| `prefer_system_theme_default` | Recommended | INFO | Default to ThemeMode.system to respect user's OS preference. Offer manual override in settings. |
+| `avoid_elevation_opacity_in_dark` | Professional | INFO | Dark mode uses surface tints instead of shadows for elevation. Material 3 handles this; Material 2 needs manual handling. |
+| `require_semantic_colors` | Professional | INFO | Name colors by purpose (errorColor, successColor) not appearance (redColor). Purposes stay constant; appearances change with theme. |
+| `prefer_theme_extensions` | Professional | INFO | Custom colors beyond ColorScheme should use ThemeExtension for proper inheritance and type safety. |
+
+### 1.20 Responsive & Adaptive Design Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_responsive_breakpoints` | Recommended | INFO | Define consistent breakpoints (compact <600, medium 600-840, expanded >840). Ad-hoc checks create inconsistent layouts. |
+| `prefer_layout_builder_over_media_query` | Professional | INFO | LayoutBuilder gives widget's actual constraints. MediaQuery gives screen size, which may differ in split view or dialogs. |
+| `avoid_fixed_dimensions` | Recommended | WARNING | Fixed pixel widths break on different screens. Use Flexible, Expanded, FractionallySizedBox, or constraints. |
+| `require_orientation_handling` | Recommended | INFO | Many apps break in landscape. Either support it properly with different layouts, or lock to portrait explicitly. |
+| `prefer_master_detail_for_large` | Professional | INFO | On tablets, list-detail flows should show both panes (master-detail) rather than stacked navigation. |
+| `avoid_text_overflow_on_small` | Essential | WARNING | Long text must handle small screens. Use maxLines with overflow, or Flexible to allow wrapping. |
+| `require_safe_area_handling` | Essential | WARNING | Notches, home indicators, and rounded corners clip content. Use SafeArea or MediaQuery.padding appropriately. |
+| `prefer_adaptive_icons` | Recommended | INFO | Icons at 24px default are too small on tablets, too large on watches. Use IconTheme or scale based on screen size. |
+| `avoid_keyboard_overlap` | Essential | WARNING | Soft keyboard covers bottom content. Use SingleChildScrollView or adjust padding with MediaQuery.viewInsets.bottom. |
+| `require_foldable_awareness` | Comprehensive | INFO | Foldable devices have hinges and multiple displays. Use DisplayFeature API to avoid placing content on fold. |
 
 ---
 
-## Part 3: Tier Assignments
+## Part 2: Tier Assignments
 
 ### Tier 1: Essential
 
@@ -469,9 +692,9 @@ custom_lint:
 
 ---
 
-## Part 4: Technical Debt & Improvements
+## Part 3: Technical Debt & Improvements
 
-### 4.0 SaropaLintRule Base Class Enhancements
+### 3.0 SaropaLintRule Base Class Enhancements
 
 The `SaropaLintRule` base class provides enhanced features for all lint rules.
 
@@ -487,7 +710,7 @@ The `SaropaLintRule` base class provides enhanced features for all lint rules.
 | **Performance Tracking** | Medium | Measure rule execution time for optimization |
 | **Tier-Based Filtering** | Medium | Enable/disable rules by tier at runtime |
 
-##### 4.0.1 Diagnostic Statistics
+##### 3.0.1 Diagnostic Statistics
 
 Track how many times each rule fires across a codebase for:
 - Prioritizing fixes ("847 `avoid_print` vs 3 `avoid_hardcoded_credentials`")
@@ -504,7 +727,7 @@ abstract class SaropaLintRule extends DartLintRule {
 }
 ```
 
-##### 4.0.2 Related Rules
+##### 3.0.2 Related Rules
 
 Link rules together for better discoverability:
 
@@ -518,7 +741,7 @@ class RequireDisposeRule extends SaropaLintRule {
 }
 ```
 
-##### 4.0.3 Suppression Tracking
+##### 3.0.3 Suppression Tracking
 
 Record every time a lint is suppressed for tech debt auditing:
 
@@ -535,7 +758,7 @@ Use cases:
 - Security audits ("are security rules being suppressed?")
 - Cleanup campaigns
 
-##### 4.0.4 Batch Deduplication
+##### 3.0.4 Batch Deduplication
 
 Prevent the same issue from being reported multiple times when AST visitors traverse nodes from multiple angles:
 
@@ -551,7 +774,7 @@ class SaropaDiagnosticReporter {
 }
 ```
 
-##### 4.0.5 Custom Ignore Prefixes
+##### 3.0.5 Custom Ignore Prefixes
 
 Support project-specific ignore comment styles:
 
@@ -562,7 +785,7 @@ Support project-specific ignore comment styles:
 // tech-debt: avoid_print (tracked separately for auditing)
 ```
 
-##### 4.0.6 Performance Tracking
+##### 3.0.6 Performance Tracking
 
 Measure rule execution time to identify slow rules:
 
@@ -576,7 +799,7 @@ abstract class SaropaLintRule extends DartLintRule {
 }
 ```
 
-##### 4.0.7 Tier-Based Filtering
+##### 3.0.7 Tier-Based Filtering
 
 Enable/disable rules based on strictness tiers at runtime:
 
@@ -594,48 +817,11 @@ abstract class SaropaLintRule extends DartLintRule {
 
 ---
 
-## Part 5: Implementation Priority
-
-### Phase 1: Test Coverage
-- [ ] Add fixtures for error_handling rules (8 rules)
-- [ ] Add fixtures for async rules (15 rules)
-- [ ] Add fixtures for remaining security rules (11 rules)
-- [ ] Add `dart run custom_lint` to CI for example/ folder
-
-### Phase 2: Highest Impact
-- Widget Rules
-- Essential State Management
-- Core Performance
-
-### Phase 3: Common Needs
-- Testing Rules
-- Security Fundamentals
-- Accessibility Core
-
-### Phase 4: Advanced Patterns
-- Advanced State Management
-- Error Handling
-- Async Patterns
-- More Testing
-
-### Phase 5: Enterprise
-- Architecture Rules
-- More Security
-- Accessibility Complete
-- Platform-Specific Start
-
-### Phase 6: Package Ecosystem
-- Package-Specific
-- Platform Complete
-- Remaining Categories
-
----
-
-## Part 6: Modern Dart & Flutter Language Features
+## Part 4: Modern Dart & Flutter Language Features
 
 This section tracks new Dart/Flutter language features that developers should learn, and corresponding lint rules to help adopt them.
 
-### 6.1 Dart Language Features
+### 4.1 Dart Language Features
 
 | Version | Date | Feature | Description | Lint Rule |
 |---------|------|---------|-------------|-----------|
@@ -659,7 +845,7 @@ This section tracks new Dart/Flutter language features that developers should le
 
 ---
 
-### 6.2 Flutter Widget Features
+### 4.2 Flutter Widget Features
 
 | Version | Date | Feature | Description | Lint Rule |
 |---------|------|---------|-------------|-----------|
@@ -673,7 +859,7 @@ This section tracks new Dart/Flutter language features that developers should le
 
 ---
 
-### 6.3 Modern Dart Rules Summary
+### 4.3 Modern Dart Rules Summary
 
 #### High Priority (Widely Applicable)
 
@@ -698,22 +884,6 @@ This section tracks new Dart/Flutter language features that developers should le
 Want to help implement these rules? See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) for guidelines.
 
 Pick a rule from the list above and submit a PR!
-
----
-
-## About This Document
-
-> "Plans are nothing; planning is everything." — Dwight D. Eisenhower
-
-> "The best time to plant a tree was 20 years ago. The second best time is now." — Chinese Proverb
-
-This **roadmap** outlines our path to 1000 lint rules. The goal is comprehensive coverage of Flutter and Dart best practices — from essential safety rules that prevent crashes to advanced architectural patterns that scale to enterprise applications.
-
-Rules are prioritized by impact: memory safety, security, and accessibility before style preferences. We welcome contributions at any skill level. Pick a rule, implement it, submit a PR. The Flutter community benefits when we all contribute.
-
-**Keywords:** Flutter roadmap, Dart lint rules planned, custom_lint development, Flutter static analysis future, lint rule implementation, open source contribution, Flutter code quality tools, Riverpod lints, Bloc lints, Provider lints, accessibility rules, security rules
-
-**Hashtags:** #Flutter #Dart #OpenSource #Roadmap #Contributing #FlutterDev #DartLang #StaticAnalysis #CodeQuality #Community
 
 ---
 

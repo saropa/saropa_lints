@@ -846,14 +846,14 @@ class _AddHackForFutureIgnoreFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for Future.ignore()',
+        message: 'Add TODO comment for Future.ignore()',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: handle this Future properly with await or unawaited()\n',
+          '// TODO: handle this Future properly with await or unawaited()\n',
         );
       });
     });
@@ -873,14 +873,14 @@ class _AddHackForFutureToStringFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for Future.toString()',
+        message: 'Add TODO comment for Future.toString()',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: await the Future before converting to string\n',
+          '// TODO: await the Future before converting to string\n',
         );
       });
     });
@@ -900,14 +900,14 @@ class _AddHackForNestedFuturesFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for nested Future',
+        message: 'Add TODO comment for nested Future',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: flatten nested Future */ ',
+          '/* TODO: flatten nested Future */ ',
         );
       });
     });
@@ -927,14 +927,14 @@ class _AddHackForNestedStreamsAndFuturesFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for nested Stream/Future',
+        message: 'Add TODO comment for nested Stream/Future',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: avoid mixing Stream and Future */ ',
+          '/* TODO: avoid mixing Stream and Future */ ',
         );
       });
     });
@@ -954,14 +954,14 @@ class _AddHackForAsyncWhenSyncExpectedFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for async callback',
+        message: 'Add TODO comment for async callback',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: async callback - ensure caller handles Future */ ',
+          '/* TODO: async callback - ensure caller handles Future */ ',
         );
       });
     });
@@ -981,14 +981,14 @@ class _AddHackForStreamToStringFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for Stream.toString()',
+        message: 'Add TODO comment for Stream.toString()',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: use stream.toList() or iterate instead of toString()\n',
+          '// TODO: use stream.toList() or iterate instead of toString()\n',
         );
       });
     });
@@ -1008,14 +1008,14 @@ class _AddHackForUnassignedSubscriptionFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unassigned subscription',
+        message: 'Add TODO comment for unassigned subscription',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: assign subscription to cancel later\n',
+          '// TODO: assign subscription to cancel later\n',
         );
       });
     });

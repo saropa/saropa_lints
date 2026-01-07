@@ -102,14 +102,14 @@ class _AddHackCommentForCollectionEqualityFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for collection comparison',
+        message: 'Add TODO comment for collection comparison',
         priority: 2,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: use listEquals/setEquals/mapEquals */ ',
+          '/* TODO: use listEquals/setEquals/mapEquals */ ',
         );
       });
     });
@@ -423,6 +423,20 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
 
     // Check for enum .values property access (e.g., MyEnum.values)
     if (expr is PrefixedIdentifier && expr.identifier.name == 'values') {
+      // Check the static type of the entire expression (e.g., List<TestEnum>)
+      // If it's a List of an enum type, it's guaranteed non-empty
+      final DartType? exprType = expr.staticType;
+      if (exprType is InterfaceType && exprType.typeArguments.isNotEmpty) {
+        final String typeName = exprType.getDisplayString();
+        if (typeName.startsWith('List<')) {
+          final DartType elementType = exprType.typeArguments.first;
+          final Element? element = elementType.element;
+          if (element is EnumElement) {
+            return true;
+          }
+        }
+      }
+
       final DartType? prefixType = expr.prefix.staticType;
       if (prefixType != null) {
         // Check if accessing .values on an enum type
@@ -874,14 +888,14 @@ class _AddHackCommentForReduceFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unsafe reduce',
+        message: 'Add TODO comment for unsafe reduce',
         priority: 2,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: use fold() or check empty */ ',
+          '/* TODO: use fold() or check empty */ ',
         );
       });
     });
@@ -1050,19 +1064,22 @@ class PreferWhereOrNullRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_whereMethods.contains(methodName)) return;
 
-      // Check if target is an Iterable type
+      // Check if target exists (has something before the dot)
       final Expression? target = node.realTarget;
       if (target == null) return;
 
+      // Check if target is an Iterable type (if type is resolved)
       final DartType? targetType = target.staticType;
-      if (targetType == null) return;
-
-      final String typeName = targetType.getDisplayString();
-      if (!typeName.startsWith('List') &&
-          !typeName.startsWith('Set') &&
-          !typeName.startsWith('Iterable') &&
-          !typeName.startsWith('Queue')) {
-        return;
+      if (targetType != null) {
+        final String typeName = targetType.getDisplayString();
+        // Skip if definitely not an iterable type
+        if (!typeName.contains('List') &&
+            !typeName.contains('Set') &&
+            !typeName.contains('Iterable') &&
+            !typeName.contains('Queue') &&
+            !typeName.contains('Iterable')) {
+          return;
+        }
       }
 
       // Only flag if orElse IS provided (otherwise AvoidUnsafeWhereMethodsRule handles it)

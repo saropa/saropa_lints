@@ -20,6 +20,10 @@
   "useGitignore": true,
   "words": [
     "apikey",
+    "assetlinks",
+    "autovalidate",
+    "backgrounded",
+    "backgrounding",
     "blocklist",
     "blocklists",
     "Checkmarx",
@@ -29,10 +33,12 @@
     "dartdoc",
     "datetimes",
     "dotenv",
+    "EXIF",
     "Expando",
     "fieldsets",
     "finalizer",
     "finalizers",
+    "geofencing",
     "getx",
     "Github",
     "Igen",
@@ -59,10 +65,14 @@
     "SonarQube",
     "strobing",
     "timezone",
+    "unfocus",
+    "unindexed",
     "unpushed",
     "Unsanitized",
+    "vsync",
     "WCAG",
-    "Wiegers"
+    "Wiegers",
+    "workmanager"
   ],
   // Specify paths/files to ignore.
   "ignorePaths": [

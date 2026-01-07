@@ -120,7 +120,7 @@ class AvoidReturningVoidRule extends SaropaLintRule {
 /// }
 /// ```
 ///
-/// **Quick fix available:** Comments out the unnecessary return.
+/// **Quick fix available:** Removes the unnecessary return.
 class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   const AvoidUnnecessaryReturnRule() : super(code: _code);
 
@@ -173,10 +173,10 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_CommentOutUnnecessaryReturnFix()];
+  List<Fix> getFixes() => <Fix>[_RemoveUnnecessaryReturnFix()];
 }
 
-class _CommentOutUnnecessaryReturnFix extends DartFix {
+class _RemoveUnnecessaryReturnFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -190,15 +190,13 @@ class _CommentOutUnnecessaryReturnFix extends DartFix {
       if (node.expression != null) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Comment out unnecessary return',
+        message: 'Remove unnecessary return',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleReplacement(
-          SourceRange(node.offset, node.length),
-          '// ${node.toSource()}',
-        );
+        // Delete the entire statement including trailing newline if present
+        builder.addDeletion(SourceRange(node.offset, node.length));
       });
     });
   }
@@ -332,6 +330,8 @@ class _InlineImmediateReturnFix extends DartFix {
 /// ```dart
 /// int getValue() => 42;
 /// ```
+///
+/// **Quick fix available:** Converts to expression body with =>.
 class PreferReturningShorthandsRule extends SaropaLintRule {
   const PreferReturningShorthandsRule() : super(code: _code);
 
@@ -369,5 +369,54 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
       // Single return statement - could use arrow
       reporter.atToken(nameToken, code);
     }
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ConvertToArrowSyntaxFix()];
+}
+
+class _ConvertToArrowSyntaxFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.name.sourceRange.intersects(analysisError.sourceRange)) return;
+      _applyFix(node.body, reporter);
+    });
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (!node.name.sourceRange.intersects(analysisError.sourceRange)) return;
+      _applyFix(node.functionExpression.body, reporter);
+    });
+  }
+
+  void _applyFix(FunctionBody body, ChangeReporter reporter) {
+    if (body is! BlockFunctionBody) return;
+
+    final Block block = body.block;
+    if (block.statements.length != 1) return;
+
+    final Statement stmt = block.statements.first;
+    if (stmt is! ReturnStatement || stmt.expression == null) return;
+
+    final Expression expr = stmt.expression!;
+
+    final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+      message: 'Convert to arrow syntax',
+      priority: 1,
+    );
+
+    changeBuilder.addDartFileEdit((builder) {
+      // Replace the entire body (from { to }) with => expression;
+      builder.addSimpleReplacement(
+        SourceRange(body.offset, body.length),
+        '=> ${expr.toSource()};',
+      );
+    });
   }
 }

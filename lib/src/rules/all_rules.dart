@@ -2,6 +2,7 @@
 library;
 
 export 'accessibility_rules.dart';
+export 'animation_rules.dart';
 export 'api_network_rules.dart';
 export 'architecture_rules.dart';
 export 'async_rules.dart';
@@ -16,11 +17,14 @@ export 'documentation_rules.dart';
 export 'equality_rules.dart';
 export 'error_handling_rules.dart';
 export 'exception_rules.dart';
+export 'firebase_rules.dart';
 export 'flutter_widget_rules.dart';
 export 'formatting_rules.dart';
+export 'forms_rules.dart';
 export 'internationalization_rules.dart';
 export 'memory_management_rules.dart';
 export 'naming_style_rules.dart';
+export 'navigation_rules.dart';
 export 'numeric_literal_rules.dart';
 export 'performance_rules.dart';
 export 'record_pattern_rules.dart';

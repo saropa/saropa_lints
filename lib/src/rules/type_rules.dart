@@ -1516,14 +1516,14 @@ class _UseNullAwareOperatorFix extends DartFix {
     PostfixExpression node,
   ) {
     final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-      message: 'Add HACK comment for null assertion',
+      message: 'Add TODO comment for null assertion',
       priority: 2,
     );
 
     changeBuilder.addDartFileEdit((builder) {
       builder.addSimpleInsertion(
         node.offset,
-        '/* HACK: null assertion */ ',
+        '/* TODO: null assertion */ ',
       );
     });
   }
@@ -1939,14 +1939,14 @@ class _AddHackForExtensionTypeCastFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for extension type cast',
+        message: 'Add TODO comment for extension type cast',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: use constructor instead of cast */ ',
+          '/* TODO: use constructor instead of cast */ ',
         );
       });
     });
@@ -1966,14 +1966,14 @@ class _AddHackForUnrelatedCollectionTypeFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unrelated type',
+        message: 'Add TODO comment for unrelated type',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: argument type cannot match collection element type */ ',
+          '/* TODO: argument type cannot match collection element type */ ',
         );
       });
     });
@@ -1994,14 +1994,14 @@ class _AddHackForImplicitlyNullableExtensionFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for implicitly nullable extension',
+        message: 'Add TODO comment for implicitly nullable extension',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: add "implements Object" to make non-nullable\n',
+          '// TODO: add "implements Object" to make non-nullable\n',
         );
       });
     });
@@ -2021,14 +2021,14 @@ class _AddHackForNullableInterpolationFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for nullable interpolation',
+        message: 'Add TODO comment for nullable interpolation',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: add null check or default value */ ',
+          '/* TODO: add null check or default value */ ',
         );
       });
     });
@@ -2048,14 +2048,14 @@ class _AddHackForNullableParamWithDefaultFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for nullable param with default',
+        message: 'Add TODO comment for nullable param with default',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: remove ? since it has non-null default */ ',
+          '/* TODO: remove ? since it has non-null default */ ',
         );
       });
     });
@@ -2075,14 +2075,14 @@ class _AddHackForUnrelatedTypeAssertionFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for impossible type check',
+        message: 'Add TODO comment for impossible type check',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* HACK: type check is always false - fix types */ ',
+          '/* TODO: type check is always false - fix types */ ',
         );
       });
     });
@@ -2102,14 +2102,14 @@ class _AddHackForIncorrectTypeNameFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for incorrect type name',
+        message: 'Add TODO comment for incorrect type name',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: rename to use UpperCamelCase\n',
+          '// TODO: rename to use UpperCamelCase\n',
         );
       });
     }

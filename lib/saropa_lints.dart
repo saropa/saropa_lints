@@ -240,7 +240,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidUnnecessaryCollectionsRule(),
   AvoidUnnecessaryDigitSeparatorsRule(),
   AvoidUnnecessaryEnumArgumentsRule(),
-  FormatTestNameRule(),
+  PreferDescriptiveTestNameRule(),
   PreferCorrectSwitchLengthRule(),
   PreferCorrectTypeNameRule(),
   PreferReturningConditionalsRule(),
@@ -325,7 +325,6 @@ const List<LintRule> _allRules = <LintRule>[
   PreferAddAllRule(),
   AvoidDuplicateCollectionElementsRule(),
   PreferReturnAwaitRule(),
-  MissingTestAssertionRule(),
   PreferSetForLookupRule(),
 
   // Code quality rules
@@ -752,6 +751,44 @@ const List<LintRule> _allRules = <LintRule>[
   RequireImmutableBlocStateRule(),
   RequireRequestTimeoutRule(),
   AvoidFlakyTestsRule(),
+
+  // New accessibility rules
+  AvoidTextScaleFactorIgnoreRule(),
+  RequireImageSemanticsRule(),
+  AvoidHiddenInteractiveRule(),
+
+  // New animation rules
+  RequireVsyncMixinRule(),
+  AvoidAnimationInBuildRule(),
+  RequireAnimationControllerDisposeRule(),
+  RequireHeroTagUniquenessRule(),
+  AvoidLayoutPassesRule(),
+
+  // New forms rules
+  PreferAutovalidateOnInteractionRule(),
+  RequireKeyboardTypeRule(),
+  RequireTextOverflowInRowRule(),
+  RequireSecureKeyboardRule(),
+
+  // New navigation rules
+  RequireUnknownRouteHandlerRule(),
+  AvoidContextAfterNavigationRule(),
+
+  // New security/performance rules
+  PreferSecureRandomRule(),
+  PreferTypedDataRule(),
+  AvoidUnnecessaryToListRule(),
+
+  // New Firebase/storage rules
+  AvoidFirestoreUnboundedQueryRule(),
+  AvoidDatabaseInBuildRule(),
+  RequirePrefsKeyConstantsRule(),
+  AvoidSecureStorageOnWebRule(),
+
+  // New state management rules
+  AvoidProviderOfInBuildRule(),
+  AvoidGetFindInBuildRule(),
+  AvoidProviderRecreateRule(),
 ];
 
 class _SaropaLints extends PluginBase {
