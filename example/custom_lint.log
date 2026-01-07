@@ -1,0 +1,104 @@
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:11858:7: Error: '_WidgetDepthVisitor' is already declared in this scope.
+[custom_lint] 2026-01-07T10:58:24.310280 class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:3619:7: Context: Previous declaration of '_WidgetDepthVisitor'.
+[custom_lint] 2026-01-07T10:58:24.310280 class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:12187:7: Error: 'RequireScrollControllerDisposeRule' is already declared in this scope.
+[custom_lint] 2026-01-07T10:58:24.310280 class RequireScrollControllerDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:8641:7: Context: Previous declaration of 'RequireScrollControllerDisposeRule'.
+[custom_lint] 2026-01-07T10:58:24.310280 class RequireScrollControllerDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:12293:7: Error: 'RequireFocusNodeDisposeRule' is already declared in this scope.
+[custom_lint] 2026-01-07T10:58:24.310280 class RequireFocusNodeDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:8801:7: Context: Previous declaration of 'RequireFocusNodeDisposeRule'.
+[custom_lint] 2026-01-07T10:58:24.310280 class RequireFocusNodeDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:11986:7: Error: 'AvoidNestedScrollablesRule' is already declared in this scope.
+[custom_lint] 2026-01-07T10:58:24.310280 class AvoidNestedScrollablesRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:9017:7: Context: Previous declaration of 'AvoidNestedScrollablesRule'.
+[custom_lint] 2026-01-07T10:58:24.310280 class AvoidNestedScrollablesRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:24.310280       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:24.310280
+[custom_lint] 2026-01-07T10:58:24.310280
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-07T10:58:24.368648 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-07T10:58:24.368648 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-07T10:58:24.368648 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:24.368648
+[custom_lint] 2026-01-07T10:58:41.548058 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:12096:7: Error: 'RequireScrollControllerDisposeRule' is already declared in this scope.
+[custom_lint] 2026-01-07T10:58:41.548058 class RequireScrollControllerDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:41.548058       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:41.548058 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:8641:7: Context: Previous declaration of 'RequireScrollControllerDisposeRule'.
+[custom_lint] 2026-01-07T10:58:41.548058 class RequireScrollControllerDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:41.548058       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:41.548058 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:12202:7: Error: 'RequireFocusNodeDisposeRule' is already declared in this scope.
+[custom_lint] 2026-01-07T10:58:41.548058 class RequireFocusNodeDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:41.548058       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:41.548058 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:8801:7: Context: Previous declaration of 'RequireFocusNodeDisposeRule'.
+[custom_lint] 2026-01-07T10:58:41.548058 class RequireFocusNodeDisposeRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:41.548058       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:41.548058 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:11895:7: Error: 'AvoidNestedScrollablesRule' is already declared in this scope.
+[custom_lint] 2026-01-07T10:58:41.548058 class AvoidNestedScrollablesRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:41.548058       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:41.548058 /d:/src/saropa_lints/lib/src/rules/flutter_widget_rules.dart:9017:7: Context: Previous declaration of 'AvoidNestedScrollablesRule'.
+[custom_lint] 2026-01-07T10:58:41.548058 class AvoidNestedScrollablesRule extends SaropaLintRule {
+[custom_lint] 2026-01-07T10:58:41.548058       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-07T10:58:41.548058
+[custom_lint] 2026-01-07T10:58:41.548058
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-07T10:58:41.600956 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-07T10:58:41.600956 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
+[custom_lint] 2026-01-07T10:58:41.600956
