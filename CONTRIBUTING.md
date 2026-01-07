@@ -162,21 +162,31 @@ All rules should have quick fixes when feasible:
 
 ### 5. Add tests
 
-Create `test/rules/my_rule_test.dart`:
+Create a fixture file in `example/lib/<category>/`:
 
 ```dart
-void main() {
-  group('AvoidMyAntiPatternRule', () {
-    test('triggers on anti-pattern', () async {
-      // Test code
-    });
+// ignore_for_file: unused_local_variable
+// Test fixture for avoid_my_anti_pattern rule
 
-    test('passes on correct pattern', () async {
-      // Test code
-    });
-  });
+void testAvoidMyAntiPattern() {
+  // BAD: This triggers the lint
+  // expect_lint: avoid_my_anti_pattern
+  final bad = myAntiPattern();
+
+  // GOOD: This should NOT trigger any lint (no expect_lint comment)
+  final good = correctPattern();
 }
 ```
+
+Run the fixture tests:
+
+```bash
+cd example
+dart pub get
+dart run custom_lint
+```
+
+The `expect_lint` comments assert that a lint fires on the next line. If the lint doesn't fire, the test fails. If a lint fires without an `expect_lint` comment, that also fails.
 
 ## Rule Naming Conventions
 
@@ -186,6 +196,84 @@ void main() {
 | `prefer_` | Do this instead of alternatives | `prefer_const_constructors` |
 | `require_` | Must have this | `require_dispose` |
 | `no_` | Absolute prohibition | `no_empty_catch` |
+
+## Message Style Guide
+
+### Doc Header Format (Published to pub.dev)
+
+Every rule class must have a doc header that follows this format:
+
+```dart
+/// One-sentence summary of what this rule warns about.
+///
+/// [Optional 1-2 sentence explanation of why this matters - the consequence.]
+///
+/// **BAD:**
+/// ```dart
+/// // Code that triggers the lint
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Code that passes the lint
+/// ```
+class MyRule extends SaropaLintRule { ... }
+```
+
+**Requirements:**
+- First line: Clear, concise summary (no period if single sentence)
+- Include **BAD:** and **GOOD:** examples with working code
+- Examples should be minimal but complete enough to understand
+- If the rule has a quick fix, add `**Quick fix available:** [description]`
+
+### Problem Message Format
+
+The `problemMessage` appears in IDEs and tells developers what's wrong:
+
+```dart
+problemMessage: '[What is wrong]. [Why it matters/consequence].',
+```
+
+**Guidelines:**
+- Start with the specific issue detected (not "Avoid..." - that's the correction)
+- Include the consequence when not obvious
+- Keep under 80 characters when possible
+- Use concrete language, not vague warnings
+
+**Examples:**
+| BAD | GOOD |
+|-----|------|
+| `'Avoid using print.'` | `'print() found. Will appear in production logs.'` |
+| `'HTTP status should be checked.'` | `'HTTP response used without status check. Errors may be silently ignored.'` |
+| `'Class has too many responsibilities.'` | `'Class has too many members (>15 fields or >20 methods). Violates Single Responsibility.'` |
+
+### Correction Message Format
+
+The `correctionMessage` tells developers how to fix it:
+
+```dart
+correctionMessage: '[Specific action to take]. [Optional example].',
+```
+
+**Guidelines:**
+- Start with an imperative verb (Add, Use, Replace, Move, Wrap)
+- Include a concrete example when helpful
+- Show the fix pattern, not just "do it differently"
+
+**Examples:**
+| BAD | GOOD |
+|-----|------|
+| `'Use configuration constants.'` | `"Extract to config: Uri.parse('\${ApiConfig.baseUrl}/endpoint')."` |
+| `'Add a timeout.'` | `'Add .timeout(Duration(seconds: 30)) or configure in client options.'` |
+| `'Check the status code.'` | `'Check if (response.statusCode == 200) before parsing response.body.'` |
+
+### Message Checklist
+
+- [ ] Problem message explains WHAT is wrong and WHY it matters
+- [ ] Correction message explains HOW to fix with specific action
+- [ ] Both messages are under 100 characters
+- [ ] No vague language like "should", "consider", "may want to"
+- [ ] Includes concrete examples where helpful
 
 ## Commit Messages
 
@@ -198,13 +286,47 @@ docs: update README with new tier
 test: add tests for avoid_abc rule
 ```
 
+## Documentation Requirements
+
+**All documentation files must be referenced in README.md.** The README serves as the central hub for discoverability.
+
+### When adding a new document
+
+1. Create the `.md` file in the project root or `doc/` folder
+2. Add it to the Documentation table in README.md:
+   ```markdown
+   | [NEW_DOC.md](NEW_DOC.md) | Brief description |
+   ```
+
+### When adding stylistic rules
+
+Stylistic rules require extra documentation since they're not in any tier:
+
+1. Add the rule to `lib/src/rules/stylistic_rules.dart`
+2. Add to `lib/saropa_lints.dart` rule list
+3. **Update [STYLISTIC.md](STYLISTIC.md)**:
+   - Add to the Quick Reference table
+   - Add full documentation section with Pros/Cons and examples
+4. Update rule count in README.md and ROADMAP.md if needed
+
+### Documentation files
+
+| File | Purpose | Update when... |
+|------|---------|----------------|
+| README.md | Central hub, must reference all docs | Adding any new documentation |
+| STYLISTIC.md | Stylistic rule details | Adding/changing stylistic rules |
+| ROADMAP.md | Planned features | Implementing planned rules (remove from roadmap) |
+| CHANGELOG.md | Version history | Any release |
+| CONTRIBUTING.md | This file | Changing contribution process |
+
 ## Pull Request Checklist
 
 - [ ] Rule follows naming conventions
 - [ ] Added to appropriate tier(s)
 - [ ] Tests pass
-- [ ] Documentation updated
+- [ ] Documentation updated (see Documentation Requirements above)
 - [ ] CHANGELOG.md updated
+- [ ] If stylistic rule: STYLISTIC.md updated
 
 ## Questions?
 
