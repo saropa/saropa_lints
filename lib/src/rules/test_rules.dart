@@ -3,7 +3,9 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -80,7 +82,12 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Only check test files
-    if (!resolver.path.endsWith('_test.dart')) return;
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'group') return;
@@ -138,7 +145,9 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
   ) {
     // Only run in test files
     final String path = resolver.path;
-    if (!path.contains('_test.dart') && !path.contains('/test/')) {
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
       return;
     }
 
@@ -200,8 +209,8 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
 /// test('should return true when input is valid', () { });
 /// test('returns empty list for null input', () { });
 /// ```
-class FormatTestNameRule extends SaropaLintRule {
-  const FormatTestNameRule() : super(code: _code);
+class PreferDescriptiveTestNameRule extends SaropaLintRule {
+  const PreferDescriptiveTestNameRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_test_name',
@@ -335,6 +344,8 @@ class _TestCallFinder extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when expect() is used with a Future instead of expectLater().
+///
+/// **Quick fix available:** Replaces `expect` with `expectLater`.
 class PreferExpectLaterRule extends SaropaLintRule {
   const PreferExpectLaterRule() : super(code: _code);
 
@@ -352,7 +363,12 @@ class PreferExpectLaterRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Only check test files
-    if (!resolver.path.endsWith('_test.dart')) return;
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'expect') return;
@@ -368,6 +384,37 @@ class PreferExpectLaterRule extends SaropaLintRule {
       if (typeName.startsWith('Future')) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceExpectWithExpectLaterFix()];
+}
+
+class _ReplaceExpectWithExpectLaterFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'expect') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: "Replace 'expect' with 'expectLater'",
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.methodName.offset, node.methodName.length),
+          'expectLater',
+        );
+      });
     });
   }
 }
@@ -390,7 +437,12 @@ class PreferTestStructureRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Only check test files
-    if (!resolver.path.endsWith('_test.dart')) return;
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addCompilationUnit((CompilationUnit node) {
       bool hasMainFunction = false;
@@ -477,131 +529,40 @@ class PreferUniqueTestNamesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    final Set<String> testNames = <String>{};
-    final List<(StringLiteral, String)> duplicates =
-        <(StringLiteral, String)>[];
-
     context.registry.addCompilationUnit((CompilationUnit unit) {
-      testNames.clear();
-      duplicates.clear();
-    });
-
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-      if (methodName != 'test' && methodName != 'testWidgets') return;
-
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.isEmpty) return;
-
-      final Expression firstArg = args.arguments.first;
-      if (firstArg is! StringLiteral) return;
-
-      final String? testName = firstArg.stringValue;
-      if (testName == null) return;
-
-      if (testNames.contains(testName)) {
-        reporter.atNode(firstArg, code);
-      } else {
-        testNames.add(testName);
-      }
+      final visitor = _UniqueTestNameVisitor(reporter, code);
+      unit.accept(visitor);
     });
   }
 }
 
-/// Warns when a test body doesn't contain any assertions.
-///
-/// Example of **bad** code:
-/// ```dart
-/// test('example', () {
-///   final value = getValue();
-///   // No assertion!
-/// });
-/// ```
-///
-/// Example of **good** code:
-/// ```dart
-/// test('example', () {
-///   final value = getValue();
-///   expect(value, equals(42));
-/// });
-/// ```
-class MissingTestAssertionRule extends SaropaLintRule {
-  const MissingTestAssertionRule() : super(code: _code);
+class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
+  _UniqueTestNameVisitor(this.reporter, this.code);
 
-  static const LintCode _code = LintCode(
-    name: 'missing_test_assertion',
-    problemMessage: 'Test body has no assertions.',
-    correctionMessage: 'Add expect(), verify(), or other assertion calls.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  static const Set<String> _assertionMethods = <String>{
-    'expect',
-    'expectLater',
-    'verify',
-    'verifyNever',
-    'verifyInOrder',
-    'verifyNoMoreInteractions',
-    'fail',
-    'throwsA',
-    'throwsAssertionError',
-    'throwsArgumentError',
-    'throwsException',
-    'throwsStateError',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    // Only check test files
-    if (!resolver.path.endsWith('_test.dart')) return;
-
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-      if (methodName != 'test' && methodName != 'testWidgets') return;
-
-      final ArgumentList args = node.argumentList;
-      if (args.arguments.length < 2) return;
-
-      // Second argument should be the callback function
-      final Expression callback = args.arguments[1];
-      if (callback is! FunctionExpression) return;
-
-      final FunctionBody body = callback.body;
-
-      // Check if body contains any assertion calls
-      final bool hasAssertion = _containsAssertion(body);
-      if (!hasAssertion) {
-        reporter.atNode(node, code);
-      }
-    });
-  }
-
-  bool _containsAssertion(FunctionBody body) {
-    bool found = false;
-    body.visitChildren(
-      _AssertionFinder((String _) {
-        found = true;
-      }),
-    );
-    return found;
-  }
-}
-
-class _AssertionFinder extends RecursiveAstVisitor<void> {
-  _AssertionFinder(this.onFound);
-
-  final void Function(String) onFound;
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> _testNames = <String>{};
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (MissingTestAssertionRule._assertionMethods
-        .contains(node.methodName.name)) {
-      onFound(node.methodName.name);
+    final String methodName = node.methodName.name;
+    if (methodName == 'test' || methodName == 'testWidgets') {
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isNotEmpty) {
+        final Expression firstArg = args.arguments.first;
+        if (firstArg is StringLiteral) {
+          final String? testName = firstArg.stringValue;
+          if (testName != null) {
+            if (_testNames.contains(testName)) {
+              reporter.atNode(firstArg, code);
+            } else {
+              _testNames.add(testName);
+            }
+          }
+        }
+      }
     }
     super.visitMethodInvocation(node);
   }
 }
+

@@ -950,3 +950,317 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when textScaleFactor is set to 1.0, ignoring user accessibility settings.
+///
+/// Users with visual impairments rely on system text scaling to make text
+/// readable. Hardcoding textScaleFactor: 1.0 overrides their preferences.
+///
+/// **BAD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   textScaleFactor: 1.0, // Ignores accessibility settings!
+/// )
+/// MediaQuery(
+///   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+///   child: child,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text('Hello') // Respects system text scale
+/// // Or if you need to limit scaling:
+/// Text(
+///   'Hello',
+///   textScaleFactor: MediaQuery.of(context).textScaleFactor.clamp(1.0, 1.5),
+/// )
+/// ```
+class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
+  const AvoidTextScaleFactorIgnoreRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_text_scale_factor_ignore',
+    problemMessage:
+        'Setting textScaleFactor to 1.0 ignores user accessibility settings.',
+    correctionMessage:
+        'Remove textScaleFactor or use clamp() to limit scaling range.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'textScaleFactor') {
+            // Check if value is 1.0
+            final Expression value = arg.expression;
+            if (value is DoubleLiteral && value.value == 1.0) {
+              reporter.atNode(arg, code);
+            } else if (value is IntegerLiteral && value.value == 1) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+
+    // Also check for copyWith(textScaleFactor: 1.0)
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'copyWith') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'textScaleFactor') {
+            final Expression value = arg.expression;
+            if (value is DoubleLiteral && value.value == 1.0) {
+              reporter.atNode(arg, code);
+            } else if (value is IntegerLiteral && value.value == 1) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Image widget lacks a semanticLabel for screen readers.
+///
+/// Images without semanticLabel are invisible to screen readers, making
+/// content inaccessible to users with visual impairments. Use
+/// excludeFromSemantics: true only for purely decorative images.
+///
+/// **BAD:**
+/// ```dart
+/// Image.network('https://example.com/photo.jpg')
+/// Image.asset('assets/icon.png')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.network(
+///   'https://example.com/photo.jpg',
+///   semanticLabel: 'Profile photo of user',
+/// )
+/// // For decorative images:
+/// Image.asset(
+///   'assets/decoration.png',
+///   excludeFromSemantics: true,
+/// )
+/// ```
+class RequireImageSemanticsRule extends SaropaLintRule {
+  const RequireImageSemanticsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_semantics',
+    problemMessage:
+        'Image lacks semanticLabel. Screen readers cannot describe this image.',
+    correctionMessage:
+        "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+      if (constructorName != 'Image') return;
+
+      bool hasSemanticLabel = false;
+      bool isExcludedFromSemantics = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'semanticLabel') {
+            hasSemanticLabel = true;
+          }
+          if (name == 'excludeFromSemantics') {
+            if (arg.expression is BooleanLiteral) {
+              isExcludedFromSemantics =
+                  (arg.expression as BooleanLiteral).value;
+            }
+          }
+        }
+      }
+
+      if (!hasSemanticLabel && !isExcludedFromSemantics) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+
+    // Also check Image.network, Image.asset, Image.file, Image.memory
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      final Expression? target = node.target;
+
+      if (target is! SimpleIdentifier || target.name != 'Image') return;
+      if (!<String>{'network', 'asset', 'file', 'memory'}.contains(methodName)) {
+        return;
+      }
+
+      bool hasSemanticLabel = false;
+      bool isExcludedFromSemantics = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'semanticLabel') {
+            hasSemanticLabel = true;
+          }
+          if (name == 'excludeFromSemantics') {
+            if (arg.expression is BooleanLiteral) {
+              isExcludedFromSemantics =
+                  (arg.expression as BooleanLiteral).value;
+            }
+          }
+        }
+      }
+
+      if (!hasSemanticLabel && !isExcludedFromSemantics) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when interactive elements have excludeFromSemantics but also have tap handlers.
+///
+/// Elements with tap handlers that are excluded from semantics are completely
+/// inaccessible to screen reader users. This is a critical accessibility bug.
+///
+/// **BAD:**
+/// ```dart
+/// Semantics(
+///   excludeFromSemantics: true,
+///   child: GestureDetector(
+///     onTap: () => doSomething(),
+///     child: Icon(Icons.add),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Semantics(
+///   button: true,
+///   label: 'Add item',
+///   child: GestureDetector(
+///     onTap: () => doSomething(),
+///     child: Icon(Icons.add),
+///   ),
+/// )
+/// ```
+class AvoidHiddenInteractiveRule extends SaropaLintRule {
+  const AvoidHiddenInteractiveRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hidden_interactive',
+    problemMessage:
+        'Interactive element with excludeFromSemantics is inaccessible to screen readers.',
+    correctionMessage:
+        'Remove excludeFromSemantics or provide Semantics wrapper with label.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _interactiveWidgets = <String>{
+    'GestureDetector',
+    'InkWell',
+    'InkResponse',
+    'IconButton',
+    'TextButton',
+    'ElevatedButton',
+    'OutlinedButton',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+
+      // Check for ExcludeSemantics wrapping interactive widgets
+      if (constructorName == 'ExcludeSemantics') {
+        // Check if child contains interactive widget
+        bool hasInteractiveChild = false;
+        node.visitChildren(
+          _InteractiveChildVisitor((String name) {
+            if (_interactiveWidgets.contains(name)) {
+              hasInteractiveChild = true;
+            }
+          }),
+        );
+
+        if (hasInteractiveChild) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+
+      // Check for Semantics(excludeSemantics: true) with interactive child
+      if (constructorName == 'Semantics') {
+        bool hasExcludeSemantics = false;
+
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'excludeSemantics') {
+            if (arg.expression is BooleanLiteral) {
+              hasExcludeSemantics = (arg.expression as BooleanLiteral).value;
+            }
+          }
+        }
+
+        if (hasExcludeSemantics) {
+          bool hasInteractiveChild = false;
+          node.visitChildren(
+            _InteractiveChildVisitor((String name) {
+              if (_interactiveWidgets.contains(name)) {
+                hasInteractiveChild = true;
+              }
+            }),
+          );
+
+          if (hasInteractiveChild) {
+            reporter.atNode(node.constructorName, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+class _InteractiveChildVisitor extends RecursiveAstVisitor<void> {
+  _InteractiveChildVisitor(this.onFound);
+
+  final void Function(String) onFound;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String? name = node.constructorName.type.element?.name;
+    if (name != null) {
+      onFound(name);
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+}

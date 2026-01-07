@@ -83,6 +83,17 @@ const Set<String> essentialRules = <String>{
   // Widget Structure
   'avoid_nested_scaffolds',
   'avoid_multiple_material_apps',
+
+  // Animation (Essential - prevent crashes)
+  'require_vsync_mixin',
+  'require_animation_controller_dispose',
+
+  // Accessibility (Essential - critical errors)
+  'avoid_hidden_interactive',
+
+  // Navigation (Essential - prevent crashes)
+  'require_unknown_route_handler',
+  'avoid_context_after_navigation',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -114,10 +125,25 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_gesture_only_interactions',
   'avoid_color_only_indicators',
   'avoid_small_touch_targets',
+  'avoid_text_scale_factor_ignore',
+  'require_image_semantics',
 
   // State Management
   'require_notify_listeners',
   'avoid_bloc_event_in_constructor',
+  'avoid_provider_recreate',
+
+  // Animation
+  'avoid_animation_in_build',
+  'require_hero_tag_uniqueness',
+
+  // Security
+  'prefer_secure_random',
+  'require_secure_keyboard',
+
+  // Firebase/Database
+  'avoid_firestore_unbounded_query',
+  'avoid_database_in_build',
 
   // Error Handling
   'avoid_generic_exceptions',
@@ -240,6 +266,8 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_stateful_without_state',
   'avoid_global_riverpod_providers',
   'prefer_consumer_widget',
+  'avoid_provider_of_in_build',
+  'avoid_get_find_in_build',
 
   // Error Handling
   'require_error_context',
@@ -262,6 +290,18 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_repaint_boundary_misuse',
   'avoid_gesture_detector_in_scrollview',
   'prefer_opacity_widget',
+  'avoid_layout_passes',
+  'prefer_typed_data',
+  'avoid_unnecessary_to_list',
+
+  // Forms/UX
+  'prefer_autovalidate_on_interaction',
+  'require_keyboard_type',
+  'require_text_overflow_in_row',
+
+  // Platform/Storage
+  'require_prefs_key_constants',
+  'avoid_secure_storage_on_web',
 
   // Testing
   'avoid_vague_test_descriptions',

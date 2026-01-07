@@ -99,14 +99,14 @@ class _AddHackCommentForSwallowedExceptionFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for unhandled exception',
+        message: 'Add TODO comment for unhandled exception',
         priority: 2,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: handle or log this exception\n    ',
+          '// TODO: handle or log this exception\n    ',
         );
       });
     });

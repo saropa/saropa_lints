@@ -1644,14 +1644,14 @@ class _AddHackForDoubleSlashImportFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for double slash import',
+        message: 'Add TODO comment for double slash import',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: remove extra slash from import path\n',
+          '// TODO: remove extra slash from import path\n',
         );
       });
     });
@@ -1671,14 +1671,14 @@ class _AddHackForDuplicateExportFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for duplicate export',
+        message: 'Add TODO comment for duplicate export',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: remove this duplicate export\n',
+          '// TODO: remove this duplicate export\n',
         );
       });
     });
@@ -1703,14 +1703,14 @@ class _AddHackForDuplicateMixinFix extends DartFix {
         if (!mixin.sourceRange.intersects(analysisError.sourceRange)) continue;
 
         final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-          message: 'Add HACK comment for duplicate mixin',
+          message: 'Add TODO comment for duplicate mixin',
           priority: 1,
         );
 
         changeBuilder.addDartFileEdit((builder) {
           builder.addSimpleInsertion(
             mixin.offset,
-            '/* HACK: duplicate mixin */ ',
+            '/* TODO: duplicate mixin */ ',
           );
         });
         return;
@@ -1732,14 +1732,14 @@ class _AddHackForDuplicateNamedImportFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for duplicate import',
+        message: 'Add TODO comment for duplicate import',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: use single import with one prefix\n',
+          '// TODO: use single import with one prefix\n',
         );
       });
     });
@@ -1760,14 +1760,14 @@ class _AddHackForGlobalStateFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for mutable global',
+        message: 'Add TODO comment for mutable global',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: make const/final or encapsulate in class\n',
+          '// TODO: make const/final or encapsulate in class\n',
         );
       });
     });

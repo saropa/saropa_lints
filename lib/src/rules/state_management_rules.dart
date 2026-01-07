@@ -235,10 +235,10 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackForStreamControllerDisposeFix()];
+  List<Fix> getFixes() => <Fix>[_AddTodoForStreamControllerDisposeFix()];
 }
 
-class _AddHackForStreamControllerDisposeFix extends DartFix {
+class _AddTodoForStreamControllerDisposeFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -251,14 +251,14 @@ class _AddHackForStreamControllerDisposeFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for missing StreamController close',
+        message: 'Add TODO comment for missing StreamController close',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: close this StreamController in dispose()\n',
+          '// TODO: close this StreamController in dispose()\n',
         );
       });
     });
@@ -641,10 +641,10 @@ class RequireMountedCheckRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackForMountedCheckFix()];
+  List<Fix> getFixes() => <Fix>[_AddMountedCheckFix()];
 }
 
-class _AddHackForMountedCheckFix extends DartFix {
+class _AddMountedCheckFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -658,14 +658,14 @@ class _AddHackForMountedCheckFix extends DartFix {
       if (node.methodName.name != 'setState') return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for missing mounted check',
+        message: 'Add mounted check before setState',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: add "if (!mounted) return;" before this setState\n',
+          'if (!mounted) return;\n    ',
         );
       });
     });
@@ -1094,10 +1094,10 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackForGlobalKeyInBuildFix()];
+  List<Fix> getFixes() => <Fix>[_AddTodoForGlobalKeyInBuildFix()];
 }
 
-class _AddHackForGlobalKeyInBuildFix extends DartFix {
+class _AddTodoForGlobalKeyInBuildFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -1112,14 +1112,14 @@ class _AddHackForGlobalKeyInBuildFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add HACK comment for GlobalKey in build',
+        message: 'Add TODO comment for GlobalKey in build',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// HACK: move this GlobalKey to a class field\n',
+          '// TODO: move this GlobalKey to a class field\n',
         );
       });
     });
@@ -1793,5 +1793,268 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
         reporter.atToken(node.name, code);
       }
     });
+  }
+}
+
+/// Warns when Provider.of is used inside build() without listen: false.
+///
+/// Using Provider.of(context) in build() with listen: true (default) causes
+/// the widget to rebuild whenever the provider changes. If you only need
+/// the value once without rebuilding, use listen: false or context.read().
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final user = Provider.of<User>(context); // Rebuilds on every change
+///   return ElevatedButton(
+///     onPressed: () => user.logout(),
+///     child: Text('Logout'),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return ElevatedButton(
+///     onPressed: () => context.read<User>().logout(),
+///     child: Text('Logout'),
+///   );
+/// }
+/// // Or if you need reactive updates:
+/// Widget build(BuildContext context) {
+///   final userName = context.watch<User>().name;
+///   return Text(userName);
+/// }
+/// ```
+class AvoidProviderOfInBuildRule extends SaropaLintRule {
+  const AvoidProviderOfInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_provider_of_in_build',
+    problemMessage:
+        'Provider.of in build() causes rebuilds. Use context.read() for actions.',
+    correctionMessage:
+        'Use context.watch() for reactive UI or context.read() in callbacks.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      node.body.visitChildren(_ProviderOfVisitor(reporter, code));
+    });
+  }
+}
+
+class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
+  _ProviderOfVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Check for Provider.of(context) pattern
+    final String methodName = node.methodName.name;
+    if (methodName != 'of') {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    final Expression? target = node.target;
+    if (target is! SimpleIdentifier || target.name != 'Provider') {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    // Check if listen: false is specified
+    bool hasListenFalse = false;
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'listen') {
+        if (arg.expression is BooleanLiteral) {
+          hasListenFalse = !(arg.expression as BooleanLiteral).value;
+        }
+      }
+    }
+
+    if (!hasListenFalse) {
+      reporter.atNode(node, code);
+    }
+
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when Get.find() is used inside build() method.
+///
+/// Get.find() in build() fetches the controller on every rebuild. If the
+/// controller doesn't exist, it throws an error. Use GetBuilder or Obx
+/// for reactive updates instead.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final controller = Get.find<MyController>(); // Called on every rebuild
+///   return Text(controller.value.toString());
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return GetBuilder<MyController>(
+///     builder: (controller) => Text(controller.value.toString()),
+///   );
+/// }
+/// // Or with Obx:
+/// Widget build(BuildContext context) {
+///   return Obx(() => Text(controller.value.toString()));
+/// }
+/// ```
+class AvoidGetFindInBuildRule extends SaropaLintRule {
+  const AvoidGetFindInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_get_find_in_build',
+    problemMessage:
+        'Get.find() in build() is inefficient. Use GetBuilder or Obx instead.',
+    correctionMessage:
+        'Use GetBuilder<T> or Obx for reactive updates with GetX.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      node.body.visitChildren(_GetFindVisitor(reporter, code));
+    });
+  }
+}
+
+class _GetFindVisitor extends RecursiveAstVisitor<void> {
+  _GetFindVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName != 'find') {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier && target.name == 'Get') {
+      reporter.atNode(node, code);
+    }
+
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when ChangeNotifier or Provider is created inside build().
+///
+/// Creating providers inside build() creates new instances on every rebuild,
+/// losing state and causing performance issues. Providers should be created
+/// once and reused.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return ChangeNotifierProvider(
+///     create: (_) => MyNotifier(), // New instance on every rebuild!
+///     child: MyWidget(),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Create providers above the widget that rebuilds
+/// class MyApp extends StatelessWidget {
+///   Widget build(BuildContext context) {
+///     return ChangeNotifierProvider(
+///       create: (_) => MyNotifier(),
+///       child: MaterialApp(...),
+///     );
+///   }
+/// }
+/// ```
+class AvoidProviderRecreateRule extends SaropaLintRule {
+  const AvoidProviderRecreateRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_provider_recreate',
+    problemMessage:
+        'Provider created in frequently rebuilding build() loses state.',
+    correctionMessage:
+        'Move Provider creation to a parent widget that does not rebuild often.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      // Check if this is a StatefulWidget's State class
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+
+      final ExtendsClause? extendsClause = classDecl.extendsClause;
+      if (extendsClause == null) return;
+
+      // Only warn in State classes (frequent rebuilds via setState)
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'State') return;
+
+      node.body.visitChildren(_ProviderRecreateVisitor(reporter, code));
+    });
+  }
+}
+
+class _ProviderRecreateVisitor extends RecursiveAstVisitor<void> {
+  _ProviderRecreateVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  static const Set<String> _providerWidgets = <String>{
+    'ChangeNotifierProvider',
+    'Provider',
+    'FutureProvider',
+    'StreamProvider',
+    'StateNotifierProvider',
+    'BlocProvider',
+    'RepositoryProvider',
+  };
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String? typeName = node.constructorName.type.element?.name;
+    if (typeName != null && _providerWidgets.contains(typeName)) {
+      reporter.atNode(node.constructorName, code);
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
