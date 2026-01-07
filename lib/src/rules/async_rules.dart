@@ -1021,3 +1021,202 @@ class _AddHackForUnassignedSubscriptionFix extends DartFix {
     });
   }
 }
+
+/// Warns when VoidCallback is used for a callback that might be async.
+///
+/// Using `VoidCallback` for handlers that perform async operations silently
+/// discards the `Future`, which can hide exceptions and make it impossible
+/// to await completion.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   final VoidCallback? onSubmit;  // Might perform async operations
+///   final VoidCallback? onSave;    // Suggests data persistence (async)
+///   final VoidCallback? onLoad;    // Suggests data loading (async)
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   final AsyncCallback? onSubmit;  // Can await and handle errors
+///   final AsyncCallback? onSave;
+///   final AsyncCallback? onLoad;
+/// }
+/// ```
+///
+/// **Quick fix available:** Changes VoidCallback to AsyncCallback.
+class PreferAsyncCallbackRule extends SaropaLintRule {
+  const PreferAsyncCallbackRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_async_callback',
+    problemMessage:
+        'VoidCallback used for potentially async operation. Future will be silently discarded.',
+    correctionMessage:
+        'Use AsyncCallback (Future<void> Function()) to properly handle async operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  bool get skipFixtureFiles => false;
+
+  /// Callback names that strongly suggest async behavior.
+  static const Set<String> _asyncSuggestingNames = <String>{
+    // Data operations
+    'onSubmit',
+    'onSave',
+    'onLoad',
+    'onFetch',
+    'onRefresh',
+    'onSync',
+    'onUpload',
+    'onDownload',
+
+    // Network operations
+    'onSend',
+    'onRequest',
+    'onLogin',
+    'onLogout',
+    'onSignIn',
+    'onSignOut',
+    'onAuthenticate',
+    'onRegister',
+
+    // Database operations
+    'onDelete',
+    'onUpdate',
+    'onInsert',
+    'onCreate',
+
+    // File operations
+    'onExport',
+    'onImport',
+    'onBackup',
+    'onRestore',
+
+    // Processing
+    'onProcess',
+    'onValidate',
+    'onConfirm',
+    'onComplete',
+    'onFinish',
+  };
+
+  /// Prefixes that suggest async behavior when combined with other words.
+  static const Set<String> _asyncSuggestingPrefixes = <String>{
+    'onSubmit',
+    'onSave',
+    'onLoad',
+    'onFetch',
+    'onRefresh',
+    'onSync',
+    'onUpload',
+    'onDownload',
+    'onSend',
+    'onDelete',
+    'onUpdate',
+    'onLogin',
+    'onLogout',
+    'onExport',
+    'onImport',
+  };
+
+  bool _isAsyncSuggestingName(String name) {
+    // Direct match
+    if (_asyncSuggestingNames.contains(name)) return true;
+
+    // Check if name starts with an async-suggesting prefix
+    // (e.g., onSubmitForm, onSaveData, onLoadUser)
+    for (final String prefix in _asyncSuggestingPrefixes) {
+      if (name.startsWith(prefix) && name.length > prefix.length) {
+        // Check that next char is uppercase (proper camelCase)
+        final String nextChar = name[prefix.length];
+        if (nextChar == nextChar.toUpperCase() && nextChar != nextChar.toLowerCase()) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  bool _isVoidCallback(TypeAnnotation? type) {
+    if (type == null) return false;
+    final String typeStr = type.toSource();
+    return typeStr == 'VoidCallback' || typeStr == 'VoidCallback?';
+  }
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check field declarations
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      final VariableDeclarationList fields = node.fields;
+      final TypeAnnotation? type = fields.type;
+
+      if (!_isVoidCallback(type)) return;
+
+      for (final VariableDeclaration variable in fields.variables) {
+        final String name = variable.name.lexeme;
+        if (_isAsyncSuggestingName(name)) {
+          reporter.atNode(type!, code);
+          break; // Only report once per declaration
+        }
+      }
+    });
+
+    // Check parameter declarations (in constructors and functions)
+    context.registry.addSimpleFormalParameter((SimpleFormalParameter node) {
+      final TypeAnnotation? type = node.type;
+      if (!_isVoidCallback(type)) return;
+
+      final Token? nameToken = node.name;
+      if (nameToken == null) return;
+
+      final String name = nameToken.lexeme;
+      if (_isAsyncSuggestingName(name)) {
+        reporter.atNode(type!, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ChangeToAsyncCallbackFix()];
+}
+
+class _ChangeToAsyncCallbackFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addNamedType((NamedType node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String source = node.toSource();
+      if (source != 'VoidCallback' && source != 'VoidCallback?') return;
+
+      final bool isNullable = source.endsWith('?');
+      final String replacement = isNullable ? 'AsyncCallback?' : 'AsyncCallback';
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Change to $replacement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(node.sourceRange, replacement);
+      });
+    });
+  }
+}

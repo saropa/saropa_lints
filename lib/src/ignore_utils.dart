@@ -51,9 +51,32 @@ class IgnoreUtils {
   /// ```dart
   /// stream.listen((_) {}); // ignore: no-empty-block
   /// ```
+  ///
+  /// Special handling for CatchClause: also checks the token immediately
+  /// before the catch clause (typically the `}` of the try block):
+  /// ```dart
+  /// try {
+  ///   // code
+  /// // ignore: avoid_swallowing_exceptions
+  /// } on Exception catch (e) {
+  ///   // empty
+  /// }
+  /// ```
   static bool hasIgnoreComment(AstNode node, String ruleName) {
     // Check the node's own begin token
     if (hasIgnoreCommentOnToken(node.beginToken, ruleName)) return true;
+
+    // Special case for CatchClause: check the token before the catch clause
+    // This handles the pattern where ignore comment is placed before the `}`
+    // that closes the try block body:
+    //   // ignore: rule
+    //   } on Exception catch (e) { ... }
+    if (node is CatchClause) {
+      final Token? prevToken = node.beginToken.previous;
+      if (prevToken != null && hasIgnoreCommentOnToken(prevToken, ruleName)) {
+        return true;
+      }
+    }
 
     // Walk up the parent chain to find comments on ancestor expressions
     AstNode? current = node.parent;

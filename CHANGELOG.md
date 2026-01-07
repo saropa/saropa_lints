@@ -5,6 +5,65 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-01-07
+
+### Added
+
+- **4 new lint rules**:
+
+  **Async Rules (1)**:
+  - `prefer_async_callback` - Warns when `VoidCallback` is used for potentially async operations (onSubmit, onSave, onLoad, etc.). Discarded Futures hide exceptions. (quick-fix) [Professional tier]
+
+  **Naming & Style Rules (2)**:
+  - `prefer_boolean_prefixes_for_locals` - Local boolean variables should use is/has/can/should prefix [Comprehensive tier]
+  - `prefer_boolean_prefixes_for_params` - Boolean parameters should use is/has/can/should prefix [Professional tier]
+
+  **Security Rules (1)**:
+  - `avoid_generic_key_in_url` - Stricter variant that catches generic `key=` and `auth=` URL parameters (higher false positive rate) [Insanity tier]
+
+- **VS Code extension** - Optional status bar button for running custom_lint (see README for installation)
+
+### Changed
+
+- `prefer_boolean_prefixes` - **Reduced scope**: Now only checks class fields and top-level variables. Local variables and parameters are handled by the new separate rules for gradual adoption.
+
+- `avoid_token_in_url` - Removed generic `auth` and `key` patterns to reduce false positives. These are now in `avoid_generic_key_in_url` for stricter codebases.
+
+- `require_scroll_controller_dispose` - Now recognizes iteration-based disposal patterns:
+  - `for (final c in _controllers) { c.dispose(); }` - for-in loop disposal
+  - `for (final c in _controllers.values) { c.dispose(); }` - Map values disposal
+
+- `require_database_close` - Fixed word boundary detection to avoid false positives on method names containing database keywords (e.g., `initIsarDatabase`)
+
+**False positive reductions** in 4 rules:
+
+- `avoid_commented_out_code` - Now skips annotation markers (TODO, FIXME, NOTE, HACK, BUG, OPTIMIZE, WARNING, CHANGED, REVIEW, DEPRECATED, IMPORTANT, MARK)
+
+- `format_comment_formatting` - Consolidated annotation marker detection using single regex pattern
+
+- `prefer_sentence_case_comments` - Now detects and skips commented-out code:
+  - Dart keywords (return, if, for, while, class, import, etc.)
+  - Code constructs (function calls, assignments, operators)
+  - Code symbols (brackets, braces, increment/decrement, ternary)
+
+- `prefer_doc_comments_over_regular` - Now skips:
+  - Annotation markers (TODO, FIXME, NOTE, HACK, etc.)
+  - Commented-out code (type declarations, control flow, imports)
+
+### Fixed
+
+- **Ignore comment handling for catch clauses** - Comments placed before the closing `}` of a try block now properly suppress warnings on the catch clause:
+  ```dart
+  try {
+    // code
+  // ignore: avoid_swallowing_exceptions
+  } on Exception catch (e) {
+    // empty
+  }
+  ```
+
+- `avoid_unsafe_where_methods` - Removed debug print statements from quick fix
+
 ## [1.3.1] - 2025-01-06
 
 ### Fixed

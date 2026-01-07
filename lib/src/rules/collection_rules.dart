@@ -986,7 +986,7 @@ class _UseWhereOrNullFix extends DartFix {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_replacements.containsKey(methodName)) return;
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
 
       final String? replacement = _replacements[methodName];
       if (replacement == null) return;

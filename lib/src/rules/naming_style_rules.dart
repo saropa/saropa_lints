@@ -432,18 +432,30 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   }
 }
 
-/// Warns when boolean prefixes are missing (is/has/can/should/will/did).
+/// Warns when boolean field prefixes are missing (is/has/can/should/will/did).
+///
+/// This rule only checks class fields and top-level variables, not local
+/// variables inside functions/methods. Local variables are implementation
+/// details and don't need strict naming conventions.
 ///
 /// Example of **bad** code:
 /// ```dart
-/// bool enabled = true;
-/// bool visible = false;
+/// class MyClass {
+///   bool enabled = true;  // Should be isEnabled
+///   bool visible = false; // Should be isVisible
+/// }
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// bool isEnabled = true;
-/// bool isVisible = false;
+/// class MyClass {
+///   bool isEnabled = true;
+///   bool isVisible = false;
+/// }
+///
+/// void myFunction() {
+///   bool enabled = true; // OK - local variable
+/// }
 /// ```
 class PreferBooleanPrefixesRule extends SaropaLintRule {
   const PreferBooleanPrefixesRule() : super(code: _code);
@@ -486,22 +498,39 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      // Check if it's a bool type
-      final AstNode? parent = node.parent;
-      if (parent is! VariableDeclarationList) return;
-
-      final TypeAnnotation? type = parent.type;
+    // Only check field declarations (class members)
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      final TypeAnnotation? type = node.fields.type;
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
 
-      final String name = node.name.lexeme;
-      // Skip private variables (starting with _)
-      final String checkName =
-          name.startsWith('_') ? name.replaceFirst('_', '') : name;
+      for (final VariableDeclaration variable in node.fields.variables) {
+        final String name = variable.name.lexeme;
+        // Skip private variables (starting with _)
+        final String checkName =
+            name.startsWith('_') ? name.replaceFirst('_', '') : name;
 
-      if (!_hasValidPrefix(checkName)) {
-        reporter.atNode(node, code);
+        if (!_hasValidPrefix(checkName)) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+
+    // Also check top-level variables
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      final TypeAnnotation? type = node.variables.type;
+      if (type is! NamedType) return;
+      if (type.name.lexeme != 'bool') return;
+
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final String name = variable.name.lexeme;
+        final String checkName =
+            name.startsWith('_') ? name.replaceFirst('_', '') : name;
+
+        if (!_hasValidPrefix(checkName)) {
+          reporter.atNode(variable, code);
+        }
       }
     });
   }
@@ -511,6 +540,238 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     for (final String prefix in _validPrefixes) {
       if (lowerName.startsWith(prefix)) {
         // Make sure it's a prefix, not just starts with those letters
+        if (name.length > prefix.length) {
+          final String nextChar = name[prefix.length];
+          if (nextChar == nextChar.toUpperCase() || nextChar == '_') {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+}
+
+/// Warns when local boolean variables are missing prefixes.
+///
+/// This rule only checks local variables inside functions/methods.
+/// Enable this separately from [PreferBooleanPrefixesRule] for gradual adoption.
+///
+/// Example of **bad** code:
+/// ```dart
+/// void myFunction() {
+///   bool enabled = true;  // Should be isEnabled
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// void myFunction() {
+///   bool isEnabled = true;
+/// }
+/// ```
+class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
+  const PreferBooleanPrefixesForLocalsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_boolean_prefixes_for_locals',
+    problemMessage:
+        'Local boolean variable should have a prefix (is/has/can/should/will/did).',
+    correctionMessage:
+        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const List<String> _validPrefixes = <String>[
+    'is',
+    'has',
+    'can',
+    'should',
+    'will',
+    'did',
+    'was',
+    'are',
+    'does',
+    'do',
+    'allow',
+    'enable',
+    'disable',
+    'show',
+    'hide',
+    'use',
+    'need',
+    'require',
+    'include',
+    'exclude',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclarationStatement(
+        (VariableDeclarationStatement node) {
+      final TypeAnnotation? type = node.variables.type;
+      if (type is! NamedType) return;
+      if (type.name.lexeme != 'bool') return;
+
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final String name = variable.name.lexeme;
+        final String checkName =
+            name.startsWith('_') ? name.replaceFirst('_', '') : name;
+
+        if (!_hasValidPrefix(checkName)) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+  }
+
+  bool _hasValidPrefix(String name) {
+    final String lowerName = name.toLowerCase();
+    for (final String prefix in _validPrefixes) {
+      if (lowerName.startsWith(prefix)) {
+        if (name.length > prefix.length) {
+          final String nextChar = name[prefix.length];
+          if (nextChar == nextChar.toUpperCase() || nextChar == '_') {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+}
+
+/// Warns when boolean parameters are missing prefixes.
+///
+/// This rule only checks function/method/constructor parameters.
+/// Enable this separately from [PreferBooleanPrefixesRule] for gradual adoption.
+///
+/// Example of **bad** code:
+/// ```dart
+/// void setVisibility(bool visible) { ... }
+/// MyWidget({required bool enabled}) { ... }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// void setVisibility({required bool isVisible}) { ... }
+/// MyWidget({required bool isEnabled}) { ... }
+/// ```
+class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
+  const PreferBooleanPrefixesForParamsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_boolean_prefixes_for_params',
+    problemMessage:
+        'Boolean parameter should have a prefix (is/has/can/should/will/did).',
+    correctionMessage:
+        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const List<String> _validPrefixes = <String>[
+    'is',
+    'has',
+    'can',
+    'should',
+    'will',
+    'did',
+    'was',
+    'are',
+    'does',
+    'do',
+    'allow',
+    'enable',
+    'disable',
+    'show',
+    'hide',
+    'use',
+    'need',
+    'require',
+    'include',
+    'exclude',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check function declarations
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkParameters(node.functionExpression.parameters, reporter);
+    });
+
+    // Check method declarations
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkParameters(node.parameters, reporter);
+    });
+
+    // Check constructor declarations
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      _checkParameters(node.parameters, reporter);
+    });
+  }
+
+  void _checkParameters(
+      FormalParameterList? parameters, SaropaDiagnosticReporter reporter) {
+    if (parameters == null) return;
+
+    for (final FormalParameter param in parameters.parameters) {
+      _checkParameter(param, reporter);
+    }
+  }
+
+  void _checkParameter(FormalParameter param, SaropaDiagnosticReporter reporter) {
+    TypeAnnotation? typeAnnotation;
+    String? paramName;
+    Token? nameToken;
+
+    if (param is SimpleFormalParameter) {
+      typeAnnotation = param.type;
+      paramName = param.name?.lexeme;
+      nameToken = param.name;
+    } else if (param is DefaultFormalParameter) {
+      final FormalParameter innerParam = param.parameter;
+      if (innerParam is SimpleFormalParameter) {
+        typeAnnotation = innerParam.type;
+        paramName = innerParam.name?.lexeme;
+        nameToken = innerParam.name;
+      }
+    } else if (param is FieldFormalParameter) {
+      // this.field parameters - check if bool type
+      typeAnnotation = param.type;
+      paramName = param.name.lexeme;
+      nameToken = param.name;
+    } else if (param is SuperFormalParameter) {
+      typeAnnotation = param.type;
+      paramName = param.name.lexeme;
+      nameToken = param.name;
+    }
+
+    if (typeAnnotation == null || paramName == null || nameToken == null) return;
+
+    // Check if it's a bool type
+    if (typeAnnotation is! NamedType) return;
+    if (typeAnnotation.name.lexeme != 'bool') return;
+
+    final String checkName =
+        paramName.startsWith('_') ? paramName.replaceFirst('_', '') : paramName;
+
+    if (!_hasValidPrefix(checkName)) {
+      reporter.atToken(nameToken, code);
+    }
+  }
+
+  bool _hasValidPrefix(String name) {
+    final String lowerName = name.toLowerCase();
+    for (final String prefix in _validPrefixes) {
+      if (lowerName.startsWith(prefix)) {
         if (name.length > prefix.length) {
           final String nextChar = name[prefix.length];
           if (nextChar == nextChar.toUpperCase() || nextChar == '_') {
