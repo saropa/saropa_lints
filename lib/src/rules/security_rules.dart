@@ -1141,7 +1141,8 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_generic_key_in_url',
-    problemMessage: 'Generic key/auth parameter in URL may contain sensitive data.',
+    problemMessage:
+        'Generic key/auth parameter in URL may contain sensitive data.',
     correctionMessage:
         'Consider using Authorization header instead of URL parameters.',
     errorSeverity: DiagnosticSeverity.WARNING,

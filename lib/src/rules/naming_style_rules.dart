@@ -470,26 +470,75 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   );
 
   static const List<String> _validPrefixes = <String>[
-    'is',
-    'has',
-    'can',
-    'should',
-    'will',
-    'did',
-    'was',
-    'are',
-    'does',
-    'do',
+    'add',
     'allow',
-    'enable',
+    'animate',
+    'apply',
+    'are',
+    'auto',
+    'block',
+    'cached',
+    'can',
+    'collapse',
+    'default',
+    'did',
     'disable',
-    'show',
-    'hide',
-    'use',
-    'need',
-    'require',
-    'include',
+    'do',
+    'does',
+    'enable',
     'exclude',
+    'expand',
+    'filter',
+    'force',
+    'has',
+    'hide',
+    'ignore',
+    'include',
+    'is',
+    'keep',
+    'load',
+    'lock',
+    'log',
+    'merge',
+    'mute',
+    'need',
+    'pin',
+    'play',
+    'prefer',
+    'remove',
+    'require',
+    'reverse',
+    'save',
+    'send',
+    'should',
+    'show',
+    'skip',
+    'sort',
+    'split',
+    'support',
+    'sync',
+    'track',
+    'trim',
+    'use',
+    'validate',
+    'was',
+    'will',
+    'wrap',
+  ];
+
+  static const List<String> _validSuffixes = <String>[
+    'Active',
+    'Checked',
+    'Disabled',
+    'Enabled',
+    'Hidden',
+    'Loaded',
+    'Loading',
+    'Required',
+    'Selected',
+    'Valid',
+    'Visibility',
+    'Visible',
   ];
 
   @override
@@ -506,11 +555,11 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 
       for (final VariableDeclaration variable in node.fields.variables) {
         final String name = variable.name.lexeme;
-        // Skip private variables (starting with _)
+        // Strip leading underscore for checking
         final String checkName =
-            name.startsWith('_') ? name.replaceFirst('_', '') : name;
+            name.startsWith('_') ? name.substring(1) : name;
 
-        if (!_hasValidPrefix(checkName)) {
+        if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable, code);
         }
       }
@@ -526,13 +575,28 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
         final String checkName =
-            name.startsWith('_') ? name.replaceFirst('_', '') : name;
+            name.startsWith('_') ? name.substring(1) : name;
 
-        if (!_hasValidPrefix(checkName)) {
+        if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable, code);
         }
       }
     });
+  }
+
+  /// Exact names allowed without prefix/suffix validation.
+  ///
+  /// These are standard Flutter naming conventions that would be
+  /// unnecessarily pedantic to flag:
+  /// - `value`: Used by Checkbox, Switch, ToggleButton, Radio widgets
+  static const Set<String> _allowedExactNames = <String>{
+    'value',
+  };
+
+  bool _hasValidBooleanName(String name) {
+    return _allowedExactNames.contains(name) ||
+        _hasValidPrefix(name) ||
+        _hasValidSuffix(name);
   }
 
   bool _hasValidPrefix(String name) {
@@ -550,17 +614,28 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     }
     return false;
   }
+
+  bool _hasValidSuffix(String name) {
+    for (final String suffix in _validSuffixes) {
+      if (name.endsWith(suffix)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
-/// Warns when local boolean variables are missing prefixes.
+/// Warns when local boolean variables are missing prefixes or suffixes.
 ///
 /// This rule only checks local variables inside functions/methods.
 /// Enable this separately from [PreferBooleanPrefixesRule] for gradual adoption.
 ///
+/// Variables with leading underscores are checked after stripping the underscore.
+///
 /// Example of **bad** code:
 /// ```dart
 /// void myFunction() {
-///   bool enabled = true;  // Should be isEnabled
+///   bool status = true;  // Should be isEnabled, hasStatus, etc.
 /// }
 /// ```
 ///
@@ -568,6 +643,8 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 /// ```dart
 /// void myFunction() {
 ///   bool isEnabled = true;
+///   bool _deviceEnabled = false; // OK - ends with Enabled
+///   bool defaultHideIcons = true; // OK - default prefix + Hide
 /// }
 /// ```
 class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
@@ -583,26 +660,75 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   );
 
   static const List<String> _validPrefixes = <String>[
-    'is',
-    'has',
-    'can',
-    'should',
-    'will',
-    'did',
-    'was',
-    'are',
-    'does',
-    'do',
+    'add',
     'allow',
-    'enable',
+    'animate',
+    'apply',
+    'are',
+    'auto',
+    'block',
+    'cached',
+    'can',
+    'collapse',
+    'default',
+    'did',
     'disable',
-    'show',
-    'hide',
-    'use',
-    'need',
-    'require',
-    'include',
+    'do',
+    'does',
+    'enable',
     'exclude',
+    'expand',
+    'filter',
+    'force',
+    'has',
+    'hide',
+    'ignore',
+    'include',
+    'is',
+    'keep',
+    'load',
+    'lock',
+    'log',
+    'merge',
+    'mute',
+    'need',
+    'pin',
+    'play',
+    'prefer',
+    'remove',
+    'require',
+    'reverse',
+    'save',
+    'send',
+    'should',
+    'show',
+    'skip',
+    'sort',
+    'split',
+    'support',
+    'sync',
+    'track',
+    'trim',
+    'use',
+    'validate',
+    'was',
+    'will',
+    'wrap',
+  ];
+
+  static const List<String> _validSuffixes = <String>[
+    'Active',
+    'Checked',
+    'Disabled',
+    'Enabled',
+    'Hidden',
+    'Loaded',
+    'Loading',
+    'Required',
+    'Selected',
+    'Valid',
+    'Visibility',
+    'Visible',
   ];
 
   @override
@@ -611,22 +737,38 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addVariableDeclarationStatement(
-        (VariableDeclarationStatement node) {
+    context.registry
+        .addVariableDeclarationStatement((VariableDeclarationStatement node) {
       final TypeAnnotation? type = node.variables.type;
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
 
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
+        // Strip leading underscore for checking
         final String checkName =
-            name.startsWith('_') ? name.replaceFirst('_', '') : name;
+            name.startsWith('_') ? name.substring(1) : name;
 
-        if (!_hasValidPrefix(checkName)) {
+        if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable, code);
         }
       }
     });
+  }
+
+  /// Exact names allowed without prefix/suffix validation.
+  ///
+  /// These are standard Flutter naming conventions that would be
+  /// unnecessarily pedantic to flag:
+  /// - `value`: Used by Checkbox, Switch, ToggleButton, Radio widgets
+  static const Set<String> _allowedExactNames = <String>{
+    'value',
+  };
+
+  bool _hasValidBooleanName(String name) {
+    return _allowedExactNames.contains(name) ||
+        _hasValidPrefix(name) ||
+        _hasValidSuffix(name);
   }
 
   bool _hasValidPrefix(String name) {
@@ -639,6 +781,15 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
             return true;
           }
         }
+      }
+    }
+    return false;
+  }
+
+  bool _hasValidSuffix(String name) {
+    for (final String suffix in _validSuffixes) {
+      if (name.endsWith(suffix)) {
+        return true;
       }
     }
     return false;
@@ -674,26 +825,75 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   );
 
   static const List<String> _validPrefixes = <String>[
-    'is',
-    'has',
-    'can',
-    'should',
-    'will',
-    'did',
-    'was',
-    'are',
-    'does',
-    'do',
+    'add',
     'allow',
-    'enable',
+    'animate',
+    'apply',
+    'are',
+    'auto',
+    'block',
+    'cached',
+    'can',
+    'collapse',
+    'default',
+    'did',
     'disable',
-    'show',
-    'hide',
-    'use',
-    'need',
-    'require',
-    'include',
+    'do',
+    'does',
+    'enable',
     'exclude',
+    'expand',
+    'filter',
+    'force',
+    'has',
+    'hide',
+    'ignore',
+    'include',
+    'is',
+    'keep',
+    'load',
+    'lock',
+    'log',
+    'merge',
+    'mute',
+    'need',
+    'pin',
+    'play',
+    'prefer',
+    'remove',
+    'require',
+    'reverse',
+    'save',
+    'send',
+    'should',
+    'show',
+    'skip',
+    'sort',
+    'split',
+    'support',
+    'sync',
+    'track',
+    'trim',
+    'use',
+    'validate',
+    'was',
+    'will',
+    'wrap',
+  ];
+
+  static const List<String> _validSuffixes = <String>[
+    'Active',
+    'Checked',
+    'Disabled',
+    'Enabled',
+    'Hidden',
+    'Loaded',
+    'Loading',
+    'Required',
+    'Selected',
+    'Valid',
+    'Visibility',
+    'Visible',
   ];
 
   @override
@@ -727,7 +927,8 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     }
   }
 
-  void _checkParameter(FormalParameter param, SaropaDiagnosticReporter reporter) {
+  void _checkParameter(
+      FormalParameter param, SaropaDiagnosticReporter reporter) {
     TypeAnnotation? typeAnnotation;
     String? paramName;
     Token? nameToken;
@@ -754,18 +955,34 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
       nameToken = param.name;
     }
 
-    if (typeAnnotation == null || paramName == null || nameToken == null) return;
+    if (typeAnnotation == null || paramName == null || nameToken == null)
+      return;
 
     // Check if it's a bool type
     if (typeAnnotation is! NamedType) return;
     if (typeAnnotation.name.lexeme != 'bool') return;
 
     final String checkName =
-        paramName.startsWith('_') ? paramName.replaceFirst('_', '') : paramName;
+        paramName.startsWith('_') ? paramName.substring(1) : paramName;
 
-    if (!_hasValidPrefix(checkName)) {
+    if (!_hasValidBooleanName(checkName)) {
       reporter.atToken(nameToken, code);
     }
+  }
+
+  /// Exact names allowed without prefix/suffix validation.
+  ///
+  /// These are standard Flutter naming conventions that would be
+  /// unnecessarily pedantic to flag:
+  /// - `value`: Used by Checkbox, Switch, ToggleButton, Radio widgets
+  static const Set<String> _allowedExactNames = <String>{
+    'value',
+  };
+
+  bool _hasValidBooleanName(String name) {
+    return _allowedExactNames.contains(name) ||
+        _hasValidPrefix(name) ||
+        _hasValidSuffix(name);
   }
 
   bool _hasValidPrefix(String name) {
@@ -778,6 +995,15 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
             return true;
           }
         }
+      }
+    }
+    return false;
+  }
+
+  bool _hasValidSuffix(String name) {
+    for (final String suffix in _validSuffixes) {
+      if (name.endsWith(suffix)) {
+        return true;
       }
     }
     return false;

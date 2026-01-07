@@ -8758,17 +8758,71 @@ class _AddScrollControllerDisposeFix extends DartFix {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: dispose ${node.name.lexeme} in dispose()',
-        priority: 1,
-      );
+      final String fieldName = node.name.lexeme;
 
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Add ${node.name.lexeme}.dispose() in dispose() method\n  ',
+      // Find the containing class
+      AstNode? current = node.parent;
+      while (current != null && current is! ClassDeclaration) {
+        current = current.parent;
+      }
+      if (current is! ClassDeclaration) return;
+
+      final ClassDeclaration classNode = current;
+
+      // Find existing dispose method
+      MethodDeclaration? disposeMethod;
+      for (final ClassMember member in classNode.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeMethod = member;
+          break;
+        }
+      }
+
+      if (disposeMethod != null) {
+        // Insert dispose call before super.dispose()
+        final String bodySource = disposeMethod.body.toSource();
+        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
+
+        if (superDisposeIndex != -1) {
+          // Find the actual offset in the file
+          final int bodyOffset = disposeMethod.body.offset;
+          final int insertOffset = bodyOffset + superDisposeIndex;
+
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Add $fieldName.dispose()',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            builder.addSimpleInsertion(
+              insertOffset,
+              '$fieldName.dispose();\n    ',
+            );
+          });
+        }
+      } else {
+        // Create new dispose method after the last field or constructor
+        int insertOffset = classNode.rightBracket.offset;
+
+        // Try to find a good insertion point (after fields/constructors)
+        for (final ClassMember member in classNode.members) {
+          if (member is FieldDeclaration || member is ConstructorDeclaration) {
+            insertOffset = member.end;
+          }
+        }
+
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Add dispose() method with $fieldName.dispose()',
+          priority: 1,
         );
-      });
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleInsertion(
+            insertOffset,
+            '\n\n  @override\n  void dispose() {\n    $fieldName.dispose();\n    super.dispose();\n  }',
+          );
+        });
+      }
     });
   }
 }
@@ -8867,12 +8921,23 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
       // Check if each node is disposed
       for (final String name in nodeNames) {
-        final bool isDisposed = disposeBody != null &&
+        // Direct disposal patterns
+        final bool isDirectlyDisposed = disposeBody != null &&
             (disposeBody.contains('$name.dispose(') ||
                 disposeBody.contains('$name?.dispose(') ||
                 disposeBody.contains('$name.disposeSafe(') ||
                 disposeBody.contains('$name?.disposeSafe(') ||
                 disposeBody.contains('$name..dispose('));
+
+        // Iteration-based disposal for List<FocusNode> or Map<..., FocusNode>
+        // Patterns like: "for (... in _name) { ...dispose()" or
+        // "for (... in _name.values) { ...dispose()"
+        final bool isIterationDisposed = disposeBody != null &&
+            (disposeBody.contains('in $name)') ||
+                disposeBody.contains('in $name.values)')) &&
+            disposeBody.contains('.dispose()');
+
+        final bool isDisposed = isDirectlyDisposed || isIterationDisposed;
 
         if (!isDisposed) {
           // Find and report the field declaration
@@ -8907,17 +8972,71 @@ class _AddFocusNodeDisposeFix extends DartFix {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: dispose ${node.name.lexeme} in dispose()',
-        priority: 1,
-      );
+      final String fieldName = node.name.lexeme;
 
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Add ${node.name.lexeme}.dispose() in dispose() method\n  ',
+      // Find the containing class
+      AstNode? current = node.parent;
+      while (current != null && current is! ClassDeclaration) {
+        current = current.parent;
+      }
+      if (current is! ClassDeclaration) return;
+
+      final ClassDeclaration classNode = current;
+
+      // Find existing dispose method
+      MethodDeclaration? disposeMethod;
+      for (final ClassMember member in classNode.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeMethod = member;
+          break;
+        }
+      }
+
+      if (disposeMethod != null) {
+        // Insert dispose call before super.dispose()
+        final String bodySource = disposeMethod.body.toSource();
+        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
+
+        if (superDisposeIndex != -1) {
+          // Find the actual offset in the file
+          final int bodyOffset = disposeMethod.body.offset;
+          final int insertOffset = bodyOffset + superDisposeIndex;
+
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Add $fieldName.dispose()',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            builder.addSimpleInsertion(
+              insertOffset,
+              '$fieldName.dispose();\n    ',
+            );
+          });
+        }
+      } else {
+        // Create new dispose method after the last field or constructor
+        int insertOffset = classNode.rightBracket.offset;
+
+        // Try to find a good insertion point (after fields/constructors)
+        for (final ClassMember member in classNode.members) {
+          if (member is FieldDeclaration || member is ConstructorDeclaration) {
+            insertOffset = member.end;
+          }
+        }
+
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Add dispose() method with $fieldName.dispose()',
+          priority: 1,
         );
-      });
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleInsertion(
+            insertOffset,
+            '\n\n  @override\n  void dispose() {\n    $fieldName.dispose();\n    super.dispose();\n  }',
+          );
+        });
+      }
     });
   }
 }
@@ -9085,6 +9204,2901 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
         }
         current = current.parent;
       }
+    });
+  }
+}
+
+// ============================================================================
+// NEW RULES FROM ROADMAP
+// ============================================================================
+
+/// Warns when hardcoded numeric values are used in layout widgets.
+///
+/// Magic numbers in layout make responsive design difficult and
+/// reduce code maintainability.
+///
+/// **BAD:**
+/// ```dart
+/// SizedBox(width: 100, height: 50);
+/// Padding(padding: EdgeInsets.all(16));
+/// Container(margin: EdgeInsets.only(left: 24));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SizedBox(width: AppDimensions.buttonWidth);
+/// Padding(padding: EdgeInsets.all(AppSpacing.medium));
+/// Container(margin: EdgeInsets.only(left: context.spacing.large));
+/// ```
+class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
+  const AvoidHardcodedLayoutValuesRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hardcoded_layout_values',
+    problemMessage: 'Avoid hardcoded numeric values in layout widgets.',
+    correctionMessage:
+        'Extract magic numbers to named constants or use a spacing system.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Layout widgets where we check for hardcoded values
+  static const Set<String> _layoutWidgets = <String>{
+    'SizedBox',
+    'Container',
+    'Padding',
+    'Margin',
+    'ConstrainedBox',
+    'LimitedBox',
+    'FractionallySizedBox',
+    'AspectRatio',
+  };
+
+  /// Properties that commonly use numeric layout values
+  static const Set<String> _layoutProperties = <String>{
+    'width',
+    'height',
+    'padding',
+    'margin',
+    'constraints',
+    'minWidth',
+    'maxWidth',
+    'minHeight',
+    'maxHeight',
+  };
+
+  /// Small values that are commonly acceptable (0, 1, 2)
+  static const Set<int> _acceptableValues = <int>{0, 1, 2};
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_layoutWidgets.contains(typeName)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (_layoutProperties.contains(argName)) {
+            _checkForHardcodedValue(arg.expression, reporter);
+          }
+        }
+      }
+    });
+
+    // Also check EdgeInsets constructors
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'EdgeInsets') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          _checkForHardcodedValue(arg.expression, reporter);
+        } else {
+          _checkForHardcodedValue(arg, reporter);
+        }
+      }
+    });
+  }
+
+  void _checkForHardcodedValue(Expression expr, SaropaDiagnosticReporter reporter) {
+    if (expr is IntegerLiteral) {
+      final int? value = expr.value;
+      if (value != null && !_acceptableValues.contains(value) && value > 4) {
+        reporter.atNode(expr, code);
+      }
+    } else if (expr is DoubleLiteral) {
+      final double value = expr.value;
+      if (value > 4.0 && value != value.roundToDouble()) {
+        reporter.atNode(expr, code);
+      } else if (value > 4.0) {
+        reporter.atNode(expr, code);
+      }
+    }
+  }
+}
+
+/// Suggests IgnorePointer when AbsorbPointer may not be needed.
+///
+/// - **AbsorbPointer**: Absorbs events and prevents them from reaching
+///   widgets behind it. Use when you need to block underlying interactions.
+/// - **IgnorePointer**: Lets events pass through completely. Use when you
+///   just want to disable this widget's interaction.
+///
+/// Choose based on whether you need to block underlying widgets.
+///
+/// **Use AbsorbPointer when:**
+/// ```dart
+/// // Overlay that should block clicks on background
+/// AbsorbPointer(
+///   absorbing: isOverlayVisible,
+///   child: OverlayContent(),
+/// )
+/// ```
+///
+/// **Use IgnorePointer when:**
+/// ```dart
+/// // Disabled widget that shouldn't block background clicks
+/// IgnorePointer(
+///   ignoring: isDisabled,
+///   child: MyWidget(),
+/// )
+/// ```
+class PreferIgnorePointerRule extends SaropaLintRule {
+  const PreferIgnorePointerRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_ignore_pointer',
+    problemMessage:
+        'AbsorbPointer blocks underlying widgets - is IgnorePointer better?',
+    correctionMessage:
+        'Use IgnorePointer if you don\'t need to block background interactions.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName == 'AbsorbPointer') {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when GestureDetector is used without specifying HitTestBehavior.
+///
+/// Without explicit behavior, gesture detection may not work as expected,
+/// especially with overlapping widgets or transparent areas.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: () => print('tapped'),
+///   child: Container(color: Colors.transparent),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GestureDetector(
+///   behavior: HitTestBehavior.opaque,
+///   onTap: () => print('tapped'),
+///   child: Container(color: Colors.transparent),
+/// )
+/// ```
+class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
+  const AvoidGestureWithoutBehaviorRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_gesture_without_behavior',
+    problemMessage: 'GestureDetector should specify HitTestBehavior.',
+    correctionMessage:
+        'Add behavior: HitTestBehavior.opaque (or translucent/deferToChild).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector') return;
+
+      // Check if behavior is specified
+      bool hasBehavior = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'behavior') {
+          hasBehavior = true;
+          break;
+        }
+      }
+
+      if (!hasBehavior) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when buttons don't prevent double-tap submissions.
+///
+/// Double-tapping a submit button can cause duplicate API calls,
+/// payments, or other unintended side effects.
+///
+/// **BAD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: () => submitForm(),
+///   child: Text('Submit'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: isSubmitting ? null : () => submitForm(),
+///   child: isSubmitting ? CircularProgressIndicator() : Text('Submit'),
+/// )
+/// ```
+class AvoidDoubleTapSubmitRule extends SaropaLintRule {
+  const AvoidDoubleTapSubmitRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_double_tap_submit',
+    problemMessage: 'Button may allow double-tap submissions.',
+    correctionMessage:
+        'Disable the button during submission or use a debounce mechanism.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _buttonWidgets = <String>{
+    'ElevatedButton',
+    'TextButton',
+    'OutlinedButton',
+    'FilledButton',
+  };
+
+  static const Set<String> _submitKeywords = <String>{
+    'submit',
+    'save',
+    'send',
+    'pay',
+    'purchase',
+    'confirm',
+    'order',
+    'checkout',
+    'register',
+    'signup',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_buttonWidgets.contains(typeName)) return;
+
+      String? childText;
+      Expression? onPressedExpr;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'child') {
+            childText = arg.expression.toSource().toLowerCase();
+          }
+          if (argName == 'onPressed') {
+            onPressedExpr = arg.expression;
+          }
+        }
+      }
+
+      // Check if this looks like a submit button
+      if (childText == null) return;
+      bool isSubmitButton = _submitKeywords.any(
+        (String keyword) => childText!.contains(keyword),
+      );
+      if (!isSubmitButton) return;
+
+      // Check if onPressed has any conditional logic
+      if (onPressedExpr == null) return;
+      final String onPressedSource = onPressedExpr.toSource();
+
+      // If it's a simple function without null check, warn
+      if (!onPressedSource.contains('?') &&
+          !onPressedSource.contains('null') &&
+          !onPressedSource.contains('isLoading') &&
+          !onPressedSource.contains('isSubmitting') &&
+          !onPressedSource.contains('_loading') &&
+          !onPressedSource.contains('_submitting')) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when buttons on web don't have mouse cursor configured.
+///
+/// On web platforms, buttons should show appropriate cursors to
+/// indicate interactivity.
+///
+/// **BAD:**
+/// ```dart
+/// InkWell(
+///   onTap: () => doSomething(),
+///   child: Text('Click me'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// InkWell(
+///   onTap: () => doSomething(),
+///   mouseCursor: SystemMouseCursors.click,
+///   child: Text('Click me'),
+/// )
+/// ```
+class PreferCursorForButtonsRule extends SaropaLintRule {
+  const PreferCursorForButtonsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_cursor_for_buttons',
+    problemMessage: 'Interactive widget should specify mouse cursor for web.',
+    correctionMessage: 'Add mouseCursor: SystemMouseCursors.click (or similar).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _interactiveWidgets = <String>{
+    'InkWell',
+    'GestureDetector',
+    'InkResponse',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_interactiveWidgets.contains(typeName)) return;
+
+      bool hasOnTap = false;
+      bool hasMouseCursor = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'onTap' || argName == 'onPressed') {
+            hasOnTap = true;
+          }
+          if (argName == 'mouseCursor') {
+            hasMouseCursor = true;
+          }
+        }
+      }
+
+      if (hasOnTap && !hasMouseCursor) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when interactive widgets don't handle hover state.
+///
+/// On web and desktop, hover states provide important visual feedback.
+///
+/// **BAD:**
+/// ```dart
+/// InkWell(
+///   onTap: () => doSomething(),
+///   child: MyButton(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// InkWell(
+///   onTap: () => doSomething(),
+///   onHover: (hovering) => setState(() => _isHovered = hovering),
+///   child: MyButton(isHovered: _isHovered),
+/// )
+/// ```
+class RequireHoverStatesRule extends SaropaLintRule {
+  const RequireHoverStatesRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_hover_states',
+    problemMessage: 'Interactive widget should handle hover state for web/desktop.',
+    correctionMessage: 'Add onHover callback for visual feedback.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      // Only check InkWell and MouseRegion
+      if (typeName != 'InkWell' && typeName != 'GestureDetector') return;
+
+      bool hasOnTap = false;
+      bool hasHoverHandling = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'onTap' || argName == 'onPressed') {
+            hasOnTap = true;
+          }
+          if (argName == 'onHover' ||
+              argName == 'hoverColor' ||
+              argName == 'highlightColor') {
+            hasHoverHandling = true;
+          }
+        }
+      }
+
+      if (hasOnTap && !hasHoverHandling) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when buttons don't have a loading state for async operations.
+///
+/// Users should see visual feedback when an async operation is in progress.
+///
+/// **BAD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: () async {
+///     await api.submit(data);
+///   },
+///   child: Text('Submit'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: isLoading ? null : () async {
+///     setState(() => isLoading = true);
+///     await api.submit(data);
+///     setState(() => isLoading = false);
+///   },
+///   child: isLoading ? CircularProgressIndicator() : Text('Submit'),
+/// )
+/// ```
+class RequireButtonLoadingStateRule extends SaropaLintRule {
+  const RequireButtonLoadingStateRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_button_loading_state',
+    problemMessage: 'Async button should show loading state.',
+    correctionMessage:
+        'Disable button and show loading indicator during async operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _buttonWidgets = <String>{
+    'ElevatedButton',
+    'TextButton',
+    'OutlinedButton',
+    'FilledButton',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_buttonWidgets.contains(typeName)) return;
+
+      Expression? onPressedExpr;
+      Expression? childExpr;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'onPressed') {
+            onPressedExpr = arg.expression;
+          }
+          if (argName == 'child') {
+            childExpr = arg.expression;
+          }
+        }
+      }
+
+      if (onPressedExpr == null) return;
+      final String onPressedSource = onPressedExpr.toSource();
+
+      // Check if the callback is async
+      bool isAsync = onPressedSource.contains('async') ||
+          onPressedSource.contains('await');
+
+      if (!isAsync) return;
+
+      // Check if there's loading state handling
+      bool hasLoadingState = onPressedSource.contains('isLoading') ||
+          onPressedSource.contains('_loading') ||
+          onPressedSource.contains('loading') ||
+          onPressedSource.contains('isSubmitting') ||
+          onPressedSource.contains('_submitting');
+
+      // Check if child shows loading indicator
+      String childSource = childExpr?.toSource() ?? '';
+      bool hasLoadingIndicator = childSource.contains('CircularProgressIndicator') ||
+          childSource.contains('Loading') ||
+          childSource.contains('isLoading') ||
+          childSource.contains('?');
+
+      if (!hasLoadingState && !hasLoadingIndicator) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when hardcoded TextStyle values are used instead of theme.
+///
+/// Hardcoded text styles make it difficult to maintain consistent
+/// typography across the app.
+///
+/// **BAD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: Theme.of(context).textTheme.bodyLarge,
+/// )
+/// ```
+class AvoidHardcodedTextStylesRule extends SaropaLintRule {
+  const AvoidHardcodedTextStylesRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hardcoded_text_styles',
+    problemMessage: 'Avoid inline TextStyle with hardcoded values.',
+    correctionMessage:
+        'Use Theme.of(context).textTheme or define styles in a central location.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TextStyle') return;
+
+      // Check if this TextStyle is used inline in a Text widget style argument
+      final AstNode? parent = node.parent;
+      if (parent is NamedExpression && parent.name.label.name == 'style') {
+        final AstNode? grandparent = parent.parent?.parent;
+        if (grandparent is InstanceCreationExpression) {
+          final String parentType =
+              grandparent.constructorName.type.name.lexeme;
+          if (parentType == 'Text' ||
+              parentType == 'RichText' ||
+              parentType == 'DefaultTextStyle') {
+            // Check for hardcoded values
+            bool hasHardcodedValues = false;
+            for (final Expression arg in node.argumentList.arguments) {
+              if (arg is NamedExpression) {
+                final String argName = arg.name.label.name;
+                if (argName == 'fontSize' || argName == 'fontWeight') {
+                  // Check if value is a literal
+                  if (arg.expression is IntegerLiteral ||
+                      arg.expression is DoubleLiteral) {
+                    hasHardcodedValues = true;
+                    break;
+                  }
+                }
+              }
+            }
+
+            if (hasHardcodedValues) {
+              reporter.atNode(node.constructorName, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when PageStorageKey is not used for scroll position preservation.
+///
+/// Without PageStorageKey, scroll positions are lost when navigating
+/// between screens.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => ListTile(),
+///   itemCount: 100,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   key: PageStorageKey('my_list'),
+///   itemBuilder: (context, index) => ListTile(),
+///   itemCount: 100,
+/// )
+/// ```
+class PreferPageStorageKeyRule extends SaropaLintRule {
+  const PreferPageStorageKeyRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_page_storage_key',
+    problemMessage: 'Consider using PageStorageKey to preserve scroll position.',
+    correctionMessage: 'Add key: PageStorageKey("unique_key") to the scrollable.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _scrollableWidgets = <String>{
+    'ListView',
+    'GridView',
+    'SingleChildScrollView',
+    'CustomScrollView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_scrollableWidgets.contains(typeName)) return;
+
+      bool hasPageStorageKey = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'key') {
+          final String keySource = arg.expression.toSource();
+          if (keySource.contains('PageStorageKey')) {
+            hasPageStorageKey = true;
+          }
+        }
+      }
+
+      // Only warn if no PageStorageKey
+      if (!hasPageStorageKey) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Suggests RefreshIndicator for lists that appear to show remote data.
+///
+/// Pull-to-refresh is expected for lists showing fetchable content.
+/// This rule only triggers when the list name suggests remote data.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return ListView.builder(
+///     itemBuilder: (context, index) => ListTile(title: Text(posts[index])),
+///     itemCount: posts.length,  // "posts" suggests remote data
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// RefreshIndicator(
+///   onRefresh: () => fetchPosts(),
+///   child: ListView.builder(
+///     itemBuilder: (context, index) => ListTile(title: Text(posts[index])),
+///     itemCount: posts.length,
+///   ),
+/// )
+/// ```
+class RequireRefreshIndicatorRule extends SaropaLintRule {
+  const RequireRefreshIndicatorRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_refresh_indicator',
+    problemMessage:
+        'List showing remote data should have RefreshIndicator for pull-to-refresh.',
+    correctionMessage:
+        'Wrap with RefreshIndicator(onRefresh: () => fetch(), child: ...).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Words suggesting remote/fetchable data
+  static const Set<String> _remoteDataIndicators = <String>{
+    'posts',
+    'items',
+    'messages',
+    'notifications',
+    'feeds',
+    'articles',
+    'users',
+    'comments',
+    'data',
+    'results',
+    'list',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      final String? constructorName = node.constructorName.name?.name;
+
+      // Only check ListView.builder which typically shows dynamic content
+      if (typeName != 'ListView' || constructorName != 'builder') return;
+
+      // Check if already wrapped in RefreshIndicator
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'RefreshIndicator') {
+            return; // Already has RefreshIndicator
+          }
+        }
+        current = current.parent;
+      }
+
+      // Only warn if the source suggests remote data
+      final String nodeSource = node.toSource().toLowerCase();
+      final bool suggestsRemoteData = _remoteDataIndicators.any(
+        (indicator) => nodeSource.contains(indicator),
+      );
+
+      if (suggestsRemoteData) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when scrollable widgets don't specify scroll physics.
+///
+/// Explicit scroll physics ensures consistent behavior across platforms.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => ListTile(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   physics: const BouncingScrollPhysics(),
+///   itemBuilder: (context, index) => ListTile(),
+/// )
+/// ```
+class RequireScrollPhysicsRule extends SaropaLintRule {
+  const RequireScrollPhysicsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_scroll_physics',
+    problemMessage: 'Scrollable widget should specify scroll physics.',
+    correctionMessage:
+        'Add physics: BouncingScrollPhysics() or ClampingScrollPhysics().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _scrollableWidgets = <String>{
+    'ListView',
+    'GridView',
+    'SingleChildScrollView',
+    'CustomScrollView',
+    'PageView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_scrollableWidgets.contains(typeName)) return;
+
+      bool hasPhysics = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'physics') {
+          hasPhysics = true;
+          break;
+        }
+      }
+
+      if (!hasPhysics) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when ListView is used inside CustomScrollView instead of SliverList.
+///
+/// Using ListView inside CustomScrollView creates nested scrollables.
+/// Use SliverList for proper sliver composition.
+///
+/// **BAD:**
+/// ```dart
+/// CustomScrollView(
+///   slivers: [
+///     SliverAppBar(...),
+///     SliverToBoxAdapter(child: ListView(...)), // Wrong!
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CustomScrollView(
+///   slivers: [
+///     SliverAppBar(...),
+///     SliverList(delegate: SliverChildBuilderDelegate(...)),
+///   ],
+/// )
+/// ```
+class PreferSliverListRule extends SaropaLintRule {
+  const PreferSliverListRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sliver_list',
+    problemMessage: 'Use SliverList instead of ListView inside CustomScrollView.',
+    correctionMessage:
+        'Replace ListView with SliverList for proper sliver composition.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ListView' && typeName != 'GridView') return;
+
+      // Check if inside CustomScrollView
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'CustomScrollView') {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when StatefulWidget doesn't use AutomaticKeepAliveClientMixin
+/// for preserving state in TabView/PageView.
+///
+/// Without AutomaticKeepAliveClientMixin, tab content is rebuilt when
+/// switching tabs, losing scroll position and state.
+///
+/// **BAD:**
+/// ```dart
+/// class _TabContentState extends State<TabContent> {
+///   @override
+///   Widget build(BuildContext context) => ListView(...);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _TabContentState extends State<TabContent>
+///     with AutomaticKeepAliveClientMixin {
+///   @override
+///   bool get wantKeepAlive => true;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     super.build(context);
+///     return ListView(...);
+///   }
+/// }
+/// ```
+class PreferKeepAliveRule extends SaropaLintRule {
+  const PreferKeepAliveRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_keep_alive',
+    problemMessage:
+        'Consider using AutomaticKeepAliveClientMixin to preserve state.',
+    correctionMessage:
+        'Add "with AutomaticKeepAliveClientMixin" to preserve state in tabs.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if it's a State class
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclassName = extendsClause.superclass.name.lexeme;
+      if (superclassName != 'State') return;
+
+      // Check if already has AutomaticKeepAliveClientMixin
+      final WithClause? withClause = node.withClause;
+      if (withClause != null) {
+        for (final NamedType mixin in withClause.mixinTypes) {
+          if (mixin.name.lexeme == 'AutomaticKeepAliveClientMixin') {
+            return; // Already has the mixin
+          }
+        }
+      }
+
+      // Check if this State builds a scrollable that might need keep alive
+      final String classSource = node.toSource();
+      if (classSource.contains('ListView') ||
+          classSource.contains('GridView') ||
+          classSource.contains('CustomScrollView')) {
+        // Check if inside a tab-like context (has TabBar reference)
+        if (classSource.contains('Tab') || classSource.contains('Page')) {
+          reporter.atToken(node.name, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Text widgets are not wrapped with DefaultTextStyle.
+///
+/// DefaultTextStyle provides consistent typography without repeating styles.
+///
+/// **BAD:**
+/// ```dart
+/// Column(
+///   children: [
+///     Text('Title', style: TextStyle(fontSize: 24)),
+///     Text('Subtitle', style: TextStyle(fontSize: 24)),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// DefaultTextStyle(
+///   style: TextStyle(fontSize: 24),
+///   child: Column(
+///     children: [Text('Title'), Text('Subtitle')],
+///   ),
+/// )
+/// ```
+class RequireDefaultTextStyleRule extends SaropaLintRule {
+  const RequireDefaultTextStyleRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_default_text_style',
+    problemMessage: 'Multiple Text widgets with same style - use DefaultTextStyle.',
+    correctionMessage: 'Wrap with DefaultTextStyle to share common styles.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addListLiteral((ListLiteral node) {
+      // Count Text widgets with explicit styles in this list
+      int textWithStyleCount = 0;
+      String? firstStyleSource;
+
+      for (final CollectionElement element in node.elements) {
+        if (element is InstanceCreationExpression) {
+          final String typeName = element.constructorName.type.name.lexeme;
+          if (typeName == 'Text') {
+            for (final Expression arg in element.argumentList.arguments) {
+              if (arg is NamedExpression && arg.name.label.name == 'style') {
+                final String styleSource = arg.expression.toSource();
+                if (firstStyleSource == null) {
+                  firstStyleSource = styleSource;
+                  textWithStyleCount++;
+                } else if (styleSource == firstStyleSource) {
+                  textWithStyleCount++;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // If 3+ Text widgets have the same style, suggest DefaultTextStyle
+      if (textWithStyleCount >= 3) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Row/Column with overflow could use Wrap instead.
+///
+/// Wrap automatically moves overflowing children to the next line.
+///
+/// **BAD:**
+/// ```dart
+/// Row(
+///   children: [Chip(...), Chip(...), Chip(...), Chip(...)], // May overflow
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Wrap(
+///   spacing: 8,
+///   children: [Chip(...), Chip(...), Chip(...), Chip(...)],
+/// )
+/// ```
+class PreferWrapOverOverflowRule extends SaropaLintRule {
+  const PreferWrapOverOverflowRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_wrap_over_overflow',
+    problemMessage: 'Row with many children may overflow - consider using Wrap.',
+    correctionMessage: 'Replace Row with Wrap for automatic wrapping.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Row') return;
+
+      // Count children
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression childrenExpr = arg.expression;
+          if (childrenExpr is ListLiteral) {
+            // If row has many small widgets, suggest Wrap
+            if (childrenExpr.elements.length >= 5) {
+              // Check if children are small widgets like Chip, Icon, etc.
+              bool hasSmallWidgets = childrenExpr.elements.any((element) {
+                if (element is InstanceCreationExpression) {
+                  final String childType =
+                      element.constructorName.type.name.lexeme;
+                  return childType == 'Chip' ||
+                      childType == 'Icon' ||
+                      childType == 'Tag' ||
+                      childType == 'Badge';
+                }
+                return false;
+              });
+
+              if (hasSmallWidgets) {
+                reporter.atNode(node.constructorName, code);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when FileImage is used for bundled assets instead of AssetImage.
+///
+/// AssetImage is optimized for bundled assets and handles resolution properly.
+///
+/// **BAD:**
+/// ```dart
+/// Image(image: FileImage(File('assets/logo.png')))
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image(image: AssetImage('assets/logo.png'))
+/// // Or simply:
+/// Image.asset('assets/logo.png')
+/// ```
+class PreferAssetImageForLocalRule extends SaropaLintRule {
+  const PreferAssetImageForLocalRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_asset_image_for_local',
+    problemMessage: 'Use AssetImage for bundled assets, not FileImage.',
+    correctionMessage: 'Replace FileImage with AssetImage or Image.asset().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'FileImage') return;
+
+      // Check if the file path looks like an asset path
+      if (node.argumentList.arguments.isNotEmpty) {
+        final String argSource = node.argumentList.arguments.first.toSource();
+        if (argSource.contains('assets/') || argSource.contains('asset')) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when background images don't use BoxFit.cover.
+///
+/// BoxFit.cover ensures the image fills the container without distortion.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   decoration: BoxDecoration(
+///     image: DecorationImage(image: AssetImage('bg.png')),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Container(
+///   decoration: BoxDecoration(
+///     image: DecorationImage(
+///       image: AssetImage('bg.png'),
+///       fit: BoxFit.cover,
+///     ),
+///   ),
+/// )
+/// ```
+class PreferFitCoverForBackgroundRule extends SaropaLintRule {
+  const PreferFitCoverForBackgroundRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_fit_cover_for_background',
+    problemMessage: 'Background images should use BoxFit.cover.',
+    correctionMessage: 'Add fit: BoxFit.cover to DecorationImage.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'DecorationImage') return;
+
+      bool hasFit = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'fit') {
+          hasFit = true;
+          break;
+        }
+      }
+
+      if (!hasFit) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when buttons with conditional onPressed don't customize disabled style.
+///
+/// While Flutter buttons have default disabled styling, custom styles
+/// provide better UX consistency across your app's design system.
+///
+/// Note: This rule suggests customization, not requirement. The default
+/// disabled styling is functional but may not match your design.
+///
+/// **BAD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: canSubmit ? submit : null,
+///   child: Text('Submit'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: canSubmit ? submit : null,
+///   style: ElevatedButton.styleFrom(
+///     disabledBackgroundColor: Colors.grey.shade300,
+///   ),
+///   child: Text('Submit'),
+/// )
+/// ```
+class RequireDisabledStateRule extends SaropaLintRule {
+  const RequireDisabledStateRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_disabled_state',
+    problemMessage:
+        'Consider customizing disabled style for design consistency.',
+    correctionMessage:
+        'Add style with disabledBackgroundColor/disabledForegroundColor.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _buttonWidgets = <String>{
+    'ElevatedButton',
+    'TextButton',
+    'OutlinedButton',
+    'FilledButton',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_buttonWidgets.contains(typeName)) return;
+
+      bool hasConditionalOnPressed = false;
+      bool hasStyleHandling = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+
+          if (argName == 'onPressed') {
+            final String source = arg.expression.toSource();
+            // Check for conditional pattern: condition ? fn : null
+            if (source.contains('?') && source.contains('null')) {
+              hasConditionalOnPressed = true;
+            }
+          }
+
+          if (argName == 'style') {
+            hasStyleHandling = true;
+          }
+        }
+      }
+
+      if (hasConditionalOnPressed && !hasStyleHandling) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Draggable doesn't have feedback widget.
+///
+/// Feedback provides visual indication during drag operations.
+///
+/// **BAD:**
+/// ```dart
+/// Draggable(
+///   data: item,
+///   child: ItemWidget(item),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Draggable(
+///   data: item,
+///   feedback: Material(child: ItemWidget(item)),
+///   child: ItemWidget(item),
+/// )
+/// ```
+class RequireDragFeedbackRule extends SaropaLintRule {
+  const RequireDragFeedbackRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_drag_feedback',
+    problemMessage: 'Draggable should have feedback widget.',
+    correctionMessage: 'Add feedback: Widget to show during drag.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Draggable' && typeName != 'LongPressDraggable') return;
+
+      bool hasFeedback = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'feedback') {
+          hasFeedback = true;
+          break;
+        }
+      }
+
+      if (!hasFeedback) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when GestureDetector widgets are nested, causing gesture conflicts.
+///
+/// Nested GestureDetectors can cause unexpected behavior as gestures
+/// compete with each other.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: handleOuterTap,
+///   child: GestureDetector(
+///     onTap: handleInnerTap, // Conflicts with outer!
+///     child: Content(),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: handleTap,
+///   child: Content(),
+/// )
+/// ```
+class AvoidGestureConflictRule extends SaropaLintRule {
+  const AvoidGestureConflictRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_gesture_conflict',
+    problemMessage: 'Nested GestureDetector widgets may cause gesture conflicts.',
+    correctionMessage: 'Consolidate gesture handling or use behavior property.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
+
+      // Check if inside another GestureDetector
+      AstNode? current = node.parent;
+      int depth = 0;
+      while (current != null && depth < 20) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'GestureDetector' || parentType == 'InkWell') {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+        depth++;
+      }
+    });
+  }
+}
+
+/// Warns when large images are loaded without size constraints.
+///
+/// Loading large images without constraints wastes memory.
+///
+/// **BAD:**
+/// ```dart
+/// Image.asset('large_photo.png') // Could be 4000x3000 pixels!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.asset(
+///   'large_photo.png',
+///   width: 300,
+///   height: 200,
+///   cacheWidth: 300,
+/// )
+/// ```
+class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
+  const AvoidLargeImagesInMemoryRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_large_images_in_memory',
+    problemMessage: 'Image should specify size constraints to save memory.',
+    correctionMessage: 'Add width/height and cacheWidth/cacheHeight parameters.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      final String? constructorName = node.constructorName.name?.name;
+
+      // Check Image.asset and Image.network
+      if (typeName != 'Image') return;
+      if (constructorName != 'asset' && constructorName != 'network') return;
+
+      bool hasWidth = false;
+      bool hasHeight = false;
+      bool hasCacheWidth = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'width') hasWidth = true;
+          if (argName == 'height') hasHeight = true;
+          if (argName == 'cacheWidth' || argName == 'cacheHeight') {
+            hasCacheWidth = true;
+          }
+        }
+      }
+
+      // Warn if no size constraints at all
+      if (!hasWidth && !hasHeight && !hasCacheWidth) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when LayoutBuilder is used inside a scrollable widget.
+///
+/// LayoutBuilder in a scrollable can cause performance issues as
+/// it rebuilds on every scroll.
+///
+/// **BAD:**
+/// ```dart
+/// ListView(
+///   children: [
+///     LayoutBuilder(builder: (context, constraints) => ...),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// LayoutBuilder(
+///   builder: (context, constraints) => ListView(
+///     children: [...],
+///   ),
+/// )
+/// ```
+class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
+  const AvoidLayoutBuilderInScrollableRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_layout_builder_in_scrollable',
+    problemMessage: 'LayoutBuilder inside scrollable causes performance issues.',
+    correctionMessage: 'Move LayoutBuilder outside the scrollable widget.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _scrollableWidgets = <String>{
+    'ListView',
+    'GridView',
+    'SingleChildScrollView',
+    'CustomScrollView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'LayoutBuilder') return;
+
+      // Check if inside a scrollable
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (_scrollableWidgets.contains(parentType)) {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when IntrinsicWidth/Height could improve layout.
+///
+/// IntrinsicWidth/Height can help with sizing widgets to their content.
+///
+/// **BAD:**
+/// ```dart
+/// Row(
+///   children: [
+///     Expanded(child: TextField()),
+///     ElevatedButton(child: Text('Submit')),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// IntrinsicWidth(
+///   child: Column(
+///     crossAxisAlignment: CrossAxisAlignment.stretch,
+///     children: [...],
+///   ),
+/// )
+/// ```
+class PreferIntrinsicDimensionsRule extends SaropaLintRule {
+  const PreferIntrinsicDimensionsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_intrinsic_dimensions',
+    problemMessage: 'Consider using IntrinsicWidth/Height for content-based sizing.',
+    correctionMessage: 'Wrap with IntrinsicWidth or IntrinsicHeight.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Column') return;
+
+      // Check for CrossAxisAlignment.stretch without IntrinsicWidth parent
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'crossAxisAlignment') {
+          final String value = arg.expression.toSource();
+          if (value.contains('stretch')) {
+            // Check if already wrapped in IntrinsicWidth
+            AstNode? current = node.parent;
+            while (current != null) {
+              if (current is InstanceCreationExpression) {
+                final String parentType =
+                    current.constructorName.type.name.lexeme;
+                if (parentType == 'IntrinsicWidth') {
+                  return; // Already properly wrapped
+                }
+              }
+              current = current.parent;
+            }
+            reporter.atNode(node.constructorName, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when keyboard shortcuts don't use the Actions/Shortcuts system.
+///
+/// The Actions/Shortcuts system provides better accessibility and
+/// consistency across platforms.
+///
+/// **BAD:**
+/// ```dart
+/// RawKeyboardListener(
+///   onKey: (event) {
+///     if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+///       submit();
+///     }
+///   },
+///   child: Form(...),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Shortcuts(
+///   shortcuts: {
+///     LogicalKeySet(LogicalKeyboardKey.enter): SubmitIntent(),
+///   },
+///   child: Actions(
+///     actions: {SubmitIntent: SubmitAction()},
+///     child: Form(...),
+///   ),
+/// )
+/// ```
+class PreferActionsAndShortcutsRule extends SaropaLintRule {
+  const PreferActionsAndShortcutsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_actions_and_shortcuts',
+    problemMessage: 'Use Actions/Shortcuts system instead of RawKeyboardListener.',
+    correctionMessage: 'Replace with Shortcuts and Actions widgets.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName == 'RawKeyboardListener' ||
+          typeName == 'KeyboardListener') {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when GestureDetector doesn't handle long press for context menus.
+///
+/// Long press is a common pattern for showing context menus on mobile.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: () => selectItem(),
+///   child: ListTile(...),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: () => selectItem(),
+///   onLongPress: () => showContextMenu(),
+///   child: ListTile(...),
+/// )
+/// ```
+class RequireLongPressCallbackRule extends SaropaLintRule {
+  const RequireLongPressCallbackRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_long_press_callback',
+    problemMessage: 'Consider adding onLongPress for context menu.',
+    correctionMessage: 'Add onLongPress callback for additional actions.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
+
+      bool hasOnTap = false;
+      bool hasOnLongPress = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'onTap') hasOnTap = true;
+          if (argName == 'onLongPress') hasOnLongPress = true;
+        }
+      }
+
+      // Only suggest if has onTap but no onLongPress, and is on a list item
+      if (hasOnTap && !hasOnLongPress) {
+        // Check if child is a list-like item
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression && arg.name.label.name == 'child') {
+            final String childSource = arg.expression.toSource();
+            if (childSource.contains('ListTile') ||
+                childSource.contains('Card') ||
+                childSource.contains('Item')) {
+              reporter.atNode(node.constructorName, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when findChildIndexCallback is called in build method.
+///
+/// Creating a new callback in build causes unnecessary rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   findChildIndexCallback: (key) => items.indexWhere(...),
+///   itemBuilder: ...,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Define callback outside build or use memoization
+/// final _findChildIndex = (Key key) => ...;
+///
+/// ListView.builder(
+///   findChildIndexCallback: _findChildIndex,
+///   itemBuilder: ...,
+/// )
+/// ```
+class AvoidFindChildInBuildRule extends SaropaLintRule {
+  const AvoidFindChildInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_find_child_in_build',
+    problemMessage: 'findChildIndexCallback should not be created in build.',
+    correctionMessage: 'Extract callback to a field or use memoization.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ListView' && typeName != 'GridView') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'findChildIndexCallback') {
+          // Check if it's a lambda defined inline
+          if (arg.expression is FunctionExpression) {
+            // Check if we're in a build method
+            AstNode? current = node.parent;
+            while (current != null) {
+              if (current is MethodDeclaration &&
+                  current.name.lexeme == 'build') {
+                reporter.atNode(arg, code);
+                return;
+              }
+              current = current.parent;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Column/Row is used inside SingleChildScrollView without constraints.
+///
+/// Without proper constraints, Column/Row may have unbounded height/width.
+///
+/// **BAD:**
+/// ```dart
+/// SingleChildScrollView(
+///   child: Column(
+///     children: [Expanded(child: Container())], // Expanded won't work!
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SingleChildScrollView(
+///   child: ConstrainedBox(
+///     constraints: BoxConstraints(minHeight: viewportHeight),
+///     child: Column(children: [...]),
+///   ),
+/// )
+/// ```
+class AvoidUnboundedConstraintsRule extends SaropaLintRule {
+  const AvoidUnboundedConstraintsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unbounded_constraints',
+    problemMessage: 'Column/Row in SingleChildScrollView may have unbounded constraints.',
+    correctionMessage:
+        'Wrap with ConstrainedBox or avoid Expanded/Flexible children.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Column' && typeName != 'Row') return;
+
+      // Check if inside SingleChildScrollView
+      AstNode? current = node.parent;
+      bool insideSingleChildScrollView = false;
+      bool hasConstrainedBox = false;
+
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'SingleChildScrollView') {
+            insideSingleChildScrollView = true;
+          }
+          if (parentType == 'ConstrainedBox' ||
+              parentType == 'SizedBox' ||
+              parentType == 'Container') {
+            hasConstrainedBox = true;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (insideSingleChildScrollView && !hasConstrainedBox) {
+        // Check if has Expanded/Flexible children
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression && arg.name.label.name == 'children') {
+            final String childrenSource = arg.expression.toSource();
+            if (childrenSource.contains('Expanded') ||
+                childrenSource.contains('Flexible')) {
+              reporter.atNode(node.constructorName, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// ============================================================================
+// BATCH 3 - MORE WIDGET RULES FROM ROADMAP
+// ============================================================================
+
+/// Warns when percentage-based sizing uses hardcoded calculations.
+///
+/// FractionallySizedBox is cleaner for percentage-based layouts.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   width: MediaQuery.of(context).size.width * 0.5,
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// FractionallySizedBox(
+///   widthFactor: 0.5,
+///   child: MyWidget(),
+/// )
+/// ```
+class PreferFractionalSizingRule extends SaropaLintRule {
+  const PreferFractionalSizingRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_fractional_sizing',
+    problemMessage: 'Use FractionallySizedBox for percentage-based sizing.',
+    correctionMessage:
+        'Replace MediaQuery.size multiplication with FractionallySizedBox.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      // Check for multiplication with a fraction
+      if (node.operator.lexeme != '*') return;
+
+      final String leftSource = node.leftOperand.toSource();
+      final String rightSource = node.rightOperand.toSource();
+
+      // Check for MediaQuery.of(context).size.width * 0.x pattern
+      if ((leftSource.contains('MediaQuery') &&
+              leftSource.contains('.size.')) ||
+          (rightSource.contains('MediaQuery') &&
+              rightSource.contains('.size.'))) {
+        // Check if multiplying by a fraction
+        if (node.rightOperand is DoubleLiteral) {
+          final double value = (node.rightOperand as DoubleLiteral).value;
+          if (value > 0 && value < 1) {
+            reporter.atNode(node, code);
+          }
+        }
+        if (node.leftOperand is DoubleLiteral) {
+          final double value = (node.leftOperand as DoubleLiteral).value;
+          if (value > 0 && value < 1) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when UnconstrainedBox is used improperly causing overflow.
+///
+/// UnconstrainedBox removes constraints which can cause overflow.
+///
+/// **BAD:**
+/// ```dart
+/// SizedBox(
+///   width: 100,
+///   child: UnconstrainedBox(
+///     child: Image.asset('wide_image.png'), // May overflow!
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SizedBox(
+///   width: 100,
+///   child: FittedBox(
+///     fit: BoxFit.contain,
+///     child: Image.asset('wide_image.png'),
+///   ),
+/// )
+/// ```
+class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
+  const AvoidUnconstrainedBoxMisuseRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unconstrained_box_misuse',
+    problemMessage: 'UnconstrainedBox in constrained parent may cause overflow.',
+    correctionMessage: 'Consider using FittedBox or OverflowBox instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'UnconstrainedBox') return;
+
+      // Check if inside a constraining widget
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'SizedBox' ||
+              parentType == 'Container' ||
+              parentType == 'ConstrainedBox' ||
+              parentType == 'LimitedBox') {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when FutureBuilder/StreamBuilder doesn't handle errors.
+///
+/// Async builders should handle error states for robustness.
+///
+/// **BAD:**
+/// ```dart
+/// FutureBuilder<User>(
+///   future: fetchUser(),
+///   builder: (context, snapshot) {
+///     if (snapshot.hasData) return UserWidget(snapshot.data!);
+///     return CircularProgressIndicator();
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// FutureBuilder<User>(
+///   future: fetchUser(),
+///   builder: (context, snapshot) {
+///     if (snapshot.hasError) return ErrorWidget(snapshot.error!);
+///     if (snapshot.hasData) return UserWidget(snapshot.data!);
+///     return CircularProgressIndicator();
+///   },
+/// )
+/// ```
+class RequireErrorWidgetRule extends SaropaLintRule {
+  const RequireErrorWidgetRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_error_widget',
+    problemMessage: 'FutureBuilder/StreamBuilder should handle error state.',
+    correctionMessage: 'Add error handling: if (snapshot.hasError) ...',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'FutureBuilder' && typeName != 'StreamBuilder') return;
+
+      // Find the builder argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
+
+          // Check if it handles errors
+          if (!builderSource.contains('hasError') &&
+              !builderSource.contains('.error')) {
+            reporter.atNode(node.constructorName, code);
+          }
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when AppBar is used inside CustomScrollView instead of SliverAppBar.
+///
+/// SliverAppBar enables collapsing/expanding behavior in scroll views.
+///
+/// **BAD:**
+/// ```dart
+/// CustomScrollView(
+///   slivers: [
+///     SliverToBoxAdapter(child: AppBar(title: Text('Title'))),
+///     SliverList(...),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CustomScrollView(
+///   slivers: [
+///     SliverAppBar(title: Text('Title'), floating: true),
+///     SliverList(...),
+///   ],
+/// )
+/// ```
+class PreferSliverAppBarRule extends SaropaLintRule {
+  const PreferSliverAppBarRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sliver_app_bar',
+    problemMessage: 'Use SliverAppBar inside CustomScrollView, not AppBar.',
+    correctionMessage: 'Replace AppBar with SliverAppBar for scroll effects.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'AppBar') return;
+
+      // Check if inside CustomScrollView
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'CustomScrollView' ||
+              parentType == 'NestedScrollView') {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when Opacity is used for animations instead of AnimatedOpacity.
+///
+/// AnimatedOpacity is more performant for opacity animations.
+///
+/// **BAD:**
+/// ```dart
+/// Opacity(
+///   opacity: _isVisible ? 1.0 : 0.0,
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// AnimatedOpacity(
+///   opacity: _isVisible ? 1.0 : 0.0,
+///   duration: Duration(milliseconds: 300),
+///   child: MyWidget(),
+/// )
+/// ```
+class AvoidOpacityMisuseRule extends SaropaLintRule {
+  const AvoidOpacityMisuseRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_opacity_misuse',
+    problemMessage: 'Use AnimatedOpacity for opacity animations.',
+    correctionMessage: 'Replace Opacity with AnimatedOpacity for smoother animations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Opacity') return;
+
+      // Check if opacity uses a conditional (suggests animation)
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'opacity') {
+          final String opacitySource = arg.expression.toSource();
+          // Check for ternary or variable (not literal)
+          if (opacitySource.contains('?') ||
+              opacitySource.contains('_') ||
+              (arg.expression is! DoubleLiteral &&
+                  arg.expression is! IntegerLiteral)) {
+            reporter.atNode(node.constructorName, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when widgets don't specify clipBehavior for performance.
+///
+/// Explicit clipBehavior helps optimize rendering.
+///
+/// **BAD:**
+/// ```dart
+/// Stack(
+///   children: [OverflowingWidget()],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(
+///   clipBehavior: Clip.none, // Intentionally allow overflow
+///   children: [OverflowingWidget()],
+/// )
+/// ```
+class PreferClipBehaviorRule extends SaropaLintRule {
+  const PreferClipBehaviorRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_clip_behavior',
+    problemMessage: 'Consider specifying clipBehavior for performance.',
+    correctionMessage: 'Add clipBehavior: Clip.none or Clip.hardEdge.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _clippableWidgets = <String>{
+    'Stack',
+    'Container',
+    'ClipRect',
+    'ClipRRect',
+    'ClipOval',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_clippableWidgets.contains(typeName)) return;
+
+      bool hasClipBehavior = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'clipBehavior') {
+          hasClipBehavior = true;
+          break;
+        }
+      }
+
+      if (!hasClipBehavior) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when scrollable lists should have a ScrollController.
+///
+/// ScrollController is needed for infinite scroll and scroll position tracking.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => ListTile(),
+///   itemCount: items.length,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   controller: _scrollController,
+///   itemBuilder: (context, index) => ListTile(),
+///   itemCount: items.length,
+/// )
+/// ```
+class RequireScrollControllerRule extends SaropaLintRule {
+  const RequireScrollControllerRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_scroll_controller',
+    problemMessage: 'Consider adding ScrollController for scroll tracking.',
+    correctionMessage: 'Add controller: _scrollController for infinite scroll.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      final String? constructorName = node.constructorName.name?.name;
+
+      // Only check ListView.builder for paginated content
+      if (typeName != 'ListView' || constructorName != 'builder') return;
+
+      bool hasController = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'controller') {
+          hasController = true;
+          break;
+        }
+      }
+
+      if (!hasController) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Positioned is used instead of PositionedDirectional.
+///
+/// PositionedDirectional respects text direction for RTL languages.
+///
+/// **BAD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     Positioned(left: 10, child: Icon(Icons.arrow_back)),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     PositionedDirectional(start: 10, child: Icon(Icons.arrow_back)),
+///   ],
+/// )
+/// ```
+class PreferPositionedDirectionalRule extends SaropaLintRule {
+  const PreferPositionedDirectionalRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_positioned_directional',
+    problemMessage: 'Use PositionedDirectional for RTL support.',
+    correctionMessage: 'Replace Positioned with PositionedDirectional.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Positioned') return;
+
+      // Check if using left/right (not top/bottom only)
+      bool usesLeftRight = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'left' || argName == 'right') {
+            usesLeftRight = true;
+            break;
+          }
+        }
+      }
+
+      if (usesLeftRight) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Stack children may cause overflow without positioning.
+///
+/// Stack children without Positioned/Align may not layout as expected.
+///
+/// **BAD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     Container(color: Colors.red),
+///     Text('Overlay'), // May be positioned unexpectedly
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     Container(color: Colors.red),
+///     Positioned(bottom: 10, child: Text('Overlay')),
+///   ],
+/// )
+/// ```
+class AvoidStackOverflowRule extends SaropaLintRule {
+  const AvoidStackOverflowRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_stack_overflow',
+    problemMessage: 'Stack children should use Positioned or Align.',
+    correctionMessage: 'Wrap child with Positioned, Align, or Center.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _positioningWidgets = <String>{
+    'Positioned',
+    'PositionedDirectional',
+    'Align',
+    'Center',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Stack') return;
+
+      // Check children
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression childrenExpr = arg.expression;
+          if (childrenExpr is ListLiteral) {
+            // Skip if only one child (stack sizing behavior)
+            if (childrenExpr.elements.length <= 1) return;
+
+            int unpositionedCount = 0;
+            for (final CollectionElement element in childrenExpr.elements) {
+              if (element is InstanceCreationExpression) {
+                final String childType =
+                    element.constructorName.type.name.lexeme;
+                if (!_positioningWidgets.contains(childType)) {
+                  unpositionedCount++;
+                }
+              }
+            }
+
+            // Warn if multiple unpositioned children
+            if (unpositionedCount > 1) {
+              reporter.atNode(node.constructorName, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Form with TextFormField doesn't have validators.
+///
+/// Forms should validate input for better UX.
+///
+/// **BAD:**
+/// ```dart
+/// Form(
+///   child: TextFormField(
+///     decoration: InputDecoration(labelText: 'Email'),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Form(
+///   child: TextFormField(
+///     decoration: InputDecoration(labelText: 'Email'),
+///     validator: (value) {
+///       if (value?.isEmpty ?? true) return 'Email is required';
+///       return null;
+///     },
+///   ),
+/// )
+/// ```
+class RequireFormValidationRule extends SaropaLintRule {
+  const RequireFormValidationRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_form_validation',
+    problemMessage: 'TextFormField in Form should have a validator.',
+    correctionMessage: 'Add validator: (value) => ... to validate input.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TextFormField') return;
+
+      // Check if inside a Form
+      bool insideForm = false;
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'Form') {
+            insideForm = true;
+            break;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (!insideForm) return;
+
+      // Check if has validator
+      bool hasValidator = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'validator') {
+          hasValidator = true;
+          break;
+        }
+      }
+
+      if (!hasValidator) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when ListView/GridView uses `shrinkWrap: true` inside a scrollable.
+///
+/// Using `shrinkWrap: true` forces the list to calculate the size of all
+/// children at once, which defeats lazy loading and causes O(n) layout cost.
+/// This is particularly problematic for large lists.
+///
+/// **BAD:**
+/// ```dart
+/// ListView(
+///   shrinkWrap: true,
+///   children: items.map((item) => ListTile(title: Text(item))).toList(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   itemBuilder: (context, index) => ListTile(title: Text(items[index])),
+/// )
+/// ```
+///
+/// **Also OK (for small fixed lists):**
+/// ```dart
+/// ListView(
+///   children: [
+///     ListTile(title: Text('Item 1')),
+///     ListTile(title: Text('Item 2')),
+///   ],
+/// )
+/// ```
+class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
+  const AvoidShrinkWrapInScrollRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_shrink_wrap_in_scroll',
+    problemMessage:
+        'shrinkWrap: true causes O(n) layout cost and defeats lazy loading.',
+    correctionMessage:
+        'Use ListView.builder with itemCount for lazy loading, or remove '
+        'shrinkWrap if not needed.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _scrollableWidgets = <String>{
+    'ListView',
+    'GridView',
+    'SingleChildScrollView',
+    'CustomScrollView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Only check scrollable widgets
+      if (!_scrollableWidgets.contains(typeName)) return;
+
+      // Check for shrinkWrap: true
+      bool hasShrinkWrapTrue = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
+          final String value = arg.expression.toSource();
+          if (value == 'true') {
+            hasShrinkWrapTrue = true;
+            break;
+          }
+        }
+      }
+
+      if (hasShrinkWrapTrue) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when widget nesting exceeds 15 levels in a build method.
+///
+/// Deeply nested widget trees are hard to read, maintain, and debug.
+/// They often indicate a need to extract widgets into separate components.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return A(child: B(child: C(child: D(child: E(child: F(child: G(
+///     child: H(child: I(child: J(child: K(child: L(child: M(child: N(
+///       child: O(child: P()), // 16 levels deep!
+///     ))))))))))))));
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return A(
+///     child: B(
+///       child: _buildContent(),
+///     ),
+///   );
+/// }
+///
+/// Widget _buildContent() {
+///   return C(child: D(child: E()));
+/// }
+/// ```
+class AvoidDeepWidgetNestingRule extends SaropaLintRule {
+  const AvoidDeepWidgetNestingRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_deep_widget_nesting',
+    problemMessage: 'Widget tree exceeds 15 levels of nesting.',
+    correctionMessage:
+        'Extract nested widgets into separate methods or widget classes '
+        'for better readability and maintainability.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const int _maxDepth = 15;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only check build methods
+      if (node.name.lexeme != 'build') return;
+
+      // Visit the body to find deep nesting (uses existing _WidgetDepthVisitor)
+      final _WidgetDepthVisitor visitor =
+          _WidgetDepthVisitor(_maxDepth, reporter, code);
+      node.body.accept(visitor);
+    });
+  }
+}
+
+/// Warns when Scaffold body content may overlap device notches or system UI.
+///
+/// Modern phones have notches, rounded corners, and system UI overlays.
+/// Content should be wrapped in SafeArea to avoid being obscured.
+///
+/// **BAD:**
+/// ```dart
+/// Scaffold(
+///   body: Column(
+///     children: [
+///       Text('Title'), // May be hidden under notch!
+///     ],
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Scaffold(
+///   body: SafeArea(
+///     child: Column(
+///       children: [
+///         Text('Title'),
+///       ],
+///     ),
+///   ),
+/// )
+/// ```
+///
+/// **Also OK (AppBar handles top safe area):**
+/// ```dart
+/// Scaffold(
+///   appBar: AppBar(title: Text('Title')),
+///   body: Content(),
+/// )
+/// ```
+///
+/// **Also OK (intentionally extends behind system UI):**
+/// ```dart
+/// Scaffold(
+///   extendBody: true, // Intentional: content extends behind nav bar
+///   extendBodyBehindAppBar: true, // Intentional: content behind app bar
+///   body: FullScreenImage(),
+/// )
+/// ```
+class PreferSafeAreaAwareRule extends SaropaLintRule {
+  const PreferSafeAreaAwareRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_safe_area_aware',
+    problemMessage: 'Content may overlap device notch or system UI.',
+    correctionMessage:
+        'Wrap body content in SafeArea, or use AppBar which handles it '
+        'automatically.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Scaffold') return;
+
+      // Check for properties that affect safe area handling
+      bool hasAppBar = false;
+      bool hasExtendBody = false;
+      bool hasExtendBehindAppBar = false;
+      Expression? bodyExpr;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'appBar') {
+            hasAppBar = true;
+          }
+          if (name == 'body') {
+            bodyExpr = arg.expression;
+          }
+          // extendBody/extendBodyBehindAppBar mean developer intentionally
+          // wants content to extend behind system UI (e.g., fullscreen images)
+          if (name == 'extendBody') {
+            final String value = arg.expression.toSource();
+            if (value == 'true') hasExtendBody = true;
+          }
+          if (name == 'extendBodyBehindAppBar') {
+            final String value = arg.expression.toSource();
+            if (value == 'true') hasExtendBehindAppBar = true;
+          }
+        }
+      }
+
+      // If has AppBar, it handles the top safe area
+      if (hasAppBar) return;
+
+      // If intentionally extending behind system UI, skip
+      if (hasExtendBody || hasExtendBehindAppBar) return;
+
+      // If no body, nothing to check
+      if (bodyExpr == null) return;
+
+      // Check if body is SafeArea or its child is SafeArea
+      if (bodyExpr is InstanceCreationExpression) {
+        final String bodyType = bodyExpr.constructorName.type.name.lexeme;
+
+        // Direct SafeArea wrapper is OK
+        if (bodyType == 'SafeArea') return;
+
+        // Check common wrapper patterns that handle their own layout
+        if (bodyType == 'Builder' ||
+            bodyType == 'LayoutBuilder' ||
+            bodyType == 'MediaQuery' ||
+            bodyType == 'CustomScrollView' ||
+            bodyType == 'NestedScrollView') {
+          // These often handle safe area internally or via slivers
+          return;
+        }
+      }
+
+      reporter.atNode(node.constructorName, code);
     });
   }
 }

@@ -1022,42 +1022,88 @@ class _AddHackForUnassignedSubscriptionFix extends DartFix {
   }
 }
 
-/// Warns when VoidCallback is used for a callback that might be async.
+/// Warns when `VoidCallback` is used for a callback that likely performs
+/// async operations.
 ///
-/// Using `VoidCallback` for handlers that perform async operations silently
-/// discards the `Future`, which can hide exceptions and make it impossible
-/// to await completion.
+/// ## Why This Matters
 ///
-/// ### Example
+/// `VoidCallback` is defined as `void Function()`. When you pass an async
+/// function to a `VoidCallback`, Dart allows it but **silently discards the
+/// returned Future**. This causes several problems:
 ///
-/// #### BAD:
+/// 1. **Lost errors**: Exceptions thrown in the async callback are swallowed
+/// 2. **Race conditions**: The caller can't wait for completion
+/// 3. **Unpredictable state**: UI may update before the operation finishes
+///
+/// ## How Detection Works
+///
+/// This rule flags `VoidCallback` fields and parameters whose names suggest
+/// async behavior:
+///
+/// - **Data operations**: onSubmit, onSave, onLoad, onFetch, onRefresh, onSync
+/// - **Network operations**: onLogin, onLogout, onSend, onRequest
+/// - **Database operations**: onDelete, onUpdate, onInsert, onCreate
+/// - **File operations**: onExport, onImport, onBackup, onRestore
+/// - **Processing**: onProcess, onValidate, onConfirm, onComplete
+///
+/// Prefixed variants (e.g., `onSubmitForm`, `onDeleteUser`) are also detected.
+///
+/// ## Example
+///
+/// ### BAD:
 /// ```dart
 /// class MyWidget extends StatelessWidget {
-///   final VoidCallback? onSubmit;  // Might perform async operations
-///   final VoidCallback? onSave;    // Suggests data persistence (async)
-///   final VoidCallback? onLoad;    // Suggests data loading (async)
+///   final VoidCallback? onSubmit;  // Future silently discarded!
+///   final VoidCallback? onDelete;  // Errors will be swallowed!
+///
+///   void _handleTap() {
+///     onSubmit?.call();  // Can't await, can't catch errors
+///     showSuccessMessage();  // May run before submit completes!
+///   }
 /// }
 /// ```
 ///
-/// #### GOOD:
+/// ### GOOD:
 /// ```dart
 /// class MyWidget extends StatelessWidget {
-///   final AsyncCallback? onSubmit;  // Can await and handle errors
-///   final AsyncCallback? onSave;
-///   final AsyncCallback? onLoad;
+///   final Future<void> Function()? onSubmit;  // Explicit async signature
+///   final Future<void> Function()? onDelete;  // Caller can await
+///
+///   Future<void> _handleTap() async {
+///     await onSubmit?.call();  // Properly awaited
+///     showSuccessMessage();     // Runs after submit completes
+///   }
 /// }
 /// ```
 ///
-/// **Quick fix available:** Changes VoidCallback to AsyncCallback.
+/// ## Why `Future<void> Function()` Instead of `AsyncCallback`?
+///
+/// While Flutter provides `AsyncCallback` in `package:flutter/foundation.dart`,
+/// we recommend the explicit `Future<void> Function()` form because:
+///
+/// 1. **No extra import required** - works with just `material.dart`
+/// 2. **Self-documenting** - the signature is immediately clear
+/// 3. **Consistent** - matches how parameterized async callbacks are written:
+///    ```dart
+///    final Future<void> Function(String id)? onDeleteItem;  // With params
+///    final Future<void> Function()? onRefresh;               // Without params
+///    ```
+///
+/// ## Quick Fix
+///
+/// This rule provides an automatic fix that replaces:
+/// - `VoidCallback` → `Future<void> Function()`
+/// - `VoidCallback?` → `Future<void> Function()?`
 class PreferAsyncCallbackRule extends SaropaLintRule {
   const PreferAsyncCallbackRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_callback',
     problemMessage:
-        'VoidCallback used for potentially async operation. Future will be silently discarded.',
+        'VoidCallback discards Futures silently. Errors will be swallowed and '
+        'callers cannot await completion.',
     correctionMessage:
-        'Use AsyncCallback (Future<void> Function()) to properly handle async operations.',
+        'Use Future<void> Function() to allow proper async handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1107,6 +1153,9 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
   };
 
   /// Prefixes that suggest async behavior when combined with other words.
+  ///
+  /// Example: `onSubmitForm`, `onDeleteUser`, `onProcessPayment`.
+  /// These are checked with camelCase validation (next char must be uppercase).
   static const Set<String> _asyncSuggestingPrefixes = <String>{
     'onSubmit',
     'onSave',
@@ -1119,10 +1168,19 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
     'onSend',
     'onDelete',
     'onUpdate',
+    'onInsert',
+    'onCreate',
     'onLogin',
     'onLogout',
+    'onSignIn',
+    'onSignOut',
     'onExport',
     'onImport',
+    'onBackup',
+    'onRestore',
+    'onProcess',
+    'onValidate',
+    'onConfirm',
   };
 
   bool _isAsyncSuggestingName(String name) {
@@ -1135,7 +1193,8 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
       if (name.startsWith(prefix) && name.length > prefix.length) {
         // Check that next char is uppercase (proper camelCase)
         final String nextChar = name[prefix.length];
-        if (nextChar == nextChar.toUpperCase() && nextChar != nextChar.toLowerCase()) {
+        if (nextChar == nextChar.toUpperCase() &&
+            nextChar != nextChar.toLowerCase()) {
           return true;
         }
       }
@@ -1188,10 +1247,14 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_ChangeToAsyncCallbackFix()];
+  List<Fix> getFixes() => <Fix>[_ChangeToFutureVoidFunctionFix()];
 }
 
-class _ChangeToAsyncCallbackFix extends DartFix {
+/// Quick fix that replaces `VoidCallback` with `Future<void> Function()`.
+///
+/// This fix is applied when the lint detects a VoidCallback used for a
+/// callback name that suggests async behavior (e.g., onSubmit, onDelete).
+class _ChangeToFutureVoidFunctionFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -1207,10 +1270,11 @@ class _ChangeToAsyncCallbackFix extends DartFix {
       if (source != 'VoidCallback' && source != 'VoidCallback?') return;
 
       final bool isNullable = source.endsWith('?');
-      final String replacement = isNullable ? 'AsyncCallback?' : 'AsyncCallback';
+      final String replacement =
+          isNullable ? 'Future<void> Function()?' : 'Future<void> Function()';
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Change to $replacement',
+        message: 'Change to Future<void> Function()',
         priority: 1,
       );
 

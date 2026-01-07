@@ -509,3 +509,123 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when HTTP requests don't specify a timeout.
+///
+/// Network requests without timeouts can hang indefinitely, leading to poor
+/// user experience. Always specify a reasonable timeout for HTTP calls.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(Uri.parse('https://api.example.com/data'));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final response = await http.get(
+///   Uri.parse('https://api.example.com/data'),
+/// ).timeout(Duration(seconds: 30));
+/// ```
+///
+/// **Also GOOD (Dio with timeout):**
+/// ```dart
+/// final dio = Dio(BaseOptions(
+///   connectTimeout: Duration(seconds: 5),
+///   receiveTimeout: Duration(seconds: 30),
+/// ));
+/// final response = await dio.get('https://api.example.com/data');
+/// ```
+class RequireRequestTimeoutRule extends SaropaLintRule {
+  const RequireRequestTimeoutRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_request_timeout',
+    problemMessage: 'HTTP request without timeout may hang indefinitely.',
+    correctionMessage:
+        'Add .timeout(Duration(seconds: 30)) or configure timeout in client options.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _httpMethods = <String>{
+    'get',
+    'post',
+    'put',
+    'patch',
+    'delete',
+    'head',
+    'read',
+    'readBytes',
+    'readString',
+    'send',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Only check HTTP methods
+      if (!_httpMethods.contains(methodName)) return;
+
+      // Check if target looks like an HTTP client
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+
+      // Check if this is an HTTP-related call
+      // Be specific to avoid false positives (e.g., apiResponse.get() is not HTTP)
+      // Look for actual HTTP client patterns, not just 'api' which matches too broadly
+      final bool isHttpCall = targetSource.contains('http') ||
+          targetSource == 'dio' ||
+          targetSource.endsWith('.dio') ||
+          targetSource.contains('httpclient') ||
+          targetSource.contains('http.client') ||
+          // Client without 'api' prefix to avoid matching apiClient, apiResponse, etc.
+          (targetSource == 'client' || targetSource.endsWith('.client'));
+
+      if (!isHttpCall) return;
+
+      // Check if .timeout() is chained on this call
+      final AstNode? parent = node.parent;
+      if (parent is MethodInvocation) {
+        final String parentMethod = parent.methodName.name;
+        if (parentMethod == 'timeout') return; // Has timeout
+      }
+
+      // Check if in await expression with timeout
+      if (parent is AwaitExpression) {
+        final AstNode? awaitParent = parent.parent;
+        if (awaitParent is MethodInvocation &&
+            awaitParent.methodName.name == 'timeout') {
+          return; // await http.get(...).timeout(...)
+        }
+      }
+
+      // Check if timeout is configured in the surrounding context
+      // (e.g., Dio with connectTimeout in options)
+      AstNode? current = node.parent;
+      int depth = 0;
+      while (current != null && depth < 10) {
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          final String bodySource = current.toSource();
+          if (bodySource.contains('connectTimeout') ||
+              bodySource.contains('receiveTimeout') ||
+              bodySource.contains('sendTimeout') ||
+              bodySource.contains('BaseOptions')) {
+            return; // Timeout likely configured at client level
+          }
+          break;
+        }
+        current = current.parent;
+        depth++;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
