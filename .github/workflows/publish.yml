@@ -1,0 +1,41 @@
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (validate only, do not publish)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC authentication with pub.dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: '3.10.4'
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Analyze
+        run: dart analyze --fatal-infos
+
+      - name: Format check
+        run: dart format --set-exit-if-changed .
+
+      - name: Run tests
+        run: dart test
+
+      - name: Dry run
+        run: dart pub publish --dry-run
+
+      - name: Publish to pub.dev
+        if: ${{ inputs.dry_run != 'true' }}
+        run: dart pub publish --force

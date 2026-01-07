@@ -768,26 +768,75 @@ def pre_publish_validation(project_dir: Path) -> bool:
     return False
 
 
-def publish_to_pubdev(project_dir: Path) -> bool:
-    """Publish to pub.dev."""
-    print_header("STEP 10: PUBLISHING TO PUB.DEV")
+# Safe publishing account - no confirmation needed when using this email
+SAFE_PUBLISH_EMAIL = "saropa.packages@gmail.com"
 
-    # Clean first
-    run_command(["flutter", "clean"], project_dir, "Cleaning project")
 
-    # Publish
-    result = run_command(
-        ["flutter", "pub", "publish", "--force"],
-        project_dir,
-        "Publishing to pub.dev"
+def get_pub_account() -> str | None:
+    """Get the currently authenticated pub.dev account email."""
+    use_shell = get_shell_mode()
+
+    # Run 'dart pub login' which tells us if we're already logged in
+    result = subprocess.run(
+        ["dart", "pub", "login"],
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+        input="n\n"  # Say no if it prompts to open browser
     )
 
-    return result.returncode == 0
+    output = result.stdout + result.stderr
+
+    # Look for "You are already logged in as <email>"
+    match = re.search(r"logged in as <([^>]+)>", output)
+    if match:
+        return match.group(1)
+
+    return None
+
+
+def publish_to_pubdev(project_dir: Path) -> bool:
+    """Publish to pub.dev via GitHub Actions."""
+    print_header("STEP 12: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
+
+    use_shell = get_shell_mode()
+
+    # Trigger GitHub Actions workflow
+    print_info("Triggering GitHub Actions publish workflow...")
+    result = subprocess.run(
+        ["gh", "workflow", "run", "publish.yml"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell
+    )
+
+    if result.returncode != 0:
+        print_error("Failed to trigger GitHub Actions workflow")
+        if result.stderr:
+            print(result.stderr)
+        print_info("Make sure you have 'gh' CLI installed and authenticated.")
+        print_info("Run: gh auth login")
+        return False
+
+    print_success("GitHub Actions publish workflow triggered!")
+    print()
+    print_colored("  The publish is now running on GitHub Actions.", Color.CYAN)
+    print_colored("  No personal email will be shown on pub.dev.", Color.GREEN)
+    print()
+
+    # Get repo URL for the actions page
+    remote_url = get_remote_url(project_dir)
+    repo_path = extract_repo_path(remote_url)
+    print_colored(f"  Monitor progress at: https://github.com/{repo_path}/actions", Color.CYAN)
+    print()
+
+    return True
 
 
 def git_commit_and_push(project_dir: Path, version: str, branch: str) -> bool:
     """Commit changes and push to remote."""
-    print_header("STEP 11: COMMITTING CHANGES")
+    print_header("STEP 10: COMMITTING CHANGES")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
@@ -832,7 +881,7 @@ def git_commit_and_push(project_dir: Path, version: str, branch: str) -> bool:
 
 def create_git_tag(project_dir: Path, version: str) -> bool:
     """Create and push git tag."""
-    print_header("STEP 12: CREATING GIT TAG")
+    print_header("STEP 11: CREATING GIT TAG")
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
@@ -1111,22 +1160,22 @@ def main() -> int:
     #     return ExitCode.USER_CANCELLED.value
 
     # =========================================================================
-    # PUBLISH AND RELEASE
+    # COMMIT, TAG, AND PUBLISH
     # =========================================================================
 
-    # Step 10: Publish to pub.dev FIRST
-    if not publish_to_pubdev(project_dir):
-        exit_with_error("Publishing to pub.dev failed", ExitCode.PUBLISH_FAILED)
-
-    # Step 11: Git commit and push (AFTER publish succeeds)
+    # Step 10: Git commit and push (BEFORE GitHub Actions - it needs the code)
     if not git_commit_and_push(project_dir, version, branch):
         exit_with_error("Git operations failed", ExitCode.GIT_FAILED)
 
-    # Step 12: Create git tag
+    # Step 11: Create git tag
     if not create_git_tag(project_dir, version):
         exit_with_error("Git tag creation failed", ExitCode.GIT_FAILED)
 
-    # Step 13: Create GitHub release (non-blocking - publish already succeeded)
+    # Step 12: Trigger GitHub Actions to publish to pub.dev
+    if not publish_to_pubdev(project_dir):
+        exit_with_error("Failed to trigger GitHub Actions publish", ExitCode.PUBLISH_FAILED)
+
+    # Step 13: Create GitHub release
     gh_success, gh_error = create_github_release(project_dir, version, release_notes)
 
     # =========================================================================

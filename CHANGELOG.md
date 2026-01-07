@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.3] - 2026-01-07
+
+### Fixed
+
+- **pub.dev scoring** - Fixed issues that caused loss of 70 pub points:
+  - Added `.pubignore` to exclude `example/pubspec.yaml` which had a `path: ../` dependency that broke pana analysis
+  - Excluded generated API docs (`doc/api/`), log files, scripts, and test fixtures from published package
+  - Package size reduced from 4MB to 469KB
+
+- **Dependency compatibility** - Updated `analyzer` constraint from `<10.0.0` to `<11.0.0` to support analyzer v10.0.0
+
+### Added
+
+- **GitHub Actions publish workflow** - Added `.github/workflows/publish.yml` for automated pub.dev publishing with dry-run option, analysis, format check, and tests
+
+- **README badges** - Added pub points badge and rules count badge (650+)
+
+### Changed
+
+- **Troubleshooting documentation** - Reorganized README troubleshooting section with clearer subsections:
+  - "IDE doesn't show lint warnings" - consolidated IDE troubleshooting steps
+  - "Out of Memory errors" - new section with 3 solutions (cache clean, heap size, delete artifacts)
+  - "Native crashes (Windows)" - moved existing crash fix content
+
 ## [1.5.2] - 2026-01-07
 
 ### Changed
