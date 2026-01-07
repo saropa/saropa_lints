@@ -9308,7 +9308,8 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
     });
   }
 
-  void _checkForHardcodedValue(Expression expr, SaropaDiagnosticReporter reporter) {
+  void _checkForHardcodedValue(
+      Expression expr, SaropaDiagnosticReporter reporter) {
     if (expr is IntegerLiteral) {
       final int? value = expr.value;
       if (value != null && !_acceptableValues.contains(value) && value > 4) {
@@ -9569,7 +9570,8 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cursor_for_buttons',
     problemMessage: 'Interactive widget should specify mouse cursor for web.',
-    correctionMessage: 'Add mouseCursor: SystemMouseCursors.click (or similar).',
+    correctionMessage:
+        'Add mouseCursor: SystemMouseCursors.click (or similar).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -9638,7 +9640,8 @@ class RequireHoverStatesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hover_states',
-    problemMessage: 'Interactive widget should handle hover state for web/desktop.',
+    problemMessage:
+        'Interactive widget should handle hover state for web/desktop.',
     correctionMessage: 'Add onHover callback for visual feedback.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -9768,10 +9771,11 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 
       // Check if child shows loading indicator
       String childSource = childExpr?.toSource() ?? '';
-      bool hasLoadingIndicator = childSource.contains('CircularProgressIndicator') ||
-          childSource.contains('Loading') ||
-          childSource.contains('isLoading') ||
-          childSource.contains('?');
+      bool hasLoadingIndicator =
+          childSource.contains('CircularProgressIndicator') ||
+              childSource.contains('Loading') ||
+              childSource.contains('isLoading') ||
+              childSource.contains('?');
 
       if (!hasLoadingState && !hasLoadingIndicator) {
         reporter.atNode(node.constructorName, code);
@@ -9885,8 +9889,10 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_page_storage_key',
-    problemMessage: 'Consider using PageStorageKey to preserve scroll position.',
-    correctionMessage: 'Add key: PageStorageKey("unique_key") to the scrollable.',
+    problemMessage:
+        'Consider using PageStorageKey to preserve scroll position.',
+    correctionMessage:
+        'Add key: PageStorageKey("unique_key") to the scrollable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -10113,7 +10119,8 @@ class PreferSliverListRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list',
-    problemMessage: 'Use SliverList instead of ListView inside CustomScrollView.',
+    problemMessage:
+        'Use SliverList instead of ListView inside CustomScrollView.',
     correctionMessage:
         'Replace ListView with SliverList for proper sliver composition.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -10253,7 +10260,8 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_default_text_style',
-    problemMessage: 'Multiple Text widgets with same style - use DefaultTextStyle.',
+    problemMessage:
+        'Multiple Text widgets with same style - use DefaultTextStyle.',
     correctionMessage: 'Wrap with DefaultTextStyle to share common styles.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -10319,7 +10327,8 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_wrap_over_overflow',
-    problemMessage: 'Row with many children may overflow - consider using Wrap.',
+    problemMessage:
+        'Row with many children may overflow - consider using Wrap.',
     correctionMessage: 'Replace Row with Wrap for automatic wrapping.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -10646,7 +10655,8 @@ class AvoidGestureConflictRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_conflict',
-    problemMessage: 'Nested GestureDetector widgets may cause gesture conflicts.',
+    problemMessage:
+        'Nested GestureDetector widgets may cause gesture conflicts.',
     correctionMessage: 'Consolidate gesture handling or use behavior property.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -10705,7 +10715,8 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_images_in_memory',
     problemMessage: 'Image should specify size constraints to save memory.',
-    correctionMessage: 'Add width/height and cacheWidth/cacheHeight parameters.',
+    correctionMessage:
+        'Add width/height and cacheWidth/cacheHeight parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -10775,7 +10786,8 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_in_scrollable',
-    problemMessage: 'LayoutBuilder inside scrollable causes performance issues.',
+    problemMessage:
+        'LayoutBuilder inside scrollable causes performance issues.',
     correctionMessage: 'Move LayoutBuilder outside the scrollable widget.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -10843,7 +10855,8 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_intrinsic_dimensions',
-    problemMessage: 'Consider using IntrinsicWidth/Height for content-based sizing.',
+    problemMessage:
+        'Consider using IntrinsicWidth/Height for content-based sizing.',
     correctionMessage: 'Wrap with IntrinsicWidth or IntrinsicHeight.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -10920,7 +10933,8 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_actions_and_shortcuts',
-    problemMessage: 'Use Actions/Shortcuts system instead of RawKeyboardListener.',
+    problemMessage:
+        'Use Actions/Shortcuts system instead of RawKeyboardListener.',
     correctionMessage: 'Replace with Shortcuts and Actions widgets.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -10935,8 +10949,7 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName == 'RawKeyboardListener' ||
-          typeName == 'KeyboardListener') {
+      if (typeName == 'RawKeyboardListener' || typeName == 'KeyboardListener') {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -11107,7 +11120,8 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_constraints',
-    problemMessage: 'Column/Row in SingleChildScrollView may have unbounded constraints.',
+    problemMessage:
+        'Column/Row in SingleChildScrollView may have unbounded constraints.',
     correctionMessage:
         'Wrap with ConstrainedBox or avoid Expanded/Flexible children.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -11261,7 +11275,8 @@ class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unconstrained_box_misuse',
-    problemMessage: 'UnconstrainedBox in constrained parent may cause overflow.',
+    problemMessage:
+        'UnconstrainedBox in constrained parent may cause overflow.',
     correctionMessage: 'Consider using FittedBox or OverflowBox instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -11450,7 +11465,8 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_misuse',
     problemMessage: 'Use AnimatedOpacity for opacity animations.',
-    correctionMessage: 'Replace Opacity with AnimatedOpacity for smoother animations.',
+    correctionMessage:
+        'Replace Opacity with AnimatedOpacity for smoother animations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

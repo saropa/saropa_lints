@@ -1043,7 +1043,8 @@ class PreferMockNavigatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_mock_navigator',
-    problemMessage: 'Navigator usage in test should be mocked for verification.',
+    problemMessage:
+        'Navigator usage in test should be mocked for verification.',
     correctionMessage: 'Use MockNavigatorObserver to verify navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1109,7 +1110,8 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_real_timer_in_widget_test',
     problemMessage: 'Avoid using Timer in widget tests.',
-    correctionMessage: 'Use fakeAsync or tester.runAsync for timer-based tests.',
+    correctionMessage:
+        'Use fakeAsync or tester.runAsync for timer-based tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1240,7 +1242,8 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_matcher_over_equals',
-    problemMessage: 'Use matchers instead of direct equality for better messages.',
+    problemMessage:
+        'Use matchers instead of direct equality for better messages.',
     correctionMessage:
         'Replace with isTrue, isFalse, isNull, hasLength(), etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1283,8 +1286,7 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
       if (actual is PrefixedIdentifier && actual.identifier.name == 'length') {
         reporter.atNode(node, code);
       }
-      if (actual is PropertyAccess &&
-          actual.propertyName.name == 'length') {
+      if (actual is PropertyAccess && actual.propertyName.name == 'length') {
         reporter.atNode(node, code);
       }
     });
@@ -1514,7 +1516,8 @@ class PreferMockHttpRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_mock_http',
-    problemMessage: 'Use mock HTTP client in tests instead of real network calls.',
+    problemMessage:
+        'Use mock HTTP client in tests instead of real network calls.',
     correctionMessage: 'Replace http.Client() with MockClient.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
