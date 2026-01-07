@@ -72,7 +72,8 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, SaropaDiagnosticReporter reporter) {
+  void _checkCondition(
+      Expression condition, SaropaDiagnosticReporter reporter) {
     if (condition is AssignmentExpression) {
       reporter.atNode(condition, code);
     }
@@ -114,8 +115,7 @@ class AvoidCollapsibleIfRule extends SaropaLintRule {
     name: 'avoid_collapsible_if',
     problemMessage:
         'Nested if without else. Extra nesting reduces readability.',
-    correctionMessage:
-        'Combine into single if: if (a && b) { ... }.',
+    correctionMessage: 'Combine into single if: if (a && b) { ... }.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1690,7 +1690,8 @@ class PreferEarlyReturnRule extends SaropaLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, SaropaDiagnosticReporter reporter) {
+  void _checkFunctionBody(
+      FunctionBody body, SaropaDiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;
@@ -1933,8 +1934,7 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
       Statement? firstStatement;
       if (statements.length == 1) {
         firstStatement = statements.first;
-      } else if (statements.length == 2 &&
-          statements.last is BreakStatement) {
+      } else if (statements.length == 2 && statements.last is BreakStatement) {
         // Allow if + break pattern
         firstStatement = statements.first;
       }
@@ -1945,7 +1945,8 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
       IfStatement? ifStmt;
       if (firstStatement is IfStatement) {
         ifStmt = firstStatement;
-      } else if (firstStatement is Block && firstStatement.statements.length == 1) {
+      } else if (firstStatement is Block &&
+          firstStatement.statements.length == 1) {
         final Statement inner = firstStatement.statements.first;
         if (inner is IfStatement) {
           ifStmt = inner;

@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -411,7 +412,8 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
     });
   }
 
-  void _checkRecordPattern(RecordPattern pattern, SaropaDiagnosticReporter reporter) {
+  void _checkRecordPattern(
+      RecordPattern pattern, SaropaDiagnosticReporter reporter) {
     for (final PatternField field in pattern.fields) {
       final PatternFieldName? fieldName = field.name;
       if (fieldName == null) continue;
@@ -1298,8 +1300,10 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_for_unused_param',
-    problemMessage: 'Parameter is unused. Consider using _ wildcard (Dart 3.7+).',
-    correctionMessage: 'Replace with _ to indicate the parameter is intentionally unused.',
+    problemMessage:
+        'Parameter is unused. Consider using _ wildcard (Dart 3.7+).',
+    correctionMessage:
+        'Replace with _ to indicate the parameter is intentionally unused.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1350,7 +1354,8 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
       final String name = nameToken.lexeme;
 
       // Skip if already a wildcard pattern
-      if (name == '_' || name.startsWith('_') && name.replaceAll('_', '').isEmpty) {
+      if (name == '_' ||
+          name.startsWith('_') && name.replaceAll('_', '').isEmpty) {
         continue;
       }
 
