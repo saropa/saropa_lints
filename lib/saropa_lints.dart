@@ -649,6 +649,44 @@ const List<LintRule> _allRules = <LintRule>[
   PreferTextThemeRule(),
   AvoidNestedScrollablesRule(),
 
+  // New widget rules from roadmap (batch 1)
+  AvoidHardcodedLayoutValuesRule(),
+  PreferIgnorePointerRule(),
+  AvoidGestureWithoutBehaviorRule(),
+  AvoidDoubleTapSubmitRule(),
+  PreferCursorForButtonsRule(),
+  RequireHoverStatesRule(),
+  RequireButtonLoadingStateRule(),
+  AvoidHardcodedTextStylesRule(),
+  PreferPageStorageKeyRule(),
+  RequireRefreshIndicatorRule(),
+
+  // New widget rules from roadmap (batch 2 - Very Easy)
+  RequireScrollPhysicsRule(),
+  PreferSliverListRule(),
+  PreferKeepAliveRule(),
+  RequireDefaultTextStyleRule(),
+  PreferWrapOverOverflowRule(),
+  PreferAssetImageForLocalRule(),
+  PreferFitCoverForBackgroundRule(),
+  RequireDisabledStateRule(),
+  RequireDragFeedbackRule(),
+
+  // New widget rules from roadmap (batch 2 - Easy)
+  AvoidGestureConflictRule(),
+  AvoidLargeImagesInMemoryRule(),
+  AvoidLayoutBuilderInScrollableRule(),
+  PreferIntrinsicDimensionsRule(),
+  PreferActionsAndShortcutsRule(),
+  RequireLongPressCallbackRule(),
+  AvoidFindChildInBuildRule(),
+  AvoidUnboundedConstraintsRule(),
+
+  // New test rules from roadmap
+  AvoidTestSleepRule(),
+  AvoidFindByTextRule(),
+  RequireTestKeysRule(),
+
   // New test rule
   PreferPumpAndSettleRule(),
 
@@ -681,6 +719,39 @@ const List<LintRule> _allRules = <LintRule>[
   PreferSnakeCaseFilesRule(),
   AvoidSmallTextRule(),
   PreferDocCommentsOverRegularRule(),
+
+  // Testing best practices rules (batch 3)
+  RequireArrangeActAssertRule(),
+  PreferMockNavigatorRule(),
+  AvoidRealTimerInWidgetTestRule(),
+  RequireMockVerificationRule(),
+  PreferMatcherOverEqualsRule(),
+  PreferTestWrapperRule(),
+  RequireScreenSizeTestsRule(),
+  AvoidStatefulTestSetupRule(),
+  PreferMockHttpRule(),
+  RequireGoldenTestRule(),
+
+  // Widget rules (batch 3)
+  PreferFractionalSizingRule(),
+  AvoidUnconstrainedBoxMisuseRule(),
+  RequireErrorWidgetRule(),
+  PreferSliverAppBarRule(),
+  AvoidOpacityMisuseRule(),
+  PreferClipBehaviorRule(),
+  RequireScrollControllerRule(),
+  PreferPositionedDirectionalRule(),
+  AvoidStackOverflowRule(),
+  RequireFormValidationRule(),
+
+  // High-impact rules (batch 4)
+  AvoidShrinkWrapInScrollRule(),
+  AvoidDeepWidgetNestingRule(),
+  PreferSafeAreaAwareRule(),
+  AvoidRefInBuildBodyRule(),
+  RequireImmutableBlocStateRule(),
+  RequireRequestTimeoutRule(),
+  AvoidFlakyTestsRule(),
 ];
 
 class _SaropaLints extends PluginBase {

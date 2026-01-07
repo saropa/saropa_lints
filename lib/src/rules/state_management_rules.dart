@@ -1288,17 +1288,69 @@ class _AddBlocCloseFix extends DartFix {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: close ${node.name.lexeme} in dispose()',
-        priority: 1,
-      );
+      final String fieldName = node.name.lexeme;
 
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Add ${node.name.lexeme}.close() in dispose() method\n  ',
+      // Find the containing class
+      AstNode? current = node.parent;
+      while (current != null && current is! ClassDeclaration) {
+        current = current.parent;
+      }
+      if (current is! ClassDeclaration) return;
+
+      final ClassDeclaration classNode = current;
+
+      // Find existing dispose method
+      MethodDeclaration? disposeMethod;
+      for (final ClassMember member in classNode.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeMethod = member;
+          break;
+        }
+      }
+
+      if (disposeMethod != null) {
+        // Insert close() call before super.dispose()
+        final String bodySource = disposeMethod.body.toSource();
+        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
+
+        if (superDisposeIndex != -1) {
+          final int bodyOffset = disposeMethod.body.offset;
+          final int insertOffset = bodyOffset + superDisposeIndex;
+
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Add $fieldName.close()',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            builder.addSimpleInsertion(
+              insertOffset,
+              '$fieldName.close();\n    ',
+            );
+          });
+        }
+      } else {
+        // Create new dispose method
+        int insertOffset = classNode.rightBracket.offset;
+
+        for (final ClassMember member in classNode.members) {
+          if (member is FieldDeclaration || member is ConstructorDeclaration) {
+            insertOffset = member.end;
+          }
+        }
+
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Add dispose() method with $fieldName.close()',
+          priority: 1,
         );
-      });
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleInsertion(
+            insertOffset,
+            '\n\n  @override\n  void dispose() {\n    $fieldName.close();\n    super.dispose();\n  }',
+          );
+        });
+      }
     });
   }
 }
@@ -1474,6 +1526,270 @@ class RequireAutoDisposeRule extends SaropaLintRule {
             }
           }
         }
+      }
+    });
+  }
+}
+
+/// Warns when ref.read() is used inside a build() method body.
+///
+/// In Riverpod, ref.read() doesn't set up reactivity - it reads the value once.
+/// Using ref.read() in build() means the widget won't rebuild when the provider
+/// changes. Use ref.watch() instead for reactive updates.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends ConsumerWidget {
+///   @override
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     final count = ref.read(counterProvider); // Won't rebuild on changes!
+///     return Text('Count: $count');
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends ConsumerWidget {
+///   @override
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     final count = ref.watch(counterProvider); // Rebuilds on changes
+///     return Text('Count: $count');
+///   }
+/// }
+/// ```
+///
+/// **Note:** ref.read() is correct in callbacks (onPressed, etc.) where you
+/// want the current value without rebuilding.
+class AvoidRefInBuildBodyRule extends SaropaLintRule {
+  const AvoidRefInBuildBodyRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_ref_in_build_body',
+    problemMessage:
+        'ref.read() in build() won\'t trigger rebuilds when the provider changes.',
+    correctionMessage:
+        'Use ref.watch() for reactive updates in build(), or move ref.read() '
+        'to a callback like onPressed.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only check build methods
+      if (node.name.lexeme != 'build') return;
+
+      // Visit the method body to find ref.read() calls
+      node.body.visitChildren(_RefReadVisitor(reporter, code));
+    });
+  }
+}
+
+/// Visitor that finds ref.read() calls in build method bodies.
+class _RefReadVisitor extends RecursiveAstVisitor<void> {
+  _RefReadVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  /// Track depth inside callbacks where ref.read() is OK
+  int _callbackDepth = 0;
+
+  /// Names of callback parameters where ref.read() is acceptable.
+  ///
+  /// These are event handlers and Future callbacks where ref.read() is correct
+  /// because you want the value at the time of the event, not reactive updates.
+  static const Set<String> _callbackMethods = <String>{
+    // Button/gesture callbacks
+    'onPressed',
+    'onTap',
+    'onLongPress',
+    'onDoubleTap',
+    'onPanUpdate',
+    'onDragEnd',
+    // Form/input callbacks
+    'onChanged',
+    'onSubmitted',
+    'onSaved',
+    'onEditingComplete',
+    'onFieldSubmitted',
+    // Navigation/animation callbacks
+    'onDismissed',
+    'onEnd',
+    'onStatusChanged',
+    'onComplete',
+    // Future/async callbacks
+    'then',
+    'catchError',
+    'whenComplete',
+    'onError',
+    // Stream callbacks
+    'listen',
+    'add',
+    'addError',
+    // Lifecycle callbacks
+    'addPostFrameCallback',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    // Check if entering a callback context
+    if (_callbackMethods.contains(methodName)) {
+      _callbackDepth++;
+      super.visitMethodInvocation(node);
+      _callbackDepth--;
+      return;
+    }
+
+    // Check for ref.read() outside callbacks
+    if (methodName == 'read' && _callbackDepth == 0) {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'ref') {
+        reporter.atNode(node, code);
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Function expressions in callbacks are OK for ref.read()
+    // Only increment if parent is a callback argument
+    final AstNode? parent = node.parent;
+    if (parent is NamedExpression &&
+        _callbackMethods.contains(parent.name.label.name)) {
+      _callbackDepth++;
+      super.visitFunctionExpression(node);
+      _callbackDepth--;
+      return;
+    }
+
+    super.visitFunctionExpression(node);
+  }
+}
+
+/// Warns when BLoC state classes are not immutable.
+///
+/// BLoC pattern relies on comparing old and new states to determine if the UI
+/// should rebuild. Mutable state classes can lead to subtle bugs where state
+/// changes aren't detected because the same object instance is being compared.
+///
+/// **BAD:**
+/// ```dart
+/// class CounterState {
+///   int count;
+///   CounterState({this.count = 0});
+/// }
+/// ```
+///
+/// **GOOD (with @immutable):**
+/// ```dart
+/// @immutable
+/// class CounterState {
+///   final int count;
+///   const CounterState({this.count = 0});
+/// }
+/// ```
+///
+/// **GOOD (with Equatable):**
+/// ```dart
+/// class CounterState extends Equatable {
+///   final int count;
+///   const CounterState({this.count = 0});
+///
+///   @override
+///   List<Object?> get props => [count];
+/// }
+/// ```
+class RequireImmutableBlocStateRule extends SaropaLintRule {
+  const RequireImmutableBlocStateRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_immutable_bloc_state',
+    problemMessage: 'BLoC state classes should be immutable.',
+    correctionMessage:
+        'Add @immutable annotation or extend Equatable to ensure state '
+        'immutability and proper equality comparisons.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme;
+
+      // Check if class name ends with 'State' (BLoC convention)
+      if (!className.endsWith('State')) return;
+
+      // Skip abstract classes
+      if (node.abstractKeyword != null) return;
+
+      // Skip if it's a Flutter State (extends State<T>)
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName == 'State') return; // Flutter State class
+      }
+
+      // Check for @immutable annotation
+      bool hasImmutable = false;
+      for (final Annotation annotation in node.metadata) {
+        final String annotationName = annotation.name.name;
+        if (annotationName == 'immutable') {
+          hasImmutable = true;
+          break;
+        }
+      }
+
+      // Check for Equatable in extends clause
+      bool hasEquatable = false;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName == 'Equatable' ||
+            superName.contains('Equatable') ||
+            superName == 'BlocState') {
+          hasEquatable = true;
+        }
+      }
+
+      // Check for Equatable in with clause (mixin)
+      final WithClause? withClause = node.withClause;
+      if (withClause != null) {
+        for (final NamedType mixin in withClause.mixinTypes) {
+          final String mixinName = mixin.name.lexeme;
+          if (mixinName == 'EquatableMixin' || mixinName.contains('Equatable')) {
+            hasEquatable = true;
+            break;
+          }
+        }
+      }
+
+      // Check for Equatable in implements clause
+      final ImplementsClause? implementsClause = node.implementsClause;
+      if (implementsClause != null) {
+        for (final NamedType interface in implementsClause.interfaces) {
+          final String interfaceName = interface.name.lexeme;
+          if (interfaceName.contains('Equatable')) {
+            hasEquatable = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasImmutable && !hasEquatable) {
+        reporter.atToken(node.name, code);
       }
     });
   }
