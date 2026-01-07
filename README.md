@@ -341,6 +341,22 @@ Create `.vscode/tasks.json` in your project root:
 
 This is more reliable than IDE integration because it runs the actual CLI tool rather than depending on the analyzer plugin system.
 
+### VS Code Status Bar Button (Optional)
+
+Want a clickable button instead of remembering the keyboard shortcut? Install the included extension:
+
+```bash
+python scripts/install_vscode_extension.py
+```
+
+Then restart VS Code.
+
+**What you get:**
+
+- A **"Lints"** button in the status bar (bottom of VS Code)
+- A search icon in the editor title bar when viewing Dart files
+- Both trigger `dart run custom_lint` and open the Problems panel
+
 ## Contributing
 
 We believe great tools are built by communities, not companies. Contributions and feedback are always welcome.
