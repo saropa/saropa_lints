@@ -5,6 +5,172 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - Unreleased
+
+### Added
+
+- **14 new lint rules**:
+
+  **Memory Leak Prevention (3 - Essential)**:
+  - `require_scroll_controller_dispose` - ScrollController fields must be disposed to prevent memory leaks
+  - `require_focus_node_dispose` - FocusNode fields must be disposed to prevent memory leaks
+  - `require_bloc_close` - Bloc/Cubit fields must be closed in dispose
+
+  **Security (1 - Essential)**:
+  - `avoid_dynamic_sql` - SQL queries built with string interpolation are vulnerable to injection attacks
+
+  **Widget Best Practices (5 - Recommended/Professional)**:
+  - `require_text_overflow_handling` - Text widgets with dynamic content should have overflow handling
+  - `require_image_error_builder` - Network images should have errorBuilder for graceful failure
+  - `require_image_dimensions` - Network images should specify dimensions to prevent layout shifts
+  - `require_placeholder_for_network` - Network images should have loading placeholders
+  - `avoid_nested_scrollables` - Nested scrollables cause gesture conflicts; use NestedScrollView
+
+  **State Management (3 - Recommended/Professional)**:
+  - `require_auto_dispose` - Riverpod providers should use autoDispose to prevent memory leaks
+  - `prefer_consumer_widget` - Prefer ConsumerWidget over wrapping with Consumer
+  - `prefer_text_theme` - Prefer Theme.textTheme over hardcoded TextStyle for consistency
+
+  **Testing (1 - Recommended)**:
+  - `prefer_pump_and_settle` - Use pumpAndSettle() after interactions to wait for animations
+
+### Improved
+
+- **Rule logic fixes**:
+  - `require_text_overflow_handling` - Now only flags dynamic content (variables, interpolation), not static strings
+  - `require_image_dimensions` - Now only flags network images, checks parent containers for sizing
+  - All State class detection rules - Now use exact `State<T>` matching instead of `contains('State')` to avoid false positives on classes like StateManager
+  - `require_auto_dispose` - Fixed method invocation detection for `Provider.family()` patterns
+  - `prefer_pump_and_settle` - Now only suggests when pump() follows interaction methods, skips explicit duration calls
+
+## [1.3.0] - 2025-01-06
+
+### Added
+
+- **37 new lint rules** with quick-fixes where applicable:
+
+  **Modern Dart 3.0+ Class Modifier Rules (4)**:
+  - `avoid_unmarked_public_class` - Public classes should use `base`, `final`, `interface`, or `sealed` modifier
+  - `prefer_final_class` - Non-extensible classes should be marked `final`
+  - `prefer_interface_class` - Pure abstract contracts should use `interface class`
+  - `prefer_base_class` - Abstract classes with shared implementation should use `base`
+
+  **Modern Dart 3.0+ Pattern Rules (3)**:
+  - `prefer_pattern_destructuring` - Use pattern destructuring instead of multiple `.$1`, `.$2` accesses
+  - `prefer_when_guard_over_if` - Use `when` guards in switch cases instead of nested `if`
+  - `prefer_wildcard_for_unused_param` - Use `_` for unused parameters (Dart 3.7+) (quick-fix)
+
+  **Modern Flutter Widget Rules (5)**:
+  - `avoid_material2_fallback` - Avoid `useMaterial3: false` (Material 3 is default since Flutter 3.16) (quick-fix)
+  - `prefer_overlay_portal` - Use OverlayPortal for declarative overlays (Flutter 3.10+)
+  - `prefer_carousel_view` - Use CarouselView for carousel patterns (Flutter 3.24+)
+  - `prefer_search_anchor` - Use SearchAnchor for Material 3 search (Flutter 3.10+)
+  - `prefer_tap_region_for_dismiss` - Use TapRegion for tap-outside-to-dismiss patterns (Flutter 3.10+)
+
+  **Flutter Widget Rules (10)**:
+  - `avoid_raw_keyboard_listener` - Use KeyboardListener instead of deprecated RawKeyboardListener (quick-fix)
+  - `avoid_image_repeat` - Image.repeat is rarely needed; explicit ImageRepeat.noRepeat preferred (quick-fix)
+  - `avoid_icon_size_override` - Use IconTheme instead of per-icon size
+  - `prefer_inkwell_over_gesture` - InkWell provides material ripple feedback (quick-fix)
+  - `avoid_fitted_box_for_text` - FittedBox can cause text scaling issues
+  - `prefer_listview_builder` - Use ListView.builder for long/infinite lists
+  - `avoid_opacity_animation` - Use AnimatedOpacity/FadeTransition instead of Opacity widget (quick-fix)
+  - `avoid_sized_box_expand` - Use SizedBox.expand() constructor instead of double.infinity (quick-fix)
+  - `prefer_selectable_text` - Use SelectableText for user-copyable content (quick-fix)
+  - `prefer_spacing_over_sizedbox` - Use Row/Column/Wrap spacing parameter instead of SizedBox spacers (Flutter 3.10+)
+
+  **Security Rules (3)**:
+  - `avoid_token_in_url` - Tokens/API keys should be in headers, not URL query params
+  - `avoid_clipboard_sensitive` - Don't copy passwords or tokens to clipboard
+  - `avoid_storing_passwords` - Never store passwords in SharedPreferences; use flutter_secure_storage
+
+  **Performance Rules (2)**:
+  - `avoid_string_concatenation_loop` - Use StringBuffer for string building in loops (quick-fix)
+  - `avoid_large_list_copy` - List.from() copies entire list; consider Iterable operations
+
+- **20 new stylistic/opinionated rules** (not in any tier by default - enable individually):
+  - `prefer_relative_imports` - Use relative imports for same-package files
+  - `prefer_one_widget_per_file` - One widget class per file
+  - `prefer_arrow_functions` - Use arrow syntax for simple functions
+  - `prefer_all_named_parameters` - Use named parameters instead of positional
+  - `prefer_trailing_comma_always` - Trailing commas on all multi-line structures
+  - `prefer_private_underscore_prefix` - Underscore prefix for private members
+  - `prefer_widget_methods_over_classes` - Helper methods instead of private widget classes
+  - `prefer_explicit_types` - Explicit type annotations instead of `var`/`final`
+  - `prefer_class_over_record_return` - Named classes instead of record return types
+  - `prefer_inline_callbacks` - Inline callbacks instead of separate methods
+  - `prefer_single_quotes` - Prefer single quotes for string literals (quick-fix)
+  - `prefer_todo_format` - TODOs follow `TODO(author): description` format
+  - `prefer_fixme_format` - FIXMEs follow `FIXME(author): description` format
+  - `prefer_sentence_case_comments` - Comments start with capital letter (quick-fix)
+  - `prefer_period_after_doc` - Doc comment sentences end with period (quick-fix)
+  - `prefer_screaming_case_constants` - Constants in SCREAMING_SNAKE_CASE (quick-fix)
+  - `prefer_descriptive_bool_names` - Boolean names use is/has/can/should prefix
+  - `prefer_snake_case_files` - File names in snake_case.dart
+  - `avoid_small_text` - Minimum 12sp text size for accessibility (quick-fix)
+  - `prefer_doc_comments_over_regular` - Use `///` instead of `//` for member docs (quick-fix)
+
+- **Quick fixes added to existing rules**:
+  - `avoid_explicit_pattern_field_name` - Auto-convert `fieldName: fieldName` to `:fieldName` shorthand
+  - `prefer_digit_separators` - Auto-add digit separators to large numbers (e.g., `1000000` → `1_000_000`)
+
+- **SaropaLintRule base class enhancements** - All rules now use the enhanced base class with:
+  - **Hyphenated ignore comments** - Both `// ignore: no_empty_block` and `// ignore: no-empty-block` formats work
+  - **Context-aware file skipping** - Generated files (`*.g.dart`, `*.freezed.dart`), fixture files skipped by default
+  - **Documentation URLs** - Each rule has `documentationUrl` and `hyphenatedName` getters
+  - **Severity override support** - Configure `SaropaLintRule.severityOverrides` for project-level severity changes
+- **Automatic file skipping** for:
+  - Generated code: `*.g.dart`, `*.freezed.dart`, `*.gen.dart`, `*.gr.dart`, `*.config.dart`, `*.mocks.dart`
+  - Fixture files: `fixture/**`, `fixtures/**`, `*_fixture.dart`
+  - Optional: test files (`skipTestFiles`), example files (`skipExampleFiles`)
+
+### Fixed
+
+- `prefer_when_guard_over_if` - Removed incorrect handler for traditional `SwitchCase` which doesn't support `when` guards (only `SwitchPatternCase` does)
+
+**Logic fixes across 5 rule files** to reduce false positives and improve accuracy:
+
+- **async_rules.dart**:
+  - `AvoidStreamToStringRule` - Now uses `staticType` instead of string matching to avoid false positives on variable names like "upstream"
+  - `AvoidPassingAsyncWhenSyncExpectedRule` - Only flags async callbacks passed to methods that ignore Futures (`forEach`, `map`, etc.) instead of all async callbacks
+  - `PreferAsyncAwaitRule` - Only flags `.then()` inside async functions where `await` could actually be used
+  - `PreferCommentingFutureDelayedRule` - Simplified token loop logic to use reliable `precedingComments` check
+  - `AvoidNestedStreamsAndFuturesRule` - No longer duplicates `AvoidNestedFuturesRule` for `Future<Future>` cases
+
+- **control_flow_rules.dart**:
+  - `AvoidNestedConditionalExpressionsRule` - Fixed double-reporting by only flagging outermost conditional
+  - `AvoidUnnecessaryContinueRule` - Fixed parent check to correctly identify loop contexts
+  - `AvoidIfWithManyBranchesRule` - Fixed else-if chain detection using `elseStatement` identity
+  - `PreferReturningConditionalsRule` - No longer overlaps with `PreferReturningConditionRule`
+
+- **security_rules.dart**:
+  - `RequireSecureStorageRule` - Removed overly broad `'key'` pattern that matched `'selectedThemeKey'`
+  - `AvoidLoggingSensitiveDataRule` - Changed `'pin'` to `'pincode'`/`'pin_code'` to avoid matching "spinning", "pinned"
+  - `RequireCertificatePinningRule` - Fixed cascade expression detection logic
+  - `AvoidEvalLikePatternsRule` - Removed `noSuchMethod` check (valid for mocking/proxying)
+
+- **testing_best_practices_rules.dart**:
+  - `AvoidRealNetworkCallsInTestsRule` - Removed `Uri.parse`/`Uri.https`/`Uri.http` from network patterns (URL construction, not network calls)
+  - `AvoidVagueTestDescriptionsRule` - Relaxed minimum length from 10 to 5 chars
+  - `AvoidProductionConfigInTestsRule` - Removed overly broad `'api.com'` and `'api.io'` patterns
+
+- **type_safety_rules.dart**:
+  - `RequireSafeJsonParsingRule` - Regex now matches any `map['key']`/`data['key']` patterns, not just `json['key']`
+
+**Performance improvements**:
+
+- **debug_rules.dart** - Moved `RegExp` patterns to `static final` class fields to avoid recompilation:
+  - `AvoidUnguardedDebugRule` - Pre-compiled `_isDebugPattern` and `_debugSuffixPattern`
+  - `PreferCommentingAnalyzerIgnoresRule` - Pre-compiled `_ignorePattern`, `_ignoreForFilePattern`, `_ignoreDirectivePattern`
+
+- **naming_style_rules.dart** - `FormatCommentRule` - Pre-compiled `_lowercaseStartPattern`
+
+### Changed
+
+- **README** - Added "Automatic File Skipping" section documenting which files are skipped by default
+- **README** - Added hyphenated ignore comment example in "Suppressing Warnings" section
+- **ROADMAP** - Added section 5.0 "SaropaLintRule Base Class Enhancements" documenting implemented and planned features
+
 ## [1.2.0] - 2025-01-06
 
 ### Changed

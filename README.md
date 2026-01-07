@@ -49,6 +49,8 @@ saropa_lints detects these patterns and hundreds more:
 - **Performance** — Unnecessary rebuilds, memory leaks, expensive operations in build
 - **Lifecycle** — setState after dispose, missing mounted checks, undisposed resources
 
+**Accuracy focused**: Rules use proper AST type checking instead of string matching, reducing false positives on variable names like "upstream" or "spinning".
+
 ### Why it matters
 
 The [European Accessibility Act](https://accessible-eu-centre.ec.europa.eu/content-corner/news/eaa-comes-effect-june-2025-are-you-ready-2025-01-31_en) takes effect June 2025, requiring accessible apps in retail, banking, and travel. GitHub detected [39 million leaked secrets](https://github.blog/security/application-security/next-evolution-github-advanced-security/) in repositories during 2024.
@@ -59,7 +61,7 @@ These aren't edge cases. They're compliance requirements and security basics tha
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with 50 critical rules, work up to 475 when you're ready.
+The tier system lets you adopt gradually — start with 55 critical rules, work up to 547 when you're ready.
 
 ---
 
@@ -71,7 +73,7 @@ The tier system lets you adopt gradually — start with 50 critical rules, work 
 # pubspec.yaml
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.2.0
+  saropa_lints: ^1.3.0
 ```
 
 ### 2. Enable custom_lint
@@ -107,13 +109,15 @@ dart run custom_lint
 
 Pick the tier that matches your team:
 
-| Tier | Rules | Best For |
-|------|-------|----------|
-| **Essential** | ~50 | Every project. Prevents crashes, memory leaks, security holes. |
-| **Recommended** | ~150 | Most teams. Adds performance, accessibility, null safety, collection bounds. |
-| **Professional** | ~250 | Enterprise. Adds architecture, documentation, comprehensive testing. |
-| **Comprehensive** | ~400 | Quality obsessed. Best practices everywhere. |
-| **Insanity** | ~475 | Greenfield projects. Every single rule. |
+| Tier | Best For |
+|------|----------|
+| **Essential** | Every project. Prevents crashes, memory leaks, security holes. |
+| **Recommended** | Most teams. Adds performance, accessibility, null safety, collection bounds. |
+| **Professional** | Enterprise. Adds architecture, documentation, comprehensive testing. |
+| **Comprehensive** | Quality obsessed. Best practices everywhere. |
+| **Insanity** | Greenfield projects. Every single rule. |
+
+**Plus 20 optional [stylistic rules](STYLISTIC.md)** — team preferences, not in any tier.
 
 ### Using a tier
 
@@ -142,6 +146,10 @@ custom_lint:
 
     # Enable a rule from a higher tier
     - require_public_api_documentation: true
+
+    # Enable stylistic rules (not in any tier by default)
+    - prefer_single_quotes: true
+    - prefer_trailing_comma_always: true
 ```
 
 **Wrong (map format - rules will be silently ignored):**
@@ -156,11 +164,21 @@ rules:
   - avoid_hardcoded_strings_in_ui: false  # DASH = PARSED!
 ```
 
+### Severity levels
+
+Each rule has a fixed severity (ERROR, WARNING, or INFO) defined in the rule itself. Severity cannot be overridden per-project. If a rule's severity doesn't match your needs:
+
+- Use `// ignore: rule_name` to suppress individual occurrences
+- Disable the rule entirely with `- rule_name: false`
+- [Open an issue](https://github.com/saropa/saropa_lints/issues) if you think the default severity should change
+
 ## Rule Categories
 
 | Category | Description |
 |----------|-------------|
 | **Flutter Widgets** | Lifecycle, setState, keys, performance |
+| **Modern Dart 3.0+** | Class modifiers, patterns, records, when guards |
+| **Modern Flutter** | TapRegion, OverlayPortal, SearchAnchor, CarouselView |
 | **State Management** | Provider, Riverpod, Bloc patterns |
 | **Performance** | Build optimization, memory, caching |
 | **Security** | Credentials, encryption, input validation |
@@ -172,6 +190,14 @@ rules:
 | **API & Network** | Timeouts, retries, caching |
 | **Internationalization** | Localization, RTL, plurals |
 | **Documentation** | Public API, examples, deprecation |
+
+## Stylistic Rules
+
+20 rules for team preferences — not included in any tier. Enable individually based on your conventions.
+
+Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`
+
+**See [STYLISTIC.md](STYLISTIC.md)** for the full list with examples, pros/cons, and quick fixes.
 
 ## Performance
 
@@ -212,11 +238,28 @@ When a rule doesn't apply to specific code:
 // ignore: avoid_hardcoded_strings_in_ui
 const debugText = 'DEBUG MODE';
 
+// Hyphenated format also works:
+// ignore: avoid-hardcoded-strings-in-ui
+const debugText = 'DEBUG MODE';
+
 // For entire files:
 // ignore_for_file: avoid_print_in_production
 ```
 
 Always add a comment explaining **why** you're suppressing.
+
+### Automatic File Skipping
+
+Rules automatically skip files that can't be manually fixed:
+
+| File Pattern | Skipped By Default |
+|--------------|-------------------|
+| `*.g.dart`, `*.freezed.dart`, `*.gen.dart` | Yes (generated code) |
+| `*_fixture.dart`, `fixture/**`, `fixtures/**` | Yes (test fixtures) |
+| `*_test.dart`, `test/**` | No (override with `skipTestFiles`) |
+| `example/**` | No (override with `skipExampleFiles`) |
+
+This reduces noise from generated code and intentionally "bad" fixture files.
 
 ## Running the Linter
 
@@ -341,6 +384,17 @@ Optional paid services for teams that want hands-on help. See [ENTERPRISE.md](ht
 | **Training** | Team workshops on Flutter best practices |
 
 Contact: [saropa.com](https://saropa.com) | [lints@saropa.com](mailto:lints@saropa.com)
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [STYLISTIC.md](STYLISTIC.md) | 20 optional stylistic rules with examples and quick fixes |
+| [ROADMAP.md](ROADMAP.md) | Planned rules and project direction |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute rules and report issues |
+| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes |
+| [SECURITY.md](SECURITY.md) | Security policy and reporting vulnerabilities |
+| [ENTERPRISE.md](ENTERPRISE.md) | Professional services and custom rules |
 
 ## Badge
 
