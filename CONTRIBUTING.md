@@ -304,7 +304,7 @@ Stylistic rules require extra documentation since they're not in any tier:
 
 1. Add the rule to `lib/src/rules/stylistic_rules.dart`
 2. Add to `lib/saropa_lints.dart` rule list
-3. **Update [STYLISTIC.md](STYLISTIC.md)**:
+3. **Update [STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)**:
    - Add to the Quick Reference table
    - Add full documentation section with Pros/Cons and examples
 4. Update rule count in README.md and ROADMAP.md if needed
@@ -333,3 +333,44 @@ Stylistic rules require extra documentation since they're not in any tier:
 Open an issue or discussion. We're happy to help!
 
 **Email**: [dev@saropa.com](mailto:dev@saropa.com)
+
+---
+
+## About This Document
+
+> "The only way to go fast is to go well." — Robert C. Martin
+
+> "First, solve the problem. Then, write the code." — John Johnson
+
+**Contributing to open source** makes you a better developer. You learn from code review, discover new patterns, and build a public portfolio. saropa_lints welcomes contributions at every skill level — from fixing typos to implementing complex AST visitors.
+
+Start small: pick a rule from the roadmap, add test fixtures, or improve documentation. Every contribution matters.
+
+**Keywords:** open source contribution, Flutter open source, Dart package development, custom_lint rules, AST visitor patterns, lint rule implementation, code review, pull request workflow, test fixtures, Dart analyzer plugins
+
+**Hashtags:** #OpenSource #Flutter #Dart #Contributing #FlutterDev #DartLang #GitHub #CodeReview #Community #DevCommunity
+
+---
+
+## Sources
+
+- **custom_lint_builder** — API for building lint rules
+  https://pub.dev/packages/custom_lint_builder
+
+- **Dart Analyzer** — AST visitor patterns and node types
+  https://pub.dev/documentation/analyzer/latest/
+
+- **Effective Dart** — Official style and documentation guidelines
+  https://dart.dev/effective-dart
+
+- **Conventional Commits** — Commit message format specification
+  https://www.conventionalcommits.org/
+
+- **Keep a Changelog** — Changelog format specification
+  https://keepachangelog.com/
+
+- **Semantic Versioning** — Version numbering standard
+  https://semver.org/
+
+- **GitHub Pull Request Guidelines** — Best practices for PRs
+  https://docs.github.com/en/pull-requests

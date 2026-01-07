@@ -1,0 +1,9 @@
+# Ensure consistent line endings
+* text=auto eol=lf
+
+# Keep LICENSE file with LF endings (required for pub.dev license detection)
+LICENSE text eol=lf
+
+# Windows-specific files can keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
