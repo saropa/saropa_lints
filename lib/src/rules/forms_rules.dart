@@ -647,8 +647,7 @@ class AvoidValidationInBuildRule extends SaropaLintRule {
     name: 'avoid_validation_in_build',
     problemMessage:
         'Complex/async validation in validator runs on every keystroke.',
-    correctionMessage:
-        'Move complex validation to onSubmit or use debouncing.',
+    correctionMessage: 'Move complex validation to onSubmit or use debouncing.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -958,8 +957,8 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
       // Check for !validate() or validate() == false
       final bool isValidationFailure =
           (condition.contains('!') && condition.contains('validate()')) ||
-          condition.contains('validate() == false') ||
-          condition.contains('validate()==false');
+              condition.contains('validate() == false') ||
+              condition.contains('validate()==false');
 
       if (isValidationFailure) {
         // Check if body contains .clear()
