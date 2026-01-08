@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.3] - 2026-01-08
+
+### Added
+
+- **New documentation guides**:
+  - `using_with_flutter_lints.md` - Guide for using saropa_lints alongside flutter_lints (complementary usage)
+  - `migration_from_solid_lints.md` - Migration guide from solid_lints (custom_lint based competitor)
+  - Added "Related Packages" section to VGA guide covering `lints`, `lint`, and `pedantic`
+
+### Changed
+
+- **Standardized naming convention** - Documentation now consistently uses "Saropa Lints" (display name) in headings and prose, reserving `saropa_lints` (package name) for code blocks, YAML, and CLI references. Updated files: README, CONTRIBUTING, ENTERPRISE, SECURITY, migration guides, links.md, and doc/README.md.
+
+- **Updated migration guides** - Both DCM and VGA migration guides now reflect current state:
+  - Version references updated from `^0.1.0` to `^1.3.0`
+  - Rule counts updated from 500+ to 766+
+  - Tier counts updated (Essential ~100, Recommended ~280, Professional ~560, Comprehensive ~700, Insanity 766+)
+  - Configuration examples now use Dart-based tier config syntax
+
 ## [1.7.2] - 2026-01-08
 
 ### Added

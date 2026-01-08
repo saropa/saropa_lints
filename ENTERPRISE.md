@@ -1,4 +1,4 @@
-# saropa_lints for Enterprise
+# Saropa Lints for Enterprise
 
 **[saropa.com](https://saropa.com)** | **[enterprise@saropa.com](mailto:enterprise@saropa.com)**
 
@@ -11,7 +11,7 @@ Static analysis catches bugs **before they reach production**. Industry data sho
 - **30-50% reduction** in production defects ([NIST](https://www.nist.gov/))
 - **6-10x cost savings** — fixing bugs in development vs production ([IBM](https://www.ibm.com/))
 
-### What saropa_lints Catches
+### What Saropa Lints Catches
 
 | Category | Examples |
 |----------|----------|
@@ -74,8 +74,8 @@ The open source package is free. For teams that want hands-on help:
 | **Training** | Team workshops on Flutter best practices and lint-driven development |
 | **Ongoing Support** | We manage your lint configuration as your codebase evolves |
 | **Alpha Access** | Early access to new rules and features before public release |
-| **Priority Support** | Direct communication channel with the saropa_lints team |
-| **Custom Builds** | Private fork of saropa_lints tailored to your organization's standards |
+| **Priority Support** | Direct communication channel with the Saropa Lints team |
+| **Custom Builds** | Private fork of Saropa Lints tailored to your organization's standards |
 | **Tailored Lint Sets** | We create a curated lint configuration specific to your tech stack, compliance requirements, and team preferences |
 | **Sponsored Rules** | Fund development of new rules that get added to the public package — your organization gets recognition while the community benefits |
 
@@ -92,7 +92,7 @@ Assessments are available as a standalone service or as the first step in a larg
 
 ### Sponsor Rules for the Public Package
 
-Organizations can sponsor the development of specific lint rules. Sponsored rules are added to the public saropa_lints package, giving your organization visibility in the open source community while improving code quality for everyone. You choose the rule, we build and maintain it.
+Organizations can sponsor the development of specific lint rules. Sponsored rules are added to the public Saropa Lints package, giving your organization visibility in the open source community while improving code quality for everyone. You choose the rule, we build and maintain it.
 
 ### Tailored Lint Sets for Your Organization
 
@@ -145,7 +145,7 @@ The package is free and open source. Try it on your codebase. If you want help w
 
 ### Can you build custom rules for our codebase?
 
-Yes. We build rules that enforce your specific patterns — internal API usage, architectural boundaries, naming conventions, deprecated code detection, or any other pattern you want to enforce. Custom rules integrate seamlessly with the existing saropa_lints package.
+Yes. We build rules that enforce your specific patterns — internal API usage, architectural boundaries, naming conventions, deprecated code detection, or any other pattern you want to enforce. Custom rules integrate seamlessly with the existing Saropa Lints package.
 
 ### Can we get early access to new features?
 
@@ -153,7 +153,7 @@ Yes. Enterprise partners get alpha access to new rules and features before publi
 
 ### Can we get a custom build for our organization?
 
-Yes. We can create a private fork of saropa_lints pre-configured for your organization — your tier settings, custom rules, and rule adjustments baked in. Your developers just add the dependency and everything works. We maintain the fork and merge upstream improvements automatically.
+Yes. We can create a private fork of Saropa Lints pre-configured for your organization — your tier settings, custom rules, and rule adjustments baked in. Your developers just add the dependency and everything works. We maintain the fork and merge upstream improvements automatically.
 
 ### We're using another linter. Can we switch?
 

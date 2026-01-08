@@ -799,68 +799,58 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidGetFindInBuildRule(),
   AvoidProviderRecreateRule(),
 
-  // Batch 1: Easy lint rules
   AvoidHardcodedDurationRule(),
   RequireAnimationCurveRule(),
   AvoidFixedDimensionsRule(),
   AvoidPrefsForLargeDataRule(),
   RequireOfflineIndicatorRule(),
 
-  // Batch 2: Easy lint rules
   PreferCoarseLocationRule(),
   RequireCameraDisposeRule(),
   RequireImageCompressionRule(),
   RequireThemeColorFromSchemeRule(),
   PreferColorSchemeFromSeedRule(),
 
-  // Batch 3: Easy lint rules
   PreferRichTextForComplexRule(),
   RequireErrorMessageContextRule(),
   PreferImplicitAnimationsRule(),
   RequireStaggeredAnimationDelaysRule(),
   PreferCubitForSimpleRule(),
 
-  // Batch 4: Easy lint rules
   RequireBlocObserverRule(),
   RequireRouteTransitionConsistencyRule(),
   RequireTestGroupsRule(),
 
-  // Batch 5: Riverpod rules
   AvoidRefInDisposeRule(),
   RequireProviderScopeRule(),
   PreferSelectForPartialRule(),
   AvoidProviderInWidgetRule(),
   PreferFamilyForParamsRule(),
 
-  // Batch 6: Build performance rules
   AvoidScrollListenerInBuildRule(),
   PreferValueListenableBuilderRule(),
   AvoidGlobalKeyMisuseRule(),
   RequireRepaintBoundaryRule(),
   AvoidTextSpanInBuildRule(),
 
-  // Batch 7: Testing rules
   AvoidTestCouplingRule(),
   RequireTestIsolationRule(),
   AvoidRealDependenciesInTestsRule(),
   RequireScrollTestsRule(),
   RequireTextInputTestsRule(),
 
-  // Batch 8: Navigation rules
   AvoidNavigatorPushUnnamedRule(),
   RequireRouteGuardsRule(),
   AvoidCircularRedirectsRule(),
   AvoidPopWithoutResultRule(),
   PreferShellRouteForPersistentUiRule(),
 
-  // Batch 9: Security rules
   RequireAuthCheckRule(),
   RequireTokenRefreshRule(),
   AvoidJwtDecodeClientRule(),
   RequireLogoutCleanupRule(),
   AvoidAuthInQueryParamsRule(),
 
-  // Batch 10: Additional Riverpod & Bloc rules
   AvoidBlocEventMutationRule(),
   PreferCopyWithForStateRule(),
   AvoidBlocListenInBuildRule(),
@@ -869,7 +859,6 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidBlocInBlocRule(),
   PreferSealedEventsRule(),
 
-  // Batch 11: Additional Performance rules
   PreferConstWidgetsRule(),
   AvoidExpensiveComputationInBuildRule(),
   AvoidWidgetCreationInLoopRule(),
@@ -881,7 +870,6 @@ const List<LintRule> _allRules = <LintRule>[
   PreferStaticConstWidgetsRule(),
   RequireDisposePatternRule(),
 
-  // Batch 12: Additional Forms rules
   RequireFormKeyRule(),
   AvoidValidationInBuildRule(),
   RequireSubmitButtonStateRule(),
@@ -891,7 +879,6 @@ const List<LintRule> _allRules = <LintRule>[
   RequireFormFieldControllerRule(),
   AvoidFormInAlertDialogRule(),
 
-  // Batch 13: Easy lint rules (new)
   PreferSystemThemeDefaultRule(),
   AvoidAbsorbPointerMisuseRule(),
   AvoidBrightnessCheckForThemeRule(),
@@ -902,7 +889,6 @@ const List<LintRule> _allRules = <LintRule>[
   RequireIntegrationTestSetupRule(),
   RequireFirebaseInitBeforeUseRule(),
 
-  // Batch 14: Second batch of easy lint rules
   // Security rules
   AvoidAuthStateInPrefsRule(),
   PreferEncryptedPrefsRule(),
@@ -927,7 +913,6 @@ const List<LintRule> _allRules = <LintRule>[
   RequireNotificationChannelAndroidRule(),
   AvoidNotificationPayloadSensitiveRule(),
 
-  // Batch 15: Gap analysis rules (script coverage)
   // Widget rules
   AvoidNullableWidgetMethodsRule(),
   // Code quality rules
@@ -936,7 +921,6 @@ const List<LintRule> _allRules = <LintRule>[
   // State management rules
   AvoidSetStateInLargeStateClassRule(),
 
-  // Batch 16: TODO.md rules
   // Widget rules
   RequireOverflowBoxRationaleRule(),
   AvoidUnconstrainedImagesRule(),
@@ -950,7 +934,6 @@ const List<LintRule> _allRules = <LintRule>[
   // Network performance rules
   PreferStreamingResponseRule(),
 
-  // Batch 17: Additional state management and performance rules
   // Riverpod rules
   AvoidCircularProviderDepsRule(),
   RequireErrorHandlingInAsyncRule(),
