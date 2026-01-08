@@ -47,10 +47,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireKeysInAnimatedListsRule extends SaropaLintRule {
   const RequireKeysInAnimatedListsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_keys_in_animated_lists',
@@ -195,10 +195,10 @@ class _ReturnVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidExpensiveBuildRule extends SaropaLintRule {
   const AvoidExpensiveBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_build',
@@ -308,10 +308,10 @@ class _ExpensiveOperationVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferConstChildWidgetsRule extends SaropaLintRule {
   const PreferConstChildWidgetsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_child_widgets',
@@ -419,10 +419,10 @@ class PreferConstChildWidgetsRule extends SaropaLintRule {
 /// ```
 class AvoidSynchronousFileIoRule extends SaropaLintRule {
   const AvoidSynchronousFileIoRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_synchronous_file_io',
@@ -476,10 +476,10 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
 /// ```
 class PreferComputeForHeavyWorkRule extends SaropaLintRule {
   const PreferComputeForHeavyWorkRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_compute_for_heavy_work',
@@ -564,10 +564,10 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
 /// ```
 class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
   const AvoidObjectCreationInHotLoopsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_object_creation_in_hot_loops',
@@ -668,10 +668,10 @@ class _CreationInLoopVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferCachedGetterRule extends SaropaLintRule {
   const PreferCachedGetterRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_getter',
@@ -758,10 +758,10 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
   const AvoidExcessiveWidgetDepthRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_widget_depth',
@@ -846,10 +846,10 @@ class _DepthVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireItemExtentForLargeListsRule extends SaropaLintRule {
   const RequireItemExtentForLargeListsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_item_extent_for_large_lists',
@@ -928,10 +928,10 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
 /// ```
 class RequireImageCacheDimensionsRule extends SaropaLintRule {
   const RequireImageCacheDimensionsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_image_cache_dimensions',
@@ -992,10 +992,10 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
 /// ```
 class PreferImagePrecacheRule extends SaropaLintRule {
   const PreferImagePrecacheRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_image_precache',
@@ -1073,10 +1073,10 @@ class PreferImagePrecacheRule extends SaropaLintRule {
 /// ```
 class AvoidControllerInBuildRule extends SaropaLintRule {
   const AvoidControllerInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_controller_in_build',
@@ -1160,10 +1160,10 @@ class _ControllerCreationVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidSetStateInBuildRule extends SaropaLintRule {
   const AvoidSetStateInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_setstate_in_build',
@@ -1279,10 +1279,10 @@ class _SetStateVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidStringConcatenationLoopRule extends SaropaLintRule {
   const AvoidStringConcatenationLoopRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_loop',
@@ -1399,10 +1399,10 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
 /// ```
 class AvoidScrollListenerInBuildRule extends SaropaLintRule {
   const AvoidScrollListenerInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_scroll_listener_in_build',
@@ -1472,10 +1472,10 @@ class _AddListenerVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferValueListenableBuilderRule extends SaropaLintRule {
   const PreferValueListenableBuilderRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_value_listenable_builder',
@@ -1569,10 +1569,10 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
   const AvoidGlobalKeyMisuseRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_misuse',
@@ -1663,10 +1663,10 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
 /// ```
 class RequireRepaintBoundaryRule extends SaropaLintRule {
   const RequireRepaintBoundaryRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_repaint_boundary',
@@ -1775,10 +1775,10 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
 /// ```
 class AvoidTextSpanInBuildRule extends SaropaLintRule {
   const AvoidTextSpanInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
@@ -1852,10 +1852,10 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidLargeListCopyRule extends SaropaLintRule {
   const AvoidLargeListCopyRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_list_copy',
@@ -1928,10 +1928,10 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 /// ```
 class PreferConstWidgetsRule extends SaropaLintRule {
   const PreferConstWidgetsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets',
@@ -2018,10 +2018,10 @@ class PreferConstWidgetsRule extends SaropaLintRule {
 /// ```
 class AvoidExpensiveComputationInBuildRule extends SaropaLintRule {
   const AvoidExpensiveComputationInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_computation_in_build',
@@ -2095,10 +2095,10 @@ class _ExpensiveMethodVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
   const AvoidWidgetCreationInLoopRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_widget_creation_in_loop',
@@ -2264,10 +2264,10 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidCallingOfInBuildRule extends SaropaLintRule {
   const AvoidCallingOfInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_calling_of_in_build',
@@ -2358,10 +2358,10 @@ class _OfCallVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireImageCacheManagementRule extends SaropaLintRule {
   const RequireImageCacheManagementRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_image_cache_management',
@@ -2425,10 +2425,10 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
 /// ```
 class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
   const AvoidMemoryIntensiveOperationsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_memory_intensive_operations',
@@ -2517,10 +2517,10 @@ class _StringConcatVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidClosureMemoryLeakRule extends SaropaLintRule {
   const AvoidClosureMemoryLeakRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_closure_memory_leak',
@@ -2590,10 +2590,10 @@ class _StreamListenVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferStaticConstWidgetsRule extends SaropaLintRule {
   const PreferStaticConstWidgetsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_static_const_widgets',

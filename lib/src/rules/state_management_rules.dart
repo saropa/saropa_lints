@@ -41,10 +41,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireNotifyListenersRule extends SaropaLintRule {
   const RequireNotifyListenersRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_notify_listeners',
@@ -152,10 +152,10 @@ class _StateModificationVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireStreamControllerDisposeRule extends SaropaLintRule {
   const RequireStreamControllerDisposeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
@@ -334,10 +334,10 @@ class _CloseCallVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireValueNotifierDisposeRule extends SaropaLintRule {
   const RequireValueNotifierDisposeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_value_notifier_dispose',
@@ -614,10 +614,10 @@ class _SimpleDisposeChecker extends RecursiveAstVisitor<void> {
 /// ```
 class RequireMountedCheckRule extends SaropaLintRule {
   const RequireMountedCheckRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
@@ -741,10 +741,10 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidWatchInCallbacksRule extends SaropaLintRule {
   const AvoidWatchInCallbacksRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_watch_in_callbacks',
@@ -800,10 +800,10 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
 /// ```
 class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   const AvoidBlocEventInConstructorRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
@@ -875,10 +875,10 @@ class _AddCallVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   const RequireUpdateShouldNotifyRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
@@ -943,10 +943,10 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 /// ```
 class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   const AvoidGlobalRiverpodProvidersRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_riverpod_providers',
@@ -1023,10 +1023,10 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 /// ```
 class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   const AvoidStatefulWithoutStateRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_without_state',
@@ -1108,10 +1108,10 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
 /// ```
 class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   const AvoidGlobalKeyInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_in_build',
@@ -1213,10 +1213,10 @@ class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
 /// are typically managed externally and don't need to be closed here.
 class RequireBlocCloseRule extends SaropaLintRule {
   const RequireBlocCloseRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_close',
@@ -1431,10 +1431,10 @@ class _AddBlocCloseFix extends DartFix {
 /// ```
 class PreferConsumerWidgetRule extends SaropaLintRule {
   const PreferConsumerWidgetRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_widget',
@@ -1508,10 +1508,10 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
 /// ```
 class RequireAutoDisposeRule extends SaropaLintRule {
   const RequireAutoDisposeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_auto_dispose',
@@ -1615,10 +1615,10 @@ class RequireAutoDisposeRule extends SaropaLintRule {
 /// want the current value without rebuilding.
 class AvoidRefInBuildBodyRule extends SaropaLintRule {
   const AvoidRefInBuildBodyRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_ref_in_build_body',
@@ -1767,10 +1767,10 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireImmutableBlocStateRule extends SaropaLintRule {
   const RequireImmutableBlocStateRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_immutable_bloc_state',
@@ -1889,10 +1889,10 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
 /// ```
 class AvoidProviderOfInBuildRule extends SaropaLintRule {
   const AvoidProviderOfInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_provider_of_in_build',
@@ -1984,10 +1984,10 @@ class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidGetFindInBuildRule extends SaropaLintRule {
   const AvoidGetFindInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_get_find_in_build',
@@ -2065,10 +2065,10 @@ class _GetFindVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidProviderRecreateRule extends SaropaLintRule {
   const AvoidProviderRecreateRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_provider_recreate',
@@ -2159,10 +2159,10 @@ class _ProviderRecreateVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferCubitForSimpleRule extends SaropaLintRule {
   const PreferCubitForSimpleRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple',
@@ -2308,10 +2308,10 @@ class _RefInDisposeVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireProviderScopeRule extends SaropaLintRule {
   const RequireProviderScopeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_provider_scope',
@@ -2383,10 +2383,10 @@ class RequireProviderScopeRule extends SaropaLintRule {
 /// ```
 class PreferSelectForPartialRule extends SaropaLintRule {
   const PreferSelectForPartialRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_select_for_partial',
@@ -2518,10 +2518,10 @@ class _ProviderUsageVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidProviderInWidgetRule extends SaropaLintRule {
   const AvoidProviderInWidgetRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_widget',
@@ -2600,10 +2600,10 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
 /// ```
 class PreferFamilyForParamsRule extends SaropaLintRule {
   const PreferFamilyForParamsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_family_for_params',
@@ -2687,10 +2687,10 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
 /// ```
 class RequireBlocObserverRule extends SaropaLintRule {
   const RequireBlocObserverRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_observer',
@@ -2756,10 +2756,10 @@ class RequireBlocObserverRule extends SaropaLintRule {
 /// ```
 class AvoidBlocEventMutationRule extends SaropaLintRule {
   const AvoidBlocEventMutationRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_mutation',
@@ -2808,10 +2808,10 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
 /// ```
 class PreferCopyWithForStateRule extends SaropaLintRule {
   const PreferCopyWithForStateRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
@@ -2863,10 +2863,10 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 /// ```
 class AvoidBlocListenInBuildRule extends SaropaLintRule {
   const AvoidBlocListenInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_listen_in_build',
@@ -2941,10 +2941,10 @@ class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireInitialStateRule extends SaropaLintRule {
   const RequireInitialStateRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
@@ -3011,10 +3011,10 @@ class RequireInitialStateRule extends SaropaLintRule {
 /// ```
 class RequireErrorStateRule extends SaropaLintRule {
   const RequireErrorStateRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_error_state',
@@ -3092,10 +3092,10 @@ class RequireErrorStateRule extends SaropaLintRule {
 /// ```
 class AvoidBlocInBlocRule extends SaropaLintRule {
   const AvoidBlocInBlocRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_in_bloc',
@@ -3182,10 +3182,10 @@ class _BlocAddVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferSealedEventsRule extends SaropaLintRule {
   const PreferSealedEventsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_events',
@@ -3250,8 +3250,7 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
     name: 'prefer_ref_watch_over_read',
     problemMessage:
         'ref.read in build() won\'t rebuild widget when provider changes.',
-    correctionMessage:
-        'Use ref.watch() in build methods for reactive updates.',
+    correctionMessage: 'Use ref.watch() in build methods for reactive updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3346,10 +3345,10 @@ class _ReplaceReadWithWatchFix extends DartFix {
 /// ```
 class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
   const AvoidChangeNotifierInWidgetRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_change_notifier_in_widget',
@@ -3424,10 +3423,10 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
 /// ```
 class RequireProviderDisposeRule extends SaropaLintRule {
   const RequireProviderDisposeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_provider_dispose',
@@ -3742,7 +3741,9 @@ class _ProviderDepVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String methodName = node.methodName.name;
-    if (methodName == 'watch' || methodName == 'read' || methodName == 'listen') {
+    if (methodName == 'watch' ||
+        methodName == 'read' ||
+        methodName == 'listen') {
       final Expression? target = node.target;
       if (target is SimpleIdentifier && target.name == 'ref') {
         // Get the provider name from arguments
@@ -3933,7 +3934,8 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
 
     context.addPostRunCallback(() {
       // Report StateProviders with multiple mutation sites
-      for (final MapEntry<String, int> entry in stateProviderMutations.entries) {
+      for (final MapEntry<String, int> entry
+          in stateProviderMutations.entries) {
         if (entry.value >= 3) {
           final AstNode? decl = stateProviderDecls[entry.key];
           if (decl != null) {

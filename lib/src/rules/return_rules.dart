@@ -24,10 +24,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidReturningCascadesRule extends SaropaLintRule {
   const AvoidReturningCascadesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_cascades',
@@ -73,10 +73,10 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
 /// ```
 class AvoidReturningVoidRule extends SaropaLintRule {
   const AvoidReturningVoidRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_void',
@@ -131,10 +131,10 @@ class AvoidReturningVoidRule extends SaropaLintRule {
 /// **Quick fix available:** Removes the unnecessary return.
 class AvoidUnnecessaryReturnRule extends SaropaLintRule {
   const AvoidUnnecessaryReturnRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_return',
@@ -234,10 +234,10 @@ class _RemoveUnnecessaryReturnFix extends DartFix {
 /// **Quick fix available:** Inlines the expression into the return statement.
 class PreferImmediateReturnRule extends SaropaLintRule {
   const PreferImmediateReturnRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_immediate_return',
@@ -350,10 +350,10 @@ class _InlineImmediateReturnFix extends DartFix {
 /// **Quick fix available:** Converts to expression body with =>.
 class PreferReturningShorthandsRule extends SaropaLintRule {
   const PreferReturningShorthandsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_shorthands',

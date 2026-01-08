@@ -41,10 +41,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
   const AvoidServiceLocatorInWidgetsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_in_widgets',
@@ -124,10 +124,10 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
 /// ```
 class AvoidTooManyDependenciesRule extends SaropaLintRule {
   const AvoidTooManyDependenciesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_too_many_dependencies',
@@ -229,10 +229,10 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
 /// ```
 class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   const AvoidInternalDependencyCreationRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
@@ -307,10 +307,10 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
 /// ```
 class PreferAbstractDependenciesRule extends SaropaLintRule {
   const PreferAbstractDependenciesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_dependencies',
@@ -396,10 +396,10 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
 /// ```
 class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   const AvoidSingletonForScopedDependenciesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_for_scoped_dependencies',
@@ -479,10 +479,10 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
 /// ```
 class AvoidCircularDiDependenciesRule extends SaropaLintRule {
   const AvoidCircularDiDependenciesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_di_dependencies',
@@ -588,10 +588,10 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
 /// ```
 class PreferNullObjectPatternRule extends SaropaLintRule {
   const PreferNullObjectPatternRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_null_object_pattern',
@@ -653,10 +653,10 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
 /// ```
 class RequireTypedDiRegistrationRule extends SaropaLintRule {
   const RequireTypedDiRegistrationRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_typed_di_registration',

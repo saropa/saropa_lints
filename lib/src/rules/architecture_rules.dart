@@ -32,10 +32,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
   const AvoidDirectDataAccessInUiRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_direct_data_access_in_ui',
@@ -118,10 +118,10 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
 /// ```
 class AvoidBusinessLogicInUiRule extends SaropaLintRule {
   const AvoidBusinessLogicInUiRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_business_logic_in_ui',
@@ -208,10 +208,10 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
 /// ```
 class AvoidCircularDependenciesRule extends SaropaLintRule {
   const AvoidCircularDependenciesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_dependencies',
@@ -294,10 +294,10 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
 /// ```
 class AvoidGodClassRule extends SaropaLintRule {
   const AvoidGodClassRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_god_class',
@@ -362,10 +362,10 @@ class AvoidGodClassRule extends SaropaLintRule {
 /// ```
 class AvoidUiInDomainLayerRule extends SaropaLintRule {
   const AvoidUiInDomainLayerRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_ui_in_domain_layer',
@@ -450,10 +450,10 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
 /// ```
 class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
   const AvoidCrossFeatureDependenciesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_cross_feature_dependencies',
@@ -519,10 +519,10 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
 /// ```
 class AvoidSingletonPatternRule extends SaropaLintRule {
   const AvoidSingletonPatternRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_pattern',

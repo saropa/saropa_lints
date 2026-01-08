@@ -31,10 +31,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidBarrelFilesRule extends SaropaLintRule {
   const AvoidBarrelFilesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_barrel_files',
@@ -94,10 +94,10 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDoubleSlashImportsRule extends SaropaLintRule {
   const AvoidDoubleSlashImportsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_slash_imports',
@@ -153,10 +153,10 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateExportsRule extends SaropaLintRule {
   const AvoidDuplicateExportsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_exports',
@@ -206,10 +206,10 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateMixinsRule extends SaropaLintRule {
   const AvoidDuplicateMixinsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_mixins',
@@ -260,10 +260,10 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
   const AvoidDuplicateNamedImportsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_named_imports',
@@ -318,10 +318,10 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidGlobalStateRule extends SaropaLintRule {
   const AvoidGlobalStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_state',
@@ -366,10 +366,10 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 /// Default maximum: 500 lines
 class AvoidLongFilesRule extends SaropaLintRule {
   const AvoidLongFilesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const int _maxLines = 500;
 
@@ -406,10 +406,10 @@ class AvoidLongFilesRule extends SaropaLintRule {
 /// Default maximum: 100 lines
 class AvoidLongFunctionsRule extends SaropaLintRule {
   const AvoidLongFunctionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const int _maxLines = 100;
 
@@ -466,10 +466,10 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 /// ```
 class AvoidLongParameterListRule extends SaropaLintRule {
   const AvoidLongParameterListRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_parameter_list',
@@ -524,10 +524,10 @@ class AvoidLongParameterListRule extends SaropaLintRule {
 /// ```
 class AvoidLocalFunctionsRule extends SaropaLintRule {
   const AvoidLocalFunctionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_local_functions',
@@ -557,10 +557,10 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
 /// Default maximum: 20 imports
 class MaxImportsRule extends SaropaLintRule {
   const MaxImportsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const int _maxImports = 20;
 
@@ -666,10 +666,10 @@ class MemberOrderingRule extends SaropaLintRule {
 /// ```
 class PreferSortedParametersRule extends SaropaLintRule {
   const PreferSortedParametersRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
@@ -735,10 +735,10 @@ class PreferSortedParametersRule extends SaropaLintRule {
 /// ```
 class PreferNamedBooleanParametersRule extends SaropaLintRule {
   const PreferNamedBooleanParametersRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_boolean_parameters',
@@ -836,10 +836,10 @@ class PreferNamedImportsRule extends SaropaLintRule {
 /// ```
 class PreferNamedParametersRule extends SaropaLintRule {
   const PreferNamedParametersRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_parameters',
@@ -953,10 +953,10 @@ class PreferStaticClassRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
   const AvoidUnnecessaryLocalVariableRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_local_variable',
@@ -1016,10 +1016,10 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
   const AvoidUnnecessaryReassignmentRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_reassignment',
@@ -1165,10 +1165,10 @@ class _ThisUsageFinder extends RecursiveAstVisitor<void> {
 /// ```
 class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
   const PreferAbstractFinalStaticClassRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_final_static_class',
@@ -1244,10 +1244,10 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedColorsRule extends SaropaLintRule {
   const AvoidHardcodedColorsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_colors',
@@ -1430,10 +1430,10 @@ class _TypeNameFinder extends RecursiveAstVisitor<void> {
 /// ```
 class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
   const PreferTrailingUnderscoreForUnusedRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_underscore_for_unused',
@@ -1498,10 +1498,10 @@ class _IdentifierCollectorStructure extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
   const AvoidUnnecessaryFuturesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
@@ -1580,10 +1580,10 @@ class _AwaitExpressionFinder extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidThrowInFinallyRule extends SaropaLintRule {
   const AvoidThrowInFinallyRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_finally',

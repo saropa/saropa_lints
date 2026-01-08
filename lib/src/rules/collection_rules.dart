@@ -32,10 +32,10 @@ import '../saropa_lint_rule.dart';
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   const AvoidCollectionEqualityChecksRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_collection_equality_checks',
@@ -133,10 +133,10 @@ class _AddHackCommentForCollectionEqualityFix extends DartFix {
 /// ```
 class AvoidDuplicateMapKeysRule extends SaropaLintRule {
   const AvoidDuplicateMapKeysRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_map_keys',
@@ -184,10 +184,10 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
 /// **Quick fix available:** Replaces with `map.containsKey(key)`.
 class AvoidMapKeysContainsRule extends SaropaLintRule {
   const AvoidMapKeysContainsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_map_keys_contains',
@@ -276,10 +276,10 @@ class _UseContainsKeyFix extends DartFix {
 /// ```
 class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   const AvoidUnnecessaryCollectionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_collections',
@@ -349,10 +349,10 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 /// ```
 class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   const AvoidUnsafeCollectionMethodsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_collection_methods',
@@ -855,10 +855,10 @@ class _UseNullSafeCollectionMethodFix extends DartFix {
 /// ```
 class AvoidUnsafeReduceRule extends SaropaLintRule {
   const AvoidUnsafeReduceRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_reduce',
@@ -948,10 +948,10 @@ class _AddHackCommentForReduceFix extends DartFix {
 /// ```
 class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   const AvoidUnsafeWhereMethodsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_where_methods',
@@ -1065,10 +1065,10 @@ class _UseWhereOrNullFix extends DartFix {
 /// ```
 class PreferWhereOrNullRule extends SaropaLintRule {
   const PreferWhereOrNullRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_where_or_null',
@@ -1222,10 +1222,10 @@ class _ReplaceWithWhereOrNullFix extends DartFix {
 /// ```
 class MapKeysOrderingRule extends SaropaLintRule {
   const MapKeysOrderingRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'map_keys_ordering',
@@ -1281,10 +1281,10 @@ class MapKeysOrderingRule extends SaropaLintRule {
 /// ```
 class PreferContainsRule extends SaropaLintRule {
   const PreferContainsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_contains',
@@ -1384,10 +1384,10 @@ class _UseContainsFix extends DartFix {
 /// **Quick fix available:** Replaces `list[0]` with `list.first`.
 class PreferFirstRule extends SaropaLintRule {
   const PreferFirstRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_first',
@@ -1465,10 +1465,10 @@ class _UseFirstFix extends DartFix {
 /// ```
 class PreferIterableOfRule extends SaropaLintRule {
   const PreferIterableOfRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_of',
@@ -1611,10 +1611,10 @@ class _UseLastFix extends DartFix {
 /// ```
 class PreferAddAllRule extends SaropaLintRule {
   const PreferAddAllRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_add_all',
@@ -1703,10 +1703,10 @@ class PreferAddAllRule extends SaropaLintRule {
 /// ```
 class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
   const AvoidDuplicateCollectionElementsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_collection_elements',
@@ -1770,10 +1770,10 @@ class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
 /// ```
 class PreferSetForLookupRule extends SaropaLintRule {
   const PreferSetForLookupRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_set_for_lookup',

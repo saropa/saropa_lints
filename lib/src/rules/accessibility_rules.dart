@@ -38,10 +38,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   const AvoidIconButtonsWithoutTooltipRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_icon_buttons_without_tooltip',
@@ -104,10 +104,10 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
 /// ```
 class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   const AvoidSmallTouchTargetsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
@@ -234,10 +234,10 @@ class _InteractiveWidgetVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   const RequireExcludeSemanticsJustificationRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_exclude_semantics_justification',
@@ -334,10 +334,10 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
 /// ```
 class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   const AvoidColorOnlyIndicatorsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
@@ -416,10 +416,10 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 /// ```
 class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   const AvoidGestureOnlyInteractionsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
@@ -503,10 +503,10 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
 /// ```
 class RequireSemanticsLabelRule extends SaropaLintRule {
   const RequireSemanticsLabelRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
@@ -596,10 +596,10 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
 /// ```
 class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
   const AvoidMergedSemanticsHidingInfoRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
@@ -689,10 +689,10 @@ class _InteractiveCountVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireLiveRegionRule extends SaropaLintRule {
   const RequireLiveRegionRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_live_region',
@@ -801,10 +801,10 @@ class RequireLiveRegionRule extends SaropaLintRule {
 /// ```
 class RequireHeadingSemanticsRule extends SaropaLintRule {
   const RequireHeadingSemanticsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
@@ -908,10 +908,10 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
 /// ```
 class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   const AvoidImageButtonsWithoutTooltipRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
@@ -1019,10 +1019,10 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
 /// ```
 class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   const AvoidTextScaleFactorIgnoreRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor_ignore',
@@ -1105,10 +1105,10 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
 /// ```
 class RequireImageSemanticsRule extends SaropaLintRule {
   const RequireImageSemanticsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_image_semantics',
@@ -1219,10 +1219,10 @@ class RequireImageSemanticsRule extends SaropaLintRule {
 /// ```
 class AvoidHiddenInteractiveRule extends SaropaLintRule {
   const AvoidHiddenInteractiveRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_hidden_interactive',
@@ -1349,10 +1349,10 @@ class _InteractiveChildVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferScalableTextRule extends SaropaLintRule {
   const PreferScalableTextRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_scalable_text',
@@ -1427,10 +1427,10 @@ class PreferScalableTextRule extends SaropaLintRule {
 /// ```
 class RequireButtonSemanticsRule extends SaropaLintRule {
   const RequireButtonSemanticsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_button_semantics',
@@ -1529,10 +1529,10 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
 /// ```
 class PreferExplicitSemanticsRule extends SaropaLintRule {
   const PreferExplicitSemanticsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_semantics',
@@ -1626,15 +1626,14 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
 /// ```
 class AvoidHoverOnlyRule extends SaropaLintRule {
   const AvoidHoverOnlyRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
 
-
   static const LintCode _code = LintCode(
     name: 'avoid_hover_only',
-    problemMessage:
-        'Hover-only interaction is inaccessible on touch devices.',
+    problemMessage: 'Hover-only interaction is inaccessible on touch devices.',
     correctionMessage:
         'Add GestureDetector with onTap or use widgets like Tooltip that handle both.',
     errorSeverity: DiagnosticSeverity.WARNING,
