@@ -26,6 +26,7 @@ These rules are **not included in any tier**. They represent team preferences wh
 | [`prefer_snake_case_files`](#prefer_snake_case_files) | File names in `snake_case.dart` |
 | [`avoid_small_text`](#avoid_small_text) | Font size at least 12 for accessibility |
 | [`prefer_doc_comments_over_regular`](#prefer_doc_comments_over_regular) | Use `///` instead of `//` for public API docs |
+| [`prefer_literal_apostrophe`](#prefer_literal_apostrophe) | Use `'` instead of `\'` by switching to double quotes |
 
 ## Enabling Stylistic Rules
 
@@ -701,6 +702,38 @@ String getFullName() => '$firstName $lastName';
 
 ---
 
+## prefer_literal_apostrophe
+
+Use literal apostrophes in strings by switching to double quotes instead of escaping with `\'`.
+
+**Pros:**
+- Cleaner, more readable strings
+- Less visual noise from escape characters
+- Double-quoted strings handle apostrophes naturally
+
+**Cons:**
+- Consistency with single-quote preference
+- Habit from other languages
+- May prefer single quotes for all strings
+
+### Example
+
+```dart
+// BAD (with this rule enabled):
+String message = 'It\'s a beautiful day';
+String name = 'O\'Brien';
+
+// GOOD:
+String message = "It's a beautiful day";
+String name = "O'Brien";
+```
+
+**Quick fix available:** Converts to double quotes automatically.
+
+**Note:** Only flags strings that don't contain double quotes (which would require escaping after conversion).
+
+---
+
 ## Opposing Rules
 
 Some stylistic rules have valid opposites. Pick what fits your team:
@@ -713,6 +746,8 @@ Some stylistic rules have valid opposites. Pick what fits your team:
 | Block bodies | (no rule yet) | `prefer_arrow_functions` |
 | Inline callbacks | `prefer_inline_callbacks` | Extracted methods |
 | Extracted methods | (no rule yet) | `prefer_inline_callbacks` |
+| Single quotes everywhere | `prefer_single_quotes` | `prefer_literal_apostrophe` |
+| Readable apostrophes | `prefer_literal_apostrophe` | `prefer_single_quotes` |
 
 See [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) for planned opposing rules.
 

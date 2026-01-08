@@ -41,6 +41,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireNotifyListenersRule extends SaropaLintRule {
   const RequireNotifyListenersRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_notify_listeners',
@@ -148,6 +152,10 @@ class _StateModificationVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireStreamControllerDisposeRule extends SaropaLintRule {
   const RequireStreamControllerDisposeRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
@@ -326,6 +334,10 @@ class _CloseCallVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireValueNotifierDisposeRule extends SaropaLintRule {
   const RequireValueNotifierDisposeRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_value_notifier_dispose',
@@ -602,6 +614,10 @@ class _SimpleDisposeChecker extends RecursiveAstVisitor<void> {
 /// ```
 class RequireMountedCheckRule extends SaropaLintRule {
   const RequireMountedCheckRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
@@ -725,6 +741,10 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidWatchInCallbacksRule extends SaropaLintRule {
   const AvoidWatchInCallbacksRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_watch_in_callbacks',
@@ -780,6 +800,10 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
 /// ```
 class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   const AvoidBlocEventInConstructorRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
@@ -851,6 +875,10 @@ class _AddCallVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   const RequireUpdateShouldNotifyRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
@@ -915,6 +943,10 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 /// ```
 class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   const AvoidGlobalRiverpodProvidersRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_riverpod_providers',
@@ -991,6 +1023,10 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 /// ```
 class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   const AvoidStatefulWithoutStateRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_without_state',
@@ -1072,6 +1108,10 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
 /// ```
 class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   const AvoidGlobalKeyInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_in_build',
@@ -1173,6 +1213,10 @@ class _GlobalKeyVisitor extends RecursiveAstVisitor<void> {
 /// are typically managed externally and don't need to be closed here.
 class RequireBlocCloseRule extends SaropaLintRule {
   const RequireBlocCloseRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_close',
@@ -1387,6 +1431,10 @@ class _AddBlocCloseFix extends DartFix {
 /// ```
 class PreferConsumerWidgetRule extends SaropaLintRule {
   const PreferConsumerWidgetRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_widget',
@@ -1460,6 +1508,10 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
 /// ```
 class RequireAutoDisposeRule extends SaropaLintRule {
   const RequireAutoDisposeRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_auto_dispose',
@@ -1563,6 +1615,10 @@ class RequireAutoDisposeRule extends SaropaLintRule {
 /// want the current value without rebuilding.
 class AvoidRefInBuildBodyRule extends SaropaLintRule {
   const AvoidRefInBuildBodyRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_ref_in_build_body',
@@ -1711,6 +1767,10 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireImmutableBlocStateRule extends SaropaLintRule {
   const RequireImmutableBlocStateRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_immutable_bloc_state',
@@ -1829,6 +1889,10 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
 /// ```
 class AvoidProviderOfInBuildRule extends SaropaLintRule {
   const AvoidProviderOfInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_provider_of_in_build',
@@ -1920,6 +1984,10 @@ class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidGetFindInBuildRule extends SaropaLintRule {
   const AvoidGetFindInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_get_find_in_build',
@@ -1997,6 +2065,10 @@ class _GetFindVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidProviderRecreateRule extends SaropaLintRule {
   const AvoidProviderRecreateRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_provider_recreate',
@@ -2087,6 +2159,10 @@ class _ProviderRecreateVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferCubitForSimpleRule extends SaropaLintRule {
   const PreferCubitForSimpleRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple',
@@ -2232,6 +2308,10 @@ class _RefInDisposeVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireProviderScopeRule extends SaropaLintRule {
   const RequireProviderScopeRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_provider_scope',
@@ -2303,6 +2383,10 @@ class RequireProviderScopeRule extends SaropaLintRule {
 /// ```
 class PreferSelectForPartialRule extends SaropaLintRule {
   const PreferSelectForPartialRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_select_for_partial',
@@ -2434,6 +2518,10 @@ class _ProviderUsageVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidProviderInWidgetRule extends SaropaLintRule {
   const AvoidProviderInWidgetRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_widget',
@@ -2512,6 +2600,10 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
 /// ```
 class PreferFamilyForParamsRule extends SaropaLintRule {
   const PreferFamilyForParamsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_family_for_params',
@@ -2595,6 +2687,10 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
 /// ```
 class RequireBlocObserverRule extends SaropaLintRule {
   const RequireBlocObserverRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_observer',
@@ -2660,6 +2756,10 @@ class RequireBlocObserverRule extends SaropaLintRule {
 /// ```
 class AvoidBlocEventMutationRule extends SaropaLintRule {
   const AvoidBlocEventMutationRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_mutation',
@@ -2708,6 +2808,10 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
 /// ```
 class PreferCopyWithForStateRule extends SaropaLintRule {
   const PreferCopyWithForStateRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
@@ -2759,6 +2863,10 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 /// ```
 class AvoidBlocListenInBuildRule extends SaropaLintRule {
   const AvoidBlocListenInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_listen_in_build',
@@ -2833,6 +2941,10 @@ class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireInitialStateRule extends SaropaLintRule {
   const RequireInitialStateRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
@@ -2899,6 +3011,10 @@ class RequireInitialStateRule extends SaropaLintRule {
 /// ```
 class RequireErrorStateRule extends SaropaLintRule {
   const RequireErrorStateRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_error_state',
@@ -2976,6 +3092,10 @@ class RequireErrorStateRule extends SaropaLintRule {
 /// ```
 class AvoidBlocInBlocRule extends SaropaLintRule {
   const AvoidBlocInBlocRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_in_bloc',
@@ -3062,6 +3182,10 @@ class _BlocAddVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferSealedEventsRule extends SaropaLintRule {
   const PreferSealedEventsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_events',
@@ -3085,6 +3209,1140 @@ class PreferSealedEventsRule extends SaropaLintRule {
       // Check if abstract but not sealed
       if (node.abstractKeyword != null && node.sealedKeyword == null) {
         reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when ref.read is used instead of ref.watch in build methods.
+///
+/// ref.read doesn't subscribe to changes - widget won't rebuild when
+/// provider updates. Use ref.watch in build methods for reactive updates.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends ConsumerWidget {
+///   Widget build(context, ref) {
+///     final count = ref.read(counterProvider); // Won't rebuild!
+///     return Text('$count');
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends ConsumerWidget {
+///   Widget build(context, ref) {
+///     final count = ref.watch(counterProvider); // Rebuilds on change
+///     return Text('$count');
+///   }
+/// }
+/// ```
+class PreferRefWatchOverReadRule extends SaropaLintRule {
+  const PreferRefWatchOverReadRule() : super(code: _code);
+
+  /// ref.read in build() won't trigger rebuilds when provider changes.
+  /// UI will show stale data until something else triggers a rebuild.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_ref_watch_over_read',
+    problemMessage:
+        'ref.read in build() won\'t rebuild widget when provider changes.',
+    correctionMessage:
+        'Use ref.watch() in build methods for reactive updates.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'read') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'ref') return;
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          if (current.name.lexeme == 'build') {
+            reporter.atNode(node, code);
+          }
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceReadWithWatchFix()];
+}
+
+class _ReplaceReadWithWatchFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'read') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace ref.read with ref.watch',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'watch',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when ChangeNotifier is created inside build().
+///
+/// Creating ChangeNotifier in build() creates new instances on every rebuild,
+/// losing state and causing memory leaks. Create in provider or StatefulWidget.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(context) {
+///   final notifier = MyChangeNotifier(); // New instance every build!
+///   return ChangeNotifierProvider.value(
+///     value: notifier,
+///     child: ...,
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // In provider
+/// final myProvider = ChangeNotifierProvider((ref) => MyChangeNotifier());
+///
+/// // Or in StatefulWidget
+/// late MyChangeNotifier _notifier;
+///
+/// @override
+/// void initState() {
+///   super.initState();
+///   _notifier = MyChangeNotifier();
+/// }
+/// ```
+class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
+  const AvoidChangeNotifierInWidgetRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_change_notifier_in_widget',
+    problemMessage:
+        'ChangeNotifier created in build() loses state on every rebuild.',
+    correctionMessage:
+        'Create in ChangeNotifierProvider or StatefulWidget.initState().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      // Check if the created type extends ChangeNotifier
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Common ChangeNotifier patterns
+      if (!typeName.contains('Notifier') &&
+          !typeName.contains('Controller') &&
+          !typeName.contains('ViewModel') &&
+          !typeName.contains('Model')) {
+        return;
+      }
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          if (current.name.lexeme == 'build') {
+            reporter.atNode(node.constructorName, code);
+          }
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when ChangeNotifierProvider is used without dispose callback.
+///
+/// ChangeNotifier and other resources must be disposed. Use create with
+/// dispose callback, or ChangeNotifierProvider which auto-disposes.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<MyNotifier>(
+///   create: (context) => MyNotifier(),
+///   // Missing dispose! Memory leak.
+///   child: ...,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ChangeNotifierProvider(
+///   create: (context) => MyNotifier(), // Auto-disposes
+///   child: ...,
+/// )
+/// // Or with manual dispose:
+/// Provider<MyNotifier>(
+///   create: (context) => MyNotifier(),
+///   dispose: (context, notifier) => notifier.dispose(),
+///   child: ...,
+/// )
+/// ```
+class RequireProviderDisposeRule extends SaropaLintRule {
+  const RequireProviderDisposeRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+
+  static const LintCode _code = LintCode(
+    name: 'require_provider_dispose',
+    problemMessage:
+        'Provider without dispose callback may leak ChangeNotifier resources.',
+    correctionMessage:
+        'Use ChangeNotifierProvider (auto-disposes) or add dispose callback.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Only check Provider (not ChangeNotifierProvider which auto-disposes)
+      if (typeName != 'Provider') return;
+
+      // Check if create callback creates a ChangeNotifier-like object
+      bool createsNotifier = false;
+      bool hasDispose = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+
+          if (name == 'dispose') {
+            hasDispose = true;
+          }
+
+          if (name == 'create') {
+            final String createSource = arg.expression.toSource();
+            if (createSource.contains('Notifier') ||
+                createSource.contains('Controller') ||
+                createSource.contains('ViewModel')) {
+              createsNotifier = true;
+            }
+          }
+        }
+      }
+
+      if (createsNotifier && !hasDispose) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when setState() is called in a large State class.
+///
+/// When a State class is large (many lines or members), calling setState()
+/// triggers a rebuild of the entire widget subtree, which can be expensive.
+/// Large State classes with setState() calls are candidates for:
+/// - Breaking into smaller widgets
+/// - Using more granular state management (ValueNotifier, etc.)
+/// - Using const child widgets to minimize rebuild scope
+///
+/// Default thresholds:
+/// - 200+ lines in the State class body
+/// - 15+ member declarations (fields + methods)
+///
+/// **BAD:**
+/// ```dart
+/// class _MyPageState extends State<MyPage> {
+///   // ... 200+ lines of code, many fields and methods ...
+///
+///   void _onTap() {
+///     setState(() {
+///       _counter++; // Rebuilds entire large widget tree
+///     });
+///   }
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     // ... complex widget tree ...
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Option 1: Break into smaller widgets
+/// class _MyPageState extends State<MyPage> {
+///   @override
+///   Widget build(BuildContext context) {
+///     return Column(
+///       children: [
+///         const HeaderWidget(), // Won't rebuild
+///         CounterWidget(), // Only this rebuilds
+///         const FooterWidget(), // Won't rebuild
+///       ],
+///     );
+///   }
+/// }
+///
+/// // Option 2: Use ValueNotifier for granular updates
+/// class _MyPageState extends State<MyPage> {
+///   final _counter = ValueNotifier<int>(0);
+///
+///   void _onTap() {
+///     _counter.value++; // Only ValueListenableBuilder rebuilds
+///   }
+/// }
+/// ```
+class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
+  const AvoidSetStateInLargeStateClassRule() : super(code: _code);
+
+  /// Performance issue in large state classes. May require refactoring.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_setstate_in_large_state_class',
+    problemMessage:
+        'setState() in a large State class causes expensive full rebuilds. '
+        'Consider breaking into smaller widgets or using granular state.',
+    correctionMessage:
+        'Extract parts of this widget into smaller stateless/stateful widgets, '
+        'or use ValueNotifier/ValueListenableBuilder for targeted rebuilds.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Threshold for number of lines in the State class body
+  static const int _lineThreshold = 200;
+
+  /// Threshold for number of member declarations
+  static const int _memberThreshold = 15;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if this is a State class
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'State') return;
+
+      // Measure class size
+      final int lineCount = _countLines(node);
+      final int memberCount = node.members.length;
+
+      // Check if class is "large"
+      final bool isLargeClass =
+          lineCount >= _lineThreshold || memberCount >= _memberThreshold;
+
+      if (!isLargeClass) return;
+
+      // Find all setState calls in this class
+      final _SetStateCallVisitor visitor = _SetStateCallVisitor();
+      node.accept(visitor);
+
+      // Report each setState call in the large class
+      for (final MethodInvocation setStateCall in visitor.setStateCalls) {
+        reporter.atNode(setStateCall, code);
+      }
+    });
+  }
+
+  int _countLines(ClassDeclaration node) {
+    final String source = node.toSource();
+    return '\n'.allMatches(source).length + 1;
+  }
+}
+
+/// Visitor that finds setState() calls within a class.
+class _SetStateCallVisitor extends RecursiveAstVisitor<void> {
+  final List<MethodInvocation> setStateCalls = <MethodInvocation>[];
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState') {
+      setStateCalls.add(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+// ============================================================================
+// Batch 17: Additional State Management Rules
+// ============================================================================
+
+/// Warns when Riverpod providers reference each other in a cycle.
+///
+/// Circular dependencies between providers cause runtime errors or infinite
+/// loops. Analyze your dependency graph to break cycles.
+///
+/// **BAD:**
+/// ```dart
+/// final providerA = Provider((ref) {
+///   final b = ref.watch(providerB); // A depends on B
+///   return 'A: $b';
+/// });
+///
+/// final providerB = Provider((ref) {
+///   final a = ref.watch(providerA); // B depends on A - circular!
+///   return 'B: $a';
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final providerA = Provider((ref) => 'A');
+/// final providerB = Provider((ref) {
+///   final a = ref.watch(providerA); // One-way dependency
+///   return 'B: $a';
+/// });
+/// ```
+class AvoidCircularProviderDepsRule extends SaropaLintRule {
+  const AvoidCircularProviderDepsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_circular_provider_deps',
+    problemMessage:
+        'Provider may have circular dependency. Check ref.watch/read calls.',
+    correctionMessage:
+        'Analyze provider dependency graph. Break cycles by extracting shared '
+        'logic or using ref.read in callbacks instead of ref.watch.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track provider definitions and their dependencies
+    final Map<String, Set<String>> providerDeps = <String, Set<String>>{};
+    final Map<String, AstNode> providerNodes = <String, AstNode>{};
+
+    context.registry.addTopLevelVariableDeclaration((
+      TopLevelVariableDeclaration node,
+    ) {
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final String providerName = variable.name.lexeme;
+        final Expression? initializer = variable.initializer;
+
+        if (initializer == null) continue;
+
+        // Check if this is a provider
+        final String initSource = initializer.toSource();
+        if (!initSource.contains('Provider') &&
+            !initSource.contains('Notifier')) {
+          continue;
+        }
+
+        providerNodes[providerName] = variable;
+        providerDeps[providerName] = <String>{};
+
+        // Find ref.watch and ref.read calls to identify dependencies
+        final _ProviderDepVisitor depVisitor = _ProviderDepVisitor();
+        initializer.visitChildren(depVisitor);
+
+        providerDeps[providerName]!.addAll(depVisitor.dependencies);
+      }
+    });
+
+    context.addPostRunCallback(() {
+      // Check for circular dependencies
+      for (final String provider in providerDeps.keys) {
+        final Set<String> visited = <String>{};
+        if (_hasCircularDep(provider, provider, providerDeps, visited)) {
+          final AstNode? node = providerNodes[provider];
+          if (node != null) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+
+  bool _hasCircularDep(
+    String start,
+    String current,
+    Map<String, Set<String>> deps,
+    Set<String> visited,
+  ) {
+    if (visited.contains(current)) {
+      return current == start;
+    }
+    visited.add(current);
+
+    final Set<String>? currentDeps = deps[current];
+    if (currentDeps == null) return false;
+
+    for (final String dep in currentDeps) {
+      if (dep == start) return true;
+      if (_hasCircularDep(start, dep, deps, visited)) return true;
+    }
+
+    return false;
+  }
+}
+
+class _ProviderDepVisitor extends RecursiveAstVisitor<void> {
+  final Set<String> dependencies = <String>{};
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName == 'watch' || methodName == 'read' || methodName == 'listen') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'ref') {
+        // Get the provider name from arguments
+        if (node.argumentList.arguments.isNotEmpty) {
+          final String depSource = node.argumentList.arguments.first.toSource();
+          // Extract provider name (handle .notifier, .future, etc.)
+          final String depName = depSource.split('.').first;
+          dependencies.add(depName);
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when async provider lacks error handling.
+///
+/// FutureProvider and AsyncNotifierProvider can fail. Without onError or
+/// try-catch, errors crash the app or show uncaught exception UI.
+///
+/// **BAD:**
+/// ```dart
+/// final userProvider = FutureProvider((ref) async {
+///   return await fetchUser(); // Throws on network error
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final userProvider = FutureProvider((ref) async {
+///   try {
+///     return await fetchUser();
+///   } catch (e) {
+///     throw UserFetchException(e.toString());
+///   }
+/// });
+///
+/// // Or handle in UI:
+/// ref.watch(userProvider).when(
+///   data: (user) => Text(user.name),
+///   loading: () => CircularProgressIndicator(),
+///   error: (e, st) => Text('Error: $e'),
+/// );
+/// ```
+class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
+  const RequireErrorHandlingInAsyncRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_error_handling_in_async',
+    problemMessage:
+        'Async provider without error handling. Errors will propagate unhandled.',
+    correctionMessage:
+        'Add try-catch in provider or handle AsyncValue.error in UI with .when().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _asyncProviderTypes = <String>{
+    'FutureProvider',
+    'AsyncNotifierProvider',
+    'StreamProvider',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addTopLevelVariableDeclaration((
+      TopLevelVariableDeclaration node,
+    ) {
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final Expression? initializer = variable.initializer;
+        if (initializer == null) continue;
+
+        String? providerType;
+
+        if (initializer is InstanceCreationExpression) {
+          providerType = initializer.constructorName.type.name.lexeme;
+        } else if (initializer is MethodInvocation) {
+          final Expression? target = initializer.target;
+          if (target is SimpleIdentifier) {
+            providerType = target.name;
+          }
+        }
+
+        if (providerType == null ||
+            !_asyncProviderTypes.contains(providerType)) {
+          continue;
+        }
+
+        // Check if callback has try-catch
+        final String initSource = initializer.toSource();
+        if (!initSource.contains('try') && !initSource.contains('catch')) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when StateProvider is used instead of StateNotifierProvider/Notifier.
+///
+/// StateProvider is fine for simple state but Notifier provides:
+/// - Encapsulated business logic
+/// - Methods instead of raw state mutation
+/// - Better testability
+///
+/// **BAD:**
+/// ```dart
+/// final counterProvider = StateProvider<int>((ref) => 0);
+///
+/// // Consumer directly mutates state
+/// ref.read(counterProvider.notifier).state++;
+/// ref.read(counterProvider.notifier).state += 10;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class CounterNotifier extends Notifier<int> {
+///   @override
+///   int build() => 0;
+///
+///   void increment() => state++;
+///   void add(int value) => state += value;
+/// }
+///
+/// final counterProvider = NotifierProvider<CounterNotifier, int>(
+///   CounterNotifier.new,
+/// );
+/// ```
+class PreferNotifierOverStateRule extends SaropaLintRule {
+  const PreferNotifierOverStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_notifier_over_state',
+    problemMessage:
+        'StateProvider allows uncontrolled state mutation. Consider Notifier.',
+    correctionMessage:
+        'Use NotifierProvider for encapsulated business logic and better testability.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track StateProvider usages
+    final Map<String, int> stateProviderMutations = <String, int>{};
+    final Map<String, AstNode> stateProviderDecls = <String, AstNode>{};
+
+    context.registry.addTopLevelVariableDeclaration((
+      TopLevelVariableDeclaration node,
+    ) {
+      for (final VariableDeclaration variable in node.variables.variables) {
+        final Expression? initializer = variable.initializer;
+        if (initializer == null) continue;
+
+        final String initSource = initializer.toSource();
+        if (initSource.contains('StateProvider')) {
+          final String name = variable.name.lexeme;
+          stateProviderMutations[name] = 0;
+          stateProviderDecls[name] = variable;
+        }
+      }
+    });
+
+    // Count .notifier.state mutations
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      final String source = node.leftHandSide.toSource();
+      if (source.contains('.notifier.state')) {
+        // Extract provider name
+        for (final String name in stateProviderMutations.keys) {
+          if (source.contains(name)) {
+            stateProviderMutations[name] = stateProviderMutations[name]! + 1;
+          }
+        }
+      }
+    });
+
+    context.addPostRunCallback(() {
+      // Report StateProviders with multiple mutation sites
+      for (final MapEntry<String, int> entry in stateProviderMutations.entries) {
+        if (entry.value >= 3) {
+          final AstNode? decl = stateProviderDecls[entry.key];
+          if (decl != null) {
+            reporter.atNode(decl, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when GetX controller doesn't call dispose on resources.
+///
+/// GetxController.onClose() must dispose controllers, streams, and
+/// subscriptions to prevent memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   final textController = TextEditingController();
+///   late StreamSubscription sub;
+///
+///   @override
+///   void onInit() {
+///     sub = stream.listen((_) {});
+///     super.onInit();
+///   }
+///   // Missing onClose! Memory leak.
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   final textController = TextEditingController();
+///   late StreamSubscription sub;
+///
+///   @override
+///   void onClose() {
+///     textController.dispose();
+///     sub.cancel();
+///     super.onClose();
+///   }
+/// }
+/// ```
+class RequireGetxControllerDisposeRule extends SaropaLintRule {
+  const RequireGetxControllerDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_getx_controller_dispose',
+    problemMessage:
+        'GetxController has disposable resources but no onClose() override.',
+    correctionMessage:
+        'Override onClose() to dispose controllers, cancel subscriptions, etc.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _disposableTypes = <String>{
+    'TextEditingController',
+    'ScrollController',
+    'PageController',
+    'TabController',
+    'AnimationController',
+    'StreamSubscription',
+    'StreamController',
+    'FocusNode',
+    'Timer',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'GetxController' &&
+          superName != 'GetXController' &&
+          superName != 'FullLifeCycleController') {
+        return;
+      }
+
+      bool hasDisposable = false;
+      bool hasOnClose = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null) {
+            for (final String disposable in _disposableTypes) {
+              if (typeName.contains(disposable)) {
+                hasDisposable = true;
+                break;
+              }
+            }
+          }
+        }
+
+        if (member is MethodDeclaration) {
+          if (member.name.lexeme == 'onClose') {
+            hasOnClose = true;
+          }
+        }
+      }
+
+      if (hasDisposable && !hasOnClose) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddOnCloseFix()];
+}
+
+/// Quick fix that adds an onClose() method skeleton to a GetxController.
+class _AddOnCloseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!node.name.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add onClose() method',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find position to insert (before closing brace)
+        final int insertOffset = node.rightBracket.offset;
+
+        builder.addSimpleInsertion(
+          insertOffset,
+          '\n\n  @override\n  void onClose() {\n    // TODO: Dispose resources here\n    super.onClose();\n  }\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when .obs is used outside a GetxController.
+///
+/// Observable (.obs) should be encapsulated in GetxController for proper
+/// lifecycle management. Using .obs in widgets causes memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   final count = 0.obs; // Reactive variable outside controller!
+///
+///   Widget build(context) => Obx(() => Text('${count.value}'));
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   final count = 0.obs;
+///   void increment() => count.value++;
+/// }
+///
+/// class MyWidget extends StatelessWidget {
+///   final controller = Get.find<MyController>();
+///
+///   Widget build(context) => Obx(() => Text('${controller.count.value}'));
+/// }
+/// ```
+class AvoidObsOutsideControllerRule extends SaropaLintRule {
+  const AvoidObsOutsideControllerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_obs_outside_controller',
+    problemMessage:
+        '.obs used outside GetxController causes memory leaks and lifecycle issues.',
+    correctionMessage:
+        'Move observable state to a GetxController for proper lifecycle management.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// GetX controller class names that are allowed to use .obs
+  static const Set<String> _getxControllerTypes = <String>{
+    'GetxController',
+    'GetXController',
+    'FullLifeCycleController',
+    'SuperController',
+    'GetxService',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check for .obs in field declarations (most common case)
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+
+      // Check if this class extends a GetX controller type
+      if (_isGetxController(classDecl)) return;
+
+      // Check for .obs in field initializer
+      for (final VariableDeclaration variable in node.fields.variables) {
+        final Expression? init = variable.initializer;
+        if (init != null && init.toSource().endsWith('.obs')) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+  }
+
+  /// Returns true if the class extends a known GetX controller type.
+  bool _isGetxController(ClassDeclaration classDecl) {
+    final ExtendsClause? extendsClause = classDecl.extendsClause;
+    if (extendsClause == null) return false;
+
+    final String superName = extendsClause.superclass.name.lexeme;
+    return _getxControllerTypes.contains(superName);
+  }
+}
+
+/// Warns when Bloc event handlers don't use EventTransformer.
+///
+/// Without EventTransformer, rapid events are processed sequentially.
+/// Use transformers for debouncing, throttling, or concurrent processing.
+///
+/// **BAD:**
+/// ```dart
+/// class SearchBloc extends Bloc<SearchEvent, SearchState> {
+///   SearchBloc() : super(SearchInitial()) {
+///     on<SearchQueryChanged>((event, emit) async {
+///       // Processes every keystroke - excessive API calls!
+///       final results = await search(event.query);
+///       emit(SearchResults(results));
+///     });
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class SearchBloc extends Bloc<SearchEvent, SearchState> {
+///   SearchBloc() : super(SearchInitial()) {
+///     on<SearchQueryChanged>(
+///       (event, emit) async {
+///         final results = await search(event.query);
+///         emit(SearchResults(results));
+///       },
+///       transformer: debounce(Duration(milliseconds: 300)),
+///     );
+///   }
+/// }
+/// ```
+class RequireBlocTransformerRule extends SaropaLintRule {
+  const RequireBlocTransformerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_transformer',
+    problemMessage:
+        'Bloc on<Event> without transformer processes all events sequentially.',
+    correctionMessage:
+        'Add transformer: for debounce, throttle, or concurrent event handling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Event names that commonly benefit from transformers
+  static const Set<String> _transformerSuggestedEvents = <String>{
+    'SearchQueryChanged',
+    'TextChanged',
+    'InputChanged',
+    'ScrollPositionChanged',
+    'FilterChanged',
+    'QueryChanged',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for on<EventType>(...) pattern
+      if (node.methodName.name != 'on') return;
+
+      // Check if it has type arguments (on<EventType>)
+      final TypeArgumentList? typeArgs = node.typeArguments;
+      if (typeArgs == null || typeArgs.arguments.isEmpty) return;
+
+      final String eventType = typeArgs.arguments.first.toSource();
+
+      // Check if this event type would benefit from a transformer
+      bool needsTransformer = false;
+      for (final String pattern in _transformerSuggestedEvents) {
+        if (eventType.contains(pattern)) {
+          needsTransformer = true;
+          break;
+        }
+      }
+
+      if (!needsTransformer) return;
+
+      // Check if transformer argument is present
+      bool hasTransformer = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'transformer') {
+          hasTransformer = true;
+          break;
+        }
+      }
+
+      if (!hasTransformer) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Bloc event handlers are too long.
+///
+/// Long event handlers indicate the handler is doing too much. Extract
+/// business logic to separate methods or services for testability.
+///
+/// **BAD:**
+/// ```dart
+/// on<SubmitForm>((event, emit) async {
+///   emit(Loading());
+///   // 50+ lines of validation, API calls, error handling...
+///   final validated = validateForm(event.data);
+///   if (!validated.isValid) {
+///     emit(Error(validated.errors));
+///     return;
+///   }
+///   final user = await api.createUser(validated.data);
+///   // ... more logic ...
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// on<SubmitForm>(_onSubmitForm);
+///
+/// Future<void> _onSubmitForm(SubmitForm event, Emitter<State> emit) async {
+///   emit(Loading());
+///   final result = await _submitFormUseCase(event.data);
+///   emit(result.fold(
+///     (error) => Error(error),
+///     (user) => Success(user),
+///   ));
+/// }
+/// ```
+class AvoidLongEventHandlersRule extends SaropaLintRule {
+  const AvoidLongEventHandlersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_long_event_handlers',
+    problemMessage:
+        'Bloc event handler is too long. Extract logic to separate methods.',
+    correctionMessage:
+        'Move complex logic to named methods or use cases for better testability.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Maximum lines before warning
+  static const int _maxLines = 30;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'on') return;
+
+      // Find the handler function in arguments
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is FunctionExpression) {
+          final String source = arg.body.toSource();
+          final int lineCount = '\n'.allMatches(source).length + 1;
+
+          if (lineCount > _maxLines) {
+            reporter.atNode(node, code);
+          }
+        }
       }
     });
   }

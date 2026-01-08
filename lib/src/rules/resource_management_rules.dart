@@ -45,6 +45,11 @@ import '../saropa_lint_rule.dart';
 class RequireFileCloseInFinallyRule extends SaropaLintRule {
   const RequireFileCloseInFinallyRule() : super(code: _code);
 
+  /// Unclosed file handles leak system resources.
+  /// Each occurrence is a resource leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_file_close_in_finally',
     problemMessage: 'File handle should be closed in finally block.',
@@ -149,6 +154,11 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 class RequireDatabaseCloseRule extends SaropaLintRule {
   const RequireDatabaseCloseRule() : super(code: _code);
 
+  /// Unclosed database connections exhaust connection pools.
+  /// Each occurrence is a resource leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_database_close',
     problemMessage: 'Database connection should be closed.',
@@ -221,6 +231,11 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
 class RequireHttpClientCloseRule extends SaropaLintRule {
   const RequireHttpClientCloseRule() : super(code: _code);
 
+  /// Unclosed HttpClient holds connection pools and leaks sockets.
+  /// Each occurrence is a resource leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_http_client_close',
     problemMessage: 'HttpClient should be closed when done.',
@@ -277,6 +292,11 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
 /// ```
 class RequireNativeResourceCleanupRule extends SaropaLintRule {
   const RequireNativeResourceCleanupRule() : super(code: _code);
+
+  /// Unfreed native memory leaks outside Dart's garbage collector.
+  /// Each occurrence is a memory leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'require_native_resource_cleanup',
@@ -359,6 +379,11 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
 /// ```
 class RequireWebSocketCloseRule extends SaropaLintRule {
   const RequireWebSocketCloseRule() : super(code: _code);
+
+  /// Unclosed WebSocket connections leak sockets and may cause errors.
+  /// Each occurrence is a resource leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_close',
@@ -449,6 +474,11 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
 class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   const RequirePlatformChannelCleanupRule() : super(code: _code);
 
+  /// Platform channel handlers prevent garbage collection of State.
+  /// Each occurrence is a memory leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_platform_channel_cleanup',
     problemMessage: 'Platform channel handler should be removed in dispose.',
@@ -536,6 +566,11 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
 class RequireIsolateKillRule extends SaropaLintRule {
   const RequireIsolateKillRule() : super(code: _code);
 
+  /// Orphaned isolates consume memory and CPU resources.
+  /// Each occurrence is a resource leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_isolate_kill',
     problemMessage: 'Spawned Isolate should be killed when done.',
@@ -607,6 +642,11 @@ class RequireIsolateKillRule extends SaropaLintRule {
 /// ```
 class RequireCameraDisposeRule extends SaropaLintRule {
   const RequireCameraDisposeRule() : super(code: _code);
+
+  /// Undisposed CameraController locks the camera and leaks native memory.
+  /// Each occurrence is a critical resource leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'require_camera_dispose',
@@ -785,6 +825,11 @@ class _AddCameraDisposeFix extends DartFix {
 class RequireImageCompressionRule extends SaropaLintRule {
   const RequireImageCompressionRule() : super(code: _code);
 
+  /// Uncompressed camera images waste bandwidth and storage.
+  /// Performance issue, not a bug.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_image_compression',
     problemMessage:
@@ -893,6 +938,11 @@ class _AddImageCompressionFix extends DartFix {
 class PreferCoarseLocationRule extends SaropaLintRule {
   const PreferCoarseLocationRule() : super(code: _code);
 
+  /// High-precision GPS uses more battery than necessary.
+  /// Optimization suggestion, not a bug.
+  @override
+  LintImpact get impact => LintImpact.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_coarse_location_when_sufficient',
     problemMessage:
@@ -931,6 +981,116 @@ class PreferCoarseLocationRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+/// Warns when ImagePicker is used without specifying source.
+///
+/// ImagePicker without specifying source shows confusing blank picker
+/// on some devices. Always specify ImageSource.camera or ImageSource.gallery.
+///
+/// **BAD:**
+/// ```dart
+/// final image = await ImagePicker().pickImage(); // Missing source!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final image = await ImagePicker().pickImage(source: ImageSource.camera);
+/// // Or for gallery:
+/// final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+/// ```
+class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
+  const AvoidImagePickerWithoutSourceRule() : super(code: _code);
+
+  /// Missing source shows blank picker on some devices.
+  /// UX bug that affects user experience.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_image_picker_without_source',
+    problemMessage:
+        'ImagePicker without source shows blank picker on some devices.',
+    correctionMessage:
+        'Specify source: ImageSource.camera or ImageSource.gallery.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName != 'pickImage' &&
+          methodName != 'pickVideo' &&
+          methodName != 'pickMultiImage') {
+        return;
+      }
+
+      // Check if source is specified
+      bool hasSource = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'source') {
+          hasSource = true;
+          break;
+        }
+      }
+
+      if (!hasSource) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddImageSourceFix()];
+}
+
+class _AddImageSourceFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String methodName = node.methodName.name;
+      if (methodName != 'pickImage' &&
+          methodName != 'pickVideo' &&
+          methodName != 'pickMultiImage') {
+        return;
+      }
+
+      final ArgumentList args = node.argumentList;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add source: ImageSource.gallery',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        if (args.arguments.isEmpty) {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            'source: ImageSource.gallery',
+          );
+        } else {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            'source: ImageSource.gallery, ',
+          );
+        }
+      });
     });
   }
 }

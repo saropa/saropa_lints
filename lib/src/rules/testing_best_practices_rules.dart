@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -35,6 +36,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireTestAssertionsRule extends SaropaLintRule {
   const RequireTestAssertionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_test_assertions',
@@ -121,6 +126,10 @@ class RequireTestAssertionsRule extends SaropaLintRule {
 /// ```
 class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   const AvoidVagueTestDescriptionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_vague_test_descriptions',
@@ -215,6 +224,10 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
 /// ```
 class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   const AvoidRealNetworkCallsInTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_network_calls_in_tests',
@@ -308,6 +321,10 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   const AvoidHardcodedTestDelaysRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_test_delays',
@@ -383,6 +400,10 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
 /// ```
 class RequireTestSetupTeardownRule extends SaropaLintRule {
   const RequireTestSetupTeardownRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_test_setup_teardown',
@@ -455,6 +476,10 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
 /// ```
 class RequirePumpAfterInteractionRule extends SaropaLintRule {
   const RequirePumpAfterInteractionRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_pump_after_interaction',
@@ -547,6 +572,10 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
 /// ```
 class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   const AvoidProductionConfigInTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_production_config_in_tests',
@@ -626,6 +655,10 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
 /// ```
 class PreferPumpAndSettleRule extends SaropaLintRule {
   const PreferPumpAndSettleRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_pump_and_settle',
@@ -728,6 +761,10 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
 /// ```
 class AvoidTestSleepRule extends SaropaLintRule {
   const AvoidTestSleepRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_test_sleep',
@@ -805,6 +842,10 @@ class AvoidTestSleepRule extends SaropaLintRule {
 /// ```
 class AvoidFindByTextRule extends SaropaLintRule {
   const AvoidFindByTextRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_find_by_text',
@@ -890,6 +931,10 @@ class AvoidFindByTextRule extends SaropaLintRule {
 /// ```
 class RequireTestKeysRule extends SaropaLintRule {
   const RequireTestKeysRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_test_keys',
@@ -984,6 +1029,10 @@ class RequireTestKeysRule extends SaropaLintRule {
 /// ```
 class RequireArrangeActAssertRule extends SaropaLintRule {
   const RequireArrangeActAssertRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_arrange_act_assert',
@@ -1064,6 +1113,10 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
 /// ```
 class PreferMockNavigatorRule extends SaropaLintRule {
   const PreferMockNavigatorRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_mock_navigator',
@@ -1132,6 +1185,10 @@ class PreferMockNavigatorRule extends SaropaLintRule {
 /// ```
 class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   const AvoidRealTimerInWidgetTestRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_timer_in_widget_test',
@@ -1201,6 +1258,10 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
 /// ```
 class RequireMockVerificationRule extends SaropaLintRule {
   const RequireMockVerificationRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_mock_verification',
@@ -1269,6 +1330,10 @@ class RequireMockVerificationRule extends SaropaLintRule {
 /// ```
 class PreferMatcherOverEqualsRule extends SaropaLintRule {
   const PreferMatcherOverEqualsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_matcher_over_equals',
@@ -1346,6 +1411,10 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 /// ```
 class PreferTestWrapperRule extends SaropaLintRule {
   const PreferTestWrapperRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_wrapper',
@@ -1414,6 +1483,10 @@ class PreferTestWrapperRule extends SaropaLintRule {
 /// ```
 class RequireScreenSizeTestsRule extends SaropaLintRule {
   const RequireScreenSizeTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_screen_size_tests',
@@ -1487,6 +1560,10 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
 /// ```
 class AvoidStatefulTestSetupRule extends SaropaLintRule {
   const AvoidStatefulTestSetupRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_test_setup',
@@ -1551,6 +1628,10 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
 /// ```
 class PreferMockHttpRule extends SaropaLintRule {
   const PreferMockHttpRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_mock_http',
@@ -1697,6 +1778,10 @@ class RequireGoldenTestRule extends SaropaLintRule {
 /// ```
 class AvoidFlakyTestsRule extends SaropaLintRule {
   const AvoidFlakyTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_flaky_tests',
@@ -1807,6 +1892,513 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
           !bodySource.contains('pump') &&
           !bodySource.contains('fakeAsync')) {
         reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when a test has multiple assertions testing different behaviors.
+///
+/// Tests with multiple assertions are harder to debug - you only see the
+/// first failure. One logical assertion per test clarifies what broke.
+///
+/// **BAD:**
+/// ```dart
+/// test('user operations', () {
+///   expect(user.name, 'John');
+///   expect(user.age, 30);
+///   expect(user.isAdmin, false);
+///   expect(user.email, 'john@example.com');
+///   expect(user.createdAt, isNotNull);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('user has correct name', () {
+///   expect(user.name, 'John');
+/// });
+///
+/// test('user has correct age', () {
+///   expect(user.age, 30);
+/// });
+/// // Or group related assertions:
+/// test('user is not admin by default', () {
+///   expect(user.isAdmin, false);
+///   expect(user.permissions, isEmpty); // Related assertion
+/// });
+/// ```
+class PreferSingleAssertionRule extends SaropaLintRule {
+  const PreferSingleAssertionRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_single_assertion',
+    problemMessage:
+        'Test has many assertions. Consider splitting into focused tests.',
+    correctionMessage:
+        'One logical assertion per test makes failures easier to debug.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Threshold for number of expect() calls before warning
+  static const int _maxAssertions = 5;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'test' && methodName != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length < 2) return;
+
+      final String bodySource = args.arguments[1].toSource();
+
+      // Count expect() calls
+      final RegExp expectPattern = RegExp(r'\bexpect\s*\(');
+      final int expectCount = expectPattern.allMatches(bodySource).length;
+
+      if (expectCount > _maxAssertions) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when find.byType() is used without a specific type.
+///
+/// Using generic finders like find.byType(Text) matches many widgets and
+/// makes tests fragile. Use more specific finders.
+///
+/// **BAD:**
+/// ```dart
+/// expect(find.byType(Text), findsWidgets); // Matches ALL Text widgets
+/// expect(find.byType(Container), findsOneWidget); // Too generic
+/// await tester.tap(find.byType(IconButton)); // Which IconButton?
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// expect(find.text('Welcome'), findsOneWidget); // Specific text
+/// expect(find.byKey(Key('submit_button')), findsOneWidget); // By key
+/// await tester.tap(find.byIcon(Icons.add)); // Specific icon
+/// expect(find.byType(MyCustomWidget), findsOneWidget); // Custom widget OK
+/// ```
+class AvoidFindAllRule extends SaropaLintRule {
+  const AvoidFindAllRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_find_all',
+    problemMessage:
+        'Generic finder (Text, Container, etc.) matches many widgets. Use specific finder.',
+    correctionMessage:
+        'Use find.text(), find.byKey(), find.byIcon(), or find your custom widget type.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Generic Flutter widget types that are too broad for reliable testing
+  static const Set<String> _genericTypes = <String>{
+    'Text',
+    'Container',
+    'SizedBox',
+    'Padding',
+    'Center',
+    'Column',
+    'Row',
+    'Expanded',
+    'Flexible',
+    'Scaffold',
+    'AppBar',
+    'Icon',
+    'IconButton',
+    'TextButton',
+    'ElevatedButton',
+    'Card',
+    'ListTile',
+    'CircularProgressIndicator',
+    'LinearProgressIndicator',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'byType') return;
+
+      // Check if target is 'find'
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'find') return;
+
+      // Check the type argument
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression typeArg = args.arguments.first;
+      final String typeSource = typeArg.toSource();
+
+      if (_genericTypes.contains(typeSource)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when integration tests don't initialize the test binding.
+///
+/// Integration tests need IntegrationTestWidgetsFlutterBinding.ensureInitialized()
+/// in main(). Without it, tests hang or crash on device.
+///
+/// **BAD:**
+/// ```dart
+/// // integration_test/app_test.dart
+/// void main() {
+///   testWidgets('app launches', (tester) async {
+///     // Hangs on device without binding!
+///   });
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // integration_test/app_test.dart
+/// void main() {
+///   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+///
+///   testWidgets('app launches', (tester) async {
+///     // Works correctly
+///   });
+/// }
+/// ```
+class RequireIntegrationTestSetupRule extends SaropaLintRule {
+  const RequireIntegrationTestSetupRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+
+  static const LintCode _code = LintCode(
+    name: 'require_integration_test_setup',
+    problemMessage:
+        'Integration test missing IntegrationTestWidgetsFlutterBinding.ensureInitialized().',
+    correctionMessage:
+        'Add IntegrationTestWidgetsFlutterBinding.ensureInitialized() at start of main().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.source.fullName;
+
+    // Only check files in integration_test directory
+    if (!path.contains('integration_test') &&
+        !path.contains(r'integration_test\')) {
+      return;
+    }
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme != 'main') return;
+
+      final String bodySource = node.functionExpression.body.toSource();
+
+      // Check for the complete binding initialization pattern
+      if (!bodySource.contains('IntegrationTestWidgetsFlutterBinding')) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddIntegrationTestBindingFix()];
+}
+
+class _AddIntegrationTestBindingFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.name.lexeme != 'main') return;
+
+      final FunctionBody body = node.functionExpression.body;
+      if (body is! BlockFunctionBody) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add IntegrationTestWidgetsFlutterBinding.ensureInitialized()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          body.block.leftBracket.end,
+          '\n  IntegrationTestWidgetsFlutterBinding.ensureInitialized();\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when Future.delayed is used with hardcoded duration in tests.
+///
+/// Hardcoded delays are flaky - too short and tests fail intermittently,
+/// too long and tests waste time. Use pumpAndSettle() or wait for conditions.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('shows loading', (tester) async {
+///   await tester.pumpWidget(MyApp());
+///   await Future.delayed(Duration(seconds: 2)); // Flaky!
+///   expect(find.byType(LoadingIndicator), findsNothing);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('shows loading', (tester) async {
+///   await tester.pumpWidget(MyApp());
+///   await tester.pumpAndSettle(); // Waits for animations
+///   expect(find.byType(LoadingIndicator), findsNothing);
+/// });
+/// // Or wait for specific condition:
+/// await tester.pumpUntil(() => find.byType(LoadingIndicator).evaluate().isEmpty);
+/// ```
+class AvoidHardcodedDelaysRule extends SaropaLintRule {
+  const AvoidHardcodedDelaysRule() : super(code: _code);
+
+  /// Hardcoded delays cause flaky tests on slower machines.
+  /// Tests may fail intermittently in CI environments.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hardcoded_delays',
+    problemMessage:
+        'Hardcoded delay in test is flaky. Use pumpAndSettle() instead.',
+    correctionMessage:
+        'Replace Future.delayed with tester.pumpAndSettle() or condition-based waiting.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'delayed') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Future') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddPumpAndSettleTodoFix()];
+}
+
+class _AddPumpAndSettleTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'delayed') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Replace with tester.pumpAndSettle()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Replace Future.delayed with await tester.pumpAndSettle()\n      ',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when test files don't include error case tests.
+///
+/// Happy path tests are insufficient. Tests should verify that errors are
+/// thrown for invalid input, network failures, and permission denials.
+///
+/// **BAD:**
+/// ```dart
+/// // user_service_test.dart
+/// void main() {
+///   test('login returns user', () async {
+///     final user = await service.login('valid@email.com', 'password');
+///     expect(user.name, isNotEmpty);
+///   });
+///   // No tests for invalid credentials, network errors, etc.
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() {
+///   test('login returns user', () async {
+///     final user = await service.login('valid@email.com', 'password');
+///     expect(user.name, isNotEmpty);
+///   });
+///
+///   test('login throws on invalid credentials', () async {
+///     expect(
+///       () => service.login('invalid@email.com', 'wrong'),
+///       throwsA(isA<AuthException>()),
+///     );
+///   });
+///
+///   test('login throws on network error', () async {
+///     mockNetwork.simulateError();
+///     expect(() => service.login('a@b.com', 'p'), throwsA(isA<NetworkException>()));
+///   });
+/// }
+/// ```
+class RequireErrorCaseTestsRule extends SaropaLintRule {
+  const RequireErrorCaseTestsRule() : super(code: _code);
+
+  /// Tests without error cases miss important edge cases.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_error_case_tests',
+    problemMessage:
+        'Test file has no error case tests. Consider adding tests for exceptions.',
+    correctionMessage:
+        'Add tests using throwsA(), throwsException, or expect(..., isA<Exception>()).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.source.fullName;
+
+    // Only check test files
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    // Track whether this file has any error case assertions
+    bool hasErrorCaseTest = false;
+    FunctionDeclaration? mainFunction;
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme == 'main') {
+        mainFunction = node;
+      }
+    });
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for error-related test patterns
+      if (methodName == 'throwsA' ||
+          methodName == 'throwsException' ||
+          methodName == 'throwsArgumentError' ||
+          methodName == 'throwsStateError' ||
+          methodName == 'throwsFormatException' ||
+          methodName == 'throwsUnsupportedError' ||
+          methodName == 'throwsNoSuchMethodError' ||
+          methodName == 'throwsRangeError') {
+        hasErrorCaseTest = true;
+        return;
+      }
+
+      // Check for expect with isA<*Exception>
+      if (methodName == 'expect') {
+        final String source = node.toSource();
+        if (source.contains('isA<') && source.contains('Exception') ||
+            source.contains('isA<') && source.contains('Error') ||
+            source.contains('throwsA')) {
+          hasErrorCaseTest = true;
+          return;
+        }
+      }
+
+      // Check for test names that suggest error testing
+      if (methodName == 'test' || methodName == 'testWidgets') {
+        final ArgumentList args = node.argumentList;
+        if (args.arguments.isNotEmpty) {
+          final String firstArg = args.arguments.first.toSource().toLowerCase();
+          if (firstArg.contains('throw') ||
+              firstArg.contains('error') ||
+              firstArg.contains('fail') ||
+              firstArg.contains('invalid') ||
+              firstArg.contains('exception')) {
+            hasErrorCaseTest = true;
+          }
+        }
+      }
+    });
+
+    // Use a post-analysis callback to check if we found any error tests
+    context.addPostRunCallback(() {
+      if (!hasErrorCaseTest && mainFunction != null) {
+        reporter.atToken(mainFunction!.name, code);
       }
     });
   }

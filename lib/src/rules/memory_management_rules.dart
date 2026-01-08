@@ -37,6 +37,11 @@ import '../saropa_lint_rule.dart';
 class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   const AvoidLargeObjectsInStateRule() : super(code: _code);
 
+  /// Large unbounded data in state can cause OOM errors.
+  /// Review for potential memory issues.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_large_objects_in_state',
     problemMessage: 'Large data structures in State may cause memory issues.',
@@ -121,6 +126,11 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
 /// ```
 class RequireImageDisposalRule extends SaropaLintRule {
   const RequireImageDisposalRule() : super(code: _code);
+
+  /// Undisposed images leak native memory and cause OOM crashes.
+  /// Each occurrence is a memory leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'require_image_disposal',
@@ -216,6 +226,11 @@ class RequireImageDisposalRule extends SaropaLintRule {
 class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   const AvoidCapturingThisInCallbacksRule() : super(code: _code);
 
+  /// Captured references prevent garbage collection and leak memory.
+  /// Review long-lived callbacks for proper lifecycle management.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_capturing_this_in_callbacks',
     problemMessage:
@@ -300,6 +315,11 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
 class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   const RequireCacheEvictionPolicyRule() : super(code: _code);
 
+  /// Unbounded caches grow indefinitely and cause OOM errors.
+  /// Each occurrence is a potential memory leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_cache_eviction_policy',
     problemMessage: 'Cache lacks eviction policy and may grow unbounded.',
@@ -365,6 +385,11 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
 /// ```
 class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   const PreferWeakReferencesForCacheRule() : super(code: _code);
+
+  /// Strong references in caches prevent GC under memory pressure.
+  /// Consider for memory-sensitive applications.
+  @override
+  LintImpact get impact => LintImpact.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_weak_references_for_cache',
@@ -434,6 +459,11 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
 class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
   const AvoidExpandoCircularReferencesRule() : super(code: _code);
 
+  /// Circular references in Expando prevent garbage collection.
+  /// Each occurrence is a memory leak.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'avoid_expando_circular_references',
     problemMessage: 'Expando value may reference its key, causing memory leak.',
@@ -500,6 +530,11 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 /// ```
 class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   const AvoidLargeIsolateCommunicationRule() : super(code: _code);
+
+  /// Large isolate copies cause temporary memory spikes.
+  /// Performance issue, not a memory leak.
+  @override
+  LintImpact get impact => LintImpact.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_isolate_communication',

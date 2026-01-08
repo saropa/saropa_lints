@@ -40,6 +40,10 @@ import '../saropa_lint_rule.dart';
 /// **Quick fix available:** Adds a comment to flag for attention.
 class AvoidSwallowingExceptionsRule extends SaropaLintRule {
   const AvoidSwallowingExceptionsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_swallowing_exceptions',
@@ -153,6 +157,10 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
 /// **Quick fix available:** Adds a stack trace parameter to the catch clause.
 class AvoidLosingStackTraceRule extends SaropaLintRule {
   const AvoidLosingStackTraceRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_losing_stack_trace',
@@ -323,6 +331,10 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 /// **Quick fix available:** Adds `.catchError()` with `debugPrint`.
 class RequireFutureErrorHandlingRule extends SaropaLintRule {
   const RequireFutureErrorHandlingRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_future_error_handling',
@@ -442,6 +454,10 @@ class _AddCatchErrorFix extends DartFix {
 /// ```
 class AvoidGenericExceptionsRule extends SaropaLintRule {
   const AvoidGenericExceptionsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_generic_exceptions',
@@ -484,6 +500,10 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
 /// ```
 class RequireErrorContextRule extends SaropaLintRule {
   const RequireErrorContextRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_error_context',
@@ -550,6 +570,10 @@ class RequireErrorContextRule extends SaropaLintRule {
 /// ```
 class PreferResultPatternRule extends SaropaLintRule {
   const PreferResultPatternRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_result_pattern',
@@ -626,6 +650,10 @@ class _ThrowCountVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
   const RequireAsyncErrorDocumentationRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_async_error_documentation',
@@ -712,6 +740,10 @@ class _AsyncAnalysisVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireErrorBoundaryRule extends SaropaLintRule {
   const RequireErrorBoundaryRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
