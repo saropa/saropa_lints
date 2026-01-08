@@ -58,6 +58,14 @@ const Set<String> essentialRules = <String>{
   'avoid_unsafe_reduce',
   'avoid_late_final_reassignment',
 
+  // State Management - Critical (Batch 10)
+  'avoid_bloc_event_mutation', // Immutability is critical
+  'require_initial_state', // Runtime crash without it
+
+  // Forms - Critical (Batch 12)
+  'require_form_key', // Forms won't work without it
+  'avoid_clearing_form_on_error', // Data loss
+
   // Async
   'avoid_throw_in_finally',
   'require_future_error_handling',
@@ -88,12 +96,27 @@ const Set<String> essentialRules = <String>{
   'require_vsync_mixin',
   'require_animation_controller_dispose',
 
+  // Resource Management (Essential - prevent hardware lock)
+  'require_camera_dispose',
+
   // Accessibility (Essential - critical errors)
   'avoid_hidden_interactive',
 
   // Navigation (Essential - prevent crashes)
   'require_unknown_route_handler',
   'avoid_context_after_navigation',
+  'require_route_guards',
+  'avoid_circular_redirects',
+
+  // Riverpod (Essential - prevent crashes)
+  'avoid_ref_in_dispose',
+  'require_provider_scope',
+
+  // Build Performance (Essential - prevent memory leaks)
+  'avoid_scroll_listener_in_build',
+
+  // Security (Essential - prevent data leaks)
+  'avoid_auth_in_query_params',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -117,6 +140,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_regex_in_loop',
   'prefer_const_string_list',
   'prefer_const_widgets_in_lists',
+  'prefer_value_listenable_builder',
 
   // Accessibility
   'require_semantics_label',
@@ -132,6 +156,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_notify_listeners',
   'avoid_bloc_event_in_constructor',
   'avoid_provider_recreate',
+  'avoid_provider_in_widget',
 
   // Animation
   'avoid_animation_in_build',
@@ -140,10 +165,14 @@ const Set<String> recommendedOnlyRules = <String>{
   // Security
   'prefer_secure_random',
   'require_secure_keyboard',
+  'require_auth_check',
+  'avoid_jwt_decode_client',
+  'require_logout_cleanup',
 
-  // Firebase/Database
+  // Firebase/Database/Storage
   'avoid_firestore_unbounded_query',
   'avoid_database_in_build',
+  'avoid_prefs_for_large_data',
 
   // Error Handling
   'avoid_generic_exceptions',
@@ -171,6 +200,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_opacity_animation',
   'prefer_spacing_over_sizedbox',
   'avoid_material2_fallback',
+  'avoid_navigator_push_unnamed',
 
   // Performance
   'avoid_string_concatenation_loop',
@@ -212,6 +242,22 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_hardcoded_test_delays',
   'missing_test_assertion',
   'avoid_duplicate_test_assertions',
+  'avoid_test_coupling',
+  'require_test_isolation',
+  'avoid_real_dependencies_in_tests',
+
+  // State Management (Batch 10)
+  'prefer_copy_with_for_state',
+  'avoid_bloc_listen_in_build',
+
+  // Performance (Batch 11)
+  'require_build_context_scope', // Can cause crashes after await
+  'avoid_memory_intensive_operations',
+  'avoid_closure_memory_leak',
+  'require_dispose_pattern',
+
+  // Forms (Batch 12)
+  'avoid_validation_in_build',
 
   // API & Network
   'require_http_status_check',
@@ -253,6 +299,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_print_in_production',
   'avoid_webview_javascript_enabled',
   'require_biometric_fallback',
+  'require_token_refresh',
 
   // Accessibility
   'avoid_merged_semantics_hiding_info',
@@ -268,6 +315,10 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_consumer_widget',
   'avoid_provider_of_in_build',
   'avoid_get_find_in_build',
+  'prefer_cubit_for_simple',
+  'require_bloc_observer',
+  'prefer_select_for_partial',
+  'prefer_family_for_params',
 
   // Error Handling
   'require_error_context',
@@ -293,11 +344,34 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_layout_passes',
   'prefer_typed_data',
   'avoid_unnecessary_to_list',
+  'avoid_global_key_misuse',
+  'require_repaint_boundary',
 
   // Forms/UX
   'prefer_autovalidate_on_interaction',
   'require_keyboard_type',
   'require_text_overflow_in_row',
+  'require_error_message_context',
+
+  // State Management (Batch 10)
+  'require_error_state',
+  'avoid_bloc_in_bloc',
+  'prefer_sealed_events',
+
+  // Performance (Batch 11)
+  'prefer_const_widgets',
+  'avoid_expensive_computation_in_build',
+  'avoid_widget_creation_in_loop',
+  'avoid_calling_of_in_build',
+  'require_image_cache_management',
+  'prefer_static_const_widgets',
+
+  // Forms (Batch 12)
+  'require_submit_button_state',
+  'avoid_form_without_unfocus',
+  'require_form_restoration',
+  'require_form_field_controller',
+  'avoid_form_in_alert_dialog',
 
   // Platform/Storage
   'require_prefs_key_constants',
@@ -316,6 +390,9 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_test_structure',
   'prefer_test_matchers',
   'prefer_pump_and_settle',
+  'require_test_groups',
+  'require_scroll_tests',
+  'require_text_input_tests',
 
   // Documentation
   'require_public_api_documentation',
@@ -417,11 +494,25 @@ const Set<String> professionalOnlyRules = <String>{
   'require_typed_api_response',
   'require_api_error_mapping',
   'require_connectivity_check',
+  'require_offline_indicator',
 
   // Resource Management
   'require_http_client_close',
   'require_platform_channel_cleanup',
   'require_isolate_kill',
+  'require_image_compression',
+  'prefer_coarse_location_when_sufficient',
+
+  // Animation (Professional - polish)
+  'avoid_hardcoded_duration',
+  'require_animation_curve',
+  'prefer_implicit_animations',
+  'require_staggered_animation_delays',
+
+  // Navigation (Professional - consistency)
+  'require_route_transition_consistency',
+  'avoid_pop_without_result',
+  'prefer_shell_route_for_persistent_ui',
 
   // Type Safety
   'prefer_constrained_generics',
@@ -438,6 +529,12 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Architecture
   'avoid_singleton_pattern',
   'avoid_service_locator_overuse',
+
+  // Theming & Styling (Comprehensive - design consistency)
+  'avoid_fixed_dimensions',
+  'require_theme_color_from_scheme',
+  'prefer_color_scheme_from_seed',
+  'prefer_rich_text_for_complex',
 
   // Flutter Widgets
   'avoid_border_all',
@@ -456,6 +553,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_sliver_prefix',
   'prefer_text_rich',
   'prefer_widget_private_members',
+  'avoid_text_span_in_build',
 
   // Async
   'avoid_nullable_tostring',

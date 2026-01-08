@@ -5,6 +5,126 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-01-08
+
+### Added
+
+- **50 new lint rules** across 10 categories:
+
+  **Riverpod/State Management Rules (5)**:
+  - `avoid_ref_in_dispose` - Using ref in dispose() is unsafe; provider may be destroyed [Error tier]
+  - `require_provider_scope` - Riverpod apps need ProviderScope at root [Error tier]
+  - `prefer_select_for_partial` - Watch entire provider when only 1-2 fields used causes rebuilds [Info tier]
+  - `avoid_provider_in_widget` - Provider declared inside widget breaks Riverpod's state model [Warning tier]
+  - `prefer_family_for_params` - Provider with callback params should use .family modifier [Info tier]
+
+  **Build Performance Rules (5)**:
+  - `avoid_scroll_listener_in_build` - Adding listeners in build() causes multiple subscriptions [Warning tier]
+  - `prefer_value_listenable_builder` - Simple single-value state could use ValueListenableBuilder [Info tier]
+  - `avoid_global_key_misuse` - Multiple GlobalKeys in a class indicates overuse [Info tier]
+  - `require_repaint_boundary` - Complex animations in Stack need RepaintBoundary [Info tier]
+  - `avoid_text_span_in_build` - TextSpan in build() prevents text layout caching [Info tier]
+
+  **Testing Rules (5)**:
+  - `avoid_test_coupling` - Tests depending on shared mutable state from other tests [Warning tier]
+  - `require_test_isolation` - Mutable top-level variables may cause test coupling [Warning tier]
+  - `avoid_real_dependencies_in_tests` - Tests using real network/database calls [Warning tier]
+  - `require_scroll_tests` - Widget tests with scrollable content should test scrolling [Info tier]
+  - `require_text_input_tests` - Widget tests with text input should test input behavior [Info tier]
+
+  **Navigation Rules (5)**:
+  - `avoid_navigator_push_unnamed` - Navigator.push without named route [Info tier]
+  - `require_route_guards` - Protected routes without authentication guard [Warning tier]
+  - `avoid_circular_redirects` - Redirect may cause infinite loop [Warning tier]
+  - `avoid_pop_without_result` - Navigator.push result may be null [Info tier]
+  - `prefer_shell_route_for_persistent_ui` - Multiple routes with same bottomNav [Info tier]
+
+  **Security Rules (5)**:
+  - `require_auth_check` - Protected endpoint may be missing authentication check [Warning tier]
+  - `require_token_refresh` - Auth service storing tokens without refresh logic [Info tier]
+  - `avoid_jwt_decode_client` - Decoding JWT on client for authorization is insecure [Warning tier]
+  - `require_logout_cleanup` - Logout may not clear all sensitive data [Warning tier]
+  - `avoid_auth_in_query_params` - Auth token in query parameter is insecure [Error tier]
+
+  **Additional Bloc/Cubit Rules (7)**:
+  - `avoid_bloc_event_mutation` - BLoC events should be immutable [Error tier]
+  - `prefer_copy_with_for_state` - Use copyWith for BLoC state updates [Warning tier]
+  - `avoid_bloc_listen_in_build` - BlocProvider.of in build causes rebuilds [Warning tier]
+  - `require_initial_state` - BLoC constructor must pass initial state [Error tier]
+  - `require_error_state` - BLoC states should include error variant [Info tier]
+  - `avoid_bloc_in_bloc` - BLoCs should not directly call other BLoCs [Warning tier]
+  - `prefer_sealed_events` - BLoC events should use sealed classes [Info tier]
+
+  **Additional Performance Rules (10)**:
+  - `prefer_const_widgets` - Widgets that can be const should be const [Info tier]
+  - `avoid_expensive_computation_in_build` - Expensive operations in build() cause jank [Warning tier]
+  - `avoid_widget_creation_in_loop` - Creating widgets in .map() creates new instances [Info tier]
+  - `require_build_context_scope` - BuildContext after await may be invalid [Warning tier]
+  - `avoid_calling_of_in_build` - Multiple .of(context) calls traverse tree repeatedly [Info tier]
+  - `require_image_cache_management` - Apps with many images need cache management [Info tier]
+  - `avoid_memory_intensive_operations` - String concatenation in loops causes O(n²) allocation [Warning tier]
+  - `avoid_closure_memory_leak` - Closures with setState may keep widget alive [Warning tier]
+  - `prefer_static_const_widgets` - Const widget fields could be static [Info tier]
+  - `require_dispose_pattern` - Classes with disposable resources need dispose method [Warning tier]
+
+  **Additional Forms Rules (8)**:
+  - `require_form_key` - Form should have GlobalKey to access FormState [Warning tier]
+  - `avoid_validation_in_build` - Complex validation in validator runs every keystroke [Warning tier]
+  - `require_submit_button_state` - Async submit button should show loading state [Info tier]
+  - `avoid_form_without_unfocus` - Form submission should close keyboard [Info tier]
+  - `require_form_restoration` - Forms with 5+ fields should use RestorationMixin [Info tier]
+  - `avoid_clearing_form_on_error` - Clearing form on validation error loses input [Warning tier]
+  - `require_form_field_controller` - TextFormField needs controller or onSaved [Info tier]
+  - `avoid_form_in_alert_dialog` - Form in AlertDialog may lose state on rebuild [Info tier]
+
+## [1.6.0] - 2026-01-07
+
+### Added
+
+- **18 new lint rules** across 7 categories:
+
+  **Animation Rules (4)**:
+  - `avoid_hardcoded_duration` - Duration literals should be extracted to named constants for consistency [Info tier]
+  - `require_animation_curve` - Animations without curves feel robotic; use CurvedAnimation [Info tier]
+  - `prefer_implicit_animations` - Simple transitions (fade, scale) should use AnimatedOpacity etc. [Info tier]
+  - `require_staggered_animation_delays` - List item animations should use Interval for cascade effect [Info tier]
+
+  **Widget/UI Rules (4)**:
+  - `avoid_fixed_dimensions` - Fixed pixel dimensions >200px break on different screen sizes [Info tier]
+  - `require_theme_color_from_scheme` - Hardcoded Color/Colors.* breaks theming [Info tier]
+  - `prefer_color_scheme_from_seed` - Manual ColorScheme is error-prone; use fromSeed() [Info tier]
+  - `prefer_rich_text_for_complex` - 3+ Text widgets in Row should use Text.rich [Info tier]
+
+  **Forms Rules (1)**:
+  - `require_error_message_context` - Generic validator messages like "Invalid" lack context [Info tier]
+
+  **Storage Rules (1)**:
+  - `avoid_prefs_for_large_data` - SharedPreferences is for small settings, not collections [Warning tier]
+
+  **Network/API Rules (1)**:
+  - `require_offline_indicator` - Connectivity checks without UI feedback confuse users [Info tier]
+
+  **Resource Management Rules (3)**:
+  - `require_camera_dispose` - CameraController must be disposed to release hardware [Error tier]
+  - `require_image_compression` - Camera images should use maxWidth/maxHeight/imageQuality [Info tier]
+  - `prefer_coarse_location_when_sufficient` - High GPS accuracy drains battery unnecessarily [Info tier]
+
+  **State Management Rules (2)**:
+  - `prefer_cubit_for_simple` - Bloc with ≤2 events is simpler as Cubit [Info tier]
+  - `require_bloc_observer` - BlocProvider without BlocObserver loses centralized logging [Info tier]
+
+  **Navigation Rules (1)**:
+  - `require_route_transition_consistency` - Mixed route types (Material/Cupertino) look unprofessional [Info tier]
+
+  **Testing Rules (1)**:
+  - `require_test_groups` - 5+ tests without group() organization are hard to navigate [Info tier]
+
+### Fixed
+
+- **RequireThemeColorFromSchemeRule** - Now correctly excludes `Colors.transparent` from warnings
+- **RequireTestGroupsRule** - Now correctly detects Windows-style test paths (`\test\`)
+- **PreferImplicitAnimationsRule** - Fixed O(n²) performance issue; now uses efficient per-class tracking
+
 ## [1.5.3] - 2026-01-07
 
 ### Fixed

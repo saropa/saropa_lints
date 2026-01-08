@@ -4,6 +4,32 @@
 
 See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 1000 rules.
 
+### Recently Implemented (v1.7.0) - 50 Rules
+
+The following rules from this roadmap have been implemented:
+
+**State Management (Riverpod/Bloc):**
+- `avoid_ref_in_dispose`, `require_provider_scope`, `prefer_select_for_partial`, `avoid_provider_in_widget`, `prefer_family_for_params`
+- `avoid_bloc_event_mutation`, `prefer_copy_with_for_state`, `avoid_bloc_listen_in_build`, `require_initial_state`, `require_error_state`, `avoid_bloc_in_bloc`, `prefer_sealed_events`
+
+**Performance:**
+- `avoid_scroll_listener_in_build`, `prefer_value_listenable_builder`, `avoid_global_key_misuse`, `require_repaint_boundary`, `avoid_text_span_in_build`
+- `prefer_const_widgets`, `avoid_expensive_computation_in_build`, `avoid_widget_creation_in_loop`, `require_build_context_scope`, `avoid_calling_of_in_build`
+- `require_image_cache_management`, `avoid_memory_intensive_operations`, `avoid_closure_memory_leak`, `prefer_static_const_widgets`, `require_dispose_pattern`
+
+**Testing:**
+- `avoid_test_coupling`, `require_test_isolation`, `avoid_real_dependencies_in_tests`, `require_scroll_tests`, `require_text_input_tests`
+
+**Navigation:**
+- `avoid_navigator_push_unnamed`, `require_route_guards`, `avoid_circular_redirects`, `avoid_pop_without_result`, `prefer_shell_route_for_persistent_ui`
+
+**Security:**
+- `require_auth_check`, `require_token_refresh`, `avoid_jwt_decode_client`, `require_logout_cleanup`, `avoid_auth_in_query_params`
+
+**Forms:**
+- `require_form_key`, `avoid_validation_in_build`, `require_submit_button_state`, `avoid_form_without_unfocus`
+- `require_form_restoration`, `avoid_clearing_form_on_error`, `require_form_field_controller`, `avoid_form_in_alert_dialog`
+
 ---
 
 ## Part 1: Detailed Rule Specifications
