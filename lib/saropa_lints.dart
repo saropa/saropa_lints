@@ -789,6 +789,98 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidProviderOfInBuildRule(),
   AvoidGetFindInBuildRule(),
   AvoidProviderRecreateRule(),
+
+  // Batch 1: Easy lint rules
+  AvoidHardcodedDurationRule(),
+  RequireAnimationCurveRule(),
+  AvoidFixedDimensionsRule(),
+  AvoidPrefsForLargeDataRule(),
+  RequireOfflineIndicatorRule(),
+
+  // Batch 2: Easy lint rules
+  PreferCoarseLocationRule(),
+  RequireCameraDisposeRule(),
+  RequireImageCompressionRule(),
+  RequireThemeColorFromSchemeRule(),
+  PreferColorSchemeFromSeedRule(),
+
+  // Batch 3: Easy lint rules
+  PreferRichTextForComplexRule(),
+  RequireErrorMessageContextRule(),
+  PreferImplicitAnimationsRule(),
+  RequireStaggeredAnimationDelaysRule(),
+  PreferCubitForSimpleRule(),
+
+  // Batch 4: Easy lint rules
+  RequireBlocObserverRule(),
+  RequireRouteTransitionConsistencyRule(),
+  RequireTestGroupsRule(),
+
+  // Batch 5: Riverpod rules
+  AvoidRefInDisposeRule(),
+  RequireProviderScopeRule(),
+  PreferSelectForPartialRule(),
+  AvoidProviderInWidgetRule(),
+  PreferFamilyForParamsRule(),
+
+  // Batch 6: Build performance rules
+  AvoidScrollListenerInBuildRule(),
+  PreferValueListenableBuilderRule(),
+  AvoidGlobalKeyMisuseRule(),
+  RequireRepaintBoundaryRule(),
+  AvoidTextSpanInBuildRule(),
+
+  // Batch 7: Testing rules
+  AvoidTestCouplingRule(),
+  RequireTestIsolationRule(),
+  AvoidRealDependenciesInTestsRule(),
+  RequireScrollTestsRule(),
+  RequireTextInputTestsRule(),
+
+  // Batch 8: Navigation rules
+  AvoidNavigatorPushUnnamedRule(),
+  RequireRouteGuardsRule(),
+  AvoidCircularRedirectsRule(),
+  AvoidPopWithoutResultRule(),
+  PreferShellRouteForPersistentUiRule(),
+
+  // Batch 9: Security rules
+  RequireAuthCheckRule(),
+  RequireTokenRefreshRule(),
+  AvoidJwtDecodeClientRule(),
+  RequireLogoutCleanupRule(),
+  AvoidAuthInQueryParamsRule(),
+
+  // Batch 10: Additional Riverpod & Bloc rules
+  AvoidBlocEventMutationRule(),
+  PreferCopyWithForStateRule(),
+  AvoidBlocListenInBuildRule(),
+  RequireInitialStateRule(),
+  RequireErrorStateRule(),
+  AvoidBlocInBlocRule(),
+  PreferSealedEventsRule(),
+
+  // Batch 11: Additional Performance rules
+  PreferConstWidgetsRule(),
+  AvoidExpensiveComputationInBuildRule(),
+  AvoidWidgetCreationInLoopRule(),
+  RequireBuildContextScopeRule(),
+  AvoidCallingOfInBuildRule(),
+  RequireImageCacheManagementRule(),
+  AvoidMemoryIntensiveOperationsRule(),
+  AvoidClosureMemoryLeakRule(),
+  PreferStaticConstWidgetsRule(),
+  RequireDisposePatternRule(),
+
+  // Batch 12: Additional Forms rules
+  RequireFormKeyRule(),
+  AvoidValidationInBuildRule(),
+  RequireSubmitButtonStateRule(),
+  AvoidFormWithoutUnfocusRule(),
+  RequireFormRestorationRule(),
+  AvoidClearingFormOnErrorRule(),
+  RequireFormFieldControllerRule(),
+  AvoidFormInAlertDialogRule(),
 ];
 
 class _SaropaLints extends PluginBase {

@@ -356,3 +356,88 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when SharedPreferences is used to store large data.
+///
+/// SharedPreferences loads the entire file on first access. Storing large
+/// amounts of data causes slow startup and memory issues. Use a database
+/// for collections or large values.
+///
+/// **BAD:**
+/// ```dart
+/// // Storing large list in SharedPreferences
+/// prefs.setStringList('all_users', hundredsOfUsers);
+///
+/// // Storing large JSON blob
+/// prefs.setString('cache_data', jsonEncode(largeData));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use Hive, Isar, or SQLite for collections
+/// await box.put('users', users);
+///
+/// // Use SharedPreferences only for small settings
+/// prefs.setBool('dark_mode', true);
+/// prefs.setString('locale', 'en_US');
+/// ```
+class AvoidPrefsForLargeDataRule extends SaropaLintRule {
+  const AvoidPrefsForLargeDataRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_prefs_for_large_data',
+    problemMessage:
+        'SharedPreferences is not suitable for large data. Use a database.',
+    correctionMessage:
+        'Use Hive, Isar, or SQLite for collections. SharedPreferences is for small settings only.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for setStringList which is often misused for large data
+      if (methodName != 'setStringList') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      // Check if target looks like SharedPreferences
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+        return;
+      }
+
+      // Check for patterns that suggest large data storage
+      if (node.argumentList.arguments.length >= 2) {
+        final Expression keyArg = node.argumentList.arguments.first;
+        final String keySource = keyArg.toSource().toLowerCase();
+
+        // Flag keys that suggest storing collections
+        final List<String> largeDataPatterns = <String>[
+          'users',
+          'items',
+          'products',
+          'orders',
+          'messages',
+          'history',
+          'cache',
+          'data',
+          'list',
+          'all_',
+          'every',
+        ];
+
+        if (largeDataPatterns.any((String p) => keySource.contains(p))) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
