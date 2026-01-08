@@ -7768,8 +7768,9 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
     for (final Expression arg in expr.argumentList.arguments) {
       if (arg is NamedExpression) {
-        if (arg.name.label.name == 'child')
+        if (arg.name.label.name == 'child') {
           return null; // Has child, not spacer
+        }
         if (arg.name.label.name == expectedArg) {
           final Expression valueExpr = arg.expression;
           if (valueExpr is IntegerLiteral) {
