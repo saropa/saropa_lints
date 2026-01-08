@@ -25,7 +25,10 @@ environment:
 
 # Runtime dependencies for lint rule implementation
 dependencies:
-  custom_lint_builder: ^0.8.0  # Framework for building custom lint rules
+  # https://pub.dev/packages/custom_lint_builder/changelog
+  custom_lint_builder: ^0.8.1  # Framework for building custom lint rules
+
+  # https://pub.dev/packages/analyzer/changelog
   analyzer: ">=8.0.0 <11.0.0"  # Dart static analysis engine (8.x+ uses enclosingElement)
 
 # Development-only dependencies
