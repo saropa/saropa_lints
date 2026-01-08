@@ -5,7 +5,7 @@
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
-[![rules](https://img.shields.io/badge/rules-720%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+[![rules](https://img.shields.io/badge/rules-746%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -119,7 +119,7 @@ Pick the tier that matches your team:
 | **Comprehensive** | Quality obsessed. Best practices everywhere. |
 | **Insanity** | Greenfield projects. Every single rule. |
 
-**Plus 20 optional [stylistic rules](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** — team preferences, not in any tier.
+**Plus 21 optional [stylistic rules](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** — team preferences, not in any tier.
 
 ### Using a tier
 
@@ -269,6 +269,43 @@ This reduces noise from generated code and intentionally "bad" fixture files.
 ```bash
 dart run custom_lint
 ```
+
+### Impact Report
+
+Run lints with results grouped by business impact:
+
+```bash
+dart run saropa_lints:impact_report
+```
+
+Output shows critical issues first, with actionable guidance:
+
+```
+--- CRITICAL (2) ---
+  lib/main.dart:45 - avoid_hardcoded_credentials
+  lib/auth.dart:23 - require_dispose
+
+--- HIGH (5) ---
+  lib/widget.dart:89 - avoid_icon_buttons_without_tooltip
+  ...
+
+Impact Summary
+==============
+CRITICAL: 2 (fix immediately!)
+HIGH:     5 (address soon)
+MEDIUM:   12 (tech debt)
+LOW:      34 (style)
+
+Total: 53 issues
+```
+
+**Impact levels:**
+- `critical`: Each occurrence is serious — even 1-2 is unacceptable (memory leaks, security)
+- `high`: 10+ requires action (accessibility, performance anti-patterns)
+- `medium`: 100+ indicates tech debt (error handling, complexity)
+- `low`: Large counts acceptable (style, naming conventions)
+
+Exit code equals the number of critical issues (capped at 125), making it CI-friendly.
 
 **IDE Integration (unreliable):**
 
@@ -488,7 +525,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 652 lint rules organized into 5 progressive tiers (and 347 more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 766 lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

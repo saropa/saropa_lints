@@ -48,6 +48,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class PreferRelativeImportsRule extends SaropaLintRule {
   const PreferRelativeImportsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
@@ -221,6 +225,10 @@ class _ConvertToRelativeImportFix extends DartFix {
 /// ```
 class PreferOneWidgetPerFileRule extends SaropaLintRule {
   const PreferOneWidgetPerFileRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
@@ -300,6 +308,10 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
 /// ```
 class PreferArrowFunctionsRule extends SaropaLintRule {
   const PreferArrowFunctionsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_arrow_functions',
@@ -472,6 +484,10 @@ class _ConvertToArrowFunctionFix extends DartFix {
 /// ```
 class PreferAllNamedParametersRule extends SaropaLintRule {
   const PreferAllNamedParametersRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   /// Threshold for number of positional parameters before suggesting named.
   static const int _threshold = 3;
@@ -586,6 +602,10 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
 /// ```
 class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   const PreferTrailingCommaAlwaysRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
@@ -778,6 +798,10 @@ class _AddTrailingCommaAlwaysFix extends DartFix {
 /// ```
 class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   const PreferPrivateUnderscorePrefixRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
@@ -904,6 +928,10 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
 /// with state or many parameters should remain as classes.
 class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   const PreferWidgetMethodsOverClassesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   /// Maximum number of lines in build method to suggest conversion.
   static const int _maxBuildLines = 5;
@@ -1016,6 +1044,10 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
 /// ```
 class PreferExplicitTypesRule extends SaropaLintRule {
   const PreferExplicitTypesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
@@ -1105,6 +1137,10 @@ class PreferExplicitTypesRule extends SaropaLintRule {
 /// ```
 class PreferClassOverRecordReturnRule extends SaropaLintRule {
   const PreferClassOverRecordReturnRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
@@ -1194,6 +1230,10 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
 /// ```
 class PreferInlineCallbacksRule extends SaropaLintRule {
   const PreferInlineCallbacksRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
@@ -1280,6 +1320,10 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
 /// ```
 class PreferSingleQuotesRule extends SaropaLintRule {
   const PreferSingleQuotesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_quotes',
@@ -1399,6 +1443,10 @@ class _ConvertToSingleQuotesFix extends DartFix {
 /// ```
 class PreferTodoFormatRule extends SaropaLintRule {
   const PreferTodoFormatRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
@@ -1486,6 +1534,10 @@ class PreferTodoFormatRule extends SaropaLintRule {
 /// ```
 class PreferFixmeFormatRule extends SaropaLintRule {
   const PreferFixmeFormatRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
@@ -1570,6 +1622,10 @@ class PreferFixmeFormatRule extends SaropaLintRule {
 /// ```
 class PreferSentenceCaseCommentsRule extends SaropaLintRule {
   const PreferSentenceCaseCommentsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_sentence_case_comments',
@@ -1810,6 +1866,10 @@ class _CapitalizeCommentFix extends DartFix {
 /// ```
 class PreferPeriodAfterDocRule extends SaropaLintRule {
   const PreferPeriodAfterDocRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_period_after_doc',
@@ -1962,6 +2022,10 @@ class _AddPeriodFix extends DartFix {
 /// ```
 class PreferScreamingCaseConstantsRule extends SaropaLintRule {
   const PreferScreamingCaseConstantsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
@@ -2097,6 +2161,10 @@ class _ConvertToScreamingCaseFix extends DartFix {
 /// ```
 class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   const PreferDescriptiveBoolNamesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
@@ -2252,6 +2320,10 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
 /// ```
 class PreferSnakeCaseFilesRule extends SaropaLintRule {
   const PreferSnakeCaseFilesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
@@ -2347,6 +2419,10 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 /// ```
 class AvoidSmallTextRule extends SaropaLintRule {
   const AvoidSmallTextRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   /// Minimum font size in logical pixels.
   static const double _minFontSize = 12.0;
@@ -2473,6 +2549,10 @@ class _IncreaseFontSizeFix extends DartFix {
 /// ```
 class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   const PreferDocCommentsOverRegularRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_doc_comments_over_regular',
@@ -2648,6 +2728,128 @@ class _ConvertToDocCommentFix extends DartFix {
       // Replace // with ///
       // The error is at the comment, so we just need to insert an extra /
       builder.addSimpleInsertion(analysisError.offset + 2, '/');
+    });
+  }
+}
+
+/// Warns when escaped apostrophes (`\'`) are used instead of literal apostrophes.
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// When a single-quoted string contains an escaped apostrophe (`\'`), it can
+/// often be rewritten with double quotes to use the apostrophe directly,
+/// improving readability.
+///
+/// **Pros of using literal apostrophes:**
+/// - Cleaner, more readable strings
+/// - Less visual noise from escape characters
+/// - Double-quoted strings handle apostrophes naturally
+///
+/// **Cons (why some teams use escaped apostrophes):**
+/// - Consistency with single-quote preference
+/// - Habit from other languages
+/// - May prefer single quotes for all strings
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// String message = 'It\'s a beautiful day';
+/// String name = 'O\'Brien';
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// String message = "It's a beautiful day";
+/// String name = "O'Brien";
+/// ```
+class PreferLiteralApostropheRule extends SaropaLintRule {
+  const PreferLiteralApostropheRule() : super(code: _code);
+
+  /// Stylistic rule - style/consistency issues are acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_literal_apostrophe',
+    problemMessage:
+        "Use literal apostrophe (') instead of escaped apostrophe (\\').",
+    correctionMessage:
+        'Switch to double quotes to use literal apostrophes: "It\'s" instead of \'It\\\'s\'',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String lexeme = node.literal.lexeme;
+
+      // Skip raw strings - they don't interpret escape sequences
+      if (lexeme.startsWith('r')) return;
+
+      // Skip double-quoted strings - apostrophes don't need escaping
+      if (lexeme.startsWith('"')) return;
+
+      // Skip multi-line strings - different quoting rules apply
+      if (lexeme.startsWith("'''")) return;
+
+      // Check if this single-quoted string contains escaped apostrophes
+      if (!lexeme.contains(r"\'")) return;
+
+      // Skip if the string contains double quotes - converting would require
+      // escaping those instead, which defeats the purpose
+      if (node.value.contains('"')) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ConvertToDoubleQuotesFix()];
+}
+
+class _ConvertToDoubleQuotesFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final String lexeme = node.literal.lexeme;
+
+      // Skip if not a single-quoted string with escaped apostrophes
+      if (!lexeme.startsWith("'") || !lexeme.contains(r"\'")) return;
+
+      // Skip if contains double quotes (would need escaping)
+      if (node.value.contains('"')) return;
+
+      // Convert the string content from single-quote escaping to double-quote.
+      // We work with the lexeme (raw source) to preserve other escape sequences.
+      // Steps:
+      // 1. Strip the surrounding single quotes
+      // 2. Replace escaped apostrophes (\') with literal apostrophes (')
+      // 3. Wrap in double quotes
+      final String content = lexeme.substring(1, lexeme.length - 1);
+      final String converted = content.replaceAll(r"\'", "'");
+      final String newLexeme = '"$converted"';
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Convert to double quotes',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(node.sourceRange, newLexeme);
+      });
     });
   }
 }

@@ -38,6 +38,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   const AvoidIconButtonsWithoutTooltipRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_icon_buttons_without_tooltip',
@@ -100,6 +104,10 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
 /// ```
 class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   const AvoidSmallTouchTargetsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
@@ -226,6 +234,10 @@ class _InteractiveWidgetVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   const RequireExcludeSemanticsJustificationRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_exclude_semantics_justification',
@@ -322,6 +334,10 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
 /// ```
 class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   const AvoidColorOnlyIndicatorsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
@@ -400,6 +416,10 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 /// ```
 class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   const AvoidGestureOnlyInteractionsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
@@ -483,6 +503,10 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
 /// ```
 class RequireSemanticsLabelRule extends SaropaLintRule {
   const RequireSemanticsLabelRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
@@ -572,6 +596,10 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
 /// ```
 class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
   const AvoidMergedSemanticsHidingInfoRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
@@ -661,6 +689,10 @@ class _InteractiveCountVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireLiveRegionRule extends SaropaLintRule {
   const RequireLiveRegionRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_live_region',
@@ -769,6 +801,10 @@ class RequireLiveRegionRule extends SaropaLintRule {
 /// ```
 class RequireHeadingSemanticsRule extends SaropaLintRule {
   const RequireHeadingSemanticsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
@@ -872,6 +908,10 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
 /// ```
 class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   const AvoidImageButtonsWithoutTooltipRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
@@ -979,6 +1019,10 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
 /// ```
 class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   const AvoidTextScaleFactorIgnoreRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor_ignore',
@@ -1061,6 +1105,10 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
 /// ```
 class RequireImageSemanticsRule extends SaropaLintRule {
   const RequireImageSemanticsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_image_semantics',
@@ -1171,6 +1219,10 @@ class RequireImageSemanticsRule extends SaropaLintRule {
 /// ```
 class AvoidHiddenInteractiveRule extends SaropaLintRule {
   const AvoidHiddenInteractiveRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_hidden_interactive',
@@ -1263,5 +1315,619 @@ class _InteractiveChildVisitor extends RecursiveAstVisitor<void> {
       onFound(name);
     }
     super.visitInstanceCreationExpression(node);
+  }
+}
+
+/// Warns when text uses fixed pixel sizes that don't scale with system settings.
+///
+/// Text should scale with system font size settings for users with visual
+/// impairments. Avoid fixed pixel sizes and let text scale naturally.
+///
+/// **BAD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: TextStyle(fontSize: 14), // Fixed size - won't scale!
+/// )
+/// Text(
+///   'Hello',
+///   textScaleFactor: 1.0, // Forces no scaling!
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: Theme.of(context).textTheme.bodyMedium, // Scales with system
+/// )
+/// // Or use relative sizing:
+/// Text(
+///   'Hello',
+///   style: TextStyle(fontSize: 14 * MediaQuery.textScaleFactorOf(context)),
+/// )
+/// ```
+class PreferScalableTextRule extends SaropaLintRule {
+  const PreferScalableTextRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_scalable_text',
+    problemMessage:
+        'Fixed font size does not scale with user accessibility settings.',
+    correctionMessage:
+        'Use Theme.textTheme or consider MediaQuery.textScaleFactorOf for scaling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TextStyle') return;
+
+      // Check for fontSize argument with literal value
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'fontSize') {
+          final Expression valueExpr = arg.expression;
+
+          // Report if it's a literal number
+          if (valueExpr is IntegerLiteral || valueExpr is DoubleLiteral) {
+            reporter.atNode(arg, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when custom tap targets lack Semantics with button: true.
+///
+/// GestureDetector and InkWell on non-button widgets are invisible to
+/// screen readers unless wrapped with Semantics indicating they're buttons.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: () => doSomething(),
+///   child: Container(
+///     child: Icon(Icons.add),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Semantics(
+///   button: true,
+///   label: 'Add item',
+///   child: GestureDetector(
+///     onTap: () => doSomething(),
+///     child: Container(
+///       child: Icon(Icons.add),
+///     ),
+///   ),
+/// )
+/// // Or use IconButton which has built-in semantics:
+/// IconButton(
+///   onPressed: () => doSomething(),
+///   icon: Icon(Icons.add),
+///   tooltip: 'Add item',
+/// )
+/// ```
+class RequireButtonSemanticsRule extends SaropaLintRule {
+  const RequireButtonSemanticsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+
+  static const LintCode _code = LintCode(
+    name: 'require_button_semantics',
+    problemMessage:
+        'Custom tap target needs Semantics with button: true for accessibility.',
+    correctionMessage:
+        'Wrap with Semantics(button: true, label: "...") or use IconButton/TextButton.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
+
+      // Check if has onTap
+      bool hasOnTap = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'onTap' || name == 'onPressed' || name == 'onLongPress') {
+            hasOnTap = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasOnTap) return;
+
+      // Check if wrapped in Semantics
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'Semantics') {
+            // Check for button: true
+            for (final Expression arg in current.argumentList.arguments) {
+              if (arg is NamedExpression && arg.name.label.name == 'button') {
+                return; // Has Semantics with button property
+              }
+            }
+          }
+        }
+        // Stop at method boundaries
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+/// Warns when custom widgets lack explicit Semantics wrapper.
+///
+/// Custom widgets that display meaningful content need Semantics to be
+/// accessible. Screen readers can't understand custom-painted or composed
+/// widgets without explicit semantic information.
+///
+/// **BAD:**
+/// ```dart
+/// class StarRating extends StatelessWidget {
+///   Widget build(context) {
+///     return Row(
+///       children: List.generate(5, (i) => Icon(
+///         i < rating ? Icons.star : Icons.star_border,
+///       )),
+///     ); // Screen reader sees nothing useful
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class StarRating extends StatelessWidget {
+///   Widget build(context) {
+///     return Semantics(
+///       label: '$rating out of 5 stars',
+///       child: Row(
+///         children: List.generate(5, (i) => Icon(
+///           i < rating ? Icons.star : Icons.star_border,
+///         )),
+///       ),
+///     );
+///   }
+/// }
+/// ```
+class PreferExplicitSemanticsRule extends SaropaLintRule {
+  const PreferExplicitSemanticsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_explicit_semantics',
+    problemMessage:
+        'Custom widget may need explicit Semantics for screen reader access.',
+    correctionMessage:
+        'Consider adding Semantics(label: "...") to describe the widget purpose.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends StatelessWidget or StatefulWidget
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String? superName = extendsClause.superclass.element?.name;
+      if (superName != 'StatelessWidget' && superName != 'StatefulWidget') {
+        return;
+      }
+
+      // Check if widget name suggests visual/custom content
+      final String className = node.name.lexeme;
+      final List<String> visualPatterns = <String>[
+        'Rating',
+        'Chart',
+        'Graph',
+        'Progress',
+        'Avatar',
+        'Badge',
+        'Indicator',
+        'Status',
+        'Custom',
+        'Canvas',
+        'Painter',
+      ];
+
+      bool needsSemantics = false;
+      for (final String pattern in visualPatterns) {
+        if (className.contains(pattern)) {
+          needsSemantics = true;
+          break;
+        }
+      }
+
+      if (!needsSemantics) return;
+
+      // Check if build method has Semantics
+      final String classSource = node.toSource();
+      if (!classSource.contains('Semantics')) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when MouseRegion or Listener is used without tap alternative.
+///
+/// Hover-only interactions are inaccessible on touch devices and for
+/// screen reader users. Always provide tap or button alternatives.
+///
+/// **BAD:**
+/// ```dart
+/// MouseRegion(
+///   onEnter: (_) => showTooltip(),
+///   onExit: (_) => hideTooltip(),
+///   child: Icon(Icons.info),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: () => showTooltip(), // Touch alternative
+///   child: MouseRegion(
+///     onEnter: (_) => showTooltip(),
+///     onExit: (_) => hideTooltip(),
+///     child: Icon(Icons.info),
+///   ),
+/// )
+/// // Or use Tooltip which handles both:
+/// Tooltip(
+///   message: 'Information',
+///   child: Icon(Icons.info),
+/// )
+/// ```
+class AvoidHoverOnlyRule extends SaropaLintRule {
+  const AvoidHoverOnlyRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hover_only',
+    problemMessage:
+        'Hover-only interaction is inaccessible on touch devices.',
+    correctionMessage:
+        'Add GestureDetector with onTap or use widgets like Tooltip that handle both.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'MouseRegion' && typeName != 'Listener') return;
+
+      // Check if has hover callbacks
+      bool hasHover = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'onEnter' || name == 'onExit' || name == 'onHover') {
+            hasHover = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasHover) return;
+
+      // Check if wrapped in GestureDetector or similar
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'GestureDetector' ||
+              parentType == 'InkWell' ||
+              parentType == 'Tooltip' ||
+              parentType == 'IconButton' ||
+              parentType == 'TextButton') {
+            return; // Has tap alternative
+          }
+        }
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      // Also check if child contains tap widgets
+      final String nodeSource = node.toSource();
+      if (nodeSource.contains('GestureDetector') ||
+          nodeSource.contains('InkWell') ||
+          nodeSource.contains('onTap') ||
+          nodeSource.contains('onPressed')) {
+        return;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+/// Warns when error states don't have non-color indicators.
+///
+/// Errors must be identifiable without color. Users with color blindness
+/// cannot distinguish red from other colors. Add icons, text labels,
+/// and positional cues alongside color changes.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   color: hasError ? Colors.red : Colors.grey,
+///   child: Text('Email'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Row(
+///   children: [
+///     if (hasError) Icon(Icons.error, color: Colors.red),
+///     Text(
+///       'Email',
+///       style: TextStyle(color: hasError ? Colors.red : null),
+///     ),
+///     if (hasError) Text(' - Required field'),
+///   ],
+/// )
+/// ```
+class RequireErrorIdentificationRule extends SaropaLintRule {
+  const RequireErrorIdentificationRule() : super(code: _code);
+
+  /// Accessibility issue affecting colorblind users.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_error_identification',
+    problemMessage:
+        'Error state uses only color. Add icon, text label, or other non-color indicator.',
+    correctionMessage:
+        'Add an error icon (Icons.error) or text message alongside color change.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addConditionalExpression((ConditionalExpression node) {
+      // Check for pattern: condition ? Colors.red/error : something
+      final String conditionSource = node.condition.toSource().toLowerCase();
+      final String thenSource = node.thenExpression.toSource().toLowerCase();
+      final String elseSource = node.elseExpression.toSource().toLowerCase();
+
+      // Check if this is an error-related condition
+      if (!conditionSource.contains('error') &&
+          !conditionSource.contains('invalid') &&
+          !conditionSource.contains('haserror') &&
+          !conditionSource.contains('iserror') &&
+          !conditionSource.contains('isvalid')) {
+        return;
+      }
+
+      // Check if using error colors
+      if (!thenSource.contains('red') &&
+          !thenSource.contains('error') &&
+          !elseSource.contains('red') &&
+          !elseSource.contains('error')) {
+        return;
+      }
+
+      // Check if this is in a color-only context (no icon nearby)
+      // Look for Icon, errorText, or helperText in surrounding context
+      AstNode? current = node.parent;
+      int depth = 0;
+      bool hasNonColorIndicator = false;
+
+      while (current != null && depth < 10) {
+        final String source = current.toSource();
+        if (source.contains('Icon(') ||
+            source.contains('Icons.error') ||
+            source.contains('Icons.warning') ||
+            source.contains('errorText') ||
+            source.contains('helperText') ||
+            source.contains('decoration:') && source.contains('error')) {
+          hasNonColorIndicator = true;
+          break;
+        }
+        current = current.parent;
+        depth++;
+      }
+
+      if (!hasNonColorIndicator) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when text may have insufficient contrast ratio.
+///
+/// Text must have 4.5:1 contrast ratio against background (3:1 for large text).
+/// This rule flags potential issues when light colors are used on light
+/// backgrounds or dark colors on dark backgrounds.
+///
+/// **BAD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: TextStyle(color: Colors.grey[300]), // Light gray on white
+/// )
+/// Container(
+///   color: Colors.black,
+///   child: Text('Hello', style: TextStyle(color: Colors.grey[700])),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: TextStyle(color: Colors.grey[700]), // Darker gray on white
+/// )
+/// Container(
+///   color: Colors.black,
+///   child: Text('Hello', style: TextStyle(color: Colors.white)),
+/// )
+/// ```
+class RequireMinimumContrastRule extends SaropaLintRule {
+  const RequireMinimumContrastRule() : super(code: _code);
+
+  /// Accessibility issue affecting users with low vision.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_minimum_contrast',
+    problemMessage:
+        'Text color may have insufficient contrast. WCAG requires 4.5:1 ratio.',
+    correctionMessage:
+        'Use darker text on light backgrounds or lighter text on dark backgrounds.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  // Light colors that may have contrast issues on white/light backgrounds
+  static const Set<String> _lightColors = <String>{
+    'grey[100]',
+    'grey[200]',
+    'grey[300]',
+    'grey[400]',
+    'grey.shade100',
+    'grey.shade200',
+    'grey.shade300',
+    'grey.shade400',
+    'white',
+    'white10',
+    'white12',
+    'white24',
+    'white30',
+    'white38',
+    'white54',
+    'yellow[100]',
+    'yellow[200]',
+    'yellow.shade100',
+    'yellow.shade200',
+    'amber[100]',
+    'amber[200]',
+    'lime[100]',
+    'lime[200]',
+    'cyan[100]',
+    'cyan[200]',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'TextStyle') return;
+
+      // Check for color argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'color') {
+          final String colorSource = arg.expression.toSource();
+
+          // Check if it's a light color
+          for (final String lightColor in _lightColors) {
+            if (colorSource.contains(lightColor)) {
+              // Check if there's an explicit dark background nearby
+              if (!_hasDarkBackgroundContext(node)) {
+                reporter.atNode(arg, code);
+              }
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  bool _hasDarkBackgroundContext(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 8) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'Container' || typeName == 'DecoratedBox') {
+          final String source = current.toSource();
+          // Check for dark background colors
+          if (source.contains('black') ||
+              source.contains('grey[800]') ||
+              source.contains('grey[900]') ||
+              source.contains('grey.shade800') ||
+              source.contains('grey.shade900')) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
   }
 }

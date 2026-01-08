@@ -42,6 +42,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireUnknownRouteHandlerRule extends SaropaLintRule {
   const RequireUnknownRouteHandlerRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_unknown_route_handler',
@@ -117,6 +121,10 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
 /// ```
 class AvoidContextAfterNavigationRule extends SaropaLintRule {
   const AvoidContextAfterNavigationRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_navigation',
@@ -279,6 +287,10 @@ class _AddMountedCheckFix extends DartFix {
 /// ```
 class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
   const RequireRouteTransitionConsistencyRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_route_transition_consistency',
@@ -358,6 +370,10 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 /// ```
 class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
   const AvoidNavigatorPushUnnamedRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_unnamed',
@@ -429,6 +445,10 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
 /// ```
 class RequireRouteGuardsRule extends SaropaLintRule {
   const RequireRouteGuardsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_route_guards',
@@ -524,6 +544,10 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 /// ```
 class AvoidCircularRedirectsRule extends SaropaLintRule {
   const AvoidCircularRedirectsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_redirects',
@@ -597,6 +621,10 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
 /// ```
 class AvoidPopWithoutResultRule extends SaropaLintRule {
   const AvoidPopWithoutResultRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_pop_without_result',
@@ -699,6 +727,10 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
 /// ```
 class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
   const PreferShellRouteForPersistentUiRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_for_persistent_ui',

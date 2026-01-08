@@ -15,6 +15,10 @@ import '../saropa_lint_rule.dart';
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
   const AvoidNonFinalExceptionClassFieldsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_final_exception_class_fields',
@@ -80,6 +84,10 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidOnlyRethrowRule extends SaropaLintRule {
   const AvoidOnlyRethrowRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_only_rethrow',
@@ -133,6 +141,10 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidThrowInCatchBlockRule extends SaropaLintRule {
   const AvoidThrowInCatchBlockRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_catch_block',
@@ -193,6 +205,10 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
   const AvoidThrowObjectsWithoutToStringRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_objects_without_tostring',
@@ -260,6 +276,10 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
 /// Warns when exception classes are private.
 class PreferPublicExceptionClassesRule extends SaropaLintRule {
   const PreferPublicExceptionClassesRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_public_exception_classes',

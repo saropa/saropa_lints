@@ -30,6 +30,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
   const AvoidHardcodedStringsInUiRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_strings_in_ui',
@@ -126,6 +130,10 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 /// ```
 class RequireLocaleAwareFormattingRule extends SaropaLintRule {
   const RequireLocaleAwareFormattingRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_locale_aware_formatting',
@@ -192,6 +200,10 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
 /// ```
 class RequireDirectionalWidgetsRule extends SaropaLintRule {
   const RequireDirectionalWidgetsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_directional_widgets',
@@ -269,6 +281,10 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
 /// ```
 class RequirePluralHandlingRule extends SaropaLintRule {
   const RequirePluralHandlingRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_plural_handling',
@@ -363,6 +379,10 @@ class RequirePluralHandlingRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedLocaleRule extends SaropaLintRule {
   const AvoidHardcodedLocaleRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale',
@@ -408,6 +428,10 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
 /// ```
 class AvoidStringConcatenationInUiRule extends SaropaLintRule {
   const AvoidStringConcatenationInUiRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_in_ui',
@@ -472,6 +496,10 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
 /// ```
 class AvoidTextInImagesRule extends SaropaLintRule {
   const AvoidTextInImagesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_in_images',
@@ -541,6 +569,10 @@ class AvoidTextInImagesRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedAppNameRule extends SaropaLintRule {
   const AvoidHardcodedAppNameRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_app_name',

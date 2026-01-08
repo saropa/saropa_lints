@@ -42,7 +42,15 @@ import 'package:saropa_lints/src/tiers.dart';
 
 // Export all rule classes for documentation
 export 'package:saropa_lints/src/rules/all_rules.dart';
+export 'package:saropa_lints/src/saropa_lint_rule.dart'
+    show ImpactTracker, LintImpact, SaropaLintRule, ViolationRecord;
 export 'package:saropa_lints/src/tiers.dart';
+
+/// All available Saropa lint rules.
+///
+/// This getter provides access to all rule instances for tools
+/// like the impact report that need to query rule metadata.
+List<LintRule> get allSaropaRules => _allRules;
 
 /// Entry point for custom_lint
 PluginBase createPlugin() => _SaropaLints();
@@ -718,6 +726,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferSnakeCaseFilesRule(),
   AvoidSmallTextRule(),
   PreferDocCommentsOverRegularRule(),
+  PreferLiteralApostropheRule(),
 
   // Testing best practices rules (batch 3)
   RequireArrangeActAssertRule(),
@@ -881,6 +890,81 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidClearingFormOnErrorRule(),
   RequireFormFieldControllerRule(),
   AvoidFormInAlertDialogRule(),
+
+  // Batch 13: Easy lint rules (new)
+  PreferSystemThemeDefaultRule(),
+  AvoidAbsorbPointerMisuseRule(),
+  AvoidBrightnessCheckForThemeRule(),
+  RequireSafeAreaHandlingRule(),
+  PreferScalableTextRule(),
+  PreferSingleAssertionRule(),
+  AvoidFindAllRule(),
+  RequireIntegrationTestSetupRule(),
+  RequireFirebaseInitBeforeUseRule(),
+
+  // Batch 14: Second batch of easy lint rules
+  // Security rules
+  AvoidAuthStateInPrefsRule(),
+  PreferEncryptedPrefsRule(),
+  // Accessibility rules
+  RequireButtonSemanticsRule(),
+  PreferExplicitSemanticsRule(),
+  AvoidHoverOnlyRule(),
+  // State management rules
+  PreferRefWatchOverReadRule(),
+  AvoidChangeNotifierInWidgetRule(),
+  RequireProviderDisposeRule(),
+  // Testing rules
+  AvoidHardcodedDelaysRule(),
+  // Resource management rules
+  AvoidImagePickerWithoutSourceRule(),
+  // Platform-specific rules
+  PreferCupertinoForIosFeelRule(),
+  PreferUrlStrategyForWebRule(),
+  RequireWindowSizeConstraintsRule(),
+  PreferKeyboardShortcutsRule(),
+  // Notification rules
+  RequireNotificationChannelAndroidRule(),
+  AvoidNotificationPayloadSensitiveRule(),
+
+  // Batch 15: Gap analysis rules (script coverage)
+  // Widget rules
+  AvoidNullableWidgetMethodsRule(),
+  // Code quality rules
+  AvoidDuplicateStringLiteralsRule(),
+  AvoidDuplicateStringLiteralsPairRule(),
+  // State management rules
+  AvoidSetStateInLargeStateClassRule(),
+
+  // Batch 16: TODO.md rules
+  // Widget rules
+  RequireOverflowBoxRationaleRule(),
+  AvoidUnconstrainedImagesRule(),
+  // Accessibility rules
+  RequireErrorIdentificationRule(),
+  RequireMinimumContrastRule(),
+  // Testing rules
+  RequireErrorCaseTestsRule(),
+  // Security rules
+  RequireDeepLinkValidationRule(),
+  // Network performance rules
+  PreferStreamingResponseRule(),
+
+  // Batch 17: Additional state management and performance rules
+  // Riverpod rules
+  AvoidCircularProviderDepsRule(),
+  RequireErrorHandlingInAsyncRule(),
+  PreferNotifierOverStateRule(),
+  // GetX rules
+  RequireGetxControllerDisposeRule(),
+  AvoidObsOutsideControllerRule(),
+  // Bloc rules
+  RequireBlocTransformerRule(),
+  AvoidLongEventHandlersRule(),
+  // Performance rules
+  RequireListPreallocateRule(),
+  PreferBuilderForConditionalRule(),
+  RequireWidgetKeyStrategyRule(),
 ];
 
 class _SaropaLints extends PluginBase {
