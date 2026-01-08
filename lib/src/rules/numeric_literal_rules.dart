@@ -339,8 +339,9 @@ class NoMagicStringRule extends SaropaLintRule {
       if (current is VariableDeclarationList && current.isConst) return true;
       if (current is InstanceCreationExpression && current.isConst) return true;
       if (current is ListLiteral && current.constKeyword != null) return true;
-      if (current is SetOrMapLiteral && current.constKeyword != null)
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
         return true;
+      }
       current = current.parent;
     }
     return false;
