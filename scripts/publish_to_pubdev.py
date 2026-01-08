@@ -754,10 +754,143 @@ def run_format(project_dir: Path) -> bool:
     return True
 
 
+def check_pubdev_lint_issues(project_dir: Path) -> list[str]:
+    """
+    Check for issues that pub.dev's stricter lints will catch.
+
+    Returns a list of issue descriptions, empty if no issues found.
+    """
+    issues = []
+
+    # Directories to scan
+    scan_dirs = [
+        project_dir / "lib",
+        project_dir / "bin",
+    ]
+
+    for scan_dir in scan_dirs:
+        if not scan_dir.exists():
+            continue
+
+        for dart_file in scan_dir.rglob("*.dart"):
+            content = dart_file.read_text(encoding="utf-8")
+            lines = content.split("\n")
+            rel_path = dart_file.relative_to(project_dir)
+
+            # Check 1: Dangling library doc comments
+            # A doc comment at the start of a file (after shebangs/ignores)
+            # that's not followed by a library directive
+            in_header = True
+            found_doc_comment = False
+            doc_comment_line = 0
+
+            for i, line in enumerate(lines, 1):
+                stripped = line.strip()
+
+                # Skip empty lines and shebang
+                if not stripped or stripped.startswith("#!"):
+                    continue
+
+                # Skip ignore comments
+                if stripped.startswith("// ignore"):
+                    continue
+
+                # Found a doc comment in header area
+                if stripped.startswith("///") and in_header:
+                    if not found_doc_comment:
+                        found_doc_comment = True
+                        doc_comment_line = i
+                    continue
+
+                # If we hit a library directive after doc comment, that's fine
+                # Handle both "library;" and "library name;"
+                if (stripped == "library;" or stripped.startswith("library ")) and found_doc_comment:
+                    found_doc_comment = False
+                    break
+
+                # If we hit any non-doc-comment line, we're past the header
+                if not stripped.startswith("///"):
+                    in_header = False
+                    if found_doc_comment:
+                        issues.append(
+                            f"{rel_path}:{doc_comment_line}: Dangling library doc comment. "
+                            "Use // instead of /// for file-level comments, or add a 'library' directive."
+                        )
+                    break
+
+            # Check 2: Angle brackets interpreted as HTML in doc comments
+            # Look for <Type> patterns outside of code blocks
+            in_code_block = False
+
+            for i, line in enumerate(lines, 1):
+                stripped = line.strip()
+
+                # Track code blocks in doc comments
+                if stripped.startswith("///") and "```" in stripped:
+                    in_code_block = not in_code_block
+                    continue
+
+                # Skip if we're in a code block
+                if in_code_block:
+                    continue
+
+                # Only check doc comment lines
+                if not stripped.startswith("///"):
+                    # Reset code block state when leaving doc comments
+                    in_code_block = False
+                    continue
+
+                # Look for unescaped angle brackets in doc comments
+                # Pattern: word followed by <word> not wrapped in backticks
+                doc_content = stripped[3:].strip()  # Remove /// prefix
+
+                # Skip if line is a code fence marker
+                if doc_content.startswith("```"):
+                    continue
+
+                # Find potential generic type patterns like List<int>, Future<void>
+                # that aren't wrapped in backticks
+                # Match Type<Type> patterns not inside backticks
+                # We look for patterns like "List<int>" that aren't preceded by ` or followed by `
+                angle_matches = list(re.finditer(r"(?<!`)\b[A-Z]\w*<\w+>(?!`)", doc_content))
+
+                for match in angle_matches:
+                    # Check if this match is inside backticks
+                    pos = match.start()
+                    before = doc_content[:pos]
+                    after = doc_content[match.end():]
+
+                    # Count backticks before - if odd, we're inside inline code
+                    if before.count("`") % 2 == 1:
+                        continue
+
+                    issues.append(
+                        f"{rel_path}:{i}: Angle brackets in '{match.group()}' will be interpreted as HTML. "
+                        "Wrap in backticks: `" + match.group() + "`"
+                    )
+
+    return issues
+
+
 def run_analysis(project_dir: Path) -> bool:
-    """Run flutter analyze."""
+    """Run flutter analyze and check for pub.dev-specific lint issues."""
     print_header("STEP 6: RUNNING STATIC ANALYSIS")
 
+    # First, check for pub.dev-specific issues
+    print_info("Checking for pub.dev lint issues...")
+    pubdev_issues = check_pubdev_lint_issues(project_dir)
+
+    if pubdev_issues:
+        print_error("Found pub.dev lint issues that will cost points:")
+        for issue in pubdev_issues:
+            print_colored(f"      {issue}", Color.YELLOW)
+        print()
+        print_info("Fix these issues to get full pub.dev static analysis points.")
+        return False
+
+    print_success("No pub.dev lint issues found")
+
+    # Then run standard flutter analyze
     result = run_command(
         ["flutter", "analyze"],
         project_dir,

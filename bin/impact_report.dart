@@ -1,16 +1,17 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
-/// CLI tool to run custom_lint and display impact summary.
-///
-/// Usage:
-///   dart run saropa_lints:impact_report [path]
-///   dart run saropa_lints:impact_report --help
-///
-/// This tool:
-/// 1. Runs `dart run custom_lint` on your project
-/// 2. Parses the output to extract violations
-/// 3. Displays a summary grouped by impact level
-/// 4. Shows critical issues first
+
+// CLI tool to run custom_lint and display impact summary.
+//
+// Usage:
+//   dart run saropa_lints:impact_report [path]
+//   dart run saropa_lints:impact_report --help
+//
+// This tool:
+// 1. Runs `dart run custom_lint` on your project
+// 2. Parses the output to extract violations
+// 3. Displays a summary grouped by impact level
+// 4. Shows critical issues first
 
 import 'dart:io';
 
