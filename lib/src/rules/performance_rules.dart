@@ -1312,6 +1312,450 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
   }
 }
 
+/// Warns when scroll listener is added in build method.
+///
+/// Adding listeners in build() causes multiple subscriptions on every rebuild,
+/// leading to memory leaks and performance issues.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   scrollController.addListener(() {
+///     print('Scrolled!');
+///   });
+///   return ListView(controller: scrollController);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState();
+///   scrollController.addListener(_onScroll);
+/// }
+///
+/// void _onScroll() { print('Scrolled!'); }
+///
+/// Widget build(BuildContext context) {
+///   return ListView(controller: scrollController);
+/// }
+/// ```
+class AvoidScrollListenerInBuildRule extends SaropaLintRule {
+  const AvoidScrollListenerInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_scroll_listener_in_build',
+    problemMessage:
+        'Adding scroll listener in build() causes multiple subscriptions.',
+    correctionMessage:
+        'Move listener registration to initState() and remove in dispose().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      node.body.visitChildren(_AddListenerVisitor(reporter, code));
+    });
+  }
+}
+
+class _AddListenerVisitor extends RecursiveAstVisitor<void> {
+  _AddListenerVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName == 'addListener' || methodName == 'addStatusListener') {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when ValueListenableBuilder could simplify state management.
+///
+/// For single values that need to trigger rebuilds, ValueListenableBuilder
+/// is more efficient than StatefulWidget + setState.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   int _counter = 0;
+///
+///   Widget build(BuildContext context) {
+///     return Text('$_counter');
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final _counter = ValueNotifier<int>(0);
+///
+/// Widget build(BuildContext context) {
+///   return ValueListenableBuilder<int>(
+///     valueListenable: _counter,
+///     builder: (context, value, child) => Text('$value'),
+///   );
+/// }
+/// ```
+class PreferValueListenableBuilderRule extends SaropaLintRule {
+  const PreferValueListenableBuilderRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_value_listenable_builder',
+    problemMessage:
+        'Simple single-value state could use ValueListenableBuilder for better performance.',
+    correctionMessage:
+        'Consider using ValueNotifier + ValueListenableBuilder for isolated rebuilds.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final NamedType superclass = extendsClause.superclass;
+      if (superclass.name.lexeme != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Count non-final fields (state)
+      int stateFieldCount = 0;
+      int setStateCallCount = 0;
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          if (!member.isStatic && !member.fields.isFinal) {
+            stateFieldCount++;
+          }
+        }
+        if (member is MethodDeclaration) {
+          member.body.visitChildren(
+            _SetStateCounterVisitor(() => setStateCallCount++),
+          );
+        }
+      }
+
+      // Suggest ValueListenableBuilder if state is very simple
+      // (1 field with few setState calls)
+      if (stateFieldCount == 1 && setStateCallCount >= 1 && setStateCallCount <= 3) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
+  _SetStateCounterVisitor(this.onSetState);
+
+  final void Function() onSetState;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState') {
+      onSetState();
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when GlobalKey is overused or misused.
+///
+/// GlobalKeys are expensive - they persist across rebuilds and maintain
+/// global state. Only use them when absolutely necessary (Form validation,
+/// accessing state from outside, etc.).
+///
+/// **BAD:**
+/// ```dart
+/// // Using GlobalKey for styling or simple references
+/// final _containerKey = GlobalKey();
+/// final _textKey = GlobalKey();
+/// final _buttonKey = GlobalKey();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Only use GlobalKey when needed
+/// final _formKey = GlobalKey<FormState>();
+///
+/// // Use ObjectKey or ValueKey for list items
+/// ListView.builder(
+///   itemBuilder: (_, i) => ListTile(key: ValueKey(items[i].id)),
+/// )
+/// ```
+class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
+  const AvoidGlobalKeyMisuseRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_global_key_misuse',
+    problemMessage:
+        'Multiple GlobalKeys in a class may indicate overuse. GlobalKeys are expensive.',
+    correctionMessage:
+        'Use ValueKey or ObjectKey for list items. Reserve GlobalKey for Form, '
+        'accessing widget state, or navigator operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Count GlobalKey fields
+      final List<VariableDeclaration> globalKeyFields = <VariableDeclaration>[];
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            final String? typeName = member.fields.type?.toSource();
+            if (typeName != null && typeName.contains('GlobalKey')) {
+              globalKeyFields.add(variable);
+            }
+            // Also check initializer
+            final Expression? init = variable.initializer;
+            if (init is InstanceCreationExpression) {
+              final String initType =
+                  init.constructorName.type.name.lexeme;
+              if (initType == 'GlobalKey') {
+                if (!globalKeyFields.contains(variable)) {
+                  globalKeyFields.add(variable);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Warn if more than 2 GlobalKeys (likely overuse)
+      if (globalKeyFields.length > 2) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when complex animations don't use RepaintBoundary.
+///
+/// RepaintBoundary isolates paint operations, preventing expensive
+/// repaints from affecting the entire widget tree.
+///
+/// **BAD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     AnimatedBuilder(
+///       animation: _controller,
+///       builder: (_, __) => Transform.rotate(
+///         angle: _controller.value * 2 * pi,
+///         child: ComplexWidget(),
+///       ),
+///     ),
+///     StaticContent(),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     RepaintBoundary(
+///       child: AnimatedBuilder(
+///         animation: _controller,
+///         builder: (_, __) => Transform.rotate(
+///           angle: _controller.value * 2 * pi,
+///           child: ComplexWidget(),
+///         ),
+///       ),
+///     ),
+///     StaticContent(),
+///   ],
+/// )
+/// ```
+class RequireRepaintBoundaryRule extends SaropaLintRule {
+  const RequireRepaintBoundaryRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_repaint_boundary',
+    problemMessage:
+        'Complex animation without RepaintBoundary may cause expensive repaints.',
+    correctionMessage:
+        'Wrap animated content with RepaintBoundary to isolate paint operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _animatedWidgets = <String>{
+    'AnimatedBuilder',
+    'AnimatedWidget',
+    'Transform',
+    'RotationTransition',
+    'ScaleTransition',
+    'SlideTransition',
+    'FadeTransition',
+    'AnimatedOpacity',
+    'AnimatedRotation',
+    'AnimatedScale',
+    'AnimatedSlide',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (typeName == null || !_animatedWidgets.contains(typeName)) return;
+
+      // Check if wrapped in RepaintBoundary
+      AstNode? current = node.parent;
+      int depth = 0;
+      bool hasRepaintBoundary = false;
+
+      while (current != null && depth < 5) {
+        if (current is InstanceCreationExpression) {
+          final String? parentType =
+              current.constructorName.type.element?.name;
+          if (parentType == 'RepaintBoundary') {
+            hasRepaintBoundary = true;
+            break;
+          }
+        }
+        current = current.parent;
+        depth++;
+      }
+
+      // Only report if inside Stack or complex layout (where isolation matters)
+      if (!hasRepaintBoundary) {
+        AstNode? parent = node.parent;
+        while (parent != null) {
+          if (parent is InstanceCreationExpression) {
+            final String? parentType =
+                parent.constructorName.type.element?.name;
+            if (parentType == 'Stack' ||
+                parentType == 'CustomMultiChildLayout') {
+              reporter.atNode(node.constructorName, code);
+              return;
+            }
+          }
+          parent = parent.parent;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when TextSpan is created in build method.
+///
+/// TextSpan objects created in build() cannot be cached by Flutter's
+/// rendering pipeline, causing unnecessary text layout calculations.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return RichText(
+///     text: TextSpan(
+///       children: [
+///         TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
+///         TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
+///       ],
+///     ),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Cache as static const or class field
+/// static const _textSpan = TextSpan(
+///   children: [
+///     TextSpan(text: 'Hello ', style: TextStyle(color: Colors.black)),
+///     TextSpan(text: 'World', style: TextStyle(color: Colors.blue)),
+///   ],
+/// );
+///
+/// Widget build(BuildContext context) {
+///   return RichText(text: _textSpan);
+/// }
+/// ```
+class AvoidTextSpanInBuildRule extends SaropaLintRule {
+  const AvoidTextSpanInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_text_span_in_build',
+    problemMessage:
+        'TextSpan created in build() prevents text layout caching.',
+    correctionMessage:
+        'Cache TextSpan as a static const or class field for better performance.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      node.body.visitChildren(_TextSpanVisitor(reporter, code));
+    });
+  }
+}
+
+class _TextSpanVisitor extends RecursiveAstVisitor<void> {
+  _TextSpanVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String typeName = node.constructorName.type.name.lexeme;
+    if (typeName == 'TextSpan') {
+      // Check if it's a const creation (which is fine)
+      if (!node.isConst) {
+        // Check if it has children (complex TextSpan worth caching)
+        final bool hasChildren = node.argumentList.arguments.any((Expression arg) {
+          if (arg is NamedExpression) {
+            return arg.name.label.name == 'children';
+          }
+          return false;
+        });
+
+        if (hasChildren) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+}
+
 /// Warns when List.from() or toList() copies large collections.
 ///
 /// These methods copy all elements to a new list, which is expensive
@@ -1375,6 +1819,786 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
             methodName == 'skip') {
           reporter.atNode(node.methodName, code);
         }
+      }
+    });
+  }
+}
+
+// ============================================================================
+// Batch 11: Additional Performance Rules
+// ============================================================================
+
+/// Warns when widgets that could be const are not declared as const.
+///
+/// Widgets that can be const are created once and reused. Without const,
+/// Flutter creates new instances on every parent rebuild.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   child: Text('Hello'), // Could be const
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Container(
+///   child: const Text('Hello'),
+/// )
+/// ```
+class PreferConstWidgetsRule extends SaropaLintRule {
+  const PreferConstWidgetsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_const_widgets',
+    problemMessage:
+        'Widget could be const. Const widgets are reused across rebuilds.',
+    correctionMessage: 'Add const keyword if all arguments are constant.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _simpleWidgets = <String>{
+    'Text',
+    'Icon',
+    'SizedBox',
+    'Spacer',
+    'Divider',
+    'Placeholder',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (node.isConst) return; // Already const
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_simpleWidgets.contains(typeName)) return;
+
+      // Check if all arguments are literals or const
+      bool canBeConst = true;
+      for (final Expression arg in node.argumentList.arguments) {
+        final Expression expr =
+            arg is NamedExpression ? arg.expression : arg;
+        if (expr is! Literal && !_isConstExpression(expr)) {
+          canBeConst = false;
+          break;
+        }
+      }
+
+      if (canBeConst) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  bool _isConstExpression(Expression expr) {
+    if (expr is Literal) return true;
+    if (expr is InstanceCreationExpression) return expr.isConst;
+    if (expr is PrefixedIdentifier) return true; // Enum values, etc.
+    if (expr is SimpleIdentifier) {
+      // Check for known constants
+      final String name = expr.name;
+      return name == name.toUpperCase() || // SCREAMING_CASE constants
+          name.startsWith('k'); // kConstant convention
+    }
+    return false;
+  }
+}
+
+/// Warns when expensive computations are performed in build method.
+///
+/// build() is called frequently (60fps during animations). Sorting,
+/// filtering, or complex calculations here cause frame drops.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final sorted = items.toList()..sort(); // Sorts every rebuild!
+///   return ListView(children: sorted.map((e) => Text(e)).toList());
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// List<String>? _sortedItems;
+///
+/// Widget build(BuildContext context) {
+///   _sortedItems ??= items.toList()..sort();
+///   return ListView(children: _sortedItems!.map((e) => Text(e)).toList());
+/// }
+/// ```
+class AvoidExpensiveComputationInBuildRule extends SaropaLintRule {
+  const AvoidExpensiveComputationInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_expensive_computation_in_build',
+    problemMessage:
+        'Expensive computation in build() runs every rebuild, causing jank.',
+    correctionMessage: 'Cache the result in a field or use memoization.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _expensiveMethods = <String>{
+    'sort',
+    'shuffle',
+    'reversed',
+    'reduce',
+    'fold',
+    'join',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      node.body.visitChildren(_ExpensiveMethodVisitor(reporter, code));
+    });
+  }
+}
+
+class _ExpensiveMethodVisitor extends RecursiveAstVisitor<void> {
+  _ExpensiveMethodVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (AvoidExpensiveComputationInBuildRule._expensiveMethods
+        .contains(node.methodName.name)) {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when widgets are created inside loops in build method.
+///
+/// Creating widgets inside loops (.map()) in build creates new instances
+/// every rebuild. Extract to a method or use ListView.builder.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return Column(
+///     children: items.map((item) => ItemWidget(item)).toList(),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return ListView.builder(
+///     itemCount: items.length,
+///     itemBuilder: (context, index) => ItemWidget(items[index]),
+///   );
+/// }
+/// ```
+class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
+  const AvoidWidgetCreationInLoopRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_widget_creation_in_loop',
+    problemMessage:
+        'Creating widgets in .map() creates new instances every rebuild.',
+    correctionMessage:
+        'Use ListView.builder for lazy construction or extract to method.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      node.body.visitChildren(_MapWidgetVisitor(reporter, code));
+    });
+  }
+}
+
+class _MapWidgetVisitor extends RecursiveAstVisitor<void> {
+  _MapWidgetVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'map') {
+      // Check if the argument creates widgets
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is FunctionExpression) {
+          final String bodySource = arg.body.toSource();
+          // Simple heuristic: uppercase first letter suggests widget
+          if (RegExp(r'\b[A-Z][a-zA-Z]+\(').hasMatch(bodySource)) {
+            reporter.atNode(node.methodName, code);
+          }
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when BuildContext is used after async gap.
+///
+/// BuildContext becomes invalid after async gaps. Storing context and
+/// using it after await can access disposed widgets, causing crashes.
+///
+/// **BAD:**
+/// ```dart
+/// void onTap(BuildContext context) async {
+///   await someAsyncOperation();
+///   Navigator.of(context).pop(); // Context may be invalid!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void onTap(BuildContext context) async {
+///   final navigator = Navigator.of(context);
+///   await someAsyncOperation();
+///   navigator.pop(); // Using cached navigator
+/// }
+/// ```
+class RequireBuildContextScopeRule extends SaropaLintRule {
+  const RequireBuildContextScopeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_build_context_scope',
+    problemMessage:
+        'BuildContext used after await may be invalid (widget disposed).',
+    correctionMessage:
+        'Cache context-dependent values before await or check mounted.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.body.toSource().contains('await')) return;
+
+      // Check if method has BuildContext parameter
+      final FormalParameterList? params = node.parameters;
+      if (params == null) return;
+
+      String? contextParamName;
+      for (final FormalParameter param in params.parameters) {
+        final String? typeName = param.declaredFragment?.element.type.toString();
+        if (typeName != null && typeName.contains('BuildContext')) {
+          contextParamName = param.name?.lexeme;
+          break;
+        }
+      }
+
+      if (contextParamName != null) {
+        node.body.visitChildren(
+            _ContextAfterAwaitVisitor(reporter, code, contextParamName));
+      }
+    });
+  }
+}
+
+class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
+  _ContextAfterAwaitVisitor(this.reporter, this.code, this.contextName);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final String contextName;
+  bool _sawAwait = false;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    _sawAwait = true;
+    super.visitAwaitExpression(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_sawAwait && node.name == contextName) {
+      reporter.atNode(node, code);
+    }
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Warns when Theme.of or MediaQuery.of is called multiple times in build.
+///
+/// These methods traverse the widget tree. Call once and store in a
+/// local variable, or use specific methods like MediaQuery.sizeOf().
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return Container(
+///     color: Theme.of(context).primaryColor,
+///     child: Text(
+///       'Hello',
+///       style: Theme.of(context).textTheme.bodyLarge, // Second call!
+///     ),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final theme = Theme.of(context);
+///   return Container(
+///     color: theme.primaryColor,
+///     child: Text('Hello', style: theme.textTheme.bodyLarge),
+///   );
+/// }
+/// ```
+class AvoidCallingOfInBuildRule extends SaropaLintRule {
+  const AvoidCallingOfInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_calling_of_in_build',
+    problemMessage:
+        'Multiple .of(context) calls traverse widget tree repeatedly.',
+    correctionMessage:
+        'Cache the result in a local variable for better performance.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _ofMethods = <String>{
+    'Theme',
+    'MediaQuery',
+    'Navigator',
+    'Scaffold',
+    'DefaultTextStyle',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final Map<String, int> ofCallCounts = <String, int>{};
+      final List<MethodInvocation> duplicateCalls = <MethodInvocation>[];
+
+      node.body.visitChildren(_OfCallVisitor((MethodInvocation call) {
+        final Expression? target = call.target;
+        if (target is SimpleIdentifier) {
+          final String typeName = target.name;
+          ofCallCounts[typeName] = (ofCallCounts[typeName] ?? 0) + 1;
+          if (ofCallCounts[typeName]! > 1) {
+            duplicateCalls.add(call);
+          }
+        }
+      }));
+
+      for (final MethodInvocation call in duplicateCalls) {
+        reporter.atNode(call, code);
+      }
+    });
+  }
+}
+
+class _OfCallVisitor extends RecursiveAstVisitor<void> {
+  _OfCallVisitor(this.onOfCall);
+
+  final void Function(MethodInvocation) onOfCall;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'of') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier &&
+          AvoidCallingOfInBuildRule._ofMethods.contains(target.name)) {
+        onOfCall(node);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when image cache is not managed in apps with many images.
+///
+/// Flutter's ImageCache grows unbounded by default. Large images
+/// accumulate in memory. Call imageCache.clear() when appropriate.
+///
+/// **BAD:**
+/// ```dart
+/// // Loading many images without cache management
+/// for (final url in imageUrls) {
+///   Image.network(url);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Clear cache when navigating away from image-heavy screens
+/// @override
+/// void dispose() {
+///   imageCache.clear();
+///   super.dispose();
+/// }
+/// ```
+class RequireImageCacheManagementRule extends SaropaLintRule {
+  const RequireImageCacheManagementRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_cache_management',
+    problemMessage:
+        'Class loads many images but never clears imageCache.',
+    correctionMessage:
+        'Call imageCache.clear() or imageCache.evict() in dispose().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      int imageCount = 0;
+      bool hasImageCacheClear = false;
+
+      for (final ClassMember member in node.members) {
+        final String source = member.toSource();
+        if (source.contains('Image.network') ||
+            source.contains('Image.asset') ||
+            source.contains('CachedNetworkImage')) {
+          imageCount++;
+        }
+        if (source.contains('imageCache.clear') ||
+            source.contains('imageCache.evict')) {
+          hasImageCacheClear = true;
+        }
+      }
+
+      // Warn if loading 5+ images without cache management
+      if (imageCount >= 5 && !hasImageCacheClear) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when memory-intensive operations are detected.
+///
+/// Allocating large lists, loading full images into memory, or string
+/// concatenation in loops can cause out-of-memory crashes.
+///
+/// **BAD:**
+/// ```dart
+/// String result = '';
+/// for (final item in items) {
+///   result += item.toString(); // O(n²) string allocation!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final buffer = StringBuffer();
+/// for (final item in items) {
+///   buffer.write(item.toString());
+/// }
+/// final result = buffer.toString();
+/// ```
+class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
+  const AvoidMemoryIntensiveOperationsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_memory_intensive_operations',
+    problemMessage:
+        'String concatenation in loop causes O(n²) memory allocation.',
+    correctionMessage: 'Use StringBuffer for building strings in loops.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addForStatement((ForStatement node) {
+      node.body.visitChildren(_StringConcatVisitor(reporter, code));
+    });
+
+    context.registry.addForElement((ForElement node) {
+      node.body.visitChildren(_StringConcatVisitor(reporter, code));
+    });
+
+    context.registry.addWhileStatement((WhileStatement node) {
+      node.body.visitChildren(_StringConcatVisitor(reporter, code));
+    });
+  }
+}
+
+class _StringConcatVisitor extends RecursiveAstVisitor<void> {
+  _StringConcatVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    // Check for += with strings
+    if (node.operator.type == TokenType.PLUS_EQ) {
+      final Expression left = node.leftHandSide;
+      if (left is SimpleIdentifier) {
+        // Simple heuristic - variable names suggesting strings
+        final String name = left.name.toLowerCase();
+        if (name.contains('str') ||
+            name.contains('text') ||
+            name.contains('result') ||
+            name.contains('output')) {
+          reporter.atNode(node, code);
+        }
+      }
+    }
+    super.visitAssignmentExpression(node);
+  }
+}
+
+/// Warns when closures capture widget references causing memory leaks.
+///
+/// Closures capture their enclosing scope. A closure referencing `this`
+/// in a callback keeps the entire widget alive even after disposal.
+///
+/// **BAD:**
+/// ```dart
+/// void initState() {
+///   someStream.listen((data) {
+///     setState(() => _data = data); // Captures State
+///   });
+///   super.initState();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// StreamSubscription? _subscription;
+///
+/// void initState() {
+///   _subscription = someStream.listen((data) {
+///     if (mounted) setState(() => _data = data);
+///   });
+///   super.initState();
+/// }
+///
+/// void dispose() {
+///   _subscription?.cancel();
+///   super.dispose();
+/// }
+/// ```
+class AvoidClosureMemoryLeakRule extends SaropaLintRule {
+  const AvoidClosureMemoryLeakRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_closure_memory_leak',
+    problemMessage:
+        'Closure with setState may keep widget alive after disposal.',
+    correctionMessage:
+        'Store subscription and cancel in dispose(), check mounted before setState.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'initState') return;
+
+      // Check for stream.listen with setState inside
+      node.body.visitChildren(_StreamListenVisitor(reporter, code));
+    });
+  }
+}
+
+class _StreamListenVisitor extends RecursiveAstVisitor<void> {
+  _StreamListenVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'listen') {
+      // Check if callback has setState without mounted check
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is FunctionExpression) {
+          final String bodySource = arg.body.toSource();
+          if (bodySource.contains('setState') &&
+              !bodySource.contains('mounted')) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when widgets could be static const for better performance.
+///
+/// `static const` widgets are created once at compile time. Instance
+/// widgets are recreated on every parent rebuild.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   final divider = const Divider(); // Created per instance
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   static const divider = Divider(); // Created once at compile time
+/// }
+/// ```
+class PreferStaticConstWidgetsRule extends SaropaLintRule {
+  const PreferStaticConstWidgetsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_static_const_widgets',
+    problemMessage:
+        'Const widget field could be static for compile-time creation.',
+    correctionMessage:
+        'Add static modifier: static const widget = Widget();',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      if (node.isStatic) return; // Already static
+
+      // Check for const widget fields
+      if (node.fields.isConst) {
+        for (final VariableDeclaration variable in node.fields.variables) {
+          final Expression? initializer = variable.initializer;
+          if (initializer is InstanceCreationExpression && initializer.isConst) {
+            reporter.atNode(variable, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when dispose pattern is not followed for resource classes.
+///
+/// Objects holding resources (streams, controllers, subscriptions)
+/// must be disposed. Undisposed resources leak memory and cause crashes.
+///
+/// **BAD:**
+/// ```dart
+/// class MyManager {
+///   final _controller = StreamController<int>();
+///   // Missing close!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyManager {
+///   final _controller = StreamController<int>();
+///
+///   void dispose() {
+///     _controller.close();
+///   }
+/// }
+/// ```
+class RequireDisposePatternRule extends SaropaLintRule {
+  const RequireDisposePatternRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_dispose_pattern',
+    problemMessage:
+        'Class has disposable resources but no dispose/close method.',
+    correctionMessage:
+        'Add dispose() or close() method to clean up resources.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _disposableTypes = <String>{
+    'StreamController',
+    'AnimationController',
+    'TextEditingController',
+    'ScrollController',
+    'TabController',
+    'FocusNode',
+    'Timer',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Skip State classes (handled by other rules)
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName == 'State') return;
+      }
+
+      bool hasDisposable = false;
+      bool hasDisposeMethod = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null) {
+            for (final String disposable in _disposableTypes) {
+              if (typeName.contains(disposable)) {
+                hasDisposable = true;
+                break;
+              }
+            }
+          }
+        }
+        if (member is MethodDeclaration) {
+          final String name = member.name.lexeme;
+          if (name == 'dispose' || name == 'close') {
+            hasDisposeMethod = true;
+          }
+        }
+      }
+
+      if (hasDisposable && !hasDisposeMethod) {
+        reporter.atNode(node, code);
       }
     });
   }

@@ -2058,3 +2058,1037 @@ class _ProviderRecreateVisitor extends RecursiveAstVisitor<void> {
     super.visitInstanceCreationExpression(node);
   }
 }
+
+/// Warns when Bloc is used for simple state that could use Cubit.
+///
+/// Cubit is simpler than Bloc for straightforward state changes.
+/// If your Bloc only has 1-2 events with simple handlers, use Cubit.
+///
+/// **BAD:**
+/// ```dart
+/// // Overly complex for simple counter
+/// abstract class CounterEvent {}
+/// class IncrementPressed extends CounterEvent {}
+///
+/// class CounterBloc extends Bloc<CounterEvent, int> {
+///   CounterBloc() : super(0) {
+///     on<IncrementPressed>((event, emit) => emit(state + 1));
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class CounterCubit extends Cubit<int> {
+///   CounterCubit() : super(0);
+///
+///   void increment() => emit(state + 1);
+/// }
+/// ```
+class PreferCubitForSimpleRule extends SaropaLintRule {
+  const PreferCubitForSimpleRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_cubit_for_simple',
+    problemMessage:
+        'Simple Bloc with few events could be a Cubit for simpler code.',
+    correctionMessage:
+        'Cubit is simpler for straightforward state. Use Bloc for complex event handling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc') return;
+
+      // Count event handlers (on<Event> calls)
+      final String classSource = node.toSource();
+
+      // Count on<EventType> registrations
+      final RegExp onPattern = RegExp(r'on<\w+>');
+      final int eventCount = onPattern.allMatches(classSource).length;
+
+      // If only 1-2 simple events, suggest Cubit
+      if (eventCount <= 2) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when ref is used in dispose method.
+///
+/// The `ref` object in Riverpod becomes invalid during dispose - providers
+/// may already be destroyed. Accessing ref in dispose can throw exceptions
+/// or access stale data.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends ConsumerState<MyWidget> {
+///   @override
+///   void dispose() {
+///     ref.read(someProvider); // Invalid! Provider may be disposed
+///     super.dispose();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends ConsumerState<MyWidget> {
+///   @override
+///   void dispose() {
+///     // Clean up local resources only
+///     _controller.dispose();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class AvoidRefInDisposeRule extends SaropaLintRule {
+  const AvoidRefInDisposeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_ref_in_dispose',
+    problemMessage:
+        'Using ref in dispose() is unsafe - the provider may already be destroyed.',
+    correctionMessage:
+        'Remove ref usage from dispose(). Access provider values earlier if needed.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'dispose') return;
+
+      // Check if this is in a ConsumerState class
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+
+      final ExtendsClause? extendsClause = classDecl.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      // ConsumerState, ConsumerStatefulWidget state
+      if (!superName.contains('ConsumerState') && superName != 'State') return;
+
+      // Look for ref.read(), ref.watch(), ref.listen() in dispose
+      node.body.visitChildren(_RefInDisposeVisitor(reporter, code));
+    });
+  }
+}
+
+class _RefInDisposeVisitor extends RecursiveAstVisitor<void> {
+  _RefInDisposeVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier && target.name == 'ref') {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when ProviderScope is missing from the app root.
+///
+/// Riverpod requires ProviderScope at the widget tree root. Without it,
+/// all provider access throws "ProviderScope not found" errors at runtime.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   runApp(MyApp()); // Missing ProviderScope!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() {
+///   runApp(
+///     ProviderScope(
+///       child: MyApp(),
+///     ),
+///   );
+/// }
+/// ```
+class RequireProviderScopeRule extends SaropaLintRule {
+  const RequireProviderScopeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_provider_scope',
+    problemMessage:
+        'Riverpod app is missing ProviderScope at root. Provider access will crash.',
+    correctionMessage:
+        'Wrap your app with ProviderScope: runApp(ProviderScope(child: MyApp()))',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme != 'main') return;
+
+      final FunctionBody body = node.functionExpression.body;
+      final String bodySource = body.toSource();
+
+      // Check if using Riverpod (has ConsumerWidget, ref.watch, etc.)
+      final bool usesRiverpod = bodySource.contains('Consumer') ||
+          bodySource.contains('ref.watch') ||
+          bodySource.contains('ref.read');
+
+      // Also check the whole file for Riverpod patterns
+      final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+      if (unit == null) return;
+
+      final String fileSource = unit.toSource();
+      final bool fileUsesRiverpod = fileSource.contains('ConsumerWidget') ||
+          fileSource.contains('ConsumerStatefulWidget') ||
+          fileSource.contains('ProviderScope') ||
+          fileSource.contains('flutter_riverpod');
+
+      if (!usesRiverpod && !fileUsesRiverpod) return;
+
+      // Check if ProviderScope is present
+      if (!bodySource.contains('ProviderScope')) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when using ref.watch() for entire provider when only part is needed.
+///
+/// Watching an entire object rebuilds when any field changes. Use
+/// ref.watch(provider.select((s) => s.field)) to rebuild only when
+/// specific fields change, improving performance.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context, WidgetRef ref) {
+///   final user = ref.watch(userProvider); // Rebuilds on any user change
+///   return Text(user.name); // Only uses name!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context, WidgetRef ref) {
+///   final name = ref.watch(userProvider.select((u) => u.name));
+///   return Text(name); // Only rebuilds when name changes
+/// }
+/// ```
+class PreferSelectForPartialRule extends SaropaLintRule {
+  const PreferSelectForPartialRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_select_for_partial',
+    problemMessage:
+        'Watching entire provider when only one field is used causes unnecessary rebuilds.',
+    correctionMessage:
+        'Use ref.watch(provider.select((s) => s.field)) for partial watching.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      // Collect watched providers and how they're used
+      final Map<String, Set<String>> providerUsage = <String, Set<String>>{};
+      final Map<String, MethodInvocation> watchCalls = <String, MethodInvocation>{};
+
+      node.body.visitChildren(
+        _ProviderUsageVisitor(
+          onWatch: (String name, MethodInvocation call) {
+            providerUsage.putIfAbsent(name, () => <String>{});
+            watchCalls[name] = call;
+          },
+          onPropertyAccess: (String name, String property) {
+            providerUsage[name]?.add(property);
+          },
+        ),
+      );
+
+      // Report providers that are watched but only one property is used
+      for (final MapEntry<String, Set<String>> entry in providerUsage.entries) {
+        // If watched and only 1-2 properties accessed, suggest select
+        if (entry.value.isNotEmpty && entry.value.length <= 2) {
+          final MethodInvocation? call = watchCalls[entry.key];
+          if (call != null) {
+            // Check if already using select
+            final String callSource = call.toSource();
+            if (!callSource.contains('.select(')) {
+              reporter.atNode(call, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+class _ProviderUsageVisitor extends RecursiveAstVisitor<void> {
+  _ProviderUsageVisitor({
+    required this.onWatch,
+    required this.onPropertyAccess,
+  });
+
+  final void Function(String name, MethodInvocation call) onWatch;
+  final void Function(String name, String property) onPropertyAccess;
+
+  final Map<String, String> _watchedVariables = <String, String>{};
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    final Expression? initializer = node.initializer;
+    if (initializer is MethodInvocation) {
+      if (initializer.methodName.name == 'watch') {
+        final Expression? target = initializer.target;
+        if (target is SimpleIdentifier && target.name == 'ref') {
+          // Track: final user = ref.watch(userProvider);
+          final String varName = node.name.lexeme;
+          final ArgumentList args = initializer.argumentList;
+          if (args.arguments.isNotEmpty) {
+            final String providerName = args.arguments.first.toSource();
+            _watchedVariables[varName] = providerName;
+            onWatch(providerName, initializer);
+          }
+        }
+      }
+    }
+    super.visitVariableDeclaration(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    // Track: user.name
+    final String prefix = node.prefix.name;
+    final String property = node.identifier.name;
+
+    // Check if prefix is a watched variable
+    final String? providerName = _watchedVariables[prefix];
+    if (providerName != null) {
+      onPropertyAccess(providerName, property);
+    }
+
+    super.visitPrefixedIdentifier(node);
+  }
+}
+
+/// Warns when Riverpod provider is declared inside a widget class.
+///
+/// Declaring providers inside widget classes makes them instance-specific
+/// and breaks Riverpod's global state model. Providers should be declared
+/// at file level as top-level variables.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends ConsumerWidget {
+///   final myProvider = StateProvider<int>((ref) => 0); // Wrong!
+///
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     return Text(ref.watch(myProvider).toString());
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final myProvider = StateProvider<int>((ref) => 0);
+///
+/// class MyWidget extends ConsumerWidget {
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     return Text(ref.watch(myProvider).toString());
+///   }
+/// }
+/// ```
+class AvoidProviderInWidgetRule extends SaropaLintRule {
+  const AvoidProviderInWidgetRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_provider_in_widget',
+    problemMessage:
+        'Provider declared inside widget class breaks Riverpod\'s global state model.',
+    correctionMessage:
+        'Move provider declaration to file level as a top-level final variable.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _providerTypes = <String>{
+    'Provider',
+    'StateProvider',
+    'FutureProvider',
+    'StreamProvider',
+    'NotifierProvider',
+    'AsyncNotifierProvider',
+    'StateNotifierProvider',
+    'ChangeNotifierProvider',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      // Check if inside a class
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+
+      // Check each field
+      for (final VariableDeclaration variable in node.fields.variables) {
+        final Expression? initializer = variable.initializer;
+        if (initializer == null) continue;
+
+        bool isProvider = false;
+
+        if (initializer is InstanceCreationExpression) {
+          final String typeName = initializer.constructorName.type.name.lexeme;
+          isProvider = _providerTypes.contains(typeName);
+        }
+
+        if (initializer is MethodInvocation) {
+          final Expression? target = initializer.target;
+          if (target is SimpleIdentifier) {
+            isProvider = _providerTypes.contains(target.name);
+          }
+        }
+
+        if (isProvider) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when ref.watch is used with .family without proper parameter.
+///
+/// When using .family providers, you must pass the parameter to get the
+/// correct provider instance. Forgetting the parameter or passing the
+/// wrong one creates a new provider instance unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// // Missing family parameter
+/// final user = ref.watch(userProvider); // Error or wrong instance!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final user = ref.watch(userProvider(userId));
+/// ```
+class PreferFamilyForParamsRule extends SaropaLintRule {
+  const PreferFamilyForParamsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_family_for_params',
+    problemMessage:
+        'Provider with parameters should use .family modifier for proper caching.',
+    correctionMessage:
+        'Use Provider.family((ref, param) => ...) and watch with provider(param).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check if it's a provider type
+      if (!typeName.contains('Provider')) return;
+
+      // Check if the create callback takes extra parameters beyond ref
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is! FunctionExpression) return;
+
+      final FormalParameterList? params = firstArg.parameters;
+      if (params == null) return;
+
+      // If callback has more than 1 parameter (ref + something else),
+      // suggest using .family
+      if (params.parameters.length > 1) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when BlocProvider is used without a BlocObserver setup.
+///
+/// BlocObserver provides centralized logging and error handling for all
+/// Blocs. Without it, state changes and errors may go untracked.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   runApp(
+///     BlocProvider(
+///       create: (_) => AuthBloc(),
+///       child: MyApp(),
+///     ),
+///   );
+///   // No BlocObserver - no centralized logging!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() {
+///   Bloc.observer = AppBlocObserver();
+///   runApp(
+///     BlocProvider(
+///       create: (_) => AuthBloc(),
+///       child: MyApp(),
+///     ),
+///   );
+/// }
+///
+/// class AppBlocObserver extends BlocObserver {
+///   @override
+///   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
+///     log('Bloc error: $error');
+///     super.onError(bloc, error, stackTrace);
+///   }
+/// }
+/// ```
+class RequireBlocObserverRule extends SaropaLintRule {
+  const RequireBlocObserverRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_observer',
+    problemMessage:
+        'Using BlocProvider without BlocObserver setup. Consider adding centralized logging.',
+    correctionMessage:
+        'Add Bloc.observer = AppBlocObserver() in main() for centralized logging and error handling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme != 'main') return;
+
+      final FunctionBody body = node.functionExpression.body;
+      final String bodySource = body.toSource();
+
+      // Check if using Bloc
+      if (!bodySource.contains('BlocProvider') &&
+          !bodySource.contains('MultiBlocProvider')) {
+        return;
+      }
+
+      // Check if BlocObserver is set
+      if (!bodySource.contains('Bloc.observer') &&
+          !bodySource.contains('BlocObserver')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// ============================================================================
+// Batch 10: Additional Riverpod & Bloc Rules
+// ============================================================================
+
+/// Warns when BLoC events are mutated after dispatch.
+///
+/// Bloc events should be immutable. Mutating an event after dispatch
+/// causes race conditions and makes debugging impossible.
+///
+/// **BAD:**
+/// ```dart
+/// class UpdateEvent extends MyEvent {
+///   String name; // Mutable!
+/// }
+///
+/// bloc.add(event);
+/// event.name = 'changed'; // Mutating after dispatch!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UpdateEvent extends MyEvent {
+///   final String name; // Immutable
+///   const UpdateEvent(this.name);
+/// }
+/// ```
+class AvoidBlocEventMutationRule extends SaropaLintRule {
+  const AvoidBlocEventMutationRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_event_mutation',
+    problemMessage:
+        'BLoC event has mutable fields. Events should be immutable.',
+    correctionMessage:
+        'Make event fields final and use const constructor.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if this is an event class (naming convention)
+      final String className = node.name.lexeme;
+      if (!className.endsWith('Event')) return;
+
+      // Check for mutable fields
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          if (!member.isStatic && !member.fields.isFinal) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when BLoC state is modified directly instead of using copyWith.
+///
+/// Directly modifying state fields breaks immutability. Use copyWith
+/// to create new state instances with updated fields.
+///
+/// **BAD:**
+/// ```dart
+/// emit(state..count = 5); // Mutating existing state!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// emit(state.copyWith(count: 5)); // New immutable state
+/// ```
+class PreferCopyWithForStateRule extends SaropaLintRule {
+  const PreferCopyWithForStateRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_copy_with_for_state',
+    problemMessage:
+        'Directly modifying state breaks immutability.',
+    correctionMessage:
+        'Use state.copyWith(field: value) to create new state.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCascadeExpression((CascadeExpression node) {
+      final Expression target = node.target;
+      if (target is SimpleIdentifier && target.name == 'state') {
+        for (final Expression section in node.cascadeSections) {
+          if (section is AssignmentExpression) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when BlocProvider.of is used with listen:true in build method.
+///
+/// listen:true causes rebuilds on every state change. Use BlocBuilder
+/// or BlocConsumer for controlled rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final bloc = BlocProvider.of<MyBloc>(context); // listen:true by default
+///   return Text('${bloc.state}');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return BlocBuilder<MyBloc, MyState>(
+///     builder: (context, state) => Text('$state'),
+///   );
+/// }
+/// ```
+class AvoidBlocListenInBuildRule extends SaropaLintRule {
+  const AvoidBlocListenInBuildRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_listen_in_build',
+    problemMessage:
+        'BlocProvider.of in build() causes rebuilds. Use BlocBuilder instead.',
+    correctionMessage:
+        'Use BlocBuilder or context.read() for one-time access.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      node.body.visitChildren(_BlocProviderOfVisitor(reporter, code));
+    });
+  }
+}
+
+class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
+  _BlocProviderOfVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'of') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'BlocProvider') {
+        // Check if listen: false is explicitly set
+        final ArgumentList args = node.argumentList;
+        bool hasListenFalse = false;
+        for (final Expression arg in args.arguments) {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'listen' &&
+              arg.expression is BooleanLiteral &&
+              !(arg.expression as BooleanLiteral).value) {
+            hasListenFalse = true;
+          }
+        }
+        if (!hasListenFalse) {
+          reporter.atNode(node, code);
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when BLoC constructor doesn't pass initial state to super.
+///
+/// Bloc without an initial state throws at runtime. Always pass
+/// initial state to super() in the constructor.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   MyBloc() : super(); // Missing initial state!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   MyBloc() : super(InitialState());
+/// }
+/// ```
+class RequireInitialStateRule extends SaropaLintRule {
+  const RequireInitialStateRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_initial_state',
+    problemMessage:
+        'BLoC constructor must pass initial state to super().',
+    correctionMessage:
+        'Add initial state: super(InitialState()) or super(const State()).',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check constructors have super with argument
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration) {
+          bool hasSuperWithArg = false;
+          for (final ConstructorInitializer init in member.initializers) {
+            if (init is SuperConstructorInvocation) {
+              if (init.argumentList.arguments.isNotEmpty) {
+                hasSuperWithArg = true;
+              }
+            }
+          }
+          if (!hasSuperWithArg) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when BLoC state sealed class doesn't include an error state.
+///
+/// States should include an error variant. Without it, errors are either
+/// swallowed or crash the app instead of showing error UI.
+///
+/// **BAD:**
+/// ```dart
+/// sealed class UserState {}
+/// class UserLoading extends UserState {}
+/// class UserLoaded extends UserState {}
+/// // Missing UserError!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// sealed class UserState {}
+/// class UserLoading extends UserState {}
+/// class UserLoaded extends UserState {}
+/// class UserError extends UserState {
+///   final String message;
+/// }
+/// ```
+class RequireErrorStateRule extends SaropaLintRule {
+  const RequireErrorStateRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_error_state',
+    problemMessage:
+        'BLoC state hierarchy should include an error state.',
+    correctionMessage:
+        'Add an Error state class (e.g., UserError) to handle failures.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final Map<String, ClassDeclaration> stateClasses =
+        <String, ClassDeclaration>{};
+    final Set<String> sealedBases = <String>{};
+
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme;
+      if (className.endsWith('State')) {
+        stateClasses[className] = node;
+        if (node.sealedKeyword != null) {
+          sealedBases.add(className);
+        }
+      }
+    });
+
+    context.addPostRunCallback(() {
+      for (final String baseName in sealedBases) {
+        bool hasErrorState = false;
+        for (final String className in stateClasses.keys) {
+          if (className.contains('Error') || className.contains('Failure')) {
+            hasErrorState = true;
+            break;
+          }
+        }
+        if (!hasErrorState && stateClasses.containsKey(baseName)) {
+          reporter.atNode(stateClasses[baseName]!, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when BLoCs directly call other BLoCs.
+///
+/// Blocs calling other blocs directly creates tight coupling. Use a
+/// parent widget or service to coordinate between blocs.
+///
+/// **BAD:**
+/// ```dart
+/// class OrderBloc extends Bloc<OrderEvent, OrderState> {
+///   final UserBloc userBloc;
+///   OrderBloc(this.userBloc);
+///
+///   void onPlaceOrder() {
+///     userBloc.add(UpdatePoints()); // Direct coupling!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Coordinate in widget or use streams
+/// BlocListener<OrderBloc, OrderState>(
+///   listener: (context, state) {
+///     if (state is OrderPlaced) {
+///       context.read<UserBloc>().add(UpdatePoints());
+///     }
+///   },
+///   child: ...
+/// )
+/// ```
+class AvoidBlocInBlocRule extends SaropaLintRule {
+  const AvoidBlocInBlocRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_in_bloc',
+    problemMessage:
+        'BLoC should not directly call another BLoC. This creates tight coupling.',
+    correctionMessage:
+        'Coordinate between BLoCs at the widget layer or use streams.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check for Bloc fields that are used with .add()
+      final Set<String> blocFields = <String>{};
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration field in member.fields.variables) {
+            final String fieldType = member.fields.type?.toSource() ?? '';
+            if (fieldType.contains('Bloc') || fieldType.contains('Cubit')) {
+              blocFields.add(field.name.lexeme);
+            }
+          }
+        }
+      }
+
+      // Check for .add() calls on bloc fields
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration) {
+          member.body.visitChildren(_BlocAddVisitor(reporter, code, blocFields));
+        }
+      }
+    });
+  }
+}
+
+class _BlocAddVisitor extends RecursiveAstVisitor<void> {
+  _BlocAddVisitor(this.reporter, this.code, this.blocFields);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> blocFields;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'add' || node.methodName.name == 'emit') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && blocFields.contains(target.name)) {
+        reporter.atNode(node, code);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when BLoC events don't use sealed classes.
+///
+/// Sealed classes for events enable exhaustive switch statements, so
+/// the compiler catches unhandled events.
+///
+/// **BAD:**
+/// ```dart
+/// abstract class CounterEvent {}
+/// class Increment extends CounterEvent {}
+/// class Decrement extends CounterEvent {}
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// sealed class CounterEvent {}
+/// class Increment extends CounterEvent {}
+/// class Decrement extends CounterEvent {}
+/// ```
+class PreferSealedEventsRule extends SaropaLintRule {
+  const PreferSealedEventsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sealed_events',
+    problemMessage:
+        'BLoC event base class should be sealed for exhaustive handling.',
+    correctionMessage:
+        'Use sealed class instead of abstract class for event hierarchy.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme;
+      if (!className.endsWith('Event')) return;
+
+      // Check if abstract but not sealed
+      if (node.abstractKeyword != null && node.sealedKeyword == null) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
