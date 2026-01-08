@@ -1329,10 +1329,10 @@ class _UseSecureRandomFix extends DartFix {
   }
 }
 
-/// Warns when List<int> is used for binary data instead of Uint8List.
+/// Warns when `List<int>` is used for binary data instead of Uint8List.
 ///
 /// Uint8List is more memory-efficient for binary data and provides better
-/// interoperability with native code and I/O operations. List<int> uses
+/// interoperability with native code and I/O operations. `List<int>` uses
 /// 8 bytes per element vs 1 byte for Uint8List.
 ///
 /// **BAD:**
@@ -1349,7 +1349,7 @@ class _UseSecureRandomFix extends DartFix {
 class PreferTypedDataRule extends SaropaLintRule {
   const PreferTypedDataRule() : super(code: _code);
 
-  /// List<int> for binary data is inefficient but functional.
+  /// `List<int>` for binary data is inefficient but functional.
   /// Optimization suggestion, not a bug.
   @override
   LintImpact get impact => LintImpact.low;
