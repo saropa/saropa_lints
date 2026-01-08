@@ -637,7 +637,8 @@ class RequireCameraDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && typeName.contains('CameraController')) {
-            for (final VariableDeclaration variable in member.fields.variables) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
               controllerNames.add(variable.name.lexeme);
             }
           }

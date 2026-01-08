@@ -282,8 +282,7 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_route_transition_consistency',
-    problemMessage:
-        'Mixed route transition types. Use consistent transitions.',
+    problemMessage: 'Mixed route transition types. Use consistent transitions.',
     correctionMessage:
         'Define transitions in ThemeData.pageTransitionsTheme for consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -433,8 +432,7 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_route_guards',
-    problemMessage:
-        'Protected route without authentication guard.',
+    problemMessage: 'Protected route without authentication guard.',
     correctionMessage:
         'Add redirect callback to check authentication before accessing this route.',
     errorSeverity: DiagnosticSeverity.WARNING,
