@@ -2260,7 +2260,8 @@ class RequireProviderScopeRule extends SaropaLintRule {
           bodySource.contains('ref.read');
 
       // Also check the whole file for Riverpod patterns
-      final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit =
+          node.thisOrAncestorOfType<CompilationUnit>();
       if (unit == null) return;
 
       final String fileSource = unit.toSource();
@@ -2323,7 +2324,8 @@ class PreferSelectForPartialRule extends SaropaLintRule {
 
       // Collect watched providers and how they're used
       final Map<String, Set<String>> providerUsage = <String, Set<String>>{};
-      final Map<String, MethodInvocation> watchCalls = <String, MethodInvocation>{};
+      final Map<String, MethodInvocation> watchCalls =
+          <String, MethodInvocation>{};
 
       node.body.visitChildren(
         _ProviderUsageVisitor(
@@ -2663,8 +2665,7 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
     name: 'avoid_bloc_event_mutation',
     problemMessage:
         'BLoC event has mutable fields. Events should be immutable.',
-    correctionMessage:
-        'Make event fields final and use const constructor.',
+    correctionMessage: 'Make event fields final and use const constructor.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2710,10 +2711,8 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
-    problemMessage:
-        'Directly modifying state breaks immutability.',
-    correctionMessage:
-        'Use state.copyWith(field: value) to create new state.',
+    problemMessage: 'Directly modifying state breaks immutability.',
+    correctionMessage: 'Use state.copyWith(field: value) to create new state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2765,8 +2764,7 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
     name: 'avoid_bloc_listen_in_build',
     problemMessage:
         'BlocProvider.of in build() causes rebuilds. Use BlocBuilder instead.',
-    correctionMessage:
-        'Use BlocBuilder or context.read() for one-time access.',
+    correctionMessage: 'Use BlocBuilder or context.read() for one-time access.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2838,8 +2836,7 @@ class RequireInitialStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
-    problemMessage:
-        'BLoC constructor must pass initial state to super().',
+    problemMessage: 'BLoC constructor must pass initial state to super().',
     correctionMessage:
         'Add initial state: super(InitialState()) or super(const State()).',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2905,8 +2902,7 @@ class RequireErrorStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_state',
-    problemMessage:
-        'BLoC state hierarchy should include an error state.',
+    problemMessage: 'BLoC state hierarchy should include an error state.',
     correctionMessage:
         'Add an Error state class (e.g., UserError) to handle failures.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3019,7 +3015,8 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
       // Check for .add() calls on bloc fields
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration) {
-          member.body.visitChildren(_BlocAddVisitor(reporter, code, blocFields));
+          member.body
+              .visitChildren(_BlocAddVisitor(reporter, code, blocFields));
         }
       }
     });
