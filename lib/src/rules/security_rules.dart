@@ -1438,8 +1438,7 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_auth_check',
-    problemMessage:
-        'Protected endpoint may be missing authentication check.',
+    problemMessage: 'Protected endpoint may be missing authentication check.',
     correctionMessage:
         'Add authentication verification before processing protected requests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1638,8 +1637,7 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
-    problemMessage:
-        'Decoding JWT on client for authorization is insecure.',
+    problemMessage: 'Decoding JWT on client for authorization is insecure.',
     correctionMessage:
         'Verify JWT claims on the server. Client-decoded JWTs can be manipulated.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1726,8 +1724,7 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
-    problemMessage:
-        'Logout may not clear all sensitive data.',
+    problemMessage: 'Logout may not clear all sensitive data.',
     correctionMessage:
         'Ensure logout clears tokens, cached user data, and resets auth state.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1759,8 +1756,8 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
           bodySource.contains('credential') ||
           bodySource.contains('auth');
 
-      final bool clearsCache = bodySource.contains('cache') ||
-          bodySource.contains('storage');
+      final bool clearsCache =
+          bodySource.contains('cache') || bodySource.contains('storage');
 
       // If logout method is too simple, warn
       if (!clearsStorage || (!clearsToken && !clearsCache)) {

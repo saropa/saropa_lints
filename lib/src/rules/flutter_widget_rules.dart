@@ -12145,8 +12145,7 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_fixed_dimensions',
-    problemMessage:
-        'Fixed pixel dimensions may not work on all screen sizes.',
+    problemMessage: 'Fixed pixel dimensions may not work on all screen sizes.',
     correctionMessage:
         'Use responsive sizing (Flexible, Expanded, FractionallySizedBox, or LayoutBuilder).',
     errorSeverity: DiagnosticSeverity.INFO,

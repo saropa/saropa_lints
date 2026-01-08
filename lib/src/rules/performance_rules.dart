@@ -1456,7 +1456,9 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
 
       // Suggest ValueListenableBuilder if state is very simple
       // (1 field with few setState calls)
-      if (stateFieldCount == 1 && setStateCallCount >= 1 && setStateCallCount <= 3) {
+      if (stateFieldCount == 1 &&
+          setStateCallCount >= 1 &&
+          setStateCallCount <= 3) {
         reporter.atToken(node.name, code);
       }
     });
@@ -1534,8 +1536,7 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
             // Also check initializer
             final Expression? init = variable.initializer;
             if (init is InstanceCreationExpression) {
-              final String initType =
-                  init.constructorName.type.name.lexeme;
+              final String initType = init.constructorName.type.name.lexeme;
               if (initType == 'GlobalKey') {
                 if (!globalKeyFields.contains(variable)) {
                   globalKeyFields.add(variable);
@@ -1637,8 +1638,7 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
 
       while (current != null && depth < 5) {
         if (current is InstanceCreationExpression) {
-          final String? parentType =
-              current.constructorName.type.element?.name;
+          final String? parentType = current.constructorName.type.element?.name;
           if (parentType == 'RepaintBoundary') {
             hasRepaintBoundary = true;
             break;
@@ -1706,8 +1706,7 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
-    problemMessage:
-        'TextSpan created in build() prevents text layout caching.',
+    problemMessage: 'TextSpan created in build() prevents text layout caching.',
     correctionMessage:
         'Cache TextSpan as a static const or class field for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1740,7 +1739,8 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
       // Check if it's a const creation (which is fine)
       if (!node.isConst) {
         // Check if it has children (complex TextSpan worth caching)
-        final bool hasChildren = node.argumentList.arguments.any((Expression arg) {
+        final bool hasChildren =
+            node.argumentList.arguments.any((Expression arg) {
           if (arg is NamedExpression) {
             return arg.name.label.name == 'children';
           }
@@ -1883,8 +1883,7 @@ class PreferConstWidgetsRule extends SaropaLintRule {
       // Check if all arguments are literals or const
       bool canBeConst = true;
       for (final Expression arg in node.argumentList.arguments) {
-        final Expression expr =
-            arg is NamedExpression ? arg.expression : arg;
+        final Expression expr = arg is NamedExpression ? arg.expression : arg;
         if (expr is! Literal && !_isConstExpression(expr)) {
           canBeConst = false;
           break;
@@ -2104,7 +2103,8 @@ class RequireBuildContextScopeRule extends SaropaLintRule {
 
       String? contextParamName;
       for (final FormalParameter param in params.parameters) {
-        final String? typeName = param.declaredFragment?.element.type.toString();
+        final String? typeName =
+            param.declaredFragment?.element.type.toString();
         if (typeName != null && typeName.contains('BuildContext')) {
           contextParamName = param.name?.lexeme;
           break;
@@ -2265,8 +2265,7 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_cache_management',
-    problemMessage:
-        'Class loads many images but never clears imageCache.',
+    problemMessage: 'Class loads many images but never clears imageCache.',
     correctionMessage:
         'Call imageCache.clear() or imageCache.evict() in dispose().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2488,8 +2487,7 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
     name: 'prefer_static_const_widgets',
     problemMessage:
         'Const widget field could be static for compile-time creation.',
-    correctionMessage:
-        'Add static modifier: static const widget = Widget();',
+    correctionMessage: 'Add static modifier: static const widget = Widget();',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2506,7 +2504,8 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
       if (node.fields.isConst) {
         for (final VariableDeclaration variable in node.fields.variables) {
           final Expression? initializer = variable.initializer;
-          if (initializer is InstanceCreationExpression && initializer.isConst) {
+          if (initializer is InstanceCreationExpression &&
+              initializer.isConst) {
             reporter.atNode(variable, code);
           }
         }
@@ -2545,8 +2544,7 @@ class RequireDisposePatternRule extends SaropaLintRule {
     name: 'require_dispose_pattern',
     problemMessage:
         'Class has disposable resources but no dispose/close method.',
-    correctionMessage:
-        'Add dispose() or close() method to clean up resources.',
+    correctionMessage: 'Add dispose() or close() method to clean up resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

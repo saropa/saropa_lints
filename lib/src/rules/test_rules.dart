@@ -724,7 +724,8 @@ class AvoidTestCouplingRule extends SaropaLintRule {
       final Set<String> topLevelVars = <String>{};
       for (final CompilationUnitMember member in unit.declarations) {
         if (member is TopLevelVariableDeclaration) {
-          for (final VariableDeclaration variable in member.variables.variables) {
+          for (final VariableDeclaration variable
+              in member.variables.variables) {
             topLevelVars.add(variable.name.lexeme);
           }
         }
@@ -887,8 +888,7 @@ class RequireTestIsolationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_test_isolation',
-    problemMessage:
-        'Mutable top-level variable may cause test coupling.',
+    problemMessage: 'Mutable top-level variable may cause test coupling.',
     correctionMessage:
         'Use setUp() to initialize shared state before each test, '
         'ensuring tests are isolated.',
@@ -968,8 +968,7 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_dependencies_in_tests',
-    problemMessage:
-        'Test uses real network/database call. Use mocks instead.',
+    problemMessage: 'Test uses real network/database call. Use mocks instead.',
     correctionMessage:
         'Replace real HTTP/database calls with mocks for faster, '
         'more reliable tests.',
@@ -1184,8 +1183,7 @@ class RequireTextInputTestsRule extends SaropaLintRule {
     name: 'require_text_input_tests',
     problemMessage:
         'Widget test creates text input but does not test user input.',
-    correctionMessage:
-        'Add tester.enterText() to verify text input behavior.',
+    correctionMessage: 'Add tester.enterText() to verify text input behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
