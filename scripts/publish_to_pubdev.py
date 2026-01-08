@@ -1374,10 +1374,13 @@ def main() -> int:
 
     repo_path = extract_repo_path(remote_url)
     print_colored("  Next steps:", Color.WHITE)
-    print_colored(f"      Verify package at: https://pub.dev/packages/{package_name}", Color.CYAN)
+    print_colored(f"      Package:    https://pub.dev/packages/{package_name}", Color.CYAN)
+    print_colored(f"      Score:      https://pub.dev/packages/{package_name}/score", Color.CYAN)
+    print_colored(f"      Versions:   https://pub.dev/packages/{package_name}/versions", Color.CYAN)
+    print_colored(f"      CI status:  https://github.com/{repo_path}/actions", Color.CYAN)
 
     if gh_success:
-        print_colored(f"      Check release at:  https://github.com/{repo_path}/releases/tag/v{version}", Color.CYAN)
+        print_colored(f"      Release:    https://github.com/{repo_path}/releases/tag/v{version}", Color.CYAN)
     else:
         print()
         print_warning(f"GitHub release was not created: {gh_error}")
