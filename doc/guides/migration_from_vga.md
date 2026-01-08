@@ -1,12 +1,12 @@
 # Migrating from very_good_analysis
 
-This guide helps you migrate from `very_good_analysis` to `saropa_lints`.
+This guide helps you migrate from `very_good_analysis` to Saropa Lints.
 
 ## Why Migrate?
 
-| Feature | very_good_analysis | saropa_lints |
+| Feature | very_good_analysis | Saropa Lints |
 |---------|-------------------|--------------|
-| **Rule count** | 174 standard rules | 500+ custom rules |
+| **Rule count** | 174 standard rules | 766+ custom rules |
 | **Rule types** | Dart linter rules | Deep custom analysis |
 | **Configuration** | Single file | 5 progressive tiers |
 | **Specialization** | General best practices | Flutter-specific (accessibility, state management, security) |
@@ -25,7 +25,7 @@ dev_dependencies:
 # After
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^0.1.0
+  saropa_lints: ^1.3.0
 ```
 
 ### Step 2: Update analysis_options.yaml
@@ -39,7 +39,9 @@ analyzer:
   plugins:
     - custom_lint
 
-include: package:saropa_lints/tiers/recommended.yaml
+custom_lint:
+  saropa_lints:
+    tier: recommended  # essential | recommended | professional | comprehensive | insanity
 ```
 
 ### Step 3: Run the linter
@@ -50,7 +52,7 @@ dart run custom_lint
 
 ## Using Both Together
 
-If you want both VGA's standard Dart rules AND saropa's custom rules:
+If you want both VGA's standard Dart rules AND Saropa Lints' custom rules:
 
 ```yaml
 # analysis_options.yaml
@@ -59,6 +61,10 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   plugins:
     - custom_lint
+
+custom_lint:
+  saropa_lints:
+    tier: recommended
 ```
 
 ```yaml
@@ -66,32 +72,32 @@ analyzer:
 dev_dependencies:
   very_good_analysis: ^6.0.0
   custom_lint: ^0.8.0
-  saropa_lints: ^0.1.0
+  saropa_lints: ^1.3.0
 ```
 
 This gives you:
 - 174 standard Dart linter rules from VGA
-- 500+ custom rules from saropa_lints
+- 766+ custom rules from saropa_lints
 
 ## Choosing a Tier
 
-VGA has one configuration. saropa_lints has five tiers to match your team's needs:
+VGA has one configuration. Saropa Lints has five tiers to match your team's needs:
 
-| VGA Equivalent | saropa_lints Tier | Description |
+| VGA Equivalent | Saropa Lints Tier | Description |
 |----------------|-------------------|-------------|
-| Basic usage | **Essential** (~50 rules) | Critical bugs, memory leaks, security |
-| Full VGA | **Recommended** (~150 rules) | Similar coverage + Flutter-specific |
-| Stricter | **Professional** (~300 rules) | Enterprise-grade |
-| Maximum | **Comprehensive** (~400 rules) | Quality obsessed |
-| Everything | **Insanity** (500+ rules) | Every single rule |
+| Basic usage | **Essential** (~100 rules) | Critical bugs, memory leaks, security |
+| Full VGA | **Recommended** (~280 rules) | Similar coverage + Flutter-specific |
+| Stricter | **Professional** (~560 rules) | Enterprise-grade |
+| Maximum | **Comprehensive** (~700 rules) | Quality obsessed |
+| Everything | **Insanity** (766+ rules) | Every single rule |
 
 **Start with `recommended`** - it's the closest to VGA's philosophy.
 
 ## Rule Mapping
 
-Many VGA rules have saropa equivalents that go deeper:
+Many VGA rules have Saropa Lints equivalents that go deeper:
 
-| VGA Rule | saropa_lints Equivalent | Enhancement |
+| VGA Rule | Saropa Lints Equivalent | Enhancement |
 |----------|------------------------|-------------|
 | `cancel_subscriptions` | `avoid_unassigned_stream_subscriptions`, `require_stream_controller_dispose` | Catches more patterns |
 | `close_sinks` | `require_dispose`, `dispose_fields` | Full disposal tracking |
@@ -103,7 +109,7 @@ Many VGA rules have saropa equivalents that go deeper:
 
 ### Flutter-Specific Rules
 
-saropa_lints includes rules VGA doesn't have:
+Saropa Lints includes rules VGA doesn't have:
 
 **Lifecycle & State**
 - `avoid_context_in_initstate_dispose` - Prevents common Flutter bug
@@ -133,9 +139,85 @@ The syntax is the same:
 // VGA style (still works)
 // ignore: public_member_api_docs
 
-// saropa_lints style
+// Saropa Lints style
 // ignore: avoid_hardcoded_strings_in_ui
 ```
+
+## Related Packages
+
+This guide applies similarly to other standard Dart linter packages:
+
+### lints (Official Dart Package)
+
+The official Dart team's recommended rules. Migration is identical to VGA:
+
+```yaml
+# Before
+include: package:lints/recommended.yaml
+
+# After (use both)
+include: package:lints/recommended.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
+
+custom_lint:
+  saropa_lints:
+    tier: recommended
+```
+
+### lint (by passsy)
+
+A popular community alternative with opinionated rules:
+
+```yaml
+# Before
+include: package:lint/analysis_options.yaml
+
+# After (use both)
+include: package:lint/analysis_options.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
+
+custom_lint:
+  saropa_lints:
+    tier: recommended
+```
+
+### pedantic (Deprecated)
+
+Google's internal Dart style guide, now deprecated in favor of `lints`:
+
+```yaml
+# Before (deprecated)
+include: package:pedantic/analysis_options.yaml
+
+# After - migrate to lints + saropa_lints
+include: package:lints/recommended.yaml
+
+analyzer:
+  plugins:
+    - custom_lint
+
+custom_lint:
+  saropa_lints:
+    tier: recommended
+```
+
+### Comparison
+
+| Package | Maintainer | Status | Rules |
+|---------|------------|--------|-------|
+| `very_good_analysis` | VGV | Active | 174 |
+| `lints` | Dart team | Active (official) | ~60 |
+| `lint` | passsy | Active | ~100 |
+| `pedantic` | Google | Deprecated | ~30 |
+| `flutter_lints` | Flutter team | Active (Flutter default) | ~30 |
+
+All of these are **standard Dart analyzer rules** and work alongside saropa_lints (custom_lint rules). See our [flutter_lints guide](using_with_flutter_lints.md) for more details.
 
 ## Getting Help
 

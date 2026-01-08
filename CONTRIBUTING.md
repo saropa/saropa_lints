@@ -1,4 +1,4 @@
-# Contributing to saropa_lints
+# Contributing to Saropa Lints
 
 Thank you for your interest in contributing! This guide will help you get started.
 
@@ -373,7 +373,7 @@ Open an issue or discussion. We're happy to help!
 
 > "First, solve the problem. Then, write the code." — John Johnson
 
-**Contributing to open source** makes you a better developer. You learn from code review, discover new patterns, and build a public portfolio. saropa_lints welcomes contributions at every skill level — from fixing typos to implementing complex AST visitors.
+**Contributing to open source** makes you a better developer. You learn from code review, discover new patterns, and build a public portfolio. Saropa Lints welcomes contributions at every skill level — from fixing typos to implementing complex AST visitors.
 
 Start small: pick a rule from the roadmap, add test fixtures, or improve documentation. Every contribution matters.
 

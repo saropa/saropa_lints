@@ -1,4 +1,4 @@
-# saropa_lints API Reference
+# Saropa Lints API Reference
 
 Custom lint rules for Dart & Flutter static analysis.
 
