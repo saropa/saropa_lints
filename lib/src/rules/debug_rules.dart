@@ -12,6 +12,10 @@ import '../saropa_lint_rule.dart';
 /// Test-only rule that always reports a lint at the start of the file.
 class AlwaysFailRule extends SaropaLintRule {
   const AlwaysFailRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'always_fail',
@@ -40,6 +44,10 @@ class AlwaysFailRule extends SaropaLintRule {
 /// control if needed).
 class AvoidCommentedOutCodeRule extends SaropaLintRule {
   const AvoidCommentedOutCodeRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_commented_out_code',
@@ -121,6 +129,10 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 /// **Quick fix available:** Comments out the debugPrint statement.
 class AvoidDebugPrintRule extends SaropaLintRule {
   const AvoidDebugPrintRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_debug_print',
@@ -233,6 +245,10 @@ class _CommentOutDebugPrintFix extends DartFix {
 /// ```
 class AvoidUnguardedDebugRule extends SaropaLintRule {
   const AvoidUnguardedDebugRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_unguarded_debug',
@@ -399,6 +415,10 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 /// ```
 class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   const PreferCommentingAnalyzerIgnoresRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_analyzer_ignores',

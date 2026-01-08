@@ -42,6 +42,11 @@ import '../saropa_lint_rule.dart';
 class RequireVsyncMixinRule extends SaropaLintRule {
   const RequireVsyncMixinRule() : super(code: _code);
 
+  /// Missing vsync causes visual glitches and sync issues.
+  /// Each occurrence is a bug that should be fixed.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'require_vsync_mixin',
     problemMessage: 'AnimationController created without vsync parameter.',
@@ -144,6 +149,11 @@ class _AddVsyncFix extends DartFix {
 /// ```
 class AvoidAnimationInBuildRule extends SaropaLintRule {
   const AvoidAnimationInBuildRule() : super(code: _code);
+
+  /// Creating controllers in build() causes resource leaks on every rebuild.
+  /// Each occurrence is a memory leak bug.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'avoid_animation_in_build',
@@ -255,6 +265,11 @@ class _AnimationControllerVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   const RequireAnimationControllerDisposeRule() : super(code: _code);
+
+  /// Undisposed controllers cause memory leaks. Each occurrence leaks memory
+  /// and prevents garbage collection. Even 1-2 is serious in production.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'require_animation_controller_dispose',
@@ -454,6 +469,11 @@ class _AddAnimationControllerDisposeFix extends DartFix {
 class RequireHeroTagUniquenessRule extends SaropaLintRule {
   const RequireHeroTagUniquenessRule() : super(code: _code);
 
+  /// Duplicate Hero tags cause runtime crashes during navigation.
+  /// Each occurrence is a crash waiting to happen.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_hero_tag_uniqueness',
     problemMessage:
@@ -541,6 +561,11 @@ class _HeroTagCollector extends RecursiveAstVisitor<void> {
 class AvoidLayoutPassesRule extends SaropaLintRule {
   const AvoidLayoutPassesRule() : super(code: _code);
 
+  /// Double layout passes hurt performance, especially in lists.
+  /// A few is okay, but 10+ in hot paths causes noticeable jank.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_layout_passes',
     problemMessage:
@@ -596,6 +621,11 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedDurationRule extends SaropaLintRule {
   const AvoidHardcodedDurationRule() : super(code: _code);
+
+  /// Hardcoded durations affect maintainability, not correctness.
+  /// 1000+ is fine in legacy code; enforce on new code only.
+  @override
+  LintImpact get impact => LintImpact.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_duration',
@@ -686,6 +716,11 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
 class RequireAnimationCurveRule extends SaropaLintRule {
   const RequireAnimationCurveRule() : super(code: _code);
 
+  /// Missing curves affect UX polish, not functionality.
+  /// Address when improving animation quality; not urgent.
+  @override
+  LintImpact get impact => LintImpact.low;
+
   static const LintCode _code = LintCode(
     name: 'require_animation_curve',
     problemMessage:
@@ -767,6 +802,11 @@ class RequireAnimationCurveRule extends SaropaLintRule {
 /// ```
 class PreferImplicitAnimationsRule extends SaropaLintRule {
   const PreferImplicitAnimationsRule() : super(code: _code);
+
+  /// Code simplification suggestion. Explicit animations work fine.
+  /// Address during refactoring; not a bug.
+  @override
+  LintImpact get impact => LintImpact.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_implicit_animations',
@@ -867,6 +907,11 @@ class _TransitionNode {
 /// ```
 class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
   const RequireStaggeredAnimationDelaysRule() : super(code: _code);
+
+  /// UX polish suggestion. Non-staggered animations work but look less polished.
+  /// Address when improving animation quality; not urgent.
+  @override
+  LintImpact get impact => LintImpact.low;
 
   static const LintCode _code = LintCode(
     name: 'require_staggered_animation_delays',

@@ -35,6 +35,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidUnsafeCastRule extends SaropaLintRule {
   const AvoidUnsafeCastRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_cast',
@@ -83,6 +87,10 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 /// ```
 class PreferConstrainedGenericsRule extends SaropaLintRule {
   const PreferConstrainedGenericsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_generics',
@@ -131,6 +139,10 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
 /// ```
 class RequireCovariantDocumentationRule extends SaropaLintRule {
   const RequireCovariantDocumentationRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_covariant_documentation',
@@ -195,6 +207,10 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
 /// ```
 class RequireSafeJsonParsingRule extends SaropaLintRule {
   const RequireSafeJsonParsingRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_safe_json_parsing',
@@ -255,6 +271,10 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
 /// ```
 class RequireNullSafeExtensionsRule extends SaropaLintRule {
   const RequireNullSafeExtensionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_null_safe_extensions',
@@ -304,6 +324,10 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
 /// ```
 class PreferSpecificNumericTypesRule extends SaropaLintRule {
   const PreferSpecificNumericTypesRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_specific_numeric_types',
@@ -357,6 +381,10 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
 /// ```
 class RequireFutureOrDocumentationRule extends SaropaLintRule {
   const RequireFutureOrDocumentationRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_futureor_documentation',

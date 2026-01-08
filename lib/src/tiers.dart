@@ -101,6 +101,8 @@ const Set<String> essentialRules = <String>{
 
   // Accessibility (Essential - critical errors)
   'avoid_hidden_interactive',
+  'require_error_identification',
+  'require_minimum_contrast',
 
   // Navigation (Essential - prevent crashes)
   'require_unknown_route_handler',
@@ -111,12 +113,24 @@ const Set<String> essentialRules = <String>{
   // Riverpod (Essential - prevent crashes)
   'avoid_ref_in_dispose',
   'require_provider_scope',
+  'avoid_circular_provider_deps',
+  'require_error_handling_in_async',
+
+  // GetX (Essential - prevent memory leaks)
+  'require_getx_controller_dispose',
 
   // Build Performance (Essential - prevent memory leaks)
   'avoid_scroll_listener_in_build',
 
   // Security (Essential - prevent data leaks)
   'avoid_auth_in_query_params',
+  'require_deep_link_validation',
+
+  // Firebase (Essential - prevent crashes)
+  'require_firebase_init_before_use',
+
+  // Notification (Essential - required for Android 8+)
+  'require_notification_channel_android',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -151,6 +165,11 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_small_touch_targets',
   'avoid_text_scale_factor_ignore',
   'require_image_semantics',
+  'prefer_scalable_text',
+  'require_safe_area_handling',
+
+  // Theming
+  'prefer_system_theme_default',
 
   // State Management
   'require_notify_listeners',
@@ -245,6 +264,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_test_coupling',
   'require_test_isolation',
   'avoid_real_dependencies_in_tests',
+  'require_error_case_tests',
 
   // State Management (Batch 10)
   'prefer_copy_with_for_state',
@@ -279,6 +299,24 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_boolean_prefixes',
   'avoid_getter_prefix',
   'prefer_wildcard_for_unused_param',
+
+  // Security (Batch 14)
+  'avoid_auth_state_in_prefs',
+
+  // Accessibility (Batch 14)
+  'require_button_semantics',
+  'avoid_hover_only',
+
+  // State Management (Batch 14)
+  'prefer_ref_watch_over_read',
+  'avoid_change_notifier_in_widget',
+  'require_provider_dispose',
+
+  // Notification (Batch 14)
+  'avoid_notification_payload_sensitive',
+
+  // GetX (Batch 17)
+  'avoid_obs_outside_controller',
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -346,6 +384,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_unnecessary_to_list',
   'avoid_global_key_misuse',
   'require_repaint_boundary',
+  'avoid_unconstrained_images',
 
   // Forms/UX
   'prefer_autovalidate_on_interaction',
@@ -393,6 +432,13 @@ const Set<String> professionalOnlyRules = <String>{
   'require_test_groups',
   'require_scroll_tests',
   'require_text_input_tests',
+  'prefer_single_assertion',
+  'avoid_find_all',
+  'require_integration_test_setup',
+
+  // Flutter Widgets - Pointer handling
+  'avoid_absorb_pointer_misuse',
+  'avoid_brightness_check_for_theme',
 
   // Documentation
   'require_public_api_documentation',
@@ -522,6 +568,38 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Naming & Style
   'prefer_boolean_prefixes_for_params',
+
+  // Security (Batch 14)
+  'prefer_encrypted_prefs',
+
+  // Accessibility (Batch 14)
+  'prefer_explicit_semantics',
+
+  // Testing (Batch 14)
+  'avoid_hardcoded_delays',
+
+  // Resource Management (Batch 14)
+  'avoid_image_picker_without_source',
+
+  // Platform (Batch 14)
+  'prefer_url_strategy_for_web',
+  'require_window_size_constraints',
+
+  // Gap Analysis Rules (Batch 15)
+  'avoid_returning_widgets',
+  'avoid_nullable_widget_methods',
+  'avoid_duplicate_string_literals',
+  'avoid_setstate_in_large_state_class',
+
+  // State Management (Batch 17)
+  'prefer_notifier_over_state',
+  'require_bloc_transformer',
+  'avoid_long_event_handlers',
+
+  // Performance (Batch 17)
+  'require_list_preallocate',
+  'prefer_builder_for_conditional',
+  'require_widget_key_strategy',
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
@@ -554,6 +632,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_text_rich',
   'prefer_widget_private_members',
   'avoid_text_span_in_build',
+  'require_overflow_box_rationale',
+
+  // Network Performance
+  'prefer_streaming_response',
 
   // Async
   'avoid_nullable_tostring',
@@ -694,6 +776,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_substring',
   'avoid_incorrect_uri',
   'no_magic_string',
+  'avoid_duplicate_string_literals_pair', // Stricter version of professional rule
   'avoid_complex_arithmetic_expressions',
   'avoid_bitwise_operators_with_booleans',
   'avoid_inconsistent_digit_separators',
@@ -761,6 +844,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // Naming & Style
   'prefer_boolean_prefixes_for_locals',
+
+  // Platform (Batch 14 - opinionated)
+  'prefer_cupertino_for_ios_feel',
+  'prefer_keyboard_shortcuts',
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.
@@ -784,7 +871,6 @@ const Set<String> insanityOnlyRules = <String>{
   'prefer_match_file_name',
   'prefer_moving_to_variable',
   'prefer_static_class',
-  'avoid_returning_widgets',
   'prefer_extracting_callbacks',
   'prefer_single_widget_per_file',
 

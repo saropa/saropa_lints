@@ -13,6 +13,10 @@ import '../saropa_lint_rule.dart';
 /// Warns when a getter name starts with 'get'.
 class AvoidGetterPrefixRule extends SaropaLintRule {
   const AvoidGetterPrefixRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_getter_prefix',
@@ -62,6 +66,10 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
 /// ```
 class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   const AvoidNonAsciiSymbolsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_ascii_symbols',
@@ -111,6 +119,10 @@ class FormatCommentRule extends SaropaLintRule {
   /// Pre-compiled pattern for performance
   static final RegExp _lowercaseStartPattern = RegExp(r'^[a-z]');
   const FormatCommentRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'capitalize_comment',
@@ -182,6 +194,10 @@ class FormatCommentRule extends SaropaLintRule {
 /// ```
 class MatchClassNamePatternRule extends SaropaLintRule {
   const MatchClassNamePatternRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'match_class_name_pattern',
@@ -266,6 +282,10 @@ class MatchClassNamePatternRule extends SaropaLintRule {
 /// ```
 class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
   const MatchGetterSetterFieldNamesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'match_getter_setter_field_names',
@@ -340,6 +360,10 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
 /// ```
 class MatchLibFolderStructureRule extends SaropaLintRule {
   const MatchLibFolderStructureRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'match_lib_folder_structure',
@@ -380,6 +404,10 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
 /// Warns when positional field names don't match the variable being assigned.
 class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   const MatchPositionalFieldNamesOnAssignmentRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'match_positional_field_names_on_assignment',
@@ -459,6 +487,10 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
 /// ```
 class PreferBooleanPrefixesRule extends SaropaLintRule {
   const PreferBooleanPrefixesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes',
@@ -649,6 +681,10 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
 /// ```
 class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   const PreferBooleanPrefixesForLocalsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_locals',
@@ -814,6 +850,10 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
 /// ```
 class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   const PreferBooleanPrefixesForParamsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_params',
@@ -1014,6 +1054,10 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
 /// Warns when callback fields don't follow onX naming convention.
 class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   const PreferCorrectCallbackFieldNameRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_callback_field_name',
@@ -1134,6 +1178,10 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
 /// ```
 class PreferCorrectErrorNameRule extends SaropaLintRule {
   const PreferCorrectErrorNameRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_error_name',
@@ -1258,6 +1306,10 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
 /// ```
 class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
   const PreferCorrectIdentifierLengthRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_identifier_length',
@@ -1350,6 +1402,10 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 /// ```
 class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
   const PreferCorrectSetterParameterNameRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_setter_parameter_name',
@@ -1406,6 +1462,10 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
 /// ```
 class PreferExplicitParameterNamesRule extends SaropaLintRule {
   const PreferExplicitParameterNamesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_parameter_names',
@@ -1441,6 +1501,10 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
 /// in the file to make it easier to locate code.
 class PreferMatchFileNameRule extends SaropaLintRule {
   const PreferMatchFileNameRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_match_file_name',
@@ -1500,6 +1564,10 @@ class PreferMatchFileNameRule extends SaropaLintRule {
 /// ```
 class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
   const PreferPrefixedGlobalConstantsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_prefixed_global_constants',
@@ -1559,6 +1627,10 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
 /// Warns when widget tag names don't follow conventions.
 class TagNameRule extends SaropaLintRule {
   const TagNameRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_kebab_tag_name',
@@ -1617,6 +1689,10 @@ class TagNameRule extends SaropaLintRule {
 /// ```
 class PreferNamedExtensionsRule extends SaropaLintRule {
   const PreferNamedExtensionsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_extensions',
@@ -1659,6 +1735,10 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
 /// ```
 class PreferTypedefForCallbacksRule extends SaropaLintRule {
   const PreferTypedefForCallbacksRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_typedef_for_callbacks',
@@ -1724,6 +1804,10 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
 /// ```
 class PreferEnhancedEnumsRule extends SaropaLintRule {
   const PreferEnhancedEnumsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_enhanced_enums',

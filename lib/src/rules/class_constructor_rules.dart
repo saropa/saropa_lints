@@ -25,6 +25,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidDeclaringCallMethodRule extends SaropaLintRule {
   const AvoidDeclaringCallMethodRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_declaring_call_method',
@@ -66,6 +70,10 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
 /// ```
 class AvoidGenericsShadowingRule extends SaropaLintRule {
   const AvoidGenericsShadowingRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_generics_shadowing',
@@ -150,6 +158,10 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
 /// ```
 class AvoidIncompleteCopyWithRule extends SaropaLintRule {
   const AvoidIncompleteCopyWithRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_incomplete_copy_with',
@@ -231,6 +243,10 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
 /// ```
 class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
   const AvoidNonEmptyConstructorBodiesRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_empty_constructor_bodies',
@@ -304,6 +320,10 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
 /// ```
 class AvoidShadowingRule extends SaropaLintRule {
   const AvoidShadowingRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_shadowing',
@@ -418,6 +438,10 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
 /// ```
 class PreferConstStringListRule extends SaropaLintRule {
   const PreferConstStringListRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_string_list',
@@ -525,6 +549,10 @@ class PreferConstStringListRule extends SaropaLintRule {
 /// Warns when a class could have a const constructor but doesn't.
 class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   const PreferDeclaringConstConstructorRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_declaring_const_constructor',
@@ -607,6 +635,10 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 /// ```
 class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
   const PreferPrivateExtensionTypeFieldRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_extension_type_field',
@@ -669,6 +701,10 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 /// ```
 class ProperSuperCallsRule extends SaropaLintRule {
   const ProperSuperCallsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'proper_super_calls',
@@ -755,6 +791,10 @@ class ProperSuperCallsRule extends SaropaLintRule {
 /// ```
 class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
   const AvoidUnmarkedPublicClassRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_unmarked_public_class',
@@ -814,6 +854,10 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
 /// ```
 class PreferFinalClassRule extends SaropaLintRule {
   const PreferFinalClassRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_final_class',
@@ -899,6 +943,10 @@ class PreferFinalClassRule extends SaropaLintRule {
 /// ```
 class PreferInterfaceClassRule extends SaropaLintRule {
   const PreferInterfaceClassRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_interface_class',
@@ -994,6 +1042,10 @@ class PreferInterfaceClassRule extends SaropaLintRule {
 /// ```
 class PreferBaseClassRule extends SaropaLintRule {
   const PreferBaseClassRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_base_class',

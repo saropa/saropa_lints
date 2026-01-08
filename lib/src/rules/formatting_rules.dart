@@ -34,6 +34,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class NewlineBeforeCaseRule extends SaropaLintRule {
   const NewlineBeforeCaseRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_case',
@@ -98,6 +102,10 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 /// ```
 class NewlineBeforeConstructorRule extends SaropaLintRule {
   const NewlineBeforeConstructorRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_constructor',
@@ -172,6 +180,10 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 /// ```
 class NewlineBeforeMethodRule extends SaropaLintRule {
   const NewlineBeforeMethodRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_method',
@@ -231,6 +243,10 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 /// by visually separating the return from the preceding logic.
 class NewlineBeforeReturnRule extends SaropaLintRule {
   const NewlineBeforeReturnRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_return',
@@ -321,6 +337,10 @@ class _AddBlankLineBeforeReturnFix extends DartFix {
 /// ```
 class PreferTrailingCommaRule extends SaropaLintRule {
   const PreferTrailingCommaRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma',
@@ -470,6 +490,10 @@ class _AddTrailingCommaFix extends DartFix {
 /// ```
 class UnnecessaryTrailingCommaRule extends SaropaLintRule {
   const UnnecessaryTrailingCommaRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'unnecessary_trailing_comma',
@@ -581,6 +605,10 @@ class _RemoveTrailingCommaFix extends DartFix {
 /// ```
 class FormatCommentFormattingRule extends SaropaLintRule {
   const FormatCommentFormattingRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'format_comment',
@@ -674,6 +702,10 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 /// ```
 class MemberOrderingFormattingRule extends SaropaLintRule {
   const MemberOrderingFormattingRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'member_ordering',
@@ -736,6 +768,10 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
 /// ```
 class ParametersOrderingConventionRule extends SaropaLintRule {
   const ParametersOrderingConventionRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'parameters_ordering',

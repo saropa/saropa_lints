@@ -29,6 +29,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
   const AvoidDuplicateTestAssertionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_test_assertions',
@@ -67,6 +71,10 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
 /// Warns when a test group() has an empty body.
 class AvoidEmptyTestGroupsRule extends SaropaLintRule {
   const AvoidEmptyTestGroupsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_test_groups',
@@ -128,6 +136,10 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
 /// ```
 class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
   const AvoidTopLevelMembersInTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_top_level_members_in_tests',
@@ -211,6 +223,10 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
 /// ```
 class PreferDescriptiveTestNameRule extends SaropaLintRule {
   const PreferDescriptiveTestNameRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_test_name',
@@ -284,6 +300,10 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
 /// ```
 class PreferCorrectTestFileNameRule extends SaropaLintRule {
   const PreferCorrectTestFileNameRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_test_file_name',
@@ -348,6 +368,10 @@ class _TestCallFinder extends RecursiveAstVisitor<void> {
 /// **Quick fix available:** Replaces `expect` with `expectLater`.
 class PreferExpectLaterRule extends SaropaLintRule {
   const PreferExpectLaterRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_expect_later',
@@ -422,6 +446,10 @@ class _ReplaceExpectWithExpectLaterFix extends DartFix {
 /// Warns when test files don't follow proper structure.
 class PreferTestStructureRule extends SaropaLintRule {
   const PreferTestStructureRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_structure',
@@ -515,6 +543,10 @@ class _TestStructureVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferUniqueTestNamesRule extends SaropaLintRule {
   const PreferUniqueTestNamesRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_unique_test_names',
@@ -600,6 +632,10 @@ class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireTestGroupsRule extends SaropaLintRule {
   const RequireTestGroupsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_test_groups',
@@ -690,6 +726,10 @@ class RequireTestGroupsRule extends SaropaLintRule {
 /// ```
 class AvoidTestCouplingRule extends SaropaLintRule {
   const AvoidTestCouplingRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_test_coupling',
@@ -885,6 +925,10 @@ class _VarAccessVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireTestIsolationRule extends SaropaLintRule {
   const RequireTestIsolationRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_test_isolation',
@@ -965,6 +1009,10 @@ class RequireTestIsolationRule extends SaropaLintRule {
 /// ```
 class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
   const AvoidRealDependenciesInTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_dependencies_in_tests',
@@ -1079,6 +1127,10 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
 /// ```
 class RequireScrollTestsRule extends SaropaLintRule {
   const RequireScrollTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_scroll_tests',
@@ -1178,6 +1230,10 @@ class RequireScrollTestsRule extends SaropaLintRule {
 /// ```
 class RequireTextInputTestsRule extends SaropaLintRule {
   const RequireTextInputTestsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'require_text_input_tests',

@@ -57,8 +57,13 @@ dart run custom_lint
 Add to the appropriate file in `lib/src/rules/`:
 
 ```dart
-class AvoidMyAntiPatternRule extends DartLintRule {
+class AvoidMyAntiPatternRule extends SaropaLintRule {
   const AvoidMyAntiPatternRule() : super(code: _code);
+
+  /// REQUIRED: Specify the business impact of this rule's violations.
+  /// See "Impact Classification" section below.
+  @override
+  LintImpact get impact => LintImpact.high;
 
   static const _code = LintCode(
     name: 'avoid_my_anti_pattern',
@@ -68,9 +73,9 @@ class AvoidMyAntiPatternRule extends DartLintRule {
   );
 
   @override
-  void run(
+  void runWithReporter(
     CustomLintResolver resolver,
-    ErrorReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
     context.registry.addXxxExpression((node) {
@@ -83,7 +88,31 @@ class AvoidMyAntiPatternRule extends DartLintRule {
 }
 ```
 
-### 2. Register the rule
+### 2. Set the impact classification (REQUIRED)
+
+Every rule **must** override the `impact` getter. This helps teams understand which violations to prioritize:
+
+| Impact | Threshold | Use when... | Examples |
+|--------|-----------|-------------|----------|
+| `critical` | 1-2 is serious | Each occurrence is independently harmful | Memory leaks, security holes, crashes |
+| `high` | 10+ needs action | Significant issues that compound | Accessibility, performance anti-patterns |
+| `medium` | 100+ = tech debt | Quality issues worth addressing | Error handling, complexity (default) |
+| `low` | Large counts OK | Style/consistency matters | Naming, hardcoded strings, formatting |
+
+```dart
+@override
+LintImpact get impact => LintImpact.critical; // Memory leak - each one matters
+```
+
+**Guidelines:**
+- **Critical**: Crashes, memory leaks, security vulnerabilities, data corruption
+- **High**: Accessibility issues, performance problems, missing error handling in critical paths
+- **Medium**: Code smells, maintainability issues, missing documentation
+- **Low**: Style preferences, naming conventions, formatting
+
+**DO NOT default to `medium` without thought.** Consider the real-world consequence of 1000 violations of your rule.
+
+### 3. Register the rule
 
 Add to `lib/src/rules/all_rules.dart`:
 
@@ -91,7 +120,7 @@ Add to `lib/src/rules/all_rules.dart`:
 AvoidMyAntiPatternRule(),
 ```
 
-### 3. Add to appropriate tier(s)
+### 4. Add to appropriate tier(s)
 
 Edit `lib/tiers/*.yaml`:
 
@@ -100,7 +129,7 @@ rules:
   avoid_my_anti_pattern: true
 ```
 
-### 4. Add quick fixes (optional but recommended)
+### 5. Add quick fixes (optional but recommended)
 
 Quick fixes provide IDE code actions that help developers resolve lint issues.
 
@@ -160,7 +189,7 @@ All rules should have quick fixes when feasible:
    - **Complex issues**: Add `// HACK:` comment for manual attention
 3. **All WARNING/ERROR severity rules must have at least a HACK comment fix**
 
-### 5. Add tests
+### 6. Add tests
 
 Create a fixture file in `example/lib/<category>/`:
 
@@ -321,6 +350,8 @@ Stylistic rules require extra documentation since they're not in any tier:
 
 ## Pull Request Checklist
 
+- [ ] Rule extends `SaropaLintRule` (not `DartLintRule`)
+- [ ] **Impact classification set** (not just defaulting to `medium`)
 - [ ] Rule follows naming conventions
 - [ ] Added to appropriate tier(s)
 - [ ] Tests pass

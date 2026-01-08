@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -34,6 +35,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   const AvoidFirestoreUnboundedQueryRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_unbounded_query',
@@ -121,6 +126,10 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
 /// ```
 class AvoidDatabaseInBuildRule extends SaropaLintRule {
   const AvoidDatabaseInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_database_in_build',
@@ -224,6 +233,10 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequirePrefsKeyConstantsRule extends SaropaLintRule {
   const RequirePrefsKeyConstantsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_prefs_key_constants',
@@ -304,6 +317,10 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
 /// ```
 class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   const AvoidSecureStorageOnWebRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_secure_storage_on_web',
@@ -383,6 +400,10 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
 /// ```
 class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   const AvoidPrefsForLargeDataRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_prefs_for_large_data',
@@ -438,6 +459,127 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
           reporter.atNode(node, code);
         }
       }
+    });
+  }
+}
+
+/// Warns when Firebase services are used before initialization.
+///
+/// Firebase.initializeApp() must complete before accessing any Firebase
+/// service. Without it, all provider access throws errors.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   runApp(MyApp());
+/// }
+///
+/// class MyApp extends StatelessWidget {
+///   Widget build(context) {
+///     // Crashes! Firebase not initialized
+///     return StreamBuilder(
+///       stream: FirebaseFirestore.instance.collection('users').snapshots(),
+///       ...
+///     );
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() async {
+///   WidgetsFlutterBinding.ensureInitialized();
+///   await Firebase.initializeApp();
+///   runApp(MyApp());
+/// }
+/// ```
+class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
+  const RequireFirebaseInitBeforeUseRule() : super(code: _code);
+  /// Each occurrence is a serious issue that should be fixed immediately.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+
+  static const LintCode _code = LintCode(
+    name: 'require_firebase_init_before_use',
+    problemMessage:
+        'Firebase service used without ensuring Firebase.initializeApp() was called.',
+    correctionMessage:
+        'Ensure Firebase.initializeApp() completes in main() before runApp().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Firebase service access patterns
+  static const Set<String> _firebaseServices = <String>{
+    'FirebaseFirestore',
+    'FirebaseAuth',
+    'FirebaseStorage',
+    'FirebaseMessaging',
+    'FirebaseAnalytics',
+    'FirebaseCrashlytics',
+    'FirebaseRemoteConfig',
+    'FirebaseDynamicLinks',
+    'FirebaseDatabase',
+    'FirebaseFunctions',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check main() function for Firebase usage without initialization
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (node.name.lexeme != 'main') return;
+
+      final String mainSource = node.toSource();
+
+      // Skip if main has Firebase.initializeApp
+      if (mainSource.contains('Firebase.initializeApp')) return;
+
+      // Check if main uses any Firebase service
+      for (final String service in _firebaseServices) {
+        if (mainSource.contains('$service.instance') ||
+            mainSource.contains('$service(')) {
+          reporter.atToken(node.name, code);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddFirebaseInitFix()];
+}
+
+class _AddFirebaseInitFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.name.lexeme != 'main') return;
+
+      final FunctionBody body = node.functionExpression.body;
+      if (body is! BlockFunctionBody) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add Firebase.initializeApp() call',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          body.block.leftBracket.end,
+          '\n  WidgetsFlutterBinding.ensureInitialized();\n  await Firebase.initializeApp();\n',
+        );
+      });
     });
   }
 }

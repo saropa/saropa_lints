@@ -35,6 +35,11 @@ import '../saropa_lint_rule.dart';
 class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   const AvoidLoggingSensitiveDataRule() : super(code: _code);
 
+  /// Logging PII exposes sensitive data in crash reports and logs.
+  /// Each occurrence is a potential data breach.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'avoid_logging_sensitive_data',
     problemMessage:
@@ -230,6 +235,11 @@ class _AddTodoForSensitiveLoggingFix extends DartFix {
 class RequireSecureStorageRule extends SaropaLintRule {
   const RequireSecureStorageRule() : super(code: _code);
 
+  /// Plain text storage of credentials is readable on rooted devices.
+  /// Each occurrence exposes sensitive data.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_secure_storage',
     problemMessage:
@@ -313,6 +323,11 @@ class RequireSecureStorageRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   const AvoidHardcodedCredentialsRule() : super(code: _code);
+
+  /// Hardcoded credentials will be committed to version control.
+  /// Each occurrence is a security vulnerability.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_credentials',
@@ -454,6 +469,11 @@ class _AddTodoForHardcodedCredentialsFix extends DartFix {
 class RequireInputSanitizationRule extends SaropaLintRule {
   const RequireInputSanitizationRule() : super(code: _code);
 
+  /// Unsanitized input enables injection attacks.
+  /// Each occurrence is a potential security exploit.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'require_input_sanitization',
     problemMessage: 'User input should be validated or sanitized before use.',
@@ -533,6 +553,11 @@ class RequireInputSanitizationRule extends SaropaLintRule {
 class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   const AvoidWebViewJavaScriptEnabledRule() : super(code: _code);
 
+  /// JavaScript in WebView can enable XSS attacks with untrusted content.
+  /// Review each occurrence for security implications.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_webview_javascript_enabled',
     problemMessage:
@@ -605,6 +630,11 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
 class RequireBiometricFallbackRule extends SaropaLintRule {
   const RequireBiometricFallbackRule() : super(code: _code);
 
+  /// Missing biometric fallback is a usability issue, not a security risk.
+  /// Address for better UX on devices without biometrics.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_biometric_fallback',
     problemMessage:
@@ -672,6 +702,11 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 /// ```
 class AvoidEvalLikePatternsRule extends SaropaLintRule {
   const AvoidEvalLikePatternsRule() : super(code: _code);
+
+  /// Dynamic code execution enables code injection attacks.
+  /// Each occurrence is a serious security vulnerability.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'avoid_eval_like_patterns',
@@ -781,6 +816,11 @@ class _AddTodoForEvalPatternFix extends DartFix {
 class RequireCertificatePinningRule extends SaropaLintRule {
   const RequireCertificatePinningRule() : super(code: _code);
 
+  /// Missing certificate pinning enables man-in-the-middle attacks.
+  /// Important for apps handling sensitive data.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
     problemMessage: 'HttpClient should implement certificate pinning.',
@@ -841,6 +881,11 @@ class RequireCertificatePinningRule extends SaropaLintRule {
 class AvoidTokenInUrlRule extends SaropaLintRule {
   const AvoidTokenInUrlRule() : super(code: _code);
 
+  /// Tokens in URLs are logged and visible in browser history.
+  /// Each occurrence exposes credentials.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'avoid_token_in_url',
     problemMessage: 'Avoid putting tokens or API keys in URLs.',
@@ -898,6 +943,11 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 /// ```
 class AvoidClipboardSensitiveRule extends SaropaLintRule {
   const AvoidClipboardSensitiveRule() : super(code: _code);
+
+  /// Clipboard data is accessible by other apps and persists.
+  /// Each occurrence risks credential exposure.
+  @override
+  LintImpact get impact => LintImpact.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_clipboard_sensitive',
@@ -965,6 +1015,11 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 class AvoidStoringPasswordsRule extends SaropaLintRule {
   const AvoidStoringPasswordsRule() : super(code: _code);
 
+  /// Passwords in SharedPreferences are stored as plain text.
+  /// Each occurrence exposes user credentials.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'avoid_storing_passwords',
     problemMessage: 'Never store passwords in SharedPreferences.',
@@ -1025,6 +1080,11 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 /// ```
 class AvoidDynamicSqlRule extends SaropaLintRule {
   const AvoidDynamicSqlRule() : super(code: _code);
+
+  /// String interpolation in SQL enables SQL injection attacks.
+  /// Each occurrence is a critical security vulnerability.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_sql',
@@ -1139,6 +1199,11 @@ class _AddTodoForDynamicSqlFix extends DartFix {
 class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   const AvoidGenericKeyInUrlRule() : super(code: _code);
 
+  /// Generic key parameters in URLs may contain sensitive data.
+  /// Review for potential credential exposure.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_generic_key_in_url',
     problemMessage:
@@ -1196,6 +1261,11 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 /// ```
 class PreferSecureRandomRule extends SaropaLintRule {
   const PreferSecureRandomRule() : super(code: _code);
+
+  /// Random() is predictable and unsuitable for security.
+  /// Use Random.secure() for tokens and crypto operations.
+  @override
+  LintImpact get impact => LintImpact.high;
 
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random',
@@ -1279,6 +1349,11 @@ class _UseSecureRandomFix extends DartFix {
 class PreferTypedDataRule extends SaropaLintRule {
   const PreferTypedDataRule() : super(code: _code);
 
+  /// List<int> for binary data is inefficient but functional.
+  /// Optimization suggestion, not a bug.
+  @override
+  LintImpact get impact => LintImpact.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_typed_data',
     problemMessage:
@@ -1345,6 +1420,11 @@ class PreferTypedDataRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessaryToListRule extends SaropaLintRule {
   const AvoidUnnecessaryToListRule() : super(code: _code);
+
+  /// Unnecessary toList() is inefficient but functional.
+  /// Performance optimization, not a bug.
+  @override
+  LintImpact get impact => LintImpact.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_to_list',
@@ -1435,6 +1515,11 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
 /// ```
 class RequireAuthCheckRule extends SaropaLintRule {
   const RequireAuthCheckRule() : super(code: _code);
+
+  /// Missing auth check exposes protected endpoints.
+  /// Each occurrence is an unauthorized access risk.
+  @override
+  LintImpact get impact => LintImpact.critical;
 
   static const LintCode _code = LintCode(
     name: 'require_auth_check',
@@ -1542,6 +1627,11 @@ class RequireAuthCheckRule extends SaropaLintRule {
 class RequireTokenRefreshRule extends SaropaLintRule {
   const RequireTokenRefreshRule() : super(code: _code);
 
+  /// Missing token refresh causes unexpected logouts.
+  /// UX issue rather than security vulnerability.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_token_refresh',
     problemMessage:
@@ -1635,6 +1725,11 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 class AvoidJwtDecodeClientRule extends SaropaLintRule {
   const AvoidJwtDecodeClientRule() : super(code: _code);
 
+  /// Client-decoded JWTs can be manipulated for authorization bypass.
+  /// Each occurrence risks privilege escalation.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
     problemMessage: 'Decoding JWT on client for authorization is insecure.',
@@ -1722,6 +1817,11 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 class RequireLogoutCleanupRule extends SaropaLintRule {
   const RequireLogoutCleanupRule() : super(code: _code);
 
+  /// Incomplete logout cleanup leaves sensitive data accessible.
+  /// Each occurrence risks data leakage after logout.
+  @override
+  LintImpact get impact => LintImpact.high;
+
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
     problemMessage: 'Logout may not clear all sensitive data.',
@@ -1788,6 +1888,11 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 class AvoidAuthInQueryParamsRule extends SaropaLintRule {
   const AvoidAuthInQueryParamsRule() : super(code: _code);
 
+  /// Auth tokens in query params are logged and leak via referrers.
+  /// Each occurrence exposes credentials.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
   static const LintCode _code = LintCode(
     name: 'avoid_auth_in_query_params',
     problemMessage:
@@ -1847,6 +1952,424 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
           return;
         }
       }
+    });
+  }
+}
+
+/// Warns when auth tokens are stored in SharedPreferences instead of secure storage.
+///
+/// SharedPreferences stores data as plain text on disk. Auth tokens, session
+/// data, and credentials must use flutter_secure_storage or platform keychain.
+///
+/// **BAD:**
+/// ```dart
+/// final prefs = await SharedPreferences.getInstance();
+/// await prefs.setString('auth_token', token);
+/// await prefs.setString('session_id', sessionId);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final secureStorage = FlutterSecureStorage();
+/// await secureStorage.write(key: 'auth_token', value: token);
+/// await secureStorage.write(key: 'session_id', value: sessionId);
+/// ```
+class AvoidAuthStateInPrefsRule extends SaropaLintRule {
+  const AvoidAuthStateInPrefsRule() : super(code: _code);
+
+  /// Auth tokens in SharedPreferences are stored as plain text.
+  /// Each occurrence exposes credentials on rooted devices.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_auth_state_in_prefs',
+    problemMessage:
+        'Auth tokens in SharedPreferences are stored as plain text.',
+    correctionMessage:
+        'Use flutter_secure_storage or platform keychain for sensitive data.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _sensitiveKeys = <String>{
+    'token',
+    'auth_token',
+    'access_token',
+    'refresh_token',
+    'session',
+    'session_id',
+    'credential',
+    'password',
+    'secret',
+    'api_key',
+    'apikey',
+    'bearer',
+    'jwt',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for SharedPreferences set methods
+      if (methodName != 'setString' &&
+          methodName != 'setStringList' &&
+          methodName != 'setBool') {
+        return;
+      }
+
+      // Check if called on SharedPreferences
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('shared')) {
+        return;
+      }
+
+      // Check if key contains sensitive patterns
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final String keySource = args.arguments.first.toSource().toLowerCase();
+      for (final String sensitive in _sensitiveKeys) {
+        if (keySource.contains(sensitive)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddSecureStorageTodoFix()];
+}
+
+class _AddSecureStorageTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Use flutter_secure_storage instead',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Use flutter_secure_storage for auth tokens\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when sensitive data uses SharedPreferences instead of encrypted storage.
+///
+/// SharedPreferences are plain text. Use encrypted_shared_preferences or
+/// flutter_secure_storage for passwords, PINs, and personal data.
+///
+/// **BAD:**
+/// ```dart
+/// final prefs = await SharedPreferences.getInstance();
+/// await prefs.setString('user_password', password);
+/// await prefs.setString('pin_code', pin);
+/// await prefs.setString('credit_card', cardNumber);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final secureStorage = FlutterSecureStorage();
+/// await secureStorage.write(key: 'user_password', value: password);
+/// // Or use encrypted_shared_preferences
+/// ```
+class PreferEncryptedPrefsRule extends SaropaLintRule {
+  const PreferEncryptedPrefsRule() : super(code: _code);
+
+  /// Sensitive data in SharedPreferences is unencrypted.
+  /// Each occurrence exposes personal data.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_encrypted_prefs',
+    problemMessage:
+        'Sensitive data in SharedPreferences is stored unencrypted.',
+    correctionMessage:
+        'Use flutter_secure_storage or encrypted_shared_preferences.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _sensitivePatterns = <String>{
+    'password',
+    'passwd',
+    'pin',
+    'credit_card',
+    'card_number',
+    'cvv',
+    'ssn',
+    'social_security',
+    'bank_account',
+    'routing_number',
+    'private_key',
+    'secret_key',
+    'encryption_key',
+    'dob',
+    'date_of_birth',
+    'mother_maiden',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (!methodName.startsWith('set') && !methodName.startsWith('get')) {
+        return;
+      }
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('shared')) {
+        return;
+      }
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final String keySource = args.arguments.first.toSource().toLowerCase();
+      for (final String sensitive in _sensitivePatterns) {
+        if (keySource.contains(sensitive)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddEncryptedPrefsTodoFix()];
+}
+
+class _AddEncryptedPrefsTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Use encrypted storage',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Use flutter_secure_storage or encrypted_shared_preferences\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when deep link handlers don't validate parameters.
+///
+/// Deep links can pass arbitrary data to your app. Validate and sanitize
+/// all deep link parameters before using them to prevent injection attacks.
+///
+/// **BAD:**
+/// ```dart
+/// void handleDeepLink(Uri uri) {
+///   final userId = uri.queryParameters['user_id'];
+///   fetchUser(userId!); // No validation!
+/// }
+///
+/// void onGenerateRoute(RouteSettings settings) {
+///   final args = settings.arguments as Map<String, dynamic>;
+///   return UserPage(userId: args['id']); // No validation!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void handleDeepLink(Uri uri) {
+///   final userId = uri.queryParameters['user_id'];
+///   if (userId == null || !_isValidUserId(userId)) {
+///     throw InvalidDeepLinkException('Invalid user_id');
+///   }
+///   fetchUser(userId);
+/// }
+///
+/// bool _isValidUserId(String id) {
+///   return RegExp(r'^[a-zA-Z0-9_-]+$').hasMatch(id) && id.length <= 36;
+/// }
+/// ```
+class RequireDeepLinkValidationRule extends SaropaLintRule {
+  const RequireDeepLinkValidationRule() : super(code: _code);
+
+  /// Deep links without validation enable injection attacks.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_deep_link_validation',
+    problemMessage:
+        'Deep link parameter used without validation. Validate before use.',
+    correctionMessage:
+        'Add null check and format validation for deep link parameters.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for queryParameters access
+      if (node.methodName.name != '[]') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('queryParameters') &&
+          !targetSource.contains('pathSegments') &&
+          !targetSource.contains('arguments')) {
+        return;
+      }
+
+      // Check if the result is validated before use
+      // Look for nearby null checks or validation
+      AstNode? current = node.parent;
+
+      // If it's inside an if condition or null check, it's likely validated
+      while (current != null) {
+        if (current is IfStatement) {
+          final String condition = current.expression.toSource();
+          if (condition.contains('==') ||
+              condition.contains('!=') ||
+              condition.contains('null') ||
+              condition.contains('isValid') ||
+              condition.contains('hasMatch')) {
+            return; // Has validation
+          }
+        }
+        if (current is ConditionalExpression ||
+            current is AssertStatement ||
+            current is ThrowExpression) {
+          return; // Has some form of validation
+        }
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      // Check if immediately null-asserted without check (dangerous)
+      final AstNode? parent = node.parent;
+      if (parent is PostfixExpression && parent.operator.lexeme == '!') {
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Check if used directly in a dangerous context
+      if (parent is MethodInvocation) {
+        final String methodName = parent.methodName.name;
+        if (methodName == 'parse' ||
+            methodName == 'int' ||
+            methodName == 'double' ||
+            methodName == 'Uri') {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+
+    // Also check for RouteSettings.arguments usage
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'arguments') return;
+
+      final String targetSource = node.target?.toSource() ?? '';
+      if (!targetSource.contains('settings') &&
+          !targetSource.contains('route') &&
+          !targetSource.contains('RouteSettings')) {
+        return;
+      }
+
+      // Check if cast without validation
+      final AstNode? parent = node.parent;
+      if (parent is AsExpression) {
+        // Check if there's validation nearby
+        AstNode? current = parent.parent;
+        while (current != null) {
+          if (current is IfStatement || current is AssertStatement) {
+            return; // Has some validation
+          }
+          if (current is MethodDeclaration || current is FunctionDeclaration) {
+            break;
+          }
+          current = current.parent;
+        }
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDeepLinkValidationFix()];
+}
+
+class _AddDeepLinkValidationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Validate deep link parameter',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Validate this deep link parameter before use\n',
+        );
+      });
     });
   }
 }

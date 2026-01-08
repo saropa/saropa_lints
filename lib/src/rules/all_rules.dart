@@ -25,6 +25,7 @@ export 'internationalization_rules.dart';
 export 'memory_management_rules.dart';
 export 'naming_style_rules.dart';
 export 'navigation_rules.dart';
+export 'notification_rules.dart';
 export 'numeric_literal_rules.dart';
 export 'performance_rules.dart';
 export 'record_pattern_rules.dart';
