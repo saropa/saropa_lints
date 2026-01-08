@@ -15,10 +15,10 @@ import '../saropa_lint_rule.dart';
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureIgnoreRule extends SaropaLintRule {
   const AvoidFutureIgnoreRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_ignore',
@@ -62,10 +62,10 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureToStringRule extends SaropaLintRule {
   const AvoidFutureToStringRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_tostring',
@@ -128,10 +128,10 @@ class AvoidFutureToStringRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNestedFuturesRule extends SaropaLintRule {
   const AvoidNestedFuturesRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_futures',
@@ -178,10 +178,10 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
   const AvoidNestedStreamsAndFuturesRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_streams_and_futures',
@@ -230,10 +230,10 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
   const AvoidPassingAsyncWhenSyncExpectedRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_passing_async_when_sync_expected',
@@ -308,10 +308,10 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
 /// ```
 class AvoidRedundantAsyncRule extends SaropaLintRule {
   const AvoidRedundantAsyncRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_async',
@@ -380,10 +380,10 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidStreamToStringRule extends SaropaLintRule {
   const AvoidStreamToStringRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   // cspell:ignore tostring
   static const LintCode _code = LintCode(
@@ -426,10 +426,10 @@ class AvoidStreamToStringRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
   const AvoidUnassignedStreamSubscriptionsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_stream_subscriptions',
@@ -483,10 +483,10 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
 /// could be used instead.
 class PreferAsyncAwaitRule extends SaropaLintRule {
   const PreferAsyncAwaitRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_await',
@@ -526,10 +526,10 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 /// Warns when await is used inline instead of assigning to a variable first.
 class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   const PreferAssigningAwaitExpressionsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_assigning_await_expressions',
@@ -595,10 +595,10 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
 /// ```
 class PreferCommentingFutureDelayedRule extends SaropaLintRule {
   const PreferCommentingFutureDelayedRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_future_delayed',
@@ -687,10 +687,10 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
 /// Warns when Stream-returning functions have incorrect return type annotations.
 class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
   const PreferCorrectStreamReturnTypeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_stream_return_type',
@@ -744,10 +744,10 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
 /// Warns when Future.value() is called without explicit type argument.
 class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
   const PreferSpecifyingFutureValueTypeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_specifying_future_value_type',
@@ -805,10 +805,10 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
 /// **Quick fix available:** Adds `await` before the returned expression.
 class PreferReturnAwaitRule extends SaropaLintRule {
   const PreferReturnAwaitRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_return_await',
@@ -1152,10 +1152,10 @@ class _AddHackForUnassignedSubscriptionFix extends DartFix {
 /// - `VoidCallback?` → `Future<void> Function()?`
 class PreferAsyncCallbackRule extends SaropaLintRule {
   const PreferAsyncCallbackRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_callback',

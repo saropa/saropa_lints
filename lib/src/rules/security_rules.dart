@@ -2028,8 +2028,7 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') &&
-          !targetSource.contains('shared')) {
+      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
         return;
       }
 
@@ -2150,8 +2149,7 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') &&
-          !targetSource.contains('shared')) {
+      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
         return;
       }
 

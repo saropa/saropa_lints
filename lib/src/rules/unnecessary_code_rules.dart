@@ -25,10 +25,10 @@ import '../saropa_lint_rule.dart';
 /// **Quick fix available:** Comments out the empty spread.
 class AvoidEmptySpreadRule extends SaropaLintRule {
   const AvoidEmptySpreadRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_spread',
@@ -108,10 +108,10 @@ class _CommentOutEmptySpreadFix extends DartFix {
 /// ```
 class AvoidUnnecessaryBlockRule extends SaropaLintRule {
   const AvoidUnnecessaryBlockRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_block',
@@ -159,10 +159,10 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
 /// **Quick fix available:** Replaces `target.call(args)` with `target(args)`.
 class AvoidUnnecessaryCallRule extends SaropaLintRule {
   const AvoidUnnecessaryCallRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_call',
@@ -249,10 +249,10 @@ class _RemoveUnnecessaryCallFix extends DartFix {
 /// **Quick fix available:** Comments out the unnecessary constructor.
 class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   const AvoidUnnecessaryConstructorRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_constructor',
@@ -354,10 +354,10 @@ class _CommentOutUnnecessaryConstructorFix extends DartFix {
 /// ```
 class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
   const AvoidUnnecessaryEnumArgumentsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_arguments',
@@ -396,10 +396,10 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
 /// Warns when using enum name prefix inside the enum declaration.
 class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   const AvoidUnnecessaryEnumPrefixRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_prefix',
@@ -533,10 +533,10 @@ class _EnumPrefixVisitor extends RecursiveAstVisitor<void> {
 /// **Quick fix available:** Removes the `extends Object` clause.
 class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
   const AvoidUnnecessaryExtendsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_extends',
@@ -624,10 +624,10 @@ class _RemoveExtendsObjectFix extends DartFix {
 /// ```
 class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   const AvoidUnnecessaryGetterRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_getter',
@@ -712,10 +712,10 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
 /// **Quick fix available:** Replaces with `.isEmpty` or `.isNotEmpty`.
 class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   const AvoidUnnecessaryLengthCheckRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_length_check',
@@ -887,10 +887,10 @@ class _UseIsEmptyOrIsNotEmptyFix extends DartFix {
 /// ```
 class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
   const AvoidUnnecessaryNegationsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_negations',
@@ -957,10 +957,10 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
 /// **Quick fix available:** Removes the `super()` call.
 class AvoidUnnecessarySuperRule extends SaropaLintRule {
   const AvoidUnnecessarySuperRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_super',
@@ -1062,10 +1062,10 @@ class _RemoveUnnecessarySuperFix extends DartFix {
 /// ```
 class NoEmptyBlockRule extends SaropaLintRule {
   const NoEmptyBlockRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const String _name = 'no_empty_block';
 
@@ -1219,10 +1219,10 @@ class _AddEmptyBlockCommentFix extends DartFix {
 /// ```
 class NoEmptyStringRule extends SaropaLintRule {
   const NoEmptyStringRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'no_empty_string',

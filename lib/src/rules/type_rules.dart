@@ -32,10 +32,10 @@ import '../saropa_lint_rule.dart';
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
   const AvoidCastingToExtensionTypeRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_casting_to_extension_type',
@@ -89,10 +89,10 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
   const AvoidCollectionMethodsWithUnrelatedTypesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_collection_methods_with_unrelated_types',
@@ -205,10 +205,10 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 /// Prefer using specific types or generics.
 class AvoidDynamicRule extends SaropaLintRule {
   const AvoidDynamicRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic',
@@ -252,10 +252,10 @@ class AvoidDynamicRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   const AvoidImplicitlyNullableExtensionTypesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_implicitly_nullable_extension_types',
@@ -300,10 +300,10 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableInterpolationRule extends SaropaLintRule {
   const AvoidNullableInterpolationRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_interpolation',
@@ -352,10 +352,10 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
   const AvoidNullableParametersWithDefaultValuesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_parameters_with_default_values',
@@ -413,10 +413,10 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
 /// ```
 class AvoidNullableToStringRule extends SaropaLintRule {
   const AvoidNullableToStringRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_tostring',
@@ -488,10 +488,10 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 /// ```
 class AvoidNullAssertionRule extends SaropaLintRule {
   const AvoidNullAssertionRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_null_assertion',
@@ -1596,10 +1596,10 @@ class _NodeContainsFinder extends GeneralizingAstVisitor<void> {
 /// ```
 class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
   const AvoidUnnecessaryTypeAssertionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_type_assertions',
@@ -1659,10 +1659,10 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
   const AvoidUnnecessaryTypeCastsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_type_casts',
@@ -1722,10 +1722,10 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
   const AvoidUnrelatedTypeAssertionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_assertions',
@@ -1809,10 +1809,10 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class PreferCorrectTypeNameRule extends SaropaLintRule {
   const PreferCorrectTypeNameRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_type_name',
@@ -1905,10 +1905,10 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 /// ```
 class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   const PreferExplicitFunctionTypeRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_function_type',
