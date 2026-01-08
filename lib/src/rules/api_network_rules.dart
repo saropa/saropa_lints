@@ -629,3 +629,93 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when connectivity monitoring is used without an offline indicator.
+///
+/// Users should know when they're offline. Using connectivity monitoring
+/// without providing visual feedback creates a confusing experience where
+/// actions fail silently.
+///
+/// **BAD:**
+/// ```dart
+/// class MyApp extends StatefulWidget {
+///   void initState() {
+///     Connectivity().onConnectivityChanged.listen((result) {
+///       _isOnline = result != ConnectivityResult.none;
+///       // No UI feedback!
+///     });
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyApp extends StatefulWidget {
+///   void initState() {
+///     Connectivity().onConnectivityChanged.listen((result) {
+///       _isOnline = result != ConnectivityResult.none;
+///       if (!_isOnline) {
+///         ScaffoldMessenger.of(context).showSnackBar(
+///           SnackBar(content: Text('You are offline')),
+///         );
+///       }
+///     });
+///   }
+/// }
+/// ```
+class RequireOfflineIndicatorRule extends SaropaLintRule {
+  const RequireOfflineIndicatorRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_offline_indicator',
+    problemMessage:
+        'Connectivity check without offline indicator. Users should see when offline.',
+    correctionMessage:
+        'Show a banner, snackbar, or icon when connectivity is lost.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for connectivity stream listening
+      if (methodName != 'listen') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('onConnectivityChanged') &&
+          !targetSource.contains('connectivityStream')) {
+        return;
+      }
+
+      // Check if the callback contains UI feedback
+      if (node.argumentList.arguments.isEmpty) return;
+
+      final Expression callback = node.argumentList.arguments.first;
+      final String callbackSource = callback.toSource();
+
+      // Look for common UI feedback patterns
+      final bool hasUiFeedback = callbackSource.contains('showSnackBar') ||
+          callbackSource.contains('showDialog') ||
+          callbackSource.contains('Banner') ||
+          callbackSource.contains('Overlay') ||
+          callbackSource.contains('showToast') ||
+          callbackSource.contains('showNotification') ||
+          callbackSource.contains('offlineWidget') ||
+          callbackSource.contains('OfflineBuilder') ||
+          callbackSource.contains('NoInternetWidget');
+
+      if (!hasUiFeedback) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}

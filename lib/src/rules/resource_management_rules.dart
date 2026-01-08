@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -560,6 +561,374 @@ class RequireIsolateKillRule extends SaropaLintRule {
       // Check for kill
       if (!classSource.contains('.kill(')) {
         reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when CameraController is not disposed.
+///
+/// CameraController holds native camera resources that must be released.
+/// Failing to dispose keeps the camera locked and causes memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class _CameraPageState extends State<CameraPage> {
+///   late CameraController _controller;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _controller = CameraController(cameras[0], ResolutionPreset.high);
+///     _controller.initialize();
+///   }
+///   // Missing dispose - camera stays locked!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _CameraPageState extends State<CameraPage> {
+///   late CameraController _controller;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _controller = CameraController(cameras[0], ResolutionPreset.high);
+///     _controller.initialize();
+///   }
+///
+///   @override
+///   void dispose() {
+///     _controller.dispose();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireCameraDisposeRule extends SaropaLintRule {
+  const RequireCameraDisposeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_camera_dispose',
+    problemMessage:
+        'CameraController must be disposed to release camera hardware.',
+    correctionMessage:
+        'Add _controller.dispose() in the dispose() method before super.dispose().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'State') return;
+
+      // Find CameraController fields
+      final List<String> controllerNames = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null && typeName.contains('CameraController')) {
+            for (final VariableDeclaration variable in member.fields.variables) {
+              controllerNames.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (controllerNames.isEmpty) return;
+
+      // Find dispose method
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check if controllers are disposed
+      for (final String name in controllerNames) {
+        final bool isDisposed = disposeBody != null &&
+            (disposeBody.contains('$name.dispose(') ||
+                disposeBody.contains('$name?.dispose('));
+
+        if (!isDisposed) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == name) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddCameraDisposeFix()];
+}
+
+class _AddCameraDisposeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String fieldName = node.name.lexeme;
+
+      // Find the containing class
+      AstNode? current = node.parent;
+      while (current != null && current is! ClassDeclaration) {
+        current = current.parent;
+      }
+      if (current is! ClassDeclaration) return;
+
+      final ClassDeclaration classNode = current;
+
+      // Find existing dispose method
+      MethodDeclaration? disposeMethod;
+      for (final ClassMember member in classNode.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeMethod = member;
+          break;
+        }
+      }
+
+      if (disposeMethod != null) {
+        // Insert dispose() call before super.dispose()
+        final String bodySource = disposeMethod.body.toSource();
+        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
+
+        if (superDisposeIndex != -1) {
+          final int bodyOffset = disposeMethod.body.offset;
+          final int insertOffset = bodyOffset + superDisposeIndex;
+
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Add $fieldName.dispose()',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            builder.addSimpleInsertion(
+              insertOffset,
+              '$fieldName.dispose();\n    ',
+            );
+          });
+        }
+      } else {
+        // Create new dispose method
+        int insertOffset = classNode.rightBracket.offset;
+
+        for (final ClassMember member in classNode.members) {
+          if (member is FieldDeclaration || member is ConstructorDeclaration) {
+            insertOffset = member.end;
+          }
+        }
+
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Add dispose() method with $fieldName.dispose()',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleInsertion(
+            insertOffset,
+            '\n\n  @override\n  void dispose() {\n    $fieldName.dispose();\n    super.dispose();\n  }',
+          );
+        });
+      }
+    });
+  }
+}
+
+/// Warns when images from camera are uploaded without compression.
+///
+/// Phone cameras produce large images (5-20MB). Uploading uncompressed
+/// images wastes bandwidth and storage. Compress before upload.
+///
+/// **BAD:**
+/// ```dart
+/// final image = await picker.pickImage(source: ImageSource.camera);
+/// await uploadFile(File(image!.path)); // Full resolution upload!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final image = await picker.pickImage(
+///   source: ImageSource.camera,
+///   maxWidth: 1920,
+///   maxHeight: 1080,
+///   imageQuality: 85,
+/// );
+/// await uploadFile(File(image!.path));
+/// ```
+class RequireImageCompressionRule extends SaropaLintRule {
+  const RequireImageCompressionRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_compression',
+    problemMessage:
+        'Camera image captured without compression. Large files waste bandwidth.',
+    correctionMessage:
+        'Add maxWidth, maxHeight, or imageQuality parameters to limit file size.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName != 'pickImage' && methodName != 'getImage') return;
+
+      // Check for camera source
+      bool isFromCamera = false;
+      bool hasCompression = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          final String value = arg.expression.toSource();
+
+          if (name == 'source' && value.contains('camera')) {
+            isFromCamera = true;
+          }
+          if (name == 'maxWidth' ||
+              name == 'maxHeight' ||
+              name == 'imageQuality') {
+            hasCompression = true;
+          }
+        }
+      }
+
+      if (isFromCamera && !hasCompression) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddImageCompressionFix()];
+}
+
+class _AddImageCompressionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add compression parameters',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          args.arguments.last.end,
+          ',\n      maxWidth: 1920,\n      maxHeight: 1080,\n      imageQuality: 85',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when precise location is requested when coarse would suffice.
+///
+/// Precise GPS location uses more battery and feels more invasive
+/// to users. For city-level features (weather, local stores), use
+/// coarse location instead.
+///
+/// **BAD:**
+/// ```dart
+/// // For a weather app - city-level is sufficient
+/// final position = await Geolocator.getCurrentPosition(
+///   desiredAccuracy: LocationAccuracy.high, // Unnecessary precision
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Weather only needs city
+/// final position = await Geolocator.getCurrentPosition(
+///   desiredAccuracy: LocationAccuracy.low,
+/// );
+/// // Or for navigation that needs precision:
+/// final position = await Geolocator.getCurrentPosition(
+///   desiredAccuracy: LocationAccuracy.high, // Justified for turn-by-turn
+/// );
+/// ```
+class PreferCoarseLocationRule extends SaropaLintRule {
+  const PreferCoarseLocationRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_coarse_location_when_sufficient',
+    problemMessage:
+        'High accuracy location uses more battery. Consider coarse location.',
+    correctionMessage:
+        'Use LocationAccuracy.low or .medium if you only need city-level location.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName != 'getCurrentPosition' && methodName != 'getPosition') {
+        return;
+      }
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+
+          if (name == 'desiredAccuracy' || name == 'accuracy') {
+            final String value = arg.expression.toSource();
+
+            // Flag high-precision modes that might be unnecessary
+            if (value.contains('.high') ||
+                value.contains('.best') ||
+                value.contains('.bestForNavigation')) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
       }
     });
   }

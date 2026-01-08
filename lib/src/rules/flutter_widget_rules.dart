@@ -12118,3 +12118,331 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when SizedBox or Container uses fixed pixel dimensions.
+///
+/// Fixed pixel dimensions break on different screen sizes. Use responsive
+/// sizing with Flexible, Expanded, FractionallySizedBox, or constraints.
+///
+/// **BAD:**
+/// ```dart
+/// SizedBox(width: 300, height: 400);
+/// Container(width: 500, height: 600);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// FractionallySizedBox(widthFactor: 0.8, child: content);
+/// LayoutBuilder(
+///   builder: (context, constraints) => SizedBox(
+///     width: constraints.maxWidth * 0.5,
+///   ),
+/// );
+/// Expanded(child: content);
+/// ```
+class AvoidFixedDimensionsRule extends SaropaLintRule {
+  const AvoidFixedDimensionsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_fixed_dimensions',
+    problemMessage:
+        'Fixed pixel dimensions may not work on all screen sizes.',
+    correctionMessage:
+        'Use responsive sizing (Flexible, Expanded, FractionallySizedBox, or LayoutBuilder).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Threshold above which fixed dimensions are considered problematic.
+  /// Small fixed sizes (icons, spacing) are usually intentional.
+  static const double _threshold = 200.0;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (typeName != 'SizedBox' && typeName != 'Container') return;
+
+      double? width;
+      double? height;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          final Expression value = arg.expression;
+
+          if (name == 'width' && value is IntegerLiteral) {
+            width = value.value?.toDouble();
+          } else if (name == 'width' && value is DoubleLiteral) {
+            width = value.value;
+          } else if (name == 'height' && value is IntegerLiteral) {
+            height = value.value?.toDouble();
+          } else if (name == 'height' && value is DoubleLiteral) {
+            height = value.value;
+          }
+        }
+      }
+
+      // Only flag if dimensions exceed threshold
+      final bool widthTooLarge = width != null && width > _threshold;
+      final bool heightTooLarge = height != null && height > _threshold;
+
+      if (widthTooLarge || heightTooLarge) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when hardcoded Color values are used instead of theme colors.
+///
+/// Hardcoded colors break theming (light/dark mode) and make style changes
+/// difficult. Use colorScheme colors from the theme.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   color: Color(0xFF2196F3), // Hardcoded color
+/// )
+/// Icon(Icons.home, color: Colors.blue) // Material color constant
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Container(
+///   color: Theme.of(context).colorScheme.primary,
+/// )
+/// Icon(Icons.home, color: Theme.of(context).colorScheme.onSurface)
+/// ```
+class RequireThemeColorFromSchemeRule extends SaropaLintRule {
+  const RequireThemeColorFromSchemeRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_theme_color_from_scheme',
+    problemMessage:
+        'Hardcoded color breaks theming. Use Theme.of(context).colorScheme.',
+    correctionMessage:
+        'Replace with colorScheme.primary, .secondary, .surface, etc.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check for Color(0x...) hardcoded colors
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Color') return;
+
+      // Skip if in theme definition file
+      final String filePath = resolver.source.fullName.toLowerCase();
+      if (filePath.contains('theme') || filePath.contains('color')) return;
+
+      // Check for hex literal
+      if (node.argumentList.arguments.isNotEmpty) {
+        final Expression firstArg = node.argumentList.arguments.first;
+        if (firstArg is IntegerLiteral) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+
+    // Check for Colors.* constants
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (node.prefix.name != 'Colors') return;
+
+      // Skip Colors.transparent - commonly used and valid
+      if (node.identifier.name == 'transparent') return;
+
+      // Skip if in theme definition
+      final String filePath = resolver.source.fullName.toLowerCase();
+      if (filePath.contains('theme') || filePath.contains('color')) return;
+
+      // Common colors that should come from theme
+      final Set<String> semanticColors = <String>{
+        'blue',
+        'red',
+        'green',
+        'orange',
+        'purple',
+        'grey',
+        'black',
+        'white',
+      };
+
+      final String colorName = node.identifier.name.toLowerCase();
+      if (semanticColors.any((String c) => colorName.startsWith(c))) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when ColorScheme is created manually instead of using fromSeed.
+///
+/// ColorScheme.fromSeed generates a harmonious, accessible color palette
+/// from a single seed color. Manual ColorScheme is error-prone and often
+/// has accessibility issues.
+///
+/// **BAD:**
+/// ```dart
+/// ColorScheme(
+///   primary: Color(0xFF6750A4),
+///   onPrimary: Colors.white,
+///   secondary: Color(0xFF625B71),
+///   // 15+ more colors to define manually...
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ColorScheme.fromSeed(
+///   seedColor: Color(0xFF6750A4),
+///   brightness: Brightness.light,
+/// )
+/// ```
+class PreferColorSchemeFromSeedRule extends SaropaLintRule {
+  const PreferColorSchemeFromSeedRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_color_scheme_from_seed',
+    problemMessage:
+        'Manual ColorScheme is error-prone. Use ColorScheme.fromSeed.',
+    correctionMessage:
+        'ColorScheme.fromSeed(seedColor: yourPrimary) generates accessible palettes.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+      final String? namedConstructor = node.constructorName.name?.name;
+
+      // Only flag default constructor, not fromSeed/fromSwatch
+      if (constructorName != 'ColorScheme') return;
+      if (namedConstructor != null) return; // fromSeed, light, dark, etc.
+
+      // Check if it has many color arguments (indicating manual definition)
+      int colorArgs = 0;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name.startsWith('on') ||
+              name == 'primary' ||
+              name == 'secondary' ||
+              name == 'tertiary' ||
+              name == 'surface' ||
+              name == 'error' ||
+              name == 'background' ||
+              name == 'outline') {
+            colorArgs++;
+          }
+        }
+      }
+
+      // If defining 4+ colors manually, suggest fromSeed
+      if (colorArgs >= 4) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when multiple adjacent Text widgets could use Text.rich or RichText.
+///
+/// Multiple Text widgets in a Row or Wrap for styled text is inefficient.
+/// Use Text.rich with TextSpan children for mixed styling.
+///
+/// **BAD:**
+/// ```dart
+/// Row(
+///   children: [
+///     Text('Hello ', style: TextStyle(fontWeight: FontWeight.bold)),
+///     Text('world', style: TextStyle(color: Colors.blue)),
+///     Text('!', style: TextStyle(fontSize: 20)),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text.rich(
+///   TextSpan(
+///     children: [
+///       TextSpan(text: 'Hello ', style: TextStyle(fontWeight: FontWeight.bold)),
+///       TextSpan(text: 'world', style: TextStyle(color: Colors.blue)),
+///       TextSpan(text: '!', style: TextStyle(fontSize: 20)),
+///     ],
+///   ),
+/// )
+/// ```
+class PreferRichTextForComplexRule extends SaropaLintRule {
+  const PreferRichTextForComplexRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_rich_text_for_complex',
+    problemMessage:
+        'Multiple Text widgets in row could be combined with Text.rich.',
+    correctionMessage:
+        'Use Text.rich with TextSpan children for better performance and line wrapping.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (typeName != 'Row' && typeName != 'Wrap') return;
+
+      // Find children argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression childrenExpr = arg.expression;
+          if (childrenExpr is ListLiteral) {
+            int textWidgetCount = 0;
+
+            for (final CollectionElement element in childrenExpr.elements) {
+              if (element is Expression) {
+                if (element is InstanceCreationExpression) {
+                  final String? childType =
+                      element.constructorName.type.element?.name;
+                  if (childType == 'Text') {
+                    textWidgetCount++;
+                  }
+                }
+              }
+            }
+
+            // If 3+ adjacent Text widgets, suggest Text.rich
+            if (textWidgetCount >= 3) {
+              reporter.atNode(node.constructorName, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}

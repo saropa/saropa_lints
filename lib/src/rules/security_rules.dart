@@ -1408,3 +1408,448 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when API endpoints don't verify authentication.
+///
+/// All authenticated endpoints should check auth status before
+/// processing. Missing checks expose sensitive data.
+///
+/// **BAD:**
+/// ```dart
+/// Future<Response> getUserProfile(Request request) async {
+///   final userId = request.params['id'];
+///   return Response.ok(await db.getUser(userId)); // No auth check!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<Response> getUserProfile(Request request) async {
+///   final token = request.headers['Authorization'];
+///   if (!await authService.verifyToken(token)) {
+///     return Response.unauthorized();
+///   }
+///   final userId = request.params['id'];
+///   return Response.ok(await db.getUser(userId));
+/// }
+/// ```
+class RequireAuthCheckRule extends SaropaLintRule {
+  const RequireAuthCheckRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_auth_check',
+    problemMessage:
+        'Protected endpoint may be missing authentication check.',
+    correctionMessage:
+        'Add authentication verification before processing protected requests.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _protectedEndpointPatterns = <String>{
+    'profile',
+    'user',
+    'account',
+    'settings',
+    'private',
+    'admin',
+    'dashboard',
+    'order',
+    'payment',
+    'wallet',
+    'transaction',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      final String functionName = node.name.lexeme.toLowerCase();
+
+      // Check if function name suggests protected endpoint
+      bool looksProtected = false;
+      for (final String pattern in _protectedEndpointPatterns) {
+        if (functionName.contains(pattern)) {
+          looksProtected = true;
+          break;
+        }
+      }
+
+      if (!looksProtected) return;
+
+      // Check return type suggests an API response
+      final TypeAnnotation? returnType = node.returnType;
+      if (returnType == null) return;
+
+      final String returnTypeStr = returnType.toSource();
+      if (!returnTypeStr.contains('Response') &&
+          !returnTypeStr.contains('Future')) {
+        return;
+      }
+
+      // Check if function body has auth verification
+      final FunctionBody body = node.functionExpression.body;
+      final String bodySource = body.toSource();
+
+      final bool hasAuthCheck = bodySource.contains('verifyToken') ||
+          bodySource.contains('authenticate') ||
+          bodySource.contains('Authorization') ||
+          bodySource.contains('isAuthenticated') ||
+          bodySource.contains('checkAuth') ||
+          bodySource.contains('unauthorized') ||
+          bodySource.contains('Unauthorized');
+
+      if (!hasAuthCheck) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when token refresh logic is missing for auth tokens.
+///
+/// Access tokens expire. Without refresh logic, users get logged out
+/// unexpectedly. Implement proactive token refresh.
+///
+/// **BAD:**
+/// ```dart
+/// class AuthService {
+///   String? accessToken;
+///
+///   Future<Response> makeRequest(String url) async {
+///     return http.get(url, headers: {'Authorization': 'Bearer $accessToken'});
+///     // Token may be expired!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class AuthService {
+///   String? accessToken;
+///   String? refreshToken;
+///   DateTime? tokenExpiry;
+///
+///   Future<Response> makeRequest(String url) async {
+///     if (tokenExpiry?.isBefore(DateTime.now()) ?? true) {
+///       await refreshAccessToken();
+///     }
+///     return http.get(url, headers: {'Authorization': 'Bearer $accessToken'});
+///   }
+/// }
+/// ```
+class RequireTokenRefreshRule extends SaropaLintRule {
+  const RequireTokenRefreshRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_token_refresh',
+    problemMessage:
+        'Auth service stores access token but may lack refresh logic.',
+    correctionMessage:
+        'Implement token refresh to handle expiration gracefully.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme.toLowerCase();
+
+      // Check if class is auth-related
+      if (!className.contains('auth') &&
+          !className.contains('session') &&
+          !className.contains('token')) {
+        return;
+      }
+
+      bool hasAccessToken = false;
+      bool hasRefreshToken = false;
+      bool hasRefreshMethod = false;
+      bool hasExpiryCheck = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String fieldSource = member.toSource().toLowerCase();
+          if (fieldSource.contains('accesstoken') ||
+              fieldSource.contains('access_token')) {
+            hasAccessToken = true;
+          }
+          if (fieldSource.contains('refreshtoken') ||
+              fieldSource.contains('refresh_token')) {
+            hasRefreshToken = true;
+          }
+          if (fieldSource.contains('expir')) {
+            hasExpiryCheck = true;
+          }
+        }
+        if (member is MethodDeclaration) {
+          final String methodName = member.name.lexeme.toLowerCase();
+          if (methodName.contains('refresh')) {
+            hasRefreshMethod = true;
+          }
+          // Check method body for expiry checks
+          final String bodySource = member.body.toSource().toLowerCase();
+          if (bodySource.contains('expir') || bodySource.contains('isbefore')) {
+            hasExpiryCheck = true;
+          }
+        }
+      }
+
+      // If has access token but no refresh logic, warn
+      if (hasAccessToken && !hasRefreshToken && !hasRefreshMethod) {
+        reporter.atToken(node.name, code);
+      }
+      if (hasAccessToken && !hasExpiryCheck) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when JWT is decoded on client for authorization decisions.
+///
+/// JWTs can be manipulated on the client. Never trust client-decoded
+/// JWT claims for authorization - always verify on the server.
+///
+/// **BAD:**
+/// ```dart
+/// final jwt = decodeJwt(token);
+/// if (jwt['role'] == 'admin') {
+///   showAdminPanel(); // User could modify JWT payload!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Verify role on server
+/// final response = await api.getUserRole(token);
+/// if (response.role == 'admin') {
+///   showAdminPanel();
+/// }
+/// ```
+class AvoidJwtDecodeClientRule extends SaropaLintRule {
+  const AvoidJwtDecodeClientRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_jwt_decode_client',
+    problemMessage:
+        'Decoding JWT on client for authorization is insecure.',
+    correctionMessage:
+        'Verify JWT claims on the server. Client-decoded JWTs can be manipulated.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name.toLowerCase();
+
+      // Check for JWT decode calls
+      if (!methodName.contains('decode') && !methodName.contains('parse')) {
+        return;
+      }
+
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource().toLowerCase();
+        if (!targetSource.contains('jwt') && !targetSource.contains('token')) {
+          return;
+        }
+      }
+
+      // Check if result is used for authorization decisions
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is IfStatement) {
+          final String condition = current.expression.toSource().toLowerCase();
+          if (condition.contains('role') ||
+              condition.contains('admin') ||
+              condition.contains('permission') ||
+              condition.contains('scope') ||
+              condition.contains('claim')) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+
+    // Also check for direct JWT library usage
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName =
+          node.constructorName.type.name.lexeme.toLowerCase();
+      if (typeName.contains('jwt') || typeName.contains('jsonwebtoken')) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when logout doesn't clear all sensitive data.
+///
+/// Logout must clear tokens, cached user data, and sensitive state.
+/// Incomplete cleanup leaves users vulnerable.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> logout() async {
+///   await api.logout();
+///   // Token still in storage! User data still cached!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> logout() async {
+///   await api.logout();
+///   await secureStorage.deleteAll();
+///   await cache.clear();
+///   _userController.add(null);
+///   _isLoggedIn = false;
+/// }
+/// ```
+class RequireLogoutCleanupRule extends SaropaLintRule {
+  const RequireLogoutCleanupRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'require_logout_cleanup',
+    problemMessage:
+        'Logout may not clear all sensitive data.',
+    correctionMessage:
+        'Ensure logout clears tokens, cached user data, and resets auth state.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final String methodName = node.name.lexeme.toLowerCase();
+
+      if (methodName != 'logout' &&
+          methodName != 'signout' &&
+          methodName != 'sign_out') {
+        return;
+      }
+
+      final String bodySource = node.body.toSource().toLowerCase();
+
+      // Check for cleanup operations
+      final bool clearsStorage = bodySource.contains('delete') ||
+          bodySource.contains('remove') ||
+          bodySource.contains('clear');
+
+      final bool clearsToken = bodySource.contains('token') ||
+          bodySource.contains('credential') ||
+          bodySource.contains('auth');
+
+      final bool clearsCache = bodySource.contains('cache') ||
+          bodySource.contains('storage');
+
+      // If logout method is too simple, warn
+      if (!clearsStorage || (!clearsToken && !clearsCache)) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when auth tokens are passed in query parameters.
+///
+/// Query parameters are logged in server access logs, browser history,
+/// and can leak through referrer headers. Use Authorization header instead.
+///
+/// **BAD:**
+/// ```dart
+/// final url = 'https://api.example.com/user?token=$accessToken';
+/// await http.get(Uri.parse(url));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await http.get(
+///   Uri.parse('https://api.example.com/user'),
+///   headers: {'Authorization': 'Bearer $accessToken'},
+/// );
+/// ```
+class AvoidAuthInQueryParamsRule extends SaropaLintRule {
+  const AvoidAuthInQueryParamsRule() : super(code: _code);
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_auth_in_query_params',
+    problemMessage:
+        'Auth token in query parameter is insecure. Use Authorization header.',
+    correctionMessage:
+        'Move token to Authorization header to prevent logging and leakage.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _tokenPatterns = <String>{
+    'token=',
+    'access_token=',
+    'auth_token=',
+    'api_key=',
+    'apikey=',
+    'secret=',
+    'password=',
+    'credential=',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final String fullString = node.toSource().toLowerCase();
+
+      for (final String pattern in _tokenPatterns) {
+        if (fullString.contains(pattern)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+
+    context.registry.addAdjacentStrings((AdjacentStrings node) {
+      final String fullString = node.toSource().toLowerCase();
+
+      for (final String pattern in _tokenPatterns) {
+        if (fullString.contains(pattern)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      // Check for string concatenation with token
+      if (node.operator.lexeme != '+') return;
+
+      final String fullExpr = node.toSource().toLowerCase();
+      for (final String pattern in _tokenPatterns) {
+        if (fullExpr.contains(pattern)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
