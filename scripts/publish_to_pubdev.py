@@ -68,7 +68,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.9"
+SCRIPT_VERSION = "3.10"
 
 
 # =============================================================================
@@ -672,16 +672,86 @@ def run_tests(project_dir: Path) -> bool:
 
 
 def run_format(project_dir: Path) -> bool:
-    """Run dart format to ensure consistent code style."""
+    """Run dart format and commit any changes to ensure CI won't fail."""
     print_header("STEP 5: FORMATTING CODE")
 
+    use_shell = get_shell_mode()
+
+    # On Windows, git autocrlf can mask formatting changes.
+    # Temporarily disable it to ensure dart format changes are detected.
+    if is_windows():
+        subprocess.run(
+            ["git", "config", "core.autocrlf", "false"],
+            cwd=project_dir,
+            capture_output=True,
+            shell=use_shell
+        )
+
+    # Run dart format
     result = run_command(
         ["dart", "format", "."],
         project_dir,
         "Formatting code"
     )
 
-    return result.returncode == 0
+    if result.returncode != 0:
+        # Restore autocrlf on failure
+        if is_windows():
+            subprocess.run(
+                ["git", "config", "core.autocrlf", "true"],
+                cwd=project_dir,
+                capture_output=True,
+                shell=use_shell
+            )
+        return False
+
+    # Check if there are formatting changes to commit
+    status_result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell
+    )
+
+    if status_result.stdout.strip():
+        # There are changes - commit them
+        print_info("Formatting changes detected, committing...")
+
+        # Stage all changes
+        subprocess.run(
+            ["git", "add", "-A"],
+            cwd=project_dir,
+            capture_output=True,
+            shell=use_shell
+        )
+
+        # Commit formatting changes
+        commit_result = subprocess.run(
+            ["git", "commit", "-m", "Apply dart format"],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell
+        )
+
+        if commit_result.returncode == 0:
+            print_success("Committed formatting changes")
+        else:
+            print_warning("Could not commit formatting changes (may already be formatted)")
+    else:
+        print_success("Code already properly formatted")
+
+    # Restore autocrlf on Windows
+    if is_windows():
+        subprocess.run(
+            ["git", "config", "core.autocrlf", "true"],
+            cwd=project_dir,
+            capture_output=True,
+            shell=use_shell
+        )
+
+    return True
 
 
 def run_analysis(project_dir: Path) -> bool:
