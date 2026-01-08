@@ -94,7 +94,8 @@ class ImpactTracker {
       };
 
   /// Get total violation count.
-  static int get total => _violations.values.fold(0, (sum, v) => sum + v.length);
+  static int get total =>
+      _violations.values.fold(0, (sum, v) => sum + v.length);
 
   /// Returns true if there are any critical violations.
   static bool get hasCritical => _violations[LintImpact.critical]!.isNotEmpty;

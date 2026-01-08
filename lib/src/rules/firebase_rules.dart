@@ -35,10 +35,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   const AvoidFirestoreUnboundedQueryRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_unbounded_query',
@@ -126,10 +126,10 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
 /// ```
 class AvoidDatabaseInBuildRule extends SaropaLintRule {
   const AvoidDatabaseInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_database_in_build',
@@ -233,10 +233,10 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequirePrefsKeyConstantsRule extends SaropaLintRule {
   const RequirePrefsKeyConstantsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_prefs_key_constants',
@@ -317,10 +317,10 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
 /// ```
 class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   const AvoidSecureStorageOnWebRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_secure_storage_on_web',
@@ -400,10 +400,10 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
 /// ```
 class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   const AvoidPrefsForLargeDataRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_prefs_for_large_data',
@@ -495,10 +495,10 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
 /// ```
 class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
   const RequireFirebaseInitBeforeUseRule() : super(code: _code);
+
   /// Each occurrence is a serious issue that should be fixed immediately.
   @override
   LintImpact get impact => LintImpact.critical;
-
 
   static const LintCode _code = LintCode(
     name: 'require_firebase_init_before_use',
