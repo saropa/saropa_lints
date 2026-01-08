@@ -76,6 +76,34 @@ The open source package is free. For teams that want hands-on help:
 | **Alpha Access** | Early access to new rules and features before public release |
 | **Priority Support** | Direct communication channel with the saropa_lints team |
 | **Custom Builds** | Private fork of saropa_lints tailored to your organization's standards |
+| **Tailored Lint Sets** | We create a curated lint configuration specific to your tech stack, compliance requirements, and team preferences |
+| **Sponsored Rules** | Fund development of new rules that get added to the public package — your organization gets recognition while the community benefits |
+
+### Project Assessments
+
+Not sure where to start? We assess your codebase and deliver a detailed report:
+
+- **Current state analysis** — How many issues, what categories, severity distribution
+- **Risk prioritization** — Which issues pose the greatest risk to stability, security, and maintainability
+- **Remediation roadmap** — Phased plan to resolve issues without disrupting feature development
+- **Estimated effort** — Scope of work if you want us to handle remediation
+
+Assessments are available as a standalone service or as the first step in a larger engagement.
+
+### Sponsor Rules for the Public Package
+
+Organizations can sponsor the development of specific lint rules. Sponsored rules are added to the public saropa_lints package, giving your organization visibility in the open source community while improving code quality for everyone. You choose the rule, we build and maintain it.
+
+### Tailored Lint Sets for Your Organization
+
+Every team has different needs. We create custom lint configurations that match your:
+
+- **Tech stack** — Firebase, GraphQL, specific state management solutions
+- **Compliance requirements** — HIPAA, PCI-DSS, GDPR-related patterns
+- **Architectural decisions** — Your specific layers, naming conventions, and boundaries
+- **Team preferences** — Severity levels, rule selections, and exceptions that fit your workflow
+
+Tailored lint sets can be delivered as a configuration file for the public package or as a private fork with custom rules baked in.
 
 ### Why Pay for Services?
 

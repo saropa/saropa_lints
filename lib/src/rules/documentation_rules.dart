@@ -37,6 +37,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequirePublicApiDocumentationRule extends SaropaLintRule {
   const RequirePublicApiDocumentationRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_public_api_documentation',
@@ -99,6 +103,10 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
 /// ```
 class AvoidMisleadingDocumentationRule extends SaropaLintRule {
   const AvoidMisleadingDocumentationRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_misleading_documentation',
@@ -157,6 +165,10 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
 /// ```
 class RequireDeprecationMessageRule extends SaropaLintRule {
   const RequireDeprecationMessageRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_deprecation_message',
@@ -227,6 +239,10 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
 /// ```
 class RequireComplexLogicCommentsRule extends SaropaLintRule {
   const RequireComplexLogicCommentsRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_complex_logic_comments',
@@ -294,6 +310,10 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
 /// ```
 class RequireParameterDocumentationRule extends SaropaLintRule {
   const RequireParameterDocumentationRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_parameter_documentation',
@@ -370,6 +390,10 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
 /// ```
 class RequireReturnDocumentationRule extends SaropaLintRule {
   const RequireReturnDocumentationRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_return_documentation',
@@ -435,6 +459,10 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
 /// ```
 class RequireExceptionDocumentationRule extends SaropaLintRule {
   const RequireExceptionDocumentationRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_exception_documentation',
@@ -499,6 +527,10 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
 /// ```
 class RequireExampleInDocumentationRule extends SaropaLintRule {
   const RequireExampleInDocumentationRule() : super(code: _code);
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
 
   static const LintCode _code = LintCode(
     name: 'require_example_in_documentation',

@@ -24,6 +24,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
   const AvoidAssignmentsAsConditionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_assignments_as_conditions',
@@ -110,6 +114,10 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for refactoring.
 class AvoidCollapsibleIfRule extends SaropaLintRule {
   const AvoidCollapsibleIfRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_collapsible_if',
@@ -202,6 +210,10 @@ class _AddHackForCollapsibleIfFix extends DartFix {
 /// **Quick fix available:** Simplifies `x == true` to `x`, `x == false` to `!x`, etc.
 class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
   const AvoidConditionsWithBooleanLiteralsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditions_with_boolean_literals',
@@ -318,6 +330,10 @@ class _SimplifyBooleanComparisonFix extends DartFix {
 /// ```
 class AvoidConstantAssertConditionsRule extends SaropaLintRule {
   const AvoidConstantAssertConditionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_constant_assert_conditions',
@@ -389,6 +405,10 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
 /// ```
 class AvoidConstantSwitchesRule extends SaropaLintRule {
   const AvoidConstantSwitchesRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_constant_switches',
@@ -446,6 +466,10 @@ class AvoidConstantSwitchesRule extends SaropaLintRule {
 /// ```
 class AvoidContinueRule extends SaropaLintRule {
   const AvoidContinueRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_continue',
@@ -483,6 +507,10 @@ class AvoidContinueRule extends SaropaLintRule {
 /// ```
 class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
   const AvoidDuplicateSwitchCaseConditionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_switch_case_conditions',
@@ -548,6 +576,10 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
 /// ```
 class AvoidIfWithManyBranchesRule extends SaropaLintRule {
   const AvoidIfWithManyBranchesRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_if_with_many_branches',
@@ -603,6 +635,10 @@ class AvoidIfWithManyBranchesRule extends SaropaLintRule {
 /// **Quick fix available:** Inverts the operator (e.g., `!(a > b)` → `a <= b`).
 class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
   const AvoidInvertedBooleanChecksRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_inverted_boolean_checks',
@@ -709,6 +745,10 @@ class _InvertOperatorFix extends DartFix {
 /// **Quick fix available:** Replaces `!x.isEmpty` with `x.isNotEmpty`.
 class AvoidNegatedConditionsRule extends SaropaLintRule {
   const AvoidNegatedConditionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_negated_conditions',
@@ -830,6 +870,10 @@ class _UsePositiveFormFix extends DartFix {
 /// ```
 class AvoidNestedAssignmentsRule extends SaropaLintRule {
   const AvoidNestedAssignmentsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_assignments',
@@ -869,6 +913,10 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
 /// statements or extracting logic into separate methods.
 class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
   const AvoidNestedConditionalExpressionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_conditional_expressions',
@@ -919,6 +967,10 @@ class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
 /// ```
 class AvoidNestedSwitchesRule extends SaropaLintRule {
   const AvoidNestedSwitchesRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switches',
@@ -982,6 +1034,10 @@ class AvoidNestedSwitchesRule extends SaropaLintRule {
 /// ```
 class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
   const AvoidNestedSwitchExpressionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switch_expressions',
@@ -1028,6 +1084,10 @@ class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
 /// ```
 class AvoidNestedTryRule extends SaropaLintRule {
   const AvoidNestedTryRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try',
@@ -1149,6 +1209,10 @@ class AvoidRedundantElseRule extends SaropaLintRule {
 /// ```
 class AvoidUnconditionalBreakRule extends SaropaLintRule {
   const AvoidUnconditionalBreakRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_unconditional_break',
@@ -1221,6 +1285,10 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
   const AvoidUnnecessaryConditionalsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_conditionals',
@@ -1354,6 +1422,10 @@ class _CommentOutUnnecessaryContinueFix extends DartFix {
 /// Warns on patterns like if (condition) return true; return false;
 class AvoidUnnecessaryIfRule extends SaropaLintRule {
   const AvoidUnnecessaryIfRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_if',
@@ -1433,6 +1505,10 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
 /// ```
 class NoEqualConditionsRule extends SaropaLintRule {
   const NoEqualConditionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'no_equal_conditions',
@@ -1495,6 +1571,10 @@ class NoEqualConditionsRule extends SaropaLintRule {
 /// ```
 class NoEqualThenElseRule extends SaropaLintRule {
   const NoEqualThenElseRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'no_equal_then_else',
@@ -1540,6 +1620,10 @@ class NoEqualThenElseRule extends SaropaLintRule {
 /// values can often be replaced with a ternary operator.
 class PreferConditionalExpressionsRule extends SaropaLintRule {
   const PreferConditionalExpressionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_conditional_expressions',
@@ -1615,6 +1699,10 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
 /// ```
 class PreferCorrectSwitchLengthRule extends SaropaLintRule {
   const PreferCorrectSwitchLengthRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const int _minCases = 2;
 
@@ -1666,6 +1754,10 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
 /// ```
 class PreferEarlyReturnRule extends SaropaLintRule {
   const PreferEarlyReturnRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
@@ -1737,6 +1829,10 @@ class PreferEarlyReturnRule extends SaropaLintRule {
 /// ```
 class PreferReturningConditionalsRule extends SaropaLintRule {
   const PreferReturningConditionalsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditionals',
@@ -1826,6 +1922,10 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
 /// ```
 class PreferReturningConditionRule extends SaropaLintRule {
   const PreferReturningConditionRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_condition',

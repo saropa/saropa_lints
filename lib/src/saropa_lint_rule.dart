@@ -8,6 +8,172 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'ignore_utils.dart';
 
+/// Impact classification for lint rules.
+///
+/// Helps teams understand the practical severity of violations:
+/// - [critical]: Each occurrence is a serious bug. Even 1-2 is unacceptable.
+/// - [high]: Significant issues. 10+ should trigger immediate action.
+/// - [medium]: Quality issues. 100+ suggests technical debt.
+/// - [low]: Style/consistency. Large numbers are acceptable in legacy code.
+enum LintImpact {
+  /// Each occurrence is independently harmful. Memory leaks, security holes,
+  /// crashes. Even 1-2 in production code is unacceptable.
+  ///
+  /// Examples: undisposed controllers, hardcoded credentials, null crashes
+  critical,
+
+  /// Significant issues that compound. A handful is manageable, but 10+
+  /// indicates systemic problems requiring immediate attention.
+  ///
+  /// Examples: missing accessibility labels, performance anti-patterns
+  high,
+
+  /// Code quality issues. Individual instances are minor, but 100+ suggests
+  /// accumulated technical debt worth addressing.
+  ///
+  /// Examples: missing error handling, complex conditionals, code duplication
+  medium,
+
+  /// Style and consistency issues. Large counts are normal in legacy codebases.
+  /// Focus enforcement on new code; address existing violations opportunistically.
+  ///
+  /// Examples: naming conventions, hardcoded strings, missing documentation
+  low,
+}
+
+/// Tracks lint violations by impact level for summary reporting.
+///
+/// Usage:
+/// ```dart
+/// // After running analysis:
+/// print(ImpactTracker.summary);
+/// // Output: "Critical: 3, High: 12, Medium: 156, Low: 892"
+///
+/// // Get detailed breakdown:
+/// final violations = ImpactTracker.violations;
+/// for (final v in violations[LintImpact.critical]!) {
+///   print('${v.file}:${v.line} - ${v.rule}');
+/// }
+/// ```
+class ImpactTracker {
+  ImpactTracker._();
+
+  static final Map<LintImpact, List<ViolationRecord>> _violations = {
+    LintImpact.critical: [],
+    LintImpact.high: [],
+    LintImpact.medium: [],
+    LintImpact.low: [],
+  };
+
+  /// Record a violation.
+  static void record({
+    required LintImpact impact,
+    required String rule,
+    required String file,
+    required int line,
+    required String message,
+  }) {
+    _violations[impact]!.add(ViolationRecord(
+      rule: rule,
+      file: file,
+      line: line,
+      message: message,
+    ));
+  }
+
+  /// Get all violations grouped by impact.
+  static Map<LintImpact, List<ViolationRecord>> get violations =>
+      Map.unmodifiable(_violations);
+
+  /// Get count of violations by impact level.
+  static Map<LintImpact, int> get counts => {
+        LintImpact.critical: _violations[LintImpact.critical]!.length,
+        LintImpact.high: _violations[LintImpact.high]!.length,
+        LintImpact.medium: _violations[LintImpact.medium]!.length,
+        LintImpact.low: _violations[LintImpact.low]!.length,
+      };
+
+  /// Get total violation count.
+  static int get total => _violations.values.fold(0, (sum, v) => sum + v.length);
+
+  /// Returns true if there are any critical violations.
+  static bool get hasCritical => _violations[LintImpact.critical]!.isNotEmpty;
+
+  /// Get a summary string suitable for display.
+  ///
+  /// Format: "Critical: 3, High: 12, Medium: 156, Low: 892"
+  static String get summary {
+    final c = counts;
+    return 'Critical: ${c[LintImpact.critical]}, '
+        'High: ${c[LintImpact.high]}, '
+        'Medium: ${c[LintImpact.medium]}, '
+        'Low: ${c[LintImpact.low]}';
+  }
+
+  /// Get a detailed summary with guidance.
+  static String get detailedSummary {
+    final c = counts;
+    final buffer = StringBuffer();
+
+    buffer.writeln('');
+    buffer.writeln('Impact Summary');
+    buffer.writeln('==============');
+
+    if (c[LintImpact.critical]! > 0) {
+      buffer.writeln('CRITICAL: ${c[LintImpact.critical]} (fix immediately!)');
+    }
+    if (c[LintImpact.high]! > 0) {
+      buffer.writeln('HIGH:     ${c[LintImpact.high]} (address soon)');
+    }
+    if (c[LintImpact.medium]! > 0) {
+      buffer.writeln('MEDIUM:   ${c[LintImpact.medium]} (tech debt)');
+    }
+    if (c[LintImpact.low]! > 0) {
+      buffer.writeln('LOW:      ${c[LintImpact.low]} (style)');
+    }
+
+    if (total == 0) {
+      buffer.writeln('No issues found.');
+    }
+
+    return buffer.toString();
+  }
+
+  /// Get violations sorted by impact (critical first).
+  static List<ViolationRecord> get sortedViolations {
+    final result = <ViolationRecord>[];
+    for (final impact in LintImpact.values) {
+      result.addAll(_violations[impact]!);
+    }
+    return result;
+  }
+
+  /// Clear all tracked violations (useful between analysis runs).
+  static void reset() {
+    for (final list in _violations.values) {
+      list.clear();
+    }
+  }
+}
+
+/// A recorded lint violation with location and metadata.
+class ViolationRecord {
+  const ViolationRecord({
+    required this.rule,
+    required this.file,
+    required this.line,
+    required this.message,
+  });
+
+  final String rule;
+  final String file;
+  final int line;
+  final String message;
+
+  @override
+  String toString() => '$file:$line - $rule: $message';
+}
+
 /// Base class for Saropa lint rules with enhanced features:
 ///
 /// 1. **Hyphenated ignore comments**: Supports both `// ignore: no_empty_block`
@@ -46,6 +212,21 @@ import 'ignore_utils.dart';
 /// ```
 abstract class SaropaLintRule extends DartLintRule {
   const SaropaLintRule({required super.code});
+
+  // ============================================================
+  // Impact Classification
+  // ============================================================
+
+  /// The business impact of this rule's violations.
+  ///
+  /// Override to specify the impact level for your rule:
+  /// - [LintImpact.critical]: Even 1-2 occurrences is serious (memory leaks, security)
+  /// - [LintImpact.high]: 10+ requires immediate action (accessibility, performance)
+  /// - [LintImpact.medium]: 100+ indicates tech debt (error handling, complexity)
+  /// - [LintImpact.low]: Large counts acceptable (style, naming conventions)
+  ///
+  /// Default: [LintImpact.medium]
+  LintImpact get impact => LintImpact.medium;
 
   // ============================================================
   // Context-Aware Auto-Suppression (#2)
@@ -190,10 +371,12 @@ abstract class SaropaLintRule extends DartLintRule {
     final path = resolver.source.fullName;
     if (_shouldSkipFile(path)) return;
 
-    // Create wrapped reporter with severity override support
+    // Create wrapped reporter with severity override and impact tracking
     final wrappedReporter = SaropaDiagnosticReporter(
       reporter,
       code.name,
+      filePath: path,
+      impact: impact,
       severityOverride: severityOverrides?[code.name],
     );
 
@@ -213,8 +396,8 @@ abstract class SaropaLintRule extends DartLintRule {
   );
 }
 
-/// A diagnostic reporter that checks for hyphenated ignore comments
-/// and supports severity overrides.
+/// A diagnostic reporter that checks for hyphenated ignore comments,
+/// supports severity overrides, and tracks violations by impact level.
 ///
 /// Wraps a [DiagnosticReporter] and intercepts [atNode] calls to check
 /// for ignore comments in both underscore and hyphen formats.
@@ -222,11 +405,15 @@ class SaropaDiagnosticReporter {
   SaropaDiagnosticReporter(
     this._delegate,
     this._ruleName, {
+    required this.filePath,
+    required this.impact,
     this.severityOverride,
   });
 
   final DiagnosticReporter _delegate;
   final String _ruleName;
+  final String filePath;
+  final LintImpact impact;
 
   /// Optional severity override for this rule.
   final DiagnosticSeverity? severityOverride;
@@ -253,6 +440,10 @@ class SaropaDiagnosticReporter {
     if (IgnoreUtils.hasIgnoreComment(node, _ruleName)) {
       return;
     }
+
+    // Track the violation by impact level
+    _trackViolation(code, _getLineNumber(node.offset, node));
+
     _delegate.atNode(node, _applyOverride(code));
   }
 
@@ -262,6 +453,10 @@ class SaropaDiagnosticReporter {
     if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
       return;
     }
+
+    // Track the violation by impact level
+    _trackViolation(code, 0); // Token doesn't have easy line access
+
     _delegate.atToken(token, _applyOverride(code));
   }
 
@@ -274,6 +469,9 @@ class SaropaDiagnosticReporter {
     required int length,
     required LintCode errorCode,
   }) {
+    // Track the violation by impact level
+    _trackViolation(errorCode, 0);
+
     // Cannot easily check for ignore comments with just offset/length
     // Delegate directly to the underlying reporter
     _delegate.atOffset(
@@ -281,5 +479,30 @@ class SaropaDiagnosticReporter {
       length: length,
       diagnosticCode: _applyOverride(errorCode),
     );
+  }
+
+  /// Track a violation in the ImpactTracker.
+  void _trackViolation(LintCode code, int line) {
+    ImpactTracker.record(
+      impact: impact,
+      rule: _ruleName,
+      file: filePath,
+      line: line,
+      message: code.problemMessage,
+    );
+  }
+
+  /// Get approximate line number from an AST node.
+  int _getLineNumber(int offset, AstNode node) {
+    // Try to get line info from the node's root
+    try {
+      final root = node.root;
+      if (root is CompilationUnit) {
+        return root.lineInfo.getLocation(offset).lineNumber;
+      }
+    } catch (_) {
+      // Fall back to 0 if we can't determine the line
+    }
+    return 0;
   }
 }

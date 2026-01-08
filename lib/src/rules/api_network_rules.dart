@@ -33,6 +33,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireHttpStatusCheckRule extends SaropaLintRule {
   const RequireHttpStatusCheckRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_http_status_check',
@@ -90,6 +94,10 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
 /// ```
 class RequireApiTimeoutRule extends SaropaLintRule {
   const RequireApiTimeoutRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_api_timeout',
@@ -177,6 +185,10 @@ class RequireApiTimeoutRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   const AvoidHardcodedApiUrlsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_api_urls',
@@ -238,6 +250,10 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 /// ```
 class RequireRetryLogicRule extends SaropaLintRule {
   const RequireRetryLogicRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
@@ -303,6 +319,10 @@ class RequireRetryLogicRule extends SaropaLintRule {
 /// ```
 class RequireTypedApiResponseRule extends SaropaLintRule {
   const RequireTypedApiResponseRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_typed_api_response',
@@ -392,6 +412,10 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
 /// ```
 class RequireConnectivityCheckRule extends SaropaLintRule {
   const RequireConnectivityCheckRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_connectivity_check',
@@ -464,6 +488,10 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
 /// ```
 class RequireApiErrorMappingRule extends SaropaLintRule {
   const RequireApiErrorMappingRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_api_error_mapping',
@@ -537,6 +565,10 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
 /// ```
 class RequireRequestTimeoutRule extends SaropaLintRule {
   const RequireRequestTimeoutRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_request_timeout',
@@ -665,6 +697,10 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 /// ```
 class RequireOfflineIndicatorRule extends SaropaLintRule {
   const RequireOfflineIndicatorRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_offline_indicator',
@@ -715,6 +751,148 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
 
       if (!hasUiFeedback) {
         reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when large file downloads don't use streaming.
+///
+/// Large downloads should stream to disk instead of buffering in memory.
+/// Loading large files entirely into memory can cause out-of-memory crashes.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(Uri.parse(largeFileUrl));
+/// final bytes = response.bodyBytes; // Entire file in memory!
+/// await file.writeAsBytes(bytes);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final request = http.Request('GET', Uri.parse(largeFileUrl));
+/// final response = await client.send(request);
+/// final file = File(path);
+/// await response.stream.pipe(file.openWrite()); // Streams to disk
+/// ```
+class PreferStreamingResponseRule extends SaropaLintRule {
+  const PreferStreamingResponseRule() : super(code: _code);
+
+  /// Large file downloads without streaming can cause OOM crashes.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_streaming_response',
+    problemMessage:
+        'Large download uses bodyBytes. Consider streaming for large files.',
+    correctionMessage:
+        'Use client.send() with StreamedResponse and pipe to file.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      final String propertyName = node.propertyName.name;
+
+      // Check for bodyBytes access which loads entire response into memory
+      if (propertyName != 'bodyBytes' && propertyName != 'body') {
+        return;
+      }
+
+      // Check if target looks like an HTTP response
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('response') &&
+          !targetSource.contains('http') &&
+          !targetSource.contains('dio')) {
+        return;
+      }
+
+      // Check if this is likely a large file context
+      // Look for file-related operations nearby
+      AstNode? current = node.parent;
+      int depth = 0;
+      bool isFileContext = false;
+
+      while (current != null && depth < 10) {
+        final String source = current.toSource();
+        if (source.contains('writeAsBytes') ||
+            source.contains('writeAsBytesSync') ||
+            source.contains('.pdf') ||
+            source.contains('.zip') ||
+            source.contains('.mp4') ||
+            source.contains('.mp3') ||
+            source.contains('.png') ||
+            source.contains('.jpg') ||
+            source.contains('.jpeg') ||
+            source.contains('download') ||
+            source.contains('Download') ||
+            source.contains('file')) {
+          isFileContext = true;
+          break;
+        }
+        current = current.parent;
+        depth++;
+      }
+
+      if (isFileContext) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Also check for dio's response.data in file context
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for dio download without streaming
+      if (methodName != 'get' && methodName != 'download') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('dio') && !targetSource.contains('http')) {
+        return;
+      }
+
+      // Check for responseType configuration
+      final String nodeSource = node.toSource();
+      if (nodeSource.contains('ResponseType.stream') ||
+          nodeSource.contains('responseType: ResponseType.bytes')) {
+        return; // Already using streaming or explicit bytes
+      }
+
+      // Check if downloading to file
+      if (nodeSource.contains('.pdf') ||
+          nodeSource.contains('.zip') ||
+          nodeSource.contains('.mp4') ||
+          nodeSource.contains('download')) {
+        // Check parent context for file operations
+        AstNode? current = node.parent;
+        int depth = 0;
+
+        while (current != null && depth < 5) {
+          final String source = current.toSource();
+          if (source.contains('writeAsBytes') ||
+              source.contains('File(') ||
+              source.contains('savePath')) {
+            // If not using streaming response type, warn
+            if (!nodeSource.contains('ResponseType.stream')) {
+              reporter.atNode(node.methodName, code);
+            }
+            break;
+          }
+          current = current.parent;
+          depth++;
+        }
       }
     });
   }

@@ -47,6 +47,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireKeysInAnimatedListsRule extends SaropaLintRule {
   const RequireKeysInAnimatedListsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_keys_in_animated_lists',
@@ -191,6 +195,10 @@ class _ReturnVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidExpensiveBuildRule extends SaropaLintRule {
   const AvoidExpensiveBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_build',
@@ -300,6 +308,10 @@ class _ExpensiveOperationVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferConstChildWidgetsRule extends SaropaLintRule {
   const PreferConstChildWidgetsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_child_widgets',
@@ -407,6 +419,10 @@ class PreferConstChildWidgetsRule extends SaropaLintRule {
 /// ```
 class AvoidSynchronousFileIoRule extends SaropaLintRule {
   const AvoidSynchronousFileIoRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_synchronous_file_io',
@@ -460,6 +476,10 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
 /// ```
 class PreferComputeForHeavyWorkRule extends SaropaLintRule {
   const PreferComputeForHeavyWorkRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_compute_for_heavy_work',
@@ -544,6 +564,10 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
 /// ```
 class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
   const AvoidObjectCreationInHotLoopsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_object_creation_in_hot_loops',
@@ -644,6 +668,10 @@ class _CreationInLoopVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferCachedGetterRule extends SaropaLintRule {
   const PreferCachedGetterRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_getter',
@@ -730,6 +758,10 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
   const AvoidExcessiveWidgetDepthRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_widget_depth',
@@ -814,6 +846,10 @@ class _DepthVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireItemExtentForLargeListsRule extends SaropaLintRule {
   const RequireItemExtentForLargeListsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_item_extent_for_large_lists',
@@ -892,6 +928,10 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
 /// ```
 class RequireImageCacheDimensionsRule extends SaropaLintRule {
   const RequireImageCacheDimensionsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_image_cache_dimensions',
@@ -952,6 +992,10 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
 /// ```
 class PreferImagePrecacheRule extends SaropaLintRule {
   const PreferImagePrecacheRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_image_precache',
@@ -1029,6 +1073,10 @@ class PreferImagePrecacheRule extends SaropaLintRule {
 /// ```
 class AvoidControllerInBuildRule extends SaropaLintRule {
   const AvoidControllerInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_controller_in_build',
@@ -1112,6 +1160,10 @@ class _ControllerCreationVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidSetStateInBuildRule extends SaropaLintRule {
   const AvoidSetStateInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_setstate_in_build',
@@ -1227,6 +1279,10 @@ class _SetStateVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidStringConcatenationLoopRule extends SaropaLintRule {
   const AvoidStringConcatenationLoopRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_loop',
@@ -1343,6 +1399,10 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
 /// ```
 class AvoidScrollListenerInBuildRule extends SaropaLintRule {
   const AvoidScrollListenerInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_scroll_listener_in_build',
@@ -1412,6 +1472,10 @@ class _AddListenerVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferValueListenableBuilderRule extends SaropaLintRule {
   const PreferValueListenableBuilderRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_value_listenable_builder',
@@ -1505,6 +1569,10 @@ class _SetStateCounterVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
   const AvoidGlobalKeyMisuseRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_misuse',
@@ -1595,6 +1663,10 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
 /// ```
 class RequireRepaintBoundaryRule extends SaropaLintRule {
   const RequireRepaintBoundaryRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_repaint_boundary',
@@ -1703,6 +1775,10 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
 /// ```
 class AvoidTextSpanInBuildRule extends SaropaLintRule {
   const AvoidTextSpanInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
@@ -1776,6 +1852,10 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidLargeListCopyRule extends SaropaLintRule {
   const AvoidLargeListCopyRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_list_copy',
@@ -1848,6 +1928,10 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 /// ```
 class PreferConstWidgetsRule extends SaropaLintRule {
   const PreferConstWidgetsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets',
@@ -1934,6 +2018,10 @@ class PreferConstWidgetsRule extends SaropaLintRule {
 /// ```
 class AvoidExpensiveComputationInBuildRule extends SaropaLintRule {
   const AvoidExpensiveComputationInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_computation_in_build',
@@ -2007,6 +2095,10 @@ class _ExpensiveMethodVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
   const AvoidWidgetCreationInLoopRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_widget_creation_in_loop',
@@ -2172,6 +2264,10 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidCallingOfInBuildRule extends SaropaLintRule {
   const AvoidCallingOfInBuildRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_calling_of_in_build',
@@ -2262,6 +2358,10 @@ class _OfCallVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireImageCacheManagementRule extends SaropaLintRule {
   const RequireImageCacheManagementRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'require_image_cache_management',
@@ -2325,6 +2425,10 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
 /// ```
 class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
   const AvoidMemoryIntensiveOperationsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_memory_intensive_operations',
@@ -2413,6 +2517,10 @@ class _StringConcatVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidClosureMemoryLeakRule extends SaropaLintRule {
   const AvoidClosureMemoryLeakRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_closure_memory_leak',
@@ -2482,6 +2590,10 @@ class _StreamListenVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferStaticConstWidgetsRule extends SaropaLintRule {
   const PreferStaticConstWidgetsRule() : super(code: _code);
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_static_const_widgets',
@@ -2599,5 +2711,346 @@ class RequireDisposePatternRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+}
+
+// ============================================================================
+// Batch 17: Additional Performance Rules
+// ============================================================================
+
+/// Warns when list is grown dynamically instead of preallocated.
+///
+/// Growing a list dynamically with add() in a loop causes multiple
+/// reallocations. Preallocate with List.filled() or List.generate().
+///
+/// **BAD:**
+/// ```dart
+/// final List<int> squares = [];
+/// for (int i = 0; i < 10000; i++) {
+///   squares.add(i * i); // Multiple reallocations!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final List<int> squares = List.generate(10000, (i) => i * i);
+/// // Or:
+/// final List<int> squares = List.filled(10000, 0);
+/// for (int i = 0; i < 10000; i++) {
+///   squares[i] = i * i;
+/// }
+/// ```
+class RequireListPreallocateRule extends SaropaLintRule {
+  const RequireListPreallocateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_list_preallocate',
+    problemMessage:
+        'List.add() in loop causes O(n) reallocations. Consider preallocating.',
+    correctionMessage:
+        'Use List.generate(), List.filled(), or growable: false with initial size.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'add') return;
+
+      // Check if inside a loop
+      if (!_isInsideLoop(node)) return;
+
+      // Check if target looks like a list variable
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+
+      // Heuristic: Check if the list was declared empty
+      // We look for patterns like `final list = <Type>[]` or `List<T>()`
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionBody || current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (current == null) return;
+
+      // Search for the variable declaration
+      final String listName = target.name;
+      final _EmptyListFinder finder = _EmptyListFinder(listName);
+      current.visitChildren(finder);
+
+      if (finder.foundEmptyList) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideLoop(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ForStatement ||
+          current is ForElement ||
+          current is WhileStatement ||
+          current is DoStatement) {
+        return true;
+      }
+      // Check for .forEach, .map, etc.
+      if (current is MethodInvocation) {
+        final String name = current.methodName.name;
+        if (name == 'forEach') {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+class _EmptyListFinder extends RecursiveAstVisitor<void> {
+  _EmptyListFinder(this.targetName);
+
+  final String targetName;
+  bool foundEmptyList = false;
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    if (node.name.lexeme != targetName) {
+      super.visitVariableDeclaration(node);
+      return;
+    }
+
+    final Expression? init = node.initializer;
+    if (init == null) {
+      super.visitVariableDeclaration(node);
+      return;
+    }
+
+    final String initSource = init.toSource();
+    // Check for empty list patterns: [], <Type>[], List(), List<T>()
+    if (initSource == '[]' ||
+        initSource.endsWith('[]') ||
+        initSource == 'List()' ||
+        RegExp(r'List<\w+>\(\)').hasMatch(initSource)) {
+      foundEmptyList = true;
+    }
+
+    super.visitVariableDeclaration(node);
+  }
+}
+
+/// Suggests using if/return instead of ternary for expensive widgets.
+///
+/// While ternary expressions only return one branch, complex widget
+/// constructors in both branches can make the code harder to read.
+/// Consider using early return for cleaner code with expensive widgets.
+///
+/// **OK but verbose:**
+/// ```dart
+/// Widget build(context) {
+///   return isLoading
+///     ? CircularProgressIndicator()
+///     : ListView.builder(...); // Complex widget in ternary
+/// }
+/// ```
+///
+/// **Better - cleaner with early return:**
+/// ```dart
+/// Widget build(context) {
+///   if (isLoading) return CircularProgressIndicator();
+///   return ListView.builder(...);
+/// }
+/// ```
+class PreferBuilderForConditionalRule extends SaropaLintRule {
+  const PreferBuilderForConditionalRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_builder_for_conditional',
+    problemMessage:
+        'Complex widget in ternary conditional. Consider if/return for readability.',
+    correctionMessage:
+        'Use if/return pattern for cleaner code: if (cond) return A(); return B();',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Widget types that are expensive to create
+  static const Set<String> _expensiveWidgets = <String>{
+    'ListView',
+    'GridView',
+    'DataTable',
+    'CustomScrollView',
+    'PageView',
+    'TabBarView',
+    'ExpansionPanelList',
+    'Stepper',
+    'ReorderableListView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addConditionalExpression((ConditionalExpression node) {
+      // Check if inside a build method
+      final MethodDeclaration? method =
+          node.thisOrAncestorOfType<MethodDeclaration>();
+      if (method == null || method.name.lexeme != 'build') return;
+
+      // Check thenExpression and elseExpression for expensive widgets
+      _checkExpressionForExpensiveWidget(node.thenExpression, reporter);
+      _checkExpressionForExpensiveWidget(node.elseExpression, reporter);
+    });
+  }
+
+  void _checkExpressionForExpensiveWidget(
+    Expression expr,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (expr is InstanceCreationExpression) {
+      final String typeName = expr.constructorName.type.name.lexeme;
+      if (_expensiveWidgets.contains(typeName)) {
+        // Check if already wrapped in Builder
+        final AstNode? parent = expr.parent;
+        if (parent is NamedExpression && parent.name.label.name == 'builder') {
+          return; // Already using Builder pattern
+        }
+        reporter.atNode(expr.constructorName, code);
+      }
+    }
+  }
+}
+
+/// Warns when widgets in lists don't have consistent key strategy.
+///
+/// Keys help Flutter efficiently update widget trees. Without keys or with
+/// inconsistent keys, Flutter may rebuild more than necessary.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) {
+///     // Sometimes uses key, sometimes doesn't
+///     if (items[index].important) {
+///       return ImportantItem(key: ValueKey(items[index].id));
+///     }
+///     return NormalItem(); // No key!
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) {
+///     final item = items[index];
+///     return item.important
+///       ? ImportantItem(key: ValueKey(item.id), item: item)
+///       : NormalItem(key: ValueKey(item.id), item: item);
+///   },
+/// )
+/// ```
+class RequireWidgetKeyStrategyRule extends SaropaLintRule {
+  const RequireWidgetKeyStrategyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_widget_key_strategy',
+    problemMessage:
+        'Inconsistent key usage in itemBuilder - some returns have keys, others do not.',
+    correctionMessage:
+        'Apply consistent key strategy: either all items have keys or none do.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Widget types that use itemBuilder pattern
+  static const Set<String> _builderWidgets = <String>{
+    'ListView',
+    'GridView',
+    'SliverList',
+    'SliverGrid',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_builderWidgets.contains(typeName)) return;
+
+      // Find itemBuilder argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
+          final Expression builderExpr = arg.expression;
+          if (builderExpr is FunctionExpression) {
+            _checkBuilderForConsistentKeys(
+              builderExpr.body,
+              reporter,
+              node.constructorName,
+            );
+          }
+        }
+      }
+    });
+  }
+
+  void _checkBuilderForConsistentKeys(
+    FunctionBody body,
+    SaropaDiagnosticReporter reporter,
+    AstNode reportNode,
+  ) {
+    // Collect all return statements and check for key consistency
+    final _KeyConsistencyVisitor visitor = _KeyConsistencyVisitor();
+    body.visitChildren(visitor);
+
+    // If we have mixed key usage, report
+    if (visitor.hasKeyedReturn && visitor.hasUnkeyedReturn) {
+      reporter.atNode(reportNode, code);
+    }
+  }
+}
+
+class _KeyConsistencyVisitor extends RecursiveAstVisitor<void> {
+  bool hasKeyedReturn = false;
+  bool hasUnkeyedReturn = false;
+
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    final Expression? expr = node.expression;
+    if (expr is InstanceCreationExpression) {
+      final bool hasKey = expr.argumentList.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'key';
+        }
+        return false;
+      });
+
+      if (hasKey) {
+        hasKeyedReturn = true;
+      } else {
+        hasUnkeyedReturn = true;
+      }
+    }
+    super.visitReturnStatement(node);
   }
 }

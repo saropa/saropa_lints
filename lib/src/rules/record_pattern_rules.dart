@@ -26,6 +26,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   const AvoidBottomTypeInPatternsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_patterns',
@@ -76,6 +80,10 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
 /// ```
 class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
   const AvoidBottomTypeInRecordsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_records',
@@ -141,6 +149,10 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
 /// ```
 class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
   const AvoidExplicitPatternFieldNameRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_explicit_pattern_field_name',
@@ -237,6 +249,10 @@ class _UseShorthandPatternFieldFix extends DartFix {
 /// ```
 class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
   const AvoidExtensionsOnRecordsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_extensions_on_records',
@@ -282,6 +298,10 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
 /// ```
 class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
   const AvoidFunctionTypeInRecordsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_function_type_in_records',
@@ -333,6 +353,10 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
 /// ```
 class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
   const AvoidKeywordsInWildcardPatternRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_keywords_in_wildcard_pattern',
@@ -435,6 +459,10 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
 /// Default maximum: 5 fields
 class AvoidLongRecordsRule extends SaropaLintRule {
   const AvoidLongRecordsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const int _maxFields = 5;
 
@@ -489,6 +517,10 @@ class AvoidLongRecordsRule extends SaropaLintRule {
 /// ```
 class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
   const AvoidMixingNamedAndPositionalFieldsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_mixing_named_and_positional_fields',
@@ -547,6 +579,10 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
 /// ```
 class AvoidNestedRecordsRule extends SaropaLintRule {
   const AvoidNestedRecordsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_records',
@@ -598,6 +634,10 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
 /// ```
 class AvoidOneFieldRecordsRule extends SaropaLintRule {
   const AvoidOneFieldRecordsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_one_field_records',
@@ -680,6 +720,10 @@ class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
 /// ```
 class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
   const AvoidRedundantPositionalFieldNameRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_positional_field_name',
@@ -730,6 +774,10 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
 /// ```
 class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
   const AvoidSingleFieldDestructuringRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_single_field_destructuring',
@@ -784,6 +832,10 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
 /// ```
 class MoveRecordsToTypedefsRule extends SaropaLintRule {
   const MoveRecordsToTypedefsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const int _maxInlineFields = 3;
 
@@ -893,6 +945,10 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
 /// ```
 class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
   const PreferSimplerPatternsNullCheckRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_patterns_null_check',
@@ -940,6 +996,10 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
 /// ```
 class PreferWildcardPatternRule extends SaropaLintRule {
   const PreferWildcardPatternRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_pattern',
@@ -990,6 +1050,10 @@ class PreferWildcardPatternRule extends SaropaLintRule {
 /// ```
 class RecordFieldsOrderingRule extends SaropaLintRule {
   const RecordFieldsOrderingRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_record_fields',

@@ -4,32 +4,6 @@
 
 See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 1000 rules.
 
-### Recently Implemented (v1.7.0) - 50 Rules
-
-The following rules from this roadmap have been implemented:
-
-**State Management (Riverpod/Bloc):**
-- `avoid_ref_in_dispose`, `require_provider_scope`, `prefer_select_for_partial`, `avoid_provider_in_widget`, `prefer_family_for_params`
-- `avoid_bloc_event_mutation`, `prefer_copy_with_for_state`, `avoid_bloc_listen_in_build`, `require_initial_state`, `require_error_state`, `avoid_bloc_in_bloc`, `prefer_sealed_events`
-
-**Performance:**
-- `avoid_scroll_listener_in_build`, `prefer_value_listenable_builder`, `avoid_global_key_misuse`, `require_repaint_boundary`, `avoid_text_span_in_build`
-- `prefer_const_widgets`, `avoid_expensive_computation_in_build`, `avoid_widget_creation_in_loop`, `require_build_context_scope`, `avoid_calling_of_in_build`
-- `require_image_cache_management`, `avoid_memory_intensive_operations`, `avoid_closure_memory_leak`, `prefer_static_const_widgets`, `require_dispose_pattern`
-
-**Testing:**
-- `avoid_test_coupling`, `require_test_isolation`, `avoid_real_dependencies_in_tests`, `require_scroll_tests`, `require_text_input_tests`
-
-**Navigation:**
-- `avoid_navigator_push_unnamed`, `require_route_guards`, `avoid_circular_redirects`, `avoid_pop_without_result`, `prefer_shell_route_for_persistent_ui`
-
-**Security:**
-- `require_auth_check`, `require_token_refresh`, `avoid_jwt_decode_client`, `require_logout_cleanup`, `avoid_auth_in_query_params`
-
-**Forms:**
-- `require_form_key`, `avoid_validation_in_build`, `require_submit_button_state`, `avoid_form_without_unfocus`
-- `require_form_restoration`, `avoid_clearing_form_on_error`, `require_form_field_controller`, `avoid_form_in_alert_dialog`
-
 ---
 
 ## Part 1: Detailed Rule Specifications
@@ -62,24 +36,16 @@ The following rules from this roadmap have been implemented:
 
 #### Input & Interaction
 
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `avoid_absorb_pointer_misuse` | Professional | WARNING | AbsorbPointer blocks ALL touch events including scrolling. Often IgnorePointer (which allows events to pass through) is the correct choice. |
-
 ### 1.2 State Management
 
 #### Riverpod Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_ref_watch_over_read` | Recommended | INFO | `ref.read` doesn't subscribe to changes - widget won't rebuild when provider updates. Use `ref.watch` in build methods for reactive updates. |
 | `require_riverpod_override_in_tests` | Professional | INFO | Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
 | `avoid_provider_recreate` | Essential | WARNING | Creating providers inside build() creates new instances every rebuild, losing state. Define providers as top-level final variables. |
 | `prefer_family_for_params` | Professional | INFO | Providers that need parameters should use `.family` modifier instead of passing params through other means, enabling proper caching per parameter. |
 | `require_auto_dispose` | Recommended | INFO | Providers without autoDispose keep state forever, even when no longer used. Add autoDispose to free resources when all listeners are removed. |
-| `avoid_circular_provider_deps` | Essential | ERROR | Provider A depending on Provider B which depends on Provider A causes stack overflow or infinite loops at runtime. |
-| `prefer_notifier_over_state` | Professional | INFO | StateProvider is for simple values. Complex state with multiple fields or validation logic should use Notifier/AsyncNotifier for better organization. |
-| `require_error_handling_in_async` | Essential | WARNING | AsyncValue can be loading, data, or error. Code that only handles `.value` crashes or shows blank UI when errors occur. Handle all three states. |
 | `avoid_provider_in_widget` | Recommended | WARNING | Declaring providers inside widget classes makes them instance-specific and breaks Riverpod's global state model. Declare at file level. |
 | `prefer_select_for_partial` | Professional | INFO | Watching an entire object rebuilds when any field changes. Use `ref.watch(provider.select((s) => s.field))` to rebuild only when specific fields change. |
 | `require_riverpod_lint` | Comprehensive | INFO | The official riverpod_lint package catches Riverpod-specific mistakes. Add it alongside saropa_lints for complete coverage. |
@@ -97,8 +63,6 @@ The following rules from this roadmap have been implemented:
 | `require_bloc_test_coverage` | Professional | INFO | Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
 | `prefer_cubit_for_simple` | Recommended | INFO | Bloc's event system adds overhead for simple state. Cubit (direct method calls) is simpler when you don't need event traceability. |
 | `avoid_bloc_listen_in_build` | Essential | WARNING | `BlocProvider.of(context)` with listen:true in build causes rebuilds on every state change. Use BlocBuilder or listen:false. |
-| `require_bloc_transformer` | Professional | INFO | Without an event transformer, rapid events process sequentially causing UI lag. Use `droppable()`, `debounce()`, or `restartable()`. |
-| `avoid_long_event_handlers` | Professional | INFO | Event handlers over 50 lines are hard to test and maintain. Extract business logic into separate methods or use cases. |
 | `prefer_sealed_events` | Comprehensive | INFO | Sealed classes for events enable exhaustive switch statements, so the compiler catches unhandled events. |
 | `require_initial_state` | Essential | ERROR | Bloc without an initial state throws at runtime. Always pass initial state to super() in the constructor. |
 | `avoid_bloc_in_bloc` | Recommended | WARNING | Blocs calling other blocs directly creates tight coupling. Use a parent widget or service to coordinate between blocs. |
@@ -111,8 +75,6 @@ The following rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `avoid_provider_of_in_build` | Essential | WARNING | `Provider.of(context)` defaults to listen:true, causing unnecessary rebuilds. Use `context.read()` for one-time access or Consumer for scoped rebuilds. |
 | `prefer_consumer_over_provider_of` | Recommended | INFO | Consumer widget limits rebuilds to its subtree. `Provider.of` in build() rebuilds the entire widget even when only part needs the value. |
-| `require_provider_dispose` | Essential | WARNING | ChangeNotifier and other resources must be disposed. Use `create` with `dispose` callback, or ChangeNotifierProvider which auto-disposes. |
-| `avoid_change_notifier_in_widget` | Recommended | WARNING | Creating ChangeNotifier inside a widget's build() creates new instances on rebuild, losing state. Create in provider or stateful widget. |
 | `prefer_selector` | Professional | INFO | Selector rebuilds only when the selected value changes. Watching the whole object rebuilds on any field change, wasting CPU cycles. |
 | `require_multi_provider` | Professional | INFO | Nested Provider widgets create deep indentation. MultiProvider flattens the tree and is easier to read and maintain. |
 | `avoid_nested_providers` | Comprehensive | INFO | Deeply nested provider trees are hard to reason about. Flatten with MultiProvider and avoid provider-in-provider patterns. |
@@ -124,11 +86,9 @@ The following rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_getx_controller_dispose` | Essential | WARNING | GetX controllers must clean up resources in `onClose()`. Streams, timers, and listeners not cancelled cause memory leaks. |
 | `avoid_get_find_in_build` | Essential | WARNING | `Get.find()` in build() can throw if controller isn't registered yet. Use `Get.put()` first or access via GetBuilder/GetX widget. |
 | `prefer_getx_builder` | Recommended | INFO | Direct `.obs` access in build() doesn't trigger rebuilds. Use GetX, GetBuilder, or Obx widgets to properly subscribe to reactive values. |
 | `require_getx_binding` | Professional | INFO | Bindings ensure controllers are created and disposed at the right time. Without them, manual Get.put/delete calls are error-prone. |
-| `avoid_obs_outside_controller` | Recommended | WARNING | `.obs` reactive variables outside GetxController aren't disposed automatically. This causes memory leaks when the widget is destroyed. |
 
 ### 1.3 Performance Rules
 
@@ -140,8 +100,6 @@ The following rules from this roadmap have been implemented:
 | `prefer_const_widgets` | Recommended | INFO | Widgets that can be const are created once and reused. Without const, Flutter creates new instances on every parent rebuild. |
 | `avoid_expensive_computation_in_build` | Essential | WARNING | build() is called frequently (60fps during animations). Sorting, filtering, or complex calculations here cause frame drops. Cache results or use compute(). |
 | `require_repaint_boundary` | Professional | INFO | RepaintBoundary isolates painting to a subtree. Complex animations or frequently changing content should be wrapped to avoid repainting siblings. |
-| `prefer_builder_for_conditional` | Professional | INFO | Conditional widgets (if/else in build) can be wrapped in Builder to limit rebuild scope when the condition changes. |
-| `require_widget_key_strategy` | Professional | INFO | Lists without proper Keys cause Flutter to rebuild all items when one changes. Use ValueKey, ObjectKey, or UniqueKey based on your data identity. |
 | `avoid_layout_passes` | Professional | WARNING | Widgets like IntrinsicWidth/IntrinsicHeight cause two layout passes. Avoid them in lists or frequently rebuilt widgets. |
 | `prefer_value_listenable_builder` | Recommended | INFO | For single-value reactivity, ValueListenableBuilder is more efficient than full state management solutions. Less boilerplate for simple cases. |
 | `avoid_calling_of_in_build` | Professional | WARNING | `Theme.of()`, `MediaQuery.of()` traverse the widget tree. Call once and store in a local variable, or use specific methods like `MediaQuery.sizeOf()`. |
@@ -161,7 +119,6 @@ The following rules from this roadmap have been implemented:
 | `require_image_cache_management` | Essential | WARNING | Flutter's ImageCache grows unbounded by default. Large images accumulate in memory. Call `imageCache.clear()` or `imageCache.evict()` when appropriate. |
 | `avoid_memory_intensive_operations` | Essential | WARNING | Allocating large lists, loading full images into memory, or string concatenation in loops can cause out-of-memory crashes on low-end devices. |
 | `prefer_weak_reference` | Comprehensive | INFO | Caches holding strong references prevent garbage collection. Use WeakReference for objects that can be recreated, allowing GC to reclaim memory under pressure. |
-| `require_list_preallocate` | Professional | INFO | `List.filled(n, value)` or `List.generate(n, ...)` preallocates capacity. Growing lists with `.add()` causes repeated reallocations and memory fragmentation. |
 | `prefer_typed_data` | Professional | INFO | `Uint8List` uses 1 byte per element; `List<int>` uses 8 bytes. For binary data, typed data lists use 8x less memory and are faster. |
 | `require_isolate_for_heavy` | Professional | WARNING | Heavy computation on main isolate blocks UI (16ms budget per frame). Use `compute()` or `Isolate.run()` for JSON parsing, image processing, or data transforms. |
 | `avoid_finalizer_misuse` | Comprehensive | INFO | Dart Finalizers run non-deterministically and add GC overhead. Prefer explicit dispose() methods. Finalizers are only for native resource cleanup as a safety net. |
@@ -198,7 +155,6 @@ The following rules from this roadmap have been implemented:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_test_coupling` | Essential | WARNING | Tests that depend on other tests' state or execution order are fragile. Each test must set up its own state and clean up after itself. |
-| `prefer_single_assertion` | Professional | INFO | Tests with multiple assertions are harder to debug - you only see the first failure. One logical assertion per test clarifies what broke. |
 | `avoid_real_dependencies` | Essential | WARNING | Tests hitting real databases, APIs, or file systems are slow, flaky, and can corrupt data. Mock external dependencies. |
 | `prefer_fake_over_mock` | Comprehensive | INFO | Fakes (simple implementations) are easier to maintain than mocks with verify() chains. Use mocks only when you need to verify interactions. |
 | `require_edge_case_tests` | Professional | INFO | Test boundary conditions: empty lists, null values, max int, empty strings, unicode, negative numbers. Edge cases cause most production bugs. |
@@ -213,7 +169,6 @@ The following rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `prefer_pump_and_settle` | Recommended | INFO | `pump()` advances one frame. Animations and async operations need `pumpAndSettle()` to complete all pending frames before assertions. |
 | `require_scroll_tests` | Recommended | INFO | Scrollable widgets may hide content. Test that items appear after scrolling with `drag()` or `scrollUntilVisible()`. |
-| `avoid_find_all` | Professional | INFO | `find.byType(Text)` matches many widgets. Use specific finders like `find.text('exact')` or `find.byKey()` for reliable tests. |
 | `require_text_input_tests` | Recommended | INFO | TextFields have complex behavior: focus, validation, keyboard types. Test with `enterText()`, `testTextInput`, and form submission. |
 | `prefer_test_variant` | Comprehensive | INFO | Testing multiple screen sizes or themes? Use `testWidgets` with `variant: ValueVariant({...})` instead of duplicating tests. |
 | `require_accessibility_tests` | Recommended | WARNING | Use `meetsGuideline(textContrastGuideline)` and `meetsGuideline(androidTapTargetGuideline)` to verify accessibility compliance. |
@@ -225,12 +180,10 @@ The following rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_integration_test_setup` | Recommended | INFO | Integration tests need `IntegrationTestWidgetsFlutterBinding.ensureInitialized()` in main(). Without it, tests hang or crash on device. |
 | `prefer_test_groups` | Professional | INFO | Group related tests with `group()` for better organization. Shared setUp/tearDown runs for the group, reducing duplication. |
 | `require_test_ordering` | Professional | INFO | Integration tests may depend on database state from previous tests. Document dependencies or use `setUp` to ensure required state. |
 | `prefer_retry_flaky` | Comprehensive | INFO | Integration tests on real devices are inherently flaky. Configure retry count in CI (e.g., `--retry=2`) rather than deleting useful tests. |
 | `require_test_cleanup` | Professional | INFO | Tests that create files, database entries, or user accounts must clean up in `tearDown`. Leftover data causes subsequent test failures. |
-| `avoid_hardcoded_delays` | Essential | WARNING | `await Future.delayed(Duration(seconds: 2))` is flaky - too short fails, too long wastes time. Use `pumpAndSettle()` or wait for conditions. |
 | `prefer_test_data_reset` | Professional | INFO | Each test should start with known state. Reset database, clear shared preferences, and log out users in setUp to prevent test pollution. |
 | `require_e2e_coverage` | Professional | INFO | Integration tests are expensive. Focus on critical user journeys: signup, purchase, core features. Don't duplicate unit test coverage. |
 | `avoid_screenshot_in_ci` | Comprehensive | INFO | Screenshots in CI consume storage and slow tests. Take screenshots only on failure for debugging, not on every test. |
@@ -248,7 +201,6 @@ The following rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `require_auth_check` | Essential | ERROR | Routes showing user data must verify authentication. Without checks, users can access protected screens via deep links or back navigation. |
 | `require_token_refresh` | Recommended | WARNING | Access tokens expire. Without refresh logic, users get logged out unexpectedly. Implement token refresh before expiry or on 401 responses. |
-| `avoid_auth_state_in_prefs` | Essential | WARNING | SharedPreferences stores data as plain text. Auth tokens and session data must use flutter_secure_storage or platform keychain. |
 | `require_logout_cleanup` | Essential | WARNING | Logout must clear tokens, cached user data, and navigation state. Incomplete cleanup leaves sensitive data accessible to the next user. |
 | `prefer_oauth_pkce` | Professional | INFO | Mobile OAuth without PKCE is vulnerable to authorization code interception. Use PKCE (Proof Key for Code Exchange) for secure OAuth flows. |
 | `avoid_jwt_decode_client` | Recommended | INFO | JWTs can be forged client-side. Never trust decoded JWT claims for authorization - always verify with the backend. |
@@ -265,7 +217,6 @@ The following rules from this roadmap have been implemented:
 | `require_data_encryption` | Essential | WARNING | Sensitive data (PII, financial, health) must be encrypted at rest. Use AES-256 or platform encryption APIs, not custom schemes. |
 | `prefer_secure_random` | Recommended | WARNING | `Random()` is predictable. Use `Random.secure()` for tokens, IVs, salts, and anything security-sensitive. |
 | `require_keychain_access` | Professional | INFO | iOS Keychain requires proper access groups and entitlements. Incorrect configuration causes data loss on app reinstall. |
-| `prefer_encrypted_prefs` | Recommended | INFO | SharedPreferences is plain text. Use encrypted_shared_preferences or flutter_secure_storage for sensitive values. |
 | `prefer_data_masking` | Professional | INFO | Sensitive data displayed on screen (SSN, credit cards) should be partially masked (••••1234) to prevent shoulder surfing. |
 | `avoid_screenshot_sensitive` | Recommended | WARNING | Financial and auth screens should disable screenshots using platform APIs. Screenshots expose sensitive data. |
 | `require_secure_keyboard` | Professional | INFO | Password fields should use secure text entry to disable keyboard autocomplete, suggestions, and clipboard history. |
@@ -297,14 +248,12 @@ The following rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_explicit_semantics` | Recommended | INFO | Widgets without Semantics are invisible to screen readers. Add explicit Semantics wrapper with label for custom widgets. |
 | `require_image_description` | Essential | WARNING | Decorative images need `excludeFromSemantics: true`. Meaningful images need `semanticLabel` describing their content. |
 | `avoid_semantics_exclusion` | Recommended | WARNING | `excludeFromSemantics` hides content from screen readers. Only use for truly decorative elements, with a comment explaining why. |
 | `prefer_merge_semantics` | Professional | INFO | Related elements (icon + text) should be wrapped in MergeSemantics so screen readers announce them as one unit. |
 | `require_heading_hierarchy` | Professional | INFO | Screen reader users navigate by headings. Use Semantics with `header: true` and ensure logical heading order (h1 before h2). |
 | `avoid_redundant_semantics` | Comprehensive | INFO | An Image with semanticLabel inside a Semantics wrapper announces twice. Remove duplicate semantic information. |
 | `prefer_semantics_container` | Professional | INFO | Groups of related widgets should use Semantics `container: true` to indicate they form a logical unit for navigation. |
-| `require_button_semantics` | Recommended | INFO | Custom tap targets (GestureDetector on Container) need Semantics with `button: true` so screen readers announce them as buttons. |
 | `avoid_hidden_interactive` | Essential | ERROR | Elements with `excludeFromSemantics: true` that have onTap handlers are unusable by screen reader users. Critical accessibility bug. |
 | `prefer_semantics_sort` | Professional | INFO | Complex layouts may need `sortKey` to control screen reader navigation order. Default order may not match visual layout. |
 | `require_live_region` | Recommended | INFO | Dynamic content updates (toasts, counters) need Semantics with `liveRegion: true` so screen readers announce changes. |
@@ -317,7 +266,6 @@ The following rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `require_minimum_contrast` | Essential | WARNING | Text must have 4.5:1 contrast ratio against background (3:1 for large text). Use contrast checker tools during design. |
 | `avoid_color_only_meaning` | Essential | WARNING | Never use color alone to convey information (red=error). Add icons, text, or patterns for colorblind users. |
-| `prefer_scalable_text` | Recommended | INFO | Text should scale with system font size settings. Avoid fixed pixel sizes; use MediaQuery.textScaleFactor. |
 | `require_focus_indicator` | Recommended | WARNING | Keyboard/switch users need visible focus indicators. Ensure focused elements have distinct borders or highlights. |
 | `avoid_small_text` | Recommended | INFO | Text smaller than 12sp is difficult to read. Ensure minimum readable size, especially for body text. |
 | `prefer_high_contrast_mode` | Professional | INFO | Support MediaQuery.highContrast for users who need stark color differences. Provide high-contrast theme variant. |
@@ -337,7 +285,6 @@ The following rules from this roadmap have been implemented:
 | `avoid_time_limits` | Recommended | INFO | Timed interactions (auto-logout, disappearing toasts) disadvantage users who need more time. Allow extension or disable timeouts. |
 | `prefer_external_keyboard` | Comprehensive | INFO | Support full keyboard navigation for users who can't use touch. Ensure all actions are reachable via Tab and Enter. |
 | `require_switch_control` | Comprehensive | INFO | Switch control users navigate sequentially. Ensure logical focus order and that all interactive elements are focusable. |
-| `avoid_hover_only` | Recommended | INFO | Touch devices and screen readers don't have hover. Never hide essential information or actions behind hover states. |
 
 ### 1.7 Animation Rules
 
@@ -435,7 +382,6 @@ The following rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `require_ios_permission_description` | Essential | ERROR | iOS rejects apps without Info.plist usage descriptions for camera, location, etc. Add NSCameraUsageDescription etc. |
 | `avoid_http_without_ats_exception` | Essential | ERROR | iOS blocks non-HTTPS by default (App Transport Security). Add exception in Info.plist only if absolutely necessary. |
-| `prefer_cupertino_for_ios_feel` | Recommended | INFO | Material widgets look foreign on iOS. Use CupertinoPageRoute, CupertinoAlertDialog for native feel, or adaptive widgets. |
 | `require_ios_background_mode` | Professional | INFO | Background tasks need specific capabilities in Xcode: background fetch, remote notifications, audio, location. |
 | `avoid_ios_13_deprecations` | Recommended | WARNING | iOS 13+ deprecates UIWebView, UIAlertView, and others. Use WKWebView and modern APIs to avoid App Store rejection. |
 | `require_apple_sign_in` | Essential | ERROR | Apps with third-party login (Google, Facebook) must also offer Sign in with Apple per App Store guidelines. |
@@ -457,7 +403,6 @@ The following rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `avoid_platform_channel_on_web` | Essential | ERROR | MethodChannel doesn't work on web. Use conditional imports and dart:js_interop for web-specific functionality. |
 | `require_web_renderer_awareness` | Professional | INFO | CanvasKit vs HTML renderer have different capabilities and bundle sizes. Test on both; choose based on needs. |
-| `prefer_url_strategy_for_web` | Recommended | INFO | Hash URLs (/#/page) look ugly and break SEO. Use PathUrlStrategy for clean URLs in production web apps. |
 | `avoid_large_assets_on_web` | Recommended | WARNING | Web has no app install; assets download on demand. Lazy-load images and use appropriate formats (WebP) for faster loads. |
 | `require_cors_handling` | Essential | ERROR | Web apps face CORS restrictions desktop/mobile don't have. API must send proper headers or use proxy for third-party APIs. |
 | `prefer_deferred_loading_web` | Professional | INFO | Web bundle size matters for initial load. Use deferred imports to split code and load features on demand. |
@@ -466,8 +411,6 @@ The following rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_window_size_constraints` | Recommended | INFO | Desktop apps need minimum window size to prevent unusable layouts. Set constraints in main() or platform runner. |
-| `prefer_keyboard_shortcuts` | Recommended | INFO | Desktop users expect Ctrl+S, Ctrl+Z, etc. Implement Shortcuts and Actions for standard keyboard interactions. |
 | `require_menu_bar_for_desktop` | Professional | INFO | macOS apps need menu bar. Use PlatformMenuBar for standard menus (File, Edit, View) on desktop platforms. |
 | `avoid_touch_only_gestures` | Recommended | WARNING | Desktop has mouse, not touch. GestureDetector works, but also handle mouse hover, right-click, scroll wheel. |
 | `require_window_close_confirmation` | Professional | INFO | Unsaved changes should prompt on window close. Handle windowShouldClose callback to prevent data loss. |
@@ -477,7 +420,6 @@ The following rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_firebase_init_before_use` | Essential | ERROR | Firebase.initializeApp() must complete before accessing any Firebase service. Await it in main() before runApp(). |
 | `avoid_firestore_unbounded_query` | Essential | WARNING | Firestore without limit() fetches entire collection, costing money and time. Always limit results or use pagination. |
 | `require_firestore_index` | Essential | ERROR | Compound queries need composite indexes. Firestore throws error with link to create index; don't ignore in dev. |
 | `prefer_firestore_batch_write` | Professional | INFO | Multiple writes should use batch() or transaction(). Individual writes have higher latency and cost. |
@@ -521,10 +463,8 @@ The following rules from this roadmap have been implemented:
 | `require_notification_permission_request` | Essential | ERROR | iOS and Android 13+ require explicit notification permission. Request before sending; denied = no notifications ever. |
 | `prefer_delayed_permission_prompt` | Recommended | INFO | Don't ask for notification permission on first launch. Wait until user sees value, then explain why before asking. |
 | `require_fcm_token_refresh_handler` | Essential | WARNING | FCM tokens can change. Listen to onTokenRefresh and update server. Stale tokens mean undelivered notifications. |
-| `avoid_notification_payload_sensitive` | Essential | ERROR | Push payloads may be logged or visible in notification center. Never include passwords, full messages, or tokens. |
 | `require_background_message_handler` | Essential | WARNING | FCM background messages need top-level handler function. Instance methods don't work when app is killed. |
 | `prefer_local_notification_for_immediate` | Recommended | INFO | flutter_local_notifications is better for app-generated notifications. FCM is for server-triggered messages. |
-| `require_notification_channel_android` | Essential | ERROR | Android 8+ requires notification channels. Define channels with appropriate importance level for different notification types. |
 | `avoid_notification_spam` | Recommended | WARNING | Too many notifications cause users to disable all notifications or uninstall. Batch, dedupe, and respect user preferences. |
 
 ### 1.16 Payment & In-App Purchase Rules
@@ -560,7 +500,6 @@ The following rules from this roadmap have been implemented:
 | `require_camera_permission_check` | Essential | ERROR | Camera access without permission crashes on iOS, throws on Android. Check and request permission before initializing. |
 | `prefer_camera_resolution_selection` | Recommended | INFO | Max resolution isn't always best. Profile photos don't need 4K. Select resolution appropriate for use case to save storage. |
 | `require_camera_dispose` | Essential | ERROR | CameraController must be disposed. Undisposed camera keeps hardware locked, preventing other apps from using camera. |
-| `avoid_image_picker_without_source` | Essential | WARNING | ImagePicker without specifying source shows confusing blank picker on some devices. Always specify camera or gallery. |
 | `require_image_compression` | Recommended | WARNING | Phone cameras produce 5-20MB images. Compress before upload (quality 70-85% is usually indistinguishable) to save bandwidth. |
 | `prefer_image_cropping` | Recommended | INFO | Profile photos should be cropped to square. Offer cropping UI after selection rather than forcing users to pre-crop. |
 | `avoid_loading_full_images_in_memory` | Essential | WARNING | Loading multiple full-resolution images causes OOM. Use ResizeImage or cacheWidth/cacheHeight for display. |
@@ -572,9 +511,7 @@ The following rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `require_theme_color_from_scheme` | Recommended | INFO | Hardcoded Colors ignore theme. Use Theme.of(context).colorScheme.primary etc. for colors that adapt to light/dark mode. |
 | `prefer_color_scheme_from_seed` | Recommended | INFO | ColorScheme.fromSeed generates harmonious palette from single color. Easier than defining all scheme colors manually. |
-| `avoid_brightness_check_for_theme` | Recommended | WARNING | Don't check brightness to pick colors. Use colorScheme which already provides appropriate colors for current theme. |
 | `require_dark_mode_testing` | Essential | WARNING | Many apps look broken in dark mode (black text on black background). Test both modes; don't just invert colors. |
-| `prefer_system_theme_default` | Recommended | INFO | Default to ThemeMode.system to respect user's OS preference. Offer manual override in settings. |
 | `avoid_elevation_opacity_in_dark` | Professional | INFO | Dark mode uses surface tints instead of shadows for elevation. Material 3 handles this; Material 2 needs manual handling. |
 | `require_semantic_colors` | Professional | INFO | Name colors by purpose (errorColor, successColor) not appearance (redColor). Purposes stay constant; appearances change with theme. |
 | `prefer_theme_extensions` | Professional | INFO | Custom colors beyond ColorScheme should use ThemeExtension for proper inheritance and type safety. |
@@ -589,7 +526,6 @@ The following rules from this roadmap have been implemented:
 | `require_orientation_handling` | Recommended | INFO | Many apps break in landscape. Either support it properly with different layouts, or lock to portrait explicitly. |
 | `prefer_master_detail_for_large` | Professional | INFO | On tablets, list-detail flows should show both panes (master-detail) rather than stacked navigation. |
 | `avoid_text_overflow_on_small` | Essential | WARNING | Long text must handle small screens. Use maxLines with overflow, or Flexible to allow wrapping. |
-| `require_safe_area_handling` | Essential | WARNING | Notches, home indicators, and rounded corners clip content. Use SafeArea or MediaQuery.padding appropriately. |
 | `prefer_adaptive_icons` | Recommended | INFO | Icons at 24px default are too small on tablets, too large on watches. Use IconTheme or scale based on screen size. |
 | `avoid_keyboard_overlap` | Essential | WARNING | Soft keyboard covers bottom content. Use SingleChildScrollView or adjust padding with MediaQuery.viewInsets.bottom. |
 | `require_foldable_awareness` | Comprehensive | INFO | Foldable devices have hinges and multiple displays. Use DisplayFeature API to avoid placing content on fold. |

@@ -27,6 +27,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidEqualExpressionsRule extends SaropaLintRule {
   const AvoidEqualExpressionsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_equal_expressions',
@@ -106,6 +110,10 @@ class _AddHackForEqualExpressionsFix extends DartFix {
 /// **Quick fix available:** Transforms `!(a == b)` to `a != b`.
 class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
   const AvoidNegationsInEqualityChecksRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_negations_in_equality_checks',
@@ -192,6 +200,10 @@ class _UseNotEqualsFix extends DartFix {
 /// ```
 class AvoidSelfAssignmentRule extends SaropaLintRule {
   const AvoidSelfAssignmentRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_self_assignment',
@@ -266,6 +278,10 @@ class _AddHackForSelfAssignmentFix extends DartFix {
 /// ```
 class AvoidSelfCompareRule extends SaropaLintRule {
   const AvoidSelfCompareRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_self_compare',
@@ -336,6 +352,10 @@ class _AddHackForSelfCompareFix extends DartFix {
 /// **Quick fix available:** Transforms `a.compareTo(b) == 0` to `a == b`.
 class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
   const AvoidUnnecessaryCompareToRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_compare_to',
@@ -449,6 +469,10 @@ class _UseDirectEqualityFix extends DartFix {
 /// ```
 class NoEqualArgumentsRule extends SaropaLintRule {
   const NoEqualArgumentsRule() : super(code: _code);
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
 
   static const LintCode _code = LintCode(
     name: 'no_equal_arguments',

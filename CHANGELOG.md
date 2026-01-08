@@ -5,6 +5,133 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 2026-01-08
+
+### Added
+
+- **Impact Classification System** - Every lint rule now has an impact level (`critical`, `high`, `medium`, `low`) to help teams prioritize violations:
+  - `critical`: Each occurrence is serious (memory leaks, security holes) - even 1-2 is unacceptable
+  - `high`: Significant issues that compound - 10+ requires immediate action
+  - `medium`: Quality issues - 100+ indicates tech debt worth addressing
+  - `low`: Style/consistency - large counts acceptable in legacy code
+
+- **Impact Report CLI Tool** - New command-line tool to run lints and display results grouped by impact level:
+  ```bash
+  dart run saropa_lints:impact_report           # analyze current directory
+  dart run saropa_lints:impact_report ./my_app  # analyze specific path
+  ```
+  - Groups violations by impact (critical first)
+  - Shows summary with counts and guidance
+  - Exit code = number of critical issues (for CI integration)
+
+- **New exports** - `SaropaLintRule` and `allSaropaRules` now exported for tooling
+
+- **47 new lint rules** across multiple categories:
+
+  **Riverpod Rules (3)**:
+  - `avoid_circular_provider_deps` - Detects circular dependencies between Riverpod providers [Essential tier]
+  - `require_error_handling_in_async` - FutureProvider/AsyncNotifierProvider should have error handling [Essential tier]
+  - `prefer_notifier_over_state` - StateProvider with many mutation sites should use NotifierProvider [Professional tier]
+
+  **GetX Rules (2)**:
+  - `require_getx_controller_dispose` - GetxController with disposable resources needs onClose() [Essential tier] + quick fix
+  - `avoid_obs_outside_controller` - Observable (.obs) should be inside GetxController only [Recommended tier]
+
+  **Bloc Rules (2)**:
+  - `require_bloc_transformer` - Bloc on<Event> for search/input events should use transformer [Professional tier]
+  - `avoid_long_event_handlers` - Bloc event handlers over 30 lines should be extracted [Professional tier]
+
+  **Performance/Style Rules (3)**:
+  - `require_list_preallocate` - List.add() in loop with empty initial list should preallocate [Professional tier]
+  - `prefer_builder_for_conditional` - Complex widgets in ternary conditionals - consider if/return [Professional tier]
+  - `require_widget_key_strategy` - ListView/GridView/SliverList/SliverGrid itemBuilder should have consistent key usage [Professional tier]
+
+  **Widget Rules (2)**:
+  - `require_overflow_box_rationale` - OverflowBox requires comment explaining why overflow is intentional [Comprehensive tier]
+  - `avoid_unconstrained_images` - Images without width/height cause layout shifts when loaded [Professional tier]
+
+  **Accessibility Rules (2)**:
+  - `require_error_identification` - Error states must have non-color indicators (icons, text) for colorblind users [Essential tier]
+  - `require_minimum_contrast` - Text colors must meet WCAG 4.5:1 contrast ratio requirements [Essential tier]
+
+  **Testing Rules (1)**:
+  - `require_error_case_tests` - Test files should include error/exception test cases [Recommended tier]
+
+  **Security Rules (1)**:
+  - `require_deep_link_validation` - Deep link parameters must be validated before use [Essential tier]
+
+  **Network Rules (1)**:
+  - `prefer_streaming_response` - Large file downloads should use streaming to avoid OOM [Comprehensive tier]
+
+  **Stylistic Rules (1)**:
+  - `prefer_literal_apostrophe` - Prefer `'` character instead of `\'` in strings by using double quotes [Stylistic - no tier]
+
+  **Flutter Widget Rules (5)**:
+  - `prefer_system_theme_default` - Hardcoded ThemeMode ignores user's OS dark mode preference [Info tier]
+  - `avoid_absorb_pointer_misuse` - AbsorbPointer blocks ALL touch events; consider IgnorePointer [Info tier]
+  - `avoid_brightness_check_for_theme` - Use colorScheme instead of checking brightness manually [Info tier]
+  - `require_safe_area_handling` - Scaffold body should handle safe areas for notches [Info tier]
+  - `avoid_nullable_widget_methods` - Methods returning Widget? types should return SizedBox.shrink() instead of null [Professional tier]
+
+  **Security Rules (2)**:
+  - `avoid_auth_state_in_prefs` - Auth tokens in SharedPreferences are stored as plain text [Warning tier]
+  - `prefer_encrypted_prefs` - Sensitive data in SharedPreferences is stored unencrypted [Warning tier]
+
+  **Accessibility Rules (4)**:
+  - `prefer_scalable_text` - Fixed font sizes don't scale with user accessibility settings [Info tier]
+  - `require_button_semantics` - Custom buttons need semantic labels for screen readers [Warning tier]
+  - `prefer_explicit_semantics` - Widgets with implicit semantics should be explicit [Info tier]
+  - `avoid_hover_only` - Hover-only interactions are inaccessible on touch devices [Warning tier]
+
+  **State Management Rules (4)**:
+  - `prefer_ref_watch_over_read` - Using ref.read in build() misses reactive updates [Warning tier]
+  - `avoid_change_notifier_in_widget` - ChangeNotifier declared in widget causes memory leaks [Warning tier]
+  - `require_provider_dispose` - Providers with resources need disposal logic [Warning tier]
+  - `avoid_setstate_in_large_state_class` - setState() in large State classes (200+ lines or 15+ members) causes expensive rebuilds [Professional tier]
+
+  **Testing Rules (4)**:
+  - `prefer_single_assertion` - Tests with many assertions should be split into focused tests [Info tier]
+  - `avoid_find_all` - Generic finders like find.byType(Text) match too many widgets [Info tier]
+  - `require_integration_test_setup` - Integration tests need IntegrationTestWidgetsFlutterBinding [Warning tier]
+  - `avoid_hardcoded_delays` - Hardcoded Future.delayed in tests causes flaky tests [Warning tier]
+
+  **Resource Management Rules (1)**:
+  - `avoid_image_picker_without_source` - ImagePicker should specify camera or gallery source [Info tier]
+
+  **Platform Rules (4)**:
+  - `prefer_cupertino_for_ios_feel` - Material widget has Cupertino equivalent for native iOS feel [Info tier]
+  - `prefer_url_strategy_for_web` - Web apps should use path URL strategy for SEO [Info tier]
+  - `require_window_size_constraints` - Desktop apps should set minimum window size [Warning tier]
+  - `prefer_keyboard_shortcuts` - Desktop apps should support keyboard shortcuts [Info tier]
+
+  **Notification Rules (2)**:
+  - `require_notification_channel_android` - Android notification should specify channel ID [Warning tier]
+  - `avoid_notification_payload_sensitive` - Notification may contain sensitive data visible on lock screen [Warning tier]
+
+  **Firebase Rules (1)**:
+  - `require_firebase_init_before_use` - Firebase services need initialization before use [Warning tier]
+
+  **Code Quality Rules (2)**:
+  - `avoid_duplicate_string_literals` - Detects string literals repeated 3+ times in a file [Professional tier]
+  - `avoid_duplicate_string_literals_pair` - Stricter variant detecting string literals repeated 2+ times [Comprehensive tier]
+
+- **11 new quick fixes**:
+  - `require_getx_controller_dispose` - Add onClose() method skeleton
+  - `prefer_ref_watch_over_read` - Replace ref.read with ref.watch
+  - `require_integration_test_setup` - Add IntegrationTestWidgetsFlutterBinding.ensureInitialized()
+  - `avoid_hardcoded_delays` - Add TODO: use pumpAndSettle()
+  - `avoid_image_picker_without_source` - Add source: ImageSource.gallery
+  - `avoid_auth_state_in_prefs` - Add TODO: use flutter_secure_storage
+  - `prefer_encrypted_prefs` - Add TODO: use encrypted storage
+  - `require_firebase_init_before_use` - Add Firebase.initializeApp() call
+  - `avoid_notification_payload_sensitive` - Add TODO about lock screen visibility
+  - `require_overflow_box_rationale` - Add TODO comment explaining overflow
+  - `require_deep_link_validation` - Add TODO: validate deep link parameter
+
+### Changed
+
+- `avoid_returning_widgets` moved from insanity tier to professional tier
+
 ## [1.7.1] - 2026-01-08
 
 ### Fixed
