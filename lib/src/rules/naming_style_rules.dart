@@ -955,8 +955,9 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
       nameToken = param.name;
     }
 
-    if (typeAnnotation == null || paramName == null || nameToken == null)
+    if (typeAnnotation == null || paramName == null || nameToken == null) {
       return;
+    }
 
     // Check if it's a bool type
     if (typeAnnotation is! NamedType) return;

@@ -66,7 +66,9 @@ class RequireTestAssertionsRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -152,7 +154,9 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -245,7 +249,9 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -322,7 +328,9 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -394,7 +402,9 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
       // Only check main function
@@ -474,7 +484,9 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -567,7 +579,9 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value.toLowerCase();
@@ -646,7 +660,9 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -730,7 +746,9 @@ class AvoidTestSleepRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -820,7 +838,9 @@ class AvoidFindByTextRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -903,7 +923,9 @@ class RequireTestKeysRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
@@ -980,7 +1002,9 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1058,7 +1082,9 @@ class PreferMockNavigatorRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1124,7 +1150,9 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
@@ -1190,7 +1218,9 @@ class RequireMockVerificationRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1258,7 +1288,9 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1332,7 +1364,9 @@ class PreferTestWrapperRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1398,7 +1432,9 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1468,7 +1504,9 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1531,7 +1569,9 @@ class PreferMockHttpRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
@@ -1590,7 +1630,9 @@ class RequireGoldenTestRule extends SaropaLintRule {
     final String path = resolver.source.fullName;
     if (!path.contains('_test.dart') &&
         !path.contains('/test/') &&
-        !path.contains(r'\test\')) return;
+        !path.contains(r'\test\')) {
+      return;
+    }
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;

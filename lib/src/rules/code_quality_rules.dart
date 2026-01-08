@@ -819,8 +819,9 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
         if (parent is VariableDeclaration && parent.name == node.token) return;
 
         // Skip assignment on the left-hand side
-        if (parent is AssignmentExpression && parent.leftHandSide == node)
+        if (parent is AssignmentExpression && parent.leftHandSide == node) {
           return;
+        }
 
         reporter.atNode(node, code);
       }
