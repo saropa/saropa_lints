@@ -6,7 +6,7 @@ This guide helps you migrate from `dart_code_metrics` (DCM) to `saropa_lints`.
 
 | Feature | DCM | saropa_lints |
 |---------|-----|--------------|
-| **Rule count** | ~70 rules + metrics | 500+ custom rules |
+| **Rule count** | ~70 rules + metrics | 766+ custom rules |
 | **Focus** | Code metrics & complexity | Flutter-specific analysis |
 | **Configuration** | Extensive YAML options | 5 progressive tiers |
 | **Maintenance** | DCM Classic discontinued | Actively maintained |
@@ -26,7 +26,7 @@ dev_dependencies:
 # After
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^0.1.0
+  saropa_lints: ^1.3.0
 ```
 
 ### Step 2: Update analysis_options.yaml
@@ -53,7 +53,9 @@ analyzer:
   plugins:
     - custom_lint
 
-include: package:saropa_lints/tiers/recommended.yaml
+custom_lint:
+  saropa_lints:
+    tier: recommended  # essential | recommended | professional | comprehensive | insanity
 ```
 
 ### Step 3: Run the linter
@@ -64,7 +66,7 @@ dart run custom_lint
 
 ## Using Both Together
 
-If you still need DCM's metrics alongside saropa's rules:
+If you still need DCM's metrics alongside saropa_lints' rules:
 
 ```yaml
 # analysis_options.yaml
@@ -77,6 +79,10 @@ dart_code_metrics:
   metrics:
     cyclomatic-complexity: 20
     lines-of-code: 100
+
+custom_lint:
+  saropa_lints:
+    tier: recommended
 ```
 
 ```yaml
@@ -84,7 +90,7 @@ dart_code_metrics:
 dev_dependencies:
   dart_code_metrics: ^5.7.0
   custom_lint: ^0.8.0
-  saropa_lints: ^0.1.0
+  saropa_lints: ^1.3.0
 ```
 
 ## Choosing a Tier
@@ -93,17 +99,17 @@ DCM has granular metric thresholds. saropa_lints uses progressive tiers:
 
 | DCM Usage | saropa_lints Tier | Description |
 |-----------|-------------------|-------------|
-| Minimal rules | **Essential** (~50 rules) | Critical bugs, memory leaks, security |
-| Default config | **Recommended** (~150 rules) | Balanced coverage |
-| Strict metrics | **Professional** (~300 rules) | Enterprise-grade |
-| All rules enabled | **Comprehensive** (~400 rules) | Quality obsessed |
-| Maximum everything | **Insanity** (500+ rules) | Every single rule |
+| Minimal rules | **Essential** (~100 rules) | Critical bugs, memory leaks, security |
+| Default config | **Recommended** (~280 rules) | Balanced coverage |
+| Strict metrics | **Professional** (~560 rules) | Enterprise-grade |
+| All rules enabled | **Comprehensive** (~700 rules) | Quality obsessed |
+| Maximum everything | **Insanity** (766+ rules) | Every single rule |
 
 **Start with `recommended`** - it provides broad coverage without overwhelming noise.
 
 ## Rule Mapping
 
-Many DCM rules have saropa equivalents or enhancements:
+Many DCM rules have saropa_lints equivalents or enhancements:
 
 ### Anti-Patterns
 
@@ -195,7 +201,7 @@ The syntax is similar:
 // ignore: avoid_returning_widgets
 ```
 
-Note: DCM uses hyphens, saropa uses underscores in rule names.
+Note: DCM uses hyphens, saropa_lints uses underscores in rule names.
 
 ## Configuration Differences
 
@@ -214,7 +220,9 @@ dart_code_metrics:
 
 ```yaml
 # saropa_lints style - choose a tier
-include: package:saropa_lints/tiers/professional.yaml
+custom_lint:
+  saropa_lints:
+    tier: professional  # essential | recommended | professional | comprehensive | insanity
 
 # Or disable specific rules
 custom_lint:
