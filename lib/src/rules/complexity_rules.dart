@@ -30,10 +30,10 @@ import '../saropa_lint_rule.dart';
 /// **Quick fix available:** Replaces `&` with `&&` or `|` with `||`.
 class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   const AvoidBitwiseOperatorsWithBooleansRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_bitwise_operators_with_booleans',
@@ -93,10 +93,10 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   const AvoidCascadeAfterIfNullRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_cascade_after_if_null',
@@ -146,10 +146,10 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
 /// ```
 class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   const AvoidComplexArithmeticExpressionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const int _maxOperators = 4;
 
@@ -222,10 +222,10 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
 /// ```
 class AvoidComplexConditionsRule extends SaropaLintRule {
   const AvoidComplexConditionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const int _maxOperators = 3;
 
@@ -305,10 +305,10 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidDuplicateCascadesRule extends SaropaLintRule {
   const AvoidDuplicateCascadesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_cascades',
@@ -361,10 +361,10 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 /// ```
 class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   const AvoidExcessiveExpressionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const int _maxOperators = 5;
 
@@ -432,10 +432,10 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
 /// ```
 class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   const AvoidImmediatelyInvokedFunctionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_immediately_invoked_functions',
@@ -473,10 +473,10 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
 /// Warns when shorthand syntax is nested too deeply.
 class AvoidNestedShorthandsRule extends SaropaLintRule {
   const AvoidNestedShorthandsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_shorthands',
@@ -539,10 +539,10 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
 /// ```
 class AvoidMultiAssignmentRule extends SaropaLintRule {
   const AvoidMultiAssignmentRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_multi_assignment',
@@ -605,10 +605,10 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
 /// extracting them to a local variable.
 class PreferMovingToVariableRule extends SaropaLintRule {
   const PreferMovingToVariableRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_moving_to_variable',
@@ -684,10 +684,10 @@ class _ExpressionCollector extends RecursiveAstVisitor<void> {
 /// ```
 class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   const PreferParenthesesWithIfNullRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_parentheses_with_if_null',

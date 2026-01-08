@@ -48,10 +48,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
   const AvoidContextInInitStateDisposeRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_initstate_dispose',
@@ -208,10 +208,10 @@ class _ContextUsageVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidEmptySetStateRule extends SaropaLintRule {
   const AvoidEmptySetStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_setstate',
@@ -270,10 +270,10 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
 /// ```
 class AvoidExpandedAsSpacerRule extends SaropaLintRule {
   const AvoidExpandedAsSpacerRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_as_spacer',
@@ -343,10 +343,10 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
 /// ```
 class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
   const AvoidFlexibleOutsideFlexRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_flexible_outside_flex',
@@ -415,10 +415,10 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 /// ```
 class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   const AvoidIncorrectImageOpacityRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_image_opacity',
@@ -497,10 +497,10 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
 /// ```
 class AvoidLateContextRule extends SaropaLintRule {
   const AvoidLateContextRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_late_context',
@@ -608,10 +608,10 @@ class AvoidLateContextRule extends SaropaLintRule {
 /// ```
 class AvoidMisnamedPaddingRule extends SaropaLintRule {
   const AvoidMisnamedPaddingRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_misnamed_padding',
@@ -738,10 +738,10 @@ class _PaddingMisuseVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidMissingImageAltRule extends SaropaLintRule {
   const AvoidMissingImageAltRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_missing_image_alt',
@@ -825,10 +825,10 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
 /// ```
 class AvoidMountedInSetStateRule extends SaropaLintRule {
   const AvoidMountedInSetStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_mounted_in_setstate',
@@ -880,10 +880,10 @@ class _MountedVisitor extends RecursiveAstVisitor<void> {
 /// extracting to a separate widget class.
 class AvoidReturningWidgetsRule extends SaropaLintRule {
   const AvoidReturningWidgetsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_widgets',
@@ -987,10 +987,10 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 /// ```
 class AvoidSingleChildColumnRowRule extends SaropaLintRule {
   const AvoidSingleChildColumnRowRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_single_child_column_row',
@@ -1061,10 +1061,10 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
 /// ```
 class AvoidStateConstructorsRule extends SaropaLintRule {
   const AvoidStateConstructorsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_state_constructors',
@@ -1118,10 +1118,10 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
 /// ```
 class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   const AvoidStatelessWidgetInitializedFieldsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateless_widget_initialized_fields',
@@ -1180,10 +1180,10 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
   const AvoidUnnecessaryGestureDetectorRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_gesture_detector',
@@ -1304,10 +1304,10 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   const AvoidUnnecessarySetStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_setstate',
@@ -1390,10 +1390,10 @@ class _SetStateCallFinder extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
   const AvoidUnnecessaryStatefulWidgetsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_stateful_widgets',
@@ -1461,10 +1461,10 @@ class _SetStatePresenceChecker extends RecursiveAstVisitor<void> {
 /// Warns when anonymous functions are used in listener methods.
 class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
   const AvoidUnremovableCallbacksInListenersRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unremovable_callbacks_in_listeners',
@@ -1536,10 +1536,10 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
 /// ```
 class AvoidUnsafeSetStateRule extends SaropaLintRule {
   const AvoidUnsafeSetStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_setstate',
@@ -1714,10 +1714,10 @@ class _NodeFinder extends GeneralizingAstVisitor<void> {
 /// ```
 class AvoidWrappingInPaddingRule extends SaropaLintRule {
   const AvoidWrappingInPaddingRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_wrapping_in_padding',
@@ -1933,10 +1933,10 @@ class _RenderObjectSetterVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   const ConsistentUpdateRenderObjectRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'consistent_update_render_object',
@@ -2053,10 +2053,10 @@ class _PropertyAssignmentFinder extends RecursiveAstVisitor<void> {
 /// ```
 class PreferConstBorderRadiusRule extends SaropaLintRule {
   const PreferConstBorderRadiusRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_border_radius',
@@ -2230,10 +2230,10 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
 /// ```
 class PreferDefineHeroTagRule extends SaropaLintRule {
   const PreferDefineHeroTagRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_define_hero_tag',
@@ -2309,10 +2309,10 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
 /// organization and maintainability.
 class PreferSingleWidgetPerFileRule extends SaropaLintRule {
   const PreferSingleWidgetPerFileRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_widget_per_file',
@@ -2375,10 +2375,10 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
 /// ```
 class PreferSliverPrefixRule extends SaropaLintRule {
   const PreferSliverPrefixRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_prefix',
@@ -2469,10 +2469,10 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 /// ```
 class PreferTextRichRule extends SaropaLintRule {
   const PreferTextRichRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich',
@@ -2713,10 +2713,10 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
 /// ```
 class RequireDisposeRule extends SaropaLintRule {
   const RequireDisposeRule() : super(code: _code);
+
   /// Each occurrence is a serious issue that should be fixed immediately.
   @override
   LintImpact get impact => LintImpact.critical;
-
 
   static const LintCode _code = LintCode(
     name: 'require_dispose',
@@ -2986,10 +2986,10 @@ class _DisposableField {
 /// ```
 class RequireTimerCancellationRule extends SaropaLintRule {
   const RequireTimerCancellationRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_timer_cancellation',
@@ -3197,10 +3197,10 @@ class _CancellableField {
 /// ```
 class NullifyAfterDisposeRule extends SaropaLintRule {
   const NullifyAfterDisposeRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'nullify_after_dispose',
@@ -3359,10 +3359,10 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 /// ```
 class UseSetStateSynchronouslyRule extends SaropaLintRule {
   const UseSetStateSynchronouslyRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'use_setstate_synchronously',
@@ -3507,10 +3507,10 @@ class _SetStateFinderBatch11 extends RecursiveAstVisitor<void> {
 /// ```
 class AlwaysRemoveListenerRule extends SaropaLintRule {
   const AlwaysRemoveListenerRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'always_remove_listener',
@@ -3647,10 +3647,10 @@ class _RemoveListenerFinder extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidBorderAllRule extends SaropaLintRule {
   const AvoidBorderAllRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_border_all',
@@ -3712,10 +3712,10 @@ class AvoidBorderAllRule extends SaropaLintRule {
 /// ```
 class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
   const AvoidDeeplyNestedWidgetsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_deeply_nested_widgets',
@@ -3825,10 +3825,10 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireAnimationDisposalRule extends SaropaLintRule {
   const RequireAnimationDisposalRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_animation_disposal',
@@ -3953,10 +3953,10 @@ class _DisposeCallFinder extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   const AvoidUncontrolledTextFieldRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_uncontrolled_text_field',
@@ -4087,10 +4087,10 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
 /// **Quick fix available:** Comments out the print statement.
 class AvoidPrintInProductionRule extends SaropaLintRule {
   const AvoidPrintInProductionRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_print_in_production',
@@ -4191,10 +4191,10 @@ class _CommentOutPrintFix extends DartFix {
 /// ```
 class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   const AvoidCatchingGenericExceptionRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_catching_generic_exception',
@@ -4255,10 +4255,10 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
 /// ```
 class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   const AvoidServiceLocatorOveruseRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_overuse',
@@ -4325,10 +4325,10 @@ class _ServiceLocatorFinder extends RecursiveAstVisitor<void> {
 /// ```
 class PreferUtcDateTimesRule extends SaropaLintRule {
   const PreferUtcDateTimesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_utc_datetimes',
@@ -4387,10 +4387,10 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
 /// ```
 class AvoidRegexInLoopRule extends SaropaLintRule {
   const AvoidRegexInLoopRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_regex_in_loop',
@@ -4462,10 +4462,10 @@ class _RegExpCreationFinder extends RecursiveAstVisitor<void> {
 /// ```
 class PreferGetterOverMethodRule extends SaropaLintRule {
   const PreferGetterOverMethodRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_getter_over_method',
@@ -4547,10 +4547,10 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
 /// ```
 class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
   const AvoidUnusedCallbackParametersRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_callback_parameters',
@@ -4706,10 +4706,10 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
 /// ```
 class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   const AvoidScaffoldMessengerAfterAwaitRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_scaffold_messenger_after_await',
@@ -4798,10 +4798,10 @@ class _ScaffoldMessengerFinderNew extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidBuildContextInProvidersRule extends SaropaLintRule {
   const AvoidBuildContextInProvidersRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_build_context_in_providers',
@@ -4870,10 +4870,10 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
 /// ```
 class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   const PreferSemanticWidgetNamesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_semantic_widget_names',
@@ -4940,10 +4940,10 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
 /// ```
 class AvoidTextScaleFactorRule extends SaropaLintRule {
   const AvoidTextScaleFactorRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor',
@@ -5072,10 +5072,10 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
 /// ```
 class AvoidImageWithoutCacheRule extends SaropaLintRule {
   const AvoidImageWithoutCacheRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_without_cache',
@@ -5138,10 +5138,10 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
 /// ```
 class PreferSplitWidgetConstRule extends SaropaLintRule {
   const PreferSplitWidgetConstRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_split_widget_const',
@@ -5208,10 +5208,10 @@ class _WidgetCounter extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
   const AvoidNavigatorPushWithoutRouteNameRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_without_route_name',
@@ -5260,10 +5260,10 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
 /// ```
 class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   const AvoidDuplicateWidgetKeysRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_widget_keys',
@@ -5342,10 +5342,10 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
 /// ```
 class PreferSafeAreaConsumerRule extends SaropaLintRule {
   const PreferSafeAreaConsumerRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_consumer',
@@ -5401,10 +5401,10 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
 /// ```
 class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   const AvoidUnrestrictedTextFieldLengthRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrestricted_text_field_length',
@@ -5456,10 +5456,10 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
 /// ```
 class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   const PreferScaffoldMessengerMaybeOfRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_scaffold_messenger_maybeof',
@@ -5506,10 +5506,10 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
 /// ```
 class AvoidFormWithoutKeyRule extends SaropaLintRule {
   const AvoidFormWithoutKeyRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_key',
@@ -5625,10 +5625,10 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
 /// ```
 class AvoidMediaQueryInBuildRule extends SaropaLintRule {
   const AvoidMediaQueryInBuildRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_mediaquery_in_build',
@@ -5676,10 +5676,10 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
 /// ```
 class PreferSliverListDelegateRule extends SaropaLintRule {
   const PreferSliverListDelegateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list_delegate',
@@ -5738,10 +5738,10 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
 /// ```
 class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
   const AvoidLayoutBuilderMisuseRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_misuse',
@@ -5818,10 +5818,10 @@ class _SimpleIdentifierCollector extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   const AvoidRepaintBoundaryMisuseRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_repaint_boundary_misuse',
@@ -5879,10 +5879,10 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
 /// ```
 class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   const AvoidSingleChildScrollViewWithColumnRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   // cspell: ignore singlechildscrollview
   static const LintCode _code = LintCode(
@@ -5957,10 +5957,10 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
 /// ```
 class PreferCachedNetworkImageRule extends SaropaLintRule {
   const PreferCachedNetworkImageRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_network_image',
@@ -6008,10 +6008,10 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
 /// ```
 class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
   const AvoidGestureDetectorInScrollViewRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_detector_in_scrollview',
@@ -6076,10 +6076,10 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
 /// ```
 class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   const AvoidStatefulWidgetInListRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_widget_in_list',
@@ -6160,10 +6160,10 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
 /// ```
 class PreferOpacityWidgetRule extends SaropaLintRule {
   const PreferOpacityWidgetRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_opacity_widget',
@@ -6378,10 +6378,10 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidUndisposedInstancesRule extends SaropaLintRule {
   const AvoidUndisposedInstancesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_undisposed_instances',
@@ -6574,10 +6574,10 @@ class _DisposeVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
   const AvoidUnnecessaryOverridesInStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides_in_state',
@@ -6648,10 +6648,10 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
 /// ```
 class DisposeFieldsRule extends SaropaLintRule {
   const DisposeFieldsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'dispose_fields',
@@ -6740,10 +6740,10 @@ class DisposeFieldsRule extends SaropaLintRule {
 /// ```
 class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   const PassExistingFutureToFutureBuilderRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'pass_existing_future_to_future_builder',
@@ -6805,10 +6805,10 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
 /// ```
 class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
   const PassExistingStreamToStreamBuilderRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'pass_existing_stream_to_stream_builder',
@@ -6964,10 +6964,10 @@ class _ReplaceEmptyTextWithSizedBoxFix extends DartFix {
 /// ```
 class AvoidFontWeightAsNumberRule extends SaropaLintRule {
   const AvoidFontWeightAsNumberRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_font_weight_as_number',
@@ -7060,10 +7060,10 @@ class _ReplaceFontWeightNumberFix extends DartFix {
 /// ```
 class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
   const PreferSizedBoxForWhitespaceRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_for_whitespace',
@@ -7226,10 +7226,10 @@ class _ReplaceContainerWithSizedBoxFix extends DartFix {
 /// ```
 class AvoidNestedScaffoldsRule extends SaropaLintRule {
   const AvoidNestedScaffoldsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scaffolds',
@@ -7367,10 +7367,10 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
 /// ```
 class AvoidRawKeyboardListenerRule extends SaropaLintRule {
   const AvoidRawKeyboardListenerRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_raw_keyboard_listener',
@@ -7450,10 +7450,10 @@ class _ReplaceRawKeyboardListenerFix extends DartFix {
 /// ```
 class AvoidImageRepeatRule extends SaropaLintRule {
   const AvoidImageRepeatRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_repeat',
@@ -7548,10 +7548,10 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
 /// ```
 class PreferInkwellOverGestureRule extends SaropaLintRule {
   const PreferInkwellOverGestureRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_inkwell_over_gesture',
@@ -7662,10 +7662,10 @@ class _ReplaceGestureWithInkWellFix extends DartFix {
 /// ```
 class AvoidFittedBoxForTextRule extends SaropaLintRule {
   const AvoidFittedBoxForTextRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_fitted_box_for_text',
@@ -7721,10 +7721,10 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
 /// ```
 class PreferListViewBuilderRule extends SaropaLintRule {
   const PreferListViewBuilderRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_listview_builder',
@@ -7785,10 +7785,10 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 /// ```
 class AvoidOpacityAnimationRule extends SaropaLintRule {
   const AvoidOpacityAnimationRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_animation',
@@ -7919,10 +7919,10 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
 /// ```
 class PreferSelectableTextRule extends SaropaLintRule {
   const PreferSelectableTextRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_selectable_text',
@@ -8004,10 +8004,10 @@ class _ReplaceTextWithSelectableFix extends DartFix {
 /// ```
 class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   const PreferSpacingOverSizedBoxRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_spacing_over_sizedbox',
@@ -8124,10 +8124,10 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 /// ```
 class AvoidMaterial2FallbackRule extends SaropaLintRule {
   const AvoidMaterial2FallbackRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_material2_fallback',
@@ -8240,10 +8240,10 @@ class _RemoveMaterial2FallbackFix extends DartFix {
 /// ```
 class PreferOverlayPortalRule extends SaropaLintRule {
   const PreferOverlayPortalRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_overlay_portal',
@@ -8388,10 +8388,10 @@ class PreferCarouselViewRule extends SaropaLintRule {
 /// ```
 class PreferSearchAnchorRule extends SaropaLintRule {
   const PreferSearchAnchorRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_search_anchor',
@@ -8457,10 +8457,10 @@ class PreferSearchAnchorRule extends SaropaLintRule {
 /// ```
 class PreferTapRegionForDismissRule extends SaropaLintRule {
   const PreferTapRegionForDismissRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_tap_region_for_dismiss',
@@ -8561,10 +8561,10 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
 /// ```
 class RequireTextOverflowHandlingRule extends SaropaLintRule {
   const RequireTextOverflowHandlingRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_handling',
@@ -8690,10 +8690,10 @@ class _AddTextOverflowFix extends DartFix {
 /// ```
 class RequireImageErrorBuilderRule extends SaropaLintRule {
   const RequireImageErrorBuilderRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_image_error_builder',
@@ -8896,10 +8896,10 @@ class RequireImageDimensionsRule extends SaropaLintRule {
 /// ```
 class RequirePlaceholderForNetworkRule extends SaropaLintRule {
   const RequirePlaceholderForNetworkRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_placeholder_for_network',
@@ -9195,10 +9195,10 @@ class _AddScrollControllerDisposeFix extends DartFix {
 /// ```
 class RequireFocusNodeDisposeRule extends SaropaLintRule {
   const RequireFocusNodeDisposeRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_focus_node_dispose',
@@ -9408,10 +9408,10 @@ class _AddFocusNodeDisposeFix extends DartFix {
 /// ```
 class PreferTextThemeRule extends SaropaLintRule {
   const PreferTextThemeRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_theme',
@@ -9484,10 +9484,10 @@ class PreferTextThemeRule extends SaropaLintRule {
 /// ```
 class AvoidNestedScrollablesRule extends SaropaLintRule {
   const AvoidNestedScrollablesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables',
@@ -9585,10 +9585,10 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
   const AvoidHardcodedLayoutValuesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_layout_values',
@@ -9711,10 +9711,10 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
 /// ```
 class PreferIgnorePointerRule extends SaropaLintRule {
   const PreferIgnorePointerRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_ignore_pointer',
@@ -9765,10 +9765,10 @@ class PreferIgnorePointerRule extends SaropaLintRule {
 /// ```
 class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
   const AvoidGestureWithoutBehaviorRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_without_behavior',
@@ -9931,10 +9931,10 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
 /// ```
 class PreferCursorForButtonsRule extends SaropaLintRule {
   const PreferCursorForButtonsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_cursor_for_buttons',
@@ -10006,10 +10006,10 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
 /// ```
 class RequireHoverStatesRule extends SaropaLintRule {
   const RequireHoverStatesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_hover_states',
@@ -10083,10 +10083,10 @@ class RequireHoverStatesRule extends SaropaLintRule {
 /// ```
 class RequireButtonLoadingStateRule extends SaropaLintRule {
   const RequireButtonLoadingStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_button_loading_state',
@@ -10183,10 +10183,10 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedTextStylesRule extends SaropaLintRule {
   const AvoidHardcodedTextStylesRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_text_styles',
@@ -10267,10 +10267,10 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
 /// ```
 class PreferPageStorageKeyRule extends SaropaLintRule {
   const PreferPageStorageKeyRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_page_storage_key',
@@ -10346,10 +10346,10 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 /// ```
 class RequireRefreshIndicatorRule extends SaropaLintRule {
   const RequireRefreshIndicatorRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator',
@@ -10435,10 +10435,10 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
 /// ```
 class RequireScrollPhysicsRule extends SaropaLintRule {
   const RequireScrollPhysicsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_scroll_physics',
@@ -10509,10 +10509,10 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 /// ```
 class PreferSliverListRule extends SaropaLintRule {
   const PreferSliverListRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list',
@@ -10581,10 +10581,10 @@ class PreferSliverListRule extends SaropaLintRule {
 /// ```
 class PreferKeepAliveRule extends SaropaLintRule {
   const PreferKeepAliveRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_keep_alive',
@@ -10658,10 +10658,10 @@ class PreferKeepAliveRule extends SaropaLintRule {
 /// ```
 class RequireDefaultTextStyleRule extends SaropaLintRule {
   const RequireDefaultTextStyleRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_default_text_style',
@@ -10729,10 +10729,10 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
 /// ```
 class PreferWrapOverOverflowRule extends SaropaLintRule {
   const PreferWrapOverOverflowRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_wrap_over_overflow',
@@ -10802,10 +10802,10 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
 /// ```
 class PreferAssetImageForLocalRule extends SaropaLintRule {
   const PreferAssetImageForLocalRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_asset_image_for_local',
@@ -10863,10 +10863,10 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
 /// ```
 class PreferFitCoverForBackgroundRule extends SaropaLintRule {
   const PreferFitCoverForBackgroundRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_fit_cover_for_background',
@@ -10930,10 +10930,10 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
 /// ```
 class RequireDisabledStateRule extends SaropaLintRule {
   const RequireDisabledStateRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_disabled_state',
@@ -11013,10 +11013,10 @@ class RequireDisabledStateRule extends SaropaLintRule {
 /// ```
 class RequireDragFeedbackRule extends SaropaLintRule {
   const RequireDragFeedbackRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_drag_feedback',
@@ -11077,10 +11077,10 @@ class RequireDragFeedbackRule extends SaropaLintRule {
 /// ```
 class AvoidGestureConflictRule extends SaropaLintRule {
   const AvoidGestureConflictRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_conflict',
@@ -11212,10 +11212,10 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
 /// ```
 class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
   const AvoidLayoutBuilderInScrollableRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_in_scrollable',
@@ -11285,10 +11285,10 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
 /// ```
 class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   const PreferIntrinsicDimensionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_intrinsic_dimensions',
@@ -11367,10 +11367,10 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
 /// ```
 class PreferActionsAndShortcutsRule extends SaropaLintRule {
   const PreferActionsAndShortcutsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_actions_and_shortcuts',
@@ -11492,10 +11492,10 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
 /// ```
 class AvoidFindChildInBuildRule extends SaropaLintRule {
   const AvoidFindChildInBuildRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_find_child_in_build',
@@ -11562,10 +11562,10 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
 /// ```
 class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   const AvoidUnboundedConstraintsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_constraints',
@@ -11650,10 +11650,10 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
 /// ```
 class PreferFractionalSizingRule extends SaropaLintRule {
   const PreferFractionalSizingRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_fractional_sizing',
@@ -11793,10 +11793,10 @@ class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
 /// ```
 class RequireErrorWidgetRule extends SaropaLintRule {
   const RequireErrorWidgetRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_error_widget',
@@ -11859,10 +11859,10 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 /// ```
 class PreferSliverAppBarRule extends SaropaLintRule {
   const PreferSliverAppBarRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_app_bar',
@@ -11922,10 +11922,10 @@ class PreferSliverAppBarRule extends SaropaLintRule {
 /// ```
 class AvoidOpacityMisuseRule extends SaropaLintRule {
   const AvoidOpacityMisuseRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_misuse',
@@ -11984,10 +11984,10 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
 /// ```
 class PreferClipBehaviorRule extends SaropaLintRule {
   const PreferClipBehaviorRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_clip_behavior',
@@ -12114,10 +12114,10 @@ class RequireScrollControllerRule extends SaropaLintRule {
 /// ```
 class PreferPositionedDirectionalRule extends SaropaLintRule {
   const PreferPositionedDirectionalRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_positioned_directional',
@@ -12182,10 +12182,10 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
 /// ```
 class AvoidStackOverflowRule extends SaropaLintRule {
   const AvoidStackOverflowRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_stack_overflow',
@@ -12355,10 +12355,10 @@ class RequireFormValidationRule extends SaropaLintRule {
 /// ```
 class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   const AvoidShrinkWrapInScrollRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_in_scroll',
@@ -12441,10 +12441,10 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 /// ```
 class AvoidDeepWidgetNestingRule extends SaropaLintRule {
   const AvoidDeepWidgetNestingRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_deep_widget_nesting',
@@ -12522,10 +12522,10 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
 /// ```
 class PreferSafeAreaAwareRule extends SaropaLintRule {
   const PreferSafeAreaAwareRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_aware',
@@ -12631,10 +12631,10 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
 /// ```
 class AvoidFixedDimensionsRule extends SaropaLintRule {
   const AvoidFixedDimensionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_fixed_dimensions',
@@ -12713,10 +12713,10 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
 /// ```
 class RequireThemeColorFromSchemeRule extends SaropaLintRule {
   const RequireThemeColorFromSchemeRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_theme_color_from_scheme',
@@ -12809,10 +12809,10 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
 /// ```
 class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   const PreferColorSchemeFromSeedRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_color_scheme_from_seed',
@@ -12895,10 +12895,10 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
 /// ```
 class PreferRichTextForComplexRule extends SaropaLintRule {
   const PreferRichTextForComplexRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_rich_text_for_complex',
@@ -12975,10 +12975,10 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
 /// ```
 class PreferSystemThemeDefaultRule extends SaropaLintRule {
   const PreferSystemThemeDefaultRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_system_theme_default',
@@ -13064,10 +13064,10 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
 /// ```
 class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
   const AvoidAbsorbPointerMisuseRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_absorb_pointer_misuse',
@@ -13432,10 +13432,8 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_window_size_constraints',
-    problemMessage:
-        'Desktop app should set minimum window size constraints.',
-    correctionMessage:
-        'Use window_manager or similar to set setMinimumSize().',
+    problemMessage: 'Desktop app should set minimum window size constraints.',
+    correctionMessage: 'Use window_manager or similar to set setMinimumSize().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -13858,7 +13856,8 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
 
       // Check for factory constructors like Image.network
       final String? constructorName = node.constructorName.name?.name;
-      if (constructorName != null && !_imageFactories.contains(constructorName)) {
+      if (constructorName != null &&
+          !_imageFactories.contains(constructorName)) {
         return;
       }
 

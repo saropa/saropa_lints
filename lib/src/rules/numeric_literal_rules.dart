@@ -27,10 +27,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
   const AvoidInconsistentDigitSeparatorsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_inconsistent_digit_separators',
@@ -115,10 +115,10 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
 /// ```
 class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
   const AvoidUnnecessaryDigitSeparatorsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_digit_separators',
@@ -166,10 +166,10 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
 /// a digit before the decimal point (0.5 instead of .5).
 class DoubleLiteralFormatRule extends SaropaLintRule {
   const DoubleLiteralFormatRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'double_literal_format',
@@ -204,10 +204,10 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
 /// constants to give meaning to numeric values.
 class NoMagicNumberRule extends SaropaLintRule {
   const NoMagicNumberRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'no_magic_number',
@@ -290,10 +290,10 @@ class NoMagicNumberRule extends SaropaLintRule {
 /// ```
 class NoMagicStringRule extends SaropaLintRule {
   const NoMagicStringRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'no_magic_string',
@@ -407,10 +407,10 @@ class NoMagicStringRule extends SaropaLintRule {
 /// ```
 class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
   const PreferAdditionSubtractionAssignmentsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_addition_subtraction_assignments',
@@ -483,10 +483,10 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
 /// ```
 class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
   const PreferCompoundAssignmentOperatorsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_compound_assignment_operators',
@@ -543,10 +543,10 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
 /// ```
 class PreferDigitSeparatorsRule extends SaropaLintRule {
   const PreferDigitSeparatorsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const int _threshold = 10000; // Numbers >= 10000 should use separators
 
@@ -673,10 +673,10 @@ class _AddDigitSeparatorsFix extends DartFix {
 /// ```
 class AvoidDigitSeparatorsRule extends SaropaLintRule {
   const AvoidDigitSeparatorsRule() : super(code: _code);
+
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_digit_separators',

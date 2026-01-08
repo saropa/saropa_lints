@@ -36,10 +36,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireTestAssertionsRule extends SaropaLintRule {
   const RequireTestAssertionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_test_assertions',
@@ -126,10 +126,10 @@ class RequireTestAssertionsRule extends SaropaLintRule {
 /// ```
 class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   const AvoidVagueTestDescriptionsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_vague_test_descriptions',
@@ -224,10 +224,10 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
 /// ```
 class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   const AvoidRealNetworkCallsInTestsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_network_calls_in_tests',
@@ -321,10 +321,10 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   const AvoidHardcodedTestDelaysRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_test_delays',
@@ -400,10 +400,10 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
 /// ```
 class RequireTestSetupTeardownRule extends SaropaLintRule {
   const RequireTestSetupTeardownRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_test_setup_teardown',
@@ -476,10 +476,10 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
 /// ```
 class RequirePumpAfterInteractionRule extends SaropaLintRule {
   const RequirePumpAfterInteractionRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_pump_after_interaction',
@@ -572,10 +572,10 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
 /// ```
 class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   const AvoidProductionConfigInTestsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_production_config_in_tests',
@@ -655,10 +655,10 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
 /// ```
 class PreferPumpAndSettleRule extends SaropaLintRule {
   const PreferPumpAndSettleRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_pump_and_settle',
@@ -761,10 +761,10 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
 /// ```
 class AvoidTestSleepRule extends SaropaLintRule {
   const AvoidTestSleepRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_test_sleep',
@@ -842,10 +842,10 @@ class AvoidTestSleepRule extends SaropaLintRule {
 /// ```
 class AvoidFindByTextRule extends SaropaLintRule {
   const AvoidFindByTextRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_find_by_text',
@@ -931,10 +931,10 @@ class AvoidFindByTextRule extends SaropaLintRule {
 /// ```
 class RequireTestKeysRule extends SaropaLintRule {
   const RequireTestKeysRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_test_keys',
@@ -1029,10 +1029,10 @@ class RequireTestKeysRule extends SaropaLintRule {
 /// ```
 class RequireArrangeActAssertRule extends SaropaLintRule {
   const RequireArrangeActAssertRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_arrange_act_assert',
@@ -1113,10 +1113,10 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
 /// ```
 class PreferMockNavigatorRule extends SaropaLintRule {
   const PreferMockNavigatorRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_mock_navigator',
@@ -1185,10 +1185,10 @@ class PreferMockNavigatorRule extends SaropaLintRule {
 /// ```
 class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   const AvoidRealTimerInWidgetTestRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_timer_in_widget_test',
@@ -1258,10 +1258,10 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
 /// ```
 class RequireMockVerificationRule extends SaropaLintRule {
   const RequireMockVerificationRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_mock_verification',
@@ -1330,10 +1330,10 @@ class RequireMockVerificationRule extends SaropaLintRule {
 /// ```
 class PreferMatcherOverEqualsRule extends SaropaLintRule {
   const PreferMatcherOverEqualsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_matcher_over_equals',
@@ -1411,10 +1411,10 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 /// ```
 class PreferTestWrapperRule extends SaropaLintRule {
   const PreferTestWrapperRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_wrapper',
@@ -1483,10 +1483,10 @@ class PreferTestWrapperRule extends SaropaLintRule {
 /// ```
 class RequireScreenSizeTestsRule extends SaropaLintRule {
   const RequireScreenSizeTestsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_screen_size_tests',
@@ -1560,10 +1560,10 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
 /// ```
 class AvoidStatefulTestSetupRule extends SaropaLintRule {
   const AvoidStatefulTestSetupRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_test_setup',
@@ -1628,10 +1628,10 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
 /// ```
 class PreferMockHttpRule extends SaropaLintRule {
   const PreferMockHttpRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_mock_http',
@@ -1778,10 +1778,10 @@ class RequireGoldenTestRule extends SaropaLintRule {
 /// ```
 class AvoidFlakyTestsRule extends SaropaLintRule {
   const AvoidFlakyTestsRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_flaky_tests',
@@ -1930,10 +1930,10 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
 /// ```
 class PreferSingleAssertionRule extends SaropaLintRule {
   const PreferSingleAssertionRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_assertion',
@@ -2001,10 +2001,10 @@ class PreferSingleAssertionRule extends SaropaLintRule {
 /// ```
 class AvoidFindAllRule extends SaropaLintRule {
   const AvoidFindAllRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_find_all',
@@ -2101,10 +2101,10 @@ class AvoidFindAllRule extends SaropaLintRule {
 /// ```
 class RequireIntegrationTestSetupRule extends SaropaLintRule {
   const RequireIntegrationTestSetupRule() : super(code: _code);
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
-
 
   static const LintCode _code = LintCode(
     name: 'require_integration_test_setup',

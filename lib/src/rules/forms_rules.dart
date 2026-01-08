@@ -39,10 +39,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
   const PreferAutovalidateOnInteractionRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'prefer_autovalidate_on_interaction',
@@ -128,10 +128,10 @@ class _ChangeToOnUserInteractionFix extends DartFix {
 /// ```
 class RequireKeyboardTypeRule extends SaropaLintRule {
   const RequireKeyboardTypeRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_keyboard_type',
@@ -258,10 +258,10 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 /// ```
 class RequireTextOverflowInRowRule extends SaropaLintRule {
   const RequireTextOverflowInRowRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_in_row',
@@ -343,10 +343,10 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
 /// ```
 class RequireSecureKeyboardRule extends SaropaLintRule {
   const RequireSecureKeyboardRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_secure_keyboard',
@@ -498,10 +498,10 @@ class _AddObscureTextFix extends DartFix {
 /// ```
 class RequireErrorMessageContextRule extends SaropaLintRule {
   const RequireErrorMessageContextRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_error_message_context',
@@ -592,10 +592,10 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
 /// ```
 class RequireFormKeyRule extends SaropaLintRule {
   const RequireFormKeyRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_form_key',
@@ -666,10 +666,10 @@ class RequireFormKeyRule extends SaropaLintRule {
 /// ```
 class AvoidValidationInBuildRule extends SaropaLintRule {
   const AvoidValidationInBuildRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_validation_in_build',
@@ -748,10 +748,10 @@ class _ValidatorVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class RequireSubmitButtonStateRule extends SaropaLintRule {
   const RequireSubmitButtonStateRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_submit_button_state',
@@ -818,10 +818,10 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
 /// ```
 class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
   const AvoidFormWithoutUnfocusRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_unfocus',
@@ -885,10 +885,10 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
 /// ```
 class RequireFormRestorationRule extends SaropaLintRule {
   const RequireFormRestorationRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_form_restoration',
@@ -975,10 +975,10 @@ class RequireFormRestorationRule extends SaropaLintRule {
 /// ```
 class AvoidClearingFormOnErrorRule extends SaropaLintRule {
   const AvoidClearingFormOnErrorRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_clearing_form_on_error',
@@ -1042,10 +1042,10 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
 /// ```
 class RequireFormFieldControllerRule extends SaropaLintRule {
   const RequireFormFieldControllerRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_form_field_controller',
@@ -1117,10 +1117,10 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
 /// ```
 class AvoidFormInAlertDialogRule extends SaropaLintRule {
   const AvoidFormInAlertDialogRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_form_in_alert_dialog',

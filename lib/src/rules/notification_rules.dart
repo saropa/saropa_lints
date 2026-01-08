@@ -47,7 +47,6 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
-
   static const LintCode _code = LintCode(
     name: 'require_notification_channel_android',
     problemMessage:
@@ -170,7 +169,6 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   /// Privacy/security issue that can expose passwords, tokens, PII.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_notification_payload_sensitive',

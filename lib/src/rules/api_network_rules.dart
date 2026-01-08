@@ -33,10 +33,10 @@ import '../saropa_lint_rule.dart';
 /// ```
 class RequireHttpStatusCheckRule extends SaropaLintRule {
   const RequireHttpStatusCheckRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_http_status_check',
@@ -94,10 +94,10 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
 /// ```
 class RequireApiTimeoutRule extends SaropaLintRule {
   const RequireApiTimeoutRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_api_timeout',
@@ -185,10 +185,10 @@ class RequireApiTimeoutRule extends SaropaLintRule {
 /// ```
 class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   const AvoidHardcodedApiUrlsRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_api_urls',
@@ -250,10 +250,10 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 /// ```
 class RequireRetryLogicRule extends SaropaLintRule {
   const RequireRetryLogicRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
@@ -319,10 +319,10 @@ class RequireRetryLogicRule extends SaropaLintRule {
 /// ```
 class RequireTypedApiResponseRule extends SaropaLintRule {
   const RequireTypedApiResponseRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_typed_api_response',
@@ -412,10 +412,10 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
 /// ```
 class RequireConnectivityCheckRule extends SaropaLintRule {
   const RequireConnectivityCheckRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_connectivity_check',
@@ -488,10 +488,10 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
 /// ```
 class RequireApiErrorMappingRule extends SaropaLintRule {
   const RequireApiErrorMappingRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_api_error_mapping',
@@ -565,10 +565,10 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
 /// ```
 class RequireRequestTimeoutRule extends SaropaLintRule {
   const RequireRequestTimeoutRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_request_timeout',
@@ -697,10 +697,10 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 /// ```
 class RequireOfflineIndicatorRule extends SaropaLintRule {
   const RequireOfflineIndicatorRule() : super(code: _code);
+
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
-
 
   static const LintCode _code = LintCode(
     name: 'require_offline_indicator',
