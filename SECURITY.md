@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-We currently support the latest version of saropa_lints published on
+We currently support the latest version of Saropa Lints published on
 [pub.dev](https://pub.dev/packages/saropa_lints). Please always use
 the latest version to ensure you have any security patches.
 
@@ -13,7 +13,7 @@ the latest version to ensure you have any security patches.
 
 ## Scope
 
-saropa_lints is a static analysis package that runs during development.
+Saropa Lints is a static analysis package that runs during development.
 It does not:
 - Collect or transmit any data
 - Execute at runtime in production applications
@@ -24,7 +24,7 @@ and suggestions.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in saropa_lints, please report
+If you discover a security vulnerability in Saropa Lints, please report
 it responsibly.
 
 **For security issues:** Email [security@saropa.com](mailto:security@saropa.com)
