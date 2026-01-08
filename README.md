@@ -1,4 +1,4 @@
-![saropa_lints banner](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner.png)
+![saropa_lints banner](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/banner_v2.png)
 
 # Saropa Lints
 
