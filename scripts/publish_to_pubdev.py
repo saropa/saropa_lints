@@ -949,8 +949,9 @@ def pre_publish_validation(project_dir: Path) -> bool:
     print_info("Running pre-publish validation...")
     use_shell = get_shell_mode()
 
+    # Use 'dart pub' instead of 'flutter pub' to avoid Windows 'nul' path bug
     result = subprocess.run(
-        ["flutter", "pub", "publish", "--dry-run"],
+        ["dart", "pub", "publish", "--dry-run"],
         cwd=project_dir,
         capture_output=True,
         text=True,
