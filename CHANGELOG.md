@@ -5,15 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.7.6] - 2026-01-09
+
+### Added
+
+- **Quick fix**: `avoid_isar_enum_field` now auto-converts enum fields to string storage with a cached getter using `values.byName`, preventing enum reordering/rename data corruption in Isar collections.
 
 ### Changed
 
-- **Code review**: Reviewed all 22 stylistic/opinionated rules for logic issues, performance risks, and code quality
-  - Verified all rules use `LintImpact.opinionated` correctly
-  - Confirmed no recursion risks or performance issues in AST traversal
-  - All rules properly implement quick fixes where applicable
-  - Documentation examples use proper Unicode escape sequences for special characters
+- **Impact tuning**: `avoid_isar_enum_field` now reports as `LintImpact.high` to reflect data corruption risk when enums are stored directly.
+
+### Fixed
+
+- Restored `NullabilitySuffix`-based nullability checks for analyzer compatibility in nullable-field lints.
 
 ## [1.7.5] - 2026-01-09
 
