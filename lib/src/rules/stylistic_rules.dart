@@ -3,8 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -51,13 +51,12 @@ class PreferRelativeImportsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
     problemMessage: 'Use relative imports instead of absolute package imports.',
-    correctionMessage:
-        'Consider using a relative import path for files within the same package.',
+    correctionMessage: 'Consider using a relative import path for files within the same package.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -154,8 +153,7 @@ class _ConvertToRelativeImportFix extends DartFix {
   }
 
   String _calculateRelativePath(String fromDir, String toPath) {
-    final List<String> fromParts =
-        fromDir.isEmpty ? <String>[] : fromDir.split('/');
+    final List<String> fromParts = fromDir.isEmpty ? <String>[] : fromDir.split('/');
     final List<String> toParts = toPath.split('/');
 
     // Find common prefix length
@@ -228,13 +226,12 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
     problemMessage: 'Multiple widget classes defined in a single file.',
-    correctionMessage:
-        'Consider moving each widget class to its own file for better organization.',
+    correctionMessage: 'Consider moving each widget class to its own file for better organization.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -274,8 +271,7 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
     // Note: State classes are NOT counted as widgets - they MUST be in the
     // same file as their StatefulWidget and are not independent widgets.
     // We only count actual widget classes that could be in separate files.
-    return superclassName == 'StatelessWidget' ||
-        superclassName == 'StatefulWidget';
+    return superclassName == 'StatelessWidget' || superclassName == 'StatefulWidget';
   }
 }
 
@@ -311,12 +307,11 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_arrow_functions',
-    problemMessage:
-        'Function body contains only a return statement; use arrow syntax.',
+    problemMessage: 'Function body contains only a return statement; use arrow syntax.',
     correctionMessage: 'Convert to arrow function: => expression',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -487,7 +482,7 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   /// Threshold for number of positional parameters before suggesting named.
   static const int _threshold = 3;
@@ -496,8 +491,7 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
     name: 'prefer_all_named_parameters',
     problemMessage:
         'Function has $_threshold or more positional parameters; consider using named parameters.',
-    correctionMessage:
-        'Convert positional parameters to named parameters for clarity.',
+    correctionMessage: 'Convert positional parameters to named parameters for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -605,7 +599,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
@@ -801,14 +795,12 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
-    problemMessage:
-        'Instance field should be private (prefixed with underscore).',
-    correctionMessage:
-        'Consider making this field private and providing a getter if needed.',
+    problemMessage: 'Instance field should be private (prefixed with underscore).',
+    correctionMessage: 'Consider making this field private and providing a getter if needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -853,8 +845,7 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
       // Check if class extends StatelessWidget or StatefulWidget (widget props)
       if (extendsClause != null) {
         final String? superclassName = extendsClause.superclass.element?.name;
-        if (superclassName == 'StatelessWidget' ||
-            superclassName == 'StatefulWidget') {
+        if (superclassName == 'StatelessWidget' || superclassName == 'StatefulWidget') {
           return true; // Widget constructor parameters are intentionally public
         }
       }
@@ -931,17 +922,15 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   /// Maximum number of lines in build method to suggest conversion.
   static const int _maxBuildLines = 5;
 
   static const LintCode _code = LintCode(
     name: 'prefer_widget_methods_over_classes',
-    problemMessage:
-        'Simple widget class could be a method in the parent widget.',
-    correctionMessage:
-        'Consider converting to a build method for less boilerplate.',
+    problemMessage: 'Simple widget class could be a method in the parent widget.',
+    correctionMessage: 'Consider converting to a build method for less boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1047,7 +1036,7 @@ class PreferExplicitTypesRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
@@ -1140,14 +1129,12 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
-    problemMessage:
-        'Method returns a record; consider using a dedicated class.',
-    correctionMessage:
-        'Create a class with named fields for better maintainability.',
+    problemMessage: 'Method returns a record; consider using a dedicated class.',
+    correctionMessage: 'Create a class with named fields for better maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1233,14 +1220,12 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
-    problemMessage:
-        'Callback references a method; consider inlining for locality.',
-    correctionMessage:
-        'Inline simple callbacks to keep behavior close to its usage.',
+    problemMessage: 'Callback references a method; consider inlining for locality.',
+    correctionMessage: 'Inline simple callbacks to keep behavior close to its usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1323,7 +1308,7 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_quotes',
@@ -1394,8 +1379,7 @@ class _ConvertToSingleQuotesFix extends DartFix {
       if (node.value.contains("'")) return;
 
       // Escape any existing backslashes and single quotes in the value
-      final String escaped =
-          node.value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
+      final String escaped = node.value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
 
       final String newLexeme = "'$escaped'";
 
@@ -1446,12 +1430,11 @@ class PreferTodoFormatRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
-    problemMessage:
-        'TODO comment should follow format: TODO(author): description',
+    problemMessage: 'TODO comment should follow format: TODO(author): description',
     correctionMessage: 'Add author name in parentheses: TODO(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1537,12 +1520,11 @@ class PreferFixmeFormatRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
-    problemMessage:
-        'FIXME comment should follow format: FIXME(author): description',
+    problemMessage: 'FIXME comment should follow format: FIXME(author): description',
     correctionMessage: 'Add author name in parentheses: FIXME(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1625,7 +1607,7 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_sentence_case_comments',
@@ -1806,10 +1788,8 @@ class _CapitalizeCommentFix extends DartFix {
             final String content = lexeme.substring(prefixLength);
 
             if (content.isNotEmpty) {
-              final String capitalized =
-                  content[0].toUpperCase() + content.substring(1);
-              final String newLexeme =
-                  '${lexeme.substring(0, prefixLength)}$capitalized';
+              final String capitalized = content[0].toUpperCase() + content.substring(1);
+              final String newLexeme = '${lexeme.substring(0, prefixLength)}$capitalized';
 
               final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
                 message: 'Capitalize first letter',
@@ -1869,7 +1849,7 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_period_after_doc',
@@ -1908,8 +1888,7 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
     });
 
     // Check top-level variables
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       _checkDocComment(node.documentationComment, reporter);
     });
 
@@ -2025,13 +2004,12 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
     problemMessage: 'Constants should use SCREAMING_SNAKE_CASE.',
-    correctionMessage:
-        'Rename to SCREAMING_SNAKE_CASE: MAX_VALUE instead of maxValue',
+    correctionMessage: 'Rename to SCREAMING_SNAKE_CASE: MAX_VALUE instead of maxValue',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2062,8 +2040,7 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Check top-level constants
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       if (!node.variables.isConst) return;
 
       for (final VariableDeclaration variable in node.variables.variables) {
@@ -2111,8 +2088,7 @@ class _ConvertToScreamingCaseFix extends DartFix {
       if (!analysisError.sourceRange.intersects(node.name.sourceRange)) return;
 
       final String name = node.name.lexeme;
-      final String newName =
-          PreferScreamingCaseConstantsRule.toScreamingSnakeCase(name);
+      final String newName = PreferScreamingCaseConstantsRule.toScreamingSnakeCase(name);
 
       if (name == newName) return;
 
@@ -2164,14 +2140,12 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
-    problemMessage:
-        'Boolean should use a descriptive prefix (is, has, can, should, etc.).',
-    correctionMessage:
-        'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
+    problemMessage: 'Boolean should use a descriptive prefix (is, has, can, should, etc.).',
+    correctionMessage: 'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2323,13 +2297,12 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
     problemMessage: 'File name should use snake_case.',
-    correctionMessage:
-        'Rename file to snake_case: user_service.dart instead of UserService.dart',
+    correctionMessage: 'Rename file to snake_case: user_service.dart instead of UserService.dart',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2368,15 +2341,13 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
       }
 
       // Skip files in generated directories
-      if (fullPath.contains('/generated/') ||
-          fullPath.contains('/.dart_tool/')) {
+      if (fullPath.contains('/generated/') || fullPath.contains('/.dart_tool/')) {
         return;
       }
 
       if (!_snakeCasePattern.hasMatch(fileName)) {
         // Report at the library directive if present, otherwise at the first token
-        final LibraryDirective? library =
-            unit.directives.whereType<LibraryDirective>().firstOrNull;
+        final LibraryDirective? library = unit.directives.whereType<LibraryDirective>().firstOrNull;
         if (library != null) {
           reporter.atNode(library, code);
         } else {
@@ -2422,7 +2393,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   /// Minimum font size in logical pixels.
   static const double _minFontSize = 12.0;
@@ -2431,8 +2402,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
     name: 'avoid_small_text',
     problemMessage:
         'Font size is smaller than $_minFontSize. Consider increasing for accessibility.',
-    correctionMessage:
-        'Use a font size of at least $_minFontSize for better readability.',
+    correctionMessage: 'Use a font size of at least $_minFontSize for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2442,8 +2412,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
 
       // Check TextStyle constructor
@@ -2466,8 +2435,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
           fontSize = expression.value?.toDouble();
         } else if (expression is DoubleLiteral) {
           fontSize = expression.value;
-        } else if (expression is PrefixExpression &&
-            expression.operator.lexeme == '-') {
+        } else if (expression is PrefixExpression && expression.operator.lexeme == '-') {
           // Handle negative numbers (which would definitely be invalid)
           final Expression operand = expression.operand;
           if (operand is IntegerLiteral || operand is DoubleLiteral) {
@@ -2552,7 +2520,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
     name: 'prefer_doc_comments_over_regular',
@@ -2732,52 +2700,58 @@ class _ConvertToDocCommentFix extends DartFix {
   }
 }
 
-/// Warns when escaped apostrophes (`\'`) are used instead of literal apostrophes.
+// cspell:ignore Brien
+/// Warns when stylized (curly) apostrophes are used instead of straight apostrophes.
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
 ///
-/// When a single-quoted string contains an escaped apostrophe (`\'`), it can
-/// often be rewritten with double quotes to use the apostrophe directly,
-/// improving readability.
+/// Code should use straight/ASCII apostrophes (') (U+0027) rather than
+/// Right Single Quotation Mark (\u2019) (U+2019) or Left Single Quotation Mark (\u2018) (U+2018).
+/// Curly apostrophes are for typography in prose, not code.
 ///
-/// **Pros of using literal apostrophes:**
-/// - Cleaner, more readable strings
-/// - Less visual noise from escape characters
-/// - Double-quoted strings handle apostrophes naturally
+/// **Pros of straight apostrophes:**
+/// - Standard in code and programming
+/// - Consistent with source code conventions
+/// - Easier to type and search for
+/// - No Unicode confusion
 ///
-/// **Cons (why some teams use escaped apostrophes):**
-/// - Consistency with single-quote preference
-/// - Habit from other languages
-/// - May prefer single quotes for all strings
+/// **Cons (why some teams use curly apostrophes):**
+/// - More typographic/professional appearance
+/// - Used in formal documentation strings
+/// - Habit from writing tools (Word, etc.)
 ///
 /// ### Example
 ///
 /// #### BAD (with this rule enabled):
 /// ```dart
-/// String message = 'It\'s a beautiful day';
-/// String name = 'O\'Brien';
+/// String message = 'It\u2019s a beautiful day';  // Right Single Quotation Mark (U+2019)
+/// String name = 'O\u2019Brien';                  // Right Single Quotation Mark (U+2019)
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
-/// String message = "It's a beautiful day";
-/// String name = "O'Brien";
+/// String message = 'It\'s a beautiful day';  // ASCII apostrophe with escape
+/// String name = "O'Brien";                   // ASCII apostrophe in double quotes
 /// ```
-class PreferLiteralApostropheRule extends SaropaLintRule {
-  const PreferLiteralApostropheRule() : super(code: _code);
+class PreferStraightApostropheRule extends SaropaLintRule {
+  const PreferStraightApostropheRule() : super(code: _code);
 
   /// Stylistic rule - style/consistency issues are acceptable in legacy code.
   @override
-  LintImpact get impact => LintImpact.low;
+  LintImpact get impact => LintImpact.opinionated;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_literal_apostrophe',
-    problemMessage:
-        "Use literal apostrophe (') instead of escaped apostrophe (\\').",
-    correctionMessage:
-        'Switch to double quotes to use literal apostrophes: "It\'s" instead of \'It\\\'s\'',
+    name: 'prefer_straight_apostrophe',
+    problemMessage: "Use straight apostrophe (') instead of Right Single Quotation Mark (').",
+    correctionMessage: "Replace Right Single Quotation Mark with straight apostrophe or escape it.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
+
+  /// Unicode Right Single Quotation Mark (U+2019)
+  static const String rightSingleQuote = '\u2019';
+
+  /// Unicode Left Single Quotation Mark (U+2018)
+  static const String leftSingleQuote = '\u2018';
 
   @override
   void runWithReporter(
@@ -2786,33 +2760,28 @@ class PreferLiteralApostropheRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      final String lexeme = node.literal.lexeme;
+      final String value = node.value;
 
-      // Skip raw strings - they don't interpret escape sequences
-      if (lexeme.startsWith('r')) return;
+      // Check for curly apostrophes
+      if (value.contains(rightSingleQuote) || value.contains(leftSingleQuote)) {
+        reporter.atNode(node, code);
+      }
+    });
 
-      // Skip double-quoted strings - apostrophes don't need escaping
-      if (lexeme.startsWith('"')) return;
-
-      // Skip multi-line strings - different quoting rules apply
-      if (lexeme.startsWith("'''")) return;
-
-      // Check if this single-quoted string contains escaped apostrophes
-      if (!lexeme.contains(r"\'")) return;
-
-      // Skip if the string contains double quotes - converting would require
-      // escaping those instead, which defeats the purpose
-      if (node.value.contains('"')) return;
-
-      reporter.atNode(node, code);
+    // Also check string interpolations
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final String value = node.toString();
+      if (value.contains(rightSingleQuote) || value.contains(leftSingleQuote)) {
+        reporter.atNode(node, code);
+      }
     });
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_ConvertToDoubleQuotesFix()];
+  List<Fix> getFixes() => <Fix>[_ReplaceCurlyApostropheFix()];
 }
 
-class _ConvertToDoubleQuotesFix extends DartFix {
+class _ReplaceCurlyApostropheFix extends DartFix {
   @override
   void run(
     CustomLintResolver resolver,
@@ -2824,32 +2793,223 @@ class _ConvertToDoubleQuotesFix extends DartFix {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
 
+      final String value = node.value;
+      if (!value.contains(PreferStraightApostropheRule.rightSingleQuote) &&
+          !value.contains(PreferStraightApostropheRule.leftSingleQuote)) {
+        return;
+      }
+
+      // Replace curly apostrophes with straight ones
+      final String fixed = value
+          .replaceAll(PreferStraightApostropheRule.rightSingleQuote, "'")
+          .replaceAll(PreferStraightApostropheRule.leftSingleQuote, "'");
+
+      // Determine the quote style to use for the new string
       final String lexeme = node.literal.lexeme;
+      final String quote = lexeme[0]; // Get the original quote character
 
-      // Skip if not a single-quoted string with escaped apostrophes
-      if (!lexeme.startsWith("'") || !lexeme.contains(r"\'")) return;
+      // Escape apostrophes if using single quotes
+      final String escaped = quote == "'" ? fixed.replaceAll("'", "\\'") : fixed;
 
-      // Skip if contains double quotes (would need escaping)
-      if (node.value.contains('"')) return;
-
-      // Convert the string content from single-quote escaping to double-quote.
-      // We work with the lexeme (raw source) to preserve other escape sequences.
-      // Steps:
-      // 1. Strip the surrounding single quotes
-      // 2. Replace escaped apostrophes (\') with literal apostrophes (')
-      // 3. Wrap in double quotes
-      final String content = lexeme.substring(1, lexeme.length - 1);
-      final String converted = content.replaceAll(r"\'", "'");
-      final String newLexeme = '"$converted"';
+      final String newLexeme = '$quote$escaped$quote';
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Convert to double quotes',
+        message: 'Replace with straight apostrophe',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleReplacement(node.sourceRange, newLexeme);
       });
+    });
+  }
+}
+
+/// Warns when straight apostrophes are used instead of stylized (curly) apostrophes.
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// For documentation and user-facing strings, Right Single Quotation Mark (\u2019) (U+2019)
+/// provides better typography than straight ASCII apostrophes (') (U+0027).
+/// This is the inverse of [PreferStraightApostropheRule].
+///
+/// **Pros of Right Single Quotation Mark:**
+/// - Better typography in user-facing text
+/// - Professional appearance in documentation
+/// - Common in publishing and design
+/// - More readable for prose
+///
+/// **Cons (why some teams avoid them):**
+/// - Code convention is straight apostrophes
+/// - Can be confusing when mixed with code
+/// - Harder to type on some keyboards (use copy/paste or compose key)
+/// - May not display correctly in some contexts
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// /// It's a beautiful day.  // Straight ASCII apostrophe (U+0027)
+/// String greeting = 'Hello';
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// /// It's a beautiful day.  // Right Single Quotation Mark (U+2019)
+/// String greeting = 'Hello';
+/// ```
+class PreferCurlyApostropheRule extends SaropaLintRule {
+  const PreferCurlyApostropheRule() : super(code: _code);
+
+  /// Stylistic rule - style/consistency issues are acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_curly_apostrophe',
+    problemMessage:
+        "Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation.",
+    correctionMessage: "Replace straight apostrophe with Right Single Quotation Mark (U+2019).",
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// ASCII straight apostrophe (U+0027)
+  static const String straightApostrophe = "'";
+
+  /// Unicode Right Single Quotation Mark (U+2019)
+  static const String curlyApostrophe = '\u2019';
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check doc comments (where typography matters most)
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+  }
+
+  void _checkDocComment(Comment? comment, SaropaDiagnosticReporter reporter) {
+    if (comment == null) return;
+
+    final List<Token> tokens = comment.tokens;
+    for (final Token token in tokens) {
+      final String lexeme = token.lexeme;
+
+      // Only check doc comments
+      if (!lexeme.startsWith('///')) continue;
+
+      // Check if it contains straight apostrophes that could be curly
+      // Look for contractions: don't, won't, can't, it's, etc.
+      if (lexeme.contains("'")) {
+        // Simple heuristic: if it looks like a contraction, suggest curly
+        final RegExp contractionCheck = RegExp(
+          r"(don't|won't|can't|shouldn't|wouldn't|isn't|aren't|"
+          r"hasn't|haven't|wasn't|weren't|let's|it's|there's|"
+          r"here's|we'll|I've|I'm|you're|they're|that's)",
+        );
+
+        if (contractionCheck.hasMatch(lexeme)) {
+          reporter.atToken(token, code);
+        }
+      }
+    }
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceStraightApostropheFix()];
+}
+
+class _ReplaceStraightApostropheFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        Token? comment = token.precedingComments;
+        while (comment != null) {
+          final SourceRange commentRange = SourceRange(comment.offset, comment.length);
+          if (!analysisError.sourceRange.intersects(commentRange)) {
+            comment = comment.next;
+            continue;
+          }
+
+          if (!comment.lexeme.startsWith('///')) {
+            comment = comment.next;
+            continue;
+          }
+
+          final String lexeme = comment.lexeme;
+          if (!lexeme.contains("'")) {
+            comment = comment.next;
+            continue;
+          }
+
+          // cspell:ignore shouldn wouldn aren hasn wasn weren
+          // Replace straight apostrophes with curly ones in contractions
+          final String fixed = lexeme
+              .replaceAll("don't", 'don\u2019t')
+              .replaceAll("won't", 'won\u2019t')
+              .replaceAll("can't", 'can\u2019t')
+              .replaceAll("shouldn't", 'shouldn\u2019t')
+              .replaceAll("wouldn't", 'wouldn\u2019t')
+              .replaceAll("isn't", 'isn\u2019t')
+              .replaceAll("aren't", 'aren\u2019t')
+              .replaceAll("hasn't", 'hasn\u2019t')
+              .replaceAll("haven't", 'haven\u2019t')
+              .replaceAll("wasn't", 'wasn\u2019t')
+              .replaceAll("weren't", 'weren\u2019t')
+              .replaceAll("let's", 'let\u2019s')
+              .replaceAll("it's", 'it\u2019s')
+              .replaceAll("there's", 'there\u2019s')
+              .replaceAll("here's", 'here\u2019s')
+              .replaceAll("we'll", 'we\u2019ll')
+              .replaceAll("I've", 'I\u2019ve')
+              .replaceAll("I'm", 'I\u2019m')
+              .replaceAll("you're", 'you\u2019re')
+              .replaceAll("they're", 'they\u2019re')
+              .replaceAll("that's", 'that\u2019s');
+
+          if (fixed != lexeme) {
+            final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+              message: 'Use stylized apostrophe',
+              priority: 1,
+            );
+
+            changeBuilder.addDartFileEdit((builder) {
+              builder.addSimpleReplacement(commentRange, fixed);
+            });
+          }
+
+          comment = comment.next;
+        }
+        token = token.next;
+      }
     });
   }
 }

@@ -7,7 +7,7 @@ This guide explains how `flutter_lints` and `saropa_lints` work together.
 | Aspect | flutter_lints | saropa_lints |
 |--------|--------------|--------------|
 | **Type** | Standard Dart analyzer rules | Custom lint rules (custom_lint) |
-| **Rule count** | ~30 rules | 766+ rules |
+| **Rule count** | ~30 rules | 767+ rules |
 | **Analysis depth** | Syntax and style | Behavior and semantics |
 | **Provided by** | Flutter team (official) | Saropa (community) |
 

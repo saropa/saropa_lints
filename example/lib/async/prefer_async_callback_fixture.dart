@@ -13,7 +13,9 @@ import 'package:flutter/material.dart';
 /// - `VoidCallback?` → `Future<void> Function()?`
 ///
 /// We use explicit function types instead of `AsyncCallback` because:
-/// 1. No extra import required (AsyncCallback needs flutter/foundation.dart)
+/// 1. No Flutter-specific import or dependency required. `AsyncCallback` lives
+///    in `package:flutter/foundation.dart` (and is accessible via
+///    `widgets.dart`/`material.dart`), but still introduces a Flutter-only type.
 /// 2. Self-documenting - the signature is immediately clear
 /// 3. Consistent with parameterized async callbacks
 
@@ -86,13 +88,19 @@ class BadFieldExamples {
 // BAD: Parameter declarations with async-suggesting names
 class BadParameterExamples {
   // expect_lint: prefer_async_callback
-  void methodWithSubmit(VoidCallback? onSubmit) {}
+  void methodWithSubmit(VoidCallback? onSubmit) {
+    onSubmit?.call();
+  }
 
   // expect_lint: prefer_async_callback
-  void methodWithSave(VoidCallback onSave) {}
+  void methodWithSave(VoidCallback onSave) {
+    onSave();
+  }
 
   // expect_lint: prefer_async_callback
-  void methodWithLoad(VoidCallback? onLoad) {}
+  void methodWithLoad(VoidCallback? onLoad) {
+    onLoad?.call();
+  }
 }
 
 // BAD: Prefixed names should also be caught
