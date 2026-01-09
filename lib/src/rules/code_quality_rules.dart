@@ -6,7 +6,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 
 import '../saropa_lint_rule.dart';
@@ -83,12 +84,16 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
       final Expression? enumTarget = target.target;
       if (enumTarget is SimpleIdentifier) {
         final String name = enumTarget.name;
-        if (name.isNotEmpty && name[0] == name[0].toUpperCase() && !name.startsWith('_')) {
+        if (name.isNotEmpty &&
+            name[0] == name[0].toUpperCase() &&
+            !name.startsWith('_')) {
           reporter.atNode(node, code);
         }
       } else if (enumTarget is PrefixedIdentifier) {
         final String name = enumTarget.identifier.name;
-        if (name.isNotEmpty && name[0] == name[0].toUpperCase() && !name.startsWith('_')) {
+        if (name.isNotEmpty &&
+            name[0] == name[0].toUpperCase() &&
+            !name.startsWith('_')) {
           reporter.atNode(node, code);
         }
       }
@@ -151,7 +156,8 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Uri') return;
 
@@ -317,7 +323,8 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   }
 
   /// Check a field declaration for enum type usage
-  void _checkFieldDeclaration(FieldDeclaration node, SaropaDiagnosticReporter reporter) {
+  void _checkFieldDeclaration(
+      FieldDeclaration node, SaropaDiagnosticReporter reporter) {
     // Skip if field has @ignore annotation
     if (_hasIgnoreAnnotation(node)) {
       return;
@@ -389,8 +396,9 @@ class _AvoidIsarEnumFieldFix extends DartFix {
       if (type is! NamedType) return;
 
       final VariableDeclaration variable = node.fields.variables.first;
-      final ClassDeclaration? clazz =
-          node.parent is ClassDeclaration ? node.parent as ClassDeclaration : null;
+      final ClassDeclaration? clazz = node.parent is ClassDeclaration
+          ? node.parent as ClassDeclaration
+          : null;
       if (clazz == null || !_hasCollectionAnnotation(clazz)) return;
 
       final bool isNullable = type.question != null;
@@ -443,8 +451,8 @@ class _AvoidIsarEnumFieldFix extends DartFix {
         if (isNullable) {
           buffer.writeln('$indent  if (value == null) return $cacheFieldName;');
           buffer.writeln('$indent  try {');
-          buffer
-              .writeln('$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
+          buffer.writeln(
+              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
           buffer.writeln('$indent  } on ArgumentError {');
           buffer.writeln('$indent    return null;');
           buffer.writeln('$indent  }');
@@ -456,10 +464,11 @@ class _AvoidIsarEnumFieldFix extends DartFix {
               "$indent    throw StateError('$stringFieldName is null for $variableName');");
           buffer.writeln('$indent  }');
           buffer.writeln('$indent  try {');
-          buffer
-              .writeln('$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
+          buffer.writeln(
+              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
           buffer.writeln('$indent  } on ArgumentError {');
-          buffer.writeln("$indent    throw StateError('Invalid $enumTypeBase value: \$value');");
+          buffer.writeln(
+              "$indent    throw StateError('Invalid $enumTypeBase value: \$value');");
           buffer.writeln('$indent  }');
         }
         buffer.writeln('$indent}');
@@ -546,7 +555,8 @@ class AvoidLateKeywordRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_keyword',
     problemMessage: "Avoid using 'late' keyword.",
-    correctionMessage: 'Use nullable type with null check, or initialize in constructor.',
+    correctionMessage:
+        'Use nullable type with null check, or initialize in constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -595,7 +605,8 @@ class AvoidMissedCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_missed_calls',
-    problemMessage: 'Function reference passed to print. Did you mean to call it?',
+    problemMessage:
+        'Function reference passed to print. Did you mean to call it?',
     correctionMessage: 'Add parentheses () to call the function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -764,7 +775,8 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 
       // Check if any argument matches the target
       for (final Expression arg in node.argumentList.arguments) {
-        final Expression actualArg = arg is NamedExpression ? arg.expression : arg;
+        final Expression actualArg =
+            arg is NamedExpression ? arg.expression : arg;
         if (actualArg.toSource() == targetSource) {
           reporter.atNode(actualArg, code);
         }
@@ -810,7 +822,8 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_calls',
     problemMessage: 'Function contains a recursive call to itself.',
-    correctionMessage: 'Ensure proper base case exists or consider using iteration.',
+    correctionMessage:
+        'Ensure proper base case exists or consider using iteration.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -840,7 +853,8 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
     String functionName,
     SaropaDiagnosticReporter reporter,
   ) {
-    final _RecursiveCallVisitor visitor = _RecursiveCallVisitor(functionName, reporter, code);
+    final _RecursiveCallVisitor visitor =
+        _RecursiveCallVisitor(functionName, reporter, code);
     body.accept(visitor);
   }
 }
@@ -898,7 +912,8 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_tostring',
     problemMessage: 'toString() method calls itself recursively.',
-    correctionMessage: 'Avoid using \$this or this.toString() inside toString().',
+    correctionMessage:
+        'Avoid using \$this or this.toString() inside toString().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -917,7 +932,8 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
       }
 
       final FunctionBody body = node.body;
-      final _ToStringRecursionVisitor visitor = _ToStringRecursionVisitor(reporter, code);
+      final _ToStringRecursionVisitor visitor =
+          _ToStringRecursionVisitor(reporter, code);
       body.accept(visitor);
     });
   }
@@ -979,7 +995,8 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_referencing_discarded_variables',
     problemMessage: 'Avoid referencing variables marked as discarded.',
-    correctionMessage: 'Variables starting with _ should not be used. Rename the variable.',
+    correctionMessage:
+        'Variables starting with _ should not be used. Rename the variable.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1053,7 +1070,8 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_pragma_inline',
     problemMessage: 'Pragma inline may be redundant for trivial methods.',
-    correctionMessage: 'Remove pragma for simple getters/methods that inline automatically.',
+    correctionMessage:
+        'Remove pragma for simple getters/methods that inline automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1249,7 +1267,8 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unused_parameters',
     problemMessage: 'Parameter is never used.',
-    correctionMessage: 'Remove the parameter or prefix with underscore if intentionally unused.',
+    correctionMessage:
+        'Remove the parameter or prefix with underscore if intentionally unused.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1349,7 +1368,8 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_weak_cryptographic_algorithms',
     problemMessage: 'Weak cryptographic algorithm detected.',
-    correctionMessage: 'Use stronger algorithms like SHA-256 or SHA-512 instead.',
+    correctionMessage:
+        'Use stronger algorithms like SHA-256 or SHA-512 instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1380,8 +1400,10 @@ class MissingUseResultAnnotationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'missing_use_result_annotation',
-    problemMessage: 'Function returns a value that might be ignored. Consider adding @useResult.',
-    correctionMessage: 'Add @useResult annotation to indicate return value should be used.',
+    problemMessage:
+        'Function returns a value that might be ignored. Consider adding @useResult.',
+    correctionMessage:
+        'Add @useResult annotation to indicate return value should be used.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1582,7 +1604,8 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dedicated_media_query_method',
     problemMessage: 'Prefer dedicated MediaQuery method.',
-    correctionMessage: 'Use MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), etc.',
+    correctionMessage:
+        'Use MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), etc.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1643,8 +1666,10 @@ class PreferEnumsByNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_enums_by_name',
-    problemMessage: 'Use Enum.values.byName() instead of firstWhere with name comparison.',
-    correctionMessage: 'Replace .firstWhere((e) => e.name == x) with .byName(x).',
+    problemMessage:
+        'Use Enum.values.byName() instead of firstWhere with name comparison.',
+    correctionMessage:
+        'Replace .firstWhere((e) => e.name == x) with .byName(x).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1672,9 +1697,10 @@ class PreferEnumsByNameRule extends SaropaLintRule {
         if (body is ExpressionFunctionBody) {
           final Expression expr = body.expression;
           // Check for pattern: e.name == 'something' or 'something' == e.name
-          if (expr is BinaryExpression && expr.operator.type == TokenType.EQ_EQ) {
-            final bool isNameComparison =
-                _isNameAccess(expr.leftOperand) || _isNameAccess(expr.rightOperand);
+          if (expr is BinaryExpression &&
+              expr.operator.type == TokenType.EQ_EQ) {
+            final bool isNameComparison = _isNameAccess(expr.leftOperand) ||
+                _isNameAccess(expr.rightOperand);
             if (isNameComparison) {
               reporter.atNode(node, code);
             }
@@ -1745,7 +1771,8 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_elements',
-    problemMessage: 'Use null-aware element syntax (?element) for nullable values.',
+    problemMessage:
+        'Use null-aware element syntax (?element) for nullable values.',
     correctionMessage: 'Replace "if (x != null) x" with "?x" in collection.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2039,7 +2066,8 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       for (final Expression arg in node.argumentList.arguments) {
         // Only check named parameters passed as explicit null
         if (arg is NamedExpression && arg.expression is NullLiteral) {
@@ -2104,7 +2132,8 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
     Set<String> staticFields,
     SaropaDiagnosticReporter reporter,
   ) {
-    body.visitChildren(_StaticFieldAssignmentVisitor(staticFields, reporter, _code));
+    body.visitChildren(
+        _StaticFieldAssignmentVisitor(staticFields, reporter, _code));
   }
 }
 
@@ -2199,7 +2228,9 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
       if (parent is MethodInvocation) {
         // Check for .then(), .catchError(), etc.
         final String methodName = parent.methodName.name;
-        if (methodName == 'then' || methodName == 'catchError' || methodName == 'whenComplete') {
+        if (methodName == 'then' ||
+            methodName == 'catchError' ||
+            methodName == 'whenComplete') {
           return;
         }
       }
@@ -2268,7 +2299,8 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, SaropaDiagnosticReporter reporter) {
+  void _checkCondition(
+      Expression condition, SaropaDiagnosticReporter reporter) {
     final int operatorCount = _countLogicalOperators(condition);
     if (operatorCount > _maxOperators) {
       reporter.atNode(condition, code);
@@ -2398,7 +2430,8 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
       final TokenType op = expr.operator.type;
       if (checkingForNull) {
         return op == TokenType.EQ_EQ &&
-            (expr.leftOperand is NullLiteral || expr.rightOperand is NullLiteral);
+            (expr.leftOperand is NullLiteral ||
+                expr.rightOperand is NullLiteral);
       }
       return op == TokenType.BANG_EQ &&
           (expr.leftOperand is NullLiteral || expr.rightOperand is NullLiteral);
@@ -2408,10 +2441,12 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
 
   String? _getNullCheckedVariable(Expression expr) {
     if (expr is BinaryExpression) {
-      if (expr.leftOperand is NullLiteral && expr.rightOperand is SimpleIdentifier) {
+      if (expr.leftOperand is NullLiteral &&
+          expr.rightOperand is SimpleIdentifier) {
         return (expr.rightOperand as SimpleIdentifier).name;
       }
-      if (expr.rightOperand is NullLiteral && expr.leftOperand is SimpleIdentifier) {
+      if (expr.rightOperand is NullLiteral &&
+          expr.leftOperand is SimpleIdentifier) {
         return (expr.leftOperand as SimpleIdentifier).name;
       }
     }
@@ -2430,7 +2465,8 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
       if (target is SimpleIdentifier) return target.name == varName;
     }
     if (expr is BinaryExpression) {
-      return _usesVariable(expr.leftOperand, varName) || _usesVariable(expr.rightOperand, varName);
+      return _usesVariable(expr.leftOperand, varName) ||
+          _usesVariable(expr.rightOperand, varName);
     }
     return false;
   }
@@ -2454,7 +2490,9 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
 
       if (leftVal is IntegerLiteral && rightVal is IntegerLiteral) {
         // x > 5 && x < 3 is a contradiction
-        if (leftVal.value != null && rightVal.value != null && leftVal.value! >= rightVal.value!) {
+        if (leftVal.value != null &&
+            rightVal.value != null &&
+            leftVal.value! >= rightVal.value!) {
           return true;
         }
       }
@@ -2482,7 +2520,8 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_identical_exception_handling_blocks',
     problemMessage: 'Catch blocks have identical code.',
-    correctionMessage: 'Combine exception types: on FormatException, IOException catch (e).',
+    correctionMessage:
+        'Combine exception types: on FormatException, IOException catch (e).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2565,13 +2604,15 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
         if (member is MethodDeclaration) {
           final Map<String, int> assignments = <String, int>{};
           member.body.visitChildren(
-            _LateFinalAssignmentCounter(lateFinalFields, assignments, reporter, _code),
+            _LateFinalAssignmentCounter(
+                lateFinalFields, assignments, reporter, _code),
           );
         }
         if (member is ConstructorDeclaration) {
           final Map<String, int> assignments = <String, int>{};
           member.body.visitChildren(
-            _LateFinalAssignmentCounter(lateFinalFields, assignments, reporter, _code),
+            _LateFinalAssignmentCounter(
+                lateFinalFields, assignments, reporter, _code),
           );
         }
       }
@@ -2580,7 +2621,8 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
 }
 
 class _LateFinalAssignmentCounter extends RecursiveAstVisitor<void> {
-  _LateFinalAssignmentCounter(this.lateFinalFields, this.assignments, this.reporter, this.code);
+  _LateFinalAssignmentCounter(
+      this.lateFinalFields, this.assignments, this.reporter, this.code);
 
   final Set<String> lateFinalFields;
   final Map<String, int> assignments;
@@ -2689,7 +2731,9 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
 
       // If we found enum keys, check if it looks incomplete
       // Full implementation would resolve the enum to get all values
-      if (enumTypeName != null && usedValues.length >= 2 && usedValues.length <= 5) {
+      if (enumTypeName != null &&
+          usedValues.length >= 2 &&
+          usedValues.length <= 5) {
         // Heuristic: if we have 2-5 values, suggest checking for completeness
         // A full implementation would resolve the enum type
         reporter.atNode(node, code);
@@ -2716,7 +2760,8 @@ class AvoidMutatingParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mutating_parameters',
     problemMessage: 'Parameter is being reassigned.',
-    correctionMessage: 'Create a local variable instead of mutating the parameter.',
+    correctionMessage:
+        'Create a local variable instead of mutating the parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2851,8 +2896,10 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
 
     // Check for common confusable patterns
     // 1 and l, 0 and O
-    final String normalizedA = a.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
-    final String normalizedB = b.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
+    final String normalizedA =
+        a.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
+    final String normalizedB =
+        b.replaceAll('1', 'l').replaceAll('0', 'O').toLowerCase();
 
     if (normalizedA == normalizedB && a != b) return true;
 
@@ -2987,7 +3034,8 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'function_always_returns_null',
     problemMessage: 'Function always returns null.',
-    correctionMessage: 'Consider changing return type to void or returning meaningful values.',
+    correctionMessage:
+        'Consider changing return type to void or returning meaningful values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3006,7 +3054,8 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
+  void _checkFunctionBody(
+      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
     if (body is ExpressionFunctionBody) {
       if (body.expression is NullLiteral) {
         reporter.atToken(nameToken, code);
@@ -3069,7 +3118,8 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_accessing_collections_by_constant_index',
     problemMessage: 'Accessing collection by constant index inside loop.',
-    correctionMessage: 'Use the loop variable or extract the element before the loop.',
+    correctionMessage:
+        'Use the loop variable or extract the element before the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3129,7 +3179,8 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_default_tostring',
     problemMessage: 'Class should override toString() for better debugging.',
-    correctionMessage: 'Add a toString() method that returns meaningful information.',
+    correctionMessage:
+        'Add a toString() method that returns meaningful information.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3191,7 +3242,8 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
         if (declaration is TopLevelVariableDeclaration) {
           if (!declaration.variables.isConst) continue;
 
-          for (final VariableDeclaration variable in declaration.variables.variables) {
+          for (final VariableDeclaration variable
+              in declaration.variables.variables) {
             final Expression? initializer = variable.initializer;
             if (initializer is StringLiteral) {
               final String value = initializer.toSource();
@@ -3306,7 +3358,8 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
         final Expression expr = body.expression;
         if (expr is MethodInvocation) {
           final Expression? target = expr.target;
-          if (target is SuperExpression && expr.methodName.name == node.name.lexeme) {
+          if (target is SuperExpression &&
+              expr.methodName.name == node.name.lexeme) {
             reporter.atNode(node, code);
           }
         }
@@ -3320,7 +3373,8 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
             final Expression expr = stmt.expression;
             if (expr is MethodInvocation) {
               final Expression? target = expr.target;
-              if (target is SuperExpression && expr.methodName.name == node.name.lexeme) {
+              if (target is SuperExpression &&
+                  expr.methodName.name == node.name.lexeme) {
                 reporter.atNode(node, code);
               }
             }
@@ -3522,10 +3576,12 @@ class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
       String? checkedVariable;
       if (condition is BinaryExpression) {
         if (condition.operator.type == TokenType.BANG_EQ) {
-          if (condition.rightOperand is NullLiteral && condition.leftOperand is SimpleIdentifier) {
+          if (condition.rightOperand is NullLiteral &&
+              condition.leftOperand is SimpleIdentifier) {
             checkedVariable = (condition.leftOperand as SimpleIdentifier).name;
           }
-          if (condition.leftOperand is NullLiteral && condition.rightOperand is SimpleIdentifier) {
+          if (condition.leftOperand is NullLiteral &&
+              condition.rightOperand is SimpleIdentifier) {
             checkedVariable = (condition.rightOperand as SimpleIdentifier).name;
           }
         }
@@ -3533,7 +3589,8 @@ class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
 
       if (checkedVariable == null) return;
 
-      final bool isUsed = _containsIdentifier(node.thenStatement, checkedVariable);
+      final bool isUsed =
+          _containsIdentifier(node.thenStatement, checkedVariable);
       if (!isUsed) {
         reporter.atNode(condition, code);
       }
@@ -3579,7 +3636,8 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_wildcard_cases_with_enums',
     problemMessage: 'Avoid using default/wildcard case with enums.',
-    correctionMessage: 'Handle all enum values explicitly for exhaustiveness checking.',
+    correctionMessage:
+        'Handle all enum values explicitly for exhaustiveness checking.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3639,7 +3697,8 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'function_always_returns_same_value',
     problemMessage: 'Function always returns the same value.',
-    correctionMessage: 'Consider returning a constant or simplifying the function.',
+    correctionMessage:
+        'Consider returning a constant or simplifying the function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3658,7 +3717,8 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
+  void _checkFunctionBody(
+      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final List<ReturnStatement> returns = <ReturnStatement>[];
@@ -3723,7 +3783,8 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
   ) {
     context.registry.addIfStatement((IfStatement node) {
       final String outerCondition = node.expression.toSource();
-      node.thenStatement.visitChildren(_NestedConditionChecker(outerCondition, reporter, _code));
+      node.thenStatement.visitChildren(
+          _NestedConditionChecker(outerCondition, reporter, _code));
     });
   }
 }
@@ -3780,7 +3841,8 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
 
       for (final SwitchMember member in node.members) {
         if (member is SwitchCase && member.statements.isNotEmpty) {
-          final String body = member.statements.map((Statement s) => s.toSource()).join();
+          final String body =
+              member.statements.map((Statement s) => s.toSource()).join();
           caseBodies.add(body);
           members.add(member);
         }
@@ -3818,7 +3880,8 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_any_or_every',
     problemMessage: 'Use any() or every() instead of where().isEmpty.',
-    correctionMessage: 'Replace where().isEmpty with !any() or where().isNotEmpty with any().',
+    correctionMessage:
+        'Replace where().isEmpty with !any() or where().isNotEmpty with any().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3995,7 +4058,8 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry
+        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final RepresentationDeclaration representation = node.representation;
 
       final DartType? fieldType = representation.fieldType.type;
@@ -4030,7 +4094,8 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_slow_collection_methods',
     problemMessage: 'Using sync* generator for simple collection may be slow.',
-    correctionMessage: 'Consider returning a List directly for small collections.',
+    correctionMessage:
+        'Consider returning a List directly for small collections.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4049,7 +4114,8 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
     });
   }
 
-  void _checkForSyncStar(FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
+  void _checkForSyncStar(
+      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
     if (body.keyword?.lexeme != 'sync') return;
     if (body.star == null) return;
 
@@ -4118,7 +4184,8 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final DartType? type = variable.declaredElement?.type;
-            if (type != null && type.nullabilitySuffix == NullabilitySuffix.question) {
+            if (type != null &&
+                type.nullabilitySuffix == NullabilitySuffix.question) {
               if (variable.initializer == null) {
                 nullableFields[variable.name.lexeme] = variable.name;
               }
@@ -4148,7 +4215,8 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
         if (member is MethodDeclaration) {
           member.body.visitChildren(_FieldAssignmentVisitor(assignedFields));
         }
-        if (member is ConstructorDeclaration && member.body is BlockFunctionBody) {
+        if (member is ConstructorDeclaration &&
+            member.body is BlockFunctionBody) {
           member.body.visitChildren(_FieldAssignmentVisitor(assignedFields));
         }
       }
@@ -4275,7 +4343,8 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_late_fields',
-    problemMessage: 'Late keyword is unnecessary when field is assigned in constructor.',
+    problemMessage:
+        'Late keyword is unnecessary when field is assigned in constructor.',
     correctionMessage: 'Remove the late keyword.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4287,7 +4356,8 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      final Map<String, FieldDeclaration> lateFields = <String, FieldDeclaration>{};
+      final Map<String, FieldDeclaration> lateFields =
+          <String, FieldDeclaration>{};
 
       // Collect late fields
       for (final ClassMember member in node.members) {
@@ -4312,7 +4382,8 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
 
             // Check field formal parameters
             for (final FormalParameter param in member.parameters.parameters) {
-              if (param is FieldFormalParameter && param.name.lexeme == fieldName) {
+              if (param is FieldFormalParameter &&
+                  param.name.lexeme == fieldName) {
                 assigned = true;
                 break;
               }
@@ -4321,7 +4392,8 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
             // Check initializers
             if (!assigned) {
               for (final ConstructorInitializer init in member.initializers) {
-                if (init is ConstructorFieldInitializer && init.fieldName.name == fieldName) {
+                if (init is ConstructorFieldInitializer &&
+                    init.fieldName.name == fieldName) {
                   assigned = true;
                   break;
                 }
@@ -4336,7 +4408,8 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
       }
 
       // Report unnecessary late fields
-      for (final MapEntry<String, FieldDeclaration> entry in lateFields.entries) {
+      for (final MapEntry<String, FieldDeclaration> entry
+          in lateFields.entries) {
         if (allConstructorsAssign(entry.key)) {
           reporter.atNode(entry.value, code);
         }
@@ -4384,7 +4457,8 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
             final DartType? type = variable.declaredElement?.type;
-            if (type != null && type.nullabilitySuffix == NullabilitySuffix.question) {
+            if (type != null &&
+                type.nullabilitySuffix == NullabilitySuffix.question) {
               // Skip if has initializer that's null
               final Expression? init = variable.initializer;
               if (init == null) {
@@ -4476,7 +4550,8 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_patterns',
     problemMessage: 'Pattern does not affect type narrowing.',
-    correctionMessage: 'Remove the unnecessary pattern or use a simple assignment.',
+    correctionMessage:
+        'Remove the unnecessary pattern or use a simple assignment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4499,7 +4574,8 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
         final DartType? expressionType = node.expression.staticType;
 
         if (patternType != null && expressionType != null) {
-          if (patternType.getDisplayString() == expressionType.getDisplayString()) {
+          if (patternType.getDisplayString() ==
+              expressionType.getDisplayString()) {
             reporter.atNode(pattern, code);
           }
         }
@@ -4602,7 +4678,8 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addSwitchExpression((SwitchExpression node) {
-      final Map<String, SwitchExpressionCase> seenExpressions = <String, SwitchExpressionCase>{};
+      final Map<String, SwitchExpressionCase> seenExpressions =
+          <String, SwitchExpressionCase>{};
 
       for (final SwitchExpressionCase caseClause in node.cases) {
         final String exprSource = caseClause.expression.toSource();
@@ -4635,7 +4712,8 @@ class PreferBytesBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bytes_builder',
     problemMessage: 'Consider using BytesBuilder for byte list operations.',
-    correctionMessage: 'BytesBuilder is more efficient for building byte arrays.',
+    correctionMessage:
+        'BytesBuilder is more efficient for building byte arrays.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4705,8 +4783,10 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
           if (thenTarget == elseTarget) {
             // Check if only one argument differs
-            final List<Expression> thenArgs = thenExpr.argumentList.arguments.toList();
-            final List<Expression> elseArgs = elseExpr.argumentList.arguments.toList();
+            final List<Expression> thenArgs =
+                thenExpr.argumentList.arguments.toList();
+            final List<Expression> elseArgs =
+                elseExpr.argumentList.arguments.toList();
 
             if (thenArgs.length == elseArgs.length && thenArgs.length >= 2) {
               int diffCount = 0;
@@ -4834,7 +4914,9 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
       final Element? element = type.element;
       if (element is EnumElement) {
         final String methodName = node.methodName.name;
-        if (methodName == 'where' || methodName == 'firstWhere' || methodName == 'singleWhere') {
+        if (methodName == 'where' ||
+            methodName == 'firstWhere' ||
+            methodName == 'singleWhere') {
           reporter.atNode(node, code);
         }
       }
@@ -4869,7 +4951,8 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'firstWhere' && node.methodName.name != 'singleWhere') {
+      if (node.methodName.name != 'firstWhere' &&
+          node.methodName.name != 'singleWhere') {
         return;
       }
 
@@ -4887,7 +4970,8 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
       if (body is! ExpressionFunctionBody) return;
 
       final Expression bodyExpr = body.expression;
-      if (bodyExpr is BinaryExpression && bodyExpr.operator.type == TokenType.EQ_EQ) {
+      if (bodyExpr is BinaryExpression &&
+          bodyExpr.operator.type == TokenType.EQ_EQ) {
         // Check if comparing against a static field
         final Expression right = bodyExpr.rightOperand;
         if (right is PrefixedIdentifier || right is PropertyAccess) {
@@ -4910,7 +4994,8 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_correct_accepted_type',
     problemMessage: 'Parameter type does not match accepted type annotation.',
-    correctionMessage: 'Ensure the parameter type matches the @Accept annotation.',
+    correctionMessage:
+        'Ensure the parameter type matches the @Accept annotation.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4933,7 +5018,8 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
               final String expectedTypeName = firstArg.type.toSource();
 
               // Get actual parameter type
-              final TypeAnnotation? paramType = node is SimpleFormalParameter ? node.type : null;
+              final TypeAnnotation? paramType =
+                  node is SimpleFormalParameter ? node.type : null;
 
               if (paramType != null) {
                 final String actualTypeName = paramType.toSource();
@@ -5246,12 +5332,15 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
 
       while (elseStmt is IfStatement) {
         final Expression elseCondition = elseStmt.expression;
-        if (elseCondition is BinaryExpression && elseCondition.operator.type == TokenType.EQ_EQ) {
+        if (elseCondition is BinaryExpression &&
+            elseCondition.operator.type == TokenType.EQ_EQ) {
           final Expression elseLeft = elseCondition.leftOperand;
           final Expression elseRight = elseCondition.rightOperand;
 
-          if ((elseLeft is SimpleIdentifier && elseLeft.name == enumVariable.name) ||
-              (elseRight is SimpleIdentifier && elseRight.name == enumVariable.name)) {
+          if ((elseLeft is SimpleIdentifier &&
+                  elseLeft.name == enumVariable.name) ||
+              (elseRight is SimpleIdentifier &&
+                  elseRight.name == enumVariable.name)) {
             branchCount++;
           }
         }
@@ -5312,8 +5401,10 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_switch_with_sealed_classes',
-    problemMessage: 'Consider using switch with sealed class for exhaustiveness.',
-    correctionMessage: 'Switch provides exhaustiveness checking for sealed classes.',
+    problemMessage:
+        'Consider using switch with sealed class for exhaustiveness.',
+    correctionMessage:
+        'Switch provides exhaustiveness checking for sealed classes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5344,7 +5435,8 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
         final Expression elseCondition = elseStmt.expression;
         if (elseCondition is IsExpression) {
           final Expression elseTarget = elseCondition.expression;
-          if (elseTarget is SimpleIdentifier && elseTarget.name == variableName) {
+          if (elseTarget is SimpleIdentifier &&
+              elseTarget.name == variableName) {
             branchCount++;
           }
         }
@@ -5407,8 +5499,10 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
       // Check for list.length == 0 pattern
       if (actual is PropertyAccess && actual.propertyName.name == 'length') {
-        if (matcher is MethodInvocation && matcher.methodName.name == 'equals') {
-          final List<Expression> matcherArgs = matcher.argumentList.arguments.toList();
+        if (matcher is MethodInvocation &&
+            matcher.methodName.name == 'equals') {
+          final List<Expression> matcherArgs =
+              matcher.argumentList.arguments.toList();
           if (matcherArgs.isNotEmpty) {
             final Expression matcherArg = matcherArgs[0];
             if (matcherArg is IntegerLiteral && matcherArg.value == 0) {
@@ -5431,7 +5525,8 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
       // Check for .isEmpty with isTrue/isFalse
       if (actual is PropertyAccess &&
-          (actual.propertyName.name == 'isEmpty' || actual.propertyName.name == 'isNotEmpty')) {
+          (actual.propertyName.name == 'isEmpty' ||
+              actual.propertyName.name == 'isNotEmpty')) {
         if (matcher is SimpleIdentifier &&
             (matcher.name == 'isTrue' || matcher.name == 'isFalse')) {
           reporter.atNode(node, code);
@@ -5584,7 +5679,8 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
             break;
           }
           final String elementTypeName = elementType.getDisplayString();
-          if (elementTypeName != declaredType && !elementTypeName.startsWith(declaredType)) {
+          if (elementTypeName != declaredType &&
+              !elementTypeName.startsWith(declaredType)) {
             allMatch = false;
             break;
           }
@@ -5648,12 +5744,14 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
       _checkArguments(node.argumentList, reporter);
     });
 
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       _checkArguments(node.argumentList, reporter);
     });
   }
 
-  void _checkArguments(ArgumentList argList, SaropaDiagnosticReporter reporter) {
+  void _checkArguments(
+      ArgumentList argList, SaropaDiagnosticReporter reporter) {
     for (final Expression arg in argList.arguments) {
       if (arg is! NamedExpression) continue;
 
@@ -5759,7 +5857,8 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_local_late',
     problemMessage: 'Late variable initialized immediately.',
-    correctionMessage: 'Remove the late keyword for immediately initialized variables.',
+    correctionMessage:
+        'Remove the late keyword for immediately initialized variables.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5769,7 +5868,8 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addVariableDeclarationStatement((VariableDeclarationStatement node) {
+    context.registry
+        .addVariableDeclarationStatement((VariableDeclarationStatement node) {
       final VariableDeclarationList variables = node.variables;
       if (!variables.isLate) return;
 
@@ -5911,7 +6011,8 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'move_variable_closer_to_its_usage',
     problemMessage: 'Scope analysis.',
-    correctionMessage: 'Consider moving the variable declaration closer to its first use.',
+    correctionMessage:
+        'Consider moving the variable declaration closer to its first use.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5926,14 +6027,17 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     context.registry.addBlock((Block node) {
       final Map<String, int> declarationLines = <String, int>{};
       final Map<String, int> firstUsageLines = <String, int>{};
-      final Map<String, VariableDeclaration> declarations = <String, VariableDeclaration>{};
+      final Map<String, VariableDeclaration> declarations =
+          <String, VariableDeclaration>{};
 
       // First pass: collect declarations
       for (final Statement statement in node.statements) {
         if (statement is VariableDeclarationStatement) {
-          for (final VariableDeclaration variable in statement.variables.variables) {
+          for (final VariableDeclaration variable
+              in statement.variables.variables) {
             final String name = variable.name.lexeme;
-            declarationLines[name] = resolver.lineInfo.getLocation(variable.offset).lineNumber;
+            declarationLines[name] =
+                resolver.lineInfo.getLocation(variable.offset).lineNumber;
             declarations[name] = variable;
           }
         }
@@ -5941,7 +6045,8 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
 
       // Second pass: find first usage of each variable
       node.visitChildren(
-        _FirstUsageVisitor(declarationLines.keys.toSet(), firstUsageLines, resolver),
+        _FirstUsageVisitor(
+            declarationLines.keys.toSet(), firstUsageLines, resolver),
       );
 
       // Check distances
@@ -5976,7 +6081,8 @@ class _FirstUsageVisitor extends RecursiveAstVisitor<void> {
           (node.parent as VariableDeclaration).name == node.token) {
         return;
       }
-      firstUsageLines[name] = resolver.lineInfo.getLocation(node.offset).lineNumber;
+      firstUsageLines[name] =
+          resolver.lineInfo.getLocation(node.offset).lineNumber;
     }
     super.visitSimpleIdentifier(node);
   }
@@ -6024,7 +6130,8 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
 
       for (final Statement statement in body.statements) {
         if (statement is VariableDeclarationStatement) {
-          for (final VariableDeclaration variable in statement.variables.variables) {
+          for (final VariableDeclaration variable
+              in statement.variables.variables) {
             final Expression? initializer = variable.initializer;
             if (initializer == null) continue;
 
@@ -6106,7 +6213,8 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_overriding_parent_equality',
     problemMessage: '== implementation consistency.',
-    correctionMessage: 'Consider calling super.== or checking parent class equality.',
+    correctionMessage:
+        'Consider calling super.== or checking parent class equality.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -6120,7 +6228,9 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
       // Check if class has an == operator
       MethodDeclaration? equalityOperator;
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == '==' && member.isOperator) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == '==' &&
+            member.isOperator) {
           equalityOperator = member;
           break;
         }
@@ -6145,7 +6255,8 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
         if (method.name == '==' && !method.isAbstract) {
           // Check if it's from Object or a custom implementation
           final enclosing = (method as Element).enclosingElement;
-          final String? enclosingName = enclosing is InterfaceElement ? enclosing.name : null;
+          final String? enclosingName =
+              enclosing is InterfaceElement ? enclosing.name : null;
           if (enclosingName != null && enclosingName != 'Object') {
             parentHasCustomEquals = true;
             break;
@@ -6157,7 +6268,8 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
 
       // Check if the child's == calls super.==
       bool callsSuper = false;
-      equalityOperator.body.visitChildren(_SuperEqualityChecker(() => callsSuper = true));
+      equalityOperator.body
+          .visitChildren(_SuperEqualityChecker(() => callsSuper = true));
 
       if (!callsSuper) {
         reporter.atToken(equalityOperator.name, code);
@@ -6174,7 +6286,8 @@ class _SuperEqualityChecker extends RecursiveAstVisitor<void> {
   @override
   void visitBinaryExpression(BinaryExpression node) {
     if (node.operator.lexeme == '==') {
-      if (node.leftOperand is SuperExpression || node.rightOperand is SuperExpression) {
+      if (node.leftOperand is SuperExpression ||
+          node.rightOperand is SuperExpression) {
         onSuperFound();
       }
     }
@@ -6245,7 +6358,8 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
     });
   }
 
-  void _checkCaseOrder(List<GuardedPattern> patterns, SaropaDiagnosticReporter reporter) {
+  void _checkCaseOrder(
+      List<GuardedPattern> patterns, SaropaDiagnosticReporter reporter) {
     for (int i = 0; i < patterns.length - 1; i++) {
       final GuardedPattern current = patterns[i];
       final GuardedPattern next = patterns[i + 1];
@@ -6304,7 +6418,8 @@ class UseExistingDestructuringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_existing_destructuring',
     problemMessage: 'Redundant property access.',
-    correctionMessage: 'Use the destructured variable instead of accessing the property.',
+    correctionMessage:
+        'Use the destructured variable instead of accessing the property.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6368,7 +6483,8 @@ class _PatternFieldCollector extends RecursiveAstVisitor<void> {
 }
 
 class _DestructuredPropertyAccessChecker extends RecursiveAstVisitor<void> {
-  _DestructuredPropertyAccessChecker(this.destructuredVars, this.reporter, this.code);
+  _DestructuredPropertyAccessChecker(
+      this.destructuredVars, this.reporter, this.code);
 
   final Map<String, Set<String>> destructuredVars;
   final SaropaDiagnosticReporter reporter;
@@ -6416,7 +6532,8 @@ class UseExistingVariableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_existing_variable',
     problemMessage: 'Redundant variable creation.',
-    correctionMessage: 'Use the existing variable instead of creating a duplicate.',
+    correctionMessage:
+        'Use the existing variable instead of creating a duplicate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6431,7 +6548,8 @@ class UseExistingVariableRule extends SaropaLintRule {
 
       for (final Statement statement in node.statements) {
         if (statement is VariableDeclarationStatement) {
-          for (final VariableDeclaration variable in statement.variables.variables) {
+          for (final VariableDeclaration variable
+              in statement.variables.variables) {
             final Expression? initializer = variable.initializer;
             if (initializer == null) continue;
 
@@ -6496,9 +6614,11 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_string_literals',
-    problemMessage: 'String literal appears 3+ times in this file. Consider extracting '
+    problemMessage:
+        'String literal appears 3+ times in this file. Consider extracting '
         'to a constant.',
-    correctionMessage: 'Extract this string to a named constant for maintainability.',
+    correctionMessage:
+        'Extract this string to a named constant for maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6516,7 +6636,8 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
   ) {
     // Track occurrences and report when threshold is reached.
     // Note: Map state is per-file since runWithReporter is called per-file.
-    final Map<String, List<AstNode>> stringOccurrences = <String, List<AstNode>>{};
+    final Map<String, List<AstNode>> stringOccurrences =
+        <String, List<AstNode>>{};
 
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
@@ -6527,7 +6648,8 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
 
-      final List<AstNode> occurrences = stringOccurrences.putIfAbsent(value, () => <AstNode>[]);
+      final List<AstNode> occurrences =
+          stringOccurrences.putIfAbsent(value, () => <AstNode>[]);
       occurrences.add(node);
 
       // Report when we hit the threshold (report the current node)
@@ -6603,9 +6725,11 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_string_literals_pair',
-    problemMessage: 'String literal appears 2+ times in this file. Consider extracting '
+    problemMessage:
+        'String literal appears 2+ times in this file. Consider extracting '
         'to a constant.',
-    correctionMessage: 'Extract this string to a named constant for maintainability.',
+    correctionMessage:
+        'Extract this string to a named constant for maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6623,7 +6747,8 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
   ) {
     // Track occurrences and report when threshold is reached.
     // Note: Map state is per-file since runWithReporter is called per-file.
-    final Map<String, List<AstNode>> stringOccurrences = <String, List<AstNode>>{};
+    final Map<String, List<AstNode>> stringOccurrences =
+        <String, List<AstNode>>{};
 
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
@@ -6634,7 +6759,8 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
       // Skip excluded patterns
       if (_shouldSkipString(value)) return;
 
-      final List<AstNode> occurrences = stringOccurrences.putIfAbsent(value, () => <AstNode>[]);
+      final List<AstNode> occurrences =
+          stringOccurrences.putIfAbsent(value, () => <AstNode>[]);
       occurrences.add(node);
 
       // Report when we hit the threshold (report the current node)
