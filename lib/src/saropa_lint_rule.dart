@@ -88,7 +88,8 @@ class ImpactTracker {
   }
 
   /// Get all violations grouped by impact.
-  static Map<LintImpact, List<ViolationRecord>> get violations => Map.unmodifiable(_violations);
+  static Map<LintImpact, List<ViolationRecord>> get violations =>
+      Map.unmodifiable(_violations);
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
@@ -100,7 +101,8 @@ class ImpactTracker {
       };
 
   /// Get total violation count.
-  static int get total => _violations.values.fold(0, (sum, v) => sum + v.length);
+  static int get total =>
+      _violations.values.fold(0, (sum, v) => sum + v.length);
 
   /// Returns true if there are any critical violations.
   static bool get hasCritical => _violations[LintImpact.critical]!.isNotEmpty;
@@ -139,7 +141,8 @@ class ImpactTracker {
       buffer.writeln('LOW:      ${c[LintImpact.low]} (style)');
     }
     if (c[LintImpact.opinionated]! > 0) {
-      buffer.writeln('OPINIONATED: ${c[LintImpact.opinionated]} (team preference)');
+      buffer.writeln(
+          'OPINIONATED: ${c[LintImpact.opinionated]} (team preference)');
     }
 
     if (total == 0) {
@@ -294,7 +297,8 @@ abstract class SaropaLintRule extends DartLintRule {
 
     // Check example files
     if (skipExampleFiles) {
-      if (normalizedPath.contains('/example/') || normalizedPath.contains('/examples/')) {
+      if (normalizedPath.contains('/example/') ||
+          normalizedPath.contains('/examples/')) {
         return true;
       }
     }
@@ -302,8 +306,8 @@ abstract class SaropaLintRule extends DartLintRule {
     // Check fixture files - but NOT in example/ directory
     // (example fixtures are specifically for testing the linter rules)
     if (skipFixtureFiles) {
-      final isInExample =
-          normalizedPath.contains('/example/') || normalizedPath.contains('/examples/');
+      final isInExample = normalizedPath.contains('/example/') ||
+          normalizedPath.contains('/examples/');
       if (!isInExample) {
         if (normalizedPath.contains('/fixture/') ||
             normalizedPath.contains('/fixtures/') ||
@@ -323,7 +327,8 @@ abstract class SaropaLintRule extends DartLintRule {
   /// Base URL for rule documentation.
   ///
   /// Override to customize the documentation host.
-  static const String documentationBaseUrl = 'https://pub.dev/packages/saropa_lints';
+  static const String documentationBaseUrl =
+      'https://pub.dev/packages/saropa_lints';
 
   /// Returns the documentation URL for this rule.
   ///
@@ -359,7 +364,8 @@ abstract class SaropaLintRule extends DartLintRule {
   bool get isDisabled => disabledRules?.contains(code.name) ?? false;
 
   /// Get the effective severity for this rule, considering overrides.
-  DiagnosticSeverity? get effectiveSeverity => severityOverrides?[code.name] ?? code.errorSeverity;
+  DiagnosticSeverity? get effectiveSeverity =>
+      severityOverrides?[code.name] ?? code.errorSeverity;
 
   // ============================================================
   // Core Implementation

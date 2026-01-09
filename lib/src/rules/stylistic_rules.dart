@@ -3,7 +3,8 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/syntactic_entity.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -56,7 +57,8 @@ class PreferRelativeImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
     problemMessage: 'Use relative imports instead of absolute package imports.',
-    correctionMessage: 'Consider using a relative import path for files within the same package.',
+    correctionMessage:
+        'Consider using a relative import path for files within the same package.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -153,7 +155,8 @@ class _ConvertToRelativeImportFix extends DartFix {
   }
 
   String _calculateRelativePath(String fromDir, String toPath) {
-    final List<String> fromParts = fromDir.isEmpty ? <String>[] : fromDir.split('/');
+    final List<String> fromParts =
+        fromDir.isEmpty ? <String>[] : fromDir.split('/');
     final List<String> toParts = toPath.split('/');
 
     // Find common prefix length
@@ -231,7 +234,8 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
     problemMessage: 'Multiple widget classes defined in a single file.',
-    correctionMessage: 'Consider moving each widget class to its own file for better organization.',
+    correctionMessage:
+        'Consider moving each widget class to its own file for better organization.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -271,7 +275,8 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
     // Note: State classes are NOT counted as widgets - they MUST be in the
     // same file as their StatefulWidget and are not independent widgets.
     // We only count actual widget classes that could be in separate files.
-    return superclassName == 'StatelessWidget' || superclassName == 'StatefulWidget';
+    return superclassName == 'StatelessWidget' ||
+        superclassName == 'StatefulWidget';
   }
 }
 
@@ -311,7 +316,8 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_arrow_functions',
-    problemMessage: 'Function body contains only a return statement; use arrow syntax.',
+    problemMessage:
+        'Function body contains only a return statement; use arrow syntax.',
     correctionMessage: 'Convert to arrow function: => expression',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -491,7 +497,8 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
     name: 'prefer_all_named_parameters',
     problemMessage:
         'Function has $_threshold or more positional parameters; consider using named parameters.',
-    correctionMessage: 'Convert positional parameters to named parameters for clarity.',
+    correctionMessage:
+        'Convert positional parameters to named parameters for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -799,8 +806,10 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
-    problemMessage: 'Instance field should be private (prefixed with underscore).',
-    correctionMessage: 'Consider making this field private and providing a getter if needed.',
+    problemMessage:
+        'Instance field should be private (prefixed with underscore).',
+    correctionMessage:
+        'Consider making this field private and providing a getter if needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -845,7 +854,8 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
       // Check if class extends StatelessWidget or StatefulWidget (widget props)
       if (extendsClause != null) {
         final String? superclassName = extendsClause.superclass.element?.name;
-        if (superclassName == 'StatelessWidget' || superclassName == 'StatefulWidget') {
+        if (superclassName == 'StatelessWidget' ||
+            superclassName == 'StatefulWidget') {
           return true; // Widget constructor parameters are intentionally public
         }
       }
@@ -929,8 +939,10 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_widget_methods_over_classes',
-    problemMessage: 'Simple widget class could be a method in the parent widget.',
-    correctionMessage: 'Consider converting to a build method for less boilerplate.',
+    problemMessage:
+        'Simple widget class could be a method in the parent widget.',
+    correctionMessage:
+        'Consider converting to a build method for less boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1133,8 +1145,10 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
-    problemMessage: 'Method returns a record; consider using a dedicated class.',
-    correctionMessage: 'Create a class with named fields for better maintainability.',
+    problemMessage:
+        'Method returns a record; consider using a dedicated class.',
+    correctionMessage:
+        'Create a class with named fields for better maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1224,8 +1238,10 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
-    problemMessage: 'Callback references a method; consider inlining for locality.',
-    correctionMessage: 'Inline simple callbacks to keep behavior close to its usage.',
+    problemMessage:
+        'Callback references a method; consider inlining for locality.',
+    correctionMessage:
+        'Inline simple callbacks to keep behavior close to its usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1379,7 +1395,8 @@ class _ConvertToSingleQuotesFix extends DartFix {
       if (node.value.contains("'")) return;
 
       // Escape any existing backslashes and single quotes in the value
-      final String escaped = node.value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
+      final String escaped =
+          node.value.replaceAll(r'\', r'\\').replaceAll("'", r"\'");
 
       final String newLexeme = "'$escaped'";
 
@@ -1434,7 +1451,8 @@ class PreferTodoFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
-    problemMessage: 'TODO comment should follow format: TODO(author): description',
+    problemMessage:
+        'TODO comment should follow format: TODO(author): description',
     correctionMessage: 'Add author name in parentheses: TODO(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1524,7 +1542,8 @@ class PreferFixmeFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
-    problemMessage: 'FIXME comment should follow format: FIXME(author): description',
+    problemMessage:
+        'FIXME comment should follow format: FIXME(author): description',
     correctionMessage: 'Add author name in parentheses: FIXME(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1788,8 +1807,10 @@ class _CapitalizeCommentFix extends DartFix {
             final String content = lexeme.substring(prefixLength);
 
             if (content.isNotEmpty) {
-              final String capitalized = content[0].toUpperCase() + content.substring(1);
-              final String newLexeme = '${lexeme.substring(0, prefixLength)}$capitalized';
+              final String capitalized =
+                  content[0].toUpperCase() + content.substring(1);
+              final String newLexeme =
+                  '${lexeme.substring(0, prefixLength)}$capitalized';
 
               final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
                 message: 'Capitalize first letter',
@@ -1888,7 +1909,8 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
     });
 
     // Check top-level variables
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       _checkDocComment(node.documentationComment, reporter);
     });
 
@@ -2009,7 +2031,8 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
     problemMessage: 'Constants should use SCREAMING_SNAKE_CASE.',
-    correctionMessage: 'Rename to SCREAMING_SNAKE_CASE: MAX_VALUE instead of maxValue',
+    correctionMessage:
+        'Rename to SCREAMING_SNAKE_CASE: MAX_VALUE instead of maxValue',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2040,7 +2063,8 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Check top-level constants
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       if (!node.variables.isConst) return;
 
       for (final VariableDeclaration variable in node.variables.variables) {
@@ -2088,7 +2112,8 @@ class _ConvertToScreamingCaseFix extends DartFix {
       if (!analysisError.sourceRange.intersects(node.name.sourceRange)) return;
 
       final String name = node.name.lexeme;
-      final String newName = PreferScreamingCaseConstantsRule.toScreamingSnakeCase(name);
+      final String newName =
+          PreferScreamingCaseConstantsRule.toScreamingSnakeCase(name);
 
       if (name == newName) return;
 
@@ -2144,8 +2169,10 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
-    problemMessage: 'Boolean should use a descriptive prefix (is, has, can, should, etc.).',
-    correctionMessage: 'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
+    problemMessage:
+        'Boolean should use a descriptive prefix (is, has, can, should, etc.).',
+    correctionMessage:
+        'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2302,7 +2329,8 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
     problemMessage: 'File name should use snake_case.',
-    correctionMessage: 'Rename file to snake_case: user_service.dart instead of UserService.dart',
+    correctionMessage:
+        'Rename file to snake_case: user_service.dart instead of UserService.dart',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2341,13 +2369,15 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
       }
 
       // Skip files in generated directories
-      if (fullPath.contains('/generated/') || fullPath.contains('/.dart_tool/')) {
+      if (fullPath.contains('/generated/') ||
+          fullPath.contains('/.dart_tool/')) {
         return;
       }
 
       if (!_snakeCasePattern.hasMatch(fileName)) {
         // Report at the library directive if present, otherwise at the first token
-        final LibraryDirective? library = unit.directives.whereType<LibraryDirective>().firstOrNull;
+        final LibraryDirective? library =
+            unit.directives.whereType<LibraryDirective>().firstOrNull;
         if (library != null) {
           reporter.atNode(library, code);
         } else {
@@ -2402,7 +2432,8 @@ class AvoidSmallTextRule extends SaropaLintRule {
     name: 'avoid_small_text',
     problemMessage:
         'Font size is smaller than $_minFontSize. Consider increasing for accessibility.',
-    correctionMessage: 'Use a font size of at least $_minFontSize for better readability.',
+    correctionMessage:
+        'Use a font size of at least $_minFontSize for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2412,7 +2443,8 @@ class AvoidSmallTextRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String? constructorName = node.constructorName.type.element?.name;
 
       // Check TextStyle constructor
@@ -2435,7 +2467,8 @@ class AvoidSmallTextRule extends SaropaLintRule {
           fontSize = expression.value?.toDouble();
         } else if (expression is DoubleLiteral) {
           fontSize = expression.value;
-        } else if (expression is PrefixExpression && expression.operator.lexeme == '-') {
+        } else if (expression is PrefixExpression &&
+            expression.operator.lexeme == '-') {
           // Handle negative numbers (which would definitely be invalid)
           final Expression operand = expression.operand;
           if (operand is IntegerLiteral || operand is DoubleLiteral) {
@@ -2742,8 +2775,10 @@ class PreferStraightApostropheRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_straight_apostrophe',
-    problemMessage: "Use straight apostrophe (') instead of Right Single Quotation Mark (').",
-    correctionMessage: "Replace Right Single Quotation Mark with straight apostrophe or escape it.",
+    problemMessage:
+        "Use straight apostrophe (') instead of Right Single Quotation Mark (').",
+    correctionMessage:
+        "Replace Right Single Quotation Mark with straight apostrophe or escape it.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2809,7 +2844,8 @@ class _ReplaceCurlyApostropheFix extends DartFix {
       final String quote = lexeme[0]; // Get the original quote character
 
       // Escape apostrophes if using single quotes
-      final String escaped = quote == "'" ? fixed.replaceAll("'", "\\'") : fixed;
+      final String escaped =
+          quote == "'" ? fixed.replaceAll("'", "\\'") : fixed;
 
       final String newLexeme = '$quote$escaped$quote';
 
@@ -2869,7 +2905,8 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
     name: 'prefer_curly_apostrophe',
     problemMessage:
         "Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation.",
-    correctionMessage: "Replace straight apostrophe with Right Single Quotation Mark (U+2019).",
+    correctionMessage:
+        "Replace straight apostrophe with Right Single Quotation Mark (U+2019).",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2902,7 +2939,8 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
       _checkDocComment(node.documentationComment, reporter);
     });
 
-    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       _checkDocComment(node.documentationComment, reporter);
     });
   }
@@ -2953,7 +2991,8 @@ class _ReplaceStraightApostropheFix extends DartFix {
       while (token != null && !token.isEof) {
         Token? comment = token.precedingComments;
         while (comment != null) {
-          final SourceRange commentRange = SourceRange(comment.offset, comment.length);
+          final SourceRange commentRange =
+              SourceRange(comment.offset, comment.length);
           if (!analysisError.sourceRange.intersects(commentRange)) {
             comment = comment.next;
             continue;
