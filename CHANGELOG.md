@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **Code review**: Reviewed all 22 stylistic/opinionated rules for logic issues, performance risks, and code quality
+  - Verified all rules use `LintImpact.opinionated` correctly
+  - Confirmed no recursion risks or performance issues in AST traversal
+  - All rules properly implement quick fixes where applicable
+  - Documentation examples use proper Unicode escape sequences for special characters
+
+## [1.7.5] - 2026-01-09
+
+### Added
+
+- **Opinionated severity**: Added `LintImpact.opinionated` for preference-heavy rules.
+- **New rule**: `prefer_future_void_function_over_async_callback` flags use of Flutter's
+  `AsyncCallback`, preferring `Future<void> Function()` to avoid Flutter-specific types.
+- **Configuration template**: Added comprehensive [example/analysis_options_template.yaml](./example/analysis_options_template.yaml)
+  with all 767+ rules organized by category, tier membership, and impact levels.
+
+### Fixed
+
+- Addressed empty block warnings in async callback fixture tests (no behavior change).
+
+### Changed
+
+- **`prefer_async_callback` documentation**: Clarified rationale for using explicit
+  `Future<void> Function()` signatures, noting that `AsyncCallback` comes from
+  Flutter foundation (or its re-exports) and introduces a Flutter-only type.
+- **Opinionated rules severity**: All stylistic/opinionated rules now use
+  `LintImpact.opinionated` instead of `low`.
+- **Docs counts**: Updated README and migration guides to reflect 767+ total
+  rules.
+
 ## [1.7.4] - 2026-01-08
   - Updated the banner image to show the project name `Saropa Lints`
 
@@ -478,8 +512,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`prefer_async_callback` rule**: Quick fix now replaces `VoidCallback` with
   `Future<void> Function()` instead of `AsyncCallback`. This eliminates the need
-  for an extra import (`package:flutter/foundation.dart`) and is consistent with
-  how parameterized async callbacks are written (e.g., `Future<void> Function(String)`).
+  for importing Flutter foundation types (directly via
+  `package:flutter/foundation.dart` or indirectly through `widgets.dart`/`material.dart`)
+  and is consistent with how parameterized async callbacks are written (e.g.,
+  `Future<void> Function(String)`).
 
 - **`prefer_safe_area_aware`**: Reduced false positives - now skips Scaffolds with:
   - `extendBody: true` or `extendBodyBehindAppBar: true` (intentional fullscreen)

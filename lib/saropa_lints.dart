@@ -380,6 +380,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidThrowInFinallyRule(),
   AvoidUnnecessaryNullableReturnTypeRule(),
   PreferAsyncCallbackRule(),
+  PreferFutureVoidFunctionOverAsyncCallbackRule(),
 
   // Performance rules
   AvoidListViewWithoutItemExtentRule(),
@@ -726,7 +727,8 @@ const List<LintRule> _allRules = <LintRule>[
   PreferSnakeCaseFilesRule(),
   AvoidSmallTextRule(),
   PreferDocCommentsOverRegularRule(),
-  PreferLiteralApostropheRule(),
+  PreferStraightApostropheRule(),
+  PreferCurlyApostropheRule(),
 
   // Testing best practices rules (batch 3)
   RequireArrangeActAssertRule(),
