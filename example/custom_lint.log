@@ -102,3 +102,368 @@ at:
 [custom_lint] 2026-01-07T10:58:41.600956 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
 [custom_lint] 2026-01-07T10:58:41.600956 <asynchronous suspension>
 [custom_lint] 2026-01-07T10:58:41.600956
+[custom_lint] 2026-01-09T09:32:32.126275 /d:/src/saropa_lints/lib/src/rules/async_rules.dart:1338:39: Error: Member not found: 'info'.
+[custom_lint] 2026-01-09T09:32:32.126275   LintImpact get impact => LintImpact.info;
+[custom_lint] 2026-01-09T09:32:32.126275                                       ^^^^
+[custom_lint] 2026-01-09T09:32:32.126275
+[custom_lint] 2026-01-09T09:32:32.126275
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-09T09:32:32.187368 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-09T09:32:32.187368 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-09T09:32:32.187368 <asynchronous suspension>
+[custom_lint] 2026-01-09T09:32:32.187368
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2910:41: Error: Expected ';' after this.
+[custom_lint] 2026-01-09T10:32:37.713039   static const String curlyApostrophe = '''; // U+2019
+[custom_lint] 2026-01-09T10:32:37.713039                                         ^^^^^^^^^^^^^^^...
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3010:53: Error: Expected a class member, but got ')'.
+[custom_lint] 2026-01-09T10:32:37.713039             (match) => match[0]!.replaceAll("'", '''),
+[custom_lint] 2026-01-09T10:32:37.713039                                                     ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3010:54: Error: Expected a class member, but got ','.
+[custom_lint] 2026-01-09T10:32:37.713039             (match) => match[0]!.replaceAll("'", '''),
+[custom_lint] 2026-01-09T10:32:37.713039                                                      ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3011:11: Error: Expected a class member, but got ')'.
+[custom_lint] 2026-01-09T10:32:37.713039           );
+[custom_lint] 2026-01-09T10:32:37.713039           ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3011:12: Error: Expected a class member, but got ';'.
+[custom_lint] 2026-01-09T10:32:37.713039           );
+[custom_lint] 2026-01-09T10:32:37.713039            ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3013:11: Error: Expected a class member, but got 'if'.
+[custom_lint] 2026-01-09T10:32:37.713039           if (fixed != lexeme) {
+[custom_lint] 2026-01-09T10:32:37.713039           ^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3013:14: Error: Expected an identifier, but got '('.
+[custom_lint] 2026-01-09T10:32:37.713039 Try inserting an identifier before '('.
+[custom_lint] 2026-01-09T10:32:37.713039           if (fixed != lexeme) {
+[custom_lint] 2026-01-09T10:32:37.713039              ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3013:21: Error: Expected ')' before this.
+[custom_lint] 2026-01-09T10:32:37.713039           if (fixed != lexeme) {
+[custom_lint] 2026-01-09T10:32:37.713039                     ^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3027:11: Error: Variables must be declared using the keywords 'const', 'final', 'var' or a type name.
+[custom_lint] 2026-01-09T10:32:37.713039 Try adding the name of the type of the variable or the keyword 'var'.
+[custom_lint] 2026-01-09T10:32:37.713039           comment = comment.next;
+[custom_lint] 2026-01-09T10:32:37.713039           ^^^^^^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3029:9: Error: Variables must be declared using the keywords 'const', 'final', 'var' or a type name.
+[custom_lint] 2026-01-09T10:32:37.713039 Try adding the name of the type of the variable or the keyword 'var'.
+[custom_lint] 2026-01-09T10:32:37.713039         token = token.next;
+[custom_lint] 2026-01-09T10:32:37.713039         ^^^^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3030:7: Error: Expected a declaration, but got '}'.
+[custom_lint] 2026-01-09T10:32:37.713039       }
+[custom_lint] 2026-01-09T10:32:37.713039       ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3031:5: Error: Expected a declaration, but got '}'.
+[custom_lint] 2026-01-09T10:32:37.713039     });
+[custom_lint] 2026-01-09T10:32:37.713039     ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3031:6: Error: Expected a declaration, but got ')'.
+[custom_lint] 2026-01-09T10:32:37.713039     });
+[custom_lint] 2026-01-09T10:32:37.713039      ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3031:7: Error: Unexpected token ';'.
+[custom_lint] 2026-01-09T10:32:37.713039     });
+[custom_lint] 2026-01-09T10:32:37.713039       ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3032:3: Error: Expected a declaration, but got '}'.
+[custom_lint] 2026-01-09T10:32:37.713039   }
+[custom_lint] 2026-01-09T10:32:37.713039   ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3033:1: Error: Expected a declaration, but got '}'.
+[custom_lint] 2026-01-09T10:32:37.713039 }
+[custom_lint] 2026-01-09T10:32:37.713039 ^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2890:7: Error: The non-abstract class 'PreferCurlyApostropheRule' is missing implementations for these members:
+[custom_lint] 2026-01-09T10:32:37.713039  - SaropaLintRule.runWithReporter
+[custom_lint] 2026-01-09T10:32:37.713039 Try to either
+[custom_lint] 2026-01-09T10:32:37.713039  - provide an implementation,
+[custom_lint] 2026-01-09T10:32:37.713039  - inherit an implementation from a superclass or mixin,
+[custom_lint] 2026-01-09T10:32:37.713039  - mark the class as abstract, or
+[custom_lint] 2026-01-09T10:32:37.713039  - provide a 'noSuchMethod' implementation.
+[custom_lint] 2026-01-09T10:32:37.713039 class PreferCurlyApostropheRule extends SaropaLintRule {
+[custom_lint] 2026-01-09T10:32:37.713039       ^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/saropa_lint_rule.dart:399:8: Context: 'SaropaLintRule.runWithReporter' is defined here.
+[custom_lint] 2026-01-09T10:32:37.713039   void runWithReporter(
+[custom_lint] 2026-01-09T10:32:37.713039        ^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3027:21: Error: Can't access 'this' in a field initializer to read 'comment'.
+[custom_lint] 2026-01-09T10:32:37.713039           comment = comment.next;
+[custom_lint] 2026-01-09T10:32:37.713039                     ^^^^^^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3029:9: Error: Can't infer the type of 'token': circularity found during type inference.
+[custom_lint] 2026-01-09T10:32:37.713039 Specify the type explicitly.
+[custom_lint] 2026-01-09T10:32:37.713039         token = token.next;
+[custom_lint] 2026-01-09T10:32:37.713039         ^^^^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/saropa_lints.dart:730:3: Error: Method not found: 'PreferLiteralApostropheRule'.
+[custom_lint] 2026-01-09T10:32:37.713039   PreferLiteralApostropheRule(),
+[custom_lint] 2026-01-09T10:32:37.713039   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:32:37.713039 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2798:26: Error: The getter 'leftSingleQuote' isn't defined for the type 'PreferStraightApostropheRule'.
+[custom_lint] 2026-01-09T10:32:37.713039  - 'PreferStraightApostropheRule' is 
+[custom_lint] 2026-01-09T10:32:37.713039
+[custom_lint] 2026-01-09T10:32:37.720043 from 'package:saropa_lints/src/rules/stylistic_rules.dart' ('/d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart').
+[custom_lint] 2026-01-09T10:32:37.720043 Try correcting the name to the name of an existing getter, or defining a getter or field named 'leftSingleQuote'.
+[custom_lint] 2026-01-09T10:32:37.720043           value.contains(leftSingleQuote)) {
+[custom_lint] 2026-01-09T10:32:37.720043                          ^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:32:37.720043 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2807:26: Error: The getter 'leftSingleQuote' isn't defined for the type 'PreferStraightApostropheRule'.
+[custom_lint] 2026-01-09T10:32:37.720043  - 'PreferStraightApostropheRule' is from 'package:saropa_lints/src/rules/stylistic_rules.dart' ('/d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart').
+[custom_lint] 2026-01-09T10:32:37.720043 Try correcting the name to the name of an existing getter, or defining a getter or field named 'leftSingleQuote'.
+[custom_lint] 2026-01-09T10:32:37.720043           value.contains(leftSingleQuote)) {
+[custom_lint] 2026-01-09T10:32:37.720043                          ^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:32:37.720043 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2891:9: Error: Constructor is marked 'const' so all fields must be final.
+[custom_lint] 2026-01-09T10:32:37.720043   const PreferCurlyApostropheRule() : super(code: _code);
+[custom_lint] 2026-01-09T10:32:37.720043         ^
+[custom_lint] 2026-01-09T10:32:37.720043 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3027:11: Context: Field isn't final, but constructor is 'const'.
+[custom_lint] 2026-01-09T10:32:37.720043           comment = comment.next;
+[custom_lint] 2026-01-09T10:32:37.720043           ^
+[custom_lint] 2026-01-09T10:32:37.720043
+[custom_lint] 2026-01-09T10:32:37.720043
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-09T10:32:37.771692 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-09T10:32:37.771692 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-09T10:32:37.771692 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:32:37.771692
+[custom_lint] 2026-01-09T10:34:33.053326 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2915:48: Error: Expected ',' before this.
+[custom_lint] 2026-01-09T10:34:33.053326     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:34:33.053326                                                ^^
+[custom_lint] 2026-01-09T10:34:33.053326 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2915:52: Error: Expected ')' before this.
+[custom_lint] 2026-01-09T10:34:33.053326     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:34:33.053326                                                    ^
+[custom_lint] 2026-01-09T10:34:33.053326 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2915:51: Error: Undefined name 'I'.
+[custom_lint] 2026-01-09T10:34:33.053326     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:34:33.053326                                                   ^
+[custom_lint] 2026-01-09T10:34:33.053326 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2915:48: Error: Undefined name 'll'.
+[custom_lint] 2026-01-09T10:34:33.053326     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:34:33.053326                                                ^^
+[custom_lint] 2026-01-09T10:34:33.053326 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2913:51: Error: Too many positional arguments: 1 allowed, but 2 found.
+[custom_lint] 2026-01-09T10:34:33.053326 Try removing the extra positional arguments.
+[custom_lint] 2026-01-09T10:34:33.053326   static final RegExp _contractionPattern = RegExp(
+[custom_lint] 2026-01-09T10:34:33.053326                                                   ^
+[custom_lint] 2026-01-09T10:34:33.053326 org-dartlang-sdk:///sdk/lib/_internal/vm/lib/regexp_patch.dart:10:11: Context: Found this candidate, but the arguments don't match.
+[custom_lint] 2026-01-09T10:34:33.053326   factory RegExp(
+[custom_lint] 2026-01-09T10:34:33.053326           ^
+[custom_lint] 2026-01-09T10:34:33.053326 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2989:13: Error: The method 'SourceRange' isn't defined for the type '_ReplaceStraightApostropheFix'.
+[custom_lint] 2026-01-09T10:34:33.053326  - '_ReplaceStraightApostropheFix' is from 'package:saropa_lints/src/rules/stylistic_rules.dart' ('/d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart').
+[custom_lint] 2026-01-09T10:34:33.053326 Try correcting the name to the name of an existing method, or defining a method named 'SourceRange'.
+[custom_lint] 2026-01-09T10:34:33.053326             SourceRange(comment.offset, comment.length),
+[custom_lint] 2026-01-09T10:34:33.053326             ^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:34:33.053326 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3021:17: Error: The method 'SourceRange' isn't defined for the type '_ReplaceStraightApostropheFix'.
+[custom_lint] 2026-01-09T10:34:33.053326  - '_ReplaceStraightApostropheFix' is from 'package:saropa_lints/src/rules/stylistic_rules.dart' ('/d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart').
+[custom_lint] 2026-01-09T10:34:33.053326 Try correcting the name to the name of an existing method, or defining a method named 'SourceRange'.
+[custom_lint] 2026-01-09T10:34:33.053326                 SourceRange(comment!.offset, comment.length),
+[custom_lint] 2026-01-09T10:34:33.053326                 ^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:34:33.053326
+[custom_lint] 2026-01-09T10:34:33.053326
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-09T10:34:33.114648 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-09T10:34:33.114648 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-09T10:34:33.114648 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:34:33.114648
+[custom_lint] 2026-01-09T10:35:48.893431 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2924:48: Error: Expected ',' before this.
+[custom_lint] 2026-01-09T10:35:48.893431     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:35:48.893431                                                ^^
+[custom_lint] 2026-01-09T10:35:48.893431 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2924:52: Error: Expected ')' before this.
+[custom_lint] 2026-01-09T10:35:48.893431     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:35:48.893431                                                    ^
+[custom_lint] 2026-01-09T10:35:48.893431 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2924:51: Error: Undefined name 'I'.
+[custom_lint] 2026-01-09T10:35:48.893431     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:35:48.893431                                                   ^
+[custom_lint] 2026-01-09T10:35:48.893431 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2924:48: Error: Undefined name 'll'.
+[custom_lint] 2026-01-09T10:35:48.893431     r'let|it|there|here|we|I|you|they|that|we\'ll|I\'ve)\b',
+[custom_lint] 2026-01-09T10:35:48.893431                                                ^^
+[custom_lint] 2026-01-09T10:35:48.893431 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2922:51: Error: Too many positional arguments: 1 allowed, but 2 found.
+[custom_lint] 2026-01-09T10:35:48.893431 Try removing the extra positional arguments.
+[custom_lint] 2026-01-09T10:35:48.893431   static final RegExp _contractionPattern = RegExp(
+[custom_lint] 2026-01-09T10:35:48.893431                                                   ^
+[custom_lint] 2026-01-09T10:35:48.893431 org-dartlang-sdk:///sdk/lib/_internal/vm/lib/regexp_patch.dart:10:11: Context: Found this candidate, but the arguments don't match.
+[custom_lint] 2026-01-09T10:35:48.893431   factory RegExp(
+[custom_lint] 2026-01-09T10:35:48.893431           ^
+[custom_lint] 2026-01-09T10:35:48.893431 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2998:13: Error: The method 'SourceRange' isn't defined for the type '_ReplaceStraightApostropheFix'.
+[custom_lint] 2026-01-09T10:35:48.893431  - '_ReplaceStraightApostropheFix' is from 'package:saropa_lints/src/rules/stylistic_rules.dart' ('/d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart').
+[custom_lint] 2026-01-09T10:35:48.893431 Try correcting the name to the name of an existing method, or defining a method named 'SourceRange'.
+[custom_lint] 2026-01-09T10:35:48.893431             SourceRange(comment.offset, comment.length),
+[custom_lint] 2026-01-09T10:35:48.893431             ^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:35:48.893431 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:3030:17: Error: The method 'SourceRange' isn't defined for the type '_ReplaceStraightApostropheFix'.
+[custom_lint] 2026-01-09T10:35:48.893431  - '_ReplaceStraightApostropheFix' is from 'package:saropa_lints/src/rules/stylistic_rules.dart' ('/d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart').
+[custom_lint] 2026-01-09T10:35:48.893431 Try correcting the name to the name of an existing method, or defining a method named 'SourceRange'.
+[custom_lint] 2026-01-09T10:35:48.893431                 SourceRange(comment!.offset, comment.length),
+[custom_lint] 2026-01-09T10:35:48.893431                 ^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:35:48.893431
+[custom_lint] 2026-01-09T10:35:48.893431
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-09T10:35:48.955507 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-09T10:35:48.955507 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-09T10:35:48.955507 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:35:48.955507
+[custom_lint] 2026-01-09T10:36:37.335074 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2996:17: Error: 'SourceRange' isn't a type.
+[custom_lint] 2026-01-09T10:36:37.335074           final SourceRange commentRange =
+[custom_lint] 2026-01-09T10:36:37.335074                 ^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:36:37.335074 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2997:15: Error: The method 'SourceRange' isn't defined for the type '_ReplaceStraightApostropheFix'.
+[custom_lint] 2026-01-09T10:36:37.335074  - '_ReplaceStraightApostropheFix' is from 'package:saropa_lints/src/rules/stylistic_rules.dart' ('/d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart').
+[custom_lint] 2026-01-09T10:36:37.335074 Try correcting the name to the name of an existing method, or defining a method named 'SourceRange'.
+[custom_lint] 2026-01-09T10:36:37.335074               SourceRange(comment.offset, comment.length);
+[custom_lint] 2026-01-09T10:36:37.335074               ^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:36:37.335074
+[custom_lint] 2026-01-09T10:36:37.335074
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-09T10:36:37.395078 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-09T10:36:37.395078 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-09T10:36:37.395078 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:36:37.395078
+[custom_lint] 2026-01-09T10:38:36.912360 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2876:2: Error: Expected an identifier, but got '('.
+[custom_lint] 2026-01-09T10:38:36.912360 Try inserting an identifier before '('.
+[custom_lint] 2026-01-09T10:38:36.912360  (U+0027)
+[custom_lint] 2026-01-09T10:38:36.912360  ^
+[custom_lint] 2026-01-09T10:38:36.912360 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2876:4: Error: Expected ')' before this.
+[custom_lint] 2026-01-09T10:38:36.912360  (U+0027)
+[custom_lint] 2026-01-09T10:38:36.912360    ^
+[custom_lint] 2026-01-09T10:38:36.912360 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2877:3: Error: Expected '{' before this.
+[custom_lint] 2026-01-09T10:38:36.912360   static const String straightApostrophe = "'";
+[custom_lint] 2026-01-09T10:38:36.912360   ^^^^^^
+[custom_lint] 2026-01-09T10:38:36.912360 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2880:50: Error: Expected a class member, but got ')'.
+[custom_lint] 2026-01-09T10:38:36.912360   static const String curlyApostrophe = '\u2019';)
+[custom_lint] 2026-01-09T10:38:36.912360                                                  ^
+[custom_lint] 2026-01-09T10:38:36.912360 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2881:23: Error: 'curlyApostrophe' is already declared in this scope.
+[custom_lint] 2026-01-09T10:38:36.912360   static const String curlyApostrophe = '\u2019'; // U+2019
+[custom_lint] 2026-01-09T10:38:36.912360                       ^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:38:36.912360 /d:/src/saropa_lints/lib/src/rules/stylistic_rules.dart:2880:23: Context: Previous declaration of 'curlyApostrophe'.
+[custom_lint] 2026-01-09T10:38:36.912360   static const String curlyApostrophe = '\u2019';)
+[custom_lint] 2026-01-09T10:38:36.912360                       ^^^^^^^^^^^^^^^
+[custom_lint] 2026-01-09T10:38:36.912360
+[custom_lint] 2026-01-09T10:38:36.912360
+Failed to start pluginsThe request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: Failed to start the plugins.
+at:
+#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)
+<asynchronous suspension>
+#1      Future.any.onValue (dart:async/future.dart:637:5)
+<asynchronous suspension>
+
+[custom_lint] 2026-01-09T10:38:36.971653 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: Failed to start the plugins.","stackTrace":"#0      SocketCustomLintServerToClientChannel._checkInitializationFail.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:223:11)\n<asynchronous suspension>\n#1      Future.any.onValue (dart:async/future.dart:637:5)\n<asynchronous suspension>\n"}
+[custom_lint] 2026-01-09T10:38:36.971653 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
+[custom_lint] 2026-01-09T10:38:36.971653

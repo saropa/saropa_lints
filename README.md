@@ -63,7 +63,7 @@ These aren't edge cases. They're compliance requirements and security basics tha
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 766+ when you're ready.
+The tier system lets you adopt gradually — start with ~100 critical rules, work up to 767+ when you're ready.
 
 ---
 
@@ -122,6 +122,10 @@ Pick the tier that matches your team:
 | **Insanity** | Greenfield projects. Every single rule. |
 
 **Plus 21 optional [stylistic rules](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** — team preferences, not in any tier.
+
+### Configuration template
+
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 767+ rules organized by category, tier membership, and examples.
 
 ### Using a tier
 

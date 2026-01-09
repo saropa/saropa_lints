@@ -1,0 +1,768 @@
+# ==============================================================================
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 1.7.5)
+# ==============================================================================
+#
+# This is an up-to-date template for configuring Saropa Lints in your project.
+# Copy this file and customize it for your needs.
+#
+# For the latest version, see:
+# https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml
+#
+# QUICK START
+# ===========
+# 1. Copy this file to your project as: analysis_options.yaml
+# 2. Choose a tier: essential | recommended | professional | comprehensive | insanity
+# 3. Customize by commenting/uncommenting rules as needed
+# 4. Run: dart analyze
+#
+# TIER GUIDE
+# ==========
+# - essential      : Critical rules (~45) - prevents crashes, security issues
+# - recommended    : Essential + common mistakes (~150) - default for most teams
+# - professional   : Recommended + architecture/testing (~350) - enterprise teams
+# - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
+# - insanity       : Everything including opinionated rules (~767+) - greenfield projects
+#
+# CONFIGURATION NOTES
+# ===================
+# - Use YAML list format (with `-` prefix) for rule names, NOT map format
+# - Set rules to true to enable, false to disable
+# - Rules from your selected tier are enabled by default
+# - You can override individual rules regardless of tier
+
+analyzer:
+  plugins:
+    - custom_lint
+
+  # Directories to exclude from analysis
+  exclude:
+    # === Generated Code ===
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.gen.dart"
+    - "**/*.gr.dart"
+    - "**/*.config.dart"
+    - "**/*.mocks.dart"
+    - "lib/generated_plugin_registrant.dart"
+
+    # === Build & Cache ===
+    - ".dart_tool/**"
+    - ".github/**"
+    - ".idea/**"
+    - ".vscode/**"
+    - "build/**"
+
+    # === Test Specific ===
+    - "test/.test_coverage.dart"
+
+    # === Platform Native Code ===
+    - "android/**"
+    - "ios/**"
+    - "web/**"
+
+    # === External Packages ===
+    - "dependency_overrides/**"
+
+    # === Static Assets ===
+    - "assets/**"
+
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+  errors:
+    cast_nullable_to_non_nullable: warning
+    missing_required_param: error
+    missing_return: error
+    todo: ignore
+
+# ==============================================================================
+# SAROPA LINTS CONFIGURATION
+# ==============================================================================
+
+custom_lint:
+  saropa_lints:
+    # Choose one tier (required):
+    #   - essential      : ~45 rules (critical only)
+    #   - recommended    : ~150 rules (default) ← START HERE
+    #   - professional   : ~350 rules (strict)
+    #   - comprehensive  : ~700 rules (very strict)
+    #   - insanity       : ~767+ rules (everything)
+    tier: recommended
+
+  # ===========================================================================
+  # RULE OVERRIDES
+  # ===========================================================================
+  # Rules from your chosen tier are enabled by default. Override them here
+  # using the list format (with `-` prefix). Set to true to enable, false to disable.
+  #
+  # Format:
+  #   rules:
+  #     - rule_name: true/false
+  #
+  # NOT supported (silently ignored):
+  #   rules:
+  #     rule_name: true/false
+  #
+  rules:
+    # IMPORTANT: Use list format (`- rule_name: value`), NOT map format
+
+    # =========================================================================
+    # ASYNC & FUTURES
+    # =========================================================================
+    - prefer_async_callback: true
+    - prefer_future_void_function_over_async_callback: false
+    - avoid_async_call_in_sync_function: false
+    - avoid_passing_async_when_sync_expected: false
+    - avoid_redundant_async: false
+    - avoid_unnecessary_futures: false
+    - avoid_future_ignore: false
+    - avoid_future_tostring: false
+    - avoid_stream_tostring: false
+    - avoid_nested_futures: false
+    - avoid_nested_streams_and_futures: false
+    - prefer_async_await: false
+    - prefer_return_await: false
+    - prefer_assigning_await_expressions: false
+    - prefer_correct_future_return_type: false
+    - prefer_correct_stream_return_type: false
+    - prefer_unwrapping_future_or: false
+    - prefer_specifying_future_value_type: false
+    - prefer_expect_later: false
+    - require_future_error_handling: false
+    - avoid_unassigned_stream_subscriptions: false
+    - require_stream_controller_dispose: false
+
+    # =========================================================================
+    # ACCESSIBILITY
+    # =========================================================================
+    - avoid_small_text: true
+    - require_error_identification: false
+    - require_semantics_label: false
+    - avoid_text_scale_factor: false
+    - avoid_icon_buttons_without_tooltip: false
+    - avoid_color_only_indicators: false
+    - require_button_semantics: false
+    - prefer_explicit_semantics: false
+    - avoid_hover_only: false
+    - require_image_semantics: false
+    - avoid_hidden_interactive: false
+    - require_minimum_contrast: false
+    - prefer_scalable_text: false
+    - avoid_text_scale_factor_ignore: false
+
+    # =========================================================================
+    # COLLECTIONS
+    # =========================================================================
+    - avoid_unsafe_collection_methods: false
+    - avoid_unsafe_reduce: false
+    - avoid_unsafe_where_methods: false
+    - prefer_where_or_null: false
+    - avoid_map_keys_contains: false
+    - avoid_collection_equality_checks: false
+    - avoid_duplicate_collection_elements: false
+    - avoid_missing_enum_constant_in_map: false
+    - avoid_enum_values_by_index: false
+    - avoid_accessing_collections_by_constant_index: false
+    - avoid_slow_collection_methods: false
+    - prefer_first: false
+    - prefer_last: false
+    - prefer_add_all: false
+    - prefer_any_or_every: false
+    - prefer_for_in: false
+    - prefer_iterable_of: false
+    - prefer_set_for_lookup: false
+    - map_keys_ordering: false
+    - avoid_unnecessary_collections: false
+
+    # =========================================================================
+    # CONTROL FLOW
+    # =========================================================================
+    - avoid_constant_conditions: false
+    - avoid_constant_assert_conditions: false
+    - avoid_constant_switches: false
+    - avoid_contradictory_expressions: false
+    - avoid_conditions_with_boolean_literals: false
+    - avoid_unnecessary_conditionals: false
+    - avoid_inverted_boolean_checks: false
+    - avoid_negated_conditions: false
+    - avoid_negations_in_equality_checks: false
+    - avoid_collapsible_if: false
+    - avoid_if_with_many_branches: false
+    - avoid_nested_switch_expressions: false
+    - avoid_nested_switches: false
+    - avoid_nested_conditional_expressions: false
+    - avoid_nested_try: false
+    - avoid_redundant_else: false
+    - avoid_unconditional_break: false
+    - avoid_continue: false
+    - avoid_unnecessary_continue: false
+    - avoid_complex_conditions: false
+    - avoid_complex_loop_conditions: false
+    - avoid_duplicate_switch_case_conditions: false
+    - avoid_wildcard_cases_with_enums: false
+    - avoid_wildcard_cases_with_sealed_classes: false
+    - no_equal_conditions: false
+    - no_equal_nested_conditions: false
+    - no_equal_then_else: false
+    - no_equal_switch_case: false
+    - no_equal_switch_expression_cases: false
+    - prefer_conditional_expressions: false
+    - prefer_early_return: false
+    - prefer_returning_condition: false
+    - prefer_returning_conditionals: false
+    - prefer_switch_expression: false
+    - prefer_switch_with_enums: false
+    - prefer_switch_with_sealed_classes: false
+    - prefer_correct_switch_length: false
+    - prefer_specific_cases_first: false
+    - prefer_pushing_conditional_expressions: false
+    - avoid_unnecessary_if: false
+
+    # =========================================================================
+    # EQUALITY
+    # =========================================================================
+    - avoid_equal_expressions: false
+    - avoid_self_compare: false
+    - avoid_self_assignment: false
+    - no_equal_arguments: false
+    - avoid_unnecessary_compare_to: false
+    - binary_expression_operand_order: false
+    - prefer_overriding_parent_equality: false
+
+    # =========================================================================
+    # ERROR HANDLING
+    # =========================================================================
+    - avoid_catching_generic_exception: false
+    - avoid_only_rethrow: false
+    - avoid_throw_in_catch_block: false
+    - avoid_throw_in_finally: false
+    - avoid_throw_objects_without_tostring: false
+    - avoid_identical_exception_handling_blocks: false
+    - avoid_missing_completer_stack_trace: false
+    - avoid_non_final_exception_class_fields: false
+    - prefer_public_exception_classes: false
+    - avoid_swallowing_exceptions: false
+    - avoid_losing_stack_trace: false
+    - avoid_generic_exceptions: false
+    - require_error_context: false
+    - prefer_result_pattern: false
+    - require_async_error_documentation: false
+    - require_error_boundary: false
+
+    # =========================================================================
+    # EXTENSION TYPES
+    # =========================================================================
+    - avoid_nested_extension_types: false
+    - avoid_implicitly_nullable_extension_types: false
+    - prefer_private_extension_type_field: false
+    - avoid_shadowed_extension_methods: false
+
+    # =========================================================================
+    # ENUMS
+    # =========================================================================
+    - prefer_enhanced_enums: false
+    - prefer_enums_by_name: false
+    - avoid_unnecessary_enum_prefix: false
+    - avoid_unnecessary_enum_arguments: false
+    - prefer_shorthands_with_enums: false
+
+    # =========================================================================
+    # EXPRESSIONS
+    # =========================================================================
+    - avoid_excessive_expressions: false
+    - avoid_cascade_after_if_null: false
+    - avoid_duplicate_cascades: false
+    - prefer_parentheses_with_if_null: false
+    - prefer_null_aware_spread: false
+    - prefer_null_aware_elements: false
+    - prefer_moving_to_variable: false
+
+    # =========================================================================
+    # FIREBASE & STORAGE
+    # =========================================================================
+    - avoid_firestore_unbounded_query: false
+    - avoid_database_in_build: false
+    - require_prefs_key_constants: false
+    - avoid_secure_storage_on_web: false
+    - require_firebase_init_before_use: false
+
+    # =========================================================================
+    # FLUTTER DISPOSAL (CRITICAL)
+    # =========================================================================
+    - require_dispose: false
+    - dispose_fields: false
+    - require_animation_disposal: false
+    - avoid_undisposed_instances: false
+    - require_value_notifier_dispose: false
+    - require_animation_controller_dispose: false
+    - require_image_disposal: false
+    - nullify_after_dispose: false
+
+    # =========================================================================
+    # FLUTTER FORMS
+    # =========================================================================
+    - require_form_key: false
+    - avoid_validation_in_build: false
+    - require_submit_button_state: false
+    - avoid_form_without_unfocus: false
+    - require_form_restoration: false
+    - avoid_clearing_form_on_error: false
+    - require_form_field_controller: false
+    - avoid_form_without_key: false
+    - avoid_form_in_alert_dialog: false
+    - require_error_message_context: false
+    - require_text_overflow_in_row: false
+    - require_keyboard_type: false
+    - require_secure_keyboard: false
+
+    # =========================================================================
+    # FLUTTER LIFECYCLE (CRITICAL)
+    # =========================================================================
+    - avoid_context_in_initstate_dispose: false
+    - avoid_inherited_widget_in_initstate: false
+    - avoid_build_context_in_providers: false
+    - avoid_late_context: false
+    - avoid_unsafe_setstate: false
+    - use_setstate_synchronously: false
+    - avoid_empty_setstate: false
+    - avoid_mounted_in_setstate: false
+    - avoid_unnecessary_setstate: false
+    - avoid_state_constructors: false
+    - avoid_stateless_widget_initialized_fields: false
+    - avoid_unnecessary_stateful_widgets: false
+    - avoid_unnecessary_overrides_in_state: false
+    - proper_super_calls: false
+    - always_remove_listener: false
+    - avoid_unremovable_callbacks_in_listeners: false
+    - require_mounted_check: false
+    - avoid_global_key_in_build: false
+    - require_notify_listeners: false
+    - require_update_should_notify: false
+    - avoid_watch_in_callbacks: false
+    - avoid_stateful_without_state: false
+    - avoid_global_riverpod_providers: false
+    - avoid_ref_in_build_body: false
+
+    # =========================================================================
+    # FLUTTER NAVIGATION
+    # =========================================================================
+    - avoid_navigator_push_without_route_name: false
+    - avoid_scaffold_messenger_after_await: false
+    - prefer_scaffold_messenger_maybeof: false
+    - require_unknown_route_handler: false
+    - avoid_context_after_navigation: false
+
+    # =========================================================================
+    # FLUTTER PERFORMANCE
+    # =========================================================================
+    - avoid_listview_without_item_extent: false
+    - avoid_shrink_wrap_in_scroll: false
+    - avoid_mediaquery_in_build: false
+    - prefer_dedicated_media_query_method: false
+    - avoid_layout_builder_misuse: false
+    - avoid_repaint_boundary_misuse: false
+    - avoid_singlechildscrollview_with_column: false
+    - avoid_gesture_detector_in_scrollview: false
+    - avoid_unnecessary_gesture_detector: false
+    - pass_existing_future_to_future_builder: false
+    - pass_existing_stream_to_stream_builder: false
+    - prefer_cached_network_image: false
+    - prefer_sliver_list_delegate: false
+    - prefer_const_string_list: false
+    - prefer_const_widgets_in_lists: false
+    - check_for_equals_in_render_object_setters: false
+    - consistent_update_render_object: false
+    - avoid_setstate_in_build: false
+    - avoid_controller_in_build: false
+    - require_keys_in_animated_lists: false
+    - avoid_expensive_build: false
+
+    # =========================================================================
+    # FLUTTER WIDGETS
+    # =========================================================================
+    - avoid_deeply_nested_widgets: false
+    - avoid_deep_widget_nesting: false
+    - avoid_recursive_widget_calls: false
+    - avoid_returning_widgets: false
+    - avoid_single_child_column_row: false
+    - avoid_expanded_as_spacer: false
+    - avoid_flexible_outside_flex: false
+    - avoid_duplicate_widget_keys: false
+    - avoid_stateful_widget_in_list: false
+    - avoid_uncontrolled_text_field: false
+    - avoid_unrestricted_text_field_length: false
+    - avoid_wrapping_in_padding: false
+    - avoid_border_all: false
+    - avoid_incorrect_image_opacity: false
+    - avoid_image_without_cache: false
+    - avoid_missing_image_alt: false
+    - avoid_absorb_pointer_misuse: false
+    - avoid_brightness_check_for_theme: false
+    - prefer_const_border_radius: false
+    - prefer_correct_edge_insets_constructor: false
+    - prefer_text_rich: false
+    - prefer_define_hero_tag: false
+    - prefer_using_list_view: false
+    - prefer_safe_area_aware: false
+    - prefer_safe_area_consumer: false
+    - prefer_semantic_widget_names: false
+    - prefer_opacity_widget: false
+    - prefer_widget_private_members: false
+    - prefer_widget_state_mixin: false
+    - prefer_split_widget_const: false
+    - prefer_single_widget_per_file: false
+    - prefer_sliver_prefix: false
+    - prefer_overflow_box_rationale: false
+    - require_disabled_state: false
+    - require_drag_feedback: false
+    - require_safe_area_handling: false
+    - avoid_nullable_widget_methods: false
+    - avoid_image_repeat: false
+    - avoid_icon_size_override: false
+    - prefer_inkwell_over_gesture: false
+    - avoid_fitted_box_for_text: false
+    - prefer_listview_builder: false
+    - avoid_opacity_animation: false
+    - avoid_sized_box_expand: false
+    - prefer_selectable_text: false
+    - prefer_spacing_over_sizedbox: false
+    - avoid_gesture_conflict: false
+    - avoid_large_images_in_memory: false
+    - avoid_gesture_without_behavior: false
+    - require_overflow_box_rationale: false
+    - avoid_unconstrained_images: false
+
+    # =========================================================================
+    # FUNCTIONS
+    # =========================================================================
+    - prefer_named_parameters: true
+    - avoid_long_functions: false
+    - avoid_long_parameter_list: false
+    - avoid_local_functions: false
+    - avoid_declaring_call_method: false
+    - avoid_recursive_calls: false
+    - avoid_recursive_tostring: false
+    - avoid_immediately_invoked_functions: false
+    - avoid_missed_calls: false
+    - avoid_passing_self_as_argument: false
+    - avoid_always_null_parameters: false
+    - avoid_mutating_parameters: false
+    - avoid_unused_parameters: false
+    - avoid_unused_callback_parameters: false
+    - function_always_returns_null: false
+    - function_always_returns_same_value: false
+    - prefer_getter_over_method: false
+    - prefer_static_method: false
+    - prefer_named_boolean_parameters: false
+    - prefer_explicit_function_type: false
+    - prefer_explicit_parameter_names: false
+    - prefer_typedef_for_callbacks: false
+    - prefer_extracting_callbacks: false
+    - prefer_extracting_function_callbacks: false
+    - pass_correct_accepted_type: false
+    - pass_optional_argument: false
+    - avoid_returning_cascades: false
+    - avoid_returning_void: false
+    - prefer_returning_shorthands: false
+    - avoid_unnecessary_return: false
+    - prefer_immediate_return: false
+
+    # =========================================================================
+    # IMPORTS
+    # =========================================================================
+    - avoid_barrel_files: false
+    - avoid_double_slash_imports: false
+    - avoid_duplicate_exports: false
+    - avoid_duplicate_named_imports: false
+    - max_imports: false
+    - prefer_named_imports: false
+
+    # =========================================================================
+    # INTERNATIONALIZATION
+    # =========================================================================
+    - avoid_hardcoded_strings_in_ui: false
+    - require_locale_aware_formatting: false
+    - require_directional_widgets: false
+    - require_plural_handling: false
+    - avoid_hardcoded_locale: false
+    - avoid_string_concatenation_in_ui: false
+    - avoid_text_in_images: false
+    - avoid_hardcoded_app_name: false
+
+    # =========================================================================
+    # MEMORY & RESOURCE MANAGEMENT
+    # =========================================================================
+    - avoid_large_objects_in_state: false
+    - avoid_capturing_this_in_callbacks: false
+    - require_cache_eviction_policy: false
+    - prefer_weak_references_for_cache: false
+    - avoid_expando_circular_references: false
+    - avoid_large_isolate_communication: false
+    - require_file_close_in_finally: false
+    - require_database_close: false
+    - require_http_client_close: false
+    - require_native_resource_cleanup: false
+    - require_websocket_close: false
+    - require_platform_channel_cleanup: false
+    - require_isolate_kill: false
+    - require_image_cache_dimensions: false
+    - prefer_image_precache: false
+
+    # =========================================================================
+    # NAMING & STYLE
+    # =========================================================================
+    - prefer_boolean_prefixes: true
+    - avoid_getter_prefix: false
+    - prefer_correct_identifier_length: false
+    - prefer_correct_type_name: false
+    - prefer_correct_error_name: false
+    - prefer_correct_setter_parameter_name: false
+    - prefer_correct_callback_field_name: false
+    - prefer_correct_handler_name: false
+    - prefer_prefixed_global_constants: false
+    - prefer_trailing_underscore_for_unused: false
+    - match_getter_setter_field_names: false
+    - match_class_name_pattern: false
+    - match_base_class_default_value: false
+    - tag_name: false
+    - prefer_kebab_tag_name: false
+
+    # =========================================================================
+    # NULL SAFETY & TYPE SAFETY
+    # =========================================================================
+    - avoid_null_assertion: false
+    - avoid_nullable_interpolation: false
+    - avoid_nullable_tostring: false
+    - avoid_nullable_parameters_with_default_values: false
+    - avoid_unnecessary_nullable_fields: false
+    - avoid_unnecessary_nullable_parameters: false
+    - avoid_unnecessary_nullable_return_type: false
+    - avoid_unrelated_type_assertions: false
+    - avoid_unnecessary_type_assertions: false
+    - avoid_unnecessary_type_casts: false
+    - avoid_dynamic: false
+    - no_object_declaration: false
+    - avoid_casting_to_extension_type: false
+    - avoid_collection_methods_with_unrelated_types: false
+    - avoid_unsafe_cast: false
+    - prefer_constrained_generics: false
+    - require_covariant_documentation: false
+    - require_safe_json_parsing: false
+    - require_null_safe_extensions: false
+    - prefer_specific_numeric_types: false
+    - require_futureor_documentation: false
+
+    # =========================================================================
+    # NETWORK & API
+    # =========================================================================
+    - require_http_status_check: false
+    - require_api_timeout: false
+    - require_request_timeout: false
+    - avoid_hardcoded_api_urls: false
+    - require_retry_logic: false
+    - require_typed_api_response: false
+    - require_connectivity_check: false
+    - require_offline_indicator: false
+    - require_api_error_mapping: false
+    - avoid_token_in_url: false
+    - avoid_generic_key_in_url: false
+
+    # =========================================================================
+    # NUMBERS & STRINGS
+    # =========================================================================
+    - avoid_adjacent_strings: false
+    - avoid_non_ascii_symbols: false
+    - avoid_substring: false
+    - avoid_incorrect_uri: false
+    - no_empty_string: false
+    - no_magic_string: false
+    - no_magic_number: false
+    - avoid_complex_arithmetic_expressions: false
+    - avoid_bitwise_operators_with_booleans: false
+    - avoid_digit_separators: false
+    - avoid_inconsistent_digit_separators: false
+    - avoid_unnecessary_digit_separators: false
+    - prefer_digit_separators: false
+    - double_literal_format: false
+    - prefer_addition_subtraction_assignments: false
+    - prefer_compound_assignment_operators: false
+    - prefer_bytes_builder: false
+
+    # =========================================================================
+    # PATTERNS & RECORDS
+    # =========================================================================
+    - avoid_one_field_records: false
+    - avoid_long_records: false
+    - avoid_nested_records: false
+    - avoid_mixing_named_and_positional_fields: false
+    - avoid_function_type_in_records: false
+    - avoid_bottom_type_in_records: false
+    - avoid_extensions_on_records: false
+    - avoid_positional_record_field_access: false
+    - avoid_redundant_positional_field_name: false
+    - avoid_bottom_type_in_patterns: false
+    - avoid_duplicate_patterns: false
+    - avoid_explicit_pattern_field_name: false
+    - avoid_keywords_in_wildcard_pattern: false
+    - avoid_unnecessary_patterns: false
+    - avoid_single_field_destructuring: false
+    - avoid_nested_shorthands: false
+    - prefer_wildcard_pattern: false
+    - prefer_simpler_patterns_null_check: false
+    - move_records_to_typedefs: false
+    - match_positional_field_names_on_assignment: false
+    - use_existing_destructuring: false
+    - prefer_sorted_record_fields: false
+    - prefer_sorted_pattern_fields: false
+    - record_fields_ordering: false
+    - pattern_fields_ordering: false
+
+    # =========================================================================
+    # SECURITY
+    # =========================================================================
+    - avoid_hardcoded_credentials: false
+    - avoid_logging_sensitive_data: false
+    - avoid_eval_like_patterns: false
+    - avoid_weak_cryptographic_algorithms: false
+    - require_certificate_pinning: false
+    - require_secure_storage: false
+    - require_input_sanitization: false
+    - avoid_clipboard_sensitive: false
+    - avoid_storing_passwords: false
+    - prefer_secure_random: false
+    - require_auth_check: false
+    - require_token_refresh: false
+    - avoid_jwt_decode_client: false
+    - require_logout_cleanup: false
+    - avoid_auth_in_query_params: false
+    - avoid_auth_state_in_prefs: false
+    - prefer_encrypted_prefs: false
+    - require_deep_link_validation: false
+
+    # =========================================================================
+    # STATE MANAGEMENT
+    # =========================================================================
+    - avoid_ref_in_dispose: false
+    - require_provider_scope: false
+    - prefer_select_for_partial: false
+    - avoid_provider_in_widget: false
+    - prefer_family_for_params: false
+    - avoid_circular_provider_deps: false
+    - require_error_handling_in_async: false
+    - prefer_notifier_over_state: false
+    - require_getx_controller_dispose: false
+    - avoid_obs_outside_controller: false
+    - require_bloc_transformer: false
+    - avoid_long_event_handlers: false
+    - avoid_bloc_event_mutation: false
+    - prefer_copy_with_for_state: false
+    - avoid_bloc_listen_in_build: false
+    - require_initial_state: false
+    - require_error_state: false
+    - avoid_bloc_in_bloc: false
+    - prefer_sealed_events: false
+    - prefer_cubit_for_simple: false
+    - require_bloc_observer: false
+    - avoid_provider_of_in_build: false
+    - avoid_get_find_in_build: false
+    - avoid_provider_recreate: false
+    - require_provider_dispose: false
+    - prefer_ref_watch_over_read: false
+    - avoid_change_notifier_in_widget: false
+    - avoid_setstate_in_large_state_class: false
+
+    # =========================================================================
+    # TESTING
+    # =========================================================================
+    - avoid_duplicate_test_assertions: false
+    - avoid_empty_test_groups: false
+    - avoid_top_level_members_in_tests: false
+    - missing_test_assertion: false
+    - prefer_correct_test_file_name: false
+    - prefer_descriptive_test_name: false
+    - prefer_unique_test_names: false
+    - prefer_test_matchers: false
+    - prefer_test_structure: false
+    - prefer_visible_for_testing_on_members: false
+    - require_test_assertions: false
+    - avoid_vague_test_descriptions: false
+    - avoid_real_network_calls_in_tests: false
+    - avoid_hardcoded_test_delays: false
+    - require_test_setup_teardown: false
+    - require_pump_after_interaction: false
+    - avoid_production_config_in_tests: false
+    - require_test_groups: false
+    - avoid_test_sleep: false
+    - avoid_find_by_text: false
+    - require_test_keys: false
+    - require_arrange_act_assert: false
+    - prefer_mock_navigator: false
+    - avoid_real_timer_in_widget_test: false
+    - require_mock_verification: false
+    - prefer_matcher_over_equals: false
+    - prefer_test_wrapper: false
+    - require_screen_size_tests: false
+    - avoid_stateful_test_setup: false
+    - prefer_mock_http: false
+    - require_golden_test: false
+    - require_integration_test_setup: false
+    - avoid_find_all: false
+    - require_error_case_tests: false
+    - avoid_scroll_tests: false
+    - require_text_input_tests: false
+    - avoid_test_coupling: false
+    - require_test_isolation: false
+
+    # =========================================================================
+    # VARIABLES & ASSIGNMENTS
+    # =========================================================================
+    - avoid_late_keyword: false
+    - avoid_late_final_reassignment: false
+    - avoid_unassigned_fields: false
+    - avoid_unassigned_late_fields: false
+    - avoid_unnecessary_late_fields: false
+    - avoid_unnecessary_local_late: false
+    - avoid_global_state: false
+    - avoid_shadowing: false
+    - avoid_generics_shadowing: false
+    - avoid_similar_names: false
+    - avoid_unused_assignment: false
+    - avoid_unused_instances: false
+    - avoid_unused_after_null_check: false
+    - avoid_unused_generics: false
+    - avoid_unnecessary_local_variable: false
+    - avoid_unnecessary_reassignment: false
+    - avoid_multi_assignment: false
+    - avoid_nested_assignments: false
+    - avoid_assignments_as_conditions: false
+    - move_variable_closer_to_usage: false
+    - move_variable_outside_iteration: false
+    - use_existing_variable: false
+    - prefer_type_over_var: false
+
+    # =========================================================================
+    # OPINIONATED RULES (Not in any tier - enable individually)
+    # =========================================================================
+    # These rules express stylistic preferences. They're not included in
+    # any tier by default but available for teams with strong style guides.
+    - prefer_relative_imports: false
+    - prefer_one_widget_per_file: false
+    - prefer_arrow_functions: false
+    - prefer_all_named_parameters: false
+    - prefer_trailing_comma_always: false
+    - prefer_private_underscore_prefix: false
+    - prefer_widget_methods_over_classes: false
+    - prefer_explicit_types: false
+    - prefer_class_over_record_return: false
+    - prefer_inline_callbacks: false
+    - prefer_single_quotes: false
+    - prefer_todo_format: false
+    - prefer_fixme_format: false
+    - prefer_sentence_case_comments: false
+    - prefer_period_after_doc: false
+    - prefer_screaming_case_constants: false
+    - prefer_descriptive_bool_names: false
+    - prefer_snake_case_files: false
+    - prefer_doc_comments_over_regular: false
