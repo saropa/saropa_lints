@@ -4,7 +4,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -21,8 +22,10 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_ignore',
-    problemMessage: 'Future.ignore() silently discards errors. Failures will go unnoticed.',
-    correctionMessage: 'Use await to handle, unawaited() if intentional, or add .catchError().',
+    problemMessage:
+        'Future.ignore() silently discards errors. Failures will go unnoticed.',
+    correctionMessage:
+        'Use await to handle, unawaited() if intentional, or add .catchError().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -66,8 +69,10 @@ class AvoidFutureToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_tostring',
-    problemMessage: "Future.toString() returns 'Instance of Future', not the resolved value.",
-    correctionMessage: 'Use await to get the value first: (await future).toString().',
+    problemMessage:
+        "Future.toString() returns 'Instance of Future', not the resolved value.",
+    correctionMessage:
+        'Use await to get the value first: (await future).toString().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -330,7 +335,8 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
     });
   }
 
-  void _checkAsyncBody(FunctionBody body, AstNode node, SaropaDiagnosticReporter reporter) {
+  void _checkAsyncBody(
+      FunctionBody body, AstNode node, SaropaDiagnosticReporter reporter) {
     // Only check async functions (not async*)
     if (body.isAsynchronous && !body.isGenerator) {
       // Check if body contains any await expressions
@@ -427,7 +433,8 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_stream_subscriptions',
-    problemMessage: 'Stream subscription not assigned. Cannot cancel it, causing memory leaks.',
+    problemMessage:
+        'Stream subscription not assigned. Cannot cancel it, causing memory leaks.',
     correctionMessage:
         'Assign to variable: final sub = stream.listen(...); then sub.cancel() in dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -526,8 +533,10 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_assigning_await_expressions',
-    problemMessage: 'Inline await expression. Harder to debug and inspect intermediate values.',
-    correctionMessage: 'Extract to variable: final result = await fetch(); then use result.',
+    problemMessage:
+        'Inline await expression. Harder to debug and inspect intermediate values.',
+    correctionMessage:
+        'Extract to variable: final result = await fetch(); then use result.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -551,7 +560,9 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
       if (parent is ExpressionStatement) return;
 
       // OK if in a list/set/map literal at top level
-      if (parent is ListLiteral || parent is SetOrMapLiteral || parent is MapLiteralEntry) {
+      if (parent is ListLiteral ||
+          parent is SetOrMapLiteral ||
+          parent is MapLiteralEntry) {
         return;
       }
 
@@ -683,7 +694,8 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_stream_return_type',
-    problemMessage: 'Async* function should have Stream return type annotation.',
+    problemMessage:
+        'Async* function should have Stream return type annotation.',
     correctionMessage: 'Add explicit Stream<T> return type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -750,7 +762,8 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final NamedType type = constructorName.type;
 
@@ -799,7 +812,8 @@ class PreferReturnAwaitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_return_await',
-    problemMessage: 'Return await in async functions for proper error handling.',
+    problemMessage:
+        'Return await in async functions for proper error handling.',
     correctionMessage: 'Add await before the returned Future.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1147,9 +1161,11 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_callback',
-    problemMessage: 'VoidCallback discards Futures silently. Errors will be swallowed and '
+    problemMessage:
+        'VoidCallback discards Futures silently. Errors will be swallowed and '
         'callers cannot await completion.',
-    correctionMessage: 'Use Future<void> Function() to allow proper async handling.',
+    correctionMessage:
+        'Use Future<void> Function() to allow proper async handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1239,7 +1255,8 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
       if (name.startsWith(prefix) && name.length > prefix.length) {
         // Check that next char is uppercase (proper camelCase)
         final String nextChar = name[prefix.length];
-        if (nextChar == nextChar.toUpperCase() && nextChar != nextChar.toLowerCase()) {
+        if (nextChar == nextChar.toUpperCase() &&
+            nextChar != nextChar.toLowerCase()) {
           return true;
         }
       }
@@ -1339,8 +1356,10 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_future_void_function_over_async_callback',
-    problemMessage: 'Prefer explicit Future<void> Function() instead of AsyncCallback.',
-    correctionMessage: 'Use Future<void> Function() to avoid Flutter-specific type dependencies.',
+    problemMessage:
+        'Prefer explicit Future<void> Function() instead of AsyncCallback.',
+    correctionMessage:
+        'Use Future<void> Function() to avoid Flutter-specific type dependencies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1359,7 +1378,8 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_ReplaceAsyncCallbackWithFutureVoidFunctionFix()];
+  List<Fix> getFixes() =>
+      <Fix>[_ReplaceAsyncCallbackWithFutureVoidFunctionFix()];
 }
 
 class _ReplaceAsyncCallbackWithFutureVoidFunctionFix extends DartFix {
