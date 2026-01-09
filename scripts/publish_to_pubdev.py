@@ -139,7 +139,7 @@ def show_saropa_logo() -> None:
 \033[38;5;208m                               ....\033[0m
 \033[38;5;208m                       `-+shdmNMMMMNmdhs+-\033[0m
 \033[38;5;209m                    -odMMMNyo/-..````.++:+o+/-\033[0m
-\033[38;5;215m                 `/dMMMMMM/`           ``````````\033[0m
+\033[38;5;215m                 `/dMMMMMM/`          ``````````\033[0m
 \033[38;5;220m                `dMMMMMMMMNdhhhdddmmmNmmddhs+-\033[0m
 \033[38;5;226m                /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh/\033[0m
 \033[38;5;190m              . :sdmNNNNMMMMMNNNMMMMMMMMMMMMMMMMm+\033[0m
@@ -672,7 +672,7 @@ def run_tests(project_dir: Path) -> bool:
 
 
 def run_format(project_dir: Path) -> bool:
-    """Run dart format and commit any changes to ensure CI won't fail."""
+    """Run dart format to ensure code is formatted before pushing."""
     print_header("STEP 5: FORMATTING CODE")
 
     use_shell = get_shell_mode()
@@ -705,9 +705,17 @@ def run_format(project_dir: Path) -> bool:
             )
         return False
 
-    # Check if there are formatting changes to commit
+    # Stage formatting changes so they're included in the final commit
+    subprocess.run(
+        ["git", "add", "-A"],
+        cwd=project_dir,
+        capture_output=True,
+        shell=use_shell
+    )
+
+    # Check if there are formatting changes
     status_result = subprocess.run(
-        ["git", "status", "--porcelain"],
+        ["git", "diff", "--cached", "--name-only"],
         cwd=project_dir,
         capture_output=True,
         text=True,
@@ -715,30 +723,7 @@ def run_format(project_dir: Path) -> bool:
     )
 
     if status_result.stdout.strip():
-        # There are changes - commit them
-        print_info("Formatting changes detected, committing...")
-
-        # Stage all changes
-        subprocess.run(
-            ["git", "add", "-A"],
-            cwd=project_dir,
-            capture_output=True,
-            shell=use_shell
-        )
-
-        # Commit formatting changes
-        commit_result = subprocess.run(
-            ["git", "commit", "-m", "Apply dart format"],
-            cwd=project_dir,
-            capture_output=True,
-            text=True,
-            shell=use_shell
-        )
-
-        if commit_result.returncode == 0:
-            print_success("Committed formatting changes")
-        else:
-            print_warning("Could not commit formatting changes (may already be formatted)")
+        print_info("Formatting changes detected and staged for commit")
     else:
         print_success("Code already properly formatted")
 
