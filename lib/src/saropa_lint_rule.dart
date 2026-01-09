@@ -39,6 +39,11 @@ enum LintImpact {
   ///
   /// Examples: naming conventions, hardcoded strings, missing documentation
   low,
+
+  /// Opinionated guidance. Preferential patterns that improve consistency but
+  /// are not inherently correctness or performance issues. Teams may opt-in or
+  /// downgrade freely.
+  opinionated,
 }
 
 /// Tracks lint violations by impact level for summary reporting.
@@ -63,6 +68,7 @@ class ImpactTracker {
     LintImpact.high: [],
     LintImpact.medium: [],
     LintImpact.low: [],
+    LintImpact.opinionated: [],
   };
 
   /// Record a violation.
@@ -82,8 +88,7 @@ class ImpactTracker {
   }
 
   /// Get all violations grouped by impact.
-  static Map<LintImpact, List<ViolationRecord>> get violations =>
-      Map.unmodifiable(_violations);
+  static Map<LintImpact, List<ViolationRecord>> get violations => Map.unmodifiable(_violations);
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
@@ -91,11 +96,11 @@ class ImpactTracker {
         LintImpact.high: _violations[LintImpact.high]!.length,
         LintImpact.medium: _violations[LintImpact.medium]!.length,
         LintImpact.low: _violations[LintImpact.low]!.length,
+        LintImpact.opinionated: _violations[LintImpact.opinionated]!.length,
       };
 
   /// Get total violation count.
-  static int get total =>
-      _violations.values.fold(0, (sum, v) => sum + v.length);
+  static int get total => _violations.values.fold(0, (sum, v) => sum + v.length);
 
   /// Returns true if there are any critical violations.
   static bool get hasCritical => _violations[LintImpact.critical]!.isNotEmpty;
@@ -108,7 +113,8 @@ class ImpactTracker {
     return 'Critical: ${c[LintImpact.critical]}, '
         'High: ${c[LintImpact.high]}, '
         'Medium: ${c[LintImpact.medium]}, '
-        'Low: ${c[LintImpact.low]}';
+        'Low: ${c[LintImpact.low]}, '
+        'Opinionated: ${c[LintImpact.opinionated]}';
   }
 
   /// Get a detailed summary with guidance.
@@ -131,6 +137,9 @@ class ImpactTracker {
     }
     if (c[LintImpact.low]! > 0) {
       buffer.writeln('LOW:      ${c[LintImpact.low]} (style)');
+    }
+    if (c[LintImpact.opinionated]! > 0) {
+      buffer.writeln('OPINIONATED: ${c[LintImpact.opinionated]} (team preference)');
     }
 
     if (total == 0) {
@@ -285,8 +294,7 @@ abstract class SaropaLintRule extends DartLintRule {
 
     // Check example files
     if (skipExampleFiles) {
-      if (normalizedPath.contains('/example/') ||
-          normalizedPath.contains('/examples/')) {
+      if (normalizedPath.contains('/example/') || normalizedPath.contains('/examples/')) {
         return true;
       }
     }
@@ -294,8 +302,8 @@ abstract class SaropaLintRule extends DartLintRule {
     // Check fixture files - but NOT in example/ directory
     // (example fixtures are specifically for testing the linter rules)
     if (skipFixtureFiles) {
-      final isInExample = normalizedPath.contains('/example/') ||
-          normalizedPath.contains('/examples/');
+      final isInExample =
+          normalizedPath.contains('/example/') || normalizedPath.contains('/examples/');
       if (!isInExample) {
         if (normalizedPath.contains('/fixture/') ||
             normalizedPath.contains('/fixtures/') ||
@@ -315,8 +323,7 @@ abstract class SaropaLintRule extends DartLintRule {
   /// Base URL for rule documentation.
   ///
   /// Override to customize the documentation host.
-  static const String documentationBaseUrl =
-      'https://pub.dev/packages/saropa_lints';
+  static const String documentationBaseUrl = 'https://pub.dev/packages/saropa_lints';
 
   /// Returns the documentation URL for this rule.
   ///
@@ -352,8 +359,7 @@ abstract class SaropaLintRule extends DartLintRule {
   bool get isDisabled => disabledRules?.contains(code.name) ?? false;
 
   /// Get the effective severity for this rule, considering overrides.
-  DiagnosticSeverity? get effectiveSeverity =>
-      severityOverrides?[code.name] ?? code.errorSeverity;
+  DiagnosticSeverity? get effectiveSeverity => severityOverrides?[code.name] ?? code.errorSeverity;
 
   // ============================================================
   // Core Implementation

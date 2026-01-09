@@ -50,6 +50,10 @@ dart test
 dart run custom_lint
 ```
 
+## Configuration Reference
+
+For a complete reference of all available rules, tiers, and configuration options, see [example/analysis_options_template.yaml](./example/analysis_options_template.yaml). It includes all 767+ rules organized by category with impact levels and tier membership documented.
+
 ## Adding a New Rule
 
 ### 1. Create the rule
