@@ -269,6 +269,11 @@ Rules automatically skip files that can't be manually fixed:
 
 This reduces noise from generated code and intentionally "bad" fixture files.
 
+## Limitations
+
+- Scope: custom_lint (and therefore saropa_lints) only runs rules inside the package where you invoke it. `dependency_overrides` pointing to local packages are not linted automatically—add saropa_lints to the overridden package and run `dart run custom_lint` in that package (or wire a workspace task) if you want coverage there.
+- File types: Only Dart source files (`.dart`) are analyzed. Non-Dart assets (JSON, XML, YAML, scripts, etc.) are out of scope for custom_lint.
+
 ## Running the Linter
 
 **Command line (recommended - always works):**
