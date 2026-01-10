@@ -6,11 +6,14 @@ This guide helps you migrate from `solid_lints` to `saropa_lints`.
 
 | Feature | solid_lints | saropa_lints |
 |---------|-------------|--------------|
-| **Rule count** | ~50 rules | 821+ custom rules |
+| **Custom rules** | 16 rules | 821+ custom rules |
 | **Framework** | custom_lint | custom_lint |
 | **Focus** | Clean code principles | Flutter-specific analysis |
 | **Configuration** | Single config | 5 progressive tiers |
 | **Specialization** | SOLID principles | Security, accessibility, state management |
+| **Cost** | Free & open source | Free & open source |
+
+**Good news**: saropa_lints implements 15 of solid_lints' 16 custom rules (94% coverage), plus 800+ additional rules.
 
 **Note**: Both packages use custom_lint, so you can only use one at a time (or carefully merge configurations).
 
@@ -75,24 +78,45 @@ solid_lints has one configuration. saropa_lints offers progressive tiers:
 
 ## Rule Mapping
 
-Many solid_lints rules have saropa equivalents or enhancements:
+All 16 solid_lints custom rules are mapped below. saropa_lints implements 15 of them (94%):
 
-### Code Quality Rules
+### Complete solid_lints Coverage
 
-| solid_lints Rule | saropa_lints Equivalent | Enhancement |
-|------------------|------------------------|-------------|
-| `avoid_unnecessary_setstate` | `avoid_unnecessary_setstate`, `avoid_empty_setstate` | Multiple specific checks |
-| `avoid_returning_widgets` | `avoid_returning_widgets` | Same coverage |
-| `avoid_unnecessary_type_assertions` | `avoid_unnecessary_type_assertions` | Same coverage |
-| `avoid_unnecessary_type_casts` | `avoid_unnecessary_type_casts` | Same coverage |
-| `avoid_unrelated_type_assertions` | `avoid_unrelated_type_assertions` | Same coverage |
-| `cyclomatic_complexity` | `avoid_long_functions`, `avoid_complex_conditions` | Different approach |
-| `newline_before_return` | `newline_before_return` | Same (insanity tier) |
-| `no_empty_block` | `no_empty_block` | Same coverage |
-| `no_equal_then_else` | `no_equal_then_else` | Same coverage |
-| `prefer_conditional_expressions` | `prefer_conditional_expressions` | Same (insanity tier) |
-| `prefer_first` | `prefer_first` | Same coverage |
-| `prefer_last` | `prefer_last` | Same coverage |
+| solid_lints Rule | saropa_lints Equivalent | Status |
+|------------------|------------------------|--------|
+| `cyclomatic_complexity` | `avoid_long_functions` | ✅ Different approach (line-based) |
+| `function_lines_of_code` | `avoid_long_functions` | ✅ Implemented |
+| `number_of_parameters` | `avoid_long_parameter_list` | ✅ Implemented |
+| `avoid_returning_widgets` | `avoid_returning_widgets` | ✅ Implemented |
+| `avoid_unnecessary_type_assertions` | `avoid_unnecessary_type_assertions` | ✅ Implemented |
+| `avoid_unnecessary_type_casts` | `avoid_unnecessary_type_casts` | ✅ Implemented |
+| `avoid_unused_parameters` | `avoid_unused_parameters` | ✅ Implemented |
+| `avoid_late_keyword` | `avoid_late_keyword` | ✅ Implemented |
+| `avoid_using_api` | — | ❌ Not implemented (layer architecture) |
+| `avoid_final_with_getter` | `avoid_unnecessary_getter` | ✅ Implemented |
+| `avoid_unnecessary_return_variable` | `prefer_immediate_return` | ✅ Implemented |
+| `member_ordering` | `member_ordering` | ✅ Implemented |
+| `newline_before_return` | `newline_before_return` | ✅ Implemented |
+| `no_empty_block` | `no_empty_block` | ✅ Implemented |
+| `no_magic_number` | `no_magic_number` | ✅ Implemented |
+| `avoid_debug_print_in_release` | `avoid_debug_print` | ✅ Implemented |
+
+### The Missing Rule: avoid_using_api
+
+solid_lints' `avoid_using_api` is a configurable rule that restricts API usage by:
+- Source package
+- Class name
+- Identifier / named parameter
+- Glob patterns for file inclusion/exclusion
+
+This is useful for enforcing architectural boundaries (e.g., "UI layer cannot call database directly").
+
+saropa_lints provides similar functionality through specific rules:
+- `avoid_direct_data_access_in_ui` - UI shouldn't access data layer directly
+- `avoid_ui_in_domain_layer` - Domain layer shouldn't reference UI
+- `avoid_cross_feature_dependencies` - Features should be isolated
+
+For configurable API restriction, this remains a gap. See our [ROADMAP](../../ROADMAP.md) for `avoid_banned_api`.
 
 ### SOLID Principles Coverage
 

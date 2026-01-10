@@ -292,3 +292,131 @@ class _UseNumTryParseFix extends DartFix {
     });
   }
 }
+
+/// Warns when Duration constructor can use cleaner units.
+///
+/// Duration(seconds: 60) is clearer as Duration(minutes: 1).
+/// This rule suggests using larger units when they divide evenly.
+///
+/// **BAD:**
+/// ```dart
+/// Duration(seconds: 60);
+/// Duration(milliseconds: 1000);
+/// Duration(minutes: 60);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Duration(minutes: 1);
+/// Duration(seconds: 1);
+/// Duration(hours: 1);
+/// ```
+class PreferDurationConstantsRule extends SaropaLintRule {
+  const PreferDurationConstantsRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_duration_constants',
+    problemMessage: 'Duration can use a cleaner unit.',
+    correctionMessage: 'Use a larger unit for cleaner code.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Duration') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        final String name = arg.name.label.name;
+        final Expression value = arg.expression;
+
+        if (value is! IntegerLiteral) continue;
+        final int intValue = value.value ?? 0;
+        if (intValue <= 0) continue;
+
+        // Check for conversions
+        if (name == 'milliseconds' && intValue >= 1000 && intValue % 1000 == 0) {
+          reporter.atNode(arg, code);
+        } else if (name == 'seconds' && intValue >= 60 && intValue % 60 == 0) {
+          reporter.atNode(arg, code);
+        } else if (name == 'minutes' && intValue >= 60 && intValue % 60 == 0) {
+          reporter.atNode(arg, code);
+        } else if (name == 'hours' && intValue >= 24 && intValue % 24 == 0) {
+          reporter.atNode(arg, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when DateTime.now() is used in test files.
+///
+/// Tests using DateTime.now() can be flaky and hard to debug.
+/// Use a clock abstraction or fixed datetime values for predictable tests.
+///
+/// **BAD:**
+/// ```dart
+/// // In *_test.dart file:
+/// test('checks expiry', () {
+///   final now = DateTime.now(); // Flaky!
+///   expect(isExpired(now), isFalse);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use fixed datetime or clock package
+/// test('checks expiry', () {
+///   final fixedTime = DateTime(2024, 1, 15, 10, 30);
+///   expect(isExpired(fixedTime), isFalse);
+/// });
+/// ```
+class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
+  const AvoidDatetimeNowInTestsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_datetime_now_in_tests',
+    problemMessage: 'DateTime.now() in tests can cause flaky behavior.',
+    correctionMessage:
+        'Use fixed datetime values or a clock abstraction for predictable tests.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String filePath = resolver.path;
+    if (!filePath.endsWith('_test.dart')) return;
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for DateTime.now()
+      if (node.methodName.name != 'now') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'DateTime') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}
