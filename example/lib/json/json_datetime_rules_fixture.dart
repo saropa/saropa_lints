@@ -107,8 +107,9 @@ void goodUriTryParse(String url) {
 // =========================================================================
 // avoid_double_for_money
 // =========================================================================
-// Rule is now STRICT: only flags unambiguous money terms like price, salary,
-// wage, and currency codes (usd, eur, gbp, etc.)
+// Rule uses WORD-BOUNDARY matching: only flags complete words that are
+// unambiguous money terms (price, salary, wage, money, currency, dollar, euro).
+// Substring matches like "aud" in "audioVolume" no longer trigger the rule.
 
 class BadMoneyClass {
   // expect_lint: avoid_double_for_money
@@ -124,10 +125,16 @@ class BadMoneyClass {
   double hourlyWage = 15.50;
 
   // expect_lint: avoid_double_for_money
-  double usdAmount = 100.0;
+  double dollarValue = 50.0;
 
   // expect_lint: avoid_double_for_money
-  double dollarValue = 50.0;
+  double euroAmount = 75.0;
+
+  // expect_lint: avoid_double_for_money
+  double monthlyMoney = 1000.0;
+
+  // expect_lint: avoid_double_for_money
+  double localCurrency = 500.0;
 }
 
 class GoodMoneyClass {
@@ -141,16 +148,26 @@ class NotMoneyDoubles {
   double totalAmount = 0.0; // "total" and "amount" are too generic
   double balance = 100.50; // could be work-life balance
   double cost = 0.0; // could be computational cost
-  double fee = 0.0; // too generic
+  double fee = 0.0; // could be service fee callback
   double total = 0.0; // too generic
   double amount = 0.0; // too generic
-  double payment = 0.0; // could be non-monetary
+  double payment = 0.0; // could be payment callback
   double discount = 0.0; // too generic
   double revenue = 0.0; // business context varies
   double profit = 0.0; // business context varies
   double budget = 0.0; // could be time budget
   double expense = 0.0; // too generic
   double income = 0.0; // too generic
+
+  // GOOD: Short currency codes removed - too ambiguous
+  double usdAmount = 0.0; // could be "used" typo or intentional abbrev
+  double cadScore = 0.0; // CAD file format
+  double audLevel = 0.0; // audio level
+
+  // GOOD: Substring matches no longer trigger (word-boundary matching)
+  double audioVolume = 1.0; // "aud" is part of "audio", not a separate word
+  double imageUrlVerticalOffsetPercent = 0.0; // no money words
+  double defaultAudioVolume = 0.5; // "aud" substring doesn't match
 
   // Non-monetary aggregates
   double totalPoints = 0.0;

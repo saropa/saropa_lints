@@ -4,6 +4,33 @@
 
 See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 1000 rules.
 
+## Implementation Difficulty Warning
+
+> **Not all rules are created equal.** Rules that appear simple often require multiple revisions due to false positives from heuristic-based detection.
+
+### Truly Easy Rules (low false-positive risk)
+- Match **exact API/method names**: `jsonDecode()`, `DateTime.parse()`
+- Check **specific named parameters**: `shrinkWrap: true`, `autoPlay: true`
+- Detect **missing required parameters**: `Image.network` without `errorBuilder`
+- Match **constructor + dispose pattern**: `ScrollController` without `dispose()`
+
+### Deceptively Hard Rules (high false-positive risk)
+- **Variable name heuristics**: `money`, `price`, `token` → matches `audioVolume`, `cadence`, `tokenizer`
+- **Generic terms**: `cost`, `fee`, `balance` have many non-target meanings
+- **Short abbreviations**: `iv` matches `activity`, `private`, `derivative`
+- **String content analysis**: Must distinguish `$password` from `${password.length}`
+
+**See [CONTRIBUTING.md](CONTRIBUTING.md#avoiding-false-positives-critical)** for detailed guidance on avoiding false positives.
+
+### Risk Legend (used in rule descriptions below)
+
+| Marker | Meaning | Example Pattern |
+|--------|---------|-----------------|
+| — | Safe: Exact API/parameter matching | `Image.network` without `errorBuilder` |
+| `[CONTEXT]` | Needs build/test context detection | Detect if inside `build()` method |
+| `[HEURISTIC]` | Variable name or string pattern matching | Detect "money" in variable names |
+| `[CROSS-FILE]` | Requires analysis across multiple files | Check if type is registered elsewhere |
+
 ## Part 1: Detailed Rule Specifications
 
 ### 1.1 Widget Rules
@@ -12,7 +39,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_overflow_box_rationale` | Comprehensive | INFO | OverflowBox allows children to overflow parent bounds, which can cause visual glitches. Require a comment explaining why overflow is intentional. |
+| `require_overflow_box_rationale` | Comprehensive | INFO | `[HEURISTIC]` OverflowBox allows children to overflow parent bounds, which can cause visual glitches. Require a comment explaining why overflow is intentional. |
 | `prefer_custom_single_child_layout` | Insanity | INFO | For complex single-child positioning logic, CustomSingleChildLayout is more efficient than nested Positioned/Align/Transform widgets. |
 
 #### Text & Typography
@@ -27,14 +54,14 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_riverpod_override_in_tests` | Professional | INFO | Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
+| `require_riverpod_override_in_tests` | Professional | INFO | `[CROSS-FILE]` Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
 
 #### Bloc/Cubit Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_yield_in_on_event` | Professional | WARNING | The `yield` keyword is deprecated in bloc event handlers. Use `emit()` instead for emitting new states. |
-| `require_bloc_test_coverage` | Professional | INFO | Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
+| `require_bloc_test_coverage` | Professional | INFO | `[CROSS-FILE]` Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
 
 #### Provider Package Rules
 
@@ -59,7 +86,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_rebuild_on_scroll` | Essential | WARNING | ScrollController listeners or NotificationListener in build() trigger rebuilds on every scroll pixel, causing jank. Move scroll handling to StatefulWidget. |
+| `avoid_rebuild_on_scroll` | Essential | WARNING | `[CONTEXT]` ScrollController listeners or NotificationListener in build() trigger rebuilds on every scroll pixel, causing jank. Move scroll handling to StatefulWidget. |
 | `prefer_inherited_widget_cache` | Professional | INFO | Repeated InheritedWidget lookups (`.of(context)`) traverse the tree each time. Cache the result in a local variable when used multiple times. |
 | `require_should_rebuild` | Professional | INFO | Custom InheritedWidgets should override `updateShouldNotify` to return false when the value hasn't meaningfully changed. |
 | `prefer_element_rebuild` | Comprehensive | INFO | Returning the same widget type with same key reuses Elements. Changing widget types or keys destroys Elements, losing state and causing expensive rebuilds. |
@@ -82,7 +109,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | `require_compression` | Comprehensive | INFO | Large JSON/text responses should use gzip compression. Reduces bandwidth 60-80% for typical API responses. |
 | `prefer_batch_requests` | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
 | `avoid_blocking_main_thread` | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
-| `avoid_json_in_main` | Professional | INFO | `jsonDecode()` for large payloads (>100KB) blocks the main thread. Use `compute()` to parse JSON in a background isolate. |
+| `avoid_json_in_main` | Professional | INFO | `[HEURISTIC]` `jsonDecode()` for large payloads (>100KB) blocks the main thread. Use `compute()` to parse JSON in a background isolate. |
 | `prefer_binary_format` | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
 | `require_network_status_check` | Recommended | INFO | Check connectivity before making requests that will obviously fail. Show appropriate offline UI instead of timeout errors. |
 
@@ -112,13 +139,13 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | `prefer_retry_flaky` | Comprehensive | INFO | Integration tests on real devices are inherently flaky. Configure retry count in CI (e.g., `--retry=2`) rather than deleting useful tests. |
 | `require_test_cleanup` | Professional | INFO | Tests that create files, database entries, or user accounts must clean up in `tearDown`. Leftover data causes subsequent test failures. |
 | `prefer_test_data_reset` | Professional | INFO | Each test should start with known state. Reset database, clear shared preferences, and log out users in setUp to prevent test pollution. |
-| `require_e2e_coverage` | Professional | INFO | Integration tests are expensive. Focus on critical user journeys: signup, purchase, core features. Don't duplicate unit test coverage. |
+| `require_e2e_coverage` | Professional | INFO | `[CROSS-FILE]` Integration tests are expensive. Focus on critical user journeys: signup, purchase, core features. Don't duplicate unit test coverage. |
 | `avoid_screenshot_in_ci` | Comprehensive | INFO | Screenshots in CI consume storage and slow tests. Take screenshots only on failure for debugging, not on every test. |
 | `prefer_test_report` | Comprehensive | INFO | Generate JUnit XML or JSON reports for CI dashboards. Raw console output is hard to track over time. |
 | `require_performance_test` | Professional | INFO | Measure frame rendering time and startup latency in integration tests. Catch performance regressions before they reach production. |
 | `avoid_test_on_real_device` | Recommended | INFO | Real devices vary in performance and state. Use emulators/simulators in CI for consistent, reproducible results. |
 | `prefer_parallel_tests` | Comprehensive | INFO | Independent integration tests can run in parallel with `--concurrency`. Reduces total CI time significantly for large test suites. |
-| `require_test_documentation` | Comprehensive | INFO | Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters. |
+| `require_test_documentation` | Comprehensive | INFO | `[HEURISTIC]` Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters. |
 
 ### 1.5 Security Rules
 
@@ -393,7 +420,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_websocket_reconnection` | Essential | WARNING | WebSocket connections drop unexpectedly. Implement automatic reconnection with exponential backoff. Detection: Find `WebSocketChannel` without reconnection logic (may have false positives if reconnection is in wrapper class). |
+| `require_websocket_reconnection` | Essential | WARNING | `[HEURISTIC]` WebSocket connections drop unexpectedly. Implement automatic reconnection with exponential backoff. Detection: Find `WebSocketChannel` without reconnection logic (may have false positives if reconnection is in wrapper class). |
 | `avoid_websocket_without_heartbeat` | Professional | INFO | WebSockets may silently disconnect. Send periodic ping/pong to detect stale connections. |
 | `require_websocket_message_validation` | Essential | WARNING | Incoming WebSocket messages can be malformed or malicious. Validate schema before processing. |
 | `avoid_websocket_memory_leak` | Essential | WARNING | WebSocket subscriptions must be cancelled on dispose. Detect `WebSocketChannel` stream subscriptions without cancellation in dispose(). |
@@ -412,7 +439,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 |-----------|------|----------|-------------|
 | `require_audio_focus_handling` | Professional | INFO | Apps should request audio focus and respect other apps. Detect audio playback without audio session configuration. |
 | `prefer_video_loading_placeholder` | Recommended | INFO | Show video thumbnail or placeholder before playing. Detect VideoPlayer without placeholder widget. |
-| `avoid_audio_in_background_without_config` | Essential | ERROR | Background audio requires proper iOS/Android configuration. Detect audio playback in apps without background audio capability. |
+| `avoid_audio_in_background_without_config` | Essential | ERROR | `[CROSS-FILE]` Background audio requires proper iOS/Android configuration. Detect audio playback in apps without background audio capability. |
 | `require_media_loading_state` | Recommended | INFO | Video/audio players need loading indicators. Detect VideoPlayer without checking `isInitialized` before display. |
 
 ### 1.24 Bluetooth & IoT Rules
@@ -445,8 +472,8 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_sensitive_data_in_clipboard` | Essential | WARNING | Clipboard contents are accessible to other apps. Detect `Clipboard.setData` with variables named password, token, secret, apiKey, or similar. Heuristic detection. |
-| `require_clipboard_paste_validation` | Recommended | INFO | Pasted content can be unexpected format. Detect `Clipboard.getData` usage in security-sensitive contexts without validation. |
+| `avoid_sensitive_data_in_clipboard` | Essential | WARNING | `[HEURISTIC]` Clipboard contents are accessible to other apps. Detect `Clipboard.setData` with variables named password, token, secret, apiKey, or similar. |
+| `require_clipboard_paste_validation` | Recommended | INFO | `[HEURISTIC]` Pasted content can be unexpected format. Detect `Clipboard.getData` usage in security-sensitive contexts without validation. |
 | `prefer_clipboard_feedback` | Recommended | INFO | "Copied!" feedback confirms clipboard action. Detect `Clipboard.setData` without accompanying SnackBar/Toast. |
 
 ### 1.28 Analytics & Tracking Rules
@@ -477,17 +504,17 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_currency_code_with_amount` | Recommended | INFO | Amounts without currency are ambiguous. Detect money-related classes without currency field. |
+| `require_currency_code_with_amount` | Recommended | INFO | `[HEURISTIC]` Amounts without currency are ambiguous. Detect money-related classes without currency field. |
 | `require_currency_formatting_locale` | Recommended | INFO | Currency formatting varies by locale. Detect NumberFormat.currency without explicit locale parameter. |
-| `avoid_money_arithmetic_on_double` | Essential | WARNING | Arithmetic on money doubles compounds rounding errors. Detect +, -, *, / operations on money-named doubles. |
+| `avoid_money_arithmetic_on_double` | Essential | WARNING | `[HEURISTIC]` Arithmetic on money doubles compounds rounding errors. Detect +, -, *, / operations on money-named doubles. |
 
 ### 1.32 File I/O Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_file_exists_check` | Recommended | INFO | File operations on non-existent files throw. Detect File read operations without exists() check or try-catch. |
-| `avoid_synchronous_file_io` | Essential | WARNING | Sync file operations block UI. Detect readAsStringSync, writeAsBytesSync, readAsBytesSync usage outside isolates. |
-| `require_temp_file_cleanup` | Professional | INFO | Temp files accumulate over time. Detect temp file creation without corresponding delete. |
+| `avoid_synchronous_file_io` | Essential | WARNING | `[CONTEXT]` Sync file operations block UI. Detect readAsStringSync, writeAsBytesSync, readAsBytesSync usage outside isolates. |
+| `require_temp_file_cleanup` | Professional | INFO | `[CROSS-FILE]` Temp files accumulate over time. Detect temp file creation without corresponding delete. |
 | `prefer_streaming_for_large_files` | Professional | INFO | Reading large files into memory causes OOM. Detect readAsBytes on files without size check. |
 | `require_file_path_sanitization` | Essential | WARNING | User-provided file paths can escape app directory. Detect file operations with unsanitized path input. |
 
@@ -495,7 +522,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_encryption_key_in_memory` | Professional | INFO | Keys kept in memory can be extracted from dumps. Detect encryption keys stored as class fields. |
+| `avoid_encryption_key_in_memory` | Professional | INFO | `[HEURISTIC]` Keys kept in memory can be extracted from dumps. Detect encryption keys stored as class fields. |
 
 ### 1.34 JSON & Serialization Rules
 
@@ -509,15 +536,15 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_lazy_singleton_registration` | Professional | INFO | Eager registration creates all singletons at startup. Detect registerSingleton with expensive constructors; suggest registerLazySingleton. |
-| `avoid_getit_unregistered_access` | Essential | ERROR | Accessing unregistered type crashes. Detect GetIt.I<T>() for types not registered in visible scope. |
+| `prefer_lazy_singleton_registration` | Professional | INFO | `[HEURISTIC]` Eager registration creates all singletons at startup. Detect registerSingleton with expensive constructors; suggest registerLazySingleton. |
+| `avoid_getit_unregistered_access` | Essential | ERROR | `[CROSS-FILE]` Accessing unregistered type crashes. Detect GetIt.I<T>() for types not registered in visible scope. |
 | `require_getit_dispose_registration` | Professional | INFO | Disposable singletons need dispose callbacks. Detect registerSingleton of Disposable types without dispose parameter. |
 
 ### 1.36 Logging Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_print_in_production` | Essential | WARNING | print() ships to production, exposing debug info. Detect print() calls outside debug/test code. |
+| `avoid_print_in_production` | Essential | WARNING | `[CONTEXT]` print() ships to production, exposing debug info. Detect print() calls outside debug/test code. |
 | `prefer_logger_over_print` | Recommended | INFO | Logger packages provide levels, formatting, filtering. Detect print() usage; suggest logger package. |
 | `require_log_level_for_production` | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
 | `avoid_expensive_log_string_construction` | Professional | INFO | Don't build expensive strings for logs that won't print. Detect string interpolation in log calls without level guard. |
@@ -526,10 +553,10 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_cache_expiration` | Recommended | WARNING | Caches without TTL serve stale data indefinitely. Detect cache implementations without expiration logic. |
-| `avoid_unbounded_cache_growth` | Essential | WARNING | Caches without size limits cause OOM. Detect Map used as cache without size limiting or LRU eviction. |
+| `require_cache_expiration` | Recommended | WARNING | `[HEURISTIC]` Caches without TTL serve stale data indefinitely. Detect cache implementations without expiration logic. |
+| `avoid_unbounded_cache_growth` | Essential | WARNING | `[HEURISTIC]` Caches without size limits cause OOM. Detect Map used as cache without size limiting or LRU eviction. |
 | `require_cache_key_uniqueness` | Professional | INFO | Cache keys must be deterministic. Detect Object used as cache key without stable hashCode/equality. |
-| `avoid_cache_in_build` | Essential | WARNING | Cache lookups in build() may be expensive. Detect cache operations inside build methods. |
+| `avoid_cache_in_build` | Essential | WARNING | `[CONTEXT]` Cache lookups in build() may be expensive. Detect cache operations inside build methods. |
 
 ### 1.38 Pagination Rules
 
@@ -589,8 +616,8 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_string_concatenation_for_l10n` | Essential | WARNING | String concatenation breaks in RTL and different word orders. Detect string + variable in UI text. |
-| `require_plural_handling` | Recommended | INFO | "1 items" is wrong. Detect numeric values next to hardcoded plural nouns. |
+| `avoid_string_concatenation_for_l10n` | Essential | WARNING | `[HEURISTIC]` String concatenation breaks in RTL and different word orders. Detect string + variable in UI text. |
+| `require_plural_handling` | Recommended | INFO | `[HEURISTIC]` "1 items" is wrong. Detect numeric values next to hardcoded plural nouns. |
 | `require_rtl_layout_support` | Recommended | WARNING | RTL languages need directional awareness. Detect hardcoded left/right in layouts without Directionality check. |
 | `avoid_hardcoded_locale_strings` | Recommended | INFO | User-visible strings should be localized. Detect string literals in Text widgets not using l10n. |
 | `require_number_formatting_locale` | Professional | INFO | Number formatting varies by locale. Detect NumberFormat without explicit locale. |
@@ -606,7 +633,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_dialog_barrier_consideration` | Recommended | INFO | Destructive confirmations shouldn't dismiss on barrier tap. Detect showDialog without explicit barrierDismissible for destructive actions. |
+| `require_dialog_barrier_consideration` | Recommended | INFO | `[HEURISTIC]` Destructive confirmations shouldn't dismiss on barrier tap. Detect showDialog without explicit barrierDismissible for destructive actions. |
 | `require_dialog_result_handling` | Professional | INFO | Dialogs returning values need result handling. Detect showDialog without await or .then() for dialogs with return values. |
 | `avoid_dialog_context_after_async` | Essential | ERROR | Context may be invalid after async in dialog. Detect Navigator.pop using context after await in dialog. |
 | `prefer_adaptive_dialog` | Comprehensive | INFO | Dialogs should adapt to platform. Detect showDialog without platform-specific styling consideration. |
@@ -615,9 +642,9 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_snackbar_action_for_undo` | Recommended | INFO | Destructive actions should offer undo. Detect delete operations showing SnackBar without action. |
+| `require_snackbar_action_for_undo` | Recommended | INFO | `[HEURISTIC]` Destructive actions should offer undo. Detect delete operations showing SnackBar without action. |
 | `avoid_snackbar_queue_buildup` | Professional | INFO | Rapid snackbar calls queue up. Detect multiple showSnackBar calls without clearSnackBars. |
-| `require_snackbar_duration_consideration` | Recommended | INFO | Important messages need longer duration. Detect SnackBar without explicit duration for important content. |
+| `require_snackbar_duration_consideration` | Recommended | INFO | `[HEURISTIC]` Important messages need longer duration. Detect SnackBar without explicit duration for important content. |
 
 ### 1.48 Tab & Bottom Navigation Rules
 
