@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~820+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~821+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -88,7 +88,7 @@ custom_lint:
     #   - recommended    : ~150 rules (default) ← START HERE
     #   - professional   : ~350 rules (strict)
     #   - comprehensive  : ~700 rules (very strict)
-    #   - insanity       : ~820+ rules (everything)
+    #   - insanity       : ~821+ rules (everything)
     tier: recommended
 
   # ===========================================================================
@@ -771,6 +771,7 @@ custom_lint:
     # =========================================================================
     - require_json_decode_try_catch: false
     - avoid_datetime_parse_unvalidated: false
+    - prefer_try_parse_for_dynamic_data: false  # CRITICAL: int/double/num/BigInt/Uri.parse
     - avoid_double_for_money: false
     - require_websocket_error_handling: false
     - avoid_autoplay_audio: false
