@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -714,6 +715,39 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
       if (condition is BooleanLiteral) {
         reporter.atNode(condition, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddFeatureFlagTodoFix()];
+}
+
+class _AddFeatureFlagTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIfStatement((IfStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression condition = node.expression;
+      if (condition is! BooleanLiteral) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO to replace with feature flag',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Replace hardcoded ${condition.value} with feature flag\n    ',
+        );
+      });
     });
   }
 }

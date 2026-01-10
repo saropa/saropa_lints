@@ -6,13 +6,13 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 
 ### Recently Implemented (v1.7.9)
 
-The following 28 rules from this roadmap have been implemented:
+The following 29 rules from this roadmap have been implemented:
 
 - **Disposal:** `require_media_player_dispose`, `require_tab_controller_dispose`
 - **Build Anti-patterns:** `avoid_gradient_in_build`, `avoid_dialog_in_build`, `avoid_snackbar_in_build`, `avoid_analytics_in_build`, `avoid_json_encode_in_build`, `avoid_getit_in_build`, `avoid_canvas_operations_in_build`, `avoid_hardcoded_feature_flags`
 - **Scroll/List:** `avoid_shrinkwrap_in_scrollview`, `avoid_nested_scrollables_conflict`, `avoid_listview_children_for_large_lists`, `avoid_excessive_bottom_nav_items`, `require_tab_controller_length_sync`, `avoid_refresh_without_await`, `avoid_multiple_autofocus`
 - **Cryptography:** `avoid_hardcoded_encryption_keys`, `prefer_secure_random_for_crypto`, `avoid_deprecated_crypto_algorithms`, `require_unique_iv_per_encryption`
-- **JSON/DateTime:** `require_json_decode_try_catch`, `avoid_datetime_parse_unvalidated`, `avoid_double_for_money`, `avoid_sensitive_data_in_logs`, `require_getit_reset_in_tests`, `require_websocket_error_handling`, `avoid_autoplay_audio`
+- **JSON/DateTime:** `require_json_decode_try_catch`, `avoid_datetime_parse_unvalidated`, `prefer_try_parse_for_dynamic_data`, `avoid_double_for_money`, `avoid_sensitive_data_in_logs`, `require_getit_reset_in_tests`, `require_websocket_error_handling`, `avoid_autoplay_audio`
 
 ---
 

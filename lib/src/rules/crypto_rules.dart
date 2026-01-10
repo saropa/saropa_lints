@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -205,6 +206,36 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
     'credential',
     'cipher',
   ];
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseSecureRandomFix()];
+}
+
+class _UseSecureRandomFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use Random.secure()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'Random.secure()',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when deprecated cryptographic algorithms are used.
