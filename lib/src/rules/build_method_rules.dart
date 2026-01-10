@@ -1,0 +1,719 @@
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
+
+/// Build method anti-pattern rules for Flutter applications.
+///
+/// These rules detect expensive or side-effect operations
+/// that should not be performed inside build() methods.
+library;
+
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
+
+/// Warns when Gradient objects are created inside build().
+///
+/// Creating Gradient objects in build() prevents Flutter from reusing them,
+/// causing unnecessary object allocations on every rebuild.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   return Container(
+///     decoration: BoxDecoration(
+///       gradient: LinearGradient(colors: [Colors.red, Colors.blue]),
+///     ),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// static const _gradient = LinearGradient(colors: [Colors.red, Colors.blue]);
+///
+/// @override
+/// Widget build(BuildContext context) {
+///   return Container(
+///     decoration: const BoxDecoration(gradient: _gradient),
+///   );
+/// }
+/// ```
+class AvoidGradientInBuildRule extends SaropaLintRule {
+  const AvoidGradientInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_gradient_in_build',
+    problemMessage:
+        'Creating Gradient in build() prevents reuse and causes allocations.',
+    correctionMessage:
+        'Store gradient as a static const field or create outside build().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _gradientTypes = <String>{
+    'LinearGradient',
+    'RadialGradient',
+    'SweepGradient',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      // Check if it's a widget build method
+      final String? returnType = node.returnType?.toSource();
+      if (returnType != 'Widget') return;
+
+      // Look for gradient construction in the body
+      node.body.visitChildren(_GradientVisitor(reporter, code, _gradientTypes));
+    });
+  }
+}
+
+class _GradientVisitor extends RecursiveAstVisitor<void> {
+  _GradientVisitor(this.reporter, this.code, this.gradientTypes);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> gradientTypes;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String typeName = node.constructorName.type.name2.lexeme;
+    if (gradientTypes.contains(typeName)) {
+      // Skip if it's const
+      if (node.keyword?.lexeme != 'const') {
+        reporter.atNode(node, code);
+      }
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+}
+
+/// Warns when showDialog is called inside build().
+///
+/// Calling showDialog in build() causes infinite dialog loops because
+/// build() is called repeatedly and each call opens a new dialog.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   if (hasError) {
+///     showDialog(...); // Opens infinite dialogs!
+///   }
+///   return Container();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void _showErrorDialog() {
+///   showDialog(...);
+/// }
+///
+/// @override
+/// Widget build(BuildContext context) {
+///   return ElevatedButton(
+///     onPressed: hasError ? _showErrorDialog : null,
+///     child: Text('Check'),
+///   );
+/// }
+/// ```
+class AvoidDialogInBuildRule extends SaropaLintRule {
+  const AvoidDialogInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dialog_in_build',
+    problemMessage: 'showDialog in build() causes infinite dialog loop.',
+    correctionMessage:
+        'Move dialog calls to event handlers or lifecycle methods.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _dialogMethods = <String>{
+    'showDialog',
+    'showModalBottomSheet',
+    'showBottomSheet',
+    'showCupertinoDialog',
+    'showCupertinoModalPopup',
+    'showGeneralDialog',
+    'showMenu',
+    'showTimePicker',
+    'showDatePicker',
+    'showDateRangePicker',
+    'showSearch',
+    'showLicensePage',
+    'showAboutDialog',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final String? returnType = node.returnType?.toSource();
+      if (returnType != 'Widget') return;
+
+      node.body.visitChildren(_DialogVisitor(reporter, code, _dialogMethods));
+    });
+  }
+}
+
+class _DialogVisitor extends RecursiveAstVisitor<void> {
+  _DialogVisitor(this.reporter, this.code, this.dialogMethods);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> dialogMethods;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Skip if inside a callback (onPressed, onTap, etc.)
+    if (_isInsideCallback(node)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    if (dialogMethods.contains(node.methodName.name)) {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  bool _isInsideCallback(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        // Check if this is a callback parameter
+        final parent = current.parent;
+        if (parent is NamedExpression) {
+          final String name = parent.name.label.name;
+          if (_callbackNames.contains(name)) {
+            return true;
+          }
+        }
+        if (parent is ArgumentList) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  static const Set<String> _callbackNames = <String>{
+    'onPressed',
+    'onTap',
+    'onLongPress',
+    'onDoubleTap',
+    'onChanged',
+    'onSubmitted',
+    'onComplete',
+    'onDismissed',
+    'builder',
+    'itemBuilder',
+  };
+}
+
+/// Warns when showSnackBar is called inside build().
+///
+/// Calling showSnackBar in build() causes repeated snackbars on every
+/// rebuild, flooding the snackbar queue.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   if (hasError) {
+///     ScaffoldMessenger.of(context).showSnackBar(...);
+///   }
+///   return Container();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void _showError() {
+///   ScaffoldMessenger.of(context).showSnackBar(...);
+/// }
+///
+/// @override
+/// Widget build(BuildContext context) {
+///   return ElevatedButton(
+///     onPressed: _showError,
+///     child: Text('Show Error'),
+///   );
+/// }
+/// ```
+class AvoidSnackbarInBuildRule extends SaropaLintRule {
+  const AvoidSnackbarInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_snackbar_in_build',
+    problemMessage: 'showSnackBar in build() causes repeated snackbars.',
+    correctionMessage: 'Move snackbar calls to event handlers.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final String? returnType = node.returnType?.toSource();
+      if (returnType != 'Widget') return;
+
+      node.body.visitChildren(_SnackbarVisitor(reporter, code));
+    });
+  }
+}
+
+class _SnackbarVisitor extends RecursiveAstVisitor<void> {
+  _SnackbarVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Skip if inside a callback
+    if (_isInsideCallback(node)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    if (node.methodName.name == 'showSnackBar') {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  bool _isInsideCallback(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when analytics calls are made inside build().
+///
+/// Analytics calls in build() fire on every rebuild, causing duplicate
+/// events and inaccurate tracking data.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   analytics.logEvent('page_view'); // Fires repeatedly!
+///   return Container();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState();
+///   analytics.logEvent('page_view');
+/// }
+/// ```
+class AvoidAnalyticsInBuildRule extends SaropaLintRule {
+  const AvoidAnalyticsInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_analytics_in_build',
+    problemMessage: 'Analytics calls in build() fire on every rebuild.',
+    correctionMessage: 'Move analytics to initState() or event handlers.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _analyticsMethods = <String>{
+    'logEvent',
+    'logScreenView',
+    'trackEvent',
+    'track',
+    'logPageView',
+    'setCurrentScreen',
+    'setUserProperty',
+    'logLogin',
+    'logPurchase',
+    'logShare',
+    'logSearch',
+    'logSelectContent',
+    'logSignUp',
+    'logBeginCheckout',
+    'logViewItem',
+    'logAddToCart',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final String? returnType = node.returnType?.toSource();
+      if (returnType != 'Widget') return;
+
+      node.body
+          .visitChildren(_AnalyticsVisitor(reporter, code, _analyticsMethods));
+    });
+  }
+}
+
+class _AnalyticsVisitor extends RecursiveAstVisitor<void> {
+  _AnalyticsVisitor(this.reporter, this.code, this.analyticsMethods);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> analyticsMethods;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Skip if inside a callback
+    if (_isInsideCallback(node)) {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    if (analyticsMethods.contains(node.methodName.name)) {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  bool _isInsideCallback(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when jsonEncode is called inside build().
+///
+/// JSON encoding is expensive. Doing it in build() causes performance issues
+/// because build() is called frequently (60fps during animations).
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final json = jsonEncode(largeObject); // Expensive!
+///   return Text(json);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// String? _cachedJson;
+///
+/// @override
+/// void initState() {
+///   super.initState();
+///   _cachedJson = jsonEncode(largeObject);
+/// }
+///
+/// @override
+/// Widget build(BuildContext context) {
+///   return Text(_cachedJson ?? '');
+/// }
+/// ```
+class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
+  const AvoidJsonEncodeInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_json_encode_in_build',
+    problemMessage: 'jsonEncode in build() is expensive and causes jank.',
+    correctionMessage: 'Cache JSON encoding result outside of build().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final String? returnType = node.returnType?.toSource();
+      if (returnType != 'Widget') return;
+
+      node.body.visitChildren(_JsonEncodeVisitor(reporter, code));
+    });
+  }
+}
+
+class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
+  _JsonEncodeVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'jsonEncode' || node.methodName.name == 'json.encode') {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    final String source = node.function.toSource();
+    if (source == 'jsonEncode') {
+      reporter.atNode(node, code);
+    }
+    super.visitFunctionExpressionInvocation(node);
+  }
+}
+
+/// Warns when GetIt.I or GetIt.instance is used inside build().
+///
+/// Service locator calls in build() hide dependencies and make
+/// testing difficult. Inject dependencies via constructor instead.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final service = GetIt.I<MyService>();
+///   return Text(service.value);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   const MyWidget({required this.service});
+///   final MyService service;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Text(service.value);
+///   }
+/// }
+/// ```
+class AvoidGetItInBuildRule extends SaropaLintRule {
+  const AvoidGetItInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_getit_in_build',
+    problemMessage:
+        'GetIt service locator in build() hides dependencies.',
+    correctionMessage:
+        'Inject dependencies via constructor or access in initState().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final String? returnType = node.returnType?.toSource();
+      if (returnType != 'Widget') return;
+
+      final String bodySource = node.body.toSource();
+      if (bodySource.contains('GetIt.I') ||
+          bodySource.contains('GetIt.instance') ||
+          bodySource.contains('getIt<') ||
+          bodySource.contains('getIt(')) {
+        // Find the actual GetIt usage
+        node.body.visitChildren(_GetItVisitor(reporter, code));
+      }
+    });
+  }
+}
+
+class _GetItVisitor extends RecursiveAstVisitor<void> {
+  _GetItVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (node.prefix.name == 'GetIt' &&
+        (node.identifier.name == 'I' || node.identifier.name == 'instance')) {
+      reporter.atNode(node, code);
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String? targetName = node.target?.toSource();
+    if (targetName == 'GetIt.I' || targetName == 'GetIt.instance') {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when Canvas operations are used outside of CustomPainter.
+///
+/// Canvas operations should only be in CustomPainter.paint(), not in
+/// build methods or other locations.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final canvas = Canvas(recorder);
+///   canvas.drawRect(...); // Wrong place!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyPainter extends CustomPainter {
+///   @override
+///   void paint(Canvas canvas, Size size) {
+///     canvas.drawRect(...);
+///   }
+/// }
+/// ```
+class AvoidCanvasInBuildRule extends SaropaLintRule {
+  const AvoidCanvasInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_canvas_operations_in_build',
+    problemMessage: 'Canvas operations belong in CustomPainter, not build().',
+    correctionMessage: 'Move canvas operations to CustomPainter.paint().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final String? returnType = node.returnType?.toSource();
+      if (returnType != 'Widget') return;
+
+      final String bodySource = node.body.toSource();
+      if (bodySource.contains('Canvas(') ||
+          bodySource.contains('.drawRect') ||
+          bodySource.contains('.drawCircle') ||
+          bodySource.contains('.drawPath') ||
+          bodySource.contains('.drawLine')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when hardcoded feature flags (if true/false) are used.
+///
+/// Hardcoded conditions like `if (true)` or `if (false)` suggest
+/// incomplete feature flag implementation or dead code.
+///
+/// **BAD:**
+/// ```dart
+/// if (true) {
+///   // This always runs - is this intentional?
+///   showNewFeature();
+/// }
+///
+/// if (false) {
+///   // Dead code - remove or use proper feature flag
+///   showOldFeature();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (FeatureFlags.newFeatureEnabled) {
+///   showNewFeature();
+/// }
+/// ```
+class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
+  const AvoidHardcodedFeatureFlagsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hardcoded_feature_flags',
+    problemMessage:
+        'Hardcoded if(true)/if(false) suggests incomplete feature flag.',
+    correctionMessage:
+        'Use a proper feature flag system or remove dead code.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIfStatement((IfStatement node) {
+      final Expression condition = node.expression;
+      if (condition is BooleanLiteral) {
+        reporter.atNode(condition, code);
+      }
+    });
+  }
+}

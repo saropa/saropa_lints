@@ -7,6 +7,100 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.6.0.
 
+## [1.7.9] - 2026-01-09
+
+### Added
+- **28 New Rules** covering disposal, build method anti-patterns, scroll/list issues, cryptography, and JSON/DateTime handling:
+
+#### Disposal Rules (2 rules)
+- `require_media_player_dispose` - Warns when VideoPlayerController/AudioPlayer is not disposed
+- `require_tab_controller_dispose` - Warns when TabController is not disposed
+
+#### Build Method Anti-Patterns (8 rules)
+- `avoid_gradient_in_build` - Warns when Gradient objects are created inside build()
+- `avoid_dialog_in_build` - Warns when showDialog is called inside build()
+- `avoid_snackbar_in_build` - Warns when showSnackBar is called inside build()
+- `avoid_analytics_in_build` - Warns when analytics calls are made inside build()
+- `avoid_json_encode_in_build` - Warns when jsonEncode is called inside build()
+- `avoid_getit_in_build` - Warns when GetIt service locator is used inside build()
+- `avoid_canvas_operations_in_build` - Warns when Canvas operations are used outside CustomPainter
+- `avoid_hardcoded_feature_flags` - Warns when if(true)/if(false) patterns are used
+
+#### Scroll and List Rules (7 rules)
+- `avoid_shrinkwrap_in_scrollview` - Warns when shrinkWrap: true is used inside a ScrollView
+- `avoid_nested_scrollables_conflict` - Warns when nested scrollables don't have explicit physics
+- `avoid_listview_children_for_large_lists` - Suggests ListView.builder for large lists
+- `avoid_excessive_bottom_nav_items` - Warns when BottomNavigationBar has more than 5 items
+- `require_tab_controller_length_sync` - Validates TabController length matches tabs count
+- `avoid_refresh_without_await` - Ensures RefreshIndicator onRefresh returns Future
+- `avoid_multiple_autofocus` - Warns when multiple widgets have autofocus: true
+
+#### Cryptography Rules (4 rules)
+- `avoid_hardcoded_encryption_keys` - Warns when encryption keys are hardcoded
+- `prefer_secure_random_for_crypto` - Warns when Random() is used for cryptographic purposes
+- `avoid_deprecated_crypto_algorithms` - Warns when MD5, SHA1, DES are used
+- `require_unique_iv_per_encryption` - Warns when static or reused IVs are detected
+
+#### JSON and DateTime Rules (7 rules)
+- `require_json_decode_try_catch` - Warns when jsonDecode is used without try-catch
+- `avoid_datetime_parse_unvalidated` - Warns when DateTime.parse is used without try-catch
+- `avoid_double_for_money` - Warns when double is used for money/currency values
+- `avoid_sensitive_data_in_logs` - Warns when sensitive data appears in log statements
+- `require_getit_reset_in_tests` - Warns when GetIt is used in tests without reset
+- `require_websocket_error_handling` - Warns when WebSocket listeners lack error handlers
+- `avoid_autoplay_audio` - Warns when autoPlay: true is set on audio/video players
+
+### Changed
+- **Docs**: Updated rule count from 792+ to 820+
+- **Impact tuning**: `avoid_hardcoded_feature_flags` and `avoid_autoplay_audio` changed to `low` to match INFO severity
+
+## [1.7.8] - 2026-01-09
+
+### Added
+- **25 New Rules** covering network performance, state management, testing, security, and database patterns:
+
+#### Network Performance (6 rules)
+- `prefer_http_connection_reuse` - Warns when HTTP clients are created without connection reuse
+- `avoid_redundant_requests` - Warns about API calls in build()/initState() without caching
+- `require_response_caching` - Warns when GET responses aren't cached
+- `prefer_pagination` - Warns when APIs return large collections without pagination
+- `avoid_over_fetching` - Warns when fetching more data than needed
+- `require_cancel_token` - Warns when async requests lack cancellation in StatefulWidgets
+
+#### State Management (3 rules)
+- `require_riverpod_lint` - Warns when Riverpod projects don't include riverpod_lint
+- `require_multi_provider` - Warns about nested Provider widgets instead of MultiProvider
+- `avoid_nested_providers` - Warns about Provider inside Consumer callbacks
+
+#### Testing (4 rules)
+- `prefer_fake_over_mock` - Warns about excessive mocking vs simpler fakes
+- `require_edge_case_tests` - Warns when tests don't cover edge cases
+- `prefer_test_data_builder` - Warns about complex test objects without builders
+- `avoid_test_implementation_details` - Warns when tests verify internal implementation
+
+#### Security (6 rules)
+- `require_data_encryption` - Warns when sensitive data stored without encryption
+- `prefer_data_masking` - Warns when sensitive data displayed without masking
+- `avoid_screenshot_sensitive` - Warns about sensitive screens without screenshot protection
+- `require_secure_password_field` - Warns about password fields without secure keyboard settings
+- `avoid_path_traversal` - Warns about file path traversal vulnerabilities
+- `prefer_html_escape` - Warns about user content in WebViews without HTML escaping
+
+#### Database (6 rules)
+- `require_database_migration` - Warns about database schema changes without migration support
+- `require_database_index` - Warns about queries on non-indexed fields
+- `prefer_transaction_for_batch` - Warns about multiple writes not batched in transactions
+- `require_hive_database_close` - Warns when database connections not properly closed
+- `require_type_adapter_registration` - Warns about Hive type adapters not registered
+- `prefer_lazy_box_for_large` - Warns about large data in regular Hive boxes vs lazy boxes
+
+### Changed
+- **Docs**: Updated rule count from 767+ to 792+
+- **Impact tuning**: `prefer_fake_over_mock`, `prefer_test_data_builder`, `require_response_caching`, `avoid_over_fetching` changed to `opinionated`
+
+### Quick Fix
+- `require_secure_password_field`: Auto-adds `enableSuggestions: false` and `autocorrect: false`
+
 ## [1.7.7] - 2026-01-09
 
 ### Changed

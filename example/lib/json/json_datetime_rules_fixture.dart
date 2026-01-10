@@ -1,0 +1,100 @@
+// ignore_for_file: unused_local_variable, unused_element, depend_on_referenced_packages
+// ignore_for_file: avoid_print
+// Test fixture for JSON and DateTime rules
+
+import 'dart:convert';
+
+// =========================================================================
+// require_json_decode_try_catch
+// =========================================================================
+
+void badJsonDecode(String jsonString) {
+  // expect_lint: require_json_decode_try_catch
+  final data = jsonDecode(jsonString);
+}
+
+void goodJsonDecode(String jsonString) {
+  // GOOD: Wrapped in try-catch
+  try {
+    final data = jsonDecode(jsonString);
+  } on FormatException catch (e) {
+    print('Invalid JSON: $e');
+  }
+}
+
+// =========================================================================
+// avoid_datetime_parse_unvalidated
+// =========================================================================
+
+void badDateTimeParse(String dateString) {
+  // expect_lint: avoid_datetime_parse_unvalidated
+  final date = DateTime.parse(dateString);
+}
+
+void goodDateTimeParse(String dateString) {
+  // GOOD: Use tryParse
+  final date = DateTime.tryParse(dateString);
+  if (date == null) {
+    print('Invalid date');
+  }
+}
+
+void goodDateTimeParseWithTryCatch(String dateString) {
+  // GOOD: Wrapped in try-catch
+  try {
+    final date = DateTime.parse(dateString);
+  } on FormatException {
+    print('Invalid date');
+  }
+}
+
+// =========================================================================
+// avoid_double_for_money
+// =========================================================================
+
+class BadMoneyClass {
+  // expect_lint: avoid_double_for_money
+  double price = 19.99;
+
+  // expect_lint: avoid_double_for_money
+  double totalAmount = 0.0;
+
+  // expect_lint: avoid_double_for_money
+  double balance = 100.50;
+}
+
+class GoodMoneyClass {
+  // GOOD: Use int cents
+  int priceInCents = 1999;
+  int totalAmountInCents = 0;
+  int balanceInCents = 10050;
+}
+
+// =========================================================================
+// avoid_sensitive_data_in_logs
+// =========================================================================
+
+void badLogging(String password, String token) {
+  // expect_lint: avoid_sensitive_data_in_logs
+  print('User password: $password');
+
+  // expect_lint: avoid_sensitive_data_in_logs
+  print('Auth token: $token');
+}
+
+void goodLogging(String userId) {
+  // GOOD: Log non-sensitive data
+  print('User logged in: $userId');
+}
+
+// =========================================================================
+// avoid_autoplay_audio
+// =========================================================================
+
+// This rule detects autoPlay: true on audio/video players
+// Example would be:
+// BetterPlayerController(
+//   configuration: BetterPlayerConfiguration(
+//     autoPlay: true,  // <- This would trigger the lint
+//   ),
+// );
