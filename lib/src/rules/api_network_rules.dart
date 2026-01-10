@@ -1665,8 +1665,7 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
     name: 'require_dio_error_handling',
     problemMessage:
         'Dio request without error handling. DioException will crash the app.',
-    correctionMessage:
-        'Wrap in try-catch to handle DioException.',
+    correctionMessage: 'Wrap in try-catch to handle DioException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1800,8 +1799,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
     name: 'prefer_dio_cancel_token',
     problemMessage:
         'Long-running Dio request without CancelToken. Cannot be cancelled.',
-    correctionMessage:
-        'Add cancelToken parameter for cancellable requests.',
+    correctionMessage: 'Add cancelToken parameter for cancellable requests.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2291,8 +2289,8 @@ class RequireDioSingletonRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'Dio') return;
 
@@ -2492,8 +2490,7 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_error_handling',
     problemMessage: 'launchUrl without error handling can crash.',
-    correctionMessage:
-        'Wrap in try-catch or check with canLaunchUrl first.',
+    correctionMessage: 'Wrap in try-catch or check with canLaunchUrl first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

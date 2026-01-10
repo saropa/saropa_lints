@@ -2084,8 +2084,7 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
     name: 'require_stream_controller_close',
     problemMessage:
         'StreamController field without close() in dispose. Memory leak.',
-    correctionMessage:
-        'Call controller.close() in dispose() method.',
+    correctionMessage: 'Call controller.close() in dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2161,8 +2160,7 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
     name: 'avoid_multiple_stream_listeners',
     problemMessage:
         'Multiple listen() on same stream. Non-broadcast streams only allow one listener.',
-    correctionMessage:
-        'Use .asBroadcastStream() or share subscriptions.',
+    correctionMessage: 'Use .asBroadcastStream() or share subscriptions.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2239,8 +2237,7 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
     name: 'require_stream_error_handling',
     problemMessage:
         'Stream.listen() without onError handler. Errors will be uncaught.',
-    correctionMessage:
-        'Add onError callback to handle stream errors.',
+    correctionMessage: 'Add onError callback to handle stream errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2316,8 +2313,7 @@ class AvoidFutureBuilderRebuildRule extends SaropaLintRule {
     name: 'avoid_future_builder_rebuild',
     problemMessage:
         'FutureBuilder with inline future. Restarts on every rebuild.',
-    correctionMessage:
-        'Cache the Future in initState() and reference it.',
+    correctionMessage: 'Cache the Future in initState() and reference it.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2390,8 +2386,7 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
     name: 'require_future_timeout',
     problemMessage:
         'Long-running Future without timeout. May hang indefinitely.',
-    correctionMessage:
-        'Add .timeout(Duration(...)) to prevent hanging.',
+    correctionMessage: 'Add .timeout(Duration(...)) to prevent hanging.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2555,8 +2550,7 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
     name: 'require_stream_on_done',
     problemMessage:
         'Stream.listen without onDone. Completion state not handled.',
-    correctionMessage:
-        'Add onDone callback to handle stream completion.',
+    correctionMessage: 'Add onDone callback to handle stream completion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2633,8 +2627,7 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
     name: 'require_completer_error_handling',
     problemMessage:
         'Completer in try-catch without completeError. May hang on error.',
-    correctionMessage:
-        'Add completer.completeError(e) in catch block.',
+    correctionMessage: 'Add completer.completeError(e) in catch block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

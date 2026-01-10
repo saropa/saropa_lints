@@ -836,10 +836,8 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_empty_results_state',
-    problemMessage:
-        'List with search-related name missing empty state check.',
-    correctionMessage:
-        'Add isEmpty check with empty state UI for better UX.',
+    problemMessage: 'List with search-related name missing empty state check.',
+    correctionMessage: 'Add isEmpty check with empty state UI for better UX.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -943,8 +941,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_search_loading_indicator',
-    problemMessage:
-        'Search callback without loading state management.',
+    problemMessage: 'Search callback without loading state management.',
     correctionMessage:
         'Set loading state before search and clear it on completion.',
     errorSeverity: DiagnosticSeverity.INFO,
