@@ -4515,8 +4515,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
 
       while (current != null) {
         if (current is InstanceCreationExpression) {
-          final String parentType =
-              current.constructorName.type.name2.lexeme;
+          final String parentType = current.constructorName.type.name2.lexeme;
           if (_providerTypes.contains(parentType)) {
             nestingDepth++;
           }
@@ -4569,8 +4568,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_providers',
-    problemMessage:
-        'Provider created inside Consumer or builder callback.',
+    problemMessage: 'Provider created inside Consumer or builder callback.',
     correctionMessage:
         'Use ProxyProvider or move provider to MultiProvider at tree root.',
     errorSeverity: DiagnosticSeverity.WARNING,

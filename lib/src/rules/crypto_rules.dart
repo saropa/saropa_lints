@@ -44,8 +44,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
     name: 'avoid_hardcoded_encryption_keys',
     problemMessage:
         'Hardcoded encryption key can be extracted from compiled app.',
-    correctionMessage:
-        'Load key from secure storage or derive at runtime.',
+    correctionMessage: 'Load key from secure storage or derive at runtime.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -159,7 +158,8 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -220,7 +220,8 @@ class _UseSecureRandomFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
@@ -300,7 +301,8 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
     });
 
     // Check for constructor calls like MD5()
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (_deprecatedAlgorithms.contains(typeName)) {
         reporter.atNode(node, code);
@@ -348,8 +350,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',
-    problemMessage:
-        'Static or reused IV breaks encryption security.',
+    problemMessage: 'Static or reused IV breaks encryption security.',
     correctionMessage:
         'Generate a new random IV for each encryption operation.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -378,9 +379,10 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
     // Check for const IV
     context.registry.addVariableDeclaration((VariableDeclaration node) {
-      final VariableDeclarationList? parent = node.parent is VariableDeclarationList
-          ? node.parent as VariableDeclarationList
-          : null;
+      final VariableDeclarationList? parent =
+          node.parent is VariableDeclarationList
+              ? node.parent as VariableDeclarationList
+              : null;
       if (parent == null) return;
 
       final bool isConst = parent.isConst;

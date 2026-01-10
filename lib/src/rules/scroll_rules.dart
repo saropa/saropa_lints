@@ -48,8 +48,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shrinkwrap_in_scrollview',
-    problemMessage:
-        'shrinkWrap: true in scrollable disables virtualization.',
+    problemMessage: 'shrinkWrap: true in scrollable disables virtualization.',
     correctionMessage:
         'Use CustomScrollView with slivers, or add NeverScrollableScrollPhysics.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -61,7 +60,8 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for ListView, GridView, etc.
@@ -69,8 +69,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 
       // Check for shrinkWrap: true
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'shrinkWrap') {
+        if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
           final Expression value = arg.expression;
           if (value is BooleanLiteral && value.value) {
             // Check if inside another scrollable
@@ -102,7 +101,8 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
           AstNode? parent = current.parent;
           while (parent != null) {
             if (parent is InstanceCreationExpression) {
-              final String parentType = parent.constructorName.type.name2.lexeme;
+              final String parentType =
+                  parent.constructorName.type.name2.lexeme;
               if (_scrollableTypes.contains(parentType)) {
                 return true;
               }
@@ -169,7 +169,8 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (!_scrollableTypes.contains(typeName)) return;
@@ -250,7 +251,8 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'ListView' && typeName != 'GridView') return;
@@ -265,7 +267,8 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'children') {
           final Expression value = arg.expression;
-          if (value is ListLiteral && value.elements.length > _maxChildrenCount) {
+          if (value is ListLiteral &&
+              value.elements.length > _maxChildrenCount) {
             reporter.atNode(node.constructorName, code);
           }
         }
@@ -301,8 +304,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_bottom_nav_items',
-    problemMessage:
-        'BottomNavigationBar with more than 5 items crowds the UI.',
+    problemMessage: 'BottomNavigationBar with more than 5 items crowds the UI.',
     correctionMessage:
         'Limit to 5 items or use a navigation drawer for additional options.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -316,11 +318,11 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
-      if (typeName != 'BottomNavigationBar' &&
-          typeName != 'NavigationBar') {
+      if (typeName != 'BottomNavigationBar' && typeName != 'NavigationBar') {
         return;
       }
 
@@ -328,7 +330,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression &&
             (arg.name.label.name == 'items' ||
-             arg.name.label.name == 'destinations')) {
+                arg.name.label.name == 'destinations')) {
           final Expression value = arg.expression;
           if (value is ListLiteral && value.elements.length > _maxItems) {
             reporter.atNode(arg, code);
@@ -365,8 +367,7 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
     name: 'require_tab_controller_length_sync',
     problemMessage:
         'TabController length must match TabBar/TabBarView children count.',
-    correctionMessage:
-        'Ensure TabController length equals the number of tabs.',
+    correctionMessage: 'Ensure TabController length equals the number of tabs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -392,32 +393,39 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Look for TabController(length: N)
-      final RegExp controllerPattern = RegExp(r'TabController\s*\(\s*length\s*:\s*(\d+)');
+      final RegExp controllerPattern =
+          RegExp(r'TabController\s*\(\s*length\s*:\s*(\d+)');
       final Match? controllerMatch = controllerPattern.firstMatch(classSource);
       if (controllerMatch != null) {
         controllerLength = int.tryParse(controllerMatch.group(1) ?? '');
       }
 
       // Look for TabBar(tabs: [...])
-      final RegExp tabBarPattern = RegExp(r'TabBar\s*\([^)]*tabs\s*:\s*\[([^\]]*)\]');
+      final RegExp tabBarPattern =
+          RegExp(r'TabBar\s*\([^)]*tabs\s*:\s*\[([^\]]*)\]');
       final Match? tabBarMatch = tabBarPattern.firstMatch(classSource);
       if (tabBarMatch != null) {
         // Count commas + 1 for number of items
         final String tabsContent = tabBarMatch.group(1) ?? '';
         if (tabsContent.trim().isNotEmpty) {
-          tabBarTabCount = tabsContent.split(',').where((s) => s.trim().isNotEmpty).length;
+          tabBarTabCount =
+              tabsContent.split(',').where((s) => s.trim().isNotEmpty).length;
         } else {
           tabBarTabCount = 0;
         }
       }
 
       // Look for TabBarView(children: [...])
-      final RegExp tabBarViewPattern = RegExp(r'TabBarView\s*\([^)]*children\s*:\s*\[([^\]]*)\]');
+      final RegExp tabBarViewPattern =
+          RegExp(r'TabBarView\s*\([^)]*children\s*:\s*\[([^\]]*)\]');
       final Match? tabBarViewMatch = tabBarViewPattern.firstMatch(classSource);
       if (tabBarViewMatch != null) {
         final String childrenContent = tabBarViewMatch.group(1) ?? '';
         if (childrenContent.trim().isNotEmpty) {
-          tabBarViewChildCount = childrenContent.split(',').where((s) => s.trim().isNotEmpty).length;
+          tabBarViewChildCount = childrenContent
+              .split(',')
+              .where((s) => s.trim().isNotEmpty)
+              .length;
         } else {
           tabBarViewChildCount = 0;
         }
@@ -428,7 +436,8 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
         if (tabBarTabCount != null && controllerLength != tabBarTabCount) {
           reporter.atNode(node, code);
         }
-        if (tabBarViewChildCount != null && controllerLength != tabBarViewChildCount) {
+        if (tabBarViewChildCount != null &&
+            controllerLength != tabBarViewChildCount) {
           reporter.atNode(node, code);
         }
       }
@@ -470,8 +479,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
     name: 'avoid_refresh_without_await',
     problemMessage:
         'RefreshIndicator onRefresh should return Future for proper timing.',
-    correctionMessage:
-        'Make onRefresh async and await async operations.',
+    correctionMessage: 'Make onRefresh async and await async operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -481,7 +489,8 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'RefreshIndicator') return;
@@ -537,8 +546,7 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
     name: 'avoid_multiple_autofocus',
     problemMessage:
         'Multiple widgets with autofocus: true causes unpredictable behavior.',
-    correctionMessage:
-        'Only one widget should have autofocus: true.',
+    correctionMessage: 'Only one widget should have autofocus: true.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
