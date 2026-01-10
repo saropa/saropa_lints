@@ -12,6 +12,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when `context` is used inside `initState` or `dispose` methods.
 ///
+/// Alias: avoid_context_in_init_state
+///
 /// Using `context` in these lifecycle methods is an anti-pattern because
 /// the widget may not be fully mounted (in `initState`) or may already be
 /// unmounted (in `dispose`). This can lead to runtime errors or unexpected
@@ -5863,6 +5865,8 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
 /// Future rule: avoid-singlechildscrollview-with-column
 /// Warns when SingleChildScrollView wraps a Column with Expanded children.
 ///
+/// Alias: avoid_single_child_scroll_view_list
+///
 /// Example of **bad** code:
 /// ```dart
 /// SingleChildScrollView(
@@ -7710,6 +7714,8 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
 
 /// Warns when ListView is used with many children instead of ListView.builder.
 ///
+/// Alias: require_list_view_builder
+///
 /// ListView with children list builds all items at once.
 /// Use ListView.builder for lazy loading with large lists.
 ///
@@ -7772,6 +7778,8 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 }
 
 /// Warns when Opacity widget is animated instead of FadeTransition.
+///
+/// Alias: avoid_opacity_widget_animation
 ///
 /// Animating Opacity causes rebuilds. FadeTransition is more performant.
 ///
@@ -15237,6 +15245,1229 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
       }
 
       reporter.atNode(node.expression, code);
+    });
+  }
+}
+
+// =============================================================================
+// Part 3: Widget Lifecycle Rules
+// =============================================================================
+
+/// Warns when dispose() method doesn't call super.dispose().
+///
+/// Alias: missing_super_dispose, super_dispose_required
+///
+/// In State<T> subclasses, dispose() must call super.dispose() to ensure
+/// proper cleanup of framework resources.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   void dispose() {
+///     // Missing super.dispose()!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   void dispose() {
+///     // Clean up resources
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireSuperDisposeCallRule extends SaropaLintRule {
+  const RequireSuperDisposeCallRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_super_dispose_call',
+    problemMessage: 'dispose() must call super.dispose().',
+    correctionMessage: 'Add super.dispose() at the end of your dispose method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'dispose') return;
+
+      // Check if in State<T> class
+      final parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+
+      final extendsClause = parent.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'State') return;
+
+      // Check if super.dispose() is called
+      final bodySource = node.body.toSource();
+      if (!bodySource.contains('super.dispose()')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when initState() method doesn't call super.initState().
+///
+/// Alias: missing_super_init_state, super_init_state_required
+///
+/// In State<T> subclasses, initState() must call super.initState() first
+/// to ensure proper framework initialization.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   void initState() {
+///     // Missing super.initState()!
+///     _initSomething();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   void initState() {
+///     super.initState();
+///     _initSomething();
+///   }
+/// }
+/// ```
+class RequireSuperInitStateCallRule extends SaropaLintRule {
+  const RequireSuperInitStateCallRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_super_init_state_call',
+    problemMessage: 'initState() must call super.initState().',
+    correctionMessage:
+        'Add super.initState() at the beginning of your initState method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'initState') return;
+
+      // Check if in State<T> class
+      final parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+
+      final extendsClause = parent.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'State') return;
+
+      // Check if super.initState() is called
+      final bodySource = node.body.toSource();
+      if (!bodySource.contains('super.initState()')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when setState is called inside dispose().
+///
+/// Alias: set_state_in_dispose, avoid_set_state_after_dispose
+///
+/// Calling setState in dispose is invalid - the widget is being unmounted.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   void dispose() {
+///     setState(() { _value = null; });  // Error!
+///     super.dispose();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   void dispose() {
+///     _controller.dispose();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class AvoidSetStateInDisposeRule extends SaropaLintRule {
+  const AvoidSetStateInDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_set_state_in_dispose',
+    problemMessage: 'setState() must not be called inside dispose().',
+    correctionMessage:
+        'Remove setState - state changes are invalid during disposal.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'setState') return;
+
+      // Walk up to find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) return;
+      if (enclosingMethod.name.lexeme != 'dispose') return;
+
+      // Check if in State<T> class
+      final parent = enclosingMethod.parent;
+      if (parent is! ClassDeclaration) return;
+
+      final extendsClause = parent.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'State') return;
+
+      reporter.atNode(node.methodName, code);
+    });
+  }
+}
+
+/// Warns when Navigator.push/pushNamed is called inside build().
+///
+/// Alias: navigation_in_build, avoid_navigator_in_build
+///
+/// Navigation inside build causes issues because build can be called
+/// multiple times during a frame.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   Widget build(BuildContext context) {
+///     if (_shouldNavigate) {
+///       Navigator.pushNamed(context, '/next');  // Bad!
+///     }
+///     return Container();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   @override
+///   void initState() {
+///     super.initState();
+///     WidgetsBinding.instance.addPostFrameCallback((_) {
+///       if (_shouldNavigate) {
+///         Navigator.pushNamed(context, '/next');
+///       }
+///     });
+///   }
+/// }
+/// ```
+class AvoidNavigationInBuildRule extends SaropaLintRule {
+  const AvoidNavigationInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_navigation_in_build',
+    problemMessage: 'Navigator calls must not be inside build().',
+    correctionMessage:
+        'Use WidgetsBinding.instance.addPostFrameCallback or move to callback.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _navigationMethods = <String>{
+    'push',
+    'pushNamed',
+    'pushReplacement',
+    'pushReplacementNamed',
+    'pushAndRemoveUntil',
+    'pushNamedAndRemoveUntil',
+    'pop',
+    'popAndPushNamed',
+    'popUntil',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Navigator.method or context.navigatorMethod via extensions
+      final methodName = node.methodName.name;
+      if (!_navigationMethods.contains(methodName)) return;
+
+      final target = node.target;
+      if (target == null) return;
+
+      final targetSource = target.toSource();
+      if (!targetSource.contains('Navigator')) return;
+
+      // Walk up to find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+      bool inCallback = false;
+
+      while (current != null) {
+        if (current is FunctionExpression) {
+          inCallback = true;
+        }
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) return;
+      if (enclosingMethod.name.lexeme != 'build') return;
+
+      // If inside a callback in build, that's usually OK
+      if (inCallback) return;
+
+      // Check if in State<T> class or StatelessWidget
+      final parent = enclosingMethod.parent;
+      if (parent is! ClassDeclaration) return;
+
+      reporter.atNode(node.methodName, code);
+    });
+  }
+}
+
+// =============================================================================
+// Part 4: Additional Missing Parameter Rules
+// =============================================================================
+
+/// Warns when TextFormField is used without a Form ancestor.
+///
+/// Alias: text_form_field_without_form, orphan_text_form_field
+///
+/// TextFormField features like validation only work inside a Form widget.
+/// For standalone text input, use TextField instead.
+///
+/// **BAD:**
+/// ```dart
+/// Column(
+///   children: [
+///     TextFormField(  // validation won't work!
+///       validator: (v) => v!.isEmpty ? 'Required' : null,
+///     ),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Form(
+///   child: TextFormField(
+///     validator: (v) => v!.isEmpty ? 'Required' : null,
+///   ),
+/// )
+/// // Or use TextField if no form validation needed
+/// ```
+///
+/// **Note:** This rule uses heuristic detection since Form widgets may be
+/// defined in parent files.
+class RequireTextFormFieldInFormRule extends SaropaLintRule {
+  const RequireTextFormFieldInFormRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_text_form_field_in_form',
+    problemMessage:
+        'TextFormField should be inside a Form widget for validation to work.',
+    correctionMessage:
+        'Wrap with Form widget or use TextField if no validation needed.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression(
+        (InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'TextFormField') return;
+
+      // Check if the TextFormField has a validator parameter (indicates form usage)
+      bool hasValidator = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'validator') {
+          hasValidator = true;
+          break;
+        }
+      }
+
+      if (!hasValidator) return; // No validator = probably OK to not have Form
+
+      // Walk up looking for Form constructor
+      AstNode? current = node.parent;
+      bool foundForm = false;
+      int depth = 0;
+      const maxDepth = 50; // Reasonable widget tree depth
+
+      while (current != null && depth < maxDepth) {
+        if (current is InstanceCreationExpression) {
+          final parentType = current.constructorName.type.name2.lexeme;
+          if (parentType == 'Form') {
+            foundForm = true;
+            break;
+          }
+        }
+        current = current.parent;
+        depth++;
+      }
+
+      if (!foundForm) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when WebView is used without navigationDelegate.
+///
+/// Alias: webview_missing_navigation_delegate, insecure_webview
+///
+/// WebView without navigationDelegate can navigate to any URL, which is
+/// a security risk. Always validate navigation requests.
+///
+/// **BAD:**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+///   // No navigation control - can go anywhere!
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+///   navigationDelegate: (request) {
+///     if (request.url.startsWith('https://trusted.com')) {
+///       return NavigationDecision.navigate;
+///     }
+///     return NavigationDecision.prevent;
+///   },
+/// )
+/// ```
+class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
+  const RequireWebViewNavigationDelegateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_webview_navigation_delegate',
+    problemMessage:
+        'WebView should have a navigationDelegate to control navigation.',
+    correctionMessage:
+        'Add navigationDelegate to validate URLs before navigation.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _webViewTypes = <String>{
+    'WebView',
+    'WebViewWidget',
+    'InAppWebView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression(
+        (InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name2.lexeme;
+      if (!_webViewTypes.contains(typeName)) return;
+
+      // Check for navigationDelegate or onNavigationRequest parameter
+      bool hasNavigationControl = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final paramName = arg.name.label.name;
+          if (paramName == 'navigationDelegate' ||
+              paramName == 'onNavigationRequest' ||
+              paramName == 'shouldOverrideUrlLoading') {
+            hasNavigationControl = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasNavigationControl) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 5: Additional API Pattern Rules
+// =============================================================================
+
+/// Warns when nested scrollables don't have NeverScrollableScrollPhysics.
+///
+/// Alias: nested_scroll_physics, scroll_conflict
+///
+/// When one scrollable is inside another, the inner one should usually
+/// have NeverScrollableScrollPhysics to prevent gesture conflicts.
+///
+/// **BAD:**
+/// ```dart
+/// ListView(
+///   children: [
+///     ListView(  // Gesture conflict!
+///       shrinkWrap: true,
+///       children: [...],
+///     ),
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView(
+///   children: [
+///     ListView(
+///       shrinkWrap: true,
+///       physics: NeverScrollableScrollPhysics(),
+///       children: [...],
+///     ),
+///   ],
+/// )
+/// ```
+class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
+  const RequirePhysicsForNestedScrollRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_physics_for_nested_scroll',
+    problemMessage:
+        'Nested scrollable should have NeverScrollableScrollPhysics.',
+    correctionMessage:
+        'Add physics: NeverScrollableScrollPhysics() to inner scrollable.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _scrollableTypes = <String>{
+    'ListView',
+    'GridView',
+    'SingleChildScrollView',
+    'CustomScrollView',
+    'PageView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression(
+        (InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name2.lexeme;
+      if (!_scrollableTypes.contains(typeName)) return;
+
+      // Check if has physics parameter
+      bool hasPhysics = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'physics') {
+          hasPhysics = true;
+          break;
+        }
+      }
+
+      if (hasPhysics) return;
+
+      // Check if inside another scrollable
+      AstNode? current = node.parent;
+      int depth = 0;
+      const maxDepth = 30;
+
+      while (current != null && depth < maxDepth) {
+        if (current is InstanceCreationExpression) {
+          final parentType = current.constructorName.type.name2.lexeme;
+          if (_scrollableTypes.contains(parentType)) {
+            reporter.atNode(node.constructorName, code);
+            return;
+          }
+        }
+        current = current.parent;
+        depth++;
+      }
+    });
+  }
+}
+
+/// Warns when AnimatedBuilder is missing the child parameter.
+///
+/// Alias: animated_builder_child, wasteful_animation
+///
+/// AnimatedBuilder should use the child parameter for parts that don't
+/// animate to avoid unnecessary rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// AnimatedBuilder(
+///   animation: _controller,
+///   builder: (context, _) => Container(
+///     transform: Matrix4.rotationZ(_controller.value),
+///     child: const Text('Heavy static widget'),  // Rebuilt every frame!
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// AnimatedBuilder(
+///   animation: _controller,
+///   child: const Text('Heavy static widget'),  // Built once
+///   builder: (context, child) => Container(
+///     transform: Matrix4.rotationZ(_controller.value),
+///     child: child,
+///   ),
+/// )
+/// ```
+class RequireAnimatedBuilderChildRule extends SaropaLintRule {
+  const RequireAnimatedBuilderChildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_animated_builder_child',
+    problemMessage:
+        'AnimatedBuilder should use child parameter for static widgets.',
+    correctionMessage:
+        'Move static widgets to child parameter to avoid rebuilds.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression(
+        (InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'AnimatedBuilder') return;
+
+      // Check if child parameter is present
+      bool hasChild = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          hasChild = true;
+          break;
+        }
+      }
+
+      if (!hasChild) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when `throw e` is used instead of `rethrow`.
+///
+/// Alias: preserve_stack_trace, use_rethrow
+///
+/// `throw e` loses the original stack trace. Use `rethrow` to preserve it.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   await api.call();
+/// } catch (e) {
+///   log(e);
+///   throw e;  // Loses stack trace!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await api.call();
+/// } catch (e) {
+///   log(e);
+///   rethrow;  // Preserves stack trace
+/// }
+/// ```
+class RequireRethrowPreserveStackRule extends SaropaLintRule {
+  const RequireRethrowPreserveStackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_rethrow_preserve_stack',
+    problemMessage: 'throw e loses stack trace. Use rethrow instead.',
+    correctionMessage: 'Replace "throw e" with "rethrow".',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addThrowExpression((ThrowExpression node) {
+      final thrown = node.expression;
+      if (thrown is! SimpleIdentifier) return;
+
+      // Check if we're in a catch clause
+      AstNode? current = node.parent;
+      CatchClause? catchClause;
+
+      while (current != null) {
+        if (current is CatchClause) {
+          catchClause = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (catchClause == null) return;
+
+      // Check if throwing the caught exception
+      final exceptionParam = catchClause.exceptionParameter?.name;
+      if (exceptionParam == null) return;
+
+      if (thrown.name == exceptionParam) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when http:// URLs are used in network calls.
+///
+/// Alias: insecure_http, require_https
+///
+/// HTTP is insecure. Always use HTTPS for network requests.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(Uri.parse('http://api.example.com/data'));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final response = await http.get(Uri.parse('https://api.example.com/data'));
+/// ```
+class RequireHttpsOverHttpRule extends SaropaLintRule {
+  const RequireHttpsOverHttpRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_https_over_http',
+    problemMessage: 'HTTP is insecure. Use HTTPS instead.',
+    correctionMessage: 'Replace http:// with https://.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final value = node.value;
+      if (value.startsWith('http://') && !value.startsWith('http://localhost') &&
+          !value.startsWith('http://127.0.0.1') &&
+          !value.startsWith('http://10.') &&
+          !value.startsWith('http://192.168.')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when ws:// URLs are used for WebSocket connections.
+///
+/// Alias: insecure_websocket, require_wss
+///
+/// ws:// is insecure. Always use wss:// for WebSocket connections.
+///
+/// **BAD:**
+/// ```dart
+/// final channel = WebSocketChannel.connect(Uri.parse('ws://api.example.com'));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final channel = WebSocketChannel.connect(Uri.parse('wss://api.example.com'));
+/// ```
+class RequireWssOverWsRule extends SaropaLintRule {
+  const RequireWssOverWsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_wss_over_ws',
+    problemMessage: 'ws:// is insecure. Use wss:// instead.',
+    correctionMessage: 'Replace ws:// with wss://.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final value = node.value;
+      if (value.startsWith('ws://') && !value.startsWith('ws://localhost') &&
+          !value.startsWith('ws://127.0.0.1') &&
+          !value.startsWith('ws://10.') &&
+          !value.startsWith('ws://192.168.')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when `late` is used without guaranteed initialization.
+///
+/// Alias: unsafe_late, late_init_risk
+///
+/// `late` fields throw LateInitializationError if accessed before init.
+/// Only use late when you can guarantee initialization before access.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends StatefulWidget {
+///   late String _data;  // May be accessed before init!
+///
+///   void fetchData() async {
+///     _data = await api.getData();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends StatefulWidget {
+///   String? _data;  // Null-safe alternative
+///
+///   // Or use late only with guaranteed init in initState:
+///   late final AnimationController _controller;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _controller = AnimationController(vsync: this);  // Always runs
+///   }
+/// }
+/// ```
+class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
+  const AvoidLateWithoutGuaranteeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_late_without_guarantee',
+    problemMessage:
+        'late field may cause LateInitializationError if accessed before init.',
+    correctionMessage:
+        'Consider using nullable type or ensure init in initState/constructor.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      // Check for late keyword
+      if (node.fields.lateKeyword == null) return;
+
+      // Skip if it's late final with an initializer
+      if (node.fields.isFinal) {
+        for (final variable in node.fields.variables) {
+          if (variable.initializer != null) return;
+        }
+      }
+
+      // Check if in State<T> class
+      final parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+
+      final extendsClause = parent.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'State') return;
+
+      // Check if initialized in initState
+      String? initStateBody;
+      for (final member in parent.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'initState') {
+          initStateBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check each late variable
+      for (final variable in node.fields.variables) {
+        final varName = variable.name.lexeme;
+
+        // If no initState or field not assigned in initState, warn
+        if (initStateBody == null ||
+            !initStateBody.contains('$varName =') &&
+                !initStateBody.contains('$varName=')) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 8: Cross-File Rules (Configuration Reminders)
+// Note: Full validation requires reading native config files. These rules
+// serve as reminders when package APIs are used.
+// =============================================================================
+
+/// Reminder to add NSPhotoLibraryUsageDescription for image_picker on iOS.
+///
+/// Alias: ios_photo_permission, image_picker_plist
+///
+/// image_picker requires Info.plist entries on iOS.
+///
+/// **Required in ios/Runner/Info.plist:**
+/// ```xml
+/// <key>NSPhotoLibraryUsageDescription</key>
+/// <string>App needs photo library access</string>
+/// <key>NSCameraUsageDescription</key>
+/// <string>App needs camera access</string>
+/// ```
+class RequireImagePickerPermissionIosRule extends SaropaLintRule {
+  const RequireImagePickerPermissionIosRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_picker_permission_ios',
+    problemMessage:
+        'image_picker usage detected. Verify iOS Info.plist has required keys.',
+    correctionMessage:
+        'Add NSPhotoLibraryUsageDescription and NSCameraUsageDescription to Info.plist.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only report once per file using image_picker
+    bool reported = false;
+
+    context.registry.addImportDirective((ImportDirective node) {
+      if (reported) return;
+
+      final uri = node.uri.stringValue ?? '';
+      if (uri.contains('image_picker')) {
+        reporter.atNode(node, code);
+        reported = true;
+      }
+    });
+  }
+}
+
+/// Reminder to add camera permission for image_picker on Android.
+///
+/// Alias: android_camera_permission, image_picker_manifest
+///
+/// Camera access requires AndroidManifest.xml entry.
+///
+/// **Required in android/app/src/main/AndroidManifest.xml:**
+/// ```xml
+/// <uses-permission android:name="android.permission.CAMERA"/>
+/// ```
+class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
+  const RequireImagePickerPermissionAndroidRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_picker_permission_android',
+    problemMessage:
+        'image_picker camera usage. Verify AndroidManifest has CAMERA permission.',
+    correctionMessage:
+        'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'pickImage') return;
+
+      // Check for ImageSource.camera
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'source') {
+          if (arg.expression.toSource() == 'ImageSource.camera') {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Reminder to add manifest entry for runtime permissions.
+///
+/// Alias: android_manifest_permission, permission_handler_manifest
+///
+/// Runtime permissions require manifest declaration on Android.
+///
+/// **Example for AndroidManifest.xml:**
+/// ```xml
+/// <uses-permission android:name="android.permission.CAMERA"/>
+/// <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+/// ```
+class RequirePermissionManifestAndroidRule extends SaropaLintRule {
+  const RequirePermissionManifestAndroidRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_permission_manifest_android',
+    problemMessage:
+        'Permission request detected. Verify AndroidManifest.xml has entry.',
+    correctionMessage:
+        'Add <uses-permission android:name="android.permission.XXX"/> to manifest.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    bool reported = false;
+
+    context.registry.addImportDirective((ImportDirective node) {
+      if (reported) return;
+
+      final uri = node.uri.stringValue ?? '';
+      if (uri.contains('permission_handler')) {
+        reporter.atNode(node, code);
+        reported = true;
+      }
+    });
+  }
+}
+
+/// Reminder to add Info.plist entries for iOS permissions.
+///
+/// Alias: ios_plist_permission, permission_handler_plist
+///
+/// iOS permissions require Info.plist usage description strings.
+///
+/// **Example for ios/Runner/Info.plist:**
+/// ```xml
+/// <key>NSCameraUsageDescription</key>
+/// <string>Camera access for photo capture</string>
+/// ```
+class RequirePermissionPlistIosRule extends SaropaLintRule {
+  const RequirePermissionPlistIosRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_permission_plist_ios',
+    problemMessage:
+        'Permission request detected. Verify Info.plist has usage description.',
+    correctionMessage:
+        'Add NSxxxUsageDescription key to Info.plist for each permission.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'request') return;
+
+      final target = node.target;
+      if (target == null) return;
+
+      final targetSource = target.toSource();
+      if (targetSource.contains('Permission.')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Reminder to add queries element for url_launcher on Android 11+.
+///
+/// Alias: android_queries_element, url_launcher_manifest
+///
+/// Android 11+ requires queries element in manifest for URL handling.
+///
+/// **Required in android/app/src/main/AndroidManifest.xml:**
+/// ```xml
+/// <queries>
+///   <intent>
+///     <action android:name="android.intent.action.VIEW"/>
+///     <data android:scheme="https"/>
+///   </intent>
+/// </queries>
+/// ```
+class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
+  const RequireUrlLauncherQueriesAndroidRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_url_launcher_queries_android',
+    problemMessage:
+        'url_launcher usage. Android 11+ requires queries element in manifest.',
+    correctionMessage:
+        'Add <queries> element with intent filters to AndroidManifest.xml.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    bool reported = false;
+
+    context.registry.addImportDirective((ImportDirective node) {
+      if (reported) return;
+
+      final uri = node.uri.stringValue ?? '';
+      if (uri.contains('url_launcher')) {
+        reporter.atNode(node, code);
+        reported = true;
+      }
+    });
+  }
+}
+
+/// Reminder to add LSApplicationQueriesSchemes for iOS url_launcher.
+///
+/// Alias: ios_url_schemes, url_launcher_plist
+///
+/// iOS requires declared URL schemes in Info.plist for canLaunchUrl.
+///
+/// **Required in ios/Runner/Info.plist:**
+/// ```xml
+/// <key>LSApplicationQueriesSchemes</key>
+/// <array>
+///   <string>https</string>
+///   <string>tel</string>
+///   <string>mailto</string>
+/// </array>
+/// ```
+class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
+  const RequireUrlLauncherSchemesIosRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_url_launcher_schemes_ios',
+    problemMessage:
+        'canLaunchUrl usage. iOS requires LSApplicationQueriesSchemes in Info.plist.',
+    correctionMessage:
+        'Add URL schemes to LSApplicationQueriesSchemes array in Info.plist.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'canLaunchUrl' &&
+          node.methodName.name != 'canLaunch') {
+        return;
+      }
+
+      reporter.atNode(node, code);
     });
   }
 }

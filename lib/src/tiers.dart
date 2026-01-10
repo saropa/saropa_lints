@@ -204,6 +204,16 @@ const Set<String> essentialRules = <String>{
   // Async (roadmap_up_next - runtime crash)
   'avoid_dialog_context_after_async',
 
+  // Package-specific rules (Essential - security/crash prevention)
+  'require_apple_signin_nonce', // Security - replay attack prevention
+  'avoid_supabase_anon_key_in_code', // Security - credential exposure
+  'require_supabase_realtime_unsubscribe', // Memory leak - channel disposal
+  'require_webview_ssl_error_handling', // Security - certificate validation
+  'require_workmanager_result_return', // Crash prevention - task status
+  'require_speech_stop_on_dispose', // Resource leak - microphone
+  'avoid_app_links_sensitive_params', // Security - token exposure
+  'avoid_openai_key_in_code', // Security - API key exposure
+
   // Part 5 - Security Rules (Essential)
   'avoid_shared_prefs_sensitive_data',
   'require_secure_storage_for_auth',
@@ -534,6 +544,18 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Navigation rules (roadmap_up_next)
   'require_refresh_indicator_on_lists',
+
+  // Package-specific rules (Recommended - error handling/best practices)
+  'require_google_signin_error_handling', // Error handling - auth failures
+  'require_supabase_error_handling', // Error handling - database failures
+  'avoid_webview_file_access', // Security - file access restriction
+  'require_workmanager_constraints', // Best practice - resource efficiency
+  'require_calendar_timezone_handling', // Best practice - time zone handling
+  'require_keyboard_visibility_dispose', // Memory - subscription cleanup
+  'require_envied_obfuscation', // Security - env var protection
+  'require_openai_error_handling', // Error handling - API rate limits
+  'require_svg_error_handler', // UI stability - error fallback
+  'require_google_fonts_fallback', // UI stability - font fallback
 
   // Part 5 - Security Rules (Recommended)
   'require_shared_prefs_null_handling',
@@ -1270,6 +1292,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Part 6 - Media Rules (Comprehensive)
   'prefer_camera_resolution_selection',
   'prefer_audio_session_config',
+
+  // Part 8 - Package-specific rules (Comprehensive - stylistic)
+  'prefer_uuid_v4', // Stylistic - prefer v4 over v1 for uniqueness
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.

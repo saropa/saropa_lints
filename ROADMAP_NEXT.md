@@ -64,11 +64,13 @@ The following rules from the original list already exist. They are listed here f
 - `require_hive_initialization` - file_handling_rules.dart / hive_rules.dart
 - `require_hive_type_adapter` - file_handling_rules.dart / hive_rules.dart
 
-### Additional Rules (5 implemented)
+### Additional Rules (7 implemented)
 - `require_sqflite_whereargs` - file_handling_rules.dart
 - `require_provider_dispose` - state_management_rules.dart
 - `require_getx_controller_dispose` - state_management_rules.dart
 - `avoid_shared_prefs_sensitive_data` - security_rules.dart
+- `require_webview_navigation_delegate` - flutter_widget_rules.dart (aliases: webview_missing_navigation_delegate, insecure_webview)
+- `avoid_logging_sensitive_data` - security_rules.dart (aliases: no_sensitive_logs, pii_in_logs, credential_logging)
 
 ### Animation Rules (5 implemented)
 - `prefer_tween_sequence` - animation_rules.dart
@@ -107,105 +109,200 @@ Critical for preventing data corruption. `avoid_isar_enum_field` already impleme
 
 ---
 
-## Part 2: Dispose Pattern Rules (7 remaining)
+## Part 2: Dispose Pattern Rules (6 remaining)
 
 Constructor + dispose pattern matching - detect resource creation without cleanup.
 
 | # | Rule Name | Tier | Severity | Detection Pattern |
 |---|-----------|------|----------|-------------------|
 | 20 | `require_change_notifier_dispose` | Essential | ERROR | `ChangeNotifier` without `dispose()` |
-| 21 | `require_web_socket_close` | Essential | ERROR | `WebSocket` without `close()` |
-| 22 | `require_receive_port_close` | Essential | ERROR | `ReceivePort` without `close()` |
-| 23 | `require_socket_close` | Essential | ERROR | `Socket` without `close()` |
-| 24 | `require_debouncer_cancel` | Essential | ERROR | Debounce timer without `cancel()` |
-| 25 | `require_interval_timer_cancel` | Essential | ERROR | `Timer.periodic` without `cancel()` (explicit periodic) |
-| 26 | `require_file_handle_close` | Essential | WARNING | `RandomAccessFile` without `close()` |
+| 21 | `require_receive_port_close` | Essential | ERROR | `ReceivePort` without `close()` |
+| 22 | `require_socket_close` | Essential | ERROR | `Socket` without `close()` |
+| 23 | `require_debouncer_cancel` | Essential | ERROR | Debounce timer without `cancel()` |
+| 24 | `require_interval_timer_cancel` | Essential | ERROR | `Timer.periodic` without `cancel()` (explicit periodic) |
+| 25 | `require_file_handle_close` | Essential | WARNING | `RandomAccessFile` without `close()` |
 
 ---
 
-## Part 3: Widget Lifecycle Rules (6 remaining)
+## Part 3: Widget Lifecycle Rules (5 remaining)
 
 Exact method/context pattern matching in StatefulWidget lifecycle.
 
 | # | Rule Name | Tier | Severity | Detection Pattern |
 |---|-----------|------|----------|-------------------|
-| 27 | `avoid_context_in_init_state` | Essential | ERROR | `Theme.of(context)` in `initState` |
-| 28 | `require_super_dispose_call` | Essential | ERROR | `dispose()` without `super.dispose()` |
-| 29 | `require_super_init_state_call` | Essential | ERROR | `initState()` without `super.initState()` |
-| 30 | `avoid_set_state_in_build` | Essential | ERROR | `setState` call inside `build()` |
-| 31 | `avoid_set_state_in_dispose` | Essential | ERROR | `setState` call inside `dispose()` |
-| 32 | `avoid_navigation_in_build` | Essential | ERROR | `Navigator.push` inside `build()` |
+| 26 | `require_super_dispose_call` | Essential | ERROR | `dispose()` without `super.dispose()` |
+| 27 | `require_super_init_state_call` | Essential | ERROR | `initState()` without `super.initState()` |
+| 28 | `avoid_set_state_in_build` | Essential | ERROR | `setState` call inside `build()` |
+| 29 | `avoid_set_state_in_dispose` | Essential | ERROR | `setState` call inside `dispose()` |
+| 30 | `avoid_navigation_in_build` | Essential | ERROR | `Navigator.push` inside `build()` |
 
 ---
 
-## Part 4: Missing Parameter Rules (4 remaining)
+## Part 4: Missing Parameter Rules (3 remaining)
 
 Detect required parameters that are frequently omitted.
 
 | # | Rule Name | Tier | Severity | Detection Pattern |
 |---|-----------|------|----------|-------------------|
-| 33 | `require_provider_generic_type` | Essential | ERROR | `Provider.of(context)` without `<Type>` |
-| 34 | `require_form_global_key` | Essential | ERROR | `Form` without `GlobalKey` |
-| 35 | `require_text_form_field_in_form` | Essential | WARNING | `TextFormField` without `Form` ancestor |
-| 36 | `require_webview_navigation_delegate` | Essential | WARNING | `WebView` without `navigationDelegate` |
+| 31 | `require_provider_generic_type` | Essential | ERROR | `Provider.of(context)` without `<Type>` |
+| 32 | `require_text_form_field_in_form` | Essential | WARNING | `TextFormField` without `Form` ancestor |
+| 33 | `require_webview_navigation_delegate` | Essential | WARNING | `WebView` without `navigationDelegate` |
 
 ---
 
-## Part 5: Exact API Pattern Rules (14 remaining)
+## Part 5: Exact API Pattern Rules (10 remaining)
 
 Direct API name or pattern matching with low false-positive risk.
 
 | # | Rule Name | Tier | Severity | Detection Pattern |
 |---|-----------|------|----------|-------------------|
-| 37 | `require_flutter_riverpod_package` | Essential | ERROR | `riverpod` import without `flutter_riverpod` |
-| 38 | `avoid_bloc_emit_after_close` | Essential | ERROR | `emit` without `isClosed` check in async |
-| 39 | `avoid_bloc_state_mutation` | Essential | ERROR | `state.field = value` instead of `copyWith` |
-| 40 | `require_bloc_initial_state` | Essential | ERROR | Bloc without `super(InitialState)` |
-| 41 | `require_list_view_builder` | Essential | WARNING | `ListView(children:)` with >20 items |
-| 42 | `avoid_single_child_scroll_view_list` | Essential | WARNING | `SingleChildScrollView` + `Column` for lists |
-| 43 | `require_physics_for_nested_scroll` | Essential | WARNING | Nested scroll without `NeverScrollableScrollPhysics` |
-| 44 | `avoid_opacity_widget_animation` | Essential | WARNING | `Opacity` widget in animated context |
-| 45 | `require_animated_builder_child` | Essential | WARNING | `AnimatedBuilder` without `child` parameter |
-| 46 | `avoid_empty_catch` | Essential | WARNING | Empty `catch` block |
-| 47 | `require_rethrow_preserve_stack` | Essential | WARNING | `throw e` instead of `rethrow` |
-| 48 | `require_https_over_http` | Essential | ERROR | `http://` URL in network calls |
-| 49 | `require_wss_over_ws` | Essential | ERROR | `ws://` URL for WebSocket |
-| 50 | `avoid_late_without_guarantee` | Essential | WARNING | `late` field without guaranteed init |
+| 34 | `require_flutter_riverpod_package` | Essential | ERROR | `riverpod` import without `flutter_riverpod` |
+| 35 | `avoid_bloc_emit_after_close` | Essential | ERROR | `emit` without `isClosed` check in async |
+| 36 | `avoid_bloc_state_mutation` | Essential | ERROR | `state.field = value` instead of `copyWith` |
+| 37 | `require_bloc_initial_state` | Essential | ERROR | Bloc without `super(InitialState)` |
+| 38 | `require_physics_for_nested_scroll` | Essential | WARNING | Nested scroll without `NeverScrollableScrollPhysics` |
+| 39 | `require_animated_builder_child` | Essential | WARNING | `AnimatedBuilder` without `child` parameter |
+| 40 | `require_rethrow_preserve_stack` | Essential | WARNING | `throw e` instead of `rethrow` |
+| 41 | `require_https_over_http` | Essential | ERROR | `http://` URL in network calls |
+| 42 | `require_wss_over_ws` | Essential | ERROR | `ws://` URL for WebSocket |
+| 43 | `avoid_late_without_guarantee` | Essential | WARNING | `late` field without guaranteed init |
 
 ---
 
-## Part 6: Additional Easy Rules (11 remaining)
+## Part 6: Additional Easy Rules (10 remaining)
 
 More straightforward detection patterns.
 
 | # | Rule Name | Tier | Severity | Detection Pattern |
 |---|-----------|------|----------|-------------------|
-| 51 | `require_secure_storage_auth_data` | Essential | ERROR | JWT in `SharedPreferences` instead of `flutter_secure_storage` |
-| 52 | `avoid_freezed_json_serializable_conflict` | Essential | ERROR | Both `@freezed` and `@JsonSerializable` |
-| 53 | `require_freezed_arrow_syntax` | Essential | ERROR | `fromJson` factory with block body |
-| 54 | `require_freezed_private_constructor` | Essential | ERROR | Freezed methods without private constructor |
-| 55 | `require_equatable_immutable` | Essential | ERROR | Non-final fields in `Equatable` |
-| 56 | `require_equatable_props_override` | Essential | ERROR | `Equatable` without `props` getter |
-| 57 | `require_equatable_all_fields_in_props` | Essential | WARNING | Fields missing from `props` list |
-| 58 | `avoid_equatable_mutable_collections` | Essential | WARNING | Mutable `List`/`Map` in `Equatable` |
-| 59 | `require_bloc_loading_state` | Recommended | INFO | Async handler without loading emission |
-| 60 | `require_bloc_error_state` | Recommended | INFO | State sealed class without error case |
-| 61 | `avoid_static_state` | Essential | WARNING | Static mutable state |
+| 44 | `require_secure_storage_auth_data` | Essential | ERROR | JWT in `SharedPreferences` instead of `flutter_secure_storage` |
+| 45 | `avoid_freezed_json_serializable_conflict` | Essential | ERROR | Both `@freezed` and `@JsonSerializable` |
+| 46 | `require_freezed_arrow_syntax` | Essential | ERROR | `fromJson` factory with block body |
+| 47 | `require_freezed_private_constructor` | Essential | ERROR | Freezed methods without private constructor |
+| 48 | `require_equatable_immutable` | Essential | ERROR | Non-final fields in `Equatable` |
+| 49 | `require_equatable_props_override` | Essential | ERROR | `Equatable` without `props` getter |
+| 50 | `avoid_equatable_mutable_collections` | Essential | WARNING | Mutable `List`/`Map` in `Equatable` |
+| 51 | `require_bloc_loading_state` | Recommended | INFO | Async handler without loading emission |
+| 52 | `require_bloc_error_state` | Recommended | INFO | State sealed class without error case |
+| 53 | `avoid_static_state` | Essential | WARNING | Static mutable state |
+
+---
+
+## Part 7: Newly Identified Easy Rules (28 remaining)
+
+These rules were identified as part of the ROADMAP organization and don't have complex markers.
+
+### Dio HTTP Client Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 54 | `avoid_dio_debug_print_production` | Essential | WARNING | Dio with debugPrint without `kDebugMode` check |
+| 55 | `require_dio_singleton` | Professional | INFO | Multiple `Dio()` constructor calls without shared instance |
+| 56 | `prefer_dio_base_options` | Professional | INFO | Repeated options in multiple requests without BaseOptions |
+| 57 | `avoid_dio_without_base_url` | Recommended | INFO | Dio without baseUrl and full URLs in requests |
+
+### go_router Navigation Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 58 | `prefer_go_router_redirect_auth` | Professional | INFO | Auth logic in page builders instead of redirect |
+| 59 | `require_go_router_typed_params` | Professional | INFO | String path params without type conversion |
+
+### Provider State Management Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 60 | `avoid_provider_circular_dependency` | Essential | ERROR | Provider A watches Provider B watches A |
+| 61 | `avoid_provider_in_init_state` | Essential | WARNING | `Provider.of` in initState |
+| 62 | `prefer_context_read_in_callbacks` | Essential | WARNING | `context.watch` in button handlers |
+
+### Hive Database Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 63 | `require_hive_type_id_management` | Essential | WARNING | Duplicate or changing typeIds |
+
+### SQLite Database Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 64 | `require_sqflite_migration` | Essential | WARNING | onUpgrade without version check |
+
+### Cached Network Image Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 65 | `avoid_cached_image_in_build` | Essential | WARNING | Variable cacheKey in build method |
+
+### Image Picker Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 66 | `require_image_picker_error_handling` | Essential | WARNING | pickImage without null check or try-catch |
+| 67 | `require_image_picker_source_choice` | Recommended | INFO | Hardcoded ImageSource |
+| 68 | `require_image_picker_result_handling` | Essential | WARNING | pickImage result unused |
+
+### Permission Handler Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 69 | `require_permission_rationale` | Recommended | INFO | Request without prior explanation |
+| 70 | `require_permission_denied_handling` | Essential | WARNING | Request without denied state handling |
+| 71 | `require_permission_status_check` | Recommended | INFO | Feature usage without permission check |
+
+### Geolocator Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 72 | `require_geolocator_timeout` | Essential | WARNING | getCurrentPosition without timeLimit |
+
+### Notification Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 73 | `require_notification_handler_top_level` | Essential | ERROR | Background handler is instance method |
+| 74 | `require_notification_permission_android13` | Essential | ERROR | Notification without POST_NOTIFICATIONS |
+
+### Connectivity Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 75 | `require_connectivity_subscription_cancel` | Essential | ERROR | onConnectivityChanged without cancel |
+
+### URL Launcher Rules
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 76 | `require_url_launcher_error_handling` | Essential | WARNING | launchUrl without try-catch |
+
+### Cross-File Rules (Lower Priority)
+
+These require analysis of native configuration files:
+
+| # | Rule Name | Tier | Severity | Detection Pattern |
+|---|-----------|------|----------|-------------------|
+| 77 | `require_image_picker_permission_ios` | Essential | ERROR | image_picker without NSPhotoLibraryUsageDescription |
+| 78 | `require_image_picker_permission_android` | Essential | ERROR | Camera usage without manifest permission |
+| 79 | `require_permission_manifest_android` | Essential | ERROR | Runtime request without manifest entry |
+| 80 | `require_permission_plist_ios` | Essential | ERROR | Request without plist description |
+| 81 | `require_url_launcher_queries_android` | Essential | ERROR | Launch without manifest queries element |
+| 82 | `require_url_launcher_schemes_ios` | Essential | ERROR | canLaunchUrl without LSApplicationQueriesSchemes |
 
 ---
 
 ## Summary
 
-**Total remaining rules to implement: 61**
+**Total remaining rules to implement: 82**
 
-- Isar rules: 19
-- Dispose patterns: 7
-- Lifecycle rules: 6
-- Missing parameters: 4
-- API patterns: 14
-- Additional: 11
+- Part 1 - Isar rules: 19
+- Part 2 - Dispose patterns: 6
+- Part 3 - Lifecycle rules: 5
+- Part 4 - Missing parameters: 3
+- Part 5 - API patterns: 10
+- Part 6 - Additional: 10
+- Part 7 - Newly identified: 29 (including 6 cross-file)
 
-**Already implemented: ~46 rules** (see reference section above)
+**Already implemented: ~54 rules** (see reference section above)
 
 ---
 
@@ -214,20 +311,119 @@ More straightforward detection patterns.
 ### Wave 1: Critical Safety (Rules 1-19)
 All remaining Isar rules - prevent data corruption.
 
-### Wave 2: Memory Leaks (Rules 20-26)
+### Wave 2: Memory Leaks (Rules 20-25)
 Remaining dispose patterns - prevent memory leaks.
 
-### Wave 3: Lifecycle Bugs (Rules 27-32)
+### Wave 3: Lifecycle Bugs (Rules 26-30)
 Widget lifecycle - prevent runtime crashes.
 
-### Wave 4: Common Mistakes (Rules 33-36)
+### Wave 4: Common Mistakes (Rules 31-33)
 Missing parameters - improve UX.
 
-### Wave 5: API Patterns (Rules 37-50)
+### Wave 5: API Patterns (Rules 34-43)
 Exact API matching - enforce best practices.
 
-### Wave 6: Additional (Rules 51-61)
+### Wave 6: Additional (Rules 44-53)
 Remaining easy wins.
+
+### Wave 7: Package-Specific (Rules 54-76)
+Dio, GoRouter, Provider, Hive, SQLite, ImagePicker, Permissions, Geolocator, Notifications, Connectivity, URL Launcher.
+
+### Wave 8: Cross-File (Rules 77-82)
+Requires manifest/plist analysis - lower priority due to complexity.
+
+---
+
+## Part 8: Package-Specific Rules from saropa Project (0 remaining, 21 implemented, 36 deferred)
+
+> Generated from `analyze_pubspec.py` analysis of the saropa contacts app dependencies.
+> **Note:** 36 rules moved to ROADMAP.md "Deferred & Complex Rules" section due to heuristic/cross-file requirements.
+
+### Already Implemented (21 rules)
+
+| # | Rule Name | Location |
+|---|-----------|----------|
+| 83 | `require_google_signin_error_handling` | package_specific_rules.dart |
+| 86 | `require_apple_signin_nonce` | package_specific_rules.dart |
+| 89 | `require_supabase_error_handling` | package_specific_rules.dart |
+| 90 | `avoid_supabase_anon_key_in_code` | package_specific_rules.dart |
+| 92 | `require_supabase_realtime_unsubscribe` | package_specific_rules.dart |
+| 97 | `require_webview_navigation_delegate` | flutter_widget_rules.dart |
+| 98 | `require_webview_ssl_error_handling` | package_specific_rules.dart |
+| 100 | `avoid_webview_file_access` | package_specific_rules.dart |
+| 101 | `require_workmanager_constraints` | package_specific_rules.dart |
+| 104 | `require_workmanager_result_return` | package_specific_rules.dart |
+| 106 | `require_calendar_timezone_handling` | package_specific_rules.dart |
+| 116 | `require_keyboard_visibility_dispose` | package_specific_rules.dart |
+| 118 | `require_speech_stop_on_dispose` | package_specific_rules.dart |
+| 127 | `avoid_app_links_sensitive_params` | package_specific_rules.dart |
+| 129 | `require_envied_obfuscation` | package_specific_rules.dart |
+| 130 | `avoid_openai_key_in_code` | package_specific_rules.dart |
+| 131 | `require_openai_error_handling` | package_specific_rules.dart |
+| 135 | `require_svg_error_handler` | package_specific_rules.dart |
+| 136 | `require_google_fonts_fallback` | package_specific_rules.dart |
+| 138 | `avoid_logging_sensitive_data` | security_rules.dart |
+| 141 | `prefer_uuid_v4` | package_specific_rules.dart |
+
+### Deferred to ROADMAP.md (36 rules)
+
+The following rules require heuristic detection, cross-file analysis, or have vague detection criteria. See ROADMAP.md "Deferred: Package-Specific Rules (saropa)" section.
+
+**Heuristic/"Logout" detection (7):** 84, 85, 87, 88, 93, 94, 95, 96, 99, 137
+**"Check before use" patterns (12):** 91, 102, 103, 105, 107-115, 117, 119-126, 132-134, 142
+**Cross-file analysis (5):** 91, 102, 128, 139, 140
+
+---
+
+## Summary
+
+**Total remaining rules to implement: 82**
+
+- Part 1 - Isar rules: 19
+- Part 2 - Dispose patterns: 6
+- Part 3 - Lifecycle rules: 5
+- Part 4 - Missing parameters: 3
+- Part 5 - API patterns: 10
+- Part 6 - Additional: 10
+- Part 7 - Newly identified: 29 (including 6 cross-file)
+- ~~Part 8 - Package-specific (saropa): 0~~ *(21 implemented, 36 deferred to ROADMAP.md)*
+
+**Already implemented: ~77 rules** (see reference section above)
+**Deferred to ROADMAP.md: 36 rules** (heuristic/cross-file detection required)
+
+---
+
+## Implementation Priority
+
+### Wave 1: Critical Safety (Rules 1-19)
+All remaining Isar rules - prevent data corruption.
+
+### Wave 2: Memory Leaks (Rules 20-25)
+Remaining dispose patterns - prevent memory leaks.
+
+### Wave 3: Lifecycle Bugs (Rules 26-30)
+Widget lifecycle - prevent runtime crashes.
+
+### Wave 4: Common Mistakes (Rules 31-33)
+Missing parameters - improve UX.
+
+### Wave 5: API Patterns (Rules 34-43)
+Exact API matching - enforce best practices.
+
+### Wave 6: Additional (Rules 44-53)
+Remaining easy wins.
+
+### Wave 7: Package-Specific (Rules 54-76)
+Dio, GoRouter, Provider, Hive, SQLite, ImagePicker, Permissions, Geolocator, Notifications, Connectivity, URL Launcher.
+
+### Wave 8: Cross-File (Rules 77-82)
+Requires manifest/plist analysis - lower priority due to complexity.
+
+### Wave 9: Authentication & Security (Rules 83-100)
+Google Sign-In, Apple Sign-In, Supabase, WebView security.
+
+### Wave 10: Platform Features (Rules 101-142)
+WorkManager, Contacts, Calendar, Speech, IAP, Deep Links, Environment secrets, File handling.
 
 ---
 
@@ -236,3 +432,5 @@ Remaining easy wins.
 - Each rule should have comprehensive tests before merging
 - See [CONTRIBUTING.md](CONTRIBUTING.md) for implementation guidelines
 - Estimated effort: 1-3 hours per rule for these "easy" rules
+- Cross-file rules (77-82) may require additional infrastructure for native config analysis
+- Part 8 rules generated from real-world app analysis - high practical value

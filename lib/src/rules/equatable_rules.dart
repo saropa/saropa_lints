@@ -111,7 +111,7 @@ class ExtendEquatableRule extends SaropaLintRule {
 
 /// Warns when an Equatable subclass has fields not listed in props.
 ///
-/// Alias: missing_props_field, equatable_props_incomplete
+/// Alias: require_equatable_all_fields_in_props, missing_props_field, equatable_props_incomplete
 ///
 /// All fields should be included in props for correct equality comparison.
 /// Missing fields can lead to subtle equality bugs.

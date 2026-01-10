@@ -345,6 +345,8 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
 
 /// Warns when WebSocket is not closed on dispose.
 ///
+/// Alias: require_web_socket_close
+///
 /// WebSocket connections should be closed when the widget or service
 /// is disposed to prevent resource leaks.
 ///
