@@ -1295,3 +1295,124 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when TextField at bottom of screen doesn't handle keyboard overlap.
+///
+/// When keyboard appears, TextFields at the bottom can be hidden.
+/// Use viewInsets or resizeToAvoidBottomInset to handle this.
+///
+/// **BAD:**
+/// ```dart
+/// Scaffold(
+///   body: Column(
+///     children: [
+///       Spacer(),
+///       TextField(), // Hidden when keyboard shows
+///     ],
+///   ),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Scaffold(
+///   resizeToAvoidBottomInset: true,
+///   body: SingleChildScrollView(
+///     child: Column(
+///       children: [
+///         Spacer(),
+///         TextField(),
+///       ],
+///     ),
+///   ),
+/// );
+/// ```
+///
+/// **ALSO GOOD:**
+/// ```dart
+/// Padding(
+///   padding: EdgeInsets.only(
+///     bottom: MediaQuery.of(context).viewInsets.bottom,
+///   ),
+///   child: TextField(),
+/// );
+/// ```
+class AvoidKeyboardOverlapRule extends SaropaLintRule {
+  const AvoidKeyboardOverlapRule() : super(code: _code);
+
+  /// UX issue - form fields hidden by keyboard.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_keyboard_overlap',
+    problemMessage:
+        'TextField may be hidden by keyboard. No viewInsets handling found.',
+    correctionMessage:
+        'Use SingleChildScrollView or handle MediaQuery.viewInsets.bottom.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'TextField' && typeName != 'TextFormField') {
+        return;
+      }
+
+      // Check if inside a Column with positioning at bottom
+      AstNode? current = node.parent;
+      bool inColumn = false;
+      bool hasScrollParent = false;
+
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final parentType = current.constructorName.type.name.lexeme;
+
+          if (parentType == 'Column') {
+            inColumn = true;
+          }
+          if (parentType == 'SingleChildScrollView' ||
+              parentType == 'ListView' ||
+              parentType == 'CustomScrollView') {
+            hasScrollParent = true;
+          }
+        }
+        if (current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (!inColumn) {
+        return;
+      }
+
+      if (hasScrollParent) {
+        return;
+      }
+
+      // Check method for viewInsets handling
+      current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          final methodSource = current.toSource().toLowerCase();
+          if (methodSource.contains('viewinsets') ||
+              methodSource.contains('resizetobottominset')) {
+            return;
+          }
+          break;
+        }
+        current = current.parent;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}

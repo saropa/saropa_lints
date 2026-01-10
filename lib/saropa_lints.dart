@@ -1248,6 +1248,132 @@ const List<LintRule> _allRules = <LintRule>[
   PreferTestVariantRule(),
   RequireAccessibilityTestsRule(),
   RequireAnimationTestsRule(),
+
+  // Part 5 - SharedPreferences Security rules
+  AvoidSharedPrefsSensitiveDataRule(),
+  RequireSecureStorageForAuthRule(),
+  RequireSharedPrefsNullHandlingRule(),
+  RequireSharedPrefsKeyConstantsRule(),
+
+  // Part 5 - sqflite Database rules
+  RequireSqfliteWhereArgsRule(),
+  RequireSqfliteTransactionRule(),
+  RequireSqfliteErrorHandlingRule(),
+  PreferSqfliteBatchRule(),
+  RequireSqfliteCloseRule(),
+
+  // Part 5 - Hive Database rules
+  RequireHiveInitializationRule(),
+  RequireHiveTypeAdapterRule(),
+  RequireHiveBoxCloseRule(),
+  PreferHiveEncryptionRule(),
+  RequireHiveEncryptionKeySecureRule(),
+
+  // Part 5 - Dio HTTP Client rules
+  RequireDioTimeoutRule(),
+  RequireDioErrorHandlingRule(),
+  RequireDioInterceptorErrorHandlerRule(),
+  PreferDioCancelTokenRule(),
+  RequireDioSslPinningRule(),
+  AvoidDioFormDataLeakRule(),
+
+  // Part 5 - Stream/Future rules
+  AvoidStreamInBuildRule(),
+  RequireStreamControllerCloseRule(),
+  AvoidMultipleStreamListenersRule(),
+  RequireStreamErrorHandlingRule(),
+  AvoidFutureBuilderRebuildRule(),
+  RequireFutureTimeoutRule(),
+
+  // Part 5 - go_router Navigation rules
+  AvoidGoRouterInlineCreationRule(),
+  RequireGoRouterErrorHandlerRule(),
+  RequireGoRouterRefreshListenableRule(),
+  AvoidGoRouterStringPathsRule(),
+
+  // Part 5 - Riverpod rules
+  RequireRiverpodErrorHandlingRule(),
+  AvoidRiverpodStateMutationRule(),
+  PreferRiverpodSelectRule(),
+
+  // Part 5 - cached_network_image rules
+  RequireCachedImageDimensionsRule(),
+  RequireCachedImagePlaceholderRule(),
+  RequireCachedImageErrorWidgetRule(),
+
+  // Part 5 - Geolocator rules
+  RequireGeolocatorPermissionCheckRule(),
+  RequireGeolocatorServiceEnabledRule(),
+  RequireGeolocatorStreamCancelRule(),
+  RequireGeolocatorErrorHandlingRule(),
+
+  // Part 6 - State Management rules
+  AvoidYieldInOnEventRule(),
+  PreferConsumerOverProviderOfRule(),
+  AvoidListenInAsyncRule(),
+  PreferGetxBuilderRule(),
+  EmitNewBlocStateInstancesRule(),
+  AvoidBlocPublicFieldsRule(),
+  AvoidBlocPublicMethodsRule(),
+  RequireAsyncValueOrderRule(),
+  RequireBlocSelectorRule(),
+  PreferSelectorRule(),
+  RequireGetxBindingRule(),
+
+  // Part 6 - Theming rules
+  RequireDarkModeTestingRule(),
+  AvoidElevationOpacityInDarkRule(),
+  PreferThemeExtensionsRule(),
+
+  // Part 6 - UI/UX rules
+  PreferSkeletonOverSpinnerRule(),
+  RequireEmptyResultsStateRule(),
+  RequireSearchLoadingIndicatorRule(),
+  RequireSearchDebounceRule(),
+  RequirePaginationLoadingStateRule(),
+
+  // Part 6 - Lifecycle rules
+  AvoidWorkInPausedStateRule(),
+  RequireResumeStateRefreshRule(),
+
+  // Part 6 - Security rules
+  RequireUrlValidationRule(),
+  AvoidRedirectInjectionRule(),
+  AvoidExternalStorageSensitiveRule(),
+  PreferLocalAuthRule(),
+
+  // Part 6 - Firebase rules
+  RequireCrashlyticsUserIdRule(),
+  RequireFirebaseAppCheckRule(),
+  AvoidStoringUserDataInAuthRule(),
+
+  // Part 6 - Collection/Performance rules
+  PreferNullAwareElementsRule(),
+  PreferIterableOperationsRule(),
+  PreferInheritedWidgetCacheRule(),
+  PreferLayoutBuilderOverMediaQueryRule(),
+
+  // Part 6 - Flutter Widget rules
+  RequireShouldRebuildRule(),
+  RequireOrientationHandlingRule(),
+  RequireWebRendererAwarenessRule(),
+
+  // Part 6 - Additional rules
+  RequireExifHandlingRule(),
+  RequireRefreshIndicatorOnListsRule(),
+  PreferAdaptiveDialogRule(),
+  RequireSnackbarActionForUndoRule(),
+  RequireContentTypeCheckRule(),
+  AvoidWebsocketWithoutHeartbeatRule(),
+  AvoidKeyboardOverlapRule(),
+  RequireLocationTimeoutRule(),
+  PreferCameraResolutionSelectionRule(),
+  PreferAudioSessionConfigRule(),
+  PreferDotShorthandRule(),
+  AvoidTouchOnlyGesturesRule(),
+  RequireFutureWaitErrorHandlingRule(),
+  RequireStreamOnDoneRule(),
+  RequireCompleterErrorHandlingRule(),
 ];
 
 class _SaropaLints extends PluginBase {

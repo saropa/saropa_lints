@@ -6822,3 +6822,767 @@ class _NullReturnVisitor extends RecursiveAstVisitor<void> {
     super.visitNullLiteral(node);
   }
 }
+
+// =============================================================================
+// Part 6 Rules: Additional State Management Rules
+// =============================================================================
+
+/// Warns when yield is used inside Bloc event handler.
+///
+/// In Bloc 8.0+, yield was replaced with emit(). Using yield in on<Event>
+/// handlers is deprecated and won't work correctly.
+///
+/// **BAD:**
+/// ```dart
+/// on<MyEvent>((event, emit) async* {
+///   yield LoadingState();  // Wrong!
+///   yield LoadedState();
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// on<MyEvent>((event, emit) async {
+///   emit(LoadingState());
+///   emit(LoadedState());
+/// });
+/// ```
+class AvoidYieldInOnEventRule extends SaropaLintRule {
+  const AvoidYieldInOnEventRule() : super(code: _code);
+
+  /// Using yield in Bloc handlers is deprecated and broken.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_yield_in_on_event',
+    problemMessage: 'yield in Bloc event handler. Use emit() instead.',
+    correctionMessage: 'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addYieldStatement((YieldStatement node) {
+      // Check if inside on<Event> handler
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodInvocation) {
+          final String methodName = current.methodName.name;
+          if (methodName == 'on') {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+        if (current is ClassDeclaration) break;
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when Provider.of<T>(context) is used in build method.
+///
+/// Provider.of rebuilds on every change. Use Consumer or context.watch
+/// for more granular rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final user = Provider.of<User>(context);
+///   return Text(user.name);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return Consumer<User>(
+///     builder: (context, user, child) => Text(user.name),
+///   );
+/// }
+/// ```
+class PreferConsumerOverProviderOfRule extends SaropaLintRule {
+  const PreferConsumerOverProviderOfRule() : super(code: _code);
+
+  /// Provider.of causes unnecessary rebuilds compared to Consumer.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_consumer_over_provider_of',
+    problemMessage: 'Provider.of in build. Use Consumer for granular rebuilds.',
+    correctionMessage: 'Replace with Consumer<T> or context.select() for better performance.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Provider.of
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Provider') return;
+      if (node.methodName.name != 'of') return;
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when context.watch() is used inside async callback.
+///
+/// watch() subscribes to changes and should only be used synchronously
+/// in build. Using it in async callbacks causes subscription leaks.
+///
+/// **BAD:**
+/// ```dart
+/// onPressed: () async {
+///   final data = context.watch<MyData>();  // Wrong!
+///   await doSomething(data);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// onPressed: () async {
+///   final data = context.read<MyData>();  // Correct
+///   await doSomething(data);
+/// }
+/// ```
+class AvoidListenInAsyncRule extends SaropaLintRule {
+  const AvoidListenInAsyncRule() : super(code: _code);
+
+  /// watch() in async callbacks causes subscription leaks.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_listen_in_async',
+    problemMessage: 'context.watch() in async callback. Use read() instead.',
+    correctionMessage: 'Replace watch() with read() in async callbacks.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'watch') return;
+
+      // Check if target is context
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('context')) return;
+
+      // Check if inside async function
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionExpression) {
+          if (current.body.isAsynchronous) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+        if (current is MethodDeclaration) {
+          if (current.body.isAsynchronous) {
+            // Only report if not in build method
+            if (current.name.lexeme != 'build') {
+              reporter.atNode(node, code);
+            }
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when .obs property is accessed without Obx wrapper.
+///
+/// GetX reactive variables (.obs) must be inside Obx/GetX builder
+/// to trigger rebuilds. Direct access won't update the UI.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(context) {
+///   return Text(controller.count.value.toString());  // No rebuild!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(context) {
+///   return Obx(() => Text(controller.count.value.toString()));
+/// }
+/// ```
+class PreferGetxBuilderRule extends SaropaLintRule {
+  const PreferGetxBuilderRule() : super(code: _code);
+
+  /// Accessing .obs without Obx won't trigger UI rebuilds.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_getx_builder',
+    problemMessage: '.obs value accessed without Obx wrapper. UI won\'t rebuild.',
+    correctionMessage: 'Wrap in Obx(() => ...) to enable reactive updates.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name != 'value') return;
+
+      // Check if target ends with .obs pattern
+      final Expression target = node.target!;
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('.obs') &&
+          !targetSource.contains('Rx') &&
+          !targetSource.contains('rx')) {
+        return;
+      }
+
+      // Check if inside build method but NOT inside Obx
+      bool insideBuild = false;
+      bool insideObx = false;
+
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          insideBuild = true;
+        }
+        if (current is MethodInvocation) {
+          final String methodName = current.methodName.name;
+          if (methodName == 'Obx' || methodName == 'GetX' || methodName == 'GetBuilder') {
+            insideObx = true;
+          }
+        }
+        if (current is InstanceCreationExpression) {
+          final String typeName = current.constructorName.type.name.lexeme;
+          if (typeName == 'Obx' || typeName == 'GetX' || typeName == 'GetBuilder') {
+            insideObx = true;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (insideBuild && !insideObx) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Bloc state is mutated with cascade instead of new instance.
+///
+/// Bloc states should be immutable. Using cascade (..) to mutate existing
+/// state breaks Bloc's equality comparison and causes missed rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// emit(state..items.add(newItem));  // Mutation!
+/// emit(state..count = newCount);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// emit(state.copyWith(items: [...state.items, newItem]));
+/// emit(MyState(count: newCount));
+/// ```
+class EmitNewBlocStateInstancesRule extends SaropaLintRule {
+  const EmitNewBlocStateInstancesRule() : super(code: _code);
+
+  /// State mutation breaks Bloc equality and causes bugs.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'emit_new_bloc_state_instances',
+    problemMessage: 'State mutated with cascade. Emit new instance instead.',
+    correctionMessage: 'Use copyWith() or constructor to create new state.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'emit') return;
+
+      // Check argument for cascade expression
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression arg = args.first;
+      if (arg is CascadeExpression) {
+        // Check if target is 'state'
+        final String targetSource = arg.target.toSource();
+        if (targetSource == 'state') {
+          reporter.atNode(arg, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Bloc has public non-final fields.
+///
+/// Bloc internals should be private. Public fields expose implementation
+/// details and allow external modification of state.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   int counter = 0;  // Public mutable field
+///   List<Item> items = [];
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   int _counter = 0;  // Private
+///   final List<Item> _items = [];
+/// }
+/// ```
+class AvoidBlocPublicFieldsRule extends SaropaLintRule {
+  const AvoidBlocPublicFieldsRule() : super(code: _code);
+
+  /// Public fields expose Bloc internals and break encapsulation.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_public_fields',
+    problemMessage: 'Public field in Bloc. Keep internals private.',
+    correctionMessage: 'Make field private (_fieldName) or final.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Bloc or Cubit
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check for public non-final fields
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          // Skip if private (starts with _)
+          for (final VariableDeclaration field in member.fields.variables) {
+            final String fieldName = field.name.lexeme;
+            if (!fieldName.startsWith('_') && !member.fields.isFinal) {
+              reporter.atNode(field, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Bloc has public methods other than add().
+///
+/// Bloc should only expose add() for events. Other public methods
+/// break the event-driven architecture and make testing harder.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   void loadData() { ... }  // Direct method call!
+///   void reset() { ... }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   // Use events instead
+///   // bloc.add(LoadDataEvent());
+///   // bloc.add(ResetEvent());
+/// }
+/// ```
+class AvoidBlocPublicMethodsRule extends SaropaLintRule {
+  const AvoidBlocPublicMethodsRule() : super(code: _code);
+
+  /// Public methods bypass Bloc's event-driven architecture.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_public_methods',
+    problemMessage: 'Public method in Bloc. Use events via add() instead.',
+    correctionMessage: 'Convert to event class and handle in on<Event>().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _allowedMethods = <String>{
+    'add',
+    'close',
+    'emit',
+    'on',
+    'onChange',
+    'onError',
+    'onEvent',
+    'onTransition',
+    'toString',
+    'hashCode',
+    'noSuchMethod',
+    'runtimeType',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Bloc
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc') return;
+
+      // Check for public methods
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration) {
+          final String methodName = member.name.lexeme;
+          // Skip private, allowed, and overrides
+          if (methodName.startsWith('_')) continue;
+          if (_allowedMethods.contains(methodName)) continue;
+          if (member.metadata.any((a) => a.name.name == 'override')) continue;
+
+          reporter.atToken(member.name, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when AsyncValue.when() has incorrect parameter order.
+///
+/// The standard order is data, error, loading. Incorrect order makes
+/// code harder to read and may indicate confusion about the API.
+///
+/// **BAD:**
+/// ```dart
+/// asyncValue.when(
+///   loading: () => CircularProgressIndicator(),
+///   error: (e, s) => ErrorWidget(e),
+///   data: (d) => DataWidget(d),  // Wrong order
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// asyncValue.when(
+///   data: (d) => DataWidget(d),
+///   error: (e, s) => ErrorWidget(e),
+///   loading: () => CircularProgressIndicator(),
+/// );
+/// ```
+class RequireAsyncValueOrderRule extends SaropaLintRule {
+  const RequireAsyncValueOrderRule() : super(code: _code);
+
+  /// Consistent ordering improves code readability.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_async_value_order',
+    problemMessage: 'AsyncValue.when() has non-standard parameter order.',
+    correctionMessage: 'Use order: data, error, loading for consistency.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'when') return;
+
+      // Check named arguments order
+      final List<String> paramOrder = <String>[];
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'data' || name == 'error' || name == 'loading') {
+            paramOrder.add(name);
+          }
+        }
+      }
+
+      // Expected order: data, error, loading
+      if (paramOrder.length == 3) {
+        if (paramOrder[0] != 'data' ||
+            paramOrder[1] != 'error' ||
+            paramOrder[2] != 'loading') {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when BlocBuilder accesses only one field from state.
+///
+/// Using BlocSelector instead of BlocBuilder when you only need one
+/// field prevents unnecessary rebuilds when other fields change.
+///
+/// **BAD:**
+/// ```dart
+/// BlocBuilder<MyBloc, MyState>(
+///   builder: (context, state) {
+///     return Text(state.name);  // Only uses one field
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// BlocSelector<MyBloc, MyState, String>(
+///   selector: (state) => state.name,
+///   builder: (context, name) {
+///     return Text(name);
+///   },
+/// )
+/// ```
+class RequireBlocSelectorRule extends SaropaLintRule {
+  const RequireBlocSelectorRule() : super(code: _code);
+
+  /// BlocSelector provides more targeted rebuilds.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_selector',
+    problemMessage:
+        'BlocBuilder accessing single field. Use BlocSelector instead.',
+    correctionMessage:
+        'Replace with BlocSelector for targeted rebuilds on specific field.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'BlocBuilder') return;
+
+      // Find builder parameter
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final Expression builderExpr = arg.expression;
+          if (builderExpr is FunctionExpression) {
+            // Count state property accesses
+            final _StateAccessCounter counter = _StateAccessCounter();
+            builderExpr.body.accept(counter);
+
+            // If only one unique field is accessed, suggest BlocSelector
+            if (counter.accessedFields.length == 1 && counter.accessCount <= 2) {
+              reporter.atNode(node, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+class _StateAccessCounter extends RecursiveAstVisitor<void> {
+  final Set<String> accessedFields = <String>{};
+  int accessCount = 0;
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier && target.name == 'state') {
+      accessedFields.add(node.propertyName.name);
+      accessCount++;
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (node.prefix.name == 'state') {
+      accessedFields.add(node.identifier.name);
+      accessCount++;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+}
+
+/// Warns when context.watch<T>() is used without select().
+///
+/// watch() rebuilds on any change to the provider. Using select()
+/// limits rebuilds to specific property changes.
+///
+/// **BAD:**
+/// ```dart
+/// final user = context.watch<UserNotifier>().user;
+/// // Rebuilds on ANY UserNotifier change
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final user = context.select<UserNotifier, User>((n) => n.user);
+/// // Only rebuilds when user changes
+/// ```
+class PreferSelectorRule extends SaropaLintRule {
+  const PreferSelectorRule() : super(code: _code);
+
+  /// select() provides more granular rebuild control.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_selector',
+    problemMessage:
+        'context.watch() accessing property. Use select() for efficiency.',
+    correctionMessage:
+        'Replace with context.select((notifier) => notifier.field).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      // Check if target is context.watch()
+      final Expression? target = node.target;
+      if (target is! MethodInvocation) return;
+
+      if (target.methodName.name != 'watch') return;
+
+      // Check if called on context
+      final Expression? watchTarget = target.target;
+      if (watchTarget == null) return;
+      final String watchTargetSource = watchTarget.toSource().toLowerCase();
+      if (!watchTargetSource.contains('context')) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when GetxController is used without proper Binding registration.
+///
+/// GetX controllers should be registered via Bindings for proper
+/// lifecycle management and dependency injection.
+///
+/// **BAD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   // Used directly without binding
+/// }
+///
+/// // In widget:
+/// final controller = Get.put(MyController());
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBinding extends Bindings {
+///   @override
+///   void dependencies() {
+///     Get.lazyPut(() => MyController());
+///   }
+/// }
+///
+/// // In route:
+/// GetPage(name: '/my', page: () => MyPage(), binding: MyBinding());
+/// ```
+class RequireGetxBindingRule extends SaropaLintRule {
+  const RequireGetxBindingRule() : super(code: _code);
+
+  /// Architecture issue - improper dependency management.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_getx_binding',
+    problemMessage:
+        'Get.put() in widget. Consider using Bindings for lifecycle management.',
+    correctionMessage:
+        'Create a Binding class and register via GetPage binding parameter.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Get.put() or Get.find()
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Get') return;
+
+      if (node.methodName.name != 'put') return;
+
+      // Check if inside a widget build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}

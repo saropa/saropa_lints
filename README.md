@@ -5,7 +5,7 @@
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
-[![rules](https://img.shields.io/badge/rules-985%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+[![rules](https://img.shields.io/badge/rules-1075%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -53,19 +53,21 @@ Saropa Lints detects these patterns and hundreds more:
 
 **Accuracy focused**: Rules use proper AST type checking instead of string matching, reducing false positives on variable names like "upstream" or "spinning".
 
-### Essential for reactive libraries
+### Essential for popular packages
 
-If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, or **Isar**, these audits are critical. These libraries are powerful but have patterns that fail silently at runtime:
+If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, or **Firebase**, these audits are critical. These libraries are powerful but have patterns that fail silently at runtime:
 
 | Library | Common issues caught | Guide |
 |---------|---------------------|-------|
-| **GetX** | Undisposed controllers, memory leaks from listeners | [Using with GetX](doc/guides/using_with_getx.md) |
+| **GetX** | Undisposed controllers, memory leaks from workers, missing super calls | [Using with GetX](doc/guides/using_with_getx.md) |
 | **Riverpod** | Circular provider deps, ref.read() in build, missing ProviderScope | [Using with Riverpod](doc/guides/using_with_riverpod.md) |
 | **Provider** | Provider.of in build causing rebuilds, recreated providers losing state | [Using with Provider](doc/guides/using_with_provider.md) |
 | **Bloc** | Events in constructor, mutable state, unclosed Blocs, BlocListener in build | [Using with Bloc](doc/guides/using_with_bloc.md) |
 | **Isar** | Enum fields causing data corruption on schema changes | [Using with Isar](doc/guides/using_with_isar.md) |
+| **Hive** | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues | [Using with Hive](doc/guides/using_with_hive.md) |
+| **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
-Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 20+ rules specifically for state management anti-patterns that cause crashes, memory leaks, and data corruption in production.
+Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production.
 
 ### Why it matters
 
@@ -77,7 +79,7 @@ These aren't edge cases. They're compliance requirements and security basics tha
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 985+ when you're ready.
+The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1075+ when you're ready.
 
 ---
 
@@ -139,7 +141,7 @@ Pick the tier that matches your team:
 
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 985+ rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1075+ rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
@@ -518,15 +520,30 @@ Contact: [saropa.com](https://saropa.com) | [lints@saropa.com](mailto:lints@saro
 | [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md) | Security policy and reporting vulnerabilities |
 | [ENTERPRISE.md](https://github.com/saropa/saropa_lints/blob/main/ENTERPRISE.md) | Professional services and custom rules |
 
-### State Management Guides
+### Package Integration Guides
 
-| Library | Guide |
-|---------|-------|
-| Riverpod | [Using with Riverpod](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_riverpod.md) |
-| Bloc | [Using with Bloc](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_bloc.md) |
-| Provider | [Using with Provider](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_provider.md) |
-| GetX | [Using with GetX](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_getx.md) |
-| Isar | [Using with Isar](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_isar.md) |
+We provide specialized lint rules for popular Flutter packages. These catch library-specific anti-patterns that standard linters miss.
+
+| Category | Package | Guide |
+|----------|---------|-------|
+| **State Management** | Riverpod | [Using with Riverpod](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_riverpod.md) |
+| | Bloc | [Using with Bloc](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_bloc.md) |
+| | Provider | [Using with Provider](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_provider.md) |
+| | GetX | [Using with GetX](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_getx.md) |
+| **Databases** | Isar | [Using with Isar](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_isar.md) |
+| | Hive | [Using with Hive](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_hive.md) |
+| **Backend Services** | Firebase | [Using with Firebase](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_firebase.md) |
+
+#### For Package Authors
+
+**Want lint rules for your package?** We'd love to collaborate with package maintainers to add rules that catch common gotchas and enforce best practices for your library.
+
+Benefits:
+- Help users avoid common mistakes with your package
+- Reduce support burden from preventable issues
+- Improve developer experience with your library
+
+Contact us via [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) or open an issue to discuss adding rules for your package.
 
 ## Badge
 
@@ -560,7 +577,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 985+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1075+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

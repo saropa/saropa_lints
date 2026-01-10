@@ -572,3 +572,79 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when GestureDetector only handles touch gestures.
+///
+/// Desktop and web apps support secondary click (right-click) and hover.
+/// Touch-only gesture handlers reduce accessibility on these platforms.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: () => selectItem(),
+///   child: ListTile(...),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: () => selectItem(),
+///   onSecondaryTap: () => showContextMenu(),
+///   onLongPress: () => showContextMenu(), // Mobile fallback
+///   child: ListTile(...),
+/// );
+/// ```
+class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
+  const AvoidTouchOnlyGesturesRule() : super(code: _code);
+
+  /// Accessibility issue on desktop/web platforms.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_touch_only_gestures',
+    problemMessage:
+        'GestureDetector with only onTap. Missing desktop/web interactions.',
+    correctionMessage:
+        'Add onSecondaryTap for right-click and consider hover states.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'GestureDetector' && typeName != 'InkWell') {
+        return;
+      }
+
+      bool hasOnTap = false;
+      bool hasSecondaryOrHover = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final name = arg.name.label.name;
+          if (name == 'onTap' || name == 'onTapDown') {
+            hasOnTap = true;
+          }
+          if (name == 'onSecondaryTap' ||
+              name == 'onSecondaryTapDown' ||
+              name == 'onHover' ||
+              name == 'onLongPress') {
+            hasSecondaryOrHover = true;
+          }
+        }
+      }
+
+      if (hasOnTap && !hasSecondaryOrHover) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

@@ -14989,3 +14989,254 @@ class _ReplaceWithVoidCallbackFix extends DartFix {
     });
   }
 }
+
+/// Warns when InheritedWidget doesn't override updateShouldNotify.
+///
+/// Without updateShouldNotify, dependent widgets rebuild on every
+/// ancestor rebuild, even when the inherited data hasn't changed.
+///
+/// **BAD:**
+/// ```dart
+/// class MyInherited extends InheritedWidget {
+///   final String data;
+///   const MyInherited({required this.data, required Widget child})
+///       : super(child: child);
+///   // Missing updateShouldNotify!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyInherited extends InheritedWidget {
+///   final String data;
+///   const MyInherited({required this.data, required Widget child})
+///       : super(child: child);
+///
+///   @override
+///   bool updateShouldNotify(MyInherited oldWidget) {
+///     return data != oldWidget.data;
+///   }
+/// }
+/// ```
+class RequireShouldRebuildRule extends SaropaLintRule {
+  const RequireShouldRebuildRule() : super(code: _code);
+
+  /// Performance issue - unnecessary rebuilds.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_should_rebuild',
+    problemMessage:
+        'InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds.',
+    correctionMessage:
+        'Override updateShouldNotify to control when dependents rebuild.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((node) {
+      // Check if extends InheritedWidget
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) {
+        return;
+      }
+
+      final superName = extendsClause.superclass.name2.lexeme;
+      if (superName != 'InheritedWidget' &&
+          superName != 'InheritedNotifier' &&
+          superName != 'InheritedModel') {
+        return;
+      }
+
+      // Check if updateShouldNotify is overridden
+      bool hasOverride = false;
+      for (final member in node.members) {
+        if (member is MethodDeclaration) {
+          if (member.name.lexeme == 'updateShouldNotify') {
+            hasOverride = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasOverride) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when app doesn't handle device orientation.
+///
+/// Apps should either lock orientation or adapt layout for both
+/// portrait and landscape modes using OrientationBuilder.
+///
+/// **BAD:**
+/// ```dart
+/// // App with no orientation handling - may break in landscape
+/// MaterialApp(home: MyHomePage());
+/// ```
+///
+/// **GOOD (lock orientation):**
+/// ```dart
+/// void main() {
+///   SystemChrome.setPreferredOrientations([
+///     DeviceOrientation.portraitUp,
+///   ]);
+///   runApp(MyApp());
+/// }
+/// ```
+///
+/// **ALSO GOOD (adapt to orientation):**
+/// ```dart
+/// OrientationBuilder(
+///   builder: (context, orientation) {
+///     return orientation == Orientation.portrait
+///         ? PortraitLayout()
+///         : LandscapeLayout();
+///   },
+/// );
+/// ```
+class RequireOrientationHandlingRule extends SaropaLintRule {
+  const RequireOrientationHandlingRule() : super(code: _code);
+
+  /// UX issue - broken layouts in certain orientations.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_orientation_handling',
+    problemMessage:
+        'MaterialApp without orientation handling. May break in landscape.',
+    correctionMessage:
+        'Use SystemChrome.setPreferredOrientations or OrientationBuilder.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name2.lexeme;
+
+      if (typeName != 'MaterialApp' && typeName != 'CupertinoApp') {
+        return;
+      }
+
+      // Check the file for orientation handling
+      final unit = node.thisOrAncestorOfType<CompilationUnit>();
+      if (unit == null) {
+        return;
+      }
+
+      final fileSource = unit.toSource();
+
+      // Check for orientation handling patterns
+      if (fileSource.contains('setPreferredOrientations') ||
+          fileSource.contains('OrientationBuilder') ||
+          fileSource.contains('MediaQuery') &&
+              fileSource.contains('orientation')) {
+        return;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+/// Warns when kIsWeb is used without considering renderer type.
+///
+/// Flutter web has different renderers (HTML, CanvasKit, Skia) with
+/// different capabilities. Code assuming one renderer may fail on others.
+///
+/// **BAD:**
+/// ```dart
+/// if (kIsWeb) {
+///   // Assumes HTML renderer capabilities
+///   html.window.localStorage['key'] = value;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (kIsWeb) {
+///   // Check renderer if using renderer-specific features
+///   if (isCanvasKit) {
+///     // CanvasKit-specific code
+///   } else {
+///     // HTML renderer code
+///   }
+/// }
+/// ```
+///
+/// **Note:** This is an INFO-level reminder. Not all web code is
+/// renderer-dependent.
+class RequireWebRendererAwarenessRule extends SaropaLintRule {
+  const RequireWebRendererAwarenessRule() : super(code: _code);
+
+  /// Platform compatibility issue.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_web_renderer_awareness',
+    problemMessage:
+        'kIsWeb check without renderer consideration. Behavior may vary.',
+    correctionMessage:
+        'Consider if code depends on HTML vs CanvasKit renderer.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIfStatement((node) {
+      // Check if condition uses kIsWeb
+      final conditionSource = node.expression.toSource();
+      if (!conditionSource.contains('kIsWeb')) {
+        return;
+      }
+
+      // Check if body uses renderer-specific APIs
+      final bodySource = node.thenStatement.toSource().toLowerCase();
+
+      // HTML-specific patterns
+      final htmlPatterns = [
+        'html.',
+        'dart:html',
+        'window.',
+        'document.',
+        'localstorage',
+        'sessionstorage',
+      ];
+
+      final usesHtmlApis = htmlPatterns.any((p) => bodySource.contains(p));
+
+      if (!usesHtmlApis) {
+        return;
+      }
+
+      // Check if there's renderer awareness
+      final blockSource = node.toSource().toLowerCase();
+      if (blockSource.contains('canvaskit') ||
+          blockSource.contains('renderer') ||
+          blockSource.contains('skwasm')) {
+        return;
+      }
+
+      reporter.atNode(node.expression, code);
+    });
+  }
+}

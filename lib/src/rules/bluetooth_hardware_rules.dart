@@ -448,3 +448,284 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 5 Rules: Geolocator Rules
+// =============================================================================
+
+/// Warns when Geolocator is used without permission check.
+///
+/// Location access without permission check crashes on iOS and throws on Android.
+///
+/// **BAD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final permission = await Geolocator.checkPermission();
+/// if (permission == LocationPermission.denied) {
+///   permission = await Geolocator.requestPermission();
+/// }
+/// if (permission == LocationPermission.deniedForever) {
+///   return; // Handle denial
+/// }
+/// final position = await Geolocator.getCurrentPosition();
+/// ```
+class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
+  const RequireGeolocatorPermissionCheckRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_geolocator_permission_check',
+    problemMessage:
+        'Location access without permission check. Crashes on iOS.',
+    correctionMessage:
+        'Call Geolocator.checkPermission() before getCurrentPosition().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getPositionStream') {
+        return;
+      }
+
+      // Check if target is Geolocator
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
+
+      // Check if there's a permission check in the enclosing function
+      AstNode? current = node.parent;
+      FunctionBody? enclosingBody;
+
+      while (current != null) {
+        if (current is FunctionBody) {
+          enclosingBody = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingBody == null) return;
+
+      final String bodySource = enclosingBody.toSource();
+      if (!bodySource.contains('checkPermission') &&
+          !bodySource.contains('requestPermission')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Geolocator is used without checking if service is enabled.
+///
+/// Location service can be disabled. Check before requesting position.
+///
+/// **BAD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+/// if (!serviceEnabled) {
+///   return; // Handle disabled service
+/// }
+/// final position = await Geolocator.getCurrentPosition();
+/// ```
+class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
+  const RequireGeolocatorServiceEnabledRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_geolocator_service_enabled',
+    problemMessage:
+        'Location request without service check. May fail if GPS is off.',
+    correctionMessage:
+        'Call Geolocator.isLocationServiceEnabled() first.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'getCurrentPosition') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
+
+      // Check for service enabled check
+      AstNode? current = node.parent;
+      FunctionBody? enclosingBody;
+
+      while (current != null) {
+        if (current is FunctionBody) {
+          enclosingBody = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingBody == null) return;
+
+      final String bodySource = enclosingBody.toSource();
+      if (!bodySource.contains('isLocationServiceEnabled')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when getPositionStream subscription is not cancelled.
+///
+/// Stream subscriptions must be cancelled to stop location updates.
+///
+/// **BAD:**
+/// ```dart
+/// Geolocator.getPositionStream().listen((position) {...});
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late StreamSubscription<Position> _subscription;
+///
+/// void initState() {
+///   _subscription = Geolocator.getPositionStream().listen(...);
+/// }
+///
+/// void dispose() {
+///   _subscription.cancel();
+///   super.dispose();
+/// }
+/// ```
+class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
+  const RequireGeolocatorStreamCancelRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_geolocator_stream_cancel',
+    problemMessage:
+        'Position stream subscription without cancel. Battery drain.',
+    correctionMessage:
+        'Store subscription and call cancel() in dispose().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'listen') return;
+
+      // Check if target is getPositionStream
+      final Expression? target = node.target;
+      if (target is! MethodInvocation) return;
+
+      if (target.methodName.name != 'getPositionStream') return;
+
+      // Check if target is Geolocator
+      final Expression? geoTarget = target.target;
+      if (geoTarget is! SimpleIdentifier || geoTarget.name != 'Geolocator') {
+        return;
+      }
+
+      // Check if result is assigned to a variable
+      AstNode? parent = node.parent;
+      if (parent is! VariableDeclaration &&
+          parent is! AssignmentExpression) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Geolocator requests are made without error handling.
+///
+/// Location requests can fail. Always handle errors gracefully.
+///
+/// **BAD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   final position = await Geolocator.getCurrentPosition();
+/// } catch (e) {
+///   handleLocationError(e);
+/// }
+/// ```
+class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
+  const RequireGeolocatorErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_geolocator_error_handling',
+    problemMessage:
+        'Location request without error handling. May crash on failure.',
+    correctionMessage:
+        'Wrap in try-catch to handle location errors.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getLastKnownPosition') {
+        return;
+      }
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
+
+      // Check if inside try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return;
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}

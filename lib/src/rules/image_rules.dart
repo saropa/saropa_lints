@@ -728,3 +728,269 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 5 Rules: cached_network_image Rules
+// =============================================================================
+
+/// Warns when CachedNetworkImage is used without memory cache dimensions.
+///
+/// Large images without cache dimensions cause OOM errors. Always specify
+/// memCacheWidth or memCacheHeight.
+///
+/// **BAD:**
+/// ```dart
+/// CachedNetworkImage(imageUrl: url)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: url,
+///   memCacheWidth: 300,
+///   memCacheHeight: 300,
+/// )
+/// ```
+class RequireCachedImageDimensionsRule extends SaropaLintRule {
+  const RequireCachedImageDimensionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_cached_image_dimensions',
+    problemMessage:
+        'CachedNetworkImage without cache dimensions. Large images cause OOM.',
+    correctionMessage:
+        'Add memCacheWidth/memCacheHeight to limit decoded image size.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CachedNetworkImage') return;
+
+      bool hasMemCacheWidth = false;
+      bool hasMemCacheHeight = false;
+      bool hasMaxWidthDiskCache = false;
+      bool hasMaxHeightDiskCache = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'memCacheWidth') hasMemCacheWidth = true;
+          if (name == 'memCacheHeight') hasMemCacheHeight = true;
+          if (name == 'maxWidthDiskCache') hasMaxWidthDiskCache = true;
+          if (name == 'maxHeightDiskCache') hasMaxHeightDiskCache = true;
+        }
+      }
+
+      // Need at least memory cache dimensions
+      if (!hasMemCacheWidth && !hasMemCacheHeight &&
+          !hasMaxWidthDiskCache && !hasMaxHeightDiskCache) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when CachedNetworkImage is used without placeholder.
+///
+/// Placeholders provide visual feedback while the image loads.
+///
+/// **BAD:**
+/// ```dart
+/// CachedNetworkImage(imageUrl: url)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: url,
+///   placeholder: (context, url) => CircularProgressIndicator(),
+/// )
+/// ```
+class RequireCachedImagePlaceholderRule extends SaropaLintRule {
+  const RequireCachedImagePlaceholderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_cached_image_placeholder',
+    problemMessage:
+        'CachedNetworkImage without placeholder. User sees blank during load.',
+    correctionMessage:
+        'Add placeholder parameter for loading state.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CachedNetworkImage') return;
+
+      bool hasPlaceholder = false;
+      bool hasProgressIndicator = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'placeholder') hasPlaceholder = true;
+          if (name == 'progressIndicatorBuilder') hasProgressIndicator = true;
+        }
+      }
+
+      if (!hasPlaceholder && !hasProgressIndicator) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when CachedNetworkImage is used without error widget.
+///
+/// Network images can fail. Always provide fallback for broken images.
+///
+/// **BAD:**
+/// ```dart
+/// CachedNetworkImage(imageUrl: url)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: url,
+///   errorWidget: (context, url, error) => Icon(Icons.error),
+/// )
+/// ```
+class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
+  const RequireCachedImageErrorWidgetRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_cached_image_error_widget',
+    problemMessage:
+        'CachedNetworkImage without errorWidget. Broken images show nothing.',
+    correctionMessage:
+        'Add errorWidget parameter to handle failed loads.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CachedNetworkImage') return;
+
+      bool hasErrorWidget = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'errorWidget') {
+          hasErrorWidget = true;
+          break;
+        }
+      }
+
+      if (!hasErrorWidget) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Image.file is used without EXIF orientation handling.
+///
+/// Photos from cameras often have EXIF orientation metadata.
+/// Without handling, images may appear rotated incorrectly.
+///
+/// **BAD:**
+/// ```dart
+/// Image.file(File(photoPath));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use a package that handles EXIF
+/// Image(image: ImageUtils.loadWithExif(photoPath));
+/// ```
+///
+/// **ALSO GOOD:**
+/// ```dart
+/// // Or use flutter_image_compress/image package
+/// final fixed = await FlutterImageCompress.compressAndGetFile(
+///   photoPath, outputPath,
+///   keepExif: false, // This auto-rotates
+/// );
+/// Image.file(fixed!);
+/// ```
+class RequireExifHandlingRule extends SaropaLintRule {
+  const RequireExifHandlingRule() : super(code: _code);
+
+  /// Visual issue - images may display rotated.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_exif_handling',
+    problemMessage:
+        'Image.file may show photos rotated. Consider EXIF handling.',
+    correctionMessage:
+        'Use flutter_image_compress or similar to auto-rotate camera photos.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      final constructorName = node.constructorName.name?.name;
+
+      // Check Image.file
+      if (typeName != 'Image' || constructorName != 'file') {
+        return;
+      }
+
+      // Check if the file reference suggests camera/photo origin
+      final argSource = node.argumentList.arguments.isNotEmpty
+          ? node.argumentList.arguments.first.toSource().toLowerCase()
+          : '';
+
+      final isCameraRelated = argSource.contains('photo') ||
+          argSource.contains('camera') ||
+          argSource.contains('image') ||
+          argSource.contains('picture');
+
+      if (isCameraRelated) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

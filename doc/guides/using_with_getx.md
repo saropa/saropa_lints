@@ -9,8 +9,14 @@ GetX is powerful but has patterns that fail silently. Standard linters see valid
 | Issue Type | What Happens | Rule |
 |------------|--------------|------|
 | Undisposed controllers | Memory leaks, stale state | `require_getx_controller_dispose` |
-| .obs outside controllers | Lifecycle issues, memory leaks | `avoid_obs_outside_getx` |
-| Missing GetBuilder/Obx | UI doesn't update | `require_getx_reactive_wrapper` |
+| .obs outside controllers | Lifecycle issues, memory leaks | `avoid_obs_outside_controller` |
+| Missing super calls | Broken lifecycle | `proper_getx_super_calls` |
+| Unassigned workers | Memory leaks | `always_remove_getx_listener` |
+| .obs in build method | Memory leaks | `avoid_getx_rx_inside_build` |
+| Rx reassignment | Broken reactivity | `avoid_mutable_rx_variables` |
+| Undisposed Worker fields | Memory leaks | `dispose_getx_fields` |
+| .obs without Obx wrapper | UI doesn't react to changes | `prefer_getx_builder` |
+| Get.put in build | Poor lifecycle management | `require_getx_binding` |
 
 ## What saropa_lints Catches
 
@@ -126,6 +132,61 @@ class MyWidget extends StatelessWidget {
 
 **Rule**: `require_getx_reactive_wrapper`
 
+### .obs Property Without Obx Wrapper
+
+```dart
+// BAD - accessing .obs property without reactive wrapper
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<MyController>();
+    // UI won't update when count changes!
+    return Text('Count: ${controller.count.value}');
+  }
+}
+
+// GOOD - wrap with Obx for reactivity
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<MyController>();
+    return Obx(() => Text('Count: ${controller.count.value}'));
+  }
+}
+```
+
+**Rule**: `prefer_getx_builder`
+
+### Get.put() in Widget Build
+
+```dart
+// BAD - controller lifecycle not managed properly
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(MyController());  // In build!
+    return Obx(() => Text('${controller.value}'));
+  }
+}
+
+// GOOD - use Bindings for proper lifecycle management
+class MyBinding extends Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<MyController>(() => MyController());
+  }
+}
+
+// In route
+GetPage(
+  name: '/my',
+  page: () => MyPage(),
+  binding: MyBinding(),
+)
+```
+
+**Rule**: `require_getx_binding`
+
 ## Recommended Setup
 
 ### 1. Update pubspec.yaml
@@ -162,8 +223,14 @@ dart run custom_lint
 | Rule | Tier | What It Catches |
 |------|------|-----------------|
 | `require_getx_controller_dispose` | essential | Controllers with undisposed resources |
-| `avoid_obs_outside_getx` | essential | .obs used outside GetxController |
-| `require_getx_reactive_wrapper` | recommended | Reading .obs values without Obx/GetBuilder |
+| `avoid_obs_outside_controller` | essential | .obs used outside GetxController |
+| `proper_getx_super_calls` | essential | Missing super.onInit/onClose calls |
+| `always_remove_getx_listener` | recommended | Workers not assigned for cleanup |
+| `avoid_getx_rx_inside_build` | recommended | .obs created in build() method |
+| `avoid_mutable_rx_variables` | recommended | Rx variable reassignment breaking reactivity |
+| `dispose_getx_fields` | recommended | Worker fields not disposed in onClose |
+| `prefer_getx_builder` | recommended | .obs property access without Obx wrapper |
+| `require_getx_binding` | professional | Get.put() in widget build method |
 
 ## Common Patterns
 

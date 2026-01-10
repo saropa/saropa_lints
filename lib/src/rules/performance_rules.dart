@@ -3352,105 +3352,6 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
   }
 }
 
-/// Warns when touch-only gestures are used on desktop.
-///
-/// Desktop apps should support mouse interactions. GestureDetector without
-/// mouse handlers limits desktop usability.
-///
-/// **BAD:**
-/// ```dart
-/// GestureDetector(
-///   onTap: _handleTap,
-///   child: widget,
-/// )
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// MouseRegion(
-///   cursor: SystemMouseCursors.click,
-///   child: GestureDetector(
-///     onTap: _handleTap,
-///     child: widget,
-///   ),
-/// )
-/// // Or better:
-/// InkWell(
-///   onTap: _handleTap,
-///   hoverColor: Colors.grey,
-///   child: widget,
-/// )
-/// ```
-class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
-  const AvoidTouchOnlyGesturesRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'avoid_touch_only_gestures',
-    problemMessage: 'GestureDetector should support mouse on desktop.',
-    correctionMessage: 'Add MouseRegion or use InkWell for desktop support.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'GestureDetector') return;
-
-      // Check for tap handler without mouse handling
-      bool hasTap = false;
-      bool hasMouseHandling = false;
-
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'onTap') hasTap = true;
-          if (name.contains('onSecondary') ||
-              name.contains('onHover') ||
-              name.contains('cursor')) {
-            hasMouseHandling = true;
-          }
-        }
-      }
-
-      if (!hasTap) return;
-
-      // Check if wrapped in MouseRegion
-      if (_hasMouseRegionAncestor(node)) return;
-
-      if (!hasMouseHandling) {
-        reporter.atNode(node.constructorName, code);
-      }
-    });
-  }
-
-  bool _hasMouseRegionAncestor(AstNode node) {
-    AstNode? current = node.parent;
-    int depth = 0;
-
-    while (current != null && depth < 5) {
-      if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name.lexeme;
-        if (typeName == 'MouseRegion') {
-          return true;
-        }
-      }
-      current = current.parent;
-      depth++;
-    }
-    return false;
-  }
-}
-
 /// Warns when desktop app lacks window close confirmation.
 ///
 /// Desktop apps with unsaved data should confirm before closing to
@@ -3591,6 +3492,183 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
             reporter.atNode(node, code);
           }
         }
+      }
+    });
+  }
+}
+
+/// Warns when same InheritedWidget is accessed multiple times in a method.
+///
+/// Multiple .of(context) calls for the same type trigger redundant lookups.
+/// Cache the result in a local variable for better performance.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return Column(
+///     children: [
+///       Text(Theme.of(context).textTheme.bodyLarge),
+///       Icon(color: Theme.of(context).colorScheme.primary),
+///       Container(color: Theme.of(context).scaffoldBackgroundColor),
+///     ],
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final theme = Theme.of(context);
+///   return Column(
+///     children: [
+///       Text(theme.textTheme.bodyLarge),
+///       Icon(color: theme.colorScheme.primary),
+///       Container(color: theme.scaffoldBackgroundColor),
+///     ],
+///   );
+/// }
+/// ```
+class PreferInheritedWidgetCacheRule extends SaropaLintRule {
+  const PreferInheritedWidgetCacheRule() : super(code: _code);
+
+  /// Performance improvement - reduces widget tree lookups.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_inherited_widget_cache',
+    problemMessage:
+        'Multiple .of(context) calls for same type. Cache in local variable.',
+    correctionMessage:
+        'Extract to: final theme = Theme.of(context); then use theme.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((node) {
+      // Only check build methods (most common case)
+      if (node.name.lexeme != 'build') {
+        return;
+      }
+
+      final methodSource = node.toSource();
+
+      // Count .of(context) calls for common types
+      final patterns = [
+        'Theme.of(context)',
+        'MediaQuery.of(context)',
+        'Navigator.of(context)',
+        'Scaffold.of(context)',
+        'DefaultTextStyle.of(context)',
+      ];
+
+      for (final pattern in patterns) {
+        // Count occurrences
+        int count = 0;
+        int index = 0;
+        while ((index = methodSource.indexOf(pattern, index)) != -1) {
+          count++;
+          index += pattern.length;
+        }
+
+        if (count >= 3) {
+          // Report on the method name
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when MediaQuery.of is used inside ListView item builder.
+///
+/// MediaQuery.of in list item builders causes rebuilds on every scroll.
+/// Use LayoutBuilder or pass dimensions from parent for better performance.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) {
+///     final width = MediaQuery.of(context).size.width;
+///     return SizedBox(width: width * 0.8);
+///   },
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// LayoutBuilder(
+///   builder: (context, constraints) {
+///     return ListView.builder(
+///       itemBuilder: (context, index) {
+///         return SizedBox(width: constraints.maxWidth * 0.8);
+///       },
+///     );
+///   },
+/// );
+/// ```
+class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
+  const PreferLayoutBuilderOverMediaQueryRule() : super(code: _code);
+
+  /// Performance issue in scrolling lists.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_layout_builder_over_media_query',
+    problemMessage:
+        'MediaQuery.of in list item builder. Causes unnecessary rebuilds.',
+    correctionMessage:
+        'Use LayoutBuilder above the list or pass dimensions from parent.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      // Check for MediaQuery.of
+      final target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'MediaQuery') {
+        return;
+      }
+
+      if (node.methodName.name != 'of') {
+        return;
+      }
+
+      // Check if we're inside a list item builder
+      AstNode? current = node.parent;
+      bool inItemBuilder = false;
+
+      while (current != null) {
+        if (current is NamedExpression) {
+          final paramName = current.name.label.name;
+          if (paramName == 'itemBuilder' ||
+              paramName == 'separatorBuilder' ||
+              paramName == 'delegate') {
+            inItemBuilder = true;
+            break;
+          }
+        }
+        // Stop at method/function boundary
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (inItemBuilder) {
+        reporter.atNode(node, code);
       }
     });
   }

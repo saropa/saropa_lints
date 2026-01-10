@@ -712,3 +712,210 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 5 Rules: Riverpod Advanced Rules
+// =============================================================================
+
+/// Warns when AsyncValue is used without error handling.
+///
+/// AsyncValue can be loading, data, or error. Always handle all states.
+///
+/// **BAD:**
+/// ```dart
+/// final value = ref.watch(myAsyncProvider);
+/// return Text(value.value.toString()); // Crashes on loading/error!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// return ref.watch(myAsyncProvider).when(
+///   data: (data) => Text(data.toString()),
+///   loading: () => CircularProgressIndicator(),
+///   error: (err, stack) => ErrorWidget(err),
+/// );
+/// ```
+class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
+  const RequireRiverpodErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_riverpod_error_handling',
+    problemMessage:
+        'AsyncValue accessed without error handling. Handle loading/error states.',
+    correctionMessage:
+        'Use .when() or .maybeWhen() to handle all AsyncValue states.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      // Check for direct .value access on AsyncValue
+      if (node.propertyName.name != 'value') return;
+
+      final Expression target = node.target!;
+      final String targetSource = target.toSource().toLowerCase();
+
+      // Check if it looks like AsyncValue access
+      if (targetSource.contains('ref.watch') ||
+          targetSource.contains('ref.read')) {
+        // Check if the provider name suggests async
+        if (targetSource.contains('async') ||
+            targetSource.contains('future') ||
+            targetSource.contains('stream')) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when state is mutated directly instead of using state assignment.
+///
+/// In Riverpod Notifiers, state should be replaced, not mutated.
+///
+/// **BAD:**
+/// ```dart
+/// class MyNotifier extends Notifier<MyState> {
+///   void update() {
+///     state.items.add(item); // Mutation doesn't trigger rebuild!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void update() {
+///   state = state.copyWith(items: [...state.items, item]);
+/// }
+/// ```
+class AvoidRiverpodStateMutationRule extends SaropaLintRule {
+  const AvoidRiverpodStateMutationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_riverpod_state_mutation',
+    problemMessage:
+        'State mutated directly. Mutations don\'t trigger rebuilds.',
+    correctionMessage:
+        'Use state = state.copyWith(...) to replace state.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _mutatingMethods = <String>{
+    'add',
+    'addAll',
+    'remove',
+    'removeAt',
+    'removeWhere',
+    'clear',
+    'insert',
+    'insertAll',
+    'sort',
+    'shuffle',
+    'fillRange',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_mutatingMethods.contains(methodName)) return;
+
+      // Check if called on state.something
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (targetSource.startsWith('state.') || targetSource == 'state') {
+        // Check if inside a Notifier class
+        AstNode? current = node.parent;
+        while (current != null) {
+          if (current is ClassDeclaration) {
+            final String? extendsName =
+                current.extendsClause?.superclass.name.lexeme;
+            if (extendsName != null &&
+                (extendsName.contains('Notifier') ||
+                    extendsName.contains('StateNotifier'))) {
+              reporter.atNode(node, code);
+            }
+            break;
+          }
+          current = current.parent;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when ref.watch is used to access only one field.
+///
+/// Using select() limits rebuilds to when that specific field changes.
+///
+/// **BAD:**
+/// ```dart
+/// final name = ref.watch(userProvider).name;
+/// // Rebuilds on ANY user change
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final name = ref.watch(userProvider.select((u) => u.name));
+/// // Only rebuilds when name changes
+/// ```
+class PreferRiverpodSelectRule extends SaropaLintRule {
+  const PreferRiverpodSelectRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_riverpod_select',
+    problemMessage:
+        'ref.watch() accessing single field. Use .select() for efficiency.',
+    correctionMessage:
+        'Use ref.watch(provider.select((s) => s.field)) for targeted rebuilds.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      // Check pattern: ref.watch(provider).field
+      final Expression? target = node.target;
+      if (target is! MethodInvocation) return;
+
+      if (target.methodName.name != 'watch') return;
+
+      // Check if ref.watch
+      final Expression? refTarget = target.target;
+      if (refTarget == null) return;
+
+      final String refSource = refTarget.toSource().toLowerCase();
+      if (!refSource.contains('ref')) return;
+
+      // Check that it's not already using select
+      final String watchSource = target.toSource();
+      if (watchSource.contains('.select(')) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}

@@ -16,6 +16,11 @@ Bloc enforces strict separation of concerns, but has subtle patterns that cause 
 | Nested Blocs | Tight coupling | `avoid_bloc_in_bloc` |
 | Missing transformer | Event flooding | `require_bloc_transformer` |
 | Missing BlocObserver | No debugging visibility | `require_bloc_observer` |
+| yield in event handler | Deprecated, breaks Bloc 8.0+ | `avoid_yield_in_on_event` |
+| State cascade mutation | Breaks equality checks | `emit_new_bloc_state_instances` |
+| Public Bloc fields | Bypasses event pattern | `avoid_bloc_public_fields` |
+| Public Bloc methods | Bypasses event pattern | `avoid_bloc_public_methods` |
+| BlocBuilder over-rebuild | Performance | `require_bloc_selector` |
 
 ## What saropa_lints Catches
 
@@ -288,6 +293,94 @@ class AppBlocObserver extends BlocObserver {
 
 **Rule**: `require_bloc_observer`
 
+### Yield in Event Handler (Bloc 8.0+)
+
+```dart
+// BAD - yield is deprecated in Bloc 8.0+, causes errors
+class UserBloc extends Bloc<UserEvent, UserState> {
+  UserBloc() : super(UserInitial()) {
+    on<LoadUser>((event, emit) async* {
+      yield UserLoading();  // Deprecated syntax!
+      final user = await userRepository.get(event.id);
+      yield UserLoaded(user);
+    });
+  }
+}
+
+// GOOD - use emit() instead
+class UserBloc extends Bloc<UserEvent, UserState> {
+  UserBloc() : super(UserInitial()) {
+    on<LoadUser>((event, emit) async {
+      emit(UserLoading());
+      final user = await userRepository.get(event.id);
+      emit(UserLoaded(user));
+    });
+  }
+}
+```
+
+**Rule**: `avoid_yield_in_on_event`
+
+### State Cascade Mutation
+
+```dart
+// BAD - cascade mutation doesn't create new instance, breaks equality
+class CounterBloc extends Bloc<CounterEvent, CounterState> {
+  on<Increment>((event, emit) {
+    emit(state..count = state.count + 1);  // Mutates existing state!
+  });
+}
+
+// GOOD - create new state instance
+class CounterBloc extends Bloc<CounterEvent, CounterState> {
+  on<Increment>((event, emit) {
+    emit(state.copyWith(count: state.count + 1));  // New instance
+  });
+}
+```
+
+**Rule**: `emit_new_bloc_state_instances`
+
+### Public Bloc Fields
+
+```dart
+// BAD - public fields bypass event pattern
+class UserBloc extends Bloc<UserEvent, UserState> {
+  User? currentUser;  // Public field - can be modified directly!
+  bool isLoggedIn = false;  // Another public field
+}
+
+// GOOD - state should be in BlocState only
+class UserBloc extends Bloc<UserEvent, UserState> {
+  on<UpdateUser>((event, emit) {
+    emit(state.copyWith(currentUser: event.user));
+  });
+}
+```
+
+**Rule**: `avoid_bloc_public_fields`
+
+### BlocBuilder Over-Rebuild
+
+```dart
+// BAD - BlocBuilder rebuilds when any state field changes
+BlocBuilder<UserBloc, UserState>(
+  builder: (context, state) {
+    return Text(state.name);  // Only uses one field, but rebuilds on any change
+  },
+)
+
+// GOOD - use BlocSelector for targeted rebuilds
+BlocSelector<UserBloc, UserState, String>(
+  selector: (state) => state.name,
+  builder: (context, name) {
+    return Text(name);  // Only rebuilds when name changes
+  },
+)
+```
+
+**Rule**: `require_bloc_selector`
+
 ## Recommended Setup
 
 ### 1. Update pubspec.yaml
@@ -327,11 +420,16 @@ dart run custom_lint
 |------|------|-----------------|
 | `avoid_bloc_event_in_constructor` | essential | Events added in Bloc constructor |
 | `require_bloc_close` | essential | Blocs not closed in dispose |
+| `avoid_yield_in_on_event` | essential | Deprecated yield in event handler |
+| `emit_new_bloc_state_instances` | essential | State cascade mutation |
 | `require_immutable_bloc_state` | recommended | Mutable state classes |
 | `avoid_bloc_event_mutation` | recommended | Mutable event classes |
 | `avoid_bloc_listen_in_build` | recommended | BlocListener in build method |
+| `avoid_bloc_public_fields` | recommended | Public non-final fields in Bloc |
 | `avoid_bloc_in_bloc` | professional | Bloc referencing another Bloc |
 | `require_bloc_transformer` | professional | Missing event transformer |
+| `avoid_bloc_public_methods` | professional | Public methods bypassing events |
+| `require_bloc_selector` | professional | BlocBuilder using single field |
 | `require_bloc_observer` | comprehensive | Missing BlocObserver in main |
 
 ## Common Patterns
