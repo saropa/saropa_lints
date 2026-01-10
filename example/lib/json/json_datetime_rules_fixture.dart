@@ -129,7 +129,8 @@ class GoodMoneyClass {
 class FalsePositiveExclusions {
   // GOOD: These should NOT trigger avoid_double_for_money
   // because they contain false positive patterns
-  double? imageUrlVerticalOffsetPercent; // "percent" contains "cent" but is not money
+  double?
+      imageUrlVerticalOffsetPercent; // "percent" contains "cent" but is not money
   double centerX = 0.0; // "center" contains "cent" but is not money
   double accentColorOpacity = 1.0; // "accent" contains "cent" but is not money
   double recentProgress = 0.0; // "recent" contains "cent" but is not money
