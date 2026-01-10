@@ -34,7 +34,8 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_file_exists_check',
-    problemMessage: 'File read operation should check exists() or use try-catch.',
+    problemMessage:
+        'File read operation should check exists() or use try-catch.',
     correctionMessage: 'Wrap in if (await file.exists()) or try-catch block.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -232,8 +233,10 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_graphql_error_handling',
-    problemMessage: 'GraphQL result should check hasException before accessing data.',
-    correctionMessage: 'Add if (result.hasException) check before result.data access.',
+    problemMessage:
+        'GraphQL result should check hasException before accessing data.',
+    correctionMessage:
+        'Add if (result.hasException) check before result.data access.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -42,8 +42,11 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
     context.registry.addBinaryExpression((BinaryExpression node) {
       // Check for comparison operators
       final String operator = node.operator.lexeme;
-      if (operator != '>' && operator != '<' && operator != '>=' &&
-          operator != '<=' && operator != '==') {
+      if (operator != '>' &&
+          operator != '<' &&
+          operator != '>=' &&
+          operator != '<=' &&
+          operator != '==') {
         return;
       }
 
@@ -64,7 +67,8 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
       // Check if the other side contains MediaQuery.of(context).size.width
       final String otherSource = otherSide.toSource();
       if (!otherSource.contains('MediaQuery') ||
-          (!otherSource.contains('.width') && !otherSource.contains('.height'))) {
+          (!otherSource.contains('.width') &&
+              !otherSource.contains('.height'))) {
         return;
       }
 
@@ -145,8 +149,7 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
         if (current is ClassDeclaration) {
           final ExtendsClause? extendsClause = current.extendsClause;
           if (extendsClause != null) {
-            final String? superName =
-                extendsClause.superclass.element?.name;
+            final String? superName = extendsClause.superclass.element?.name;
             if (superName == 'CustomPainter') {
               inCustomPainter = true;
             }
@@ -195,8 +198,10 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_custom_painter_shouldrepaint',
-    problemMessage: 'shouldRepaint always returns true, causing unnecessary repaints.',
-    correctionMessage: 'Compare relevant fields instead of always returning true.',
+    problemMessage:
+        'shouldRepaint always returns true, causing unnecessary repaints.',
+    correctionMessage:
+        'Compare relevant fields instead of always returning true.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -232,9 +237,11 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
       } else if (body is BlockFunctionBody) {
         final List<Statement> statements = body.block.statements;
         if (statements.length == 1 && statements.first is ReturnStatement) {
-          final ReturnStatement returnStmt = statements.first as ReturnStatement;
+          final ReturnStatement returnStmt =
+              statements.first as ReturnStatement;
           if (returnStmt.expression is BooleanLiteral) {
-            final BooleanLiteral boolLit = returnStmt.expression as BooleanLiteral;
+            final BooleanLiteral boolLit =
+                returnStmt.expression as BooleanLiteral;
             if (boolLit.value) {
               reporter.atNode(returnStmt.expression!, code);
             }
@@ -271,7 +278,8 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_currency_formatting_locale',
     problemMessage: 'NumberFormat.currency should have explicit locale.',
-    correctionMessage: 'Add locale parameter for consistent currency formatting.',
+    correctionMessage:
+        'Add locale parameter for consistent currency formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -613,7 +621,8 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_itemextent_when_known',
     problemMessage: 'Consider adding itemExtent for better scroll performance.',
-    correctionMessage: 'Set itemExtent when all list items have the same height.',
+    correctionMessage:
+        'Set itemExtent when all list items have the same height.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -630,7 +639,9 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.name?.name;
 
       if (typeName != 'ListView') return;
-      if (constructorName != 'builder' && constructorName != 'separated') return;
+      if (constructorName != 'builder' && constructorName != 'separated') {
+        return;
+      }
 
       // Check for itemExtent or prototypeItem
       bool hasItemExtent = false;

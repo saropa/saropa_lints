@@ -27,8 +27,10 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bluetooth_scan_without_timeout',
-    problemMessage: 'Bluetooth scan should have a timeout to prevent battery drain.',
-    correctionMessage: 'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
+    problemMessage:
+        'Bluetooth scan should have a timeout to prevent battery drain.',
+    correctionMessage:
+        'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -97,7 +99,8 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bluetooth_state_check',
     problemMessage: 'BLE operations should check adapter state first.',
-    correctionMessage: 'Check FlutterBluePlus.adapterState before BLE operations.',
+    correctionMessage:
+        'Check FlutterBluePlus.adapterState before BLE operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -202,7 +205,8 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ble_disconnect_handling',
     problemMessage: 'BLE connection should handle disconnect state.',
-    correctionMessage: 'Listen to device.connectionState for disconnect events.',
+    correctionMessage:
+        'Listen to device.connectionState for disconnect events.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -290,7 +294,8 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_audio_focus_handling',
-    problemMessage: 'Audio playback should configure AudioSession for proper focus handling.',
+    problemMessage:
+        'Audio playback should configure AudioSession for proper focus handling.',
     correctionMessage: 'Use AudioSession.instance to configure audio behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

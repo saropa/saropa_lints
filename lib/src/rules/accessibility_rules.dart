@@ -2027,8 +2027,7 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
     name: 'require_badge_semantics',
     problemMessage:
         'Badge lacks accessibility semantics. Screen readers cannot announce it.',
-    correctionMessage:
-        'Wrap Badge in Semantics widget with descriptive label.',
+    correctionMessage: 'Wrap Badge in Semantics widget with descriptive label.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2099,8 +2098,7 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
     name: 'require_badge_count_limit',
     problemMessage:
         'Badge count exceeds 99. Use "99+" pattern for large numbers.',
-    correctionMessage:
-        'Replace with: Text(count > 99 ? "99+" : "\$count")',
+    correctionMessage: 'Replace with: Text(count > 99 ? "99+" : "\$count")',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2127,8 +2125,7 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
                 labelExpr.constructorName.type.name.lexeme;
             if (labelTypeName == 'Text' &&
                 labelExpr.argumentList.arguments.isNotEmpty) {
-              final Expression textArg =
-                  labelExpr.argumentList.arguments.first;
+              final Expression textArg = labelExpr.argumentList.arguments.first;
               if (textArg is SimpleStringLiteral) {
                 final int? number = int.tryParse(textArg.value);
                 if (number != null && number > 99) {
