@@ -126,6 +126,17 @@ class GoodMoneyClass {
   int balanceInCents = 10050;
 }
 
+class FalsePositiveExclusions {
+  // GOOD: These should NOT trigger avoid_double_for_money
+  // because they contain false positive patterns
+  double? imageUrlVerticalOffsetPercent; // "percent" contains "cent" but is not money
+  double centerX = 0.0; // "center" contains "cent" but is not money
+  double accentColorOpacity = 1.0; // "accent" contains "cent" but is not money
+  double recentProgress = 0.0; // "recent" contains "cent" but is not money
+  double descentOffset = 0.0; // "descent" contains "cent" but is not money
+  double centimeterScale = 1.0; // "centimeter" contains "cent" but is not money
+}
+
 // =========================================================================
 // avoid_sensitive_data_in_logs
 // =========================================================================
