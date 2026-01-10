@@ -1018,6 +1018,7 @@ const List<LintRule> _allRules = <LintRule>[
   // JSON and DateTime rules (NEW)
   RequireJsonDecodeTryCatchRule(),
   AvoidDateTimeParseUnvalidatedRule(),
+  PreferTryParseForDynamicDataRule(),
   AvoidDoubleForMoneyRule(),
   AvoidSensitiveDataInLogsRule(),
   RequireGetItResetInTestsRule(),
