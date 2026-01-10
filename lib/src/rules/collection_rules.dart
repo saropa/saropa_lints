@@ -2072,8 +2072,7 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
     name: 'prefer_null_aware_elements',
     problemMessage:
         'Explicit null check for nullable item. Use ?element syntax.',
-    correctionMessage:
-        'Replace `if (x != null) x` with `?x` for cleaner code.',
+    correctionMessage: 'Replace `if (x != null) x` with `?x` for cleaner code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

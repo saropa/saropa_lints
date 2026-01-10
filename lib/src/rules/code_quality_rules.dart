@@ -6655,8 +6655,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dot_shorthand',
-    problemMessage:
-        'Enum value could use dot shorthand (.value) in Dart 3.',
+    problemMessage: 'Enum value could use dot shorthand (.value) in Dart 3.',
     correctionMessage:
         'Replace EnumType.value with .value when type is inferred.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6696,7 +6695,8 @@ class PreferDotShorthandRule extends SaropaLintRule {
       } else if (parent is NamedExpression) {
         // In named parameter, type is known from function signature
         reporter.atNode(node, code);
-      } else if (parent is AssignmentExpression && parent.rightHandSide == node) {
+      } else if (parent is AssignmentExpression &&
+          parent.rightHandSide == node) {
         // Assignment to typed variable
         reporter.atNode(node, code);
       }

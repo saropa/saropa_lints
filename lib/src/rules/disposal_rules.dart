@@ -1024,7 +1024,8 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
       if (notifierFields.isEmpty) return;
 
       final String? disposeBody = _getDisposeMethodBody(node);
-      _reportUndisposedFields(node, notifierFields, disposeBody, reporter, code);
+      _reportUndisposedFields(
+          node, notifierFields, disposeBody, reporter, code);
     });
   }
 }

@@ -2076,8 +2076,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_firebase_app_check',
-    problemMessage:
-        'Firebase initialization without App Check activation.',
+    problemMessage: 'Firebase initialization without App Check activation.',
     correctionMessage:
         'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp().',
     errorSeverity: DiagnosticSeverity.INFO,

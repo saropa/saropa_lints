@@ -153,7 +153,8 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
       }
 
       final resolutionArg = args[1].toSource();
-      if (resolutionArg.contains('max') || resolutionArg.contains('ultraHigh')) {
+      if (resolutionArg.contains('max') ||
+          resolutionArg.contains('ultraHigh')) {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -189,8 +190,7 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
     name: 'prefer_audio_session_config',
     problemMessage:
         'AudioPlayer used without audio session config. May conflict with other audio.',
-    correctionMessage:
-        'Configure AudioSession.instance before playing audio.',
+    correctionMessage: 'Configure AudioSession.instance before playing audio.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -209,8 +209,7 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
       }
 
       final targetSource = node.target?.toSource().toLowerCase() ?? '';
-      if (!targetSource.contains('player') &&
-          !targetSource.contains('audio')) {
+      if (!targetSource.contains('player') && !targetSource.contains('audio')) {
         return;
       }
 

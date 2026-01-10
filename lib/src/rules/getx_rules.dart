@@ -719,7 +719,8 @@ class PreferGetxBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
-    problemMessage: '.obs value accessed without Obx wrapper. UI won\'t rebuild.',
+    problemMessage:
+        '.obs value accessed without Obx wrapper. UI won\'t rebuild.',
     correctionMessage: 'Wrap in Obx(() => ...) to enable reactive updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -754,13 +755,17 @@ class PreferGetxBuilderRule extends SaropaLintRule {
         }
         if (current is MethodInvocation) {
           final String methodName = current.methodName.name;
-          if (methodName == 'Obx' || methodName == 'GetX' || methodName == 'GetBuilder') {
+          if (methodName == 'Obx' ||
+              methodName == 'GetX' ||
+              methodName == 'GetBuilder') {
             insideObx = true;
           }
         }
         if (current is InstanceCreationExpression) {
           final String typeName = current.constructorName.type.name.lexeme;
-          if (typeName == 'Obx' || typeName == 'GetX' || typeName == 'GetBuilder') {
+          if (typeName == 'Obx' ||
+              typeName == 'GetX' ||
+              typeName == 'GetBuilder') {
             insideObx = true;
           }
         }

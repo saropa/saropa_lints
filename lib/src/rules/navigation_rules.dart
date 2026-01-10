@@ -1207,8 +1207,7 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_inline_creation',
-    problemMessage:
-        'GoRouter created in build(). Causes hot reload issues.',
+    problemMessage: 'GoRouter created in build(). Causes hot reload issues.',
     correctionMessage:
         'Create GoRouter as a field or in initState(), not in build().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1265,8 +1264,7 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
     name: 'require_go_router_error_handler',
     problemMessage:
         'GoRouter without error handler. Unknown routes show blank screen.',
-    correctionMessage:
-        'Add errorBuilder or errorPageBuilder parameter.',
+    correctionMessage: 'Add errorBuilder or errorPageBuilder parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1436,6 +1434,191 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
           firstArg is AdjacentStrings) {
         reporter.atNode(firstArg, code);
       }
+    });
+  }
+}
+
+// =============================================================================
+// ROADMAP_NEXT Part 7 Rules
+// =============================================================================
+
+/// Suggests using go_router redirect instead of auth checks in page builders.
+///
+/// Alias: go_router_auth_redirect, auth_in_redirect
+///
+/// Authentication logic belongs in go_router's redirect callback, not in
+/// individual page builders. Centralizing auth checks improves maintainability.
+///
+/// **BAD:**
+/// ```dart
+/// GoRoute(
+///   path: '/profile',
+///   builder: (context, state) {
+///     if (!authService.isLoggedIn) {
+///       return LoginPage(); // Auth check in builder
+///     }
+///     return ProfilePage();
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoRouter(
+///   redirect: (context, state) {
+///     if (!authService.isLoggedIn && state.matchedLocation != '/login') {
+///       return '/login';
+///     }
+///     return null;
+///   },
+///   routes: [
+///     GoRoute(path: '/profile', builder: (_, __) => ProfilePage()),
+///   ],
+/// )
+/// ```
+class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
+  const PreferGoRouterRedirectAuthRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_go_router_redirect_auth',
+    problemMessage:
+        'Auth check in page builder. Use redirect callback instead.',
+    correctionMessage:
+        'Move authentication logic to GoRouter\'s redirect parameter.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'GoRoute') return;
+
+      // Find builder argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final Expression builderExpr = arg.expression;
+
+          // Check if builder contains auth-related checks
+          final String builderSource = builderExpr.toSource().toLowerCase();
+
+          // Look for common auth patterns
+          if ((builderSource.contains('isloggedin') ||
+                  builderSource.contains('isauthenticated') ||
+                  builderSource.contains('isauth') ||
+                  builderSource.contains('currentuser') ||
+                  builderSource.contains('authstate')) &&
+              (builderSource.contains('if ') || builderSource.contains('?'))) {
+            reporter.atNode(arg, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when go_router path parameters are used without type conversion.
+///
+/// Alias: typed_go_router_params, go_router_param_types
+///
+/// Path parameters from go_router are strings. Using them without parsing
+/// can lead to runtime errors when the code expects other types.
+///
+/// **BAD:**
+/// ```dart
+/// GoRoute(
+///   path: '/user/:id',
+///   builder: (context, state) {
+///     final int userId = state.pathParameters['id']; // Type error!
+///     return UserPage(userId: userId);
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoRoute(
+///   path: '/user/:id',
+///   builder: (context, state) {
+///     final userId = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+///     return UserPage(userId: userId);
+///   },
+/// )
+/// ```
+class RequireGoRouterTypedParamsRule extends SaropaLintRule {
+  const RequireGoRouterTypedParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_go_router_typed_params',
+    problemMessage:
+        'Path parameter used without type conversion. May cause runtime errors.',
+    correctionMessage:
+        'Use int.tryParse(), double.tryParse(), or other type conversion.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      // Check if accessing pathParameters
+      final Expression? target = node.target;
+      if (target is! PrefixedIdentifier) return;
+
+      if (target.identifier.name != 'pathParameters') return;
+
+      // Check parent - are we inside a tryParse or similar?
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodInvocation) {
+          final String methodName = current.methodName.name.toLowerCase();
+          if (methodName.contains('parse') ||
+              methodName.contains('tryparse') ||
+              methodName == 'tostring') {
+            return; // Already being parsed
+          }
+        }
+        if (current is VariableDeclaration) {
+          // Check if type is String
+          final AstNode? varDeclList = current.parent;
+          if (varDeclList is VariableDeclarationList) {
+            final TypeAnnotation? type = varDeclList.type;
+            if (type != null && type.toSource() == 'String') {
+              return; // Explicitly typed as String, OK
+            }
+            // Check for var/final with String inference
+            final Expression? initializer = current.initializer;
+            if (initializer != null) {
+              final String initSource = initializer.toSource();
+              if (initSource.contains('?? \'') ||
+                  initSource.contains("?? '") ||
+                  initSource.contains('?? ""') ||
+                  initSource.contains('toString()')) {
+                return; // Has null default string, likely OK
+              }
+            }
+          }
+          break;
+        }
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
     });
   }
 }

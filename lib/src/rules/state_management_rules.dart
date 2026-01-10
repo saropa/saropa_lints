@@ -6857,7 +6857,8 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_yield_in_on_event',
     problemMessage: 'yield in Bloc event handler. Use emit() instead.',
-    correctionMessage: 'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
+    correctionMessage:
+        'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -6916,7 +6917,8 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_over_provider_of',
     problemMessage: 'Provider.of in build. Use Consumer for granular rebuilds.',
-    correctionMessage: 'Replace with Consumer<T> or context.select() for better performance.',
+    correctionMessage:
+        'Replace with Consumer<T> or context.select() for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7045,7 +7047,8 @@ class PreferGetxBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
-    problemMessage: '.obs value accessed without Obx wrapper. UI won\'t rebuild.',
+    problemMessage:
+        '.obs value accessed without Obx wrapper. UI won\'t rebuild.',
     correctionMessage: 'Wrap in Obx(() => ...) to enable reactive updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -7079,13 +7082,17 @@ class PreferGetxBuilderRule extends SaropaLintRule {
         }
         if (current is MethodInvocation) {
           final String methodName = current.methodName.name;
-          if (methodName == 'Obx' || methodName == 'GetX' || methodName == 'GetBuilder') {
+          if (methodName == 'Obx' ||
+              methodName == 'GetX' ||
+              methodName == 'GetBuilder') {
             insideObx = true;
           }
         }
         if (current is InstanceCreationExpression) {
           final String typeName = current.constructorName.type.name.lexeme;
-          if (typeName == 'Obx' || typeName == 'GetX' || typeName == 'GetBuilder') {
+          if (typeName == 'Obx' ||
+              typeName == 'GetX' ||
+              typeName == 'GetBuilder') {
             insideObx = true;
           }
         }
@@ -7428,7 +7435,8 @@ class RequireBlocSelectorRule extends SaropaLintRule {
             builderExpr.body.accept(counter);
 
             // If only one unique field is accessed, suggest BlocSelector
-            if (counter.accessedFields.length == 1 && counter.accessCount <= 2) {
+            if (counter.accessedFields.length == 1 &&
+                counter.accessCount <= 2) {
               reporter.atNode(node, code);
             }
           }
@@ -7717,7 +7725,8 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
       final emitOffset = node.offset - enclosingMethod.body.offset;
 
       // Simple heuristic: check if there's an await before this emit
-      final beforeEmit = methodSource.substring(0, emitOffset.clamp(0, methodSource.length));
+      final beforeEmit =
+          methodSource.substring(0, emitOffset.clamp(0, methodSource.length));
       if (!beforeEmit.contains('await ')) return;
 
       // Check if there's an isClosed check protecting this emit
@@ -8486,7 +8495,8 @@ class AvoidStaticStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_static_state',
-    problemMessage: 'Static mutable state can cause testing and hot-reload issues.',
+    problemMessage:
+        'Static mutable state can cause testing and hot-reload issues.',
     correctionMessage:
         'Use proper state management (Provider, Riverpod, Bloc) instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -8523,8 +8533,9 @@ class AvoidStaticStateRule extends SaropaLintRule {
 
       // Check for mutable types
       final type = node.fields.type?.toSource() ?? '';
-      final isMutableCollection =
-          type.startsWith('List') || type.startsWith('Map') || type.startsWith('Set');
+      final isMutableCollection = type.startsWith('List') ||
+          type.startsWith('Map') ||
+          type.startsWith('Set');
 
       // Non-final static or mutable collection
       if (!node.fields.isFinal || isMutableCollection) {
