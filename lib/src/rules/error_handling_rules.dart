@@ -16,7 +16,7 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when catch block swallows exception without logging.
 ///
-/// Alias: empty_catch, silent_catch, no_empty_catch_block
+/// Alias: avoid_empty_catch, empty_catch, silent_catch, no_empty_catch_block
 ///
 /// Empty catch blocks hide errors and make debugging difficult.
 ///

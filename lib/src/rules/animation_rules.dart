@@ -200,7 +200,7 @@ class _AnimationControllerVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when AnimationController is not disposed.
 ///
-/// Alias: dispose_animation_controller, animation_controller_dispose, animation_controller_leak
+/// Alias: dispose_animation_controller, animation_controller_dispose, animation_controller_leak, require_animation_disposal
 ///
 /// AnimationController holds native resources (a [Ticker]) that must be
 /// explicitly released. Failing to dispose causes memory leaks and prevents

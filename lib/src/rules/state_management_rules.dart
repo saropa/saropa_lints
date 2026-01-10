@@ -7586,3 +7586,950 @@ class RequireGetxBindingRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 4: Missing Parameter Rules
+// =============================================================================
+
+/// Warns when Provider.of is used without a generic type parameter.
+///
+/// Alias: provider_missing_type, provider_generic_required
+///
+/// Provider.of without a type parameter returns dynamic, losing type safety.
+///
+/// **BAD:**
+/// ```dart
+/// final model = Provider.of(context);  // Returns dynamic!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final model = Provider.of<MyModel>(context);
+/// // Or better, use context.read/watch:
+/// final model = context.read<MyModel>();
+/// ```
+class RequireProviderGenericTypeRule extends SaropaLintRule {
+  const RequireProviderGenericTypeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_provider_generic_type',
+    problemMessage: 'Provider.of must specify a generic type parameter.',
+    correctionMessage: 'Add <Type> to Provider.of<Type>(context).',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Provider.of
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Provider') return;
+      if (node.methodName.name != 'of') return;
+
+      // Check if type argument is missing
+      final typeArgs = node.typeArguments;
+      if (typeArgs == null || typeArgs.arguments.isEmpty) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 5: Bloc API Pattern Rules
+// =============================================================================
+
+/// Warns when emit() is called without checking isClosed in async handlers.
+///
+/// Alias: bloc_emit_after_close, unsafe_emit
+///
+/// After async operations, the Bloc may have been closed. Emitting to a
+/// closed Bloc throws an error.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
+///   final data = await api.fetch();
+///   emit(LoadedState(data));  // Bloc might be closed!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
+///   final data = await api.fetch();
+///   if (!isClosed) {
+///     emit(LoadedState(data));
+///   }
+/// }
+/// ```
+class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
+  const AvoidBlocEmitAfterCloseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_emit_after_close',
+    problemMessage: 'emit() after await may throw if Bloc is closed.',
+    correctionMessage: 'Add "if (!isClosed)" check before emit after await.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'emit') return;
+
+      // Find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) return;
+
+      // Check if method is async
+      if (enclosingMethod.body is! BlockFunctionBody) return;
+      final body = enclosingMethod.body as BlockFunctionBody;
+      if (body.keyword?.lexeme != 'async') return;
+
+      // Check if emit is after an await expression
+      final methodSource = enclosingMethod.body.toSource();
+      final emitOffset = node.offset - enclosingMethod.body.offset;
+
+      // Simple heuristic: check if there's an await before this emit
+      final beforeEmit = methodSource.substring(0, emitOffset.clamp(0, methodSource.length));
+      if (!beforeEmit.contains('await ')) return;
+
+      // Check if there's an isClosed check protecting this emit
+      AstNode? parentNode = node.parent;
+      bool hasIsClosedCheck = false;
+
+      while (parentNode != null && parentNode != enclosingMethod) {
+        if (parentNode is IfStatement) {
+          final condition = parentNode.expression.toSource();
+          if (condition.contains('isClosed') ||
+              condition.contains('!isClosed')) {
+            hasIsClosedCheck = true;
+            break;
+          }
+        }
+        parentNode = parentNode.parent;
+      }
+
+      if (!hasIsClosedCheck) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Bloc state is mutated directly instead of using copyWith.
+///
+/// Alias: bloc_state_direct_mutation, immutable_bloc_state
+///
+/// Bloc states should be immutable. Direct mutation causes bugs because
+/// the framework compares by reference.
+///
+/// **BAD:**
+/// ```dart
+/// void _onUpdate(UpdateEvent event, Emitter<State> emit) {
+///   state.name = event.name;  // Direct mutation!
+///   emit(state);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void _onUpdate(UpdateEvent event, Emitter<State> emit) {
+///   emit(state.copyWith(name: event.name));
+/// }
+/// ```
+class AvoidBlocStateMutationRule extends SaropaLintRule {
+  const AvoidBlocStateMutationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_state_mutation',
+    problemMessage: 'Bloc state must not be mutated directly.',
+    correctionMessage: 'Use state.copyWith() to create a new state instance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      // Check for state.field = value pattern
+      final leftSide = node.leftHandSide;
+      if (leftSide is! PropertyAccess) return;
+
+      final target = leftSide.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'state') return;
+
+      // Check if inside a Bloc class
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is ClassDeclaration) {
+          final extendsClause = current.extendsClause;
+          if (extendsClause != null) {
+            final superName = extendsClause.superclass.name.lexeme;
+            if (superName == 'Bloc' || superName == 'Cubit') {
+              reporter.atNode(leftSide, code);
+              return;
+            }
+          }
+          break;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when Bloc constructor doesn't call super with initial state.
+///
+/// Alias: bloc_missing_initial_state, bloc_super_required
+///
+/// Every Bloc must specify its initial state in the super() constructor call.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc() {  // Missing super call!
+///     on<MyEvent>(_onEvent);
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc() : super(MyInitialState()) {
+///     on<MyEvent>(_onEvent);
+///   }
+/// }
+/// ```
+class RequireBlocInitialStateRule extends SaropaLintRule {
+  const RequireBlocInitialStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_initial_state',
+    problemMessage: 'Bloc constructor must call super with initial state.',
+    correctionMessage: 'Add : super(InitialState()) to the constructor.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Find constructors
+      for (final member in node.members) {
+        if (member is ConstructorDeclaration) {
+          // Check for super initializer
+          bool hasSuperInit = false;
+          for (final initializer in member.initializers) {
+            if (initializer is SuperConstructorInvocation) {
+              hasSuperInit = true;
+              break;
+            }
+          }
+
+          if (!hasSuperInit) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 6: Additional Rules - Freezed
+// =============================================================================
+
+/// Warns when both @freezed and @JsonSerializable are used on same class.
+///
+/// Alias: freezed_json_conflict, duplicate_json_annotation
+///
+/// @freezed already generates JSON serialization. Adding @JsonSerializable
+/// causes conflicts and duplicate code.
+///
+/// **BAD:**
+/// ```dart
+/// @freezed
+/// @JsonSerializable()  // Conflict!
+/// class User with _$User {
+///   factory User({String? name}) = _User;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   factory User({String? name}) = _User;
+///   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+/// }
+/// ```
+class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
+  const AvoidFreezedJsonSerializableConflictRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_freezed_json_serializable_conflict',
+    problemMessage:
+        '@freezed and @JsonSerializable conflict. Use only @freezed.',
+    correctionMessage:
+        'Remove @JsonSerializable - @freezed handles JSON generation.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      bool hasFreezed = false;
+      Annotation? jsonSerializableAnnotation;
+
+      for (final annotation in node.metadata) {
+        final name = annotation.name.name.toLowerCase();
+        if (name == 'freezed') {
+          hasFreezed = true;
+        }
+        if (name == 'jsonserializable') {
+          jsonSerializableAnnotation = annotation;
+        }
+      }
+
+      if (hasFreezed && jsonSerializableAnnotation != null) {
+        reporter.atNode(jsonSerializableAnnotation, code);
+      }
+    });
+  }
+}
+
+/// Warns when Freezed fromJson has block body instead of arrow syntax.
+///
+/// Alias: freezed_fromjson_syntax, freezed_arrow_required
+///
+/// Freezed fromJson factory must use arrow syntax for code generation.
+///
+/// **BAD:**
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   factory User.fromJson(Map<String, dynamic> json) {
+///     return _$UserFromJson(json);  // Block body - won't work!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+/// }
+/// ```
+class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
+  const RequireFreezedArrowSyntaxRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_freezed_arrow_syntax',
+    problemMessage: 'Freezed fromJson must use arrow syntax (=>).',
+    correctionMessage:
+        'Use: factory User.fromJson(Map<String, dynamic> json) => _\$UserFromJson(json);',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check for @freezed annotation
+      bool hasFreezed = false;
+      for (final annotation in node.metadata) {
+        if (annotation.name.name.toLowerCase() == 'freezed') {
+          hasFreezed = true;
+          break;
+        }
+      }
+
+      if (!hasFreezed) return;
+
+      // Check fromJson factory
+      for (final member in node.members) {
+        if (member is ConstructorDeclaration &&
+            member.factoryKeyword != null &&
+            member.name?.lexeme == 'fromJson') {
+          // Check if it uses block body instead of arrow
+          final body = member.body;
+          if (body is BlockFunctionBody) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Freezed class is missing the private constructor.
+///
+/// Alias: freezed_private_ctor, freezed_underscore_ctor
+///
+/// Freezed classes need a private constructor for methods like copyWith.
+///
+/// **BAD:**
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   factory User({String? name}) = _User;
+///   // Missing: const User._();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   const User._();  // Required for custom methods
+///   factory User({String? name}) = _User;
+/// }
+/// ```
+class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
+  const RequireFreezedPrivateConstructorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_freezed_private_constructor',
+    problemMessage: 'Freezed class should have private constructor.',
+    correctionMessage: 'Add: const ClassName._();',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check for @freezed annotation
+      bool hasFreezed = false;
+      for (final annotation in node.metadata) {
+        if (annotation.name.name.toLowerCase() == 'freezed') {
+          hasFreezed = true;
+          break;
+        }
+      }
+
+      if (!hasFreezed) return;
+
+      // Check for private constructor (ClassName._)
+      bool hasPrivateConstructor = false;
+      for (final member in node.members) {
+        if (member is ConstructorDeclaration) {
+          final ctorName = member.name?.lexeme ?? '';
+          if (ctorName == '_') {
+            hasPrivateConstructor = true;
+            break;
+          }
+        }
+      }
+
+      // Only warn if class has custom methods that need the private ctor
+      bool hasCustomMethods = false;
+      for (final member in node.members) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme != 'toString' &&
+            member.name.lexeme != 'toJson') {
+          hasCustomMethods = true;
+          break;
+        }
+      }
+
+      if (!hasPrivateConstructor && hasCustomMethods) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 6: Additional Rules - Equatable
+// =============================================================================
+
+/// Warns when Equatable class has non-final fields.
+///
+/// Alias: equatable_mutable_field, immutable_equatable
+///
+/// Equatable classes must be immutable for equality to work correctly.
+///
+/// **BAD:**
+/// ```dart
+/// class User extends Equatable {
+///   String name;  // Non-final!
+///   @override
+///   List<Object?> get props => [name];
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class User extends Equatable {
+///   final String name;
+///   const User(this.name);
+///   @override
+///   List<Object?> get props => [name];
+/// }
+/// ```
+class RequireEquatableImmutableRule extends SaropaLintRule {
+  const RequireEquatableImmutableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_equatable_immutable',
+    problemMessage: 'Equatable fields must be final for correct equality.',
+    correctionMessage: 'Make all fields final.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Equatable
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'Equatable') return;
+
+      // Check for non-final fields
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          if (!member.fields.isFinal && !member.isStatic) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Equatable class doesn't override props.
+///
+/// Alias: equatable_missing_props, props_override_required
+///
+/// Equatable requires props getter to define which fields affect equality.
+///
+/// **BAD:**
+/// ```dart
+/// class User extends Equatable {
+///   final String name;
+///   // Missing props!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class User extends Equatable {
+///   final String name;
+///   @override
+///   List<Object?> get props => [name];
+/// }
+/// ```
+class RequireEquatablePropsOverrideRule extends SaropaLintRule {
+  const RequireEquatablePropsOverrideRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_equatable_props_override',
+    problemMessage: 'Equatable class must override props getter.',
+    correctionMessage: 'Add: List<Object?> get props => [field1, field2];',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Equatable
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'Equatable') return;
+
+      // Check for props getter
+      bool hasProps = false;
+      for (final member in node.members) {
+        if (member is MethodDeclaration &&
+            member.isGetter &&
+            member.name.lexeme == 'props') {
+          hasProps = true;
+          break;
+        }
+      }
+
+      if (!hasProps) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Equatable uses mutable collections in props.
+///
+/// Alias: equatable_mutable_collection, immutable_props
+///
+/// Mutable List/Map in Equatable can change after creation, breaking equality.
+///
+/// **BAD:**
+/// ```dart
+/// class User extends Equatable {
+///   final List<String> tags;  // Mutable list!
+///   @override
+///   List<Object?> get props => [tags];
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class User extends Equatable {
+///   final List<String> tags;
+///   @override
+///   List<Object?> get props => [List.unmodifiable(tags)];
+///   // Or use IList from fast_immutable_collections
+/// }
+/// ```
+class AvoidEquatableMutableCollectionsRule extends SaropaLintRule {
+  const AvoidEquatableMutableCollectionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_equatable_mutable_collections',
+    problemMessage:
+        'Mutable collections in Equatable can break equality comparison.',
+    correctionMessage:
+        'Use List.unmodifiable() or immutable collections like IList.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Equatable
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+      if (extendsClause.superclass.name.lexeme != 'Equatable') return;
+
+      // Check fields for mutable collections
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          final type = member.fields.type?.toSource() ?? '';
+          if (type.startsWith('List<') ||
+              type.startsWith('Map<') ||
+              type.startsWith('Set<')) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 6: Additional Rules - Bloc & Static State
+// =============================================================================
+
+/// Warns when Bloc async handler doesn't emit loading state.
+///
+/// Alias: bloc_missing_loading, async_loading_state
+///
+/// Async operations should emit loading state to show UI feedback.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
+///   final data = await api.fetch();  // No loading state!
+///   emit(LoadedState(data));
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> _onFetch(FetchEvent event, Emitter<State> emit) async {
+///   emit(LoadingState());
+///   final data = await api.fetch();
+///   emit(LoadedState(data));
+/// }
+/// ```
+class RequireBlocLoadingStateRule extends SaropaLintRule {
+  const RequireBlocLoadingStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_loading_state',
+    problemMessage: 'Async Bloc handler should emit loading state.',
+    correctionMessage: 'Add emit(LoadingState()) before async operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Check if async method
+      if (node.body is! BlockFunctionBody) return;
+      final body = node.body as BlockFunctionBody;
+      if (body.keyword?.lexeme != 'async') return;
+
+      // Check if in Bloc class
+      final parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+      final extendsClause = parent.extendsClause;
+      if (extendsClause == null) return;
+      final superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check if method has Emitter parameter (Bloc handler)
+      bool hasEmitter = false;
+      for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
+        final paramSource = param.toSource();
+        if (paramSource.contains('Emitter')) {
+          hasEmitter = true;
+          break;
+        }
+      }
+
+      if (!hasEmitter) return;
+
+      // Check if emit is called before await
+      final methodSource = body.toSource();
+      final awaitIndex = methodSource.indexOf('await ');
+      if (awaitIndex == -1) return;
+
+      final beforeAwait = methodSource.substring(0, awaitIndex);
+      final hasLoadingEmit = beforeAwait.contains('emit(') &&
+          (beforeAwait.toLowerCase().contains('loading') ||
+              beforeAwait.toLowerCase().contains('inprogress'));
+
+      if (!hasLoadingEmit) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Bloc state sealed class doesn't have an error case.
+///
+/// Alias: bloc_missing_error_state, state_error_handling
+///
+/// Bloc states should include an error case for proper error handling.
+///
+/// **BAD:**
+/// ```dart
+/// sealed class UserState {}
+/// class UserInitial extends UserState {}
+/// class UserLoaded extends UserState {}
+/// // Missing error state!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// sealed class UserState {}
+/// class UserInitial extends UserState {}
+/// class UserLoaded extends UserState {}
+/// class UserError extends UserState {}
+/// ```
+class RequireBlocErrorStateRule extends SaropaLintRule {
+  const RequireBlocErrorStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_error_state',
+    problemMessage: 'Bloc state sealed class should have an error case.',
+    correctionMessage: 'Add an error state class (e.g., UserError).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if sealed class ending with State
+      if (node.sealedKeyword == null) return;
+      if (!node.name.lexeme.endsWith('State')) return;
+
+      // This is a sealed state class - check file for error subclass
+      final fileSource = resolver.source.contents.data;
+      final className = node.name.lexeme;
+      final baseName = className.replaceAll('State', '');
+
+      // Look for error/failure subclass
+      final hasError = fileSource.contains('${baseName}Error') ||
+          fileSource.contains('${baseName}Failure') ||
+          fileSource.contains('${className}Error') ||
+          fileSource.contains('Error extends $className');
+
+      if (!hasError) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when static mutable state is used.
+///
+/// Alias: global_mutable_state, static_state_antipattern
+///
+/// Static mutable state causes issues with testing, hot reload, and
+/// can lead to subtle bugs in concurrent scenarios.
+///
+/// **BAD:**
+/// ```dart
+/// class AppState {
+///   static User? currentUser;  // Global mutable state!
+///   static List<String> cache = [];
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use proper state management:
+/// final userProvider = StateProvider<User?>((ref) => null);
+/// // Or dependency injection:
+/// class AppState {
+///   User? currentUser;  // Instance field, not static
+/// }
+/// ```
+class AvoidStaticStateRule extends SaropaLintRule {
+  const AvoidStaticStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_static_state',
+    problemMessage: 'Static mutable state can cause testing and hot-reload issues.',
+    correctionMessage:
+        'Use proper state management (Provider, Riverpod, Bloc) instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      if (!node.isStatic) return;
+      if (node.fields.isFinal && node.fields.isConst) return;
+
+      // Skip if final with immutable initializer
+      if (node.fields.isFinal) {
+        for (final variable in node.fields.variables) {
+          final init = variable.initializer;
+          if (init != null) {
+            final initSource = init.toSource();
+            // Allow final static with const initializers
+            if (initSource.startsWith('const ') ||
+                initSource == 'true' ||
+                initSource == 'false' ||
+                RegExp(r'^[\d.]+$').hasMatch(initSource) ||
+                initSource.startsWith("'") ||
+                initSource.startsWith('"')) {
+              return;
+            }
+          }
+        }
+      }
+
+      // Check for mutable types
+      final type = node.fields.type?.toSource() ?? '';
+      final isMutableCollection =
+          type.startsWith('List') || type.startsWith('Map') || type.startsWith('Set');
+
+      // Non-final static or mutable collection
+      if (!node.fields.isFinal || isMutableCollection) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

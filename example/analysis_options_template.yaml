@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.0.0)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.2.0)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -860,6 +860,36 @@ custom_lint:
     - move_variable_outside_iteration: false
     - use_existing_variable: false
     - prefer_type_over_var: false
+
+    # =========================================================================
+    # PACKAGE-SPECIFIC RULES (v2.2.0)
+    # =========================================================================
+    # Authentication
+    - require_google_signin_error_handling: false
+    - require_apple_signin_nonce: false
+    - avoid_openai_key_in_code: false
+    - require_openai_error_handling: false
+    # Supabase
+    - require_supabase_error_handling: false
+    - avoid_supabase_anon_key_in_code: false
+    - require_supabase_realtime_unsubscribe: false
+    # WebView
+    - require_webview_ssl_error_handling: false
+    - avoid_webview_file_access: false
+    # WorkManager
+    - require_workmanager_constraints: false
+    - require_workmanager_result_return: false
+    # Disposal
+    - require_keyboard_visibility_dispose: false
+    - require_speech_stop_on_dispose: false
+    - require_calendar_timezone_handling: false
+    # Security
+    - avoid_app_links_sensitive_params: false
+    - require_envied_obfuscation: false
+    # UI Components
+    - require_svg_error_handler: false
+    - require_google_fonts_fallback: false
+    - prefer_uuid_v4: false
 
     # =========================================================================
     # OPINIONATED RULES (Not in any tier - enable individually)
