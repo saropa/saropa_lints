@@ -1116,7 +1116,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Platform (Batch 14 - opinionated)
   'prefer_cupertino_for_ios_feel',
   'prefer_keyboard_shortcuts',
-
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.

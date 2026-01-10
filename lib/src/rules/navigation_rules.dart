@@ -869,6 +869,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
   }
 }
 
+// cspell:ignore myapp
 /// Warns when deep link contains sensitive parameters like password or token.
 ///
 /// Deep links are logged and may be visible in browser history or analytics.
@@ -895,7 +896,8 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
     problemMessage: 'Deep link should not contain sensitive parameters.',
-    correctionMessage: 'Do not pass passwords, tokens, or secrets via deep link.',
+    correctionMessage:
+        'Do not pass passwords, tokens, or secrets via deep link.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -978,7 +980,8 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_typed_route_params',
     problemMessage: 'Route parameter used without type conversion.',
-    correctionMessage: 'Use int.tryParse/double.tryParse for numeric parameters.',
+    correctionMessage:
+        'Use int.tryParse/double.tryParse for numeric parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1150,10 +1153,8 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check for multi-step patterns
-      final bool hasMultipleSteps = RegExp(r'step\s*==\s*\d')
-              .allMatches(bodySource)
-              .length >=
-          3;
+      final bool hasMultipleSteps =
+          RegExp(r'step\s*==\s*\d').allMatches(bodySource).length >= 3;
 
       if (!hasMultipleSteps) return;
 
@@ -1221,7 +1222,9 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
 
       // Check for ListView.builder or similar patterns
       if (typeName != 'ListView' && typeName != 'GridView') return;
-      if (constructorName != 'builder' && constructorName != 'separated') return;
+      if (constructorName != 'builder' && constructorName != 'separated') {
+        return;
+      }
 
       // Check if wrapped in RefreshIndicator
       if (_hasRefreshIndicatorAncestor(node)) return;
