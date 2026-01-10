@@ -806,8 +806,7 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
     name: 'avoid_riverpod_state_mutation',
     problemMessage:
         'State mutated directly. Mutations don\'t trigger rebuilds.',
-    correctionMessage:
-        'Use state = state.copyWith(...) to replace state.',
+    correctionMessage: 'Use state = state.copyWith(...) to replace state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -948,8 +947,7 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_flutter_riverpod_package',
-    problemMessage:
-        'Use flutter_riverpod instead of riverpod in Flutter apps.',
+    problemMessage: 'Use flutter_riverpod instead of riverpod in Flutter apps.',
     correctionMessage:
         'Import package:flutter_riverpod/flutter_riverpod.dart instead.',
     errorSeverity: DiagnosticSeverity.ERROR,

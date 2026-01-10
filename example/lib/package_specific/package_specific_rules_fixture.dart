@@ -78,8 +78,11 @@ class GoogleFonts {
 
 // Mock Flutter types
 class Widget {}
+
 class Container extends Widget {}
+
 class TextStyle {}
+
 class State<T> {
   void dispose() {}
 }

@@ -126,7 +126,9 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for put/add operations
-      if (methodName != 'put' && methodName != 'add' && methodName != 'addAll') {
+      if (methodName != 'put' &&
+          methodName != 'add' &&
+          methodName != 'addAll') {
         return;
       }
 
@@ -142,9 +144,8 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       if (args.isEmpty) return;
 
       // Get the value argument (2nd for put, 1st for add)
-      final Expression valueArg = methodName == 'put' && args.length > 1
-          ? args[1]
-          : args.first;
+      final Expression valueArg =
+          methodName == 'put' && args.length > 1 ? args[1] : args.first;
 
       // Check if value is a user-defined class instance
       final String? typeName = valueArg.staticType?.element?.name;
@@ -203,10 +204,8 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
-    problemMessage:
-        'Hive box opened but not closed in dispose. Resource leak.',
-    correctionMessage:
-        'Call box.close() in dispose() method.',
+    problemMessage: 'Hive box opened but not closed in dispose. Resource leak.',
+    correctionMessage: 'Call box.close() in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -223,8 +222,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
-            final String typeStr =
-                member.fields.type?.toSource() ?? '';
+            final String typeStr = member.fields.type?.toSource() ?? '';
             final String nameStr = variable.name.lexeme.toLowerCase();
 
             if (typeStr.contains('Box') || nameStr.contains('box')) {
@@ -287,8 +285,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
-    problemMessage:
-        'Sensitive data stored in unencrypted Hive box.',
+    problemMessage: 'Sensitive data stored in unencrypted Hive box.',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -383,8 +380,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
     ) {
-      final String typeName =
-          node.constructorName.type.name.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'HiveAesCipher') return;
 

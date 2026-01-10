@@ -15628,8 +15628,8 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'TextFormField') return;
 
@@ -15723,8 +15723,8 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
@@ -15813,8 +15813,8 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (!_scrollableTypes.contains(typeName)) return;
 
@@ -15899,8 +15899,8 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'AnimatedBuilder') return;
 
@@ -16029,7 +16029,8 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       final value = node.value;
-      if (value.startsWith('http://') && !value.startsWith('http://localhost') &&
+      if (value.startsWith('http://') &&
+          !value.startsWith('http://localhost') &&
           !value.startsWith('http://127.0.0.1') &&
           !value.startsWith('http://10.') &&
           !value.startsWith('http://192.168.')) {
@@ -16075,7 +16076,8 @@ class RequireWssOverWsRule extends SaropaLintRule {
   ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       final value = node.value;
-      if (value.startsWith('ws://') && !value.startsWith('ws://localhost') &&
+      if (value.startsWith('ws://') &&
+          !value.startsWith('ws://localhost') &&
           !value.startsWith('ws://127.0.0.1') &&
           !value.startsWith('ws://10.') &&
           !value.startsWith('ws://192.168.')) {

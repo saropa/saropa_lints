@@ -257,6 +257,71 @@ const Set<String> essentialRules = <String>{
   // Part 6 - Form Rules (Essential)
   'avoid_keyboard_overlap',
   'require_search_debounce', // Prevents request spam
+
+  // =========================================================================
+  // ROADMAP_NEXT Parts 1-7 Rules
+  // =========================================================================
+
+  // Part 1 - Isar Database Rules (Essential - prevent data corruption)
+  'require_isar_collection_annotation', // ERROR - missing annotation
+  'require_isar_id_field', // ERROR - missing ID field
+  'require_isar_close_on_dispose', // WARNING - resource leak
+  'avoid_isar_schema_breaking_changes', // ERROR - data corruption
+  'require_isar_links_load', // ERROR - accessing unloaded links
+  'avoid_isar_transaction_nesting', // ERROR - deadlocks
+  'require_isar_non_nullable_migration', // ERROR - data corruption
+  'require_isar_inspector_debug_only', // WARNING - production exposure
+  'avoid_isar_clear_in_production', // ERROR - data loss
+
+  // Part 2 - Dispose Pattern Rules (Essential - memory leaks)
+  'require_change_notifier_dispose', // ERROR - memory leak
+  'require_receive_port_close', // ERROR - resource leak
+  'require_socket_close', // ERROR - resource leak
+  'require_debouncer_cancel', // ERROR - timer leak
+  'require_interval_timer_cancel', // ERROR - timer leak
+  'require_file_handle_close', // WARNING - file handle leak
+
+  // Part 3 - Widget Lifecycle Rules (Essential - crashes)
+  'require_super_dispose_call', // ERROR - broken lifecycle
+  'require_super_init_state_call', // ERROR - broken lifecycle
+  'avoid_set_state_in_build', // ERROR - infinite rebuild
+  'avoid_set_state_in_dispose', // ERROR - disposed widget
+  'avoid_navigation_in_build', // ERROR - navigation chaos
+
+  // Part 4 - Missing Parameter Rules (Essential)
+  'require_provider_generic_type', // ERROR - wrong type inference
+  'require_text_form_field_in_form', // WARNING - broken validation
+
+  // Part 5 - Exact API Pattern Rules (Essential)
+  'require_flutter_riverpod_package', // ERROR - import error
+  'avoid_bloc_emit_after_close', // ERROR - emit on closed bloc
+  'avoid_bloc_state_mutation', // ERROR - equality bugs
+  'require_bloc_initial_state', // ERROR - null state
+  'require_physics_for_nested_scroll', // WARNING - scroll conflict
+  'require_animated_builder_child', // WARNING - performance
+  'require_rethrow_preserve_stack', // WARNING - lost stack trace
+  'require_https_over_http', // ERROR - security
+  'require_wss_over_ws', // ERROR - security
+  'avoid_late_without_guarantee', // WARNING - LateInitializationError
+
+  // Part 6 - Additional Easy Rules (Essential)
+  'require_secure_storage_auth_data', // ERROR - security
+  'avoid_freezed_json_serializable_conflict', // ERROR - build failure
+  'require_freezed_arrow_syntax', // ERROR - wrong fromJson
+  'require_freezed_private_constructor', // ERROR - build failure
+  'require_equatable_immutable', // ERROR - equality bugs
+  'require_equatable_props_override', // ERROR - equality bugs
+  'avoid_equatable_mutable_collections', // WARNING - equality bugs
+  'avoid_static_state', // WARNING - state leaks between tests
+
+  // Part 7 - Package-Specific Rules (Essential)
+  'avoid_dio_debug_print_production', // WARNING - security
+  'require_url_launcher_error_handling', // WARNING - crash
+  'require_image_picker_error_handling', // WARNING - crash
+  'require_geolocator_timeout', // WARNING - hang
+  'require_connectivity_subscription_cancel', // ERROR - leak
+  'require_notification_handler_top_level', // ERROR - crash
+  'require_permission_denied_handling', // WARNING - crash
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -596,6 +661,20 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Part 6 - Flutter Widget Rules (Recommended)
   'require_orientation_handling',
+
+  // =========================================================================
+  // ROADMAP_NEXT Parts 1-7 Rules (Recommended)
+  // =========================================================================
+
+  // Part 6 - Bloc Rules (Recommended - good practice)
+  'require_bloc_loading_state', // INFO - UX
+  'require_bloc_error_state', // INFO - UX
+
+  // Part 7 - Dio Rules (Recommended - maintainability)
+  'avoid_dio_without_base_url', // INFO - consistency
+
+  // Part 7 - Image Picker Rules (Recommended - UX)
+  'require_image_picker_source_choice', // INFO - flexibility
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1033,6 +1112,30 @@ const Set<String> professionalOnlyRules = <String>{
   'require_future_wait_error_handling',
   'require_stream_on_done',
   'require_completer_error_handling',
+
+  // =========================================================================
+  // ROADMAP_NEXT Parts 1-7 Rules (Professional)
+  // =========================================================================
+
+  // Part 1 - Isar Database Rules (Professional - optimization)
+  'prefer_isar_index_for_queries', // INFO - query performance
+  'avoid_isar_embedded_large_objects', // WARNING - memory
+  'prefer_isar_async_writes', // INFO - UI responsiveness
+  'prefer_isar_lazy_links', // INFO - large collections
+  'avoid_isar_web_limitations', // WARNING - platform compat
+  'prefer_isar_batch_operations', // INFO - performance
+  'avoid_isar_string_contains_without_index', // WARNING - performance
+  'prefer_isar_composite_index', // INFO - query performance
+  'prefer_isar_query_stream', // INFO - reactivity
+  'avoid_isar_float_equality_queries', // WARNING - precision
+
+  // Part 7 - Dio Rules (Professional - architecture)
+  'require_dio_singleton', // INFO - consistency
+  'prefer_dio_base_options', // INFO - maintainability
+
+  // Part 7 - GoRouter Rules (Professional - best practice)
+  'prefer_go_router_redirect_auth', // INFO - separation of concerns
+  'require_go_router_typed_params', // INFO - type safety
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
