@@ -40,10 +40,8 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_json_decode_try_catch',
-    problemMessage:
-        'jsonDecode throws on malformed JSON. Wrap in try-catch.',
-    correctionMessage:
-        'Add try-catch for FormatException around jsonDecode.',
+    problemMessage: 'jsonDecode throws on malformed JSON. Wrap in try-catch.',
+    correctionMessage: 'Add try-catch for FormatException around jsonDecode.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -62,7 +60,8 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final String source = node.function.toSource();
       if (source != 'jsonDecode') return;
 
@@ -118,8 +117,7 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
     name: 'avoid_datetime_parse_unvalidated',
     problemMessage:
         'DateTime.parse throws on invalid input. Use tryParse or try-catch.',
-    correctionMessage:
-        'Replace with DateTime.tryParse() or wrap in try-catch.',
+    correctionMessage: 'Replace with DateTime.tryParse() or wrap in try-catch.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -218,8 +216,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     name: 'prefer_try_parse_for_dynamic_data',
     problemMessage:
         'parse() throws on invalid input. Use tryParse() for dynamic data.',
-    correctionMessage:
-        'Replace with tryParse() and handle null result.',
+    correctionMessage: 'Replace with tryParse() and handle null result.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -326,8 +323,7 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
     name: 'avoid_double_for_money',
     problemMessage:
         'double has precision issues for money. Use int cents or Decimal.',
-    correctionMessage:
-        'Store money as int cents or use a Decimal package.',
+    correctionMessage: 'Store money as int cents or use a Decimal package.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -366,9 +362,10 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
   ) {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       // Check type
-      final VariableDeclarationList? parent = node.parent is VariableDeclarationList
-          ? node.parent as VariableDeclarationList
-          : null;
+      final VariableDeclarationList? parent =
+          node.parent is VariableDeclarationList
+              ? node.parent as VariableDeclarationList
+              : null;
       if (parent == null) return;
 
       final String? typeName = parent.type?.toSource();
@@ -425,8 +422,7 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_logs',
-    problemMessage:
-        'Sensitive data in logs creates security risks.',
+    problemMessage: 'Sensitive data in logs creates security risks.',
     correctionMessage:
         'Remove sensitive data or log only non-sensitive metadata.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -486,7 +482,8 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final String funcName = node.function.toSource();
       if (!_logMethods.contains(funcName)) return;
 
@@ -552,10 +549,8 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_getit_reset_in_tests',
-    problemMessage:
-        'GetIt singletons persist across tests. Reset in setUp.',
-    correctionMessage:
-        'Add GetIt.I.reset() in setUp() or setUpAll().',
+    problemMessage: 'GetIt singletons persist across tests. Reset in setUp.',
+    correctionMessage: 'Add GetIt.I.reset() in setUp() or setUpAll().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -642,10 +637,8 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_error_handling',
-    problemMessage:
-        'WebSocket listener without onError can crash on errors.',
-    correctionMessage:
-        'Add onError handler to WebSocket stream.listen().',
+    problemMessage: 'WebSocket listener without onError can crash on errors.',
+    correctionMessage: 'Add onError handler to WebSocket stream.listen().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -714,8 +707,7 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_autoplay_audio',
-    problemMessage:
-        'Autoplay is blocked on iOS/web and annoys users.',
+    problemMessage: 'Autoplay is blocked on iOS/web and annoys users.',
     correctionMessage:
         'Set autoPlay: false and require user interaction to play.',
     errorSeverity: DiagnosticSeverity.INFO,

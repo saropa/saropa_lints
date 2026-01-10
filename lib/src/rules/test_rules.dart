@@ -1688,8 +1688,9 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
 
       // Also check for deep internal call verification patterns
       // e.g., verify(mock.internalMethod().subMethod()).called(1)
-      final int chainedVerifies =
-          RegExp(r'verify\([^)]+\.[^)]+\.[^)]+\)').allMatches(bodySource).length;
+      final int chainedVerifies = RegExp(r'verify\([^)]+\.[^)]+\.[^)]+\)')
+          .allMatches(bodySource)
+          .length;
 
       if (chainedVerifies >= 2) {
         reporter.atNode(node.methodName, code);

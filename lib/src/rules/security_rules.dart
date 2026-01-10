@@ -2692,8 +2692,7 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_secure_password_field',
-    problemMessage:
-        'Password field missing secure keyboard settings.',
+    problemMessage: 'Password field missing secure keyboard settings.',
     correctionMessage:
         'Add enableSuggestions: false and autocorrect: false for passwords.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2826,8 +2825,7 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_path_traversal',
-    problemMessage:
-        'File path may be vulnerable to path traversal attack.',
+    problemMessage: 'File path may be vulnerable to path traversal attack.',
     correctionMessage:
         'Validate paths: check for "..", use basename, verify resolved path.',
     errorSeverity: DiagnosticSeverity.WARNING,

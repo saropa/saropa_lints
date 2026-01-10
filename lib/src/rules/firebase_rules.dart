@@ -848,8 +848,12 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
           '.updateAll('.allMatches(bodySource).length;
       final int setCount = '.set('.allMatches(bodySource).length;
 
-      final int writeOps =
-          putCount + addCount + insertCount + deleteCount + updateCount + setCount;
+      final int writeOps = putCount +
+          addCount +
+          insertCount +
+          deleteCount +
+          updateCount +
+          setCount;
 
       // If few writes, not a concern
       if (writeOps < 3) return;
@@ -913,8 +917,7 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
     name: 'require_hive_database_close',
     problemMessage:
         'Database opened but no close() method found. Resource leak risk.',
-    correctionMessage:
-        'Add dispose() method that calls database.close().',
+    correctionMessage: 'Add dispose() method that calls database.close().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
