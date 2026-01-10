@@ -481,8 +481,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_geolocator_permission_check',
-    problemMessage:
-        'Location access without permission check. Crashes on iOS.',
+    problemMessage: 'Location access without permission check. Crashes on iOS.',
     correctionMessage:
         'Call Geolocator.checkPermission() before getCurrentPosition().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -557,8 +556,7 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
     name: 'require_geolocator_service_enabled',
     problemMessage:
         'Location request without service check. May fail if GPS is off.',
-    correctionMessage:
-        'Call Geolocator.isLocationServiceEnabled() first.',
+    correctionMessage: 'Call Geolocator.isLocationServiceEnabled() first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -631,8 +629,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
     name: 'require_geolocator_stream_cancel',
     problemMessage:
         'Position stream subscription without cancel. Battery drain.',
-    correctionMessage:
-        'Store subscription and call cancel() in dispose().',
+    correctionMessage: 'Store subscription and call cancel() in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -659,8 +656,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
 
       // Check if result is assigned to a variable
       AstNode? parent = node.parent;
-      if (parent is! VariableDeclaration &&
-          parent is! AssignmentExpression) {
+      if (parent is! VariableDeclaration && parent is! AssignmentExpression) {
         reporter.atNode(node, code);
       }
     });
@@ -694,8 +690,7 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
     name: 'require_geolocator_error_handling',
     problemMessage:
         'Location request without error handling. May crash on failure.',
-    correctionMessage:
-        'Wrap in try-catch to handle location errors.',
+    correctionMessage: 'Wrap in try-catch to handle location errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

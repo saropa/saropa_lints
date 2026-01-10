@@ -391,8 +391,7 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_collection_annotation',
-    problemMessage:
-        'Class used with Isar must have @collection annotation.',
+    problemMessage: 'Class used with Isar must have @collection annotation.',
     correctionMessage: 'Add @collection annotation to the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -694,8 +693,7 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_transaction_nesting',
     problemMessage: 'Nested writeTxn calls cause deadlocks.',
-    correctionMessage:
-        'Combine operations into a single writeTxn block.',
+    correctionMessage: 'Combine operations into a single writeTxn block.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -885,8 +883,7 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_inspector_debug_only',
-    problemMessage:
-        'Isar Inspector should only be enabled in debug mode.',
+    problemMessage: 'Isar Inspector should only be enabled in debug mode.',
     correctionMessage: 'Use inspector: kDebugMode instead of inspector: true.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -946,10 +943,8 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_clear_in_production',
-    problemMessage:
-        'isar.clear() deletes all data. Wrap in kDebugMode check.',
-    correctionMessage:
-        'Add if (kDebugMode) guard before calling clear().',
+    problemMessage: 'isar.clear() deletes all data. Wrap in kDebugMode check.',
+    correctionMessage: 'Add if (kDebugMode) guard before calling clear().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1096,8 +1091,8 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for Timer.periodic
       final constructorName = node.constructorName.toString();
       if (!constructorName.contains('Timer.periodic')) return;
@@ -1144,8 +1139,7 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_web_limitations',
-    problemMessage:
-        'Isar sync APIs do not work on web. Use async methods.',
+    problemMessage: 'Isar sync APIs do not work on web. Use async methods.',
     correctionMessage:
         'Replace Sync methods with async equivalents for web compatibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1212,8 +1206,7 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
     name: 'prefer_isar_index_for_queries',
     problemMessage:
         'Consider adding @Index to frequently queried fields for better performance.',
-    correctionMessage:
-        'Add @Index() annotation to the field being queried.',
+    correctionMessage: 'Add @Index() annotation to the field being queried.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1355,8 +1348,8 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final type = node.constructorName.type;
       final typeName = type.name2.lexeme;
       if (typeName != 'IsarLinks') return;
@@ -1390,8 +1383,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
     name: 'avoid_isar_schema_breaking_changes',
     problemMessage:
         'Isar field changes may break migrations. Use @Name to preserve DB field names.',
-    correctionMessage:
-        'Add @Name("originalFieldName") when renaming fields.',
+    correctionMessage: 'Add @Name("originalFieldName") when renaming fields.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1458,8 +1450,7 @@ class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
     name: 'require_isar_non_nullable_migration',
     problemMessage:
         'Non-nullable Isar fields need default values for migration safety.',
-    correctionMessage:
-        'Make the field nullable or provide a default value.',
+    correctionMessage: 'Make the field nullable or provide a default value.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1533,8 +1524,7 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_isar_composite_index',
-    problemMessage:
-        'Multi-field queries benefit from composite indexes.',
+    problemMessage: 'Multi-field queries benefit from composite indexes.',
     correctionMessage:
         'Add @Index(composite: [...]) for frequently used field combinations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1549,7 +1539,8 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for chained filter conditions
       final methodName = node.methodName.name;
-      if (!methodName.endsWith('EqualTo') && !methodName.endsWith('StartsWith')) {
+      if (!methodName.endsWith('EqualTo') &&
+          !methodName.endsWith('StartsWith')) {
         return;
       }
 

@@ -794,8 +794,10 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
       }
 
       // Need at least memory cache dimensions
-      if (!hasMemCacheWidth && !hasMemCacheHeight &&
-          !hasMaxWidthDiskCache && !hasMaxHeightDiskCache) {
+      if (!hasMemCacheWidth &&
+          !hasMemCacheHeight &&
+          !hasMaxWidthDiskCache &&
+          !hasMaxHeightDiskCache) {
         reporter.atNode(node, code);
       }
     });
@@ -828,8 +830,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
     name: 'require_cached_image_placeholder',
     problemMessage:
         'CachedNetworkImage without placeholder. User sees blank during load.',
-    correctionMessage:
-        'Add placeholder parameter for loading state.',
+    correctionMessage: 'Add placeholder parameter for loading state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -889,8 +890,7 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
     name: 'require_cached_image_error_widget',
     problemMessage:
         'CachedNetworkImage without errorWidget. Broken images show nothing.',
-    correctionMessage:
-        'Add errorWidget parameter to handle failed loads.',
+    correctionMessage: 'Add errorWidget parameter to handle failed loads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

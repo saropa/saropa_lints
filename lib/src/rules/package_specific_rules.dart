@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -152,7 +153,8 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_apple_signin_nonce',
-    problemMessage: 'Apple Sign-In should include nonce parameter for security.',
+    problemMessage:
+        'Apple Sign-In should include nonce parameter for security.',
     correctionMessage:
         'Add nonce parameter to getAppleIDCredential() to prevent replay attacks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -599,8 +601,8 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for legacy WebView/InAppWebView constructors
@@ -1083,8 +1085,8 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
 
       // device_calendar Event requires a positional calendarId as first arg
       // This helps distinguish it from other Event classes
-      final bool hasPositionalArg = args.arguments.isNotEmpty &&
-          args.arguments.first is! NamedExpression;
+      final bool hasPositionalArg =
+          args.arguments.isNotEmpty && args.arguments.first is! NamedExpression;
       if (!hasPositionalArg) return;
 
       // Must have both 'start' and 'end' named parameters (device_calendar pattern)
