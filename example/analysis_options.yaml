@@ -18,3 +18,16 @@ custom_lint:
     - avoid_print_in_production: true
     # Explicitly enable to debug
     - prefer_where_or_null: true
+    # Explicitly enable new rules to test
+    - avoid_gradient_in_build: true
+    - avoid_snackbar_in_build: true
+    - avoid_hardcoded_feature_flags: true
+    - prefer_secure_random_for_crypto: true
+    - require_json_decode_try_catch: true
+    - avoid_datetime_parse_unvalidated: true
+    - avoid_shrinkwrap_in_scrollview: true
+    - avoid_nested_scrollables_conflict: true
+    - avoid_multiple_autofocus: true
+    - avoid_excessive_bottom_nav_items: true
+    - require_media_player_dispose: true
+    - require_tab_controller_dispose: true

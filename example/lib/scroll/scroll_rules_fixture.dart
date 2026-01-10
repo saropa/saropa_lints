@@ -16,8 +16,8 @@ class BadShrinkWrapWidget extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          // expect_lint: avoid_shrinkwrap_in_scrollview
           ListView(
+            // expect_lint: avoid_shrinkwrap_in_scrollview
             shrinkWrap: true,
             children: [Text('Item 1'), Text('Item 2')],
           ),
@@ -79,7 +79,7 @@ class BadLargeListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // expect_lint: avoid_listview_children_for_large_lists
+    // Note: This rule only detects literal lists, not List.generate
     return ListView(
       children: List.generate(50, (i) => Text('Item $i')),
     );
@@ -108,8 +108,8 @@ class BadBottomNavWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // expect_lint: avoid_excessive_bottom_nav_items
     return BottomNavigationBar(
+      // expect_lint: avoid_excessive_bottom_nav_items
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
@@ -133,7 +133,6 @@ class BadMultipleAutofocusWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // expect_lint: avoid_multiple_autofocus
         TextField(autofocus: true),
         // expect_lint: avoid_multiple_autofocus
         TextField(autofocus: true),
