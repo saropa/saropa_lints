@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when Firestore query doesn't have a limit.
 ///
+/// Alias: firestore_query_limit, no_unbounded_query
+///
 /// Firestore queries without limits can return unbounded amounts of data,
 /// causing performance issues and high costs. Always limit query results.
 ///
@@ -92,6 +94,8 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
 }
 
 /// Warns when database operations are performed directly in widget build.
+///
+/// Alias: no_database_in_build, cache_database_query, avoid_firestore_in_widget_build
 ///
 /// Database operations in build() cause queries on every rebuild, leading
 /// to performance issues and unnecessary reads/costs. Use state management
@@ -212,6 +216,8 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when SharedPreferences uses string literals for keys.
 ///
+/// Alias: prefs_key_constant, no_string_literal_prefs_key
+///
 /// Using string literals for SharedPreferences keys is error-prone.
 /// A typo in the key string will silently fail. Define keys as constants.
 ///
@@ -294,6 +300,8 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
 
 /// Warns when flutter_secure_storage is used in web builds.
 ///
+/// Alias: no_secure_storage_web, web_storage_insecure
+///
 /// flutter_secure_storage uses localStorage on web, which is not secure.
 /// Sensitive data on web should use different approaches like encrypted
 /// cookies with HttpOnly flag or server-side storage.
@@ -375,6 +383,8 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
 }
 
 /// Warns when SharedPreferences is used to store large data.
+///
+/// Alias: no_large_prefs, use_database_for_large_data
 ///
 /// SharedPreferences loads the entire file on first access. Storing large
 /// amounts of data causes slow startup and memory issues. Use a database
@@ -464,6 +474,8 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
 }
 
 /// Warns when Firebase services are used before initialization.
+///
+/// Alias: firebase_init_first, no_firebase_before_init
 ///
 /// Firebase.initializeApp() must complete before accessing any Firebase
 /// service. Without it, all provider access throws errors.
@@ -586,6 +598,8 @@ class _AddFirebaseInitFix extends DartFix {
 
 /// Warns when database schema changes lack migration support.
 ///
+/// Alias: database_migration, schema_versioning
+///
 /// Breaking schema changes without migrations corrupt existing user data.
 /// Use versioned migrations for schema evolution.
 ///
@@ -683,6 +697,8 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
 }
 
 /// Warns when frequently queried database fields lack indices.
+///
+/// Alias: index_database_field, add_query_index
 ///
 /// Queries on non-indexed fields are slow. Add indices for fields
 /// used in where clauses, especially in large collections.
@@ -786,6 +802,8 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
 
 /// Warns when multiple database writes are not batched in transactions.
 ///
+/// Alias: batch_database_writes, use_transaction
+///
 /// Individual writes are slower and can leave data inconsistent.
 /// Use transactions or batch writes for multiple related changes.
 ///
@@ -878,6 +896,8 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
 
 /// Warns when database connections are not properly closed.
 ///
+/// Alias: close_database, database_connection_leak
+///
 /// Unclosed database connections cause resource leaks and can prevent
 /// proper app shutdown. Always close databases in dispose.
 ///
@@ -953,6 +973,8 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
 }
 
 /// Warns when Hive type adapters are used without registration.
+///
+/// Alias: register_hive_adapter, hive_adapter_missing
 ///
 /// Custom Hive types require adapters to be registered before use.
 /// Unregistered adapters cause runtime errors.
@@ -1045,6 +1067,8 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
 
 /// Warns when large data is loaded into regular Hive boxes instead of lazy.
 ///
+/// Alias: use_lazy_box, hive_lazy_loading
+///
 /// Regular boxes load all data into memory at open time. For large
 /// datasets, use lazy boxes that load values on demand.
 ///
@@ -1135,6 +1159,796 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
             return;
           }
         }
+      }
+    });
+  }
+}
+
+/// Warns when Firebase Analytics event name doesn't follow conventions.
+///
+/// Alias: firebase_event_naming, analytics_event_format
+///
+/// Firebase Analytics has strict naming conventions:
+/// - Must start with a letter
+/// - Can only contain alphanumeric characters and underscores
+/// - Must be 1-40 characters
+/// - Cannot start with 'firebase_', 'google_', or 'ga_' (reserved)
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// analytics.logEvent(name: 'User-Clicked-Button'); // Hyphens not allowed
+/// analytics.logEvent(name: 'firebase_custom'); // Reserved prefix
+/// analytics.logEvent(name: '123_event'); // Must start with letter
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// analytics.logEvent(name: 'user_clicked_button');
+/// analytics.logEvent(name: 'purchase_completed');
+/// ```
+class IncorrectFirebaseEventNameRule extends SaropaLintRule {
+  const IncorrectFirebaseEventNameRule() : super(code: _code);
+
+  /// Critical issue. Invalid event names are silently dropped.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'incorrect_firebase_event_name',
+    problemMessage: 'Firebase Analytics event name does not follow conventions.',
+    correctionMessage:
+        'Event names must: start with a letter, contain only alphanumeric '
+        'and underscores, be 1-40 chars, and not use reserved prefixes.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Valid event name pattern
+  static final RegExp _validEventName = RegExp(r'^[a-zA-Z][a-zA-Z0-9_]{0,39}$');
+
+  /// Reserved prefixes
+  static const List<String> _reservedPrefixes = <String>[
+    'firebase_',
+    'google_',
+    'ga_',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'logEvent') return;
+
+      // Find the 'name' argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'name') {
+          final Expression value = arg.expression;
+          if (value is StringLiteral) {
+            final String? eventName = value.stringValue;
+            if (eventName != null && !_isValidEventName(eventName)) {
+              reporter.atNode(value, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  bool _isValidEventName(String name) {
+    // Check reserved prefixes
+    for (final String prefix in _reservedPrefixes) {
+      if (name.toLowerCase().startsWith(prefix)) {
+        return false;
+      }
+    }
+
+    // Check pattern
+    return _validEventName.hasMatch(name);
+  }
+}
+
+/// Warns when Firebase Analytics parameter name doesn't follow conventions.
+///
+/// Alias: firebase_param_naming, analytics_param_format
+///
+/// Firebase Analytics parameters have strict naming conventions:
+/// - Must start with a letter
+/// - Can only contain alphanumeric characters and underscores
+/// - Must be 1-40 characters
+/// - Cannot start with 'firebase_', 'google_', or 'ga_' (reserved)
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// analytics.logEvent(
+///   name: 'purchase',
+///   parameters: {
+///     'item-id': '123', // Hyphens not allowed
+///     'firebase_custom': 'value', // Reserved prefix
+///   },
+/// );
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// analytics.logEvent(
+///   name: 'purchase',
+///   parameters: {
+///     'item_id': '123',
+///     'item_name': 'Widget',
+///   },
+/// );
+/// ```
+class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
+  const IncorrectFirebaseParameterNameRule() : super(code: _code);
+
+  /// Critical issue. Invalid parameter names are silently dropped.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'incorrect_firebase_parameter_name',
+    problemMessage:
+        'Firebase Analytics parameter name does not follow conventions.',
+    correctionMessage:
+        'Parameter names must: start with a letter, contain only alphanumeric '
+        'and underscores, be 1-40 chars, and not use reserved prefixes.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Valid parameter name pattern
+  static final RegExp _validParamName = RegExp(r'^[a-zA-Z][a-zA-Z0-9_]{0,39}$');
+
+  /// Reserved prefixes
+  static const List<String> _reservedPrefixes = <String>[
+    'firebase_',
+    'google_',
+    'ga_',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'logEvent') return;
+
+      // Find the 'parameters' argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'parameters') {
+          final Expression value = arg.expression;
+          if (value is SetOrMapLiteral) {
+            _checkMapLiteral(value, reporter);
+          }
+        }
+      }
+    });
+  }
+
+  void _checkMapLiteral(
+    SetOrMapLiteral mapLiteral,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final CollectionElement element in mapLiteral.elements) {
+      if (element is MapLiteralEntry) {
+        final Expression key = element.key;
+        if (key is StringLiteral) {
+          final String? paramName = key.stringValue;
+          if (paramName != null && !_isValidParamName(paramName)) {
+            reporter.atNode(key, code);
+          }
+        }
+      }
+    }
+  }
+
+  bool _isValidParamName(String name) {
+    // Check reserved prefixes
+    for (final String prefix in _reservedPrefixes) {
+      if (name.toLowerCase().startsWith(prefix)) {
+        return false;
+      }
+    }
+
+    // Check pattern
+    return _validParamName.hasMatch(name);
+  }
+}
+
+/// Warns when multiple individual Firestore writes could be batched.
+///
+/// Alias: firestore_batch_write, batch_firestore_ops
+///
+/// Multiple individual write operations are slower and more expensive than
+/// batch writes. Use WriteBatch for multiple related operations.
+///
+/// **BAD:**
+/// ```dart
+/// await doc1.set(data1);
+/// await doc2.set(data2);
+/// await doc3.set(data3);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final batch = FirebaseFirestore.instance.batch();
+/// batch.set(doc1, data1);
+/// batch.set(doc2, data2);
+/// batch.set(doc3, data3);
+/// await batch.commit();
+/// ```
+class PreferFirestoreBatchWriteRule extends SaropaLintRule {
+  const PreferFirestoreBatchWriteRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_firestore_batch_write',
+    problemMessage: 'Multiple individual Firestore writes should be batched.',
+    correctionMessage: 'Use WriteBatch for multiple related write operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBlock((Block node) {
+      int firestoreWriteCount = 0;
+      MethodInvocation? firstWrite;
+
+      for (final Statement statement in node.statements) {
+        if (statement is ExpressionStatement) {
+          final Expression expr = statement.expression;
+          if (expr is AwaitExpression) {
+            final Expression awaited = expr.expression;
+            if (awaited is MethodInvocation) {
+              final String methodName = awaited.methodName.name;
+              if (methodName == 'set' ||
+                  methodName == 'update' ||
+                  methodName == 'delete') {
+                // Check if it's a Firestore operation
+                final String source = awaited.toSource();
+                if (source.contains('.doc(') ||
+                    source.contains('DocumentReference') ||
+                    source.contains('Firestore')) {
+                  firestoreWriteCount++;
+                  firstWrite ??= awaited;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // Report if there are 3 or more consecutive writes
+      if (firestoreWriteCount >= 3 && firstWrite != null) {
+        reporter.atNode(firstWrite, code);
+      }
+    });
+  }
+}
+
+/// Warns when Firestore operations are performed in widget build method.
+///
+/// Alias: no_firestore_in_build, firestore_query_in_build
+///
+/// Firestore queries in build() execute on every rebuild, causing performance
+/// issues and unnecessary reads. Use StreamBuilder, FutureBuilder, or state
+/// management instead.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final data = FirebaseFirestore.instance.collection('users').get();
+///   // ...
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return StreamBuilder<QuerySnapshot>(
+///     stream: FirebaseFirestore.instance.collection('users').snapshots(),
+///     builder: (context, snapshot) => ...,
+///   );
+/// }
+/// ```
+class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
+  const AvoidFirestoreInWidgetBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_firestore_in_widget_build',
+    problemMessage: 'Firestore operation in build() causes queries on rebuild.',
+    correctionMessage: 'Use StreamBuilder/FutureBuilder or state management.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Firestore get or collection operations
+      final String methodName = node.methodName.name;
+      if (methodName != 'get' &&
+          methodName != 'collection' &&
+          methodName != 'doc') {
+        return;
+      }
+
+      // Check if it's Firestore-related
+      final String source = node.toSource();
+      if (!source.contains('Firestore') && !source.contains('firestore')) {
+        return;
+      }
+
+      // Check if inside build method
+      if (!_isInsideBuildMethod(node)) return;
+
+      // Allow if inside StreamBuilder or FutureBuilder
+      if (_isInsideBuilder(node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _isInsideBuildMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration && current.name.lexeme == 'build') {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _isInsideBuilder(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String typeName =
+            current.constructorName.type.name.lexeme;
+        if (typeName.contains('Builder')) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when RemoteConfig is used without setting defaults.
+///
+/// Alias: remote_config_defaults, set_remote_defaults
+///
+/// RemoteConfig values may not be fetched immediately. Without defaults,
+/// the app may have undefined behavior on first launch or offline.
+///
+/// **BAD:**
+/// ```dart
+/// final value = remoteConfig.getString('feature_key');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await remoteConfig.setDefaults({
+///   'feature_key': 'default_value',
+/// });
+/// final value = remoteConfig.getString('feature_key');
+/// ```
+class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
+  const PreferFirebaseRemoteConfigDefaultsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_firebase_remote_config_defaults',
+    problemMessage: 'RemoteConfig should have defaults set before use.',
+    correctionMessage: 'Call setDefaults() with fallback values.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track if setDefaults is called
+    bool hasSetDefaults = false;
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName == 'setDefaults' || methodName == 'setConfigSettings') {
+        hasSetDefaults = true;
+        return;
+      }
+
+      // Check for RemoteConfig get methods without setDefaults
+      if (methodName.startsWith('get') &&
+          (methodName == 'getString' ||
+              methodName == 'getBool' ||
+              methodName == 'getInt' ||
+              methodName == 'getDouble')) {
+        final Expression? target = node.target;
+        if (target == null) return;
+
+        final String targetSource = target.toSource();
+        if (!targetSource.contains('remoteConfig') &&
+            !targetSource.contains('RemoteConfig')) {
+          return;
+        }
+
+        if (!hasSetDefaults) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when FCM is used without handling token refresh.
+///
+/// Alias: fcm_token_refresh, handle_token_refresh
+///
+/// FCM tokens can be refreshed at any time. Without handling onTokenRefresh,
+/// the server may have stale tokens and messages won't be delivered.
+///
+/// **BAD:**
+/// ```dart
+/// final token = await messaging.getToken();
+/// // Send to server - but no refresh handling!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final token = await messaging.getToken();
+/// sendToServer(token);
+///
+/// messaging.onTokenRefresh.listen((newToken) {
+///   sendToServer(newToken);
+/// });
+/// ```
+class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
+  const RequireFcmTokenRefreshHandlerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_fcm_token_refresh_handler',
+    problemMessage: 'FCM token refresh should be handled.',
+    correctionMessage: 'Listen to onTokenRefresh to update server with new tokens.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    bool hasTokenRefreshHandler = false;
+    MethodInvocation? getTokenCall;
+
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name == 'onTokenRefresh') {
+        hasTokenRefreshHandler = true;
+      }
+    });
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name == 'getToken') {
+        final Expression? target = node.target;
+        if (target == null) return;
+
+        final String targetSource = target.toSource();
+        if (targetSource.contains('messaging') ||
+            targetSource.contains('Messaging') ||
+            targetSource.contains('FirebaseMessaging')) {
+          getTokenCall = node;
+        }
+      }
+    });
+
+    // Use addCompilationUnit to report at the end
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      if (getTokenCall != null && !hasTokenRefreshHandler) {
+        reporter.atNode(getTokenCall!, code);
+      }
+    });
+  }
+}
+
+/// Warns when FCM is used without a background message handler.
+///
+/// Alias: fcm_background_handler, background_message_handler
+///
+/// FCM messages received when app is terminated need a top-level background
+/// handler. Without it, background messages are lost.
+///
+/// **BAD:**
+/// ```dart
+/// FirebaseMessaging.onMessage.listen((message) {
+///   // Only handles foreground messages!
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @pragma('vm:entry-point')
+/// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage msg) async {
+///   // Handle background message
+/// }
+///
+/// void main() async {
+///   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+/// }
+/// ```
+class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
+  const RequireBackgroundMessageHandlerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_background_message_handler',
+    problemMessage: 'FCM should have a background message handler.',
+    correctionMessage:
+        'Add onBackgroundMessage with a top-level handler function.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    bool hasBackgroundHandler = false;
+    PropertyAccess? onMessageAccess;
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name == 'onBackgroundMessage') {
+        hasBackgroundHandler = true;
+      }
+    });
+
+    context.registry.addPropertyAccess((PropertyAccess node) {
+      if (node.propertyName.name == 'onMessage') {
+        final String source = node.toSource();
+        if (source.contains('Messaging') || source.contains('messaging')) {
+          onMessageAccess = node;
+        }
+      }
+      if (node.propertyName.name == 'onBackgroundMessage') {
+        hasBackgroundHandler = true;
+      }
+    });
+
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      if (onMessageAccess != null && !hasBackgroundHandler) {
+        reporter.atNode(onMessageAccess!, code);
+      }
+    });
+  }
+}
+
+/// Warns when map markers are created in build method.
+///
+/// Alias: cache_map_markers, no_markers_in_build
+///
+/// Creating markers in build() causes recreation on every rebuild,
+/// leading to flickering and performance issues. Cache markers.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return GoogleMap(
+///     markers: locations.map((loc) => Marker(
+///       markerId: MarkerId(loc.id),
+///       position: loc.position,
+///     )).toSet(),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Set<Marker>? _cachedMarkers;
+///
+/// Set<Marker> get markers {
+///   return _cachedMarkers ??= locations.map((loc) => Marker(
+///     markerId: MarkerId(loc.id),
+///     position: loc.position,
+///   )).toSet();
+/// }
+/// ```
+class AvoidMapMarkersInBuildRule extends SaropaLintRule {
+  const AvoidMapMarkersInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_map_markers_in_build',
+    problemMessage: 'Creating map markers in build() causes flickering.',
+    correctionMessage: 'Cache markers in state and only recreate when needed.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Marker') return;
+
+      // Check if inside build method
+      if (!_isInsideBuildMethod(node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _isInsideBuildMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration && current.name.lexeme == 'build') {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when map data is fetched on onCameraMove instead of onCameraIdle.
+///
+/// Alias: map_camera_idle, no_fetch_on_camera_move
+///
+/// onCameraMove fires continuously during pan/zoom, causing excessive API calls.
+/// Use onCameraIdle to fetch data only when movement stops.
+///
+/// **BAD:**
+/// ```dart
+/// GoogleMap(
+///   onCameraMove: (position) {
+///     fetchMarkersForRegion(position.target);  // Fires 60x/second!
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoogleMap(
+///   onCameraIdle: () {
+///     final position = mapController.camera;
+///     fetchMarkersForRegion(position.center);
+///   },
+/// )
+/// ```
+class RequireMapIdleCallbackRule extends SaropaLintRule {
+  const RequireMapIdleCallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_map_idle_callback',
+    problemMessage: 'Data fetching should use onCameraIdle, not onCameraMove.',
+    correctionMessage: 'Move data fetching to onCameraIdle to prevent spam.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'onCameraMove') return;
+
+      // Check if the callback contains fetch/load/get operations
+      final Expression value = node.expression;
+      if (value is! FunctionExpression) return;
+
+      final String bodySource = value.body.toSource();
+      if (bodySource.contains('fetch') ||
+          bodySource.contains('load') ||
+          bodySource.contains('get') ||
+          bodySource.contains('http') ||
+          bodySource.contains('Http') ||
+          bodySource.contains('api') ||
+          bodySource.contains('Api')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when many individual map markers are used without clustering.
+///
+/// Alias: marker_clustering, cluster_map_markers
+///
+/// Displaying hundreds of markers individually causes performance issues.
+/// Use marker clustering for better performance and UX.
+///
+/// **BAD:**
+/// ```dart
+/// GoogleMap(
+///   markers: allLocations.map((loc) => Marker(...)).toSet(),  // 500 markers!
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use flutter_map_marker_cluster or google_maps_cluster_manager
+/// FlutterMap(
+///   children: [
+///     MarkerClusterLayerWidget(
+///       options: MarkerClusterLayerOptions(
+///         markers: markers,
+///       ),
+///     ),
+///   ],
+/// )
+/// ```
+class PreferMarkerClusteringRule extends SaropaLintRule {
+  const PreferMarkerClusteringRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_marker_clustering',
+    problemMessage: 'Consider using marker clustering for better performance.',
+    correctionMessage: 'Use marker clustering library for many markers.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'markers') return;
+
+      // Check if using .map() to create markers from a collection
+      final Expression value = node.expression;
+      final String valueSource = value.toSource();
+
+      // Look for patterns that suggest many markers
+      if (valueSource.contains('.map(') && valueSource.contains('Marker')) {
+        reporter.atNode(node, code);
       }
     });
   }

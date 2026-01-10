@@ -70,6 +70,14 @@ const Set<String> essentialRules = <String>{
   // State Management - Critical (Batch 10)
   'avoid_bloc_event_mutation', // Immutability is critical
   'require_initial_state', // Runtime crash without it
+  'avoid_instantiating_in_bloc_value_provider', // Memory leak
+  'avoid_existing_instances_in_bloc_provider', // Unexpected closure
+  'avoid_instantiating_in_value_provider', // Memory leak (Provider package)
+  'dispose_providers', // Resource cleanup
+  'proper_getx_super_calls', // Broken lifecycle
+  'always_remove_getx_listener', // Memory leak
+  'avoid_hooks_outside_build', // Runtime error
+  'avoid_conditional_hooks', // Runtime error
 
   // Forms - Critical (Batch 12)
   'require_form_key', // Forms won't work without it
@@ -78,13 +86,20 @@ const Set<String> essentialRules = <String>{
   // Async
   'avoid_throw_in_finally',
   'require_future_error_handling',
+  'avoid_uncaught_future_errors',
 
   // Collections
   'avoid_duplicate_map_keys',
   'avoid_isar_enum_field',
 
+  // Equatable (Essential - missing fields cause equality bugs)
+  'list_all_equatable_fields',
+
   // Architecture
   'avoid_circular_dependencies',
+
+  // GetIt/DI (Essential - wrong usage)
+  'avoid_functions_in_register_singleton',
 
   // Resource Management
   'require_native_resource_cleanup',
@@ -96,6 +111,17 @@ const Set<String> essentialRules = <String>{
   'avoid_swallowing_exceptions',
   'avoid_losing_stack_trace',
   'no_empty_block',
+
+  // Collection/Loop Safety (Phase 2)
+  'avoid_unreachable_for_loop',
+
+  // GetX (Phase 2 - memory leaks)
+  'avoid_getx_rx_inside_build',
+  'avoid_mutable_rx_variables',
+
+  // Remaining ROADMAP_NEXT - resource cleanup
+  'dispose_provided_instances',
+  'dispose_getx_fields',
 
   // Widget Structure
   'avoid_nested_scaffolds',
@@ -132,6 +158,16 @@ const Set<String> essentialRules = <String>{
   'require_provider_scope',
   'avoid_circular_provider_deps',
   'require_error_handling_in_async',
+  'avoid_ref_read_inside_build',
+  'avoid_ref_watch_outside_build',
+  'avoid_ref_inside_state_dispose',
+  'use_ref_read_synchronously',
+  'use_ref_and_state_synchronously',
+  'avoid_assigning_notifiers',
+
+  // Bloc (Essential - prevent crashes)
+  'check_is_not_closed_after_async_gap',
+  'avoid_duplicate_bloc_event_handlers',
 
   // GetX (Essential - prevent memory leaks)
   'require_getx_controller_dispose',
@@ -145,18 +181,28 @@ const Set<String> essentialRules = <String>{
 
   // Firebase (Essential - prevent crashes)
   'require_firebase_init_before_use',
+  'incorrect_firebase_event_name',
+  'incorrect_firebase_parameter_name',
 
   // Notification (Essential - required for Android 8+)
   'require_notification_channel_android',
 
   // Testing (Essential - prevent flaky tests)
   'avoid_datetime_now_in_tests',
+  'missing_test_assertion',
+  'avoid_async_callback_in_fake_async',
 
   // QR/Camera (Essential - app store compliance)
   'require_qr_permission_check',
 
   // Lifecycle (Essential - battery/stability)
   'require_lifecycle_observer',
+
+  // Disposal (roadmap_up_next - memory leak)
+  'require_stream_subscription_cancel',
+
+  // Async (roadmap_up_next - runtime crash)
+  'avoid_dialog_context_after_async',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -216,6 +262,10 @@ const Set<String> recommendedOnlyRules = <String>{
   // Theming
   'prefer_system_theme_default',
 
+  // Widget optimization
+  'prefer_transform_over_container',
+  'prefer_action_button_tooltip',
+
   // State Management
   'require_notify_listeners',
   'avoid_bloc_event_in_constructor',
@@ -259,6 +309,15 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_state_constructors',
   'avoid_empty_text_widgets',
   'prefer_sized_box_for_whitespace',
+  'prefer_sized_box_square',
+  'prefer_center_over_align',
+  'prefer_align_over_container',
+  'prefer_padding_over_container',
+  'prefer_constrained_box_over_container',
+  'prefer_multi_bloc_provider',
+  'prefer_correct_bloc_provider',
+  'prefer_multi_provider',
+  'avoid_unnecessary_hook_widgets',
   'prefer_inkwell_over_gesture',
   'prefer_listview_builder',
   'avoid_opacity_animation',
@@ -400,6 +459,37 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // QR Scanner (Plan Group I)
   'require_qr_scan_feedback',
+
+  // Phase 2 Rules - Collection/Loop
+  'prefer_correct_for_loop_increment',
+
+  // Phase 2 Rules - Widget Optimization
+  'prefer_single_setstate',
+  'avoid_empty_build_when',
+
+  // Phase 2 Rules - Riverpod
+  'avoid_unnecessary_consumer_widgets',
+  'avoid_nullable_async_value_pattern',
+
+  // Phase 2 Rules - Flame Engine
+  'avoid_creating_vector_in_update',
+  'avoid_redundant_async_on_load',
+
+  // Image rules (roadmap_up_next)
+  'require_image_loading_placeholder',
+
+  // Async rules (roadmap_up_next)
+  'require_location_timeout',
+
+  // Firebase/Maps rules (roadmap_up_next - aliases)
+  'avoid_firestore_in_widget_build',
+
+  // Accessibility rules (roadmap_up_next)
+  'require_image_description',
+  'avoid_motion_without_reduce',
+
+  // Navigation rules (roadmap_up_next)
+  'require_refresh_indicator_on_lists',
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -474,6 +564,29 @@ const Set<String> professionalOnlyRules = <String>{
   'require_keyboard_type',
   'require_text_overflow_in_row',
   'require_error_message_context',
+
+  // Equatable (Professional - cleaner patterns)
+  'extend_equatable',
+  'prefer_equatable_mixin',
+
+  // Types (Professional - cleaner patterns)
+  'prefer_void_callback',
+
+  // Testing (Professional - better test patterns)
+  'prefer_symbol_over_key',
+
+  // Riverpod (Professional - cleaner patterns)
+  'avoid_notifier_constructors',
+  'prefer_immutable_provider_arguments',
+
+  // Provider (Professional - type safety)
+  'prefer_nullable_provider_types',
+
+  // Bloc (Professional - cleaner patterns)
+  'prefer_immutable_bloc_events',
+  'prefer_immutable_bloc_state',
+  'prefer_sealed_bloc_events',
+  'prefer_sealed_bloc_state',
 
   // State Management (Batch 10)
   'require_error_state',
@@ -619,6 +732,10 @@ const Set<String> professionalOnlyRules = <String>{
   'require_plural_handling',
   'avoid_text_in_images',
   'avoid_hardcoded_app_name',
+  'prefer_date_format',
+  'prefer_intl_name',
+  'prefer_providing_intl_description',
+  'prefer_providing_intl_examples',
 
   // API & Network
   'require_retry_logic',
@@ -650,6 +767,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_covariant_documentation',
   'prefer_specific_numeric_types',
   'require_futureor_documentation',
+  'prefer_explicit_type_arguments',
 
   // Naming & Style
   'prefer_boolean_prefixes_for_params',
@@ -710,6 +828,39 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Image (Plan Group A)
   'prefer_image_size_constraints',
+
+  // Phase 2 Rules - Widget Optimization
+  'prefer_compute_over_isolate_run',
+  'prefer_for_loop_in_children',
+  'prefer_container',
+
+  // Phase 2 Rules - Provider Advanced
+  'prefer_immutable_selector_value',
+  'prefer_provider_extensions',
+
+  // Phase 2 Rules - Code Quality
+  'prefer_typedefs_for_callbacks',
+  'prefer_redirecting_superclass_constructor',
+
+  // Phase 2 Rules - Bloc Naming
+  'prefer_bloc_event_suffix',
+  'prefer_bloc_state_suffix',
+
+  // Phase 2 Rules - Hooks
+  'prefer_use_prefix',
+
+  // Firebase rules (roadmap_up_next)
+  'prefer_firestore_batch_write',
+
+  // Animation rules (roadmap_up_next)
+  'require_animation_status_listener',
+
+  // Platform rules (roadmap_up_next)
+  'avoid_touch_only_gestures',
+
+  // Test rules (roadmap_up_next)
+  'require_test_cleanup',
+  'require_accessibility_tests',
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
@@ -965,6 +1116,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Platform (Batch 14 - opinionated)
   'prefer_cupertino_for_ios_feel',
   'prefer_keyboard_shortcuts',
+
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.
@@ -973,6 +1125,10 @@ const Set<String> insanityOnlyRules = <String>{
   'avoid_generic_key_in_url',
 
   // Noisy but valuable
+  'prefer_blank_line_before_case',
+  'prefer_blank_line_before_method',
+  'prefer_blank_line_before_constructor',
+  'enum_constants_ordering',
   'avoid_commented_out_code',
   'avoid_dynamic',
   'avoid_late_keyword',
@@ -981,7 +1137,7 @@ const Set<String> insanityOnlyRules = <String>{
   'binary_expression_operand_order',
   'double_literal_format',
   'member_ordering',
-  'newline_before_return',
+  'prefer_blank_line_before_return',
   'no_magic_number',
   'prefer_async_await',
   'prefer_conditional_expressions',

@@ -590,6 +590,8 @@ class _SimpleDisposeChecker extends RecursiveAstVisitor<void> {
 
 /// Warns when setState is called with async gap.
 ///
+/// Alias: check_mounted_after_async
+///
 /// Calling setState after await may occur when widget is unmounted.
 ///
 /// **BAD:**
@@ -4505,7 +4507,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_providerTypes.contains(typeName)) return;
 
@@ -4515,7 +4517,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
 
       while (current != null) {
         if (current is InstanceCreationExpression) {
-          final String parentType = current.constructorName.type.name2.lexeme;
+          final String parentType = current.constructorName.type.name.lexeme;
           if (_providerTypes.contains(parentType)) {
             nestingDepth++;
           }
@@ -4606,7 +4608,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_providerTypes.contains(typeName)) return;
 
@@ -4623,7 +4625,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
           while (builderParent != null) {
             if (builderParent is InstanceCreationExpression) {
               final String parentType =
-                  builderParent.constructorName.type.name2.lexeme;
+                  builderParent.constructorName.type.name.lexeme;
               if (_consumerTypes.contains(parentType)) {
                 reporter.atNode(node, code);
                 return;
@@ -4639,7 +4641,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
           while (childParent != null) {
             if (childParent is InstanceCreationExpression) {
               final String parentType =
-                  childParent.constructorName.type.name2.lexeme;
+                  childParent.constructorName.type.name.lexeme;
               if (_providerTypes.contains(parentType)) {
                 // This is direct nesting - handled by RequireMultiProviderRule
                 return;
@@ -4652,5 +4654,2178 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
         current = current.parent;
       }
     });
+  }
+}
+
+/// Warns when nested `BlocProvider` widgets are used.
+///
+/// Use `MultiBlocProvider` when providing multiple blocs to reduce nesting
+/// and improve readability.
+///
+/// **BAD:**
+/// ```dart
+/// BlocProvider<AuthBloc>(
+///   create: (_) => AuthBloc(),
+///   child: BlocProvider<UserBloc>(
+///     create: (_) => UserBloc(),
+///     child: MyApp(),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MultiBlocProvider(
+///   providers: [
+///     BlocProvider<AuthBloc>(create: (_) => AuthBloc()),
+///     BlocProvider<UserBloc>(create: (_) => UserBloc()),
+///   ],
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// **Quick fix available:** Adds a `TODO` comment for manual conversion.
+class PreferMultiBlocProviderRule extends SaropaLintRule {
+  const PreferMultiBlocProviderRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_multi_bloc_provider',
+    problemMessage:
+        'Nested BlocProviders should use MultiBlocProvider instead.',
+    correctionMessage:
+        'Combine into MultiBlocProvider(providers: [...], child: ...).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'BlocProvider') return;
+
+      // Check if child is also a BlocProvider
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression childExpr = arg.expression;
+          if (childExpr is InstanceCreationExpression) {
+            final String childType =
+                childExpr.constructorName.type.name.lexeme;
+            if (childType == 'BlocProvider') {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when `BlocProvider.value` receives a newly created bloc instance.
+///
+/// `BlocProvider.value` should only receive existing bloc instances.
+/// Creating a new bloc in the value parameter will not properly manage
+/// the bloc's lifecycle (it won't be automatically closed).
+///
+/// **BAD:**
+/// ```dart
+/// BlocProvider.value(
+///   value: AuthBloc(), // New instance - won't be automatically closed!
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// BlocProvider(
+///   create: (_) => AuthBloc(), // Properly managed by BlocProvider
+///   child: MyWidget(),
+/// )
+/// // OR for existing instances:
+/// BlocProvider.value(
+///   value: existingBloc, // Variable reference is correct
+///   child: MyWidget(),
+/// )
+/// ```
+class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
+  const AvoidInstantiatingInBlocValueProviderRule() : super(code: _code);
+
+  /// Critical - memory leak potential.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_instantiating_in_bloc_value_provider',
+    problemMessage:
+        'BlocProvider.value should not create a new bloc instance. '
+        'The bloc will not be automatically closed.',
+    correctionMessage:
+        'Use BlocProvider(create: ...) for new instances, or pass an existing '
+        'bloc variable to BlocProvider.value.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (typeName != 'BlocProvider') return;
+
+      // Check if this is BlocProvider.value
+      if (constructorName.name?.name != 'value') return;
+
+      // Check if value parameter is an instance creation (new bloc)
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          final Expression valueExpr = arg.expression;
+          if (valueExpr is InstanceCreationExpression) {
+            // This is creating a new instance in value - BAD
+            reporter.atNode(valueExpr, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when `BlocProvider(create: ...)` returns an existing bloc instance.
+///
+/// `BlocProvider(create: ...)` should create a new bloc instance.
+/// Returning an existing variable will cause the bloc to be closed when
+/// the provider is disposed, even though it may still be in use elsewhere.
+///
+/// **BAD:**
+/// ```dart
+/// final myBloc = AuthBloc();
+/// // ...
+/// BlocProvider(
+///   create: (_) => myBloc, // Existing instance - will be closed unexpectedly!
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// BlocProvider(
+///   create: (_) => AuthBloc(), // New instance - proper lifecycle
+///   child: MyWidget(),
+/// )
+/// // OR for existing instances:
+/// BlocProvider.value(
+///   value: myBloc, // Use .value for existing instances
+///   child: MyWidget(),
+/// )
+/// ```
+class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
+  const AvoidExistingInstancesInBlocProviderRule() : super(code: _code);
+
+  /// Critical - unexpected bloc closure.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_existing_instances_in_bloc_provider',
+    problemMessage:
+        'BlocProvider(create: ...) should create a new bloc, not return an '
+        'existing instance. The bloc will be closed when the provider disposes.',
+    correctionMessage:
+        'Use BlocProvider.value(value: existingBloc) for existing instances, '
+        'or create a new bloc inside the create callback.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (typeName != 'BlocProvider') return;
+
+      // Skip BlocProvider.value - that's what they should use for existing
+      if (constructorName.name?.name == 'value') return;
+
+      // Check if create parameter returns an existing variable
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final Expression createExpr = arg.expression;
+          if (createExpr is FunctionExpression) {
+            final FunctionBody body = createExpr.body;
+            if (body is ExpressionFunctionBody) {
+              final Expression returnExpr = body.expression;
+              // Check if return is just a simple identifier (variable)
+              if (returnExpr is SimpleIdentifier) {
+                // Check it's not calling a constructor
+                // A simple identifier returning means it's an existing variable
+                reporter.atNode(returnExpr, code);
+                return;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when the wrong BlocProvider variant is used for the use case.
+///
+/// - Use `BlocProvider(create: ...)` when you need to create AND manage a bloc
+/// - Use `BlocProvider.value(value: ...)` when providing an already-existing bloc
+///
+/// This rule identifies common mismatches between provider type and usage.
+///
+/// **BAD:**
+/// ```dart
+/// // Using create but immediately closing the bloc elsewhere
+/// BlocProvider(
+///   create: (_) => context.read<AuthBloc>(), // Getting existing bloc!
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use .value for accessing blocs from context
+/// BlocProvider.value(
+///   value: context.read<AuthBloc>(),
+///   child: MyWidget(),
+/// )
+/// ```
+class PreferCorrectBlocProviderRule extends SaropaLintRule {
+  const PreferCorrectBlocProviderRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_correct_bloc_provider',
+    problemMessage:
+        'Using context.read() in BlocProvider.create returns an existing bloc. '
+        'Use BlocProvider.value instead.',
+    correctionMessage:
+        'Replace with BlocProvider.value(value: context.read<T>(), ...).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (typeName != 'BlocProvider') return;
+
+      // Only check BlocProvider(create: ...)
+      if (constructorName.name?.name == 'value') return;
+
+      // Check if create parameter uses context.read()
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final Expression createExpr = arg.expression;
+          if (createExpr is FunctionExpression) {
+            final FunctionBody body = createExpr.body;
+            if (body is ExpressionFunctionBody) {
+              final Expression returnExpr = body.expression;
+              // Check for context.read<T>() pattern
+              if (returnExpr is MethodInvocation) {
+                final String methodName = returnExpr.methodName.name;
+                if (methodName == 'read' || methodName == 'watch') {
+                  reporter.atNode(node, code);
+                  return;
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when nested `Provider` widgets are used.
+///
+/// Use `MultiProvider` when providing multiple objects to reduce nesting
+/// and improve readability.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<AuthService>(
+///   create: (_) => AuthService(),
+///   child: Provider<UserService>(
+///     create: (_) => UserService(),
+///     child: MyApp(),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MultiProvider(
+///   providers: [
+///     Provider<AuthService>(create: (_) => AuthService()),
+///     Provider<UserService>(create: (_) => UserService()),
+///   ],
+///   child: MyApp(),
+/// )
+/// ```
+class PreferMultiProviderRule extends SaropaLintRule {
+  const PreferMultiProviderRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_multi_provider',
+    problemMessage: 'Nested Providers should use MultiProvider instead.',
+    correctionMessage:
+        'Combine into MultiProvider(providers: [...], child: ...).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _providerTypes = <String>{
+    'Provider',
+    'ChangeNotifierProvider',
+    'ListenableProvider',
+    'ValueListenableProvider',
+    'StreamProvider',
+    'FutureProvider',
+    'ProxyProvider',
+    'ChangeNotifierProxyProvider',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_providerTypes.contains(typeName)) return;
+
+      // Skip if this is .value constructor
+      if (node.constructorName.name?.name == 'value') return;
+
+      // Check if child is also a Provider
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression childExpr = arg.expression;
+          if (childExpr is InstanceCreationExpression) {
+            final String childType =
+                childExpr.constructorName.type.name.lexeme;
+            if (_providerTypes.contains(childType)) {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when `Provider.value` receives a newly created instance.
+///
+/// `Provider.value` should only receive existing instances.
+/// Creating a new instance in the value parameter will not properly manage
+/// the instance's lifecycle.
+///
+/// **BAD:**
+/// ```dart
+/// Provider.value(
+///   value: AuthService(), // New instance - not managed!
+///   child: MyWidget(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Provider(
+///   create: (_) => AuthService(), // Properly managed
+///   child: MyWidget(),
+/// )
+/// // OR for existing instances:
+/// Provider.value(
+///   value: existingService, // Variable reference is correct
+///   child: MyWidget(),
+/// )
+/// ```
+class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
+  const AvoidInstantiatingInValueProviderRule() : super(code: _code);
+
+  /// Critical - lifecycle management issue.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_instantiating_in_value_provider',
+    problemMessage:
+        'Provider.value should not create a new instance. '
+        'The instance lifecycle will not be properly managed.',
+    correctionMessage:
+        'Use Provider(create: ...) for new instances, or pass an existing '
+        'instance variable to Provider.value.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _providerTypes = <String>{
+    'Provider',
+    'ChangeNotifierProvider',
+    'ListenableProvider',
+    'ValueListenableProvider',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (!_providerTypes.contains(typeName)) return;
+
+      // Check if this is .value constructor
+      if (constructorName.name?.name != 'value') return;
+
+      // Check if value parameter is an instance creation
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          final Expression valueExpr = arg.expression;
+          if (valueExpr is InstanceCreationExpression) {
+            reporter.atNode(valueExpr, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when `Provider` lacks a dispose callback for disposable instances.
+///
+/// When providing disposable resources like controllers or services,
+/// always provide a dispose callback to prevent memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<ApiService>(
+///   create: (_) => ApiService(), // No dispose - may leak resources!
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Provider<ApiService>(
+///   create: (_) => ApiService(),
+///   dispose: (_, service) => service.dispose(),
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// Note: This rule flags all Providers without dispose. If your instance
+/// doesn't need disposal, add `dispose: (_, __) {}` to silence the warning.
+class DisposeProvidersRule extends SaropaLintRule {
+  const DisposeProvidersRule() : super(code: _code);
+
+  /// High impact - memory leak prevention.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'dispose_providers',
+    problemMessage:
+        'Provider lacks dispose callback. Resources may not be cleaned up.',
+    correctionMessage:
+        'Add dispose: (_, instance) => instance.dispose() to clean up resources.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+
+      // Only check Provider (not ChangeNotifierProvider which auto-disposes)
+      if (typeName != 'Provider') return;
+
+      // Skip .value constructor
+      if (constructorName.name?.name == 'value') return;
+
+      // Check if dispose parameter is present
+      bool hasDispose = false;
+      bool hasCreate = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'dispose') hasDispose = true;
+          if (name == 'create') hasCreate = true;
+        }
+      }
+
+      // Only report if has create but no dispose
+      if (hasCreate && !hasDispose) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when GetxController overrides `onInit` or `onClose` without calling super.
+///
+/// Not calling the super method in lifecycle overrides can break the
+/// controller's internal state management and cause unexpected behavior.
+///
+/// **BAD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   @override
+///   void onInit() {
+///     // Missing super.onInit()!
+///     loadData();
+///   }
+///
+///   @override
+///   void onClose() {
+///     // Missing super.onClose()!
+///     cleanup();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   @override
+///   void onInit() {
+///     super.onInit();
+///     loadData();
+///   }
+///
+///   @override
+///   void onClose() {
+///     cleanup();
+///     super.onClose();
+///   }
+/// }
+/// ```
+class ProperGetxSuperCallsRule extends SaropaLintRule {
+  const ProperGetxSuperCallsRule() : super(code: _code);
+
+  /// Critical - broken lifecycle management.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'proper_getx_super_calls',
+    problemMessage:
+        'GetxController lifecycle method must call super. '
+        'Missing super call breaks controller lifecycle.',
+    correctionMessage:
+        'Add super.onInit() at the start or super.onClose() at the end.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _lifecycleMethods = <String>{
+    'onInit',
+    'onReady',
+    'onClose',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final String methodName = node.name.lexeme;
+      if (!_lifecycleMethods.contains(methodName)) return;
+
+      // Check if this method has @override annotation
+      bool hasOverride = false;
+      for (final Annotation annotation in node.metadata) {
+        if (annotation.name.name == 'override') {
+          hasOverride = true;
+          break;
+        }
+      }
+
+      if (!hasOverride) return;
+
+      // Check if method body contains super call
+      final FunctionBody body = node.body;
+      if (body is EmptyFunctionBody) return;
+
+      final _SuperCallVisitor visitor = _SuperCallVisitor(methodName);
+      body.accept(visitor);
+
+      if (!visitor.hasSuperCall) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+class _SuperCallVisitor extends RecursiveAstVisitor<void> {
+  _SuperCallVisitor(this.methodName);
+
+  final String methodName;
+  bool hasSuperCall = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.target is SuperExpression &&
+        node.methodName.name == methodName) {
+      hasSuperCall = true;
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when GetX reactive workers are created without cleanup.
+///
+/// Workers like `ever()`, `once()`, `debounce()`, and `interval()` create
+/// subscriptions that must be cancelled in `onClose()` to prevent memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   @override
+///   void onInit() {
+///     super.onInit();
+///     ever(count, (_) => print('changed'));  // No cleanup!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   late Worker _worker;
+///
+///   @override
+///   void onInit() {
+///     super.onInit();
+///     _worker = ever(count, (_) => print('changed'));
+///   }
+///
+///   @override
+///   void onClose() {
+///     _worker.dispose();
+///     super.onClose();
+///   }
+/// }
+/// ```
+class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
+  const AlwaysRemoveGetxListenerRule() : super(code: _code);
+
+  /// High impact - memory leak prevention.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'always_remove_getx_listener',
+    problemMessage:
+        'GetX worker is not assigned to a variable for cleanup. '
+        'This will cause a memory leak.',
+    correctionMessage:
+        'Assign the worker to a variable and call dispose() in onClose().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _workerMethods = <String>{
+    'ever',
+    'once',
+    'debounce',
+    'interval',
+    'everAll',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_workerMethods.contains(methodName)) return;
+
+      // Check if this is a statement by itself (not assigned to variable)
+      final AstNode? parent = node.parent;
+      if (parent is ExpressionStatement) {
+        // Not assigned - potential leak
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Flutter Hooks are called outside of a build method.
+///
+/// Hooks (functions starting with `use`) must be called from within
+/// the build method of a HookWidget. Calling them elsewhere violates
+/// the rules of hooks and causes runtime errors.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   void initData() {
+///     final controller = useTextEditingController(); // Wrong!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     final controller = useTextEditingController(); // Correct!
+///     return TextField(controller: controller);
+///   }
+/// }
+/// ```
+class AvoidHooksOutsideBuildRule extends SaropaLintRule {
+  const AvoidHooksOutsideBuildRule() : super(code: _code);
+
+  /// Critical - runtime error.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hooks_outside_build',
+    problemMessage:
+        'Hook function called outside of build method. '
+        'Hooks must only be called from build().',
+    correctionMessage: 'Move this hook call inside the build() method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check if it's a hook function (starts with 'use')
+      if (!methodName.startsWith('use')) return;
+      if (methodName.length < 4) return; // 'use' alone is not a hook
+
+      // Check if we're inside a build method
+      if (!_isInsideBuildMethod(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideBuildMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        return current.name.lexeme == 'build';
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when Flutter Hooks are called inside conditionals.
+///
+/// Hooks must be called unconditionally in the same order every build.
+/// Calling hooks inside if/else, switch, or ternary expressions violates
+/// the rules of hooks and causes runtime errors.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   if (condition) {
+///     final value = useState(0); // Wrong!
+///   }
+///   return condition ? useCallback() : null; // Wrong!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final value = useState(0); // Called unconditionally
+///   if (condition) {
+///     value.value = 42; // Use the value conditionally, not the hook
+///   }
+///   return Container();
+/// }
+/// ```
+class AvoidConditionalHooksRule extends SaropaLintRule {
+  const AvoidConditionalHooksRule() : super(code: _code);
+
+  /// Critical - runtime error.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_conditional_hooks',
+    problemMessage:
+        'Hook function called conditionally. '
+        'Hooks must be called unconditionally in the same order.',
+    correctionMessage:
+        'Move hook calls outside of conditionals. Use the hook value conditionally instead.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check if it's a hook function (starts with 'use')
+      if (!methodName.startsWith('use')) return;
+      if (methodName.length < 4) return;
+
+      // Check if inside build method first
+      if (!_isInsideBuildMethod(node)) return;
+
+      // Check if inside a conditional
+      if (_isInsideConditional(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideBuildMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        return current.name.lexeme == 'build';
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _isInsideConditional(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      // Stop at build method level
+      if (current is MethodDeclaration) break;
+
+      // Check for conditionals
+      if (current is IfStatement ||
+          current is ConditionalExpression ||
+          current is SwitchStatement ||
+          current is SwitchExpression) {
+        return true;
+      }
+
+      // Check for loop bodies (hooks shouldn't be in loops either)
+      if (current is ForStatement ||
+          current is ForEachParts ||
+          current is WhileStatement ||
+          current is DoStatement) {
+        return true;
+      }
+
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when a HookWidget doesn't use any hooks.
+///
+/// If a widget extends HookWidget but doesn't call any hook functions,
+/// it should be a regular StatelessWidget instead.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     return Text('No hooks used!'); // Should be StatelessWidget
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends HookWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     final counter = useState(0); // Using hooks!
+///     return Text('${counter.value}');
+///   }
+/// }
+/// ```
+class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
+  const AvoidUnnecessaryHookWidgetsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unnecessary_hook_widgets',
+    problemMessage:
+        'HookWidget without any hook calls. Use StatelessWidget instead.',
+    correctionMessage:
+        'Change to StatelessWidget if no hooks are needed.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class extends HookWidget
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclassName = extendsClause.superclass.name.lexeme;
+      if (superclassName != 'HookWidget' &&
+          superclassName != 'HookConsumerWidget') {
+        return;
+      }
+
+      // Find build method
+      MethodDeclaration? buildMethod;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'build') {
+          buildMethod = member;
+          break;
+        }
+      }
+
+      if (buildMethod == null) return;
+
+      // Check if build method contains any hook calls
+      final _HookCallVisitor visitor = _HookCallVisitor();
+      buildMethod.body.accept(visitor);
+
+      if (!visitor.hasHookCall) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+class _HookCallVisitor extends RecursiveAstVisitor<void> {
+  bool hasHookCall = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName.startsWith('use') && methodName.length > 3) {
+      hasHookCall = true;
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when emit() is called after an await without checking isClosed.
+///
+/// Bloc can be closed while awaiting, leading to state emissions on a
+/// closed bloc which causes errors.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// on<LoadEvent>((event, emit) async {
+///   final data = await fetchData();
+///   emit(LoadedState(data)); // Bloc might be closed!
+/// });
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// on<LoadEvent>((event, emit) async {
+///   final data = await fetchData();
+///   if (!isClosed) {
+///     emit(LoadedState(data));
+///   }
+/// });
+/// ```
+class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
+  const CheckIsNotClosedAfterAsyncGapRule() : super(code: _code);
+
+  /// Critical bug. Emit after close causes crash.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'check_is_not_closed_after_async_gap',
+    problemMessage: 'emit() called after await without checking isClosed.',
+    correctionMessage:
+        'Add if (!isClosed) check before emit() after async operations.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Look for on<Event> handler registration
+      if (node.methodName.name != 'on') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      // Get the callback
+      final Expression callback = args.arguments.first;
+      if (callback is! FunctionExpression) return;
+
+      final FunctionBody body = callback.body;
+      if (!body.isAsynchronous) return;
+
+      // Find emit calls after await
+      final _EmitAfterAwaitVisitor visitor = _EmitAfterAwaitVisitor();
+      body.accept(visitor);
+
+      for (final MethodInvocation emitCall in visitor.emitCallsAfterAwait) {
+        reporter.atNode(emitCall, code);
+      }
+    });
+  }
+}
+
+class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
+  bool _foundAwait = false;
+  bool _insideClosedCheck = false;
+  final List<MethodInvocation> emitCallsAfterAwait = <MethodInvocation>[];
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    _foundAwait = true;
+    super.visitAwaitExpression(node);
+  }
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    // Check for if (!isClosed) or if (isClosed) return patterns
+    final Expression condition = node.expression;
+    if (_isClosedCheck(condition)) {
+      _insideClosedCheck = true;
+      node.thenStatement.accept(this);
+      _insideClosedCheck = false;
+      node.elseStatement?.accept(this);
+    } else {
+      super.visitIfStatement(node);
+    }
+  }
+
+  bool _isClosedCheck(Expression expr) {
+    // Check for !isClosed or isClosed
+    if (expr is PrefixExpression && expr.operator.lexeme == '!') {
+      final Expression operand = expr.operand;
+      return operand is SimpleIdentifier && operand.name == 'isClosed';
+    }
+    if (expr is SimpleIdentifier) {
+      return expr.name == 'isClosed';
+    }
+    return false;
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'emit' &&
+        _foundAwait &&
+        !_insideClosedCheck) {
+      emitCallsAfterAwait.add(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when multiple handlers are registered for the same event type.
+///
+/// Bloc doesn't support multiple handlers for the same event. The second
+/// handler will override the first, leading to unexpected behavior.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc() : super(InitialState()) {
+///     on<LoadEvent>((e, emit) => emit(Loading()));
+///     on<LoadEvent>((e, emit) => emit(Loaded())); // Duplicate!
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc() : super(InitialState()) {
+///     on<LoadEvent>((e, emit) {
+///       emit(Loading());
+///       // ... then emit Loaded
+///     });
+///   }
+/// }
+/// ```
+class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
+  const AvoidDuplicateBlocEventHandlersRule() : super(code: _code);
+
+  /// Critical bug. Duplicate handlers cause unexpected behavior.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_duplicate_bloc_event_handlers',
+    problemMessage: 'Duplicate event handler registration detected.',
+    correctionMessage:
+        'Combine handlers into one on<Event> call. Only one handler per event type.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class extends Bloc
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclassName = extendsClause.superclass.name.lexeme;
+      if (superclassName != 'Bloc') return;
+
+      // Find constructor
+      ConstructorDeclaration? constructor;
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration && member.name == null) {
+          constructor = member;
+          break;
+        }
+      }
+
+      if (constructor == null) return;
+
+      // Find all on<Event> calls
+      final Map<String, List<MethodInvocation>> eventHandlers =
+          <String, List<MethodInvocation>>{};
+
+      final _OnCallVisitor visitor = _OnCallVisitor();
+      constructor.body.accept(visitor);
+
+      for (final MethodInvocation onCall in visitor.onCalls) {
+        final TypeArgumentList? typeArgs = onCall.typeArguments;
+        if (typeArgs == null || typeArgs.arguments.isEmpty) continue;
+
+        final String eventType = typeArgs.arguments.first.toSource();
+        eventHandlers.putIfAbsent(eventType, () => <MethodInvocation>[]);
+        eventHandlers[eventType]!.add(onCall);
+      }
+
+      // Report duplicates
+      for (final String eventType in eventHandlers.keys) {
+        final List<MethodInvocation> handlers = eventHandlers[eventType]!;
+        if (handlers.length > 1) {
+          // Report all but the first one
+          for (int i = 1; i < handlers.length; i++) {
+            reporter.atNode(handlers[i], code);
+          }
+        }
+      }
+    });
+  }
+}
+
+class _OnCallVisitor extends RecursiveAstVisitor<void> {
+  final List<MethodInvocation> onCalls = <MethodInvocation>[];
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'on') {
+      onCalls.add(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when Bloc event classes have mutable fields.
+///
+/// Bloc events should be immutable for predictable state management.
+/// Mutable events can be changed after dispatch, causing bugs.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class UpdateUserEvent extends UserEvent {
+///   String name; // Mutable!
+///   UpdateUserEvent(this.name);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class UpdateUserEvent extends UserEvent {
+///   final String name; // Immutable
+///   const UpdateUserEvent(this.name);
+/// }
+/// ```
+class PreferImmutableBlocEventsRule extends SaropaLintRule {
+  const PreferImmutableBlocEventsRule() : super(code: _code);
+
+  /// Bug risk. Mutable events can cause unexpected behavior.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_immutable_bloc_events',
+    problemMessage: 'Bloc event class has mutable fields.',
+    correctionMessage: 'Mark all fields as final for immutable events.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class name ends with Event
+      final String className = node.name.lexeme;
+      if (!className.endsWith('Event')) return;
+
+      // Check for mutable fields
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration && !member.isStatic) {
+          final VariableDeclarationList fields = member.fields;
+          if (!fields.isFinal && !fields.isConst) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Bloc state classes have mutable fields.
+///
+/// Bloc states should be immutable for predictable state management.
+/// Mutable states can be changed outside the bloc, breaking the pattern.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class LoadedState extends UserState {
+///   List<User> users; // Mutable!
+///   LoadedState(this.users);
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class LoadedState extends UserState {
+///   final List<User> users; // Immutable reference
+///   const LoadedState(this.users);
+/// }
+/// ```
+class PreferImmutableBlocStateRule extends SaropaLintRule {
+  const PreferImmutableBlocStateRule() : super(code: _code);
+
+  /// Bug risk. Mutable state breaks bloc pattern.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_immutable_bloc_state',
+    problemMessage: 'Bloc state class has mutable fields.',
+    correctionMessage: 'Mark all fields as final for immutable state.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class name ends with State
+      final String className = node.name.lexeme;
+      if (!className.endsWith('State')) return;
+
+      // Exclude Flutter's State class by checking for extends StatefulWidget
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName == 'State') return; // Flutter State, not Bloc state
+      }
+
+      // Check for mutable fields
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration && !member.isStatic) {
+          final VariableDeclarationList fields = member.fields;
+          if (!fields.isFinal && !fields.isConst) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Bloc event classes are not sealed.
+///
+/// Sealed event classes ensure exhaustive pattern matching in handlers
+/// and prevent unexpected event subtypes from being created.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// abstract class UserEvent {}
+/// class LoadUserEvent extends UserEvent {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// sealed class UserEvent {}
+/// class LoadUserEvent extends UserEvent {}
+/// ```
+class PreferSealedBlocEventsRule extends SaropaLintRule {
+  const PreferSealedBlocEventsRule() : super(code: _code);
+
+  /// Code quality. Sealed classes improve type safety.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sealed_bloc_events',
+    problemMessage: 'Bloc event base class should be sealed.',
+    correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class name ends with Event
+      final String className = node.name.lexeme;
+      if (!className.endsWith('Event')) return;
+
+      // Check if it's a base class (abstract without extending another Event)
+      if (node.abstractKeyword == null) return;
+
+      // Check if it's already sealed
+      if (node.sealedKeyword != null) return;
+
+      // Check if it doesn't extend another Event class
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName.endsWith('Event')) return; // Not a base class
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when Bloc state classes are not sealed.
+///
+/// Sealed state classes ensure exhaustive pattern matching in widgets
+/// and prevent unexpected state subtypes from being created.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// abstract class UserState {}
+/// class LoadingState extends UserState {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// sealed class UserState {}
+/// class LoadingState extends UserState {}
+/// ```
+class PreferSealedBlocStateRule extends SaropaLintRule {
+  const PreferSealedBlocStateRule() : super(code: _code);
+
+  /// Code quality. Sealed classes improve type safety.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sealed_bloc_state',
+    problemMessage: 'Bloc state base class should be sealed.',
+    correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class name ends with State
+      final String className = node.name.lexeme;
+      if (!className.endsWith('State')) return;
+
+      // Check if it's a base class (abstract without extending another State)
+      if (node.abstractKeyword == null) return;
+
+      // Check if it's already sealed
+      if (node.sealedKeyword != null) return;
+
+      // Check if it doesn't extend another State class (excluding Flutter State)
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName.endsWith('State') && superName != 'State') {
+          return; // Not a base class
+        }
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Suggests that Bloc event classes end with 'Event' suffix.
+///
+/// Consistent naming helps identify Bloc event classes quickly.
+///
+/// **BAD:**
+/// ```dart
+/// abstract class UserAction {}  // Should end with Event
+/// class LoadUser extends UserAction {}
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// abstract class UserEvent {}
+/// class LoadUserEvent extends UserEvent {}
+/// ```
+class PreferBlocEventSuffixRule extends SaropaLintRule {
+  const PreferBlocEventSuffixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_bloc_event_suffix',
+    problemMessage: 'Bloc event class should end with "Event" suffix.',
+    correctionMessage: 'Rename class to include Event suffix (e.g., LoadUserEvent).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+
+      // Check if this class extends something that ends with Event
+      // but this class itself doesn't end with Event
+      if (superName.endsWith('Event')) {
+        final String className = node.name.lexeme;
+        if (!className.endsWith('Event')) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Suggests that Bloc state classes end with 'State' suffix.
+///
+/// Consistent naming helps identify Bloc state classes quickly.
+///
+/// **BAD:**
+/// ```dart
+/// abstract class UserStatus {}  // Should end with State
+/// class UserLoading extends UserStatus {}
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// abstract class UserState {}
+/// class UserLoadingState extends UserState {}
+/// ```
+class PreferBlocStateSuffixRule extends SaropaLintRule {
+  const PreferBlocStateSuffixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_bloc_state_suffix',
+    problemMessage: 'Bloc state class should end with "State" suffix.',
+    correctionMessage: 'Rename class to include State suffix (e.g., UserLoadingState).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+
+      // Check if this class extends something that ends with State (but not Flutter's State)
+      // and this class itself doesn't end with State
+      if (superName.endsWith('State') && superName != 'State') {
+        final String className = node.name.lexeme;
+        if (!className.endsWith('State')) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when mutable values are used in Provider Selector.
+///
+/// Selector values should be immutable to ensure proper comparisons.
+///
+/// **BAD:**
+/// ```dart
+/// Selector<Model, List<Item>>(
+///   selector: (_, model) => model.items, // List is mutable
+///   builder: (context, items, child) => ...
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Selector<Model, int>(
+///   selector: (_, model) => model.items.length, // Immutable value
+///   builder: (context, count, child) => ...
+/// )
+/// ```
+class PreferImmutableSelectorValueRule extends SaropaLintRule {
+  const PreferImmutableSelectorValueRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_immutable_selector_value',
+    problemMessage: 'Selector uses mutable type that may cause incorrect rebuilds.',
+    correctionMessage: 'Return an immutable value or use a primitive type.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _mutableTypes = <String>{
+    'List',
+    'Map',
+    'Set',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (typeName != 'Selector') return;
+
+      // Check type argument
+      final TypeArgumentList? typeArgs = node.constructorName.type.typeArguments;
+      if (typeArgs == null || typeArgs.arguments.length < 2) return;
+
+      final TypeAnnotation selectedType = typeArgs.arguments[1];
+      final String typeSource = selectedType.toSource();
+
+      for (final String mutableType in _mutableTypes) {
+        if (typeSource.startsWith('$mutableType<')) {
+          reporter.atNode(selectedType, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when long Provider access chains are used.
+///
+/// Long chains like context.read<A>().read<B>().value are hard to read.
+/// Consider using extension methods.
+///
+/// **BAD:**
+/// ```dart
+/// final value = context.read<MyProvider>().read<SubProvider>().value;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// extension MyProviderX on BuildContext {
+///   MyValue get myValue => read<MyProvider>().read<SubProvider>().value;
+/// }
+/// final value = context.myValue;
+/// ```
+class PreferProviderExtensionsRule extends SaropaLintRule {
+  const PreferProviderExtensionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_provider_extensions',
+    problemMessage: 'Long provider access chain is hard to read.',
+    correctionMessage: 'Consider using an extension method.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'read' && methodName != 'watch' && methodName != 'select') {
+        return;
+      }
+
+      // Check if this is a chained call (target is also a method invocation)
+      final Expression? target = node.target;
+      if (target is MethodInvocation) {
+        final String targetMethod = target.methodName.name;
+        if (targetMethod == 'read' || targetMethod == 'watch') {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when .obs is used inside build() method.
+///
+/// Creating reactive variables in build() causes memory leaks and
+/// unnecessary rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   final count = 0.obs; // Creates new Rx every rebuild!
+///   return Obx(() => Text('$count'));
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   final count = 0.obs;
+/// }
+///
+/// @override
+/// Widget build(BuildContext context) {
+///   return Obx(() => Text('${controller.count}'));
+/// }
+/// ```
+class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
+  const AvoidGetxRxInsideBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_getx_rx_inside_build',
+    problemMessage: 'Creating .obs in build() causes memory leaks.',
+    correctionMessage: 'Move reactive variables to a GetxController.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      // Visit method body for .obs usage
+      node.body.visitChildren(_ObsVisitor(reporter, code));
+    });
+  }
+}
+
+class _ObsVisitor extends RecursiveAstVisitor<void> {
+  _ObsVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (node.propertyName.name == 'obs') {
+      reporter.atNode(node, code);
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (node.identifier.name == 'obs') {
+      reporter.atNode(node, code);
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+}
+
+/// Warns when Rx variables are reassigned instead of updated.
+///
+/// Reassigning Rx variables breaks the reactive chain.
+///
+/// **BAD:**
+/// ```dart
+/// count = 5.obs; // Breaks reactivity!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// count.value = 5; // Properly updates value
+/// count(5); // Or use callable syntax
+/// ```
+class AvoidMutableRxVariablesRule extends SaropaLintRule {
+  const AvoidMutableRxVariablesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_mutable_rx_variables',
+    problemMessage: 'Reassigning Rx variable breaks reactivity.',
+    correctionMessage: 'Use .value = or callable syntax to update.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      // Check if right side is .obs call
+      final Expression right = node.rightHandSide;
+      if (right is PropertyAccess && right.propertyName.name == 'obs') {
+        reporter.atNode(node, code);
+      }
+      if (right is PrefixedIdentifier && right.identifier.name == 'obs') {
+        reporter.atNode(node, code);
+      }
+      // Check for direct Rx constructor
+      if (right is InstanceCreationExpression) {
+        final String? typeName = right.constructorName.type.element?.name;
+        if (typeName != null && _rxTypes.contains(typeName)) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  static const Set<String> _rxTypes = <String>{
+    'Rx',
+    'RxInt',
+    'RxDouble',
+    'RxString',
+    'RxBool',
+    'RxList',
+    'RxMap',
+    'RxSet',
+  };
+}
+
+/// Warns when Provider.create returns a disposable instance without dispose callback.
+///
+/// When a Provider creates an instance that has a dispose() method, it should
+/// also provide a dispose callback to clean up the instance.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<MyService>(
+///   create: (_) => MyService(), // MyService has dispose()!
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Provider<MyService>(
+///   create: (_) => MyService(),
+///   dispose: (_, service) => service.dispose(),
+///   child: MyApp(),
+/// )
+/// ```
+class DisposeProvidedInstancesRule extends SaropaLintRule {
+  const DisposeProvidedInstancesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'dispose_provided_instances',
+    problemMessage:
+        'Provider creates disposable instance without dispose callback.',
+    correctionMessage:
+        'Add dispose: (_, instance) => instance.dispose() to clean up.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _disposableTypes = <String>{
+    'TextEditingController',
+    'ScrollController',
+    'PageController',
+    'TabController',
+    'AnimationController',
+    'FocusNode',
+    'StreamController',
+    'StreamSubscription',
+    'Timer',
+    'ChangeNotifier',
+    'ValueNotifier',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+
+      if (typeName != 'Provider') return;
+      if (constructorName.name?.name == 'value') return;
+
+      bool hasDispose = false;
+      Expression? createExpression;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'dispose') hasDispose = true;
+          if (name == 'create') createExpression = arg.expression;
+        }
+      }
+
+      if (hasDispose || createExpression == null) return;
+
+      // Check if create returns a disposable type
+      if (createExpression is FunctionExpression) {
+        final FunctionBody body = createExpression.body;
+        if (body is ExpressionFunctionBody) {
+          final Expression expr = body.expression;
+          if (expr is InstanceCreationExpression) {
+            final String? createdType =
+                expr.constructorName.type.element?.name ??
+                    expr.constructorName.type.name.lexeme;
+            if (_disposableTypes.contains(createdType)) {
+              reporter.atNode(node, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when GetxController has Worker fields that are not disposed.
+///
+/// Workers created with ever(), once(), debounce(), etc. must be stored
+/// and disposed in onClose() to prevent memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   late Worker _worker;
+///
+///   @override
+///   void onInit() {
+///     super.onInit();
+///     _worker = ever(count, (_) => print('changed'));
+///   }
+///   // Missing onClose with _worker.dispose()!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyController extends GetxController {
+///   late Worker _worker;
+///
+///   @override
+///   void onInit() {
+///     super.onInit();
+///     _worker = ever(count, (_) => print('changed'));
+///   }
+///
+///   @override
+///   void onClose() {
+///     _worker.dispose();
+///     super.onClose();
+///   }
+/// }
+/// ```
+class DisposeGetxFieldsRule extends SaropaLintRule {
+  const DisposeGetxFieldsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'dispose_getx_fields',
+    problemMessage:
+        'GetxController has Worker fields that may not be disposed.',
+    correctionMessage: 'Call dispose() on Worker fields in onClose().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class extends GetxController
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'GetxController' && superName != 'GetxService') return;
+
+      // Find Worker fields
+      final List<String> workerFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toString();
+          if (typeName == 'Worker' || typeName == 'Worker?') {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              workerFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (workerFields.isEmpty) return;
+
+      // Check if onClose exists and disposes all workers
+      bool hasOnClose = false;
+      final Set<String> disposedFields = <String>{};
+
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'onClose') {
+          hasOnClose = true;
+          // Check for dispose calls
+          member.body.visitChildren(_DisposeVisitor(
+            onDispose: (String fieldName) {
+              disposedFields.add(fieldName);
+            },
+          ));
+        }
+      }
+
+      // Report if no onClose or missing dispose calls
+      if (!hasOnClose && workerFields.isNotEmpty) {
+        reporter.atNode(node, code);
+      } else {
+        for (final String field in workerFields) {
+          if (!disposedFields.contains(field)) {
+            reporter.atNode(node, code);
+            break;
+          }
+        }
+      }
+    });
+  }
+}
+
+class _DisposeVisitor extends RecursiveAstVisitor<void> {
+  _DisposeVisitor({required this.onDispose});
+
+  final void Function(String) onDispose;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'dispose') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier) {
+        onDispose(target.name);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when Provider type parameter is non-nullable but create returns null.
+///
+/// When a Provider's create callback explicitly returns null, the type
+/// parameter should be nullable to prevent runtime errors.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<User>( // Non-nullable but returns null!
+///   create: (_) => null,
+///   child: MyApp(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Provider<User?>( // Nullable type matches reality
+///   create: (_) => currentUser,
+///   child: MyApp(),
+/// )
+/// ```
+class PreferNullableProviderTypesRule extends SaropaLintRule {
+  const PreferNullableProviderTypesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_nullable_provider_types',
+    problemMessage:
+        'Provider type is non-nullable but create may return null.',
+    correctionMessage: 'Use nullable type parameter: Provider<Type?>.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+
+      if (typeName != 'Provider') return;
+
+      // Check if type argument is nullable
+      final TypeArgumentList? typeArgs = constructorName.type.typeArguments;
+      if (typeArgs == null || typeArgs.arguments.isEmpty) return;
+
+      final TypeAnnotation typeArg = typeArgs.arguments.first;
+      final bool isNullable = typeArg.question != null;
+
+      if (isNullable) return; // Already nullable, good!
+
+      // Check if create callback contains null return or null literal
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final Expression createExpr = arg.expression;
+          if (createExpr is FunctionExpression) {
+            // Check body for null returns
+            final _NullReturnVisitor visitor = _NullReturnVisitor();
+            createExpr.body.accept(visitor);
+            if (visitor.hasNullReturn) {
+              reporter.atNode(node, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+class _NullReturnVisitor extends RecursiveAstVisitor<void> {
+  bool hasNullReturn = false;
+
+  @override
+  void visitNullLiteral(NullLiteral node) {
+    // Check if this null is being returned
+    final AstNode? parent = node.parent;
+    if (parent is ReturnStatement ||
+        parent is ExpressionFunctionBody ||
+        parent is ConditionalExpression) {
+      hasNullReturn = true;
+    }
+    super.visitNullLiteral(node);
   }
 }

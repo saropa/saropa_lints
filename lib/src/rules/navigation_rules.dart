@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when MaterialApp/CupertinoApp lacks onUnknownRoute.
 ///
+/// Alias: add_unknown_route, fallback_route, route_not_found_handler
+///
 /// Without onUnknownRoute, navigating to an undefined route crashes the app.
 /// Always provide a fallback for unknown routes.
 ///
@@ -99,6 +101,8 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
 }
 
 /// Warns when BuildContext is used after an await in navigation.
+///
+/// Alias: avoid_dialog_context_after_async, context_after_await, mounted_check
 ///
 /// After awaiting a navigation operation, the widget may be disposed.
 /// Using the BuildContext after this can cause errors or unexpected behavior.
@@ -261,6 +265,8 @@ class _AddMountedCheckFix extends DartFix {
 }
 
 /// Warns when different page route transition types are mixed in the same app.
+///
+/// Alias: consistent_transitions, mixed_page_routes, page_transition_theme
 ///
 /// Inconsistent transitions (some pages slide, others fade, others pop)
 /// feel unprofessional. Use consistent page transitions throughout.
@@ -778,5 +784,468 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
         }
       }
     });
+  }
+}
+
+/// Warns when deep link handler lacks fallback for invalid/missing content.
+///
+/// Deep links may reference content that doesn't exist or has been deleted.
+/// Always handle the case where the linked content is unavailable.
+///
+/// **BAD:**
+/// ```dart
+/// void handleDeepLink(Uri uri) {
+///   final productId = uri.pathSegments[1];
+///   Navigator.push(context, ProductPage(id: productId));
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void handleDeepLink(Uri uri) async {
+///   final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
+///   if (productId == null) {
+///     Navigator.pushReplacement(context, NotFoundPage());
+///     return;
+///   }
+///   final product = await productService.getProduct(productId);
+///   if (product == null) {
+///     Navigator.pushReplacement(context, NotFoundPage());
+///     return;
+///   }
+///   Navigator.push(context, ProductPage(product: product));
+/// }
+/// ```
+class RequireDeepLinkFallbackRule extends SaropaLintRule {
+  const RequireDeepLinkFallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_deep_link_fallback',
+    problemMessage: 'Deep link handler should handle missing/invalid content.',
+    correctionMessage:
+        'Add fallback for when linked content is not found or unavailable.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final String methodName = node.name.lexeme.toLowerCase();
+
+      // Check for deep link handling methods
+      if (!methodName.contains('deeplink') &&
+          !methodName.contains('link') &&
+          !methodName.contains('uri') &&
+          !methodName.contains('route')) {
+        return;
+      }
+
+      final FunctionBody? body = node.body;
+      if (body == null) return;
+
+      final String bodySource = body.toSource();
+
+      // Check for fallback patterns
+      final bool hasFallback = bodySource.contains('NotFound') ||
+          bodySource.contains('404') ||
+          bodySource.contains('error') ||
+          bodySource.contains('null)') ||
+          bodySource.contains('== null') ||
+          bodySource.contains('isEmpty') ||
+          bodySource.contains('try') ||
+          bodySource.contains('catch');
+
+      if (!hasFallback) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when deep link contains sensitive parameters like password or token.
+///
+/// Deep links are logged and may be visible in browser history or analytics.
+/// Never pass sensitive data via deep link parameters.
+///
+/// **BAD:**
+/// ```dart
+/// // myapp://reset-password?token=abc123&password=secret
+/// final password = uri.queryParameters['password'];
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // myapp://reset-password?token=abc123
+/// // Token is one-time use, fetches new password from server
+/// final token = uri.queryParameters['token'];
+/// ```
+class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
+  const AvoidDeepLinkSensitiveParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_deep_link_sensitive_params',
+    problemMessage: 'Deep link should not contain sensitive parameters.',
+    correctionMessage: 'Do not pass passwords, tokens, or secrets via deep link.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _sensitiveParams = <String>{
+    'password',
+    'passwd',
+    'secret',
+    'api_key',
+    'apikey',
+    'access_token',
+    'refresh_token',
+    'auth_token',
+    'bearer',
+    'credential',
+    'credit_card',
+    'ssn',
+    'pin',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      // Check for uri.queryParameters['password']
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource();
+
+      if (!targetSource.contains('queryParameters') &&
+          !targetSource.contains('pathSegments')) {
+        return;
+      }
+
+      final Expression index = node.index;
+      if (index is SimpleStringLiteral) {
+        final String paramName = index.value.toLowerCase();
+        if (_sensitiveParams.contains(paramName)) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when route parameters are used as strings without type conversion.
+///
+/// Route parameters are always strings. Using them directly without parsing
+/// can cause type mismatches and bugs. Parse to correct type.
+///
+/// **BAD:**
+/// ```dart
+/// GoRoute(
+///   path: '/user/:id',
+///   builder: (context, state) {
+///     final id = state.pathParameters['id']!;  // String!
+///     return UserPage(userId: id);  // Expects int?
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoRoute(
+///   path: '/user/:id',
+///   builder: (context, state) {
+///     final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+///     return UserPage(userId: id);
+///   },
+/// )
+/// ```
+class PreferTypedRouteParamsRule extends SaropaLintRule {
+  const PreferTypedRouteParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_typed_route_params',
+    problemMessage: 'Route parameter used without type conversion.',
+    correctionMessage: 'Use int.tryParse/double.tryParse for numeric parameters.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      final Expression? target = node.target;
+      if (target == null) return;
+      final String targetSource = target.toSource();
+
+      if (!targetSource.contains('pathParameters') &&
+          !targetSource.contains('queryParameters')) {
+        return;
+      }
+
+      // Check if result is immediately used without parsing
+      final AstNode? parent = node.parent;
+
+      // OK if wrapped in parse
+      if (parent is ArgumentList) {
+        final AstNode? grandparent = parent.parent;
+        if (grandparent is MethodInvocation) {
+          final String methodName = grandparent.methodName.name;
+          if (methodName.contains('parse') || methodName.contains('Parse')) {
+            return;
+          }
+        }
+      }
+
+      // OK if assigned to variable (might be parsed later)
+      if (parent is VariableDeclaration) return;
+      if (parent is AssignmentExpression) return;
+
+      // OK if accessed with ?. or null check
+      if (parent is PropertyAccess) return;
+
+      // Report if used directly in expression
+      if (parent is NamedExpression || parent is ArgumentList) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Stepper widget lacks validation in onStepContinue.
+///
+/// Steppers should validate the current step before allowing progression.
+/// Without validation, users can skip required fields.
+///
+/// **BAD:**
+/// ```dart
+/// Stepper(
+///   onStepContinue: () {
+///     setState(() => _currentStep++);
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stepper(
+///   onStepContinue: () {
+///     if (_formKeys[_currentStep].currentState!.validate()) {
+///       setState(() => _currentStep++);
+///     }
+///   },
+/// )
+/// ```
+class RequireStepperValidationRule extends SaropaLintRule {
+  const RequireStepperValidationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_stepper_validation',
+    problemMessage: 'Stepper onStepContinue should validate before proceeding.',
+    correctionMessage: 'Add form validation in onStepContinue callback.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Stepper') return;
+
+      // Check onStepContinue callback
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onStepContinue') {
+          final Expression callback = arg.expression;
+          if (callback is FunctionExpression) {
+            final String bodySource = callback.body.toSource();
+
+            // Check for validation patterns
+            final bool hasValidation = bodySource.contains('validate()') ||
+                bodySource.contains('isValid') ||
+                bodySource.contains('canProceed') ||
+                bodySource.contains('if (');
+
+            if (!hasValidation) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when multi-step flow lacks a progress indicator.
+///
+/// Users need to know where they are in a multi-step process.
+/// Show step count or progress indicator.
+///
+/// **BAD:**
+/// ```dart
+/// Column(children: [
+///   if (step == 1) Step1Page(),
+///   if (step == 2) Step2Page(),
+///   if (step == 3) Step3Page(),
+/// ])
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Column(children: [
+///   LinearProgressIndicator(value: step / totalSteps),
+///   Text('Step $step of $totalSteps'),
+///   if (step == 1) Step1Page(),
+///   // ...
+/// ])
+/// ```
+class RequireStepCountIndicatorRule extends SaropaLintRule {
+  const RequireStepCountIndicatorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_step_count_indicator',
+    problemMessage: 'Multi-step flow should show progress indicator.',
+    correctionMessage: 'Add step counter or progress indicator.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      final FunctionBody? body = node.body;
+      if (body == null) return;
+
+      final String bodySource = body.toSource();
+
+      // Check for multi-step patterns
+      final bool hasMultipleSteps = RegExp(r'step\s*==\s*\d')
+              .allMatches(bodySource)
+              .length >=
+          3;
+
+      if (!hasMultipleSteps) return;
+
+      // Check for progress indicator
+      final bool hasProgressIndicator =
+          bodySource.contains('ProgressIndicator') ||
+              bodySource.contains('Stepper') ||
+              bodySource.contains('Step ') ||
+              bodySource.contains('of \$') ||
+              bodySource.contains('totalSteps') ||
+              bodySource.contains('stepCount');
+
+      if (!hasProgressIndicator) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when scrollable list lacks RefreshIndicator.
+///
+/// Pull-to-refresh is a standard pattern for updating list content.
+/// Users expect this interaction on scrollable lists.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => ListTile(...),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// RefreshIndicator(
+///   onRefresh: _loadData,
+///   child: ListView.builder(
+///     itemBuilder: (context, index) => ListTile(...),
+///   ),
+/// )
+/// ```
+class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
+  const RequireRefreshIndicatorOnListsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_refresh_indicator_on_lists',
+    problemMessage: 'Scrollable list should have RefreshIndicator.',
+    correctionMessage: 'Wrap list with RefreshIndicator for pull-to-refresh.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      final String? constructorName = node.constructorName.name?.name;
+
+      // Check for ListView.builder or similar patterns
+      if (typeName != 'ListView' && typeName != 'GridView') return;
+      if (constructorName != 'builder' && constructorName != 'separated') return;
+
+      // Check if wrapped in RefreshIndicator
+      if (_hasRefreshIndicatorAncestor(node)) return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  bool _hasRefreshIndicatorAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 10) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'RefreshIndicator' ||
+            typeName == 'SmartRefresher' ||
+            typeName == 'PullToRefresh') {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
   }
 }

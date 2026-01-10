@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when double is used for money/currency values.
 ///
+/// Alias: no_double_for_currency, money_type_safety, decimal_for_money
+///
 /// Floating point arithmetic has precision issues (0.1 + 0.2 != 0.3).
 /// Use int cents or a Decimal package for monetary calculations.
 ///
