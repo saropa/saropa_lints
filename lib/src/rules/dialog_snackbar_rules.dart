@@ -35,8 +35,7 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_snackbar_duration',
     problemMessage: 'SnackBar should have explicit duration.',
-    correctionMessage:
-        'Add duration parameter for consistent UX timing.',
+    correctionMessage: 'Add duration parameter for consistent UX timing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

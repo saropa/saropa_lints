@@ -347,7 +347,9 @@ class PreferDurationConstantsRule extends SaropaLintRule {
         if (intValue <= 0) continue;
 
         // Check for conversions
-        if (name == 'milliseconds' && intValue >= 1000 && intValue % 1000 == 0) {
+        if (name == 'milliseconds' &&
+            intValue >= 1000 &&
+            intValue % 1000 == 0) {
           reporter.atNode(arg, code);
         } else if (name == 'seconds' && intValue >= 60 && intValue % 60 == 0) {
           reporter.atNode(arg, code);

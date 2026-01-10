@@ -287,8 +287,10 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_image_size_constraints',
-    problemMessage: 'Consider adding cacheWidth/cacheHeight for memory optimization.',
-    correctionMessage: 'Set cacheWidth/cacheHeight to avoid decoding at full resolution.',
+    problemMessage:
+        'Consider adding cacheWidth/cacheHeight for memory optimization.',
+    correctionMessage:
+        'Set cacheWidth/cacheHeight to avoid decoding at full resolution.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
