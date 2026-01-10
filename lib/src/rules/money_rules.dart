@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -41,7 +42,8 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_for_money',
-    problemMessage: 'double has precision issues for money. Use int cents or Decimal.',
+    problemMessage:
+        'double has precision issues for money. Use int cents or Decimal.',
     correctionMessage: 'Store money as int cents or use a Decimal package.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -76,7 +78,9 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       // Check type
       final VariableDeclarationList? parent =
-          node.parent is VariableDeclarationList ? node.parent as VariableDeclarationList : null;
+          node.parent is VariableDeclarationList
+              ? node.parent as VariableDeclarationList
+              : null;
       if (parent == null) return;
 
       final String? typeName = parent.type?.toSource();

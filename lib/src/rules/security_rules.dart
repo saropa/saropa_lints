@@ -3018,7 +3018,8 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_logs',
     problemMessage: 'Sensitive data in logs creates security risks.',
-    correctionMessage: 'Remove sensitive data or log only non-sensitive metadata.',
+    correctionMessage:
+        'Remove sensitive data or log only non-sensitive metadata.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3089,7 +3090,8 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final String funcName = node.function.toSource();
       if (!_logMethods.contains(funcName)) return;
 
@@ -3157,7 +3159,8 @@ class _CommentOutSensitiveLogFix extends DartFix {
       });
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       AstNode? current = node;

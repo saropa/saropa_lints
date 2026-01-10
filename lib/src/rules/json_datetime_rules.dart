@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -58,7 +59,8 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final String source = node.function.toSource();
       if (source != 'jsonDecode') return;
 
@@ -112,7 +114,8 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_parse_unvalidated',
-    problemMessage: 'DateTime.parse throws on invalid input. Use tryParse or try-catch.',
+    problemMessage:
+        'DateTime.parse throws on invalid input. Use tryParse or try-catch.',
     correctionMessage: 'Replace with DateTime.tryParse() or wrap in try-catch.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -210,7 +213,8 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_try_parse_for_dynamic_data',
-    problemMessage: 'parse() throws on invalid input. Use tryParse() for dynamic data.',
+    problemMessage:
+        'parse() throws on invalid input. Use tryParse() for dynamic data.',
     correctionMessage: 'Replace with tryParse() and handle null result.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

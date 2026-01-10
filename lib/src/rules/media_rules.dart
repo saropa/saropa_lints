@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -40,7 +41,8 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_autoplay_audio',
     problemMessage: 'Autoplay is blocked on iOS/web and annoys users.',
-    correctionMessage: 'Set autoPlay: false and require user interaction to play.',
+    correctionMessage:
+        'Set autoPlay: false and require user interaction to play.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -51,7 +53,8 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'autoPlay' && node.name.label.name != 'autoplay') {
+      if (node.name.label.name != 'autoPlay' &&
+          node.name.label.name != 'autoplay') {
         return;
       }
 
