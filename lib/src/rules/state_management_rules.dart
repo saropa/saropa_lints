@@ -4349,3 +4349,310 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when a Riverpod project doesn't include riverpod_lint.
+///
+/// The official riverpod_lint package catches Riverpod-specific mistakes
+/// that general linters miss. Use it alongside saropa_lints for complete
+/// coverage.
+///
+/// **BAD:**
+/// ```yaml
+/// # pubspec.yaml
+/// dependencies:
+///   flutter_riverpod: ^2.0.0
+/// dev_dependencies:
+///   # No riverpod_lint - missing Riverpod-specific checks
+/// ```
+///
+/// **GOOD:**
+/// ```yaml
+/// # pubspec.yaml
+/// dependencies:
+///   flutter_riverpod: ^2.0.0
+/// dev_dependencies:
+///   riverpod_lint: ^2.0.0
+/// ```
+class RequireRiverpodLintRule extends SaropaLintRule {
+  const RequireRiverpodLintRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_riverpod_lint',
+    problemMessage:
+        'Project uses Riverpod but riverpod_lint is not configured.',
+    correctionMessage:
+        'Add riverpod_lint to dev_dependencies for Riverpod-specific linting.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // This rule checks file-level imports for Riverpod usage
+    context.registry.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+
+      // Check if using Riverpod
+      if (!uri.contains('riverpod') && !uri.contains('flutter_riverpod')) {
+        return;
+      }
+
+      // This is a heuristic check - we found Riverpod imports
+      // In a real implementation, we'd check pubspec.yaml for riverpod_lint
+      // For now, we flag when Riverpod is imported without riverpod_lint
+      // annotations being visible in the same file
+
+      // Check if file has riverpod_lint annotations
+      final AstNode root = node.root;
+      if (root is CompilationUnit) {
+        final String source = root.toSource();
+
+        // Look for riverpod_lint annotations or generated code
+        if (source.contains('@riverpod') ||
+            source.contains('.g.dart') ||
+            source.contains('riverpod_annotation')) {
+          // Using code generation - riverpod_lint likely configured
+          return;
+        }
+
+        // Check for classic provider definitions without lint annotations
+        if (source.contains('Provider(') ||
+            source.contains('StateProvider(') ||
+            source.contains('FutureProvider(') ||
+            source.contains('StreamProvider(')) {
+          // Using classic providers - suggest riverpod_lint
+          // Only report once per file
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Provider package uses nested Provider widgets instead of
+/// MultiProvider.
+///
+/// Nested Provider widgets create deep indentation. MultiProvider flattens
+/// the tree and is easier to read and maintain.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<A>(
+///   create: (_) => A(),
+///   child: Provider<B>(
+///     create: (_) => B(),
+///     child: Provider<C>(
+///       create: (_) => C(),
+///       child: MyApp(),
+///     ),
+///   ),
+/// ),
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MultiProvider(
+///   providers: [
+///     Provider<A>(create: (_) => A()),
+///     Provider<B>(create: (_) => B()),
+///     Provider<C>(create: (_) => C()),
+///   ],
+///   child: MyApp(),
+/// ),
+/// ```
+class RequireMultiProviderRule extends SaropaLintRule {
+  const RequireMultiProviderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_multi_provider',
+    problemMessage:
+        'Nested Provider widgets. Use MultiProvider for better readability.',
+    correctionMessage:
+        'Replace nested Providers with MultiProvider(providers: [...], child: ...).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _providerTypes = {
+    'Provider',
+    'ChangeNotifierProvider',
+    'FutureProvider',
+    'StreamProvider',
+    'ListenableProvider',
+    'ValueListenableProvider',
+    'ProxyProvider',
+    'ProxyProvider2',
+    'ProxyProvider3',
+    'ProxyProvider4',
+    'ProxyProvider5',
+    'ProxyProvider6',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      if (!_providerTypes.contains(typeName)) return;
+
+      // Check if parent is also a Provider (nested pattern)
+      AstNode? current = node.parent;
+      int nestingDepth = 0;
+
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType =
+              current.constructorName.type.name2.lexeme;
+          if (_providerTypes.contains(parentType)) {
+            nestingDepth++;
+          }
+        }
+        current = current.parent;
+      }
+
+      // If nested 2+ levels deep, suggest MultiProvider
+      if (nestingDepth >= 2) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Provider widgets are deeply nested.
+///
+/// Deeply nested provider trees are hard to reason about and maintain.
+/// Flatten with MultiProvider and avoid provider-in-provider patterns
+/// where possible.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<A>(
+///   create: (_) => A(),
+///   child: Consumer<A>(
+///     builder: (_, a, child) => Provider<B>(
+///       create: (_) => B(a), // Provider inside Consumer
+///       child: child,
+///     ),
+///   ),
+/// ),
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MultiProvider(
+///   providers: [
+///     Provider<A>(create: (_) => A()),
+///     ProxyProvider<A, B>(update: (_, a, __) => B(a)),
+///   ],
+///   child: MyApp(),
+/// ),
+/// ```
+class AvoidNestedProvidersRule extends SaropaLintRule {
+  const AvoidNestedProvidersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_nested_providers',
+    problemMessage:
+        'Provider created inside Consumer or builder callback.',
+    correctionMessage:
+        'Use ProxyProvider or move provider to MultiProvider at tree root.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _providerTypes = {
+    'Provider',
+    'ChangeNotifierProvider',
+    'FutureProvider',
+    'StreamProvider',
+    'ListenableProvider',
+    'ValueListenableProvider',
+  };
+
+  static const Set<String> _consumerTypes = {
+    'Consumer',
+    'Consumer2',
+    'Consumer3',
+    'Consumer4',
+    'Consumer5',
+    'Consumer6',
+    'Selector',
+    'Selector2',
+    'Selector3',
+    'Selector4',
+    'Selector5',
+    'Selector6',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      if (!_providerTypes.contains(typeName)) return;
+
+      // Check if inside a Consumer's builder callback
+      AstNode? current = node.parent;
+
+      while (current != null) {
+        // Check for builder callback pattern
+        if (current is NamedExpression &&
+            (current.name.label.name == 'builder' ||
+                current.name.label.name == 'selector')) {
+          // Check if this builder belongs to a Consumer
+          AstNode? builderParent = current.parent;
+          while (builderParent != null) {
+            if (builderParent is InstanceCreationExpression) {
+              final String parentType =
+                  builderParent.constructorName.type.name2.lexeme;
+              if (_consumerTypes.contains(parentType)) {
+                reporter.atNode(node, code);
+                return;
+              }
+            }
+            builderParent = builderParent.parent;
+          }
+        }
+
+        // Also check for direct nesting in child argument of other providers
+        if (current is NamedExpression && current.name.label.name == 'child') {
+          AstNode? childParent = current.parent;
+          while (childParent != null) {
+            if (childParent is InstanceCreationExpression) {
+              final String parentType =
+                  childParent.constructorName.type.name2.lexeme;
+              if (_providerTypes.contains(parentType)) {
+                // This is direct nesting - handled by RequireMultiProviderRule
+                return;
+              }
+            }
+            childParent = childParent.parent;
+          }
+        }
+
+        current = current.parent;
+      }
+    });
+  }
+}

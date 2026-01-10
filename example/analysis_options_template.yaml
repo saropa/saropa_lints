@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 1.7.5)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 1.7.9)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~767+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~820+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -88,7 +88,7 @@ custom_lint:
     #   - recommended    : ~150 rules (default) ← START HERE
     #   - professional   : ~350 rules (strict)
     #   - comprehensive  : ~700 rules (very strict)
-    #   - insanity       : ~767+ rules (everything)
+    #   - insanity       : ~820+ rules (everything)
     tier: recommended
 
   # ===========================================================================
@@ -287,6 +287,12 @@ custom_lint:
     - require_prefs_key_constants: false
     - avoid_secure_storage_on_web: false
     - require_firebase_init_before_use: false
+    - require_database_migration: false
+    - require_database_index: false
+    - prefer_transaction_for_batch: false
+    - require_hive_database_close: false
+    - require_type_adapter_registration: false
+    - prefer_lazy_box_for_large: false
 
     # =========================================================================
     # FLUTTER DISPOSAL (CRITICAL)
@@ -299,6 +305,8 @@ custom_lint:
     - require_animation_controller_dispose: false
     - require_image_disposal: false
     - nullify_after_dispose: false
+    - require_media_player_dispose: false
+    - require_tab_controller_dispose: false
 
     # =========================================================================
     # FLUTTER FORMS
@@ -378,6 +386,23 @@ custom_lint:
     - avoid_controller_in_build: false
     - require_keys_in_animated_lists: false
     - avoid_expensive_build: false
+    # Build method anti-patterns
+    - avoid_gradient_in_build: false
+    - avoid_dialog_in_build: false
+    - avoid_snackbar_in_build: false
+    - avoid_analytics_in_build: false
+    - avoid_json_encode_in_build: false
+    - avoid_getit_in_build: false
+    - avoid_canvas_operations_in_build: false
+    - avoid_hardcoded_feature_flags: false
+    # Scroll and list rules
+    - avoid_shrinkwrap_in_scrollview: false
+    - avoid_nested_scrollables_conflict: false
+    - avoid_listview_children_for_large_lists: false
+    - avoid_excessive_bottom_nav_items: false
+    - require_tab_controller_length_sync: false
+    - avoid_refresh_without_await: false
+    - avoid_multiple_autofocus: false
 
     # =========================================================================
     # FLUTTER WIDGETS
@@ -568,6 +593,12 @@ custom_lint:
     - require_api_error_mapping: false
     - avoid_token_in_url: false
     - avoid_generic_key_in_url: false
+    - prefer_http_connection_reuse: false
+    - avoid_redundant_requests: false
+    - require_response_caching: false
+    - prefer_pagination: false
+    - avoid_over_fetching: false
+    - require_cancel_token: false
 
     # =========================================================================
     # NUMBERS & STRINGS
@@ -640,6 +671,18 @@ custom_lint:
     - avoid_auth_state_in_prefs: false
     - prefer_encrypted_prefs: false
     - require_deep_link_validation: false
+    - require_data_encryption: false
+    - prefer_data_masking: false
+    - avoid_screenshot_sensitive: false
+    - require_secure_password_field: false
+    - avoid_path_traversal: false
+    - prefer_html_escape: false
+    # Cryptography rules
+    - avoid_hardcoded_encryption_keys: false
+    - prefer_secure_random_for_crypto: false
+    - avoid_deprecated_crypto_algorithms: false
+    - require_unique_iv_per_encryption: false
+    - avoid_sensitive_data_in_logs: false
 
     # =========================================================================
     # STATE MANAGEMENT
@@ -672,6 +715,9 @@ custom_lint:
     - prefer_ref_watch_over_read: false
     - avoid_change_notifier_in_widget: false
     - avoid_setstate_in_large_state_class: false
+    - require_riverpod_lint: false
+    - require_multi_provider: false
+    - avoid_nested_providers: false
 
     # =========================================================================
     # TESTING
@@ -714,6 +760,20 @@ custom_lint:
     - require_text_input_tests: false
     - avoid_test_coupling: false
     - require_test_isolation: false
+    - prefer_fake_over_mock: false
+    - require_edge_case_tests: false
+    - prefer_test_data_builder: false
+    - avoid_test_implementation_details: false
+    - require_getit_reset_in_tests: false
+
+    # =========================================================================
+    # JSON & DATETIME
+    # =========================================================================
+    - require_json_decode_try_catch: false
+    - avoid_datetime_parse_unvalidated: false
+    - avoid_double_for_money: false
+    - require_websocket_error_handling: false
+    - avoid_autoplay_audio: false
 
     # =========================================================================
     # VARIABLES & ASSIGNMENTS

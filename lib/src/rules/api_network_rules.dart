@@ -897,3 +897,562 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when HTTP clients are created without connection reuse.
+///
+/// Each new HTTP client requires DNS lookup, TCP handshake, and TLS
+/// negotiation. Reusing connections is much more efficient.
+///
+/// **BAD:**
+/// ```dart
+/// Future<Data> fetchData() async {
+///   final client = http.Client(); // New client each call
+///   final response = await client.get(url);
+///   client.close();
+///   return Data.fromJson(response.body);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class ApiService {
+///   final http.Client _client = http.Client(); // Reused client
+///
+///   Future<Data> fetchData() async {
+///     final response = await _client.get(url);
+///     return Data.fromJson(response.body);
+///   }
+///
+///   void dispose() => _client.close();
+/// }
+/// ```
+class PreferHttpConnectionReuseRule extends SaropaLintRule {
+  const PreferHttpConnectionReuseRule() : super(code: _code);
+
+  /// Performance issue - connection overhead adds latency.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_http_connection_reuse',
+    problemMessage:
+        'HTTP client created inside method. Connection overhead on every call.',
+    correctionMessage:
+        'Create HTTP client as a class field and reuse across requests.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Check for client creation inside method
+      if (!bodySource.contains('http.Client()') &&
+          !bodySource.contains('Client()') &&
+          !bodySource.contains('Dio()')) {
+        return;
+      }
+
+      // Check if client is created as local variable (not returned)
+      if (bodySource.contains('final client = ') ||
+          bodySource.contains('var client = ') ||
+          bodySource.contains('final dio = ') ||
+          bodySource.contains('var dio = ')) {
+        // Check if closed in same method (ephemeral pattern)
+        if (bodySource.contains('.close()')) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+
+    // Also check for inline Client() usage that isn't assigned to local variable
+    // (The MethodDeclaration check above handles local variable + close pattern)
+    context.registry.addInstanceCreationExpression(
+      (InstanceCreationExpression node) {
+        final String typeName = node.constructorName.type.name2.lexeme;
+
+        if (typeName != 'Client' && typeName != 'Dio') return;
+
+        // Check if this is assigned to a local variable (handled above)
+        final AstNode? parent = node.parent;
+        if (parent is VariableDeclaration) {
+          // Already handled by the MethodDeclaration check
+          return;
+        }
+
+        // Check if inside a method body (not a field declaration)
+        AstNode? current = parent;
+        while (current != null) {
+          if (current is MethodDeclaration ||
+              current is FunctionDeclaration) {
+            // Inline usage inside method - should reuse
+            reporter.atNode(node, code);
+            return;
+          }
+          if (current is FieldDeclaration ||
+              current is TopLevelVariableDeclaration) {
+            // Field declaration - good pattern
+            return;
+          }
+          current = current.parent;
+        }
+      },
+    );
+  }
+}
+
+/// Warns when the same API endpoint might be called redundantly.
+///
+/// Multiple widgets or methods requesting the same data simultaneously
+/// wastes bandwidth and server resources. Deduplicate concurrent requests.
+///
+/// **BAD:**
+/// ```dart
+/// class UserWidget extends StatelessWidget {
+///   Future<User> build() async {
+///     return await api.getUser(userId); // Called in multiple widgets
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserRepository {
+///   final Map<String, Future<User>> _pending = {};
+///
+///   Future<User> getUser(String id) {
+///     return _pending.putIfAbsent(id, () async {
+///       final user = await api.getUser(id);
+///       _pending.remove(id);
+///       return user;
+///     });
+///   }
+/// }
+/// ```
+class AvoidRedundantRequestsRule extends SaropaLintRule {
+  const AvoidRedundantRequestsRule() : super(code: _code);
+
+  /// Performance and resource waste.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_redundant_requests',
+    problemMessage:
+        'API call in build() or similar may cause redundant requests.',
+    correctionMessage:
+        'Cache results or use request deduplication pattern.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final String methodName = node.name.lexeme;
+
+      // Check methods that run frequently
+      if (methodName != 'build' &&
+          methodName != 'initState' &&
+          methodName != 'didChangeDependencies' &&
+          methodName != 'didUpdateWidget') {
+        return;
+      }
+
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Check for HTTP API calls without caching
+      // Note: Avoid matching generic .get() which could be Map.get() or Box.get()
+      final bool hasApiCall = bodySource.contains('http.get(') ||
+          bodySource.contains('client.get(') ||
+          bodySource.contains('dio.get(') ||
+          bodySource.contains('.post(') ||
+          bodySource.contains('.fetch(') ||
+          bodySource.contains('http.') ||
+          bodySource.contains('dio.');
+
+      if (!hasApiCall) return;
+
+      // Check for caching patterns
+      final bool hasCaching = bodySource.contains('cache') ||
+          bodySource.contains('Cache') ||
+          bodySource.contains('_pending') ||
+          bodySource.contains('putIfAbsent') ||
+          bodySource.contains('memoize');
+
+      if (!hasCaching) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when GET responses are not cached.
+///
+/// GET responses for static or slowly-changing data should be cached
+/// to reduce bandwidth usage and improve responsiveness.
+///
+/// **BAD:**
+/// ```dart
+/// Future<Config> getConfig() async {
+///   return await api.get('/config'); // Fetches every time
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Config? _cachedConfig;
+/// DateTime? _cacheTime;
+///
+/// Future<Config> getConfig() async {
+///   if (_cachedConfig != null &&
+///       DateTime.now().difference(_cacheTime!) < Duration(minutes: 5)) {
+///     return _cachedConfig!;
+///   }
+///   _cachedConfig = await api.get('/config');
+///   _cacheTime = DateTime.now();
+///   return _cachedConfig!;
+/// }
+/// ```
+class RequireResponseCachingRule extends SaropaLintRule {
+  const RequireResponseCachingRule() : super(code: _code);
+
+  /// Caching depends on data freshness requirements - may not be appropriate.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  static const LintCode _code = LintCode(
+    name: 'require_response_caching',
+    problemMessage:
+        'GET request without caching. Consider caching static data.',
+    correctionMessage:
+        'Add response caching with TTL for data that changes infrequently.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final String methodName = node.name.lexeme.toLowerCase();
+
+      // Check for getter methods that likely fetch data
+      if (!methodName.startsWith('get') &&
+          !methodName.startsWith('fetch') &&
+          !methodName.startsWith('load') &&
+          !methodName.contains('config') &&
+          !methodName.contains('settings')) {
+        return;
+      }
+
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Check for GET requests
+      if (!bodySource.contains('.get(') &&
+          !bodySource.contains('http.get')) {
+        return;
+      }
+
+      // Check for caching patterns
+      final bool hasCaching = bodySource.contains('cache') ||
+          bodySource.contains('Cache') ||
+          bodySource.contains('_cached') ||
+          bodySource.contains('cached') ||
+          bodySource.contains('ttl') ||
+          bodySource.contains('TTL') ||
+          bodySource.contains('Duration');
+
+      // Check class for cache fields
+      final AstNode? parent = node.parent;
+      if (parent is ClassDeclaration) {
+        final String classSource = parent.toSource();
+        if (classSource.contains('_cache') ||
+            classSource.contains('Cache') ||
+            classSource.contains('_cached')) {
+          return; // Class has caching infrastructure
+        }
+      }
+
+      if (!hasCaching) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when APIs return large collections without pagination.
+///
+/// Loading thousands of items at once is slow and memory-intensive.
+/// Use pagination with limit/offset or cursor-based pagination.
+///
+/// **BAD:**
+/// ```dart
+/// Future<List<Item>> getAllItems() async {
+///   final response = await api.get('/items');
+///   return response.map((e) => Item.fromJson(e)).toList();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<List<Item>> getItems({int page = 0, int limit = 20}) async {
+///   final response = await api.get('/items?page=$page&limit=$limit');
+///   return response.map((e) => Item.fromJson(e)).toList();
+/// }
+/// ```
+class PreferPaginationRule extends SaropaLintRule {
+  const PreferPaginationRule() : super(code: _code);
+
+  /// Performance and memory usage.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_pagination',
+    problemMessage:
+        'API fetches all items without pagination. May cause memory issues.',
+    correctionMessage:
+        'Add pagination parameters: limit, offset, page, or cursor.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final String methodName = node.name.lexeme.toLowerCase();
+
+      // Check for methods that fetch collections
+      if (!methodName.contains('all') &&
+          !methodName.startsWith('get') &&
+          !methodName.startsWith('fetch') &&
+          !methodName.startsWith('list') &&
+          !methodName.startsWith('load')) {
+        return;
+      }
+
+      // Check return type for List
+      final TypeAnnotation? returnType = node.returnType;
+      if (returnType == null) return;
+      final String returnTypeStr = returnType.toSource();
+      if (!returnTypeStr.contains('List<') &&
+          !returnTypeStr.contains('Iterable<')) {
+        return;
+      }
+
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Check for API calls
+      if (!bodySource.contains('.get(') &&
+          !bodySource.contains('http.') &&
+          !bodySource.contains('dio.')) {
+        return;
+      }
+
+      // Check for pagination patterns
+      final bool hasPagination = bodySource.contains('limit') ||
+          bodySource.contains('offset') ||
+          bodySource.contains('page') ||
+          bodySource.contains('cursor') ||
+          bodySource.contains('pageSize') ||
+          bodySource.contains('perPage') ||
+          node.parameters?.toSource().contains('limit') == true ||
+          node.parameters?.toSource().contains('page') == true;
+
+      if (!hasPagination) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when API responses fetch more data than needed.
+///
+/// Fetching entire objects when only a few fields are needed wastes
+/// bandwidth. Use field selection or create dedicated endpoints.
+///
+/// **BAD:**
+/// ```dart
+/// // Fetches entire user object just to display name
+/// final user = await api.getUser(id);
+/// return Text(user.name);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Only fetch needed fields
+/// final name = await api.getUserName(id);
+/// // Or use GraphQL field selection
+/// final user = await api.query('{ user(id: $id) { name } }');
+/// ```
+class AvoidOverFetchingRule extends SaropaLintRule {
+  const AvoidOverFetchingRule() : super(code: _code);
+
+  /// Optimization depends on API design - may require backend changes.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_over_fetching',
+    problemMessage:
+        'Fetching full object but only using few fields. Consider optimizing.',
+    correctionMessage:
+        'Use field selection, sparse fieldsets, or dedicated endpoints.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // This rule requires more sophisticated analysis
+    // Detect patterns like: fetch full object, use 1-2 properties
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Look for API fetch followed by single property access
+      final RegExp fetchPattern = RegExp(
+        r'await\s+\w+\.(get|fetch|query)\([^)]+\)',
+      );
+
+      if (!fetchPattern.hasMatch(bodySource)) return;
+
+      // Count property accesses on result vs fields available
+      // This is a heuristic - if method is short and only accesses
+      // one or two properties after fetch, might be over-fetching
+      final int propertyAccesses =
+          RegExp(r'\.\w+(?!\()').allMatches(bodySource).length;
+      final int apiCalls =
+          RegExp(r'\.(get|fetch|post|query)\(').allMatches(bodySource).length;
+
+      // If we have an API call and very few property accesses relative
+      // to typical object size, might be over-fetching
+      if (apiCalls > 0 && propertyAccesses <= 3 && bodySource.length < 500) {
+        // Additional heuristic: check for .name, .id, .title only patterns
+        if (bodySource.contains('.name') ||
+            bodySource.contains('.title') ||
+            bodySource.contains('.id')) {
+          final int totalProps =
+              RegExp(r'\.(name|title|id|label|text)\b')
+                  .allMatches(bodySource)
+                  .length;
+          if (totalProps >= 1 && totalProps <= 2) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when async requests lack cancellation support.
+///
+/// Requests for disposed screens waste resources and can cause errors.
+/// Use CancelToken or cancel HTTP requests when the widget is disposed.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   Future<void> loadData() async {
+///     final data = await api.fetchData(); // No cancellation
+///     setState(() => _data = data);
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   final CancelToken _cancelToken = CancelToken();
+///
+///   Future<void> loadData() async {
+///     final data = await api.fetchData(cancelToken: _cancelToken);
+///     if (mounted) setState(() => _data = data);
+///   }
+///
+///   @override
+///   void dispose() {
+///     _cancelToken.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireCancelTokenRule extends SaropaLintRule {
+  const RequireCancelTokenRule() : super(code: _code);
+
+  /// Resource management and avoiding errors.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_cancel_token',
+    problemMessage:
+        'Async request in StatefulWidget without cancellation support.',
+    correctionMessage:
+        'Use CancelToken (Dio) or implement request cancellation on dispose.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if it's a State class
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclass = extendsClause.superclass.toSource();
+      if (!superclass.startsWith('State<')) return;
+
+      final String classSource = node.toSource();
+
+      // Check for HTTP calls
+      final bool hasHttpCalls = classSource.contains('.get(') ||
+          classSource.contains('.post(') ||
+          classSource.contains('.fetch(') ||
+          classSource.contains('http.') ||
+          classSource.contains('dio.');
+
+      if (!hasHttpCalls) return;
+
+      // Check for cancellation patterns
+      final bool hasCancellation = classSource.contains('CancelToken') ||
+          classSource.contains('cancelToken') ||
+          classSource.contains('_cancelled') ||
+          classSource.contains('isCancelled') ||
+          classSource.contains('cancel()');
+
+      // Check for mounted check (partial mitigation)
+      final bool hasMountedCheck = classSource.contains('if (mounted)') ||
+          classSource.contains('if (!mounted)');
+
+      if (!hasCancellation && !hasMountedCheck) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
