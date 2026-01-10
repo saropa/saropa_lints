@@ -4,18 +4,6 @@
 
 See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 1000 rules.
 
-### Recently Implemented (v1.7.9)
-
-The following 29 rules from this roadmap have been implemented:
-
-- **Disposal:** `require_media_player_dispose`, `require_tab_controller_dispose`
-- **Build Anti-patterns:** `avoid_gradient_in_build`, `avoid_dialog_in_build`, `avoid_snackbar_in_build`, `avoid_analytics_in_build`, `avoid_json_encode_in_build`, `avoid_getit_in_build`, `avoid_canvas_operations_in_build`, `avoid_hardcoded_feature_flags`
-- **Scroll/List:** `avoid_shrinkwrap_in_scrollview`, `avoid_nested_scrollables_conflict`, `avoid_listview_children_for_large_lists`, `avoid_excessive_bottom_nav_items`, `require_tab_controller_length_sync`, `avoid_refresh_without_await`, `avoid_multiple_autofocus`
-- **Cryptography:** `avoid_hardcoded_encryption_keys`, `prefer_secure_random_for_crypto`, `avoid_deprecated_crypto_algorithms`, `require_unique_iv_per_encryption`
-- **JSON/DateTime:** `require_json_decode_try_catch`, `avoid_datetime_parse_unvalidated`, `prefer_try_parse_for_dynamic_data`, `avoid_double_for_money`, `avoid_sensitive_data_in_logs`, `require_getit_reset_in_tests`, `require_websocket_error_handling`, `avoid_autoplay_audio`
-
----
-
 ## Part 1: Detailed Rule Specifications
 
 ### 1.1 Widget Rules
@@ -409,7 +397,6 @@ The following 29 rules from this roadmap have been implemented:
 | `avoid_websocket_without_heartbeat` | Professional | INFO | WebSockets may silently disconnect. Send periodic ping/pong to detect stale connections. |
 | `require_websocket_message_validation` | Essential | WARNING | Incoming WebSocket messages can be malformed or malicious. Validate schema before processing. |
 | `avoid_websocket_memory_leak` | Essential | WARNING | WebSocket subscriptions must be cancelled on dispose. Detect `WebSocketChannel` stream subscriptions without cancellation in dispose(). |
-| `require_websocket_error_handling` | Essential | WARNING | WebSocket streams can emit errors. Detect `.listen()` on WebSocket without `onError` handler. |
 
 ### 1.22 GraphQL Rules
 
@@ -423,8 +410,6 @@ The following 29 rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_media_player_dispose` | Essential | ERROR | VideoPlayerController, AudioPlayer, and similar must be disposed. Detect media player fields in StatefulWidget without dispose() call. |
-| `avoid_autoplay_audio` | Recommended | INFO | Autoplaying audio without user interaction is blocked on iOS/web and annoys users. Detect `autoPlay: true` on audio/video players. |
 | `require_audio_focus_handling` | Professional | INFO | Apps should request audio focus and respect other apps. Detect audio playback without audio session configuration. |
 | `prefer_video_loading_placeholder` | Recommended | INFO | Show video thumbnail or placeholder before playing. Detect VideoPlayer without placeholder widget. |
 | `avoid_audio_in_background_without_config` | Essential | ERROR | Background audio requires proper iOS/Android configuration. Detect audio playback in apps without background audio capability. |
@@ -469,7 +454,6 @@ The following 29 rules from this roadmap have been implemented:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_analytics_event_naming` | Professional | INFO | Consistent event naming improves analysis. Detect analytics events not matching configured naming pattern (e.g., snake_case). |
-| `avoid_analytics_in_build` | Essential | WARNING | Analytics calls in build() fire on every rebuild. Detect analytics tracking calls inside build methods. |
 | `require_analytics_error_handling` | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
 
 ### 1.29 Feature Flag Rules
@@ -477,7 +461,6 @@ The following 29 rules from this roadmap have been implemented:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_feature_flag_default` | Essential | WARNING | Feature flags must have defaults for offline/error cases. Detect feature flag checks without fallback value. |
-| `avoid_hardcoded_feature_flags` | Professional | INFO | Hardcoded `if (true)` or `if (false)` for features should use proper feature flag system. |
 | `require_feature_flag_type_safety` | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
 
 ### 1.30 Date & Time Rules
@@ -485,7 +468,6 @@ The following 29 rules from this roadmap have been implemented:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `prefer_utc_for_storage` | Essential | WARNING | Store dates in UTC. Detect DateTime storage/serialization without `.toUtc()` conversion. |
-| `avoid_datetime_parse_unvalidated` | Essential | WARNING | `DateTime.parse()` throws on invalid input. Detect DateTime.parse without try-catch; suggest tryParse(). |
 | `require_timezone_display` | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
 | `prefer_duration_constants` | Recommended | INFO | `Duration(seconds: 60)` is less clear than `Duration(minutes: 1)`. Detect durations using smaller units when larger fit evenly. |
 | `avoid_datetime_now_in_tests` | Essential | WARNING | Tests using `DateTime.now()` are non-deterministic. Detect DateTime.now() in test files without clock injection. |
@@ -495,7 +477,6 @@ The following 29 rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_double_for_money` | Essential | ERROR | Floating point causes rounding errors (0.1 + 0.2 ≠ 0.3). Detect `double` fields/variables with names like price, amount, cost, total, balance. |
 | `require_currency_code_with_amount` | Recommended | INFO | Amounts without currency are ambiguous. Detect money-related classes without currency field. |
 | `require_currency_formatting_locale` | Recommended | INFO | Currency formatting varies by locale. Detect NumberFormat.currency without explicit locale parameter. |
 | `avoid_money_arithmetic_on_double` | Essential | WARNING | Arithmetic on money doubles compounds rounding errors. Detect +, -, *, / operations on money-named doubles. |
@@ -514,10 +495,6 @@ The following 29 rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_hardcoded_encryption_keys` | Essential | ERROR | Keys in source code are extractable. Detect string literals passed to encryption key parameters. |
-| `require_unique_iv_per_encryption` | Essential | ERROR | Reusing IV breaks encryption security. Detect IV reuse or static IV in encryption calls. |
-| `avoid_deprecated_crypto_algorithms` | Essential | WARNING | MD5, SHA1, DES are broken. Detect usage of deprecated algorithms; suggest SHA-256+, AES-256-GCM. |
-| `prefer_secure_random_for_crypto` | Essential | WARNING | `Random()` is predictable. Detect Random() used for encryption keys, IVs, or salts; require Random.secure(). |
 | `avoid_encryption_key_in_memory` | Professional | INFO | Keys kept in memory can be extracted from dumps. Detect encryption keys stored as class fields. |
 
 ### 1.34 JSON & Serialization Rules
@@ -525,17 +502,13 @@ The following 29 rules from this roadmap have been implemented:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_dynamic_json_access` | Recommended | WARNING | `json['key']['nested']` crashes on missing keys. Detect chained bracket access on dynamic JSON without null checks. |
-| `require_json_decode_try_catch` | Essential | WARNING | `jsonDecode()` throws on malformed JSON. Detect jsonDecode without surrounding try-catch. |
 | `prefer_json_codegen` | Professional | INFO | Manual fromJson/toJson is error-prone. Detect hand-written fromJson methods; suggest json_serializable/freezed. |
 | `require_json_date_format_consistency` | Professional | INFO | Dates in JSON need consistent format. Detect DateTime serialization without explicit format. |
-| `avoid_json_encode_in_build` | Essential | WARNING | JSON encoding is expensive. Detect jsonEncode inside build() methods. |
 
 ### 1.35 GetIt & Dependency Injection Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_getit_reset_in_tests` | Essential | WARNING | GetIt singletons persist across tests. Detect test files using GetIt.I without reset() in setUp/tearDown. |
-| `avoid_getit_in_build` | Essential | WARNING | GetIt.instance() in build() hides dependencies. Detect GetIt.I or GetIt.instance calls inside build methods. |
 | `prefer_lazy_singleton_registration` | Professional | INFO | Eager registration creates all singletons at startup. Detect registerSingleton with expensive constructors; suggest registerLazySingleton. |
 | `avoid_getit_unregistered_access` | Essential | ERROR | Accessing unregistered type crashes. Detect GetIt.I<T>() for types not registered in visible scope. |
 | `require_getit_dispose_registration` | Professional | INFO | Disposable singletons need dispose callbacks. Detect registerSingleton of Disposable types without dispose parameter. |
@@ -545,7 +518,6 @@ The following 29 rules from this roadmap have been implemented:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_print_in_production` | Essential | WARNING | print() ships to production, exposing debug info. Detect print() calls outside debug/test code. |
-| `avoid_sensitive_data_in_logs` | Essential | ERROR | Tokens, passwords in logs create security risks. Detect logging calls with variables named password, token, secret, credential. |
 | `prefer_logger_over_print` | Recommended | INFO | Logger packages provide levels, formatting, filtering. Detect print() usage; suggest logger package. |
 | `require_log_level_for_production` | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
 | `avoid_expensive_log_string_construction` | Professional | INFO | Don't build expensive strings for logs that won't print. Detect string interpolation in log calls without level guard. |
@@ -600,11 +572,8 @@ The following 29 rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_shrinkwrap_in_scrollview` | Essential | WARNING | shrinkWrap: true in ListView inside ScrollView disables virtualization. Detect shrinkWrap: true nested in scrollable. |
 | `prefer_itemextent_when_known` | Professional | INFO | ListView with fixed item heights should use itemExtent for performance. Detect ListView without itemExtent when items are uniform. |
-| `avoid_nested_scrollables_conflict` | Recommended | WARNING | Nested scrollables need explicit physics. Detect ListView/GridView inside SingleChildScrollView without NeverScrollableScrollPhysics. |
 | `require_scroll_controller_dispose` | Essential | ERROR | ScrollController must be disposed. Detect ScrollController field without dispose() call. |
-| `avoid_listview_children_for_large_lists` | Essential | WARNING | ListView(children: [...]) loads all items. Detect ListView with >20 children; suggest ListView.builder. |
 | `prefer_sliverfillremaining_for_empty` | Professional | INFO | Empty state in CustomScrollView needs SliverFillRemaining. Detect empty state widget as regular sliver. |
 
 ### 1.43 Focus & Keyboard Rules
@@ -612,7 +581,6 @@ The following 29 rules from this roadmap have been implemented:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_focus_node_dispose` | Essential | ERROR | FocusNode must be disposed. Detect FocusNode field in StatefulWidget without dispose() call. |
-| `avoid_multiple_autofocus` | Recommended | WARNING | Only one widget can have autofocus. Detect multiple `autofocus: true` in same build method. |
 | `require_keyboard_action_type` | Recommended | INFO | Text fields need appropriate keyboard action. Detect TextField without textInputAction in forms. |
 | `prefer_focus_traversal_order` | Professional | INFO | Tab order should be logical. Detect forms without FocusTraversalGroup for complex layouts. |
 | `require_keyboard_dismiss_on_scroll` | Recommended | INFO | Keyboard should dismiss when scrolling. Detect ListView in form without keyboardDismissBehavior. |
@@ -631,16 +599,13 @@ The following 29 rules from this roadmap have been implemented:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_gradient_in_build` | Essential | WARNING | Creating Gradient in build() prevents reuse. Detect LinearGradient/RadialGradient construction in build methods. |
 | `require_custom_painter_shouldrepaint` | Professional | INFO | CustomPainter without proper shouldRepaint causes excessive repaints or stale UI. Detect CustomPainter with default shouldRepaint. |
 | `prefer_cached_paint_objects` | Professional | INFO | Paint objects are expensive to create. Detect Paint() construction inside paint() method. |
-| `avoid_canvas_operations_in_build` | Essential | WARNING | Canvas operations belong in CustomPainter, not build. Detect Canvas usage outside CustomPainter.paint(). |
 
 ### 1.46 Dialog & Modal Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_dialog_in_build` | Essential | ERROR | showDialog in build() causes infinite dialog loop. Detect showDialog/showModalBottomSheet calls inside build methods. |
 | `require_dialog_barrier_consideration` | Recommended | INFO | Destructive confirmations shouldn't dismiss on barrier tap. Detect showDialog without explicit barrierDismissible for destructive actions. |
 | `require_dialog_result_handling` | Professional | INFO | Dialogs returning values need result handling. Detect showDialog without await or .then() for dialogs with return values. |
 | `avoid_dialog_context_after_async` | Essential | ERROR | Context may be invalid after async in dialog. Detect Navigator.pop using context after await in dialog. |
@@ -653,15 +618,11 @@ The following 29 rules from this roadmap have been implemented:
 | `require_snackbar_action_for_undo` | Recommended | INFO | Destructive actions should offer undo. Detect delete operations showing SnackBar without action. |
 | `avoid_snackbar_queue_buildup` | Professional | INFO | Rapid snackbar calls queue up. Detect multiple showSnackBar calls without clearSnackBars. |
 | `require_snackbar_duration_consideration` | Recommended | INFO | Important messages need longer duration. Detect SnackBar without explicit duration for important content. |
-| `avoid_snackbar_in_build` | Essential | WARNING | showSnackBar in build causes repeated snackbars. Detect ScaffoldMessenger.showSnackBar in build method. |
 
 ### 1.48 Tab & Bottom Navigation Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_tab_controller_dispose` | Essential | ERROR | TabController with vsync must be disposed. Detect TabController field without dispose() call. |
-| `require_tab_controller_length_sync` | Essential | ERROR | TabController length must match tab count. Detect TabController length not matching TabBar children count. |
-| `avoid_excessive_bottom_nav_items` | Recommended | INFO | More than 5 bottom nav items crowds UI. Detect BottomNavigationBar with >5 items. |
 | `require_tab_state_preservation` | Professional | INFO | Tab state should persist on switch. Detect TabBarView children without AutomaticKeepAliveClientMixin. |
 
 ### 1.49 Stepper & Multi-step Flow Rules
@@ -703,7 +664,6 @@ The following 29 rules from this roadmap have been implemented:
 |-----------|------|----------|-------------|
 | `require_refresh_indicator_on_lists` | Recommended | INFO | Scrollable lists should support pull-to-refresh. Detect ListView without RefreshIndicator wrapper. |
 | `require_refresh_completion_feedback` | Recommended | INFO | Refresh without visible change confuses users. Detect onRefresh completing without UI feedback. |
-| `avoid_refresh_without_await` | Essential | WARNING | RefreshIndicator needs Future for spinner timing. Detect onRefresh callback not returning Future. |
 
 ### 1.54 Infinite Scroll Rules
 
