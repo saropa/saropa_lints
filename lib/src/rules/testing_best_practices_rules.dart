@@ -204,6 +204,8 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
 
 /// Warns when test uses real network calls.
 ///
+/// Alias: avoid_real_dependencies
+///
 /// Tests should mock external dependencies for reliability.
 ///
 /// **BAD:**

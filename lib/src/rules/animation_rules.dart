@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when AnimationController is created without vsync.
 ///
+/// Alias: animation_controller_vsync, missing_vsync, no_vsync_parameter
+///
 /// AnimationController requires a TickerProvider (vsync) to function
 /// correctly. Without it, animations may not sync with frame rendering
 /// and can cause visual glitches.
@@ -125,6 +127,8 @@ class _AddVsyncFix extends DartFix {
 
 /// Warns when AnimationController is created inside build() method.
 ///
+/// Alias: no_animation_controller_in_build, animation_controller_in_build_method
+///
 /// Creating AnimationController in build() creates a new controller on
 /// every rebuild, wasting resources and causing animation issues.
 /// Controllers should be created in initState() or as late final fields.
@@ -195,6 +199,8 @@ class _AnimationControllerVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when AnimationController is not disposed.
+///
+/// Alias: dispose_animation_controller, animation_controller_dispose, animation_controller_leak
 ///
 /// AnimationController holds native resources (a [Ticker]) that must be
 /// explicitly released. Failing to dispose causes memory leaks and prevents
@@ -449,6 +455,8 @@ class _AddAnimationControllerDisposeFix extends DartFix {
 
 /// Warns when duplicate Hero tags are found in the same file.
 ///
+/// Alias: unique_hero_tag, duplicate_hero_tag, hero_tag_conflict
+///
 /// Hero widgets with the same tag cause "Multiple heroes" errors when
 /// both are on screen during a navigation transition. Each Hero must
 /// have a unique tag within the visible widget tree.
@@ -536,6 +544,8 @@ class _HeroTagCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when IntrinsicWidth or IntrinsicHeight is used.
 ///
+/// Alias: no_intrinsic_width, no_intrinsic_height, avoid_intrinsic_dimensions
+///
 /// IntrinsicWidth and IntrinsicHeight cause two layout passes, which
 /// doubles the layout cost for their subtree. This can significantly
 /// impact performance, especially in lists or frequently rebuilt widgets.
@@ -596,6 +606,8 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
 }
 
 /// Warns when Duration uses hardcoded literal values instead of constants.
+///
+/// Alias: no_magic_duration, duration_constant, extract_duration
 ///
 /// Hardcoded duration values make it difficult to maintain consistent
 /// timing across the app. Define duration constants for reusability.
@@ -688,6 +700,8 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
 
 /// Warns when animations don't specify a curve.
 ///
+/// Alias: animation_curve, prefer_easing, missing_animation_curve
+///
 /// Linear animations (default) feel robotic and unnatural. Using curves
 /// like easeInOut, bounceIn, or elasticOut creates more natural motion
 /// that matches platform conventions.
@@ -770,6 +784,8 @@ class RequireAnimationCurveRule extends SaropaLintRule {
 }
 
 /// Warns when explicit AnimationController is used for simple transitions.
+///
+/// Alias: use_animated_widgets, prefer_animated_opacity, implicit_vs_explicit_animation
 ///
 /// For simple animations (opacity, size, color), use implicit animations
 /// like AnimatedOpacity, AnimatedContainer, etc. They're simpler and
@@ -877,6 +893,8 @@ class _TransitionNode {
 
 /// Warns when list item animations don't use staggered delays.
 ///
+/// Alias: stagger_list_animations, list_animation_delay, cascade_animation
+///
 /// Animating all list items at once looks jarring. Stagger animations
 /// with Interval or increasing delays for a smoother cascade effect.
 ///
@@ -970,6 +988,395 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
             reporter.atNode(arg.name, code);
           }
         }
+      }
+    });
+  }
+}
+
+/// Warns when multiple chained animations could use TweenSequence.
+///
+/// Alias: chain_animations, sequential_animations, use_tween_sequence
+///
+/// Multiple sequential animations are harder to manage and can drift.
+/// TweenSequence provides a single timeline with precise control.
+///
+/// **BAD:**
+/// ```dart
+/// _controller1.forward().then((_) {
+///   _controller2.forward().then((_) {
+///     _controller3.forward();
+///   });
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TweenSequence([
+///   TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 1),
+///   TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.5), weight: 1),
+///   TweenSequenceItem(tween: Tween(begin: 0.5, end: 1.0), weight: 1),
+/// ]).animate(_controller);
+/// ```
+class PreferTweenSequenceRule extends SaropaLintRule {
+  const PreferTweenSequenceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_tween_sequence',
+    problemMessage: 'Multiple chained animations should use TweenSequence.',
+    correctionMessage: 'Use TweenSequence for sequential animations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'then') return;
+
+      // Check if called on .forward()
+      final Expression? target = node.target;
+      if (target is! MethodInvocation) return;
+      if (target.methodName.name != 'forward') return;
+
+      // Check if the callback also calls forward
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression callback = args.arguments.first;
+      if (callback is FunctionExpression) {
+        final String bodySource = callback.body.toSource();
+        if (bodySource.contains('.forward()')) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when one-shot animation lacks StatusListener for cleanup.
+///
+/// Alias: animation_completion_listener, animation_status_callback, on_animation_complete
+///
+/// Animations that run once need to know when they complete for cleanup
+/// or state updates. Use StatusListener to handle completion.
+///
+/// **BAD:**
+/// ```dart
+/// _controller.forward();
+/// // How do we know when it's done?
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// _controller.addStatusListener((status) {
+///   if (status == AnimationStatus.completed) {
+///     setState(() => _showContent = true);
+///   }
+/// });
+/// _controller.forward();
+/// ```
+class RequireAnimationStatusListenerRule extends SaropaLintRule {
+  const RequireAnimationStatusListenerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_animation_status_listener',
+    problemMessage: 'One-shot animation should have StatusListener for completion.',
+    correctionMessage: 'Add addStatusListener to handle animation completion.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track controllers and their listeners
+    final Set<String> controllersWithListener = <String>{};
+    final Map<String, MethodInvocation> forwardCalls =
+        <String, MethodInvocation>{};
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName == 'addStatusListener') {
+        final Expression? target = node.target;
+        if (target != null) {
+          controllersWithListener.add(target.toSource());
+        }
+      }
+
+      if (methodName == 'forward') {
+        final Expression? target = node.target;
+        if (target != null) {
+          // Skip if using repeat (continuous animation)
+          final String source = node.toSource();
+          if (!source.contains('repeat')) {
+            forwardCalls[target.toSource()] = node;
+          }
+        }
+      }
+    });
+
+    context.addPostRunCallback(() {
+      for (final MapEntry<String, MethodInvocation> entry
+          in forwardCalls.entries) {
+        if (!controllersWithListener.contains(entry.key)) {
+          reporter.atNode(entry.value, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when multiple animations target the same property.
+///
+/// Alias: conflicting_animations, duplicate_animation_property, animation_conflict
+///
+/// Overlapping animations on the same property fight each other,
+/// causing jitter and unpredictable behavior.
+///
+/// **BAD:**
+/// ```dart
+/// ScaleTransition(
+///   scale: _scaleAnimation,
+///   child: ScaleTransition(
+///     scale: _anotherScaleAnimation,  // Conflicts!
+///     child: widget,
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ScaleTransition(
+///   scale: _combinedScaleAnimation,  // Single animation
+///   child: widget,
+/// )
+/// ```
+class AvoidOverlappingAnimationsRule extends SaropaLintRule {
+  const AvoidOverlappingAnimationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_overlapping_animations',
+    problemMessage: 'Multiple animations on same property cause conflicts.',
+    correctionMessage: 'Combine into single animation or use different properties.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  // Map transition types to the property they animate
+  static const Map<String, String> _transitionProperties = <String, String>{
+    'ScaleTransition': 'scale',
+    'FadeTransition': 'opacity',
+    'SlideTransition': 'position',
+    'RotationTransition': 'rotation',
+    'SizeTransition': 'size',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_transitionProperties.containsKey(typeName)) return;
+
+      final String property = _transitionProperties[typeName]!;
+
+      // Check if child is same type of transition
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression child = arg.expression;
+          if (child is InstanceCreationExpression) {
+            final String childTypeName =
+                child.constructorName.type.name.lexeme;
+            if (_transitionProperties[childTypeName] == property) {
+              reporter.atNode(child.constructorName, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when AnimatedBuilder wraps too much of the widget tree.
+///
+/// Alias: animated_builder_scope, minimize_animation_rebuild, animation_rebuild_scope
+///
+/// AnimatedBuilder rebuilds its entire child on every frame. Wrapping
+/// large widget trees causes excessive rebuilds and poor performance.
+///
+/// **BAD:**
+/// ```dart
+/// AnimatedBuilder(
+///   animation: _controller,
+///   builder: (context, child) => Scaffold(
+///     appBar: AppBar(...),
+///     body: Column(
+///       children: [
+///         Transform.scale(scale: _controller.value, child: widget),
+///         // Many other widgets that don't animate
+///       ],
+///     ),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Scaffold(
+///   appBar: AppBar(...),
+///   body: Column(
+///     children: [
+///       AnimatedBuilder(
+///         animation: _controller,
+///         builder: (context, child) =>
+///           Transform.scale(scale: _controller.value, child: child),
+///         child: widget,  // Static child passed through
+///       ),
+///     ],
+///   ),
+/// )
+/// ```
+class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
+  const AvoidAnimationRebuildWasteRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_animation_rebuild_waste',
+    problemMessage: 'AnimatedBuilder wraps too much of the widget tree.',
+    correctionMessage: 'Move AnimatedBuilder closer to animated widgets only.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  // Large container widgets that shouldn't be inside AnimatedBuilder
+  static const Set<String> _largeContainers = <String>{
+    'Scaffold',
+    'MaterialApp',
+    'CupertinoApp',
+    'Navigator',
+    'TabBarView',
+    'PageView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'AnimatedBuilder') return;
+
+      // Check builder argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
+
+          // Check if builder contains large containers
+          for (final String container in _largeContainers) {
+            if (builderSource.contains('$container(')) {
+              reporter.atNode(node.constructorName, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when drag-release interaction doesn't use physics simulation.
+///
+/// Alias: spring_animation, natural_animation, use_spring_simulation
+///
+/// Abruptly stopping animations on release feels unnatural. Use spring
+/// or friction physics for smooth deceleration.
+///
+/// **BAD:**
+/// ```dart
+/// onPanEnd: (details) {
+///   _controller.animateTo(0.0);  // Abrupt stop
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// onPanEnd: (details) {
+///   final simulation = SpringSimulation(
+///     SpringDescription.withDampingRatio(mass: 1, stiffness: 100),
+///     _controller.value,
+///     0.0,
+///     details.velocity.pixelsPerSecond.dx,
+///   );
+///   _controller.animateWith(simulation);
+/// }
+/// ```
+class PreferPhysicsSimulationRule extends SaropaLintRule {
+  const PreferPhysicsSimulationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_physics_simulation',
+    problemMessage: 'Drag-release should use physics simulation for natural feel.',
+    correctionMessage: 'Use SpringSimulation or FrictionSimulation with animateWith.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      final String name = node.name.label.name;
+
+      if (name != 'onPanEnd' && name != 'onDragEnd') return;
+
+      final Expression callback = node.expression;
+      if (callback is! FunctionExpression) return;
+
+      final String bodySource = callback.body.toSource();
+
+      // Check if using animateTo/animateBack without physics
+      if (bodySource.contains('animateTo') ||
+          bodySource.contains('animateBack')) {
+        // OK if using physics simulation
+        if (bodySource.contains('Simulation') ||
+            bodySource.contains('animateWith') ||
+            bodySource.contains('spring') ||
+            bodySource.contains('Spring') ||
+            bodySource.contains('friction') ||
+            bodySource.contains('Friction')) {
+          return;
+        }
+
+        reporter.atNode(node, code);
       }
     });
   }

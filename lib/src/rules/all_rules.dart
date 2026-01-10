@@ -1,5 +1,8 @@
+
 /// Barrel export for all lint rules organized by category
 library;
+
+export 'riverpod_rules.dart';
 
 export 'accessibility_rules.dart';
 export 'animation_rules.dart';
@@ -20,10 +23,12 @@ export 'dialog_snackbar_rules.dart';
 export 'disposal_rules.dart';
 export 'documentation_rules.dart';
 export 'equality_rules.dart';
+export 'equatable_rules.dart';
 export 'error_handling_rules.dart';
 export 'exception_rules.dart';
 export 'file_handling_rules.dart';
 export 'firebase_rules.dart';
+export 'flame_rules.dart';
 export 'flutter_widget_rules.dart';
 export 'formatting_rules.dart';
 export 'forms_rules.dart';
