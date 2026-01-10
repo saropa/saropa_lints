@@ -643,7 +643,8 @@ class PreferDateFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_date_format',
     problemMessage: 'Raw DateTime formatting ignores user locale.',
-    correctionMessage: 'Use DateFormat from intl package for locale-aware formatting.',
+    correctionMessage:
+        'Use DateFormat from intl package for locale-aware formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -781,7 +782,8 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_description',
     problemMessage: 'Intl.message without description.',
-    correctionMessage: 'Add desc parameter to help translators understand context.',
+    correctionMessage:
+        'Add desc parameter to help translators understand context.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

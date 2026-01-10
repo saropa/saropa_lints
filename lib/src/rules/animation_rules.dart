@@ -1089,7 +1089,8 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_animation_status_listener',
-    problemMessage: 'One-shot animation should have StatusListener for completion.',
+    problemMessage:
+        'One-shot animation should have StatusListener for completion.',
     correctionMessage: 'Add addStatusListener to handle animation completion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1172,7 +1173,8 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_overlapping_animations',
     problemMessage: 'Multiple animations on same property cause conflicts.',
-    correctionMessage: 'Combine into single animation or use different properties.',
+    correctionMessage:
+        'Combine into single animation or use different properties.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1204,8 +1206,7 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression child = arg.expression;
           if (child is InstanceCreationExpression) {
-            final String childTypeName =
-                child.constructorName.type.name.lexeme;
+            final String childTypeName = child.constructorName.type.name.lexeme;
             if (_transitionProperties[childTypeName] == property) {
               reporter.atNode(child.constructorName, code);
             }
@@ -1342,8 +1343,10 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_physics_simulation',
-    problemMessage: 'Drag-release should use physics simulation for natural feel.',
-    correctionMessage: 'Use SpringSimulation or FrictionSimulation with animateWith.',
+    problemMessage:
+        'Drag-release should use physics simulation for natural feel.',
+    correctionMessage:
+        'Use SpringSimulation or FrictionSimulation with animateWith.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

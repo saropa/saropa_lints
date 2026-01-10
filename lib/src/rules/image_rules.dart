@@ -371,7 +371,8 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_error_fallback',
-    problemMessage: 'Image.network should have an errorBuilder for failed loads.',
+    problemMessage:
+        'Image.network should have an errorBuilder for failed loads.',
     correctionMessage: 'Add errorBuilder callback to handle network failures.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -440,7 +441,8 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_loading_placeholder',
-    problemMessage: 'Image.network should have a loadingBuilder for UX feedback.',
+    problemMessage:
+        'Image.network should have a loadingBuilder for UX feedback.',
     correctionMessage: 'Add loadingBuilder to show progress while loading.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
