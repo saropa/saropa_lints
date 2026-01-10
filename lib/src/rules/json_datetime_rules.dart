@@ -327,52 +327,29 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  /// Only unambiguous money-related terms.
+  /// Generic terms like "total", "amount", "balance" removed - too many
+  /// false positives in non-monetary contexts.
   static const Set<String> _moneyIndicators = <String>{
-    'price',
-    'cost',
-    'amount',
-    'total',
-    'balance',
-    'payment',
-    'fee',
-    'tax',
-    'discount',
-    'subtotal',
-    'revenue',
-    'profit',
-    'salary',
-    'wage',
-    'budget',
-    'expense',
-    'income',
-    'money',
-    'currency',
+    'price', // itemPrice, unitPrice
+    'money', // explicit
+    'currency', // explicit
     'dollar',
     'euro',
-    'pound',
     'yen',
-    'cent',
+    'usd',
+    'eur',
+    'gbp',
+    'jpy',
+    'cad',
+    'aud',
+    'salary', // definitely money
+    'wage', // definitely money
   };
 
-  /// Words containing money indicators that are NOT money-related.
-  /// Used to prevent false positives like "percent" matching "cent".
+  /// Words that match indicators but aren't money-related.
   static const Set<String> _falsePositivePatterns = <String>{
-    'percent', // percentage values, not cents
-    'percentage',
-    'center', // UI centering
-    'centered',
-    'centimeter', // measurements
-    'accent', // colors, text styling
-    'accented',
-    'recent', // time-related
-    'recently',
-    'descent', // typography, movement
-    'descend',
-    'innocent', // not money
-    'incentive', // could be money, but often not
-    'concentrate',
-    'central',
-    'century',
+    'priceless', // not a price
   };
 
   @override
@@ -500,6 +477,17 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
     'verbose',
   };
 
+  /// Pre-compiled regex patterns for each sensitive name.
+  /// Pattern 1: $password at word boundary (not inside braces)
+  /// Pattern 2: ${password} with ONLY the variable name inside braces
+  static final Map<String, (RegExp, RegExp)> _sensitivePatterns = {
+    for (final String name in _sensitiveNames)
+      name: (
+        RegExp(r'\$' + RegExp.escape(name) + r'(?![a-z0-9_\{])'),
+        RegExp(r'\$\{\s*' + RegExp.escape(name) + r'\s*\}'),
+      ),
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -530,14 +518,20 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
     });
   }
 
+  /// Checks if the argument contains direct interpolation of sensitive data.
+  /// Only flags patterns that actually expose the value:
+  /// - `$password` (direct interpolation)
+  /// - `${password}` (braced direct interpolation)
+  ///
+  /// Does NOT flag expressions that don't expose the value:
+  /// - `${password != null}` (null check)
+  /// - `${password.length}` (property access)
+  /// - `${password?.isEmpty}` (null-safe method call)
   bool _containsSensitiveData(Expression arg) {
     final String source = arg.toSource().toLowerCase();
-    for (final String sensitive in _sensitiveNames) {
-      // Check for variable interpolation like $password or ${password}
-      if (source.contains('\$$sensitive') ||
-          source.contains('\${$sensitive') ||
-          source.contains('$sensitive:') ||
-          source.contains('$sensitive =')) {
+    for (final patterns in _sensitivePatterns.values) {
+      final (directPattern, bracedPattern) = patterns;
+      if (directPattern.hasMatch(source) || bracedPattern.hasMatch(source)) {
         return true;
       }
     }
