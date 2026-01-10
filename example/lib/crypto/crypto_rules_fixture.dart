@@ -52,4 +52,18 @@ void testCryptoRules() {
     // sha256.convert(...)
     // sha512.convert(...)
   }
+
+  // =========================================================================
+  // require_unique_iv_per_encryption
+  // =========================================================================
+
+  // These should NOT trigger (false positive exclusions):
+  void falsePositiveIvNames() {
+    // Variable names containing "iv" that are NOT IVs
+    final activity = 'user_action'; // "actIVity" - not an IV
+    final privateName = 'secret'; // "prIVate" - not an IV
+    final derivative = 42.0; // "derIVative" - not an IV
+    final archives = <String>[]; // "archIVes" - not an IV
+    final festival = 'holiday'; // "festIVal" - not an IV
+  }
 }

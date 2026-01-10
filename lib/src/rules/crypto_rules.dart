@@ -364,6 +364,23 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  /// Checks if a variable name indicates an IV/nonce variable.
+  /// Avoids false positives like "activity", "private", "derivative".
+  static bool _isIvVariableName(String originalName) {
+    final String lowerName = originalName.toLowerCase();
+
+    // Snake_case patterns: my_iv, iv_value, _iv_
+    if (lowerName.contains('_iv_') ||
+        lowerName.endsWith('_iv') ||
+        lowerName.startsWith('iv_')) {
+      return true;
+    }
+
+    // CamelCase patterns: myIv, encryptionIV
+    // Capital I after lowercase = word boundary
+    return RegExp(r'[a-z]I[Vv]').hasMatch(originalName);
+  }
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -375,11 +392,20 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
       final bool isStatic = node.isStatic;
       if (!isStatic) return;
 
-      final String fieldSource = node.toSource();
-      if (fieldSource.contains('IV.') ||
-          fieldSource.contains('iv') ||
-          fieldSource.contains('IV ')) {
-        for (final VariableDeclaration variable in node.fields.variables) {
+      for (final VariableDeclaration variable in node.fields.variables) {
+        // Check variable name for IV-related patterns
+        final String originalName = variable.name.lexeme;
+        final String lowerName = originalName.toLowerCase();
+        final bool hasIvName = lowerName == 'iv' ||
+            lowerName == 'nonce' ||
+            _isIvVariableName(originalName);
+
+        // Check if type or initializer references IV class
+        final String fieldSource = node.toSource();
+        final bool hasIvClass =
+            fieldSource.contains('IV.') || fieldSource.contains('IV(');
+
+        if (hasIvName || hasIvClass) {
           reporter.atNode(variable, code);
         }
       }
@@ -396,15 +422,11 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
       final bool isConst = parent.isConst;
       if (!isConst) return;
 
-      final String varName = node.name.lexeme.toLowerCase();
-      // Check for exact 'iv' or 'nonce', or compound names like 'myIv', 'ivValue'
-      // Avoid matching words like 'private', 'derivative'
-      if (varName == 'iv' ||
-          varName == 'nonce' ||
-          varName.startsWith('iv') ||
-          varName.endsWith('iv') ||
-          varName.contains('_iv') ||
-          varName.contains('iv_')) {
+      final String originalName = node.name.lexeme;
+      final String lowerName = originalName.toLowerCase();
+      if (lowerName == 'iv' ||
+          lowerName == 'nonce' ||
+          _isIvVariableName(originalName)) {
         reporter.atNode(node, code);
       }
     });
@@ -427,6 +449,39 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
           reporter.atNode(node, code);
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseSecureRandomIvFix()];
+}
+
+class _UseSecureRandomIvFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String methodName = node.methodName.name;
+      if (methodName != 'fromUtf8' && methodName != 'fromBase64') return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Use IV.fromSecureRandom(16)',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'IV.fromSecureRandom(16)',
+        );
+      });
     });
   }
 }

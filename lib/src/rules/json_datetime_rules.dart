@@ -354,6 +354,27 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
     'cent',
   };
 
+  /// Words containing money indicators that are NOT money-related.
+  /// Used to prevent false positives like "percent" matching "cent".
+  static const Set<String> _falsePositivePatterns = <String>{
+    'percent', // percentage values, not cents
+    'percentage',
+    'center', // UI centering
+    'centered',
+    'centimeter', // measurements
+    'accent', // colors, text styling
+    'accented',
+    'recent', // time-related
+    'recently',
+    'descent', // typography, movement
+    'descend',
+    'innocent', // not money
+    'incentive', // could be money, but often not
+    'concentrate',
+    'central',
+    'century',
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -373,11 +394,8 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
 
       // Check variable name for money indicators
       final String varName = node.name.lexeme.toLowerCase();
-      for (final String indicator in _moneyIndicators) {
-        if (varName.contains(indicator)) {
-          reporter.atNode(node, code);
-          return;
-        }
+      if (_containsMoneyIndicator(varName)) {
+        reporter.atNode(node, code);
       }
     });
 
@@ -387,14 +405,31 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
 
       for (final VariableDeclaration variable in node.fields.variables) {
         final String varName = variable.name.lexeme.toLowerCase();
-        for (final String indicator in _moneyIndicators) {
-          if (varName.contains(indicator)) {
-            reporter.atNode(variable, code);
-            break;
-          }
+        if (_containsMoneyIndicator(varName)) {
+          reporter.atNode(variable, code);
         }
       }
     });
+  }
+
+  /// Checks if a variable name contains a money indicator while avoiding
+  /// false positives like "percent" matching "cent".
+  static bool _containsMoneyIndicator(String varName) {
+    // First check if the name contains any false positive patterns
+    for (final String falsePositive in _falsePositivePatterns) {
+      if (varName.contains(falsePositive)) {
+        return false;
+      }
+    }
+
+    // Then check for money indicators
+    for (final String indicator in _moneyIndicators) {
+      if (varName.contains(indicator)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
