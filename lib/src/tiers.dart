@@ -203,6 +203,50 @@ const Set<String> essentialRules = <String>{
 
   // Async (roadmap_up_next - runtime crash)
   'avoid_dialog_context_after_async',
+
+  // Part 5 - Security Rules (Essential)
+  'avoid_shared_prefs_sensitive_data',
+  'require_secure_storage_for_auth',
+  'require_sqflite_whereargs',
+  'require_hive_initialization',
+  'require_hive_type_adapter',
+  'require_hive_encryption_key_secure',
+
+  // Part 5 - HTTP/Dio Rules (Essential)
+  'require_dio_timeout',
+  'require_dio_error_handling',
+
+  // Part 5 - Stream/Future Rules (Essential)
+  'avoid_stream_in_build',
+  'require_stream_controller_close',
+  'avoid_future_builder_rebuild',
+
+  // Part 5 - Riverpod Rules (Essential)
+  'require_riverpod_error_handling',
+  'avoid_riverpod_state_mutation',
+
+  // Part 5 - Navigation Rules (Essential)
+  'avoid_go_router_inline_creation',
+
+  // Part 5 - Geolocator Rules (Essential)
+  'require_geolocator_permission_check',
+
+  // Part 5 - Image Rules (Essential)
+  'require_cached_image_dimensions',
+
+  // Part 6 - State Management Rules (Essential)
+  'avoid_yield_in_on_event', // Critical - deprecated/broken in Bloc 8.0+
+  'emit_new_bloc_state_instances', // Critical - state mutation breaks equality
+  'avoid_listen_in_async', // High - subscription leaks in async callbacks
+
+  // Part 6 - Security Rules (Essential)
+  'require_url_validation',
+  'avoid_redirect_injection',
+  'avoid_external_storage_sensitive',
+
+  // Part 6 - Form Rules (Essential)
+  'avoid_keyboard_overlap',
+  'require_search_debounce', // Prevents request spam
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -490,6 +534,46 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Navigation rules (roadmap_up_next)
   'require_refresh_indicator_on_lists',
+
+  // Part 5 - Security Rules (Recommended)
+  'require_shared_prefs_null_handling',
+  'require_shared_prefs_key_constants',
+
+  // Part 5 - Navigation Rules (Recommended)
+  'require_go_router_error_handler',
+
+  // Part 5 - Image Rules (Recommended)
+  'require_cached_image_placeholder',
+  'require_cached_image_error_widget',
+
+  // Part 5 - Stream Rules (Recommended)
+  'avoid_multiple_stream_listeners',
+  'require_stream_error_handling',
+
+  // Part 6 - State Management Rules (Recommended)
+  'prefer_consumer_over_provider_of',
+  'prefer_getx_builder',
+  'require_async_value_order',
+  'avoid_bloc_public_fields',
+
+  // Part 6 - Theming Rules (Recommended)
+  'require_dark_mode_testing',
+
+  // Part 6 - UI/UX Rules (Recommended)
+  'prefer_skeleton_over_spinner',
+  'require_empty_results_state',
+  'require_search_loading_indicator',
+  'require_pagination_loading_state',
+
+  // Part 6 - Lifecycle Rules (Recommended)
+  'avoid_work_in_paused_state',
+  'require_resume_state_refresh',
+
+  // Part 6 - Firebase Rules (Recommended)
+  'avoid_storing_user_data_in_auth',
+
+  // Part 6 - Flutter Widget Rules (Recommended)
+  'require_orientation_handling',
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -861,6 +945,72 @@ const Set<String> professionalOnlyRules = <String>{
   // Test rules (roadmap_up_next)
   'require_test_cleanup',
   'require_accessibility_tests',
+
+  // Part 5 - Database Rules (Professional)
+  'require_sqflite_transaction',
+  'prefer_sqflite_batch',
+  'require_sqflite_error_handling',
+  'require_sqflite_close',
+  'require_hive_box_close',
+  'prefer_hive_encryption',
+
+  // Part 5 - Dio Rules (Professional)
+  'require_dio_interceptor_error_handler',
+  'prefer_dio_cancel_token',
+  'require_dio_ssl_pinning',
+  'avoid_dio_form_data_leak',
+
+  // Part 5 - Async Rules (Professional)
+  'require_future_timeout',
+
+  // Part 5 - Riverpod Rules (Professional)
+  'prefer_riverpod_select',
+
+  // Part 5 - Navigation Rules (Professional)
+  'require_go_router_refresh_listenable',
+  'avoid_go_router_string_paths',
+
+  // Part 5 - Geolocator Rules (Professional)
+  'require_geolocator_service_enabled',
+  'require_geolocator_stream_cancel',
+  'require_geolocator_error_handling',
+
+  // Part 6 - State Management Rules (Professional)
+  'avoid_bloc_public_methods',
+  'require_bloc_selector',
+  'prefer_selector',
+  'require_getx_binding',
+
+  // Part 6 - Firebase Rules (Professional)
+  'require_crashlytics_user_id',
+  'require_firebase_app_check',
+
+  // Part 6 - Theming Rules (Professional)
+  'avoid_elevation_opacity_in_dark',
+  'prefer_theme_extensions',
+
+  // Part 6 - Security Rules (Professional)
+  'prefer_local_auth',
+
+  // Part 6 - Performance Rules (Professional)
+  'prefer_inherited_widget_cache',
+  'prefer_layout_builder_over_media_query',
+
+  // Part 6 - Flutter Widget Rules (Professional)
+  'require_should_rebuild',
+  'require_web_renderer_awareness',
+
+  // Part 6 - Additional Rules (Professional)
+  'require_exif_handling',
+  'prefer_adaptive_dialog',
+  'require_snackbar_action_for_undo',
+  'require_content_type_check',
+  'avoid_websocket_without_heartbeat',
+  'prefer_iterable_operations',
+  'prefer_dot_shorthand',
+  'require_future_wait_error_handling',
+  'require_stream_on_done',
+  'require_completer_error_handling',
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
@@ -1116,6 +1266,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Platform (Batch 14 - opinionated)
   'prefer_cupertino_for_ios_feel',
   'prefer_keyboard_shortcuts',
+
+  // Part 6 - Media Rules (Comprehensive)
+  'prefer_camera_resolution_selection',
+  'prefer_audio_session_config',
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.

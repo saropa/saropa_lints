@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~985+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~1025+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================

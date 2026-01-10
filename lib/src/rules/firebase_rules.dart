@@ -1954,3 +1954,275 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when FirebaseCrashlytics is used without setting user identifier.
+///
+/// Setting a user identifier helps track crashes to specific users
+/// for better debugging and support. Without it, crashes are anonymous.
+///
+/// **BAD:**
+/// ```dart
+/// void initCrashlytics() async {
+///   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+///   // Missing setUserIdentifier!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void initCrashlytics(String userId) async {
+///   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+///   await FirebaseCrashlytics.instance.setUserIdentifier(userId);
+/// }
+/// ```
+///
+/// **Note:** This rule checks within the same method. Cross-method detection
+/// is not possible with static analysis.
+class RequireCrashlyticsUserIdRule extends SaropaLintRule {
+  const RequireCrashlyticsUserIdRule() : super(code: _code);
+
+  /// Debugging improvement - not critical but helpful.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_crashlytics_user_id',
+    problemMessage:
+        'Crashlytics setup without setUserIdentifier. Crashes will be anonymous.',
+    correctionMessage:
+        'Add FirebaseCrashlytics.instance.setUserIdentifier(userId).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+
+      // Check for Crashlytics configuration methods
+      if (methodName != 'setCrashlyticsCollectionEnabled' &&
+          methodName != 'recordError' &&
+          methodName != 'log') {
+        return;
+      }
+
+      // Check target is FirebaseCrashlytics
+      final targetSource = node.target?.toSource() ?? '';
+      if (!targetSource.contains('Crashlytics')) {
+        return;
+      }
+
+      // Find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) {
+        return;
+      }
+
+      final methodSource = enclosingMethod.toSource();
+
+      // Check if setUserIdentifier is called
+      if (!methodSource.contains('setUserIdentifier')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Firebase services are used without App Check.
+///
+/// Firebase App Check helps protect your backend resources from abuse.
+/// Without it, your Firebase services are vulnerable to unauthorized access.
+///
+/// **BAD:**
+/// ```dart
+/// void initFirebase() async {
+///   await Firebase.initializeApp();
+///   // Using Firestore without App Check
+///   FirebaseFirestore.instance.collection('users').get();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void initFirebase() async {
+///   await Firebase.initializeApp();
+///   await FirebaseAppCheck.instance.activate();
+///   FirebaseFirestore.instance.collection('users').get();
+/// }
+/// ```
+///
+/// **Note:** This is an INFO-level reminder. App Check activation typically
+/// happens once at app startup, not necessarily in the same file.
+class RequireFirebaseAppCheckRule extends SaropaLintRule {
+  const RequireFirebaseAppCheckRule() : super(code: _code);
+
+  /// Security improvement - protects backend from abuse.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_firebase_app_check',
+    problemMessage:
+        'Firebase initialization without App Check activation.',
+    correctionMessage:
+        'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      // Check for Firebase.initializeApp()
+      final target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Firebase') {
+        return;
+      }
+
+      if (node.methodName.name != 'initializeApp') {
+        return;
+      }
+
+      // Find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        if (current is FunctionDeclaration) {
+          // Check function body
+          final funcSource = current.toSource();
+          if (funcSource.contains('FirebaseAppCheck') &&
+              funcSource.contains('activate')) {
+            return;
+          }
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) {
+        return;
+      }
+
+      final methodSource = enclosingMethod.toSource();
+
+      // Check if App Check is activated
+      if (!methodSource.contains('FirebaseAppCheck') ||
+          !methodSource.contains('activate')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when setCustomClaims stores large user data.
+///
+/// Firebase custom claims are meant for access control, not user data storage.
+/// They're limited to 1000 bytes and are included in every auth token.
+///
+/// **BAD:**
+/// ```dart
+/// await admin.auth().setCustomUserClaims(uid, {
+///   'profile': userProfile,  // Large object!
+///   'preferences': allPrefs,
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await admin.auth().setCustomUserClaims(uid, {
+///   'role': 'admin',
+///   'tier': 'premium',
+/// });
+/// // Store large data in Firestore instead
+/// ```
+class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
+  const AvoidStoringUserDataInAuthRule() : super(code: _code);
+
+  /// Architectural issue - misuse of custom claims.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_storing_user_data_in_auth',
+    problemMessage:
+        'Large object in setCustomClaims. Claims are for roles, not data storage.',
+    correctionMessage:
+        'Store user data in Firestore. Use claims only for access control (roles, permissions).',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const _dataTerms = [
+    'profile',
+    'preferences',
+    'settings',
+    'address',
+    'history',
+    'data',
+    'info',
+    'details',
+    'metadata',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+
+      if (methodName != 'setCustomUserClaims' &&
+          methodName != 'setCustomClaims') {
+        return;
+      }
+
+      // Check arguments for large data patterns
+      for (final arg in node.argumentList.arguments) {
+        if (arg is SetOrMapLiteral) {
+          // Check if map has data-storage-like keys
+          for (final element in arg.elements) {
+            if (element is MapLiteralEntry) {
+              final keySource = element.key.toSource().toLowerCase();
+              final hasDataKey =
+                  _dataTerms.any((term) => keySource.contains(term));
+
+              if (hasDataKey) {
+                reporter.atNode(arg, code);
+                return;
+              }
+            }
+          }
+
+          // Also warn if map has more than 5 entries (too much data)
+          if (arg.elements.length > 5) {
+            reporter.atNode(arg, code);
+          }
+        }
+      }
+    });
+  }
+}

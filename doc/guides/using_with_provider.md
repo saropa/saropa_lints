@@ -12,6 +12,8 @@ Provider is Flutter's recommended state management for simple apps. But it has p
 | Recreated providers | State lost on rebuild | `avoid_provider_recreate` |
 | BuildContext in providers | Lifecycle issues | `avoid_build_context_in_providers` |
 | Missing dispose | Memory leaks | `require_provider_dispose` |
+| Provider.of for reactivity | Use Consumer instead | `prefer_consumer_over_provider_of` |
+| context.watch in async | Subscription leaks | `avoid_listen_in_async` |
 
 ## What saropa_lints Catches
 
@@ -186,6 +188,77 @@ class DataProvider extends ChangeNotifier {
 
 **Rule**: `require_provider_dispose`
 
+### Consumer vs Provider.of
+
+```dart
+// BAD - Provider.of triggers rebuild of entire widget
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final user = Provider.of<UserModel>(context);
+    return Column(
+      children: [
+        ExpensiveWidget(),  // Rebuilds unnecessarily!
+        Text(user.name),
+      ],
+    );
+  }
+}
+
+// GOOD - Consumer scopes rebuilds to just what needs it
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ExpensiveWidget(),  // Doesn't rebuild
+        Consumer<UserModel>(
+          builder: (context, user, _) => Text(user.name),
+        ),
+      ],
+    );
+  }
+}
+```
+
+**Rule**: `prefer_consumer_over_provider_of`
+
+### context.watch() in Async Callbacks
+
+```dart
+// BAD - context.watch in async callback causes subscription leaks
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        await Future.delayed(Duration(seconds: 1));
+        final user = context.watch<UserModel>();  // Subscription leak!
+        print(user.name);
+      },
+      child: Text('Load'),
+    );
+  }
+}
+
+// GOOD - use context.read in callbacks
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () async {
+        await Future.delayed(Duration(seconds: 1));
+        final user = context.read<UserModel>();  // Safe - no subscription
+        print(user.name);
+      },
+      child: Text('Load'),
+    );
+  }
+}
+```
+
+**Rule**: `avoid_listen_in_async`
+
 ## Recommended Setup
 
 ### 1. Update pubspec.yaml
@@ -223,8 +296,10 @@ dart run custom_lint
 |------|------|-----------------|
 | `avoid_provider_of_in_build` | essential | Provider.of causing unnecessary rebuilds |
 | `avoid_provider_recreate` | essential | Providers recreated in build methods |
+| `avoid_listen_in_async` | essential | context.watch in async callbacks |
 | `avoid_build_context_in_providers` | recommended | BuildContext stored in ChangeNotifier |
 | `require_provider_dispose` | recommended | Missing dispose in ChangeNotifier |
+| `prefer_consumer_over_provider_of` | recommended | Provider.of instead of Consumer |
 
 ## Common Patterns
 

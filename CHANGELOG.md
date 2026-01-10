@@ -7,6 +7,150 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.6.0.
 
+## [2.1.0] - 2026-01-10
+
+#### SharedPreferences Security Rules (4 rules)
+- **`avoid_shared_prefs_sensitive_data`**: Warns when sensitive data (passwords, tokens) is stored in SharedPreferences
+- **`require_secure_storage_for_auth`**: Warns when auth tokens use SharedPreferences instead of flutter_secure_storage
+- **`require_shared_prefs_null_handling`**: Warns when SharedPreferences getter is used with null assertion
+- **`require_shared_prefs_key_constants`**: Warns when string literals are used as SharedPreferences keys
+
+#### sqflite Database Rules (5 rules)
+- **`require_sqflite_whereargs`**: Warns when SQL queries use string interpolation - SQL injection vulnerability
+- **`require_sqflite_transaction`**: Warns when multiple sequential writes should use transaction
+- **`require_sqflite_error_handling`**: Warns when database operations lack try-catch
+- **`prefer_sqflite_batch`**: Warns when database insert is in a loop - use batch operations
+- **`require_sqflite_close`**: Warns when database is opened but not closed in dispose
+
+#### Hive Database Rules (5 rules)
+- **`require_hive_initialization`**: Reminds to ensure Hive.init() is called before openBox (heuristic)
+- **`require_hive_type_adapter`**: Warns when custom object is stored in Hive without @HiveType
+- **`require_hive_box_close`**: Warns when Hive box is opened but not closed in dispose
+- **`prefer_hive_encryption`**: Warns when sensitive data is stored in unencrypted Hive box
+- **`require_hive_encryption_key_secure`**: Warns when HiveAesCipher uses hardcoded key
+
+#### Dio HTTP Client Rules (6 rules)
+- **`require_dio_timeout`**: Warns when Dio instance lacks timeout configuration
+- **`require_dio_error_handling`**: Warns when Dio requests lack error handling
+- **`require_dio_interceptor_error_handler`**: Warns when InterceptorsWrapper lacks onError callback
+- **`prefer_dio_cancel_token`**: Warns when long-running Dio requests lack CancelToken
+- **`require_dio_ssl_pinning`**: Warns when Dio auth endpoints lack SSL certificate pinning
+- **`avoid_dio_form_data_leak`**: Warns when FormData with files lacks cleanup
+
+#### Stream/Future Rules (6 rules)
+- **`avoid_stream_in_build`**: Warns when StreamController is created in build() method
+- **`require_stream_controller_close`**: Warns when StreamController field is not closed in dispose
+- **`avoid_multiple_stream_listeners`**: Warns when multiple listen() calls on non-broadcast stream
+- **`require_stream_error_handling`**: Warns when stream.listen() lacks onError callback
+- **`avoid_future_builder_rebuild`**: Warns when FutureBuilder has inline future in build
+- **`require_future_timeout`**: Warns when long-running Future lacks timeout
+
+#### go_router Navigation Rules (4 rules)
+- **`avoid_go_router_inline_creation`**: Warns when GoRouter is created inside build() method
+- **`require_go_router_error_handler`**: Warns when GoRouter lacks errorBuilder
+- **`require_go_router_refresh_listenable`**: Warns when GoRouter with redirect lacks refreshListenable
+- **`avoid_go_router_string_paths`**: Warns when string literals used in go_router navigation
+
+#### Riverpod Rules (3 rules)
+- **`require_riverpod_error_handling`**: Warns when AsyncValue is accessed without error handling
+- **`avoid_riverpod_state_mutation`**: Warns when state is mutated directly in Notifier
+- **`prefer_riverpod_select`**: Warns when ref.watch() accesses single field - use select()
+
+#### cached_network_image Rules (3 rules)
+- **`require_cached_image_dimensions`**: Warns when CachedNetworkImage lacks cache dimensions
+- **`require_cached_image_placeholder`**: Warns when CachedNetworkImage lacks placeholder
+- **`require_cached_image_error_widget`**: Warns when CachedNetworkImage lacks errorWidget
+
+#### Geolocator Rules (4 rules)
+- **`require_geolocator_permission_check`**: Warns when location request lacks permission check
+- **`require_geolocator_service_enabled`**: Warns when location request lacks service enabled check
+- **`require_geolocator_stream_cancel`**: Warns when position stream subscription lacks cancel
+- **`require_geolocator_error_handling`**: Warns when location request lacks error handling
+
+#### State Management Rules (11 rules)
+- **`avoid_yield_in_on_event`**: Warns when yield is used in Bloc event handler (deprecated in Bloc 8.0+)
+- **`prefer_consumer_over_provider_of`**: Warns when Provider.of<T>(context) is used in build method
+- **`avoid_listen_in_async`**: Warns when context.watch() is used inside async callback
+- **`prefer_getx_builder`**: Warns when .obs property is accessed without Obx wrapper
+- **`emit_new_bloc_state_instances`**: Warns when emit(state..property = x) cascade mutation is used
+- **`avoid_bloc_public_fields`**: Warns when Bloc has public non-final fields
+- **`avoid_bloc_public_methods`**: Warns when Bloc has public methods other than add()
+- **`require_async_value_order`**: Warns when AsyncValue.when() has wrong parameter order
+- **`require_bloc_selector`**: Warns when BlocBuilder only uses one field from state
+- **`prefer_selector`**: Warns when context.watch<T>() is used without select()
+- **`require_getx_binding`**: Warns when Get.put() is used in widget build - use Bindings
+
+#### Theming Rules (3 rules)
+- **`require_dark_mode_testing`**: Warns when MaterialApp is missing darkTheme parameter
+- **`avoid_elevation_opacity_in_dark`**: Warns when high elevation used without brightness check
+- **`prefer_theme_extensions`**: Warns when ThemeData.copyWith used for custom colors
+
+#### UI/UX Rules (5 rules)
+- **`prefer_skeleton_over_spinner`**: Suggests skeleton loaders over CircularProgressIndicator
+- **`require_empty_results_state`**: Warns when search list lacks empty state handling
+- **`require_search_loading_indicator`**: Warns when search callback lacks loading state
+- **`require_search_debounce`**: Warns when search onChanged triggers API without debounce
+- **`require_pagination_loading_state`**: Warns when paginated list lacks loading indicator
+
+#### Lifecycle Rules (2 rules)
+- **`avoid_work_in_paused_state`**: Warns when Timer.periodic runs without lifecycle handling
+- **`require_resume_state_refresh`**: Warns when didChangeAppLifecycleState handles paused but not resumed
+
+#### Security Rules (4 rules)
+- **`require_url_validation`**: Warns when Uri.parse on variable lacks scheme validation
+- **`avoid_redirect_injection`**: Warns when redirect URL from parameter lacks domain validation
+- **`avoid_external_storage_sensitive`**: Warns when sensitive data written to external storage
+- **`prefer_local_auth`**: Warns when payment/sensitive operation lacks biometric authentication
+
+#### Firebase Rules (3 rules)
+- **`require_crashlytics_user_id`**: Warns when Crashlytics setup lacks setUserIdentifier
+- **`require_firebase_app_check`**: Warns when Firebase.initializeApp lacks App Check activation
+- **`avoid_storing_user_data_in_auth`**: Warns when setCustomClaims stores large user data
+
+#### Collection/Performance Rules (4 rules)
+- **`prefer_null_aware_elements`**: Warns when if (x != null) x can use ?x syntax
+- **`prefer_iterable_operations`**: Warns when .toList() after chain in for-in is unnecessary
+- **`prefer_inherited_widget_cache`**: Warns when same .of(context) called 3+ times in method
+- **`prefer_layout_builder_over_media_query`**: Warns when MediaQuery.of in list item builder
+
+#### Flutter Widget Rules (3 rules)
+- **`require_should_rebuild`**: Warns when InheritedWidget missing updateShouldNotify
+- **`require_orientation_handling`**: Warns when MaterialApp lacks orientation handling
+- **`require_web_renderer_awareness`**: Warns when kIsWeb check uses HTML APIs without renderer check
+
+#### Image/Media Rules (4 rules)
+- **`require_exif_handling`**: Warns when Image.file may show photos rotated
+- **`prefer_camera_resolution_selection`**: Warns when CameraController uses max resolution
+- **`prefer_audio_session_config`**: Warns when AudioPlayer lacks audio session config
+- **`require_image_loading_placeholder`**: Warns when Image.network lacks loadingBuilder
+
+#### Scroll/Navigation Rules (1 rule)
+- **`require_refresh_indicator_on_lists`**: Warns when ListView lacks RefreshIndicator wrapper
+
+#### Dialog/SnackBar Rules (2 rules)
+- **`prefer_adaptive_dialog`**: Warns when AlertDialog lacks adaptive styling
+- **`require_snackbar_action_for_undo`**: Warns when delete SnackBar lacks undo action
+
+#### API/Network Rules (2 rules)
+- **`require_content_type_check`**: Warns when response parsed without Content-Type check
+- **`avoid_websocket_without_heartbeat`**: Warns when WebSocket lacks heartbeat/ping mechanism
+
+#### Forms Rules (1 rule)
+- **`avoid_keyboard_overlap`**: Warns when TextField in Column may be hidden by keyboard
+
+#### Location Rules (1 rule)
+- **`require_location_timeout`**: Warns when Geolocator.getCurrentPosition lacks timeLimit
+
+#### Code Quality Rules (1 rule)
+- **`prefer_dot_shorthand`**: Suggests Dart 3 dot shorthand (.value) for enum values
+
+#### Architecture Rules (1 rule)
+- **`avoid_touch_only_gestures`**: Warns when GestureDetector only handles touch gestures
+
+#### Async Rules (3 rules)
+- **`require_future_wait_error_handling`**: Warns when Future.wait lacks eagerError: false
+- **`require_stream_on_done`**: Warns when Stream.listen lacks onDone handler
+- **`require_completer_error_handling`**: Warns when Completer in try-catch lacks completeError
 
 ## [2.0.0] - 2026-01-10
 

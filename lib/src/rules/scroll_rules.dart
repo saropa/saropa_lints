@@ -673,3 +673,89 @@ class _AutofocusVisitor extends RecursiveAstVisitor<void> {
     super.visitNamedExpression(node);
   }
 }
+
+/// Warns when ListView/GridView doesn't have RefreshIndicator.
+///
+/// Pull-to-refresh is a standard mobile UX pattern. Lists with
+/// dynamic content should support manual refresh.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   itemBuilder: (ctx, i) => ListTile(title: Text(items[i])),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// RefreshIndicator(
+///   onRefresh: () => fetchItems(),
+///   child: ListView.builder(
+///     itemCount: items.length,
+///     itemBuilder: (ctx, i) => ListTile(title: Text(items[i])),
+///   ),
+/// );
+/// ```
+class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
+  const RequireRefreshIndicatorOnListsRule() : super(code: _code);
+
+  /// UX improvement - standard mobile pattern.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_refresh_indicator_on_lists',
+    problemMessage:
+        'ListView without RefreshIndicator. Users can\'t pull to refresh.',
+    correctionMessage:
+        'Wrap with RefreshIndicator for pull-to-refresh support.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
+        return;
+      }
+
+      // Check if already wrapped in RefreshIndicator
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final parentType = current.constructorName.type.name.lexeme;
+          if (parentType == 'RefreshIndicator') {
+            return;
+          }
+        }
+        // Stop at method boundary
+        if (current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      // Check method/class for RefreshIndicator
+      current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          final methodSource = current.toSource();
+          if (methodSource.contains('RefreshIndicator')) {
+            return;
+          }
+          break;
+        }
+        current = current.parent;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}

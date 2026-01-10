@@ -98,3 +98,147 @@ class _DisableAutoplayFix extends DartFix {
     });
   }
 }
+
+/// Warns when CameraController is created without explicit resolution preset.
+///
+/// Camera resolution affects performance, battery, and storage.
+/// Always specify the desired resolution for your use case.
+///
+/// **BAD:**
+/// ```dart
+/// final controller = CameraController(camera, ResolutionPreset.max);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use appropriate resolution for your use case
+/// final controller = CameraController(
+///   camera,
+///   ResolutionPreset.medium, // Good for video calls
+/// );
+/// ```
+class PreferCameraResolutionSelectionRule extends SaropaLintRule {
+  const PreferCameraResolutionSelectionRule() : super(code: _code);
+
+  /// Performance/battery consideration.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_camera_resolution_selection',
+    problemMessage:
+        'CameraController with max resolution. Consider app-specific needs.',
+    correctionMessage:
+        'Use ResolutionPreset.medium for video calls, .high for photos.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'CameraController') {
+        return;
+      }
+
+      // Check second argument for resolution preset
+      final args = node.argumentList.arguments;
+      if (args.length < 2) {
+        return;
+      }
+
+      final resolutionArg = args[1].toSource();
+      if (resolutionArg.contains('max') || resolutionArg.contains('ultraHigh')) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when AudioPlayer is used without audio session configuration.
+///
+/// Audio session determines how your app interacts with other audio.
+/// Without configuration, audio may behave unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// final player = AudioPlayer();
+/// await player.play(UrlSource(url));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final session = await AudioSession.instance;
+/// await session.configure(AudioSessionConfiguration.music());
+/// final player = AudioPlayer();
+/// await player.play(UrlSource(url));
+/// ```
+class PreferAudioSessionConfigRule extends SaropaLintRule {
+  const PreferAudioSessionConfigRule() : super(code: _code);
+
+  /// Audio UX issue - unexpected behavior with other apps.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_audio_session_config',
+    problemMessage:
+        'AudioPlayer used without audio session config. May conflict with other audio.',
+    correctionMessage:
+        'Configure AudioSession.instance before playing audio.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+
+      // Check for play method on audio player
+      if (methodName != 'play' && methodName != 'setUrl') {
+        return;
+      }
+
+      final targetSource = node.target?.toSource().toLowerCase() ?? '';
+      if (!targetSource.contains('player') &&
+          !targetSource.contains('audio')) {
+        return;
+      }
+
+      // Find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) {
+        return;
+      }
+
+      final methodSource = enclosingMethod.toSource().toLowerCase();
+
+      // Check for audio session configuration
+      if (methodSource.contains('audiosession') ||
+          methodSource.contains('audio_session')) {
+        return;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
