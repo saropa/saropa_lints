@@ -2502,46 +2502,47 @@ These rules should be revisited when:
 3. Runtime analysis tools are integrated
 4. Package-specific detection is implemented
 
-## Package-Specific Rules from saropa (59 rules)
+## Package-Specific Rules from saropa (38 remaining, 21 implemented)
 
 > Generated on 2026-01-10 by `analyze_pubspec.py`
+> **v2.2.0**: 19 rules implemented in `package_specific_rules.dart`, 2 already existed in other files.
 
 ### Authentication
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
-| `require_google_signin_error_handling` | Recommended | google_sign_in | Ensure GoogleSignIn.signIn() has try-catch for PlatformException |
+| `require_google_signin_error_handling` | Recommended | google_sign_in | ✅ IMPLEMENTED - Ensure GoogleSignIn.signIn() has try-catch for PlatformException |
 | `require_google_signin_disconnect_on_logout` | Recommended | google_sign_in | Call GoogleSignIn.disconnect() on logout |
 | `avoid_google_signin_silent_without_fallback` | Stylistic | google_sign_in | signInSilently() should have fallback |
 | `require_google_sign_in_platform_interface_error_handling` | Recommended | google_sign_in_platform_interface | Handle auth errors |
 | `require_google_sign_in_platform_interface_logout_cleanup` | Recommended | google_sign_in_platform_interface | Cleanup on logout |
 | `require_googleapis_auth_error_handling` | Recommended | googleapis_auth | Handle auth errors |
 | `require_googleapis_auth_logout_cleanup` | Recommended | googleapis_auth | Cleanup on logout |
-| `require_apple_signin_nonce` | Essential | sign_in_with_apple | Use secure random nonce to prevent replay attacks |
+| `require_apple_signin_nonce` | Essential | sign_in_with_apple | ✅ IMPLEMENTED - Use secure random nonce to prevent replay attacks |
 | `require_apple_credential_state_check` | Recommended | sign_in_with_apple | Check getCredentialState() before assuming signed in |
 | `avoid_storing_apple_identity_token` | Essential | sign_in_with_apple | Don't store identity tokens locally |
 | `require_sign_in_with_apple_platform_interface_error_handling` | Recommended | sign_in_with_apple_platform_interface | Handle auth errors |
 | `require_sign_in_with_apple_platform_interface_logout_cleanup` | Recommended | sign_in_with_apple_platform_interface | Cleanup on logout |
-| `require_supabase_error_handling` | Recommended | supabase_flutter | Wrap Supabase calls in try-catch |
-| `avoid_supabase_anon_key_in_code` | Essential | supabase_flutter | Don't hardcode Supabase anon key |
+| `require_supabase_error_handling` | Recommended | supabase_flutter | ✅ IMPLEMENTED - Wrap Supabase calls in try-catch |
+| `avoid_supabase_anon_key_in_code` | Essential | supabase_flutter | ✅ IMPLEMENTED - Don't hardcode Supabase anon key |
 | `require_supabase_auth_state_listener` | Recommended | supabase_flutter | Listen to onAuthStateChange |
-| `require_supabase_realtime_unsubscribe` | Essential | supabase_flutter | Unsubscribe from realtime on dispose |
+| `require_supabase_realtime_unsubscribe` | Essential | supabase_flutter | ✅ IMPLEMENTED - Unsubscribe from realtime on dispose |
 
 ### Background Processing
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
-| `require_workmanager_constraints` | Recommended | workmanager | Specify NetworkType/battery constraints |
+| `require_workmanager_constraints` | Recommended | workmanager | ✅ IMPLEMENTED - Specify NetworkType/battery constraints |
 | `require_workmanager_unique_name` | Recommended | workmanager | Use unique names to prevent duplicates |
 | `require_workmanager_error_handling` | Recommended | workmanager | Handle task failures with retry |
-| `require_workmanager_result_return` | Essential | workmanager | Always return Result.success/failure/retry |
+| `require_workmanager_result_return` | Essential | workmanager | ✅ IMPLEMENTED - Always return Result.success/failure/retry |
 
 ### Contacts & Calendar
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
 | `require_calendar_permission_check` | Essential | device_calendar | Request permission before accessing |
-| `require_calendar_timezone_handling` | Recommended | device_calendar | Handle timezone explicitly |
+| `require_calendar_timezone_handling` | Recommended | device_calendar | ✅ IMPLEMENTED - Handle timezone explicitly |
 | `require_contacts_permission_check` | Essential | flutter_contacts | Request permission before accessing |
 | `require_contacts_error_handling` | Recommended | flutter_contacts | Handle permission denied gracefully |
 | `avoid_contacts_full_fetch` | Stylistic | flutter_contacts | Use withProperties for needed fields only |
@@ -2561,16 +2562,16 @@ These rules should be revisited when:
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
-| `require_keyboard_visibility_dispose` | Recommended | flutter_keyboard_visibility | Dispose subscription |
+| `require_keyboard_visibility_dispose` | Recommended | flutter_keyboard_visibility | ✅ IMPLEMENTED - Dispose subscription |
 | `require_speech_permission_check` | Essential | speech_to_text | Check microphone permission |
-| `require_speech_stop_on_dispose` | Essential | speech_to_text | Call stop() in dispose |
+| `require_speech_stop_on_dispose` | Essential | speech_to_text | ✅ IMPLEMENTED - Call stop() in dispose |
 | `require_speech_availability_check` | Recommended | speech_to_text | Check isAvailable first |
 
 ### Images & Media
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
-| `require_svg_error_handler` | Recommended | flutter_svg | Provide errorBuilder |
+| `require_svg_error_handler` | Recommended | flutter_svg | ✅ IMPLEMENTED - Provide errorBuilder |
 
 ### In-App Features
 
@@ -2578,10 +2579,10 @@ These rules should be revisited when:
 |------|------|---------|-------------|
 | `avoid_in_app_review_on_first_launch` | Recommended | in_app_review | Don't request on first launch |
 | `require_in_app_review_availability_check` | Recommended | in_app_review | Check isAvailable first |
-| `require_webview_navigation_delegate` | Recommended | webview_flutter | Set navigationDelegate to control URL loading |
-| `require_webview_ssl_error_handling` | Essential | webview_flutter | Handle SSL errors explicitly |
+| `require_webview_navigation_delegate` | Recommended | webview_flutter | ✅ IMPLEMENTED (flutter_widget_rules.dart) - Set navigationDelegate to control URL loading |
+| `require_webview_ssl_error_handling` | Essential | webview_flutter | ✅ IMPLEMENTED - Handle SSL errors explicitly |
 | `require_webview_clear_on_logout` | Recommended | webview_flutter | Clear WebView cache/cookies on logout |
-| `avoid_webview_file_access` | Recommended | webview_flutter | Disable file:// access unless required |
+| `avoid_webview_file_access` | Recommended | webview_flutter | ✅ IMPLEMENTED - Disable file:// access unless required |
 
 ### Location & Maps
 
@@ -2594,17 +2595,17 @@ These rules should be revisited when:
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
 | `require_app_links_validation` | Recommended | app_links | Validate deep link parameters |
-| `avoid_app_links_sensitive_params` | Essential | app_links | Don't pass tokens in URLs |
-| `avoid_openai_key_in_code` | Essential | chat_gpt_sdk | Don't hardcode API key |
-| `require_openai_error_handling` | Recommended | chat_gpt_sdk | Handle rate limits and errors |
+| `avoid_app_links_sensitive_params` | Essential | app_links | ✅ IMPLEMENTED - Don't pass tokens in URLs |
+| `avoid_openai_key_in_code` | Essential | chat_gpt_sdk | ✅ IMPLEMENTED - Don't hardcode API key |
+| `require_openai_error_handling` | Recommended | chat_gpt_sdk | ✅ IMPLEMENTED - Handle rate limits and errors |
 | `avoid_envied_secrets_in_repo` | Essential | envied | Ensure .env files are gitignored |
-| `require_envied_obfuscation` | Recommended | envied | Use obfuscate: true for secrets |
+| `require_envied_obfuscation` | Recommended | envied | ✅ IMPLEMENTED - Use obfuscate: true for secrets |
 | `require_file_picker_permission_check` | Recommended | file_picker | Check storage permission first |
 | `require_file_picker_type_validation` | Recommended | file_picker | Validate file type after picking |
 | `require_file_picker_size_check` | Recommended | file_picker | Check file size to prevent OOM |
 | `require_cache_manager_clear_on_logout` | Recommended | flutter_cache_manager | Clear cache on logout |
-| `require_google_fonts_fallback` | Recommended | google_fonts | Specify fontFamilyFallback |
-| `avoid_logging_sensitive_data` | Essential | logging | Don't log PII or tokens |
+| `require_google_fonts_fallback` | Recommended | google_fonts | ✅ IMPLEMENTED - Specify fontFamilyFallback |
+| `avoid_logging_sensitive_data` | Essential | logging | ✅ IMPLEMENTED (security_rules.dart) - Don't log PII or tokens |
 | `require_timezone_initialization` | Essential | timezone | Call initializeTimeZones() first |
 | `require_password_strength_threshold` | Recommended | zxcvbn | Enforce minimum score 3+ |
 
@@ -2613,4 +2614,4 @@ These rules should be revisited when:
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
 | `require_intl_locale_initialization` | Recommended | intl | Initialize default locale on start |
-| `prefer_uuid_v4` | Stylistic | uuid | UUIDv4 for random IDs; v1 leaks MAC |
+| `prefer_uuid_v4` | Stylistic | uuid | ✅ IMPLEMENTED - UUIDv4 for random IDs; v1 leaks MAC |
