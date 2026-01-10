@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.7.9] - 2026-01-09
 
 ### Added
-- **28 New Rules** covering disposal, build method anti-patterns, scroll/list issues, cryptography, and JSON/DateTime handling:
+- **29 New Rules** covering disposal, build method anti-patterns, scroll/list issues, cryptography, and JSON/DateTime handling:
 
 #### Disposal Rules (2 rules)
 - `require_media_player_dispose` - Warns when VideoPlayerController/AudioPlayer is not disposed
@@ -41,9 +41,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `avoid_deprecated_crypto_algorithms` - Warns when MD5, SHA1, DES are used
 - `require_unique_iv_per_encryption` - Warns when static or reused IVs are detected
 
-#### JSON and DateTime Rules (7 rules)
+#### JSON and DateTime Rules (8 rules)
 - `require_json_decode_try_catch` - Warns when jsonDecode is used without try-catch
 - `avoid_datetime_parse_unvalidated` - Warns when DateTime.parse is used without try-catch
+- `prefer_try_parse_for_dynamic_data` - **CRITICAL**: Warns when int/double/num.parse is used without try-catch
 - `avoid_double_for_money` - Warns when double is used for money/currency values
 - `avoid_sensitive_data_in_logs` - Warns when sensitive data appears in log statements
 - `require_getit_reset_in_tests` - Warns when GetIt is used in tests without reset
@@ -51,8 +52,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `avoid_autoplay_audio` - Warns when autoPlay: true is set on audio/video players
 
 ### Changed
-- **Docs**: Updated rule count from 792+ to 820+
+- **Docs**: Updated rule count from 792+ to 821+
 - **Impact tuning**: `avoid_hardcoded_feature_flags` and `avoid_autoplay_audio` changed to `low` to match INFO severity
+- **Impact tuning**: `avoid_double_for_money` promoted to `critical` to match ERROR severity (financial bugs)
+
+### Quick Fixes
+- `prefer_secure_random_for_crypto`: Auto-replaces `Random()` with `Random.secure()`
+- `avoid_datetime_parse_unvalidated`: Auto-replaces `DateTime.parse` with `DateTime.tryParse`
+- `prefer_try_parse_for_dynamic_data`: Auto-replaces `int/double/num.parse` with `tryParse`
+- `avoid_autoplay_audio`: Auto-sets `autoPlay: false`
+- `avoid_hardcoded_feature_flags`: Adds TODO comment for feature flag replacement
 
 ## [1.7.8] - 2026-01-09
 

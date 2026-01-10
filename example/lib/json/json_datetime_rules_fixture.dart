@@ -49,6 +49,62 @@ void goodDateTimeParseWithTryCatch(String dateString) {
 }
 
 // =========================================================================
+// prefer_try_parse_for_dynamic_data
+// =========================================================================
+
+void badIntParse(String userInput) {
+  // expect_lint: prefer_try_parse_for_dynamic_data
+  final age = int.parse(userInput);
+}
+
+void badDoubleParse(String priceString) {
+  // expect_lint: prefer_try_parse_for_dynamic_data
+  final price = double.parse(priceString);
+}
+
+void badNumParse(String value) {
+  // expect_lint: prefer_try_parse_for_dynamic_data
+  final number = num.parse(value);
+}
+
+void goodIntTryParse(String userInput) {
+  // GOOD: Use tryParse with null handling
+  final age = int.tryParse(userInput) ?? 0;
+}
+
+void goodDoubleTryParse(String priceString) {
+  // GOOD: Use tryParse with null handling
+  final price = double.tryParse(priceString) ?? 0.0;
+}
+
+void goodNumTryParse(String value) {
+  // GOOD: Use tryParse with null handling
+  final number = num.tryParse(value) ?? 0;
+}
+
+void goodIntParseInTryCatch(String userInput) {
+  // GOOD: Wrapped in try-catch
+  try {
+    final age = int.parse(userInput);
+  } on FormatException {
+    print('Invalid number');
+  }
+}
+
+void badUriParse(String url) {
+  // expect_lint: prefer_try_parse_for_dynamic_data
+  final uri = Uri.parse(url);
+}
+
+void goodUriTryParse(String url) {
+  // GOOD: Use tryParse with null handling
+  final uri = Uri.tryParse(url);
+  if (uri == null) {
+    print('Invalid URL');
+  }
+}
+
+// =========================================================================
 // avoid_double_for_money
 // =========================================================================
 
