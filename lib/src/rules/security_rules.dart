@@ -3949,3 +3949,103 @@ class PreferLocalAuthRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 6: Additional Security Rules
+// =============================================================================
+
+/// Warns when JWT/auth tokens are stored in SharedPreferences.
+///
+/// Alias: insecure_token_storage, shared_prefs_auth_data
+///
+/// SharedPreferences is not encrypted. Auth tokens should use
+/// flutter_secure_storage which encrypts data at rest.
+///
+/// **BAD:**
+/// ```dart
+/// final prefs = await SharedPreferences.getInstance();
+/// await prefs.setString('jwt', token);  // Unencrypted!
+/// await prefs.setString('access_token', token);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final storage = FlutterSecureStorage();
+/// await storage.write(key: 'jwt', value: token);  // Encrypted
+/// ```
+class RequireSecureStorageAuthDataRule extends SaropaLintRule {
+  const RequireSecureStorageAuthDataRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_secure_storage_auth_data',
+    problemMessage:
+        'Auth tokens in SharedPreferences are insecure. Use FlutterSecureStorage.',
+    correctionMessage:
+        'Replace SharedPreferences with FlutterSecureStorage for sensitive data.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _sensitiveKeys = <String>{
+    'jwt',
+    'token',
+    'access_token',
+    'accesstoken',
+    'refresh_token',
+    'refreshtoken',
+    'auth_token',
+    'authtoken',
+    'api_key',
+    'apikey',
+    'secret',
+    'password',
+    'session',
+    'bearer',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for SharedPreferences set methods
+      final methodName = node.methodName.name;
+      if (methodName != 'setString' && methodName != 'setStringList') return;
+
+      // Check target is SharedPreferences-like
+      final target = node.target;
+      if (target == null) return;
+      final targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('prefs') &&
+          !targetSource.contains('sharedpreferences') &&
+          !targetSource.contains('preferences')) {
+        return;
+      }
+
+      // Check if key is sensitive
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      String? keyValue;
+      final firstArg = args.first;
+      if (firstArg is SimpleStringLiteral) {
+        keyValue = firstArg.value.toLowerCase();
+      } else if (firstArg is StringInterpolation) {
+        keyValue = firstArg.toSource().toLowerCase();
+      }
+
+      if (keyValue != null) {
+        for (final sensitiveKey in _sensitiveKeys) {
+          if (keyValue.contains(sensitiveKey)) {
+            reporter.atNode(node.methodName, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}

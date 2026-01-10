@@ -2275,3 +2275,342 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 - **Hive Database** — Lightweight key-value database documentation
   https://pub.dev/packages/hive
+
+---
+
+## Deferred & Complex Rules (Consolidated)
+
+This section consolidates all rules that are deferred or marked as too complex for reliable AST detection. These rules are listed here for tracking purposes and should NOT be implemented until the underlying complexity is resolved.
+
+### Why Rules Are Deferred
+
+| Marker | Reason | Implementation Barrier |
+|--------|--------|------------------------|
+| `[HEURISTIC]` | Variable name or string pattern matching | High false-positive risk from matching non-target patterns |
+| `[CONTEXT]` | Needs build/test context detection | Requires tracking widget lifecycle state |
+| `[CROSS-FILE]` | Requires analysis across multiple files | Single-file AST analysis cannot detect these |
+| `[TOO-COMPLEX]` | Pattern too abstract for reliable detection | No clear AST pattern exists |
+| `DEFERRED` | Explicitly deferred for various reasons | See individual rule descriptions |
+
+---
+
+### Deferred: Widget/Image Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `prefer_image_size_constraints` | HEURISTIC | Heuristic-based detection for image sizing |
+| `prefer_video_loading_placeholder` | HEURISTIC | Detecting "loading state" is too abstract |
+| `require_media_loading_state` | STATE ANALYSIS | Requires runtime state tracking |
+| `require_pdf_loading_indicator` | PACKAGE-SPECIFIC | PDF viewer package detection varies |
+| `prefer_clipboard_feedback` | CROSS-METHOD | Requires tracking Clipboard.setData and SnackBar together |
+| `require_keyboard_action_type` | FORM DETECTION | Requires detecting Form context |
+| `require_keyboard_dismiss_on_scroll` | FORM DETECTION | Requires detecting Form context |
+
+### Deferred: Async/Context Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_websocket_message_validation` | VAGUE | "Validation" is too abstract to detect reliably |
+| `require_feature_flag_default` | PACKAGE-SPECIFIC | Varies by feature flag package |
+| `prefer_utc_for_storage` | HEURISTIC | DateTime storage patterns vary |
+
+### Deferred: Firebase/Maps Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `prefer_firebase_remote_config_defaults` | CROSS-FILE | Defaults may be in separate file |
+| `require_fcm_token_refresh_handler` | CLASS-LEVEL | Requires class-level analysis |
+| `require_background_message_handler` | CROSS-FILE | Handler may be in separate file |
+| `avoid_map_markers_in_build` | PACKAGE-SPECIFIC | Map package detection varies |
+| `require_map_idle_callback` | PACKAGE-SPECIFIC | Map package detection varies |
+| `prefer_marker_clustering` | HEURISTIC | "Many markers" is subjective |
+
+### Deferred: Accessibility Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_semantics_exclusion` | COMMENT DETECTION | Requires validating comment explains exclusion |
+| `prefer_merge_semantics` | SIBLING DETECTION | Requires analyzing widget tree siblings |
+| `require_focus_indicator` | RUNTIME | Focus visibility is runtime-determined |
+| `avoid_flashing_content` | TIMING ANALYSIS | Animation timing analysis is complex |
+| `prefer_adequate_spacing` | LAYOUT CALC | Layout calculation is runtime |
+
+### Deferred: Navigation/Dialog Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_deep_link_fallback` | PACKAGE-SPECIFIC | Deep link handling varies by package |
+| `avoid_deep_link_sensitive_params` | HEURISTIC | "Sensitive" pattern detection has false positives |
+| `prefer_typed_route_params` | PACKAGE-SPECIFIC | Varies by router package |
+| `require_stepper_validation` | VALIDATION DETECTION | "Validation logic" is too abstract |
+| `require_step_count_indicator` | TOO ABSTRACT | "Progress indication" is too vague |
+
+### Deferred: Platform Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_platform_channel_on_web` | CROSS-FILE | Platform imports may be conditional |
+| `prefer_deferred_loading_web` | IMPORT SIZE | Import size analysis not available |
+| `require_menu_bar_for_desktop` | CROSS-FILE | Menu bar may be in separate file |
+| `require_window_close_confirmation` | CROSS-FILE | Window handling may be centralized |
+| `prefer_native_file_dialogs` | DETECTION UNCLEAR | Native dialog detection varies |
+
+### Deferred: Testing Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `prefer_test_variant` | TOO ABSTRACT | "Multiple variants" is subjective |
+| `require_animation_tests` | CROSS-FILE | Animation tests may be separate |
+
+### Deferred: Bloc/State Management Rules (with markers)
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_riverpod_override_in_tests` | CROSS-FILE | Test overrides may be in setup |
+| `avoid_riverpod_for_network_only` | HEURISTIC | "Only for network" is subjective |
+| `require_bloc_test_coverage` | CROSS-FILE | Test coverage requires test file analysis |
+| `avoid_large_bloc` | HEURISTIC | "Large" is subjective |
+| `avoid_overengineered_bloc_states` | HEURISTIC | "Overengineered" is subjective |
+| `prefer_feature_folder_structure` | HEURISTIC | Project structure detection varies |
+
+### Deferred: GetX Rules (with markers)
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_getx_static_context` | HEURISTIC | Static context usage varies |
+| `avoid_tight_coupling_with_getx` | HEURISTIC | "Tight coupling" is subjective |
+
+### Deferred: Performance Rules (with markers)
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_rebuild_on_scroll` | CONTEXT | Requires detecting build() method context |
+| `avoid_json_in_main` | HEURISTIC | "Large payload" threshold is arbitrary |
+
+### Deferred: Code Quality Rules (with markers)
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_e2e_coverage` | CROSS-FILE | Test coverage is cross-file |
+| `require_test_documentation` | HEURISTIC | "Complex test" is subjective |
+
+### Deferred: Loading State Rules
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_loading_timeout` | TOO-COMPLEX | "Loading state" is too abstract |
+| `require_loading_state_distinction` | TOO-COMPLEX | Initial vs refresh is runtime |
+| `require_refresh_completion_feedback` | TOO-COMPLEX | "Visible change" detection is runtime |
+| `require_infinite_scroll_end_indicator` | TOO-COMPLEX | Scroll + hasMore + indicator is complex |
+
+### Deferred: Heuristic Variable Name Detection
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_currency_code_with_amount` | HEURISTIC | Money-related class detection varies |
+| `avoid_money_arithmetic_on_double` | HEURISTIC | "Money" variable name matching has false positives |
+| `avoid_sensitive_data_in_clipboard` | HEURISTIC | "Sensitive" variable detection varies |
+| `require_clipboard_paste_validation` | HEURISTIC | "Security-sensitive" context is vague |
+| `avoid_string_concatenation_for_l10n` | HEURISTIC | UI text detection varies |
+| `require_plural_handling` | HEURISTIC | Plural context detection varies |
+| `require_cache_expiration` | HEURISTIC | "Cache" class detection varies |
+| `avoid_unbounded_cache_growth` | HEURISTIC | Cache map detection varies |
+| `prefer_lazy_singleton_registration` | HEURISTIC | "Expensive" constructor is subjective |
+| `avoid_print_in_production` | CONTEXT | Requires detecting debug/release context |
+| `avoid_encryption_key_in_memory` | HEURISTIC | "Encryption key" field detection varies |
+| `require_dialog_barrier_consideration` | HEURISTIC | "Destructive action" is subjective |
+| `require_snackbar_action_for_undo` | HEURISTIC | "Destructive" operation detection varies |
+| `require_snackbar_duration_consideration` | HEURISTIC | "Important content" is subjective |
+
+### Deferred: Cross-File Analysis Required
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_never_passed_parameters` | CROSS-FILE | Requires analyzing all call sites |
+| `avoid_getit_unregistered_access` | CROSS-FILE | Registration may be in separate file |
+| `require_temp_file_cleanup` | CROSS-FILE | Delete may be in separate function |
+| `avoid_misused_hooks` | CONTEXT | Hook rules vary by context |
+| `require_crash_reporting` | CROSS-FILE | Crash reporting setup is centralized |
+| `prefer_layer_separation` | CROSS-FILE | Architecture analysis is cross-file |
+| `require_missing_test_files` | CROSS-FILE | Test file existence check |
+
+### Deferred: Package-Specific Rules (saropa)
+
+These rules from the saropa project analysis require heuristic detection, cross-file analysis, or have vague detection criteria.
+
+#### Heuristic/"Logout" Detection
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_google_signin_disconnect_on_logout` | LOGOUT DETECTION | What constitutes "logout" is context-dependent |
+| `avoid_google_signin_silent_without_fallback` | CONTROL FLOW | Requires understanding interactive fallback flow |
+| `require_apple_credential_state_check` | CONTROL FLOW | Requires detecting prior state check |
+| `avoid_storing_apple_identity_token` | DATA FLOW | Requires tracing token to storage calls |
+| `require_google_sign_in_platform_interface_error_handling` | HEURISTIC | Platform auth error handling varies |
+| `require_google_sign_in_platform_interface_logout_cleanup` | LOGOUT DETECTION | Logout cleanup is context-dependent |
+| `require_googleapis_auth_error_handling` | HEURISTIC | Auth error handling varies |
+| `require_googleapis_auth_logout_cleanup` | LOGOUT DETECTION | Logout cleanup is context-dependent |
+| `require_webview_clear_on_logout` | LOGOUT DETECTION | What constitutes "logout" is context-dependent |
+| `require_cache_manager_clear_on_logout` | LOGOUT DETECTION | What constitutes "logout" is context-dependent |
+
+#### "Check Before Use" Patterns
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `require_supabase_auth_state_listener` | CROSS-FILE | Listener may be set up elsewhere |
+| `require_workmanager_unique_name` | CROSS-FILE | Requires comparing names across all files |
+| `require_workmanager_error_handling` | HEURISTIC | What counts as "retry logic" is vague |
+| `require_calendar_permission_check` | CHECK BEFORE USE | Permission check may be in separate method |
+| `require_contacts_permission_check` | CHECK BEFORE USE | Permission check may be in separate method |
+| `require_contacts_error_handling` | HEURISTIC | "Error handling" is too vague |
+| `avoid_contacts_full_fetch` | HEURISTIC | Usage context determines if full fetch is needed |
+| `require_device_info_permission_check` | CHECK BEFORE USE | Permission check may be in separate method |
+| `require_device_info_error_handling` | HEURISTIC | "Error handling" is too vague |
+| `require_package_info_permission_check` | CHECK BEFORE USE | Permission check may be in separate method |
+| `require_package_info_error_handling` | HEURISTIC | "Error handling" is too vague |
+| `require_url_launcher_can_launch_check` | CHECK BEFORE USE | canLaunchUrl may be called elsewhere |
+| `avoid_url_launcher_untrusted_urls` | DATA FLOW | Requires tracing URL source |
+| `require_speech_permission_check` | CHECK BEFORE USE | Permission check may be in separate method |
+| `require_speech_availability_check` | CHECK BEFORE USE | Availability check may be in separate method |
+| `avoid_in_app_review_on_first_launch` | APP STATE | First launch detection requires app state |
+| `require_in_app_review_availability_check` | CHECK BEFORE USE | Availability check may be elsewhere |
+| `require_iap_error_handling` | HEURISTIC | PurchaseStatus handling patterns vary |
+| `require_iap_verification` | TOO COMPLEX | "Server-side verification" cannot be detected |
+| `require_iap_restore_handling` | CROSS-FILE | Restore handling may be in separate class |
+| `require_geomag_permission_check` | CHECK BEFORE USE | Permission check may be in separate method |
+| `require_app_links_validation` | HEURISTIC | What counts as "validation" is vague |
+| `require_file_picker_permission_check` | CHECK BEFORE USE | Permission check may be in separate method |
+| `require_file_picker_type_validation` | HEURISTIC | What counts as "type validation" is vague |
+| `require_file_picker_size_check` | HEURISTIC | What counts as "size check" is vague |
+| `require_password_strength_threshold` | HEURISTIC | Score threshold usage patterns vary |
+
+#### Cross-File Analysis Required
+
+| Rule | Reason | Description |
+|------|--------|-------------|
+| `avoid_envied_secrets_in_repo` | CROSS-FILE | Requires reading .gitignore file |
+| `require_timezone_initialization` | CROSS-FILE | initializeTimeZones() may be in main.dart |
+| `require_intl_locale_initialization` | CROSS-FILE | Locale init may be in main.dart |
+
+---
+
+**Total Deferred Rules: ~136** (was ~100, added 36 from saropa package analysis)
+
+These rules should be revisited when:
+1. Cross-file analysis becomes available
+2. Better heuristics are developed
+3. Runtime analysis tools are integrated
+4. Package-specific detection is implemented
+
+## Package-Specific Rules from saropa (59 rules)
+
+> Generated on 2026-01-10 by `analyze_pubspec.py`
+
+### Authentication
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_google_signin_error_handling` | Recommended | google_sign_in | Ensure GoogleSignIn.signIn() has try-catch for PlatformException |
+| `require_google_signin_disconnect_on_logout` | Recommended | google_sign_in | Call GoogleSignIn.disconnect() on logout |
+| `avoid_google_signin_silent_without_fallback` | Stylistic | google_sign_in | signInSilently() should have fallback |
+| `require_google_sign_in_platform_interface_error_handling` | Recommended | google_sign_in_platform_interface | Handle auth errors |
+| `require_google_sign_in_platform_interface_logout_cleanup` | Recommended | google_sign_in_platform_interface | Cleanup on logout |
+| `require_googleapis_auth_error_handling` | Recommended | googleapis_auth | Handle auth errors |
+| `require_googleapis_auth_logout_cleanup` | Recommended | googleapis_auth | Cleanup on logout |
+| `require_apple_signin_nonce` | Essential | sign_in_with_apple | Use secure random nonce to prevent replay attacks |
+| `require_apple_credential_state_check` | Recommended | sign_in_with_apple | Check getCredentialState() before assuming signed in |
+| `avoid_storing_apple_identity_token` | Essential | sign_in_with_apple | Don't store identity tokens locally |
+| `require_sign_in_with_apple_platform_interface_error_handling` | Recommended | sign_in_with_apple_platform_interface | Handle auth errors |
+| `require_sign_in_with_apple_platform_interface_logout_cleanup` | Recommended | sign_in_with_apple_platform_interface | Cleanup on logout |
+| `require_supabase_error_handling` | Recommended | supabase_flutter | Wrap Supabase calls in try-catch |
+| `avoid_supabase_anon_key_in_code` | Essential | supabase_flutter | Don't hardcode Supabase anon key |
+| `require_supabase_auth_state_listener` | Recommended | supabase_flutter | Listen to onAuthStateChange |
+| `require_supabase_realtime_unsubscribe` | Essential | supabase_flutter | Unsubscribe from realtime on dispose |
+
+### Background Processing
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_workmanager_constraints` | Recommended | workmanager | Specify NetworkType/battery constraints |
+| `require_workmanager_unique_name` | Recommended | workmanager | Use unique names to prevent duplicates |
+| `require_workmanager_error_handling` | Recommended | workmanager | Handle task failures with retry |
+| `require_workmanager_result_return` | Essential | workmanager | Always return Result.success/failure/retry |
+
+### Contacts & Calendar
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_calendar_permission_check` | Essential | device_calendar | Request permission before accessing |
+| `require_calendar_timezone_handling` | Recommended | device_calendar | Handle timezone explicitly |
+| `require_contacts_permission_check` | Essential | flutter_contacts | Request permission before accessing |
+| `require_contacts_error_handling` | Recommended | flutter_contacts | Handle permission denied gracefully |
+| `avoid_contacts_full_fetch` | Stylistic | flutter_contacts | Use withProperties for needed fields only |
+
+### Device & Platform
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_device_info_permission_check` | Recommended | device_info_plus | Check permissions |
+| `require_device_info_error_handling` | Recommended | device_info_plus | Handle errors |
+| `require_package_info_permission_check` | Recommended | package_info_plus | Check permissions |
+| `require_package_info_error_handling` | Recommended | package_info_plus | Handle errors |
+| `require_url_launcher_can_launch_check` | Recommended | url_launcher | Call canLaunchUrl before launchUrl |
+| `avoid_url_launcher_untrusted_urls` | Recommended | url_launcher | Validate URLs before launching |
+
+### Forms & Input
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_keyboard_visibility_dispose` | Recommended | flutter_keyboard_visibility | Dispose subscription |
+| `require_speech_permission_check` | Essential | speech_to_text | Check microphone permission |
+| `require_speech_stop_on_dispose` | Essential | speech_to_text | Call stop() in dispose |
+| `require_speech_availability_check` | Recommended | speech_to_text | Check isAvailable first |
+
+### Images & Media
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_svg_error_handler` | Recommended | flutter_svg | Provide errorBuilder |
+
+### In-App Features
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `avoid_in_app_review_on_first_launch` | Recommended | in_app_review | Don't request on first launch |
+| `require_in_app_review_availability_check` | Recommended | in_app_review | Check isAvailable first |
+| `require_webview_navigation_delegate` | Recommended | webview_flutter | Set navigationDelegate to control URL loading |
+| `require_webview_ssl_error_handling` | Essential | webview_flutter | Handle SSL errors explicitly |
+| `require_webview_clear_on_logout` | Recommended | webview_flutter | Clear WebView cache/cookies on logout |
+| `avoid_webview_file_access` | Recommended | webview_flutter | Disable file:// access unless required |
+
+### Location & Maps
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_geomag_permission_check` | Essential | geomag | Check location permission |
+
+### Other
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_app_links_validation` | Recommended | app_links | Validate deep link parameters |
+| `avoid_app_links_sensitive_params` | Essential | app_links | Don't pass tokens in URLs |
+| `avoid_openai_key_in_code` | Essential | chat_gpt_sdk | Don't hardcode API key |
+| `require_openai_error_handling` | Recommended | chat_gpt_sdk | Handle rate limits and errors |
+| `avoid_envied_secrets_in_repo` | Essential | envied | Ensure .env files are gitignored |
+| `require_envied_obfuscation` | Recommended | envied | Use obfuscate: true for secrets |
+| `require_file_picker_permission_check` | Recommended | file_picker | Check storage permission first |
+| `require_file_picker_type_validation` | Recommended | file_picker | Validate file type after picking |
+| `require_file_picker_size_check` | Recommended | file_picker | Check file size to prevent OOM |
+| `require_cache_manager_clear_on_logout` | Recommended | flutter_cache_manager | Clear cache on logout |
+| `require_google_fonts_fallback` | Recommended | google_fonts | Specify fontFamilyFallback |
+| `avoid_logging_sensitive_data` | Essential | logging | Don't log PII or tokens |
+| `require_timezone_initialization` | Essential | timezone | Call initializeTimeZones() first |
+| `require_password_strength_threshold` | Recommended | zxcvbn | Enforce minimum score 3+ |
+
+### Utilities
+
+| Rule | Tier | Package | Description |
+|------|------|---------|-------------|
+| `require_intl_locale_initialization` | Recommended | intl | Initialize default locale on start |
+| `prefer_uuid_v4` | Stylistic | uuid | UUIDv4 for random IDs; v1 leaks MAC |
