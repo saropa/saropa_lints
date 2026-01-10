@@ -2040,3 +2040,162 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when collections handle nullable items without null-aware spread.
+///
+/// Dart 3 supports null-aware elements (?element) in collections.
+/// This avoids explicit null checks when adding nullable items.
+///
+/// **BAD:**
+/// ```dart
+/// final items = [
+///   item1,
+///   if (item2 != null) item2,
+/// ];
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final items = [
+///   item1,
+///   ?item2,
+/// ];
+/// ```
+class PreferNullAwareElementsRule extends SaropaLintRule {
+  const PreferNullAwareElementsRule() : super(code: _code);
+
+  /// Code style improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_null_aware_elements',
+    problemMessage:
+        'Explicit null check for nullable item. Use ?element syntax.',
+    correctionMessage:
+        'Replace `if (x != null) x` with `?x` for cleaner code.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIfElement((node) {
+      // Check for pattern: if (x != null) x
+      final condition = node.expression;
+      if (condition is! BinaryExpression) {
+        return;
+      }
+
+      if (condition.operator.lexeme != '!=') {
+        return;
+      }
+
+      // Check if comparing to null
+      final right = condition.rightOperand;
+      if (right is! NullLiteral) {
+        return;
+      }
+
+      // Get the variable being checked
+      final left = condition.leftOperand;
+      if (left is! SimpleIdentifier) {
+        return;
+      }
+
+      final varName = left.name;
+
+      // Check if then element is just that variable
+      final thenElement = node.thenElement;
+      if (thenElement is! Expression) {
+        return;
+      }
+
+      if (thenElement is SimpleIdentifier && thenElement.name == varName) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when iterable operations chain to List when lazy iteration suffices.
+///
+/// Chaining .map().where().toList() creates intermediate lists.
+/// If only iterating once, keep it lazy for better memory usage.
+///
+/// **BAD:**
+/// ```dart
+/// for (final item in items.map((x) => x.name).where((n) => n.isNotEmpty).toList()) {
+///   print(item);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// for (final item in items.map((x) => x.name).where((n) => n.isNotEmpty)) {
+///   print(item);
+/// }
+/// ```
+///
+/// **ALSO OK:**
+/// ```dart
+/// // toList() is fine when you need the list itself
+/// final names = items.map((x) => x.name).toList();
+/// names.add('extra');
+/// ```
+class PreferIterableOperationsRule extends SaropaLintRule {
+  const PreferIterableOperationsRule() : super(code: _code);
+
+  /// Performance improvement for large collections.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_iterable_operations',
+    problemMessage:
+        '.toList() after iterable chain in for-in. Unnecessary allocation.',
+    correctionMessage:
+        'Remove .toList() to keep iteration lazy and avoid extra allocation.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addForStatement((node) {
+      final forParts = node.forLoopParts;
+      if (forParts is! ForEachPartsWithDeclaration) {
+        return;
+      }
+
+      // Check if iterable ends with toList()
+      final iterable = forParts.iterable;
+      if (iterable is! MethodInvocation) {
+        return;
+      }
+
+      if (iterable.methodName.name != 'toList' &&
+          iterable.methodName.name != 'toSet') {
+        return;
+      }
+
+      // Check if there's a chain before toList
+      final target = iterable.target;
+      if (target is! MethodInvocation) {
+        return;
+      }
+
+      // Common chained methods that return iterables
+      final chainMethods = ['map', 'where', 'expand', 'take', 'skip'];
+      if (chainMethods.contains(target.methodName.name)) {
+        reporter.atNode(iterable.methodName, code);
+      }
+    });
+  }
+}

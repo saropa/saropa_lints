@@ -3191,3 +3191,761 @@ class _CommentOutSensitiveLogFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// Part 5 Rules: Package-Specific Security Rules
+// =============================================================================
+
+/// Warns when sensitive data is stored in SharedPreferences.
+///
+/// SharedPreferences stores data unencrypted on disk, making it readable
+/// to anyone with device access or app data backup.
+///
+/// **BAD:**
+/// ```dart
+/// prefs.setString('password', userPassword);
+/// prefs.setString('auth_token', jwt);
+/// prefs.setString('api_key', apiKey);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await secureStorage.write(key: 'password', value: userPassword);
+/// await secureStorage.write(key: 'auth_token', value: jwt);
+/// ```
+class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
+  const AvoidSharedPrefsSensitiveDataRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_shared_prefs_sensitive_data',
+    problemMessage:
+        'Storing sensitive data in SharedPreferences. Data is unencrypted.',
+    correctionMessage:
+        'Use flutter_secure_storage for passwords, tokens, and API keys.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _sensitiveKeys = <String>{
+    'password',
+    'passwd',
+    'token',
+    'auth_token',
+    'authtoken',
+    'access_token',
+    'accesstoken',
+    'refresh_token',
+    'refreshtoken',
+    'api_key',
+    'apikey',
+    'secret',
+    'private_key',
+    'privatekey',
+    'credential',
+    'jwt',
+    'bearer',
+    'session_id',
+    'sessionid',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check SharedPreferences setter methods
+      if (!methodName.startsWith('set')) return;
+
+      // Check if it's on SharedPreferences
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('sharedpreferences')) {
+        return;
+      }
+
+      // Check first argument (key) for sensitive patterns
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression keyArg = args.first;
+      final String keySource = keyArg.toSource().toLowerCase();
+
+      for (final String sensitiveKey in _sensitiveKeys) {
+        if (keySource.contains(sensitiveKey)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseSecureStorageFix()];
+}
+
+class _UseSecureStorageFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Use flutter_secure_storage',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Replace with FlutterSecureStorage().write()\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when authentication tokens are stored in SharedPreferences instead
+/// of flutter_secure_storage.
+///
+/// This rule complements `avoid_shared_prefs_sensitive_data` by specifically
+/// checking for auth token patterns in the VALUE being stored, not just the key.
+/// This catches cases where the key is generic but the value is clearly auth data.
+///
+/// **BAD:**
+/// ```dart
+/// prefs.setString('data', jwtToken);  // Value contains auth token
+/// prefs.setString('user', bearerToken);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await FlutterSecureStorage().write(key: 'auth', value: jwtToken);
+/// ```
+class RequireSecureStorageForAuthRule extends SaropaLintRule {
+  const RequireSecureStorageForAuthRule() : super(code: _code);
+
+  /// Storing auth tokens in SharedPreferences exposes credentials.
+  /// Critical security vulnerability.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_secure_storage_for_auth',
+    problemMessage:
+        'Auth token stored in SharedPreferences. Use flutter_secure_storage.',
+    correctionMessage:
+        'Use FlutterSecureStorage for JWT, bearer tokens, and auth credentials.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Auth-specific patterns to check in VALUE (not key).
+  /// Key-based detection is handled by `avoid_shared_prefs_sensitive_data`.
+  static const Set<String> _authValuePatterns = <String>{
+    'jwt',
+    'bearer',
+    'accesstoken',
+    'access_token',
+    'refreshtoken',
+    'refresh_token',
+    'idtoken',
+    'id_token',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'setString') return;
+
+      // Check if it's SharedPreferences
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetType = target.staticType?.toString() ?? '';
+      final String targetSource = target.toSource().toLowerCase();
+
+      final bool isPrefs = targetType.contains('SharedPreferences') ||
+          targetSource.contains('pref') ||
+          targetSource.contains('sharedpreferences');
+
+      if (!isPrefs) return;
+
+      // Check VALUE argument for auth patterns (key is checked by other rule)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.length < 2) return;
+
+      final String valueSource = args[1].toSource().toLowerCase();
+
+      for (final String pattern in _authValuePatterns) {
+        if (valueSource.contains(pattern)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when SharedPreferences getter results are used without null handling.
+///
+/// SharedPreferences getters return null when the key doesn't exist.
+/// Using the result without null handling causes crashes.
+///
+/// **BAD:**
+/// ```dart
+/// final String name = prefs.getString('name')!;
+/// final int count = prefs.getInt('count') ?? 0;  // Good, but detect the first case
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final String? name = prefs.getString('name');
+/// final String name = prefs.getString('name') ?? 'default';
+/// ```
+class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
+  const RequireSharedPrefsNullHandlingRule() : super(code: _code);
+
+  /// Null assertion on SharedPreferences getter causes runtime crash
+  /// when key doesn't exist - a common source of production crashes.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_shared_prefs_null_handling',
+    problemMessage:
+        'SharedPreferences getter used with null assertion. Returns null if key missing.',
+    correctionMessage:
+        'Use null-aware operator (??) with a default value, or handle nullable type.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _getterMethods = <String>{
+    'getString',
+    'getInt',
+    'getDouble',
+    'getBool',
+    'getStringList',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPostfixExpression((PostfixExpression node) {
+      // Check for ! operator
+      if (node.operator.lexeme != '!') return;
+
+      final Expression operand = node.operand;
+      if (operand is! MethodInvocation) return;
+
+      final String methodName = operand.methodName.name;
+      if (!_getterMethods.contains(methodName)) return;
+
+      // Check if it's SharedPreferences
+      final Expression? target = operand.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (targetSource.contains('pref') ||
+          targetSource.contains('sharedpreferences')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when string literals are used as SharedPreferences keys.
+///
+/// Using string literals for keys is error-prone and makes refactoring difficult.
+/// Define keys as constants for type safety and easier maintenance.
+///
+/// **BAD:**
+/// ```dart
+/// prefs.getString('user_name');
+/// prefs.setInt('login_count', count);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// static const String kUserName = 'user_name';
+/// prefs.getString(kUserName);
+/// prefs.setInt(PrefsKeys.loginCount, count);
+/// ```
+class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
+  const RequireSharedPrefsKeyConstantsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_shared_prefs_key_constants',
+    problemMessage:
+        'String literal used as SharedPreferences key. Use named constants.',
+    correctionMessage:
+        'Define keys as constants (e.g., static const kUserName = "user_name").',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _prefsMethods = <String>{
+    'getString',
+    'getInt',
+    'getDouble',
+    'getBool',
+    'getStringList',
+    'setString',
+    'setInt',
+    'setDouble',
+    'setBool',
+    'setStringList',
+    'remove',
+    'containsKey',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_prefsMethods.contains(methodName)) return;
+
+      // Check if it's SharedPreferences
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('sharedpreferences')) {
+        return;
+      }
+
+      // Check first argument for string literal
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression keyArg = args.first;
+      if (keyArg is SimpleStringLiteral || keyArg is AdjacentStrings) {
+        reporter.atNode(keyArg, code);
+      }
+    });
+  }
+}
+
+/// Warns when Uri.parse is used on user input without scheme validation.
+///
+/// Parsing URLs from user input without validation can lead to
+/// security issues like SSRF or accessing unintended protocols.
+///
+/// **BAD:**
+/// ```dart
+/// final url = Uri.parse(userInput);
+/// http.get(url);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final url = Uri.parse(userInput);
+/// if (url.scheme != 'https') {
+///   throw SecurityException('Only HTTPS allowed');
+/// }
+/// http.get(url);
+/// ```
+class RequireUrlValidationRule extends SaropaLintRule {
+  const RequireUrlValidationRule() : super(code: _code);
+
+  /// Security vulnerability - unvalidated URLs can be exploited.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_url_validation',
+    problemMessage:
+        'Uri.parse on variable without scheme validation. Potential SSRF risk.',
+    correctionMessage:
+        'Validate url.scheme is https/http before making requests.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      // Check for Uri.parse
+      final target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Uri') {
+        return;
+      }
+
+      if (node.methodName.name != 'parse') {
+        return;
+      }
+
+      // Check if argument is a variable (not a literal)
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) {
+        return;
+      }
+
+      final urlArg = args.first;
+
+      // Skip string literals - they're static URLs
+      if (urlArg is StringLiteral) {
+        return;
+      }
+
+      // Find enclosing method/function
+      AstNode? current = node.parent;
+      Block? enclosingBlock;
+
+      while (current != null) {
+        if (current is Block) {
+          enclosingBlock = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingBlock == null) {
+        return;
+      }
+
+      // Check if there's a scheme validation in the same block
+      final blockSource = enclosingBlock.toSource();
+      if (blockSource.contains('.scheme') &&
+          (blockSource.contains('https') || blockSource.contains('http'))) {
+        return;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when redirect URL is taken from parameter without domain validation.
+///
+/// Open redirects can be used for phishing attacks. Always validate
+/// redirect URLs against an allowlist of trusted domains.
+///
+/// **BAD:**
+/// ```dart
+/// void handleRedirect(String redirectUrl) {
+///   Navigator.of(context).pushNamed(redirectUrl);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void handleRedirect(String redirectUrl) {
+///   final uri = Uri.parse(redirectUrl);
+///   if (!trustedDomains.contains(uri.host)) {
+///     throw SecurityException('Untrusted redirect domain');
+///   }
+///   Navigator.of(context).pushNamed(redirectUrl);
+/// }
+/// ```
+class AvoidRedirectInjectionRule extends SaropaLintRule {
+  const AvoidRedirectInjectionRule() : super(code: _code);
+
+  /// Security vulnerability - open redirects enable phishing.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_redirect_injection',
+    problemMessage:
+        'Redirect URL from parameter without domain validation. Open redirect risk.',
+    correctionMessage:
+        'Validate redirect URL host against trusted domains allowlist.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const _redirectTerms = [
+    'redirect',
+    'returnurl',
+    'return_url',
+    'next',
+    'callback',
+    'goto',
+    'target',
+    'destination',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name.toLowerCase();
+
+      // Check for navigation methods
+      if (!methodName.contains('push') &&
+          !methodName.contains('navigate') &&
+          !methodName.contains('go') &&
+          methodName != 'launch' &&
+          methodName != 'launchurl') {
+        return;
+      }
+
+      // Check arguments for redirect-related variable names
+      for (final arg in node.argumentList.arguments) {
+        final argSource = arg.toSource().toLowerCase();
+
+        // Check if argument name suggests redirect
+        final isRedirectRelated =
+            _redirectTerms.any((term) => argSource.contains(term));
+
+        if (!isRedirectRelated) {
+          continue;
+        }
+
+        // Skip if there's validation nearby
+        AstNode? current = node.parent;
+        Block? enclosingBlock;
+
+        while (current != null) {
+          if (current is Block) {
+            enclosingBlock = current;
+            break;
+          }
+          current = current.parent;
+        }
+
+        if (enclosingBlock != null) {
+          final blockSource = enclosingBlock.toSource().toLowerCase();
+          if (blockSource.contains('.host') ||
+              blockSource.contains('.authority') ||
+              blockSource.contains('allowlist') ||
+              blockSource.contains('whitelist') ||
+              blockSource.contains('trusted')) {
+            continue;
+          }
+        }
+
+        reporter.atNode(arg, code);
+      }
+    });
+  }
+}
+
+/// Warns when sensitive data is written to external storage.
+///
+/// External storage is accessible by other apps and users. Sensitive
+/// data should be stored in app-private directories or encrypted.
+///
+/// **BAD:**
+/// ```dart
+/// final dir = await getExternalStorageDirectory();
+/// File('${dir.path}/user_credentials.json').writeAsString(creds);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final dir = await getApplicationDocumentsDirectory();
+/// File('${dir.path}/user_credentials.json').writeAsString(creds);
+/// ```
+///
+/// **ALSO GOOD (if external needed):**
+/// ```dart
+/// final dir = await getExternalStorageDirectory();
+/// final encrypted = await encrypt(creds);
+/// File('${dir.path}/data.enc').writeAsString(encrypted);
+/// ```
+class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
+  const AvoidExternalStorageSensitiveRule() : super(code: _code);
+
+  /// Security vulnerability - sensitive data exposed.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_external_storage_sensitive',
+    problemMessage:
+        'Sensitive data written to external storage. Accessible by other apps.',
+    correctionMessage:
+        'Use getApplicationDocumentsDirectory() or encrypt data first.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const _sensitiveTerms = [
+    'credential',
+    'password',
+    'token',
+    'secret',
+    'private',
+    'auth',
+    'session',
+    'api_key',
+    'apikey',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+
+      // Check for file write methods
+      if (methodName != 'writeAsString' &&
+          methodName != 'writeAsBytes' &&
+          methodName != 'writeAsStringSync' &&
+          methodName != 'writeAsBytesSync') {
+        return;
+      }
+
+      // Find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) {
+        return;
+      }
+
+      final methodSource = enclosingMethod.toSource().toLowerCase();
+
+      // Check if using external storage
+      if (!methodSource.contains('getexternalstoragedirectory') &&
+          !methodSource.contains('external')) {
+        return;
+      }
+
+      // Check if writing sensitive data
+      final writeDataSource = node.argumentList.arguments.isNotEmpty
+          ? node.argumentList.arguments.first.toSource().toLowerCase()
+          : '';
+
+      final isSensitive =
+          _sensitiveTerms.any((term) => writeDataSource.contains(term));
+
+      // Also check the file path
+      final filePathSource = node.target?.toSource().toLowerCase() ?? '';
+      final pathSensitive =
+          _sensitiveTerms.any((term) => filePathSource.contains(term));
+
+      if (isSensitive || pathSensitive) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when payment or sensitive operations lack biometric authentication.
+///
+/// Critical operations like payments should require additional authentication
+/// to prevent unauthorized access even if the device is unlocked.
+///
+/// **BAD:**
+/// ```dart
+/// void processPayment(PaymentDetails details) async {
+///   await paymentApi.charge(details);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void processPayment(PaymentDetails details) async {
+///   final authenticated = await LocalAuthentication().authenticate(
+///     localizedReason: 'Confirm payment',
+///   );
+///   if (!authenticated) return;
+///   await paymentApi.charge(details);
+/// }
+/// ```
+class PreferLocalAuthRule extends SaropaLintRule {
+  const PreferLocalAuthRule() : super(code: _code);
+
+  /// Security best practice for sensitive operations.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_local_auth',
+    problemMessage:
+        'Payment/sensitive operation without biometric authentication.',
+    correctionMessage:
+        'Add LocalAuthentication().authenticate() before sensitive operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const _sensitiveOperations = [
+    'payment',
+    'charge',
+    'transfer',
+    'withdraw',
+    'delete_account',
+    'deleteaccount',
+    'change_password',
+    'changepassword',
+    'export',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((node) {
+      final methodName = node.name.lexeme.toLowerCase();
+
+      // Check if method name suggests sensitive operation
+      final isSensitive =
+          _sensitiveOperations.any((op) => methodName.contains(op));
+
+      if (!isSensitive) {
+        return;
+      }
+
+      final methodSource = node.toSource().toLowerCase();
+
+      // Check if authentication is present
+      if (methodSource.contains('localauthentication') ||
+          methodSource.contains('authenticate') ||
+          methodSource.contains('biometric') ||
+          methodSource.contains('fingerprint') ||
+          methodSource.contains('faceid')) {
+        return;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}

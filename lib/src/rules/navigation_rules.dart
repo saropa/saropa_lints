@@ -1174,37 +1174,99 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
   }
 }
 
-/// Warns when scrollable list lacks RefreshIndicator.
+// =============================================================================
+// Part 5 Rules: go_router Navigation Rules
+// =============================================================================
+
+/// Warns when GoRouter is created inline in build() method.
 ///
-/// Pull-to-refresh is a standard pattern for updating list content.
-/// Users expect this interaction on scrollable lists.
+/// Creating GoRouter in build() causes issues with hot reload and state.
 ///
 /// **BAD:**
 /// ```dart
-/// ListView.builder(
-///   itemBuilder: (context, index) => ListTile(...),
-/// )
+/// Widget build(BuildContext context) {
+///   return MaterialApp.router(
+///     routerConfig: GoRouter(routes: [...]), // Hot reload issues!
+///   );
+/// }
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// RefreshIndicator(
-///   onRefresh: _loadData,
-///   child: ListView.builder(
-///     itemBuilder: (context, index) => ListTile(...),
-///   ),
+/// late final GoRouter _router = GoRouter(routes: [...]);
+///
+/// Widget build(BuildContext context) {
+///   return MaterialApp.router(routerConfig: _router);
+/// }
+/// ```
+class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
+  const AvoidGoRouterInlineCreationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_go_router_inline_creation',
+    problemMessage:
+        'GoRouter created in build(). Causes hot reload issues.',
+    correctionMessage:
+        'Create GoRouter as a field or in initState(), not in build().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GoRouter') return;
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when GoRouter is configured without error handler.
+///
+/// Without an error handler, unknown routes show a blank screen.
+///
+/// **BAD:**
+/// ```dart
+/// GoRouter(routes: myRoutes)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoRouter(
+///   routes: myRoutes,
+///   errorBuilder: (context, state) => ErrorPage(state.error),
 /// )
 /// ```
-class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
-  const RequireRefreshIndicatorOnListsRule() : super(code: _code);
+class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
+  const RequireGoRouterErrorHandlerRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.medium;
 
   static const LintCode _code = LintCode(
-    name: 'require_refresh_indicator_on_lists',
-    problemMessage: 'Scrollable list should have RefreshIndicator.',
-    correctionMessage: 'Wrap list with RefreshIndicator for pull-to-refresh.',
+    name: 'require_go_router_error_handler',
+    problemMessage:
+        'GoRouter without error handler. Unknown routes show blank screen.',
+    correctionMessage:
+        'Add errorBuilder or errorPageBuilder parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1218,37 +1280,162 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      final String? constructorName = node.constructorName.name?.name;
+      if (typeName != 'GoRouter') return;
 
-      // Check for ListView.builder or similar patterns
-      if (typeName != 'ListView' && typeName != 'GridView') return;
-      if (constructorName != 'builder' && constructorName != 'separated') {
-        return;
-      }
+      // Check for error handler
+      bool hasErrorHandler = false;
 
-      // Check if wrapped in RefreshIndicator
-      if (_hasRefreshIndicatorAncestor(node)) return;
-
-      reporter.atNode(node.constructorName, code);
-    });
-  }
-
-  bool _hasRefreshIndicatorAncestor(AstNode node) {
-    AstNode? current = node.parent;
-    int depth = 0;
-
-    while (current != null && depth < 10) {
-      if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name.lexeme;
-        if (typeName == 'RefreshIndicator' ||
-            typeName == 'SmartRefresher' ||
-            typeName == 'PullToRefresh') {
-          return true;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'errorBuilder' || name == 'errorPageBuilder') {
+            hasErrorHandler = true;
+            break;
+          }
         }
       }
-      current = current.parent;
-      depth++;
-    }
-    return false;
+
+      if (!hasErrorHandler) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when GoRouter with auth doesn't have refreshListenable.
+///
+/// Auth state changes should refresh the router to update protected routes.
+///
+/// **BAD:**
+/// ```dart
+/// GoRouter(
+///   redirect: (context, state) => authState.isLoggedIn ? null : '/login',
+///   routes: [...],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoRouter(
+///   redirect: (context, state) => authState.isLoggedIn ? null : '/login',
+///   refreshListenable: authState, // Refreshes on auth changes
+///   routes: [...],
+/// )
+/// ```
+class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
+  const RequireGoRouterRefreshListenableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_go_router_refresh_listenable',
+    problemMessage:
+        'GoRouter with redirect but no refreshListenable. Auth changes won\'t refresh routes.',
+    correctionMessage:
+        'Add refreshListenable parameter to update routes on auth changes.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GoRouter') return;
+
+      bool hasRedirect = false;
+      bool hasRefreshListenable = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'redirect') hasRedirect = true;
+          if (name == 'refreshListenable') hasRefreshListenable = true;
+        }
+      }
+
+      if (hasRedirect && !hasRefreshListenable) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when string literals are used in go_router navigation.
+///
+/// Type-safe navigation with go_router_builder is preferred.
+///
+/// **BAD:**
+/// ```dart
+/// context.go('/users/123/profile');
+/// context.push('/settings');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// context.go(UserProfileRoute(userId: '123').location);
+/// // Or with go_router_builder:
+/// UserProfileRoute(userId: '123').go(context);
+/// ```
+class AvoidGoRouterStringPathsRule extends SaropaLintRule {
+  const AvoidGoRouterStringPathsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_go_router_string_paths',
+    problemMessage:
+        'String literal in navigation. Use typed routes for type safety.',
+    correctionMessage:
+        'Consider using go_router_builder for type-safe navigation.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _navigationMethods = <String>{
+    'go',
+    'goNamed',
+    'push',
+    'pushNamed',
+    'pushReplacement',
+    'pushReplacementNamed',
+    'replace',
+    'replaceNamed',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_navigationMethods.contains(methodName)) return;
+
+      // Check if target is context
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('context')) return;
+
+      // Check first argument for string literal
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+      if (firstArg is SimpleStringLiteral ||
+          firstArg is StringInterpolation ||
+          firstArg is AdjacentStrings) {
+        reporter.atNode(firstArg, code);
+      }
+    });
   }
 }

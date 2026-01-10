@@ -160,6 +160,52 @@ ProviderScope(
 
 **Rule**: `avoid_global_riverpod_providers`
 
+### AsyncValue.when Parameter Order
+
+```dart
+// BAD - non-standard parameter order confuses readers
+asyncValue.when(
+  loading: () => CircularProgressIndicator(),
+  error: (e, s) => ErrorWidget(e),  // Wrong order
+  data: (d) => DataWidget(d),
+);
+
+// GOOD - consistent order: data, error, loading
+asyncValue.when(
+  data: (d) => DataWidget(d),
+  error: (e, s) => ErrorWidget(e),
+  loading: () => CircularProgressIndicator(),
+);
+```
+
+**Rule**: `require_async_value_order`
+
+### context.watch Without select
+
+```dart
+// BAD - rebuilds on any UserNotifier change
+class MyWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userProvider).user;  // Rebuilds on any change
+    return Text(user.name);
+  }
+}
+
+// GOOD - use select for targeted rebuilds
+class MyWidget extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userName = ref.watch(
+      userProvider.select((notifier) => notifier.user.name),
+    );
+    return Text(userName);  // Only rebuilds when name changes
+  }
+}
+```
+
+**Rule**: `prefer_selector`
+
 ## Recommended Setup
 
 ### 1. Update pubspec.yaml
@@ -202,8 +248,10 @@ dart run custom_lint
 | `avoid_ref_read_in_build` | essential | ref.read() instead of ref.watch() in build |
 | `avoid_circular_provider_deps` | recommended | Providers that depend on each other |
 | `avoid_provider_in_widget` | recommended | Providers declared inside widget classes |
+| `require_async_value_order` | recommended | Non-standard AsyncValue.when order |
 | `prefer_auto_dispose_providers` | professional | Providers without autoDispose modifier |
 | `avoid_ref_in_dispose` | professional | Using ref during disposal |
+| `prefer_selector` | professional | context.watch without select |
 | `avoid_global_riverpod_providers` | comprehensive | Unscoped global providers |
 | `require_riverpod_lint` | comprehensive | Missing riverpod_lint in project |
 

@@ -1562,3 +1562,612 @@ class _AddOnErrorHandlerFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// Part 5 Rules: Dio HTTP Client Rules
+// =============================================================================
+
+/// Warns when Dio is used without timeout configuration.
+///
+/// Network requests without timeouts can hang indefinitely, causing poor UX.
+/// Always configure connectTimeout and receiveTimeout.
+///
+/// **BAD:**
+/// ```dart
+/// final dio = Dio();
+/// await dio.get('https://api.example.com/data');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final dio = Dio(BaseOptions(
+///   connectTimeout: Duration(seconds: 10),
+///   receiveTimeout: Duration(seconds: 30),
+/// ));
+/// ```
+class RequireDioTimeoutRule extends SaropaLintRule {
+  const RequireDioTimeoutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dio_timeout',
+    problemMessage:
+        'Dio instance without timeout configuration. Requests may hang indefinitely.',
+    correctionMessage:
+        'Configure connectTimeout and receiveTimeout in BaseOptions.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Dio') return;
+
+      // Check if BaseOptions argument has timeout
+      final NodeList<Expression> args = node.argumentList.arguments;
+
+      if (args.isEmpty) {
+        // No options at all
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Check for timeout in BaseOptions
+      bool hasConnectTimeout = false;
+      bool hasReceiveTimeout = false;
+
+      for (final arg in args) {
+        final String argSource = arg.toSource();
+        if (argSource.contains('connectTimeout')) hasConnectTimeout = true;
+        if (argSource.contains('receiveTimeout')) hasReceiveTimeout = true;
+      }
+
+      if (!hasConnectTimeout || !hasReceiveTimeout) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Dio requests are made without error handling.
+///
+/// Dio throws DioException on network errors. Unhandled exceptions crash the app.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await dio.get('/users');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   final response = await dio.get('/users');
+/// } on DioException catch (e) {
+///   handleNetworkError(e);
+/// }
+/// ```
+class RequireDioErrorHandlingRule extends SaropaLintRule {
+  const RequireDioErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dio_error_handling',
+    problemMessage:
+        'Dio request without error handling. DioException will crash the app.',
+    correctionMessage:
+        'Wrap in try-catch to handle DioException.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _dioMethods = <String>{
+    'get',
+    'post',
+    'put',
+    'patch',
+    'delete',
+    'head',
+    'download',
+    'fetch',
+    'request',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_dioMethods.contains(methodName)) return;
+
+      // Check if target is Dio
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('dio')) return;
+
+      // Check if inside try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return;
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when Dio InterceptorsWrapper doesn't have onError handler.
+///
+/// Interceptors without error handling let errors propagate unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// dio.interceptors.add(InterceptorsWrapper(
+///   onRequest: (options, handler) => handler.next(options),
+/// ));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// dio.interceptors.add(InterceptorsWrapper(
+///   onRequest: (options, handler) => handler.next(options),
+///   onError: (error, handler) => handler.next(error),
+/// ));
+/// ```
+class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
+  const RequireDioInterceptorErrorHandlerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dio_interceptor_error_handler',
+    problemMessage:
+        'InterceptorsWrapper without onError handler. Errors may be unhandled.',
+    correctionMessage:
+        'Add onError callback to handle request errors in interceptor.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'InterceptorsWrapper') return;
+
+      // Check for onError parameter
+      bool hasOnError = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onError') {
+          hasOnError = true;
+          break;
+        }
+      }
+
+      if (!hasOnError) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when long-running Dio requests don't use CancelToken.
+///
+/// Requests should be cancellable to avoid wasting resources when the user
+/// navigates away.
+///
+/// **BAD:**
+/// ```dart
+/// await dio.download(url, path); // Can't be cancelled!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final cancelToken = CancelToken();
+/// await dio.download(url, path, cancelToken: cancelToken);
+/// // On dispose: cancelToken.cancel();
+/// ```
+class PreferDioCancelTokenRule extends SaropaLintRule {
+  const PreferDioCancelTokenRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_dio_cancel_token',
+    problemMessage:
+        'Long-running Dio request without CancelToken. Cannot be cancelled.',
+    correctionMessage:
+        'Add cancelToken parameter for cancellable requests.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _longRunningMethods = <String>{
+    'download',
+    'fetch',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_longRunningMethods.contains(methodName)) return;
+
+      // Check if target is Dio
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('dio')) return;
+
+      // Check for cancelToken parameter
+      bool hasCancelToken = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'cancelToken') {
+          hasCancelToken = true;
+          break;
+        }
+      }
+
+      if (!hasCancelToken) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Dio is used for auth endpoints without SSL pinning.
+///
+/// Sensitive endpoints should use certificate pinning to prevent MITM attacks.
+///
+/// **BAD:**
+/// ```dart
+/// dio.post('/login', data: credentials);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// dio.httpClientAdapter = IOHttpClientAdapter(
+///   createHttpClient: () {
+///     final client = HttpClient(context: SecurityContext());
+///     client.badCertificateCallback = (cert, host, port) =>
+///         validateCertificate(cert);
+///     return client;
+///   },
+/// );
+/// ```
+class RequireDioSslPinningRule extends SaropaLintRule {
+  const RequireDioSslPinningRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dio_ssl_pinning',
+    problemMessage:
+        'Auth endpoint without SSL pinning. Vulnerable to MITM attacks.',
+    correctionMessage:
+        'Configure httpClientAdapter with certificate validation.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _authEndpoints = <String>{
+    'login',
+    'auth',
+    'signin',
+    'sign-in',
+    'signup',
+    'sign-up',
+    'register',
+    'token',
+    'oauth',
+    'password',
+    'credentials',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'post' && methodName != 'get') return;
+
+      // Check if target is Dio
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('dio')) return;
+
+      // Check URL argument for auth endpoints
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final String urlSource = args.first.toSource().toLowerCase();
+
+      for (final endpoint in _authEndpoints) {
+        if (urlSource.contains(endpoint)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when FormData with files is not properly cleaned up.
+///
+/// FormData with file streams should be cleaned up to avoid resource leaks.
+///
+/// **BAD:**
+/// ```dart
+/// final formData = FormData.fromMap({
+///   'file': await MultipartFile.fromFile(path),
+/// });
+/// await dio.post('/upload', data: formData);
+/// // FormData never cleaned up
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use in try-finally or with proper disposal
+/// ```
+class AvoidDioFormDataLeakRule extends SaropaLintRule {
+  const AvoidDioFormDataLeakRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dio_form_data_leak',
+    problemMessage:
+        'FormData with file. Ensure proper cleanup of file resources.',
+    correctionMessage:
+        'Consider cleanup or using try-finally for file uploads.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for MultipartFile.fromFile
+      if (methodName != 'fromFile') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+
+      if (target.name == 'MultipartFile') {
+        // Check if inside try-finally
+        AstNode? current = node.parent;
+        bool insideTryFinally = false;
+
+        while (current != null) {
+          if (current is TryStatement && current.finallyBlock != null) {
+            insideTryFinally = true;
+            break;
+          }
+          current = current.parent;
+        }
+
+        if (!insideTryFinally) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when HTTP response is parsed without Content-Type check.
+///
+/// APIs may return different content types on error. Parsing JSON
+/// without checking Content-Type may fail unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(url);
+/// final data = jsonDecode(response.body);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final response = await http.get(url);
+/// if (response.headers['content-type']?.contains('application/json') == true) {
+///   final data = jsonDecode(response.body);
+/// } else {
+///   throw FormatException('Expected JSON but got ${response.headers['content-type']}');
+/// }
+/// ```
+class RequireContentTypeCheckRule extends SaropaLintRule {
+  const RequireContentTypeCheckRule() : super(code: _code);
+
+  /// Reliability issue - parsing may fail unexpectedly.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_content_type_check',
+    problemMessage:
+        'Parsing response without Content-Type check. May fail on error responses.',
+    correctionMessage:
+        'Check response.headers[\'content-type\'] before parsing.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      final methodName = node.methodName.name;
+
+      // Check for JSON parsing
+      if (methodName != 'jsonDecode' && methodName != 'decode') {
+        return;
+      }
+
+      // Check if argument references response.body
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) {
+        return;
+      }
+
+      final argSource = args.first.toSource().toLowerCase();
+      if (!argSource.contains('response') || !argSource.contains('body')) {
+        return;
+      }
+
+      // Find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) {
+        return;
+      }
+
+      final methodSource = enclosingMethod.toSource().toLowerCase();
+
+      // Check for Content-Type check
+      if (methodSource.contains('content-type') ||
+          methodSource.contains('contenttype')) {
+        return;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when WebSocket is used without heartbeat/ping mechanism.
+///
+/// WebSocket connections can silently fail. Periodic pings help
+/// detect dead connections and keep firewalls from closing idle sockets.
+///
+/// **BAD:**
+/// ```dart
+/// final channel = WebSocketChannel.connect(Uri.parse('wss://...'));
+/// channel.stream.listen((data) => handleData(data));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final channel = WebSocketChannel.connect(Uri.parse('wss://...'));
+/// Timer.periodic(Duration(seconds: 30), (_) {
+///   channel.sink.add('ping');
+/// });
+/// channel.stream.listen((data) => handleData(data));
+/// ```
+class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
+  const AvoidWebsocketWithoutHeartbeatRule() : super(code: _code);
+
+  /// Reliability issue - dead connections go undetected.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_websocket_without_heartbeat',
+    problemMessage:
+        'WebSocket without heartbeat/ping. Dead connections won\'t be detected.',
+    correctionMessage:
+        'Add periodic ping messages to detect connection failures.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((node) {
+      // Check for WebSocketChannel.connect
+      final target = node.target;
+      if (target is! SimpleIdentifier) {
+        return;
+      }
+
+      if (!target.name.contains('WebSocket')) {
+        return;
+      }
+
+      if (node.methodName.name != 'connect') {
+        return;
+      }
+
+      // Find enclosing class or method
+      AstNode? current = node.parent;
+      ClassDeclaration? enclosingClass;
+
+      while (current != null) {
+        if (current is ClassDeclaration) {
+          enclosingClass = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingClass == null) {
+        return;
+      }
+
+      final classSource = enclosingClass.toSource().toLowerCase();
+
+      // Check for heartbeat patterns
+      if (classSource.contains('ping') ||
+          classSource.contains('heartbeat') ||
+          classSource.contains('keepalive') ||
+          (classSource.contains('timer.periodic') &&
+              classSource.contains('sink.add'))) {
+        return;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
