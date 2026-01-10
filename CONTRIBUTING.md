@@ -221,6 +221,49 @@ dart run custom_lint
 
 The `expect_lint` comments assert that a lint fires on the next line. If the lint doesn't fire, the test fails. If a lint fires without an `expect_lint` comment, that also fails.
 
+## Avoiding False Positives (Critical)
+
+**Heuristic-based detection is the #1 source of bugs in lint rules.** Many rules that seem "easy" turn out to require multiple revisions due to false positives.
+
+### What NOT to do
+
+| Anti-Pattern | Problem | Example |
+|--------------|---------|---------|
+| **Substring matching on variable names** | Matches unintended words | `aud` in `audioVolume`, `cad` in `cadence` |
+| **Generic term detection** | Terms have multiple meanings | `cost` (computational), `fee` (service callback), `balance` (physics) |
+| **Short abbreviations** | Too ambiguous even as words | `iv` matches `activity`, `private`, `derivative` |
+| **String interpolation without context** | Flags safe usage | `${password.length}` doesn't expose the password |
+
+### Lessons Learned (from our own revisions)
+
+1. **`avoid_double_for_money`** — Required 3 revisions:
+   - v1.7.9: Broad word list (`total`, `amount`, `cost`, `fee`...) → many false positives
+   - v1.8.0: Removed generic terms, kept only `price`, `money`, `currency`, `salary`, `wage`
+   - v1.8.1: Still matching `audioVolume` → `aud`. Switched to **word-boundary matching** with camelCase/snake_case splitting
+
+2. **`avoid_sensitive_data_in_logs`** — Changed regex to only match direct interpolation (`$password`), not expressions like `${password != null}` or `${token.length}`
+
+3. **`require_unique_iv_per_encryption`** — Had to add word boundary detection to avoid matching `activity`, `private`, `derivative`
+
+### What TO do
+
+| Good Pattern | Why It Works | Example |
+|--------------|--------------|---------|
+| **Match exact API calls** | Unambiguous | `jsonDecode()`, `DateTime.parse()` |
+| **Check specific named parameters** | Clear semantics | `shrinkWrap: true`, `autoPlay: true` |
+| **Detect missing required parameters** | Binary yes/no | `Image.network` without `errorBuilder` |
+| **Match constructor + specific type** | Type-safe | `ScrollController` field without `dispose()` |
+
+### Before implementing a rule
+
+Ask yourself:
+1. Can this be detected by exact API/method name matching?
+2. If using variable names, will `audioVolume` or `cadenceTracker` cause false positives?
+3. If matching strings, have I tested with property access (`.length`) and null checks (`!= null`)?
+4. Is there a word that appears inside other common words?
+
+**If you must use heuristics:** Use word-boundary matching (split camelCase/snake_case into words) and test extensively with real codebases.
+
 ## Rule Naming Conventions
 
 | Prefix | Meaning | Example |
