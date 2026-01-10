@@ -30,6 +30,7 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | `[CONTEXT]` | Needs build/test context detection | Detect if inside `build()` method |
 | `[HEURISTIC]` | Variable name or string pattern matching | Detect "money" in variable names |
 | `[CROSS-FILE]` | Requires analysis across multiple files | Check if type is registered elsewhere |
+| `[TOO-COMPLEX]` | Pattern too abstract for reliable AST detection | Detect "loading state" or "user feedback" generically |
 
 ## Part 1: Detailed Rule Specifications
 
@@ -55,6 +56,10 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_riverpod_override_in_tests` | Professional | INFO | `[CROSS-FILE]` Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
+| `require_async_value_order` | Recommended | WARNING | AsyncValue pattern matching order matters - check for values before errors, handle loading last. Wrong order causes incorrect behavior. |
+| `avoid_riverpod_navigation` | Recommended | INFO | Riverpod shouldn't handle navigation via global navigator keys. Navigation belongs in widgets, not state management. |
+| `require_flutter_riverpod_package` | Essential | ERROR | Using `riverpod` instead of `flutter_riverpod` in Flutter apps - ConsumerWidget and ref.watch() won't work without the Flutter bindings. |
+| `avoid_riverpod_for_network_only` | Professional | INFO | `[HEURISTIC]` Using Riverpod just to access network layer when direct injection would suffice adds unnecessary complexity. |
 
 #### Bloc/Cubit Rules
 
@@ -62,8 +67,13 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 |-----------|------|----------|-------------|
 | `avoid_yield_in_on_event` | Professional | WARNING | The `yield` keyword is deprecated in bloc event handlers. Use `emit()` instead for emitting new states. |
 | `require_bloc_test_coverage` | Professional | INFO | `[CROSS-FILE]` Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
+| `require_bloc_selector` | Recommended | INFO | Not using BlocSelector leads to unnecessary rebuilds. BlocBuilder rebuilds on any state change even if irrelevant. |
+| `avoid_large_bloc` | Professional | INFO | `[HEURISTIC]` Blocs handling too many responsibilities become hard to maintain. Keep Blocs focused on single domain. |
+| `avoid_overengineered_bloc_states` | Professional | INFO | `[HEURISTIC]` Separate states for "loading" and "idle" when a boolean would suffice. Simpler state machines are easier to reason about. |
+| `require_bloc_manual_dispose` | Essential | WARNING | Even though Bloc handles cleanup, manually created controllers or streams inside a Bloc must still be disposed in close(). |
+| `prefer_feature_folder_structure` | Comprehensive | INFO | `[HEURISTIC]` Group files by feature (/auth, /profile) instead of type (/bloc, /ui) for better scalability. |
 
-#### Provider Package Rules
+#### Provider Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
@@ -79,6 +89,9 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 |-----------|------|----------|-------------|
 | `prefer_getx_builder` | Recommended | INFO | Direct `.obs` access in build() doesn't trigger rebuilds. Use GetX, GetBuilder, or Obx widgets to properly subscribe to reactive values. |
 | `require_getx_binding` | Professional | INFO | Bindings ensure controllers are created and disposed at the right time. Without them, manual Get.put/delete calls are error-prone. |
+| `avoid_getx_context_outside_widget` | Essential | WARNING | GetX relies on context for navigation, dialogs, etc. Accessing context outside widgets (in services/utilities) causes runtime errors. |
+| `avoid_getx_static_context` | Professional | WARNING | `[HEURISTIC]` Get.offNamed and Get.dialog use static context internally - cannot be unit tested. Consider abstraction for testability. |
+| `avoid_tight_coupling_with_getx` | Professional | INFO | `[HEURISTIC]` Using GetX for everything leads to tight coupling and hard-to-test code. Use only necessary features. |
 
 ### 1.3 Performance Rules
 
@@ -496,8 +509,8 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 |-----------|------|----------|-------------|
 | `prefer_utc_for_storage` | Essential | WARNING | Store dates in UTC. Detect DateTime storage/serialization without `.toUtc()` conversion. |
 | `require_timezone_display` | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
-| `prefer_duration_constants` | Recommended | INFO | `Duration(seconds: 60)` is less clear than `Duration(minutes: 1)`. Detect durations using smaller units when larger fit evenly. |
-| `avoid_datetime_now_in_tests` | Essential | WARNING | Tests using `DateTime.now()` are non-deterministic. Detect DateTime.now() in test files without clock injection. |
+| ~~`prefer_duration_constants`~~ | Recommended | INFO | [IMPLEMENTED v1.8.2] `Duration(seconds: 60)` is less clear than `Duration(minutes: 1)`. |
+| ~~`avoid_datetime_now_in_tests`~~ | Essential | WARNING | [IMPLEMENTED v1.8.2] Tests using `DateTime.now()` are non-deterministic. |
 | `avoid_datetime_comparison_without_precision` | Professional | INFO | DateTime equality fails due to microsecond differences. Detect direct DateTime equality; suggest difference threshold. |
 
 ### 1.31 Money & Currency Rules
@@ -681,25 +694,297 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `prefer_skeleton_over_spinner` | Recommended | INFO | Skeleton loaders feel faster than spinners. Detect CircularProgressIndicator for content loading; suggest shimmer/skeleton. |
-| `require_loading_timeout` | Essential | WARNING | Infinite loading states lose users. Detect loading state without timeout error handling. |
+| `require_loading_timeout` | Essential | WARNING | `[TOO-COMPLEX]` Infinite loading states lose users. Cannot reliably detect "loading state" generically via AST - would need package-specific implementations (dio timeout, etc.). |
 | `avoid_loading_flash` | Professional | INFO | Brief loading flash looks glitchy. Detect loading indicator shown without minimum delay (150-200ms). |
-| `require_loading_state_distinction` | Recommended | INFO | Initial load vs refresh should differ. Detect same loading UI for both states. |
+| `require_loading_state_distinction` | Recommended | INFO | `[TOO-COMPLEX]` Initial load vs refresh should differ. Cannot reliably distinguish "initial load" vs "refresh" states in static analysis. |
 
 ### 1.53 Pull-to-Refresh Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_refresh_indicator_on_lists` | Recommended | INFO | Scrollable lists should support pull-to-refresh. Detect ListView without RefreshIndicator wrapper. |
-| `require_refresh_completion_feedback` | Recommended | INFO | Refresh without visible change confuses users. Detect onRefresh completing without UI feedback. |
+| `require_refresh_completion_feedback` | Recommended | INFO | `[TOO-COMPLEX]` Refresh without visible change confuses users. Cannot detect "visible change" or "user feedback" generically - setState could update anything. |
 
 ### 1.54 Infinite Scroll Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_infinite_scroll_end_indicator` | Recommended | INFO | Detect when all items loaded. Detect infinite scroll without "end of list" state. |
+| `require_infinite_scroll_end_indicator` | Recommended | INFO | `[TOO-COMPLEX]` Detect when all items loaded. Pattern requires detecting scroll listener + hasMore flag + end indicator - too many variables for reliable detection. |
 | `prefer_infinite_scroll_preload` | Professional | INFO | Load next page before reaching end. Detect ScrollController listener triggering at 100% scroll. |
 | `require_infinite_scroll_error_recovery` | Recommended | INFO | Failed page loads need retry. Detect infinite scroll without error state and retry button. |
 | `avoid_infinite_scroll_duplicate_requests` | Professional | WARNING | Prevent multiple simultaneous page requests. Detect scroll listener without loading guard. |
+
+### 1.55 Architecture Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_banned_api` | Professional | WARNING | Configurable rule to restrict usage of specific APIs based on source package, class name, identifier, or named parameter, with include/exclude file patterns. Useful for enforcing layer boundaries (e.g., UI cannot call database directly). Inspired by solid_lints' `avoid_using_api`. |
+
+### 1.56 Type Safety & Casting Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_non_null_assertion` | Recommended | WARNING | Avoid `!` null assertion operator - use null checks or `??` instead. |
+| `avoid_type_casts` | Professional | INFO | Prefer type checks over casts where possible. |
+| `avoid_unrelated_type_casts` | Essential | ERROR | Casting between unrelated types will always fail. |
+| `prefer_explicit_type_arguments` | Professional | INFO | Prefer explicit type arguments over inference in complex cases. |
+| `avoid_explicit_type_declaration` | Stylistic | INFO | Prefer type inference over explicit type declarations where the type is obvious. |
+
+### 1.57 Error Handling Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_nested_try_statements` | Professional | INFO | Nested try-catch blocks indicate overly complex error handling. |
+| `avoid_uncaught_future_errors` | Essential | WARNING | Futures without error handling can cause unhandled exceptions. |
+| `handle_throwing_invocations` | Professional | INFO | Invocations that can throw should be handled appropriately. |
+| `prefer_correct_throws` | Professional | INFO | Document thrown exceptions with `@Throws` annotation. |
+
+### 1.58 Class & Inheritance Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_accessing_other_classes_private_members` | Professional | WARNING | Detect access to private members of other classes through workarounds. |
+| `avoid_referencing_subclasses` | Professional | INFO | Base classes should not reference their subclasses directly. |
+| `avoid_renaming_representation_getters` | Professional | INFO | Extension type representation getters should not be renamed. |
+| `avoid_suspicious_super_overrides` | Professional | WARNING | Detect suspicious super.method() calls in overrides. |
+| `prefer_redirecting_superclass_constructor` | Recommended | INFO | Use redirecting constructors to call super constructors. |
+| `prefer_class_destructuring` | Professional | INFO | Use record destructuring for class field access when beneficial. |
+
+### 1.59 Boolean & Conditional Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `no_boolean_literal_compare` | Recommended | INFO | Avoid comparing boolean expressions to boolean literals (`if (x == true)`). |
+| `prefer_simpler_boolean_expressions` | Recommended | INFO | Simplify complex boolean expressions using De Morgan's laws. |
+| `prefer_returning_conditional_expressions` | Recommended | INFO | Return conditional expressions directly instead of if/else blocks. |
+
+### 1.60 JSON & Serialization Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_not_encodable_in_to_json` | Professional | WARNING | Detect toJson methods that return non-encodable types. |
+| `prefer_correct_json_casts` | Professional | INFO | Use proper type casts when working with JSON data. |
+
+### 1.61 Ordering & Pattern Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `arguments_ordering` | Stylistic | INFO | Enforce consistent ordering of function arguments (alphabetical, required first, etc.). |
+| `pattern_fields_ordering` | Stylistic | INFO | Enforce consistent ordering of fields in pattern matching. |
+| `record_fields_ordering` | Stylistic | INFO | Enforce consistent ordering of fields in record declarations. |
+
+### 1.62 Code Quality Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_deprecated_usage` | Recommended | WARNING | Warn when using deprecated APIs, classes, or methods. |
+| `avoid_high_cyclomatic_complexity` | Professional | WARNING | Warn when functions exceed a configurable cyclomatic complexity threshold. |
+| `avoid_ignoring_return_values` | Recommended | INFO | Warn when function return values are ignored (unless explicitly marked). |
+| `avoid_importing_entrypoint_exports` | Professional | INFO | Avoid importing from files that re-export entry points. |
+| `avoid_missing_interpolation` | Recommended | WARNING | Detect string concatenation that should use interpolation. |
+| `avoid_never_passed_parameters` | Professional | INFO | `[CROSS-FILE]` Detect function parameters that are never passed by any caller. |
+| `avoid_suspicious_global_reference` | Professional | WARNING | Detect suspicious references to global state in methods. |
+| `avoid_unreachable_for_loop` | Recommended | WARNING | Detect for loops that will never execute (empty ranges). |
+| `avoid_unused_local_variable` | Recommended | WARNING | Local variables that are declared but never used. |
+| `no_empty_block` | Recommended | WARNING | Empty blocks indicate missing implementation or dead code. |
+| `prefer_correct_for_loop_increment` | Recommended | INFO | Use standard for-loop increment patterns. |
+| `prefer_typedefs_for_callbacks` | Professional | INFO | Use typedefs for function type signatures to improve readability. |
+| `tag_name` | Professional | INFO | Validate custom element tag names follow conventions. |
+| `banned_usage` | Professional | WARNING | Configurable rule to ban specific APIs, classes, or patterns. |
+
+### 1.63 Bloc/Cubit Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_bloc_public_fields` | Professional | WARNING | Bloc fields should be private - expose state through streams only. |
+| `avoid_bloc_public_methods` | Professional | WARNING | Bloc should only expose event handling - use add() for events. |
+| `avoid_cubits` | Stylistic | INFO | Prefer Bloc over Cubit for better event traceability. |
+| `avoid_duplicate_bloc_event_handlers` | Essential | ERROR | Multiple handlers for the same event type cause undefined behavior. |
+| `avoid_empty_build_when` | Recommended | WARNING | Empty buildWhen in BlocBuilder means it always rebuilds. |
+| `avoid_existing_instances_in_bloc_provider` | Essential | ERROR | BlocProvider.value with existing instances breaks proper disposal. |
+| `avoid_instantiating_in_bloc_value_provider` | Essential | ERROR | BlocProvider.value should receive existing instance, not create new one. |
+| `avoid_passing_bloc_to_bloc` | Professional | WARNING | Blocs should not directly depend on other Blocs - use streams or events. |
+| `avoid_passing_build_context_to_blocs` | Essential | WARNING | BuildContext in Blocs couples UI to business logic. |
+| `avoid_returning_value_from_cubit_methods` | Professional | INFO | Cubit methods should emit states, not return values. |
+| `check_is_not_closed_after_async_gap` | Essential | ERROR | Check `isClosed` before emitting state after async operations. |
+| `emit_new_bloc_state_instances` | Professional | WARNING | Always emit new state instances - mutating existing state breaks equality checks. |
+| `handle_bloc_event_subclasses` | Professional | INFO | Ensure all event subclasses are handled in event handlers. |
+| `prefer_bloc_event_suffix` | Stylistic | INFO | Bloc event classes should have `Event` suffix. |
+| `prefer_bloc_extensions` | Professional | INFO | Use Bloc extension methods for cleaner code. |
+| `prefer_bloc_state_suffix` | Stylistic | INFO | Bloc state classes should have `State` suffix. |
+| `prefer_correct_bloc_provider` | Recommended | INFO | Use appropriate BlocProvider variant (create vs value). |
+| `prefer_immutable_bloc_events` | Professional | WARNING | Bloc events should be immutable for predictable behavior. |
+| `prefer_immutable_bloc_state` | Professional | WARNING | Bloc states should be immutable for proper equality checks. |
+| `prefer_multi_bloc_provider` | Recommended | INFO | Use MultiBlocProvider instead of nested BlocProviders. |
+| `prefer_sealed_bloc_events` | Professional | INFO | Use sealed classes for Bloc events for exhaustive handling. |
+| `prefer_sealed_bloc_state` | Professional | INFO | Use sealed classes for Bloc states for exhaustive handling. |
+
+#### Riverpod Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_assigning_notifiers` | Essential | ERROR | Notifiers should not be reassigned - they manage their own state. |
+| `avoid_calling_notifier_members_inside_build` | Essential | WARNING | Calling notifier methods in build causes side effects during rendering. |
+| `avoid_notifier_constructors` | Professional | WARNING | Notifiers should use build() method, not constructors for initialization. |
+| `avoid_nullable_async_value_pattern` | Recommended | INFO | Prefer AsyncValue.when() over nullable pattern matching. |
+| `avoid_public_notifier_properties` | Professional | INFO | Notifier properties should be private - expose through state only. |
+| `avoid_read_inside_build` | Essential | WARNING | Use ref.watch() in build, ref.read() only in callbacks. |
+| `avoid_ref_inside_state_dispose` | Essential | ERROR | Ref is not available during dispose - cache values in initState. |
+| `avoid_ref_read_inside_build` | Essential | WARNING | ref.read() in build doesn't track dependencies - use ref.watch(). |
+| `avoid_ref_watch_outside_build` | Essential | ERROR | ref.watch() outside build causes subscription leaks. |
+| `avoid_watch_outside_build` | Essential | ERROR | Watching providers outside build causes memory leaks. |
+| `prefer_immutable_provider_arguments` | Professional | INFO | Provider arguments should be immutable for consistent behavior. |
+| `use_ref_and_state_synchronously` | Essential | WARNING | Use ref and state synchronously in async methods. |
+| `use_ref_read_synchronously` | Essential | WARNING | Cache ref.read() results before async gaps. |
+
+#### Provider Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_instantiating_in_value_provider` | Essential | ERROR | Provider.value should receive existing instance, not create new one. |
+| `prefer_immutable_selector_value` | Professional | INFO | Selector values should be immutable for proper equality checks. |
+| `prefer_multi_provider` | Recommended | INFO | Use MultiProvider instead of nested Providers. |
+| `prefer_nullable_provider_types` | Professional | INFO | Provider types should be nullable when the value can be absent. |
+| `prefer_provider_extensions` | Professional | INFO | Use Provider extension methods for cleaner code. |
+| `dispose_provided_instances` | Essential | WARNING | Instances created in Provider.create should be disposed. |
+| `dispose_providers` | Essential | WARNING | Providers with disposable resources need proper cleanup. |
+
+#### GetX Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `always_remove_getx_listener` | Essential | WARNING | GetX listeners must be removed to prevent memory leaks. |
+| `avoid_getx_rx_inside_build` | Professional | WARNING | Creating Rx variables in build causes unnecessary rebuilds. |
+| `avoid_mutable_rx_variables` | Professional | INFO | Rx variables should not be reassigned - update their values instead. |
+| `dispose_getx_fields` | Essential | WARNING | GetX controllers and workers must be disposed. |
+| `proper_getx_super_calls` | Essential | ERROR | GetX lifecycle methods must call super properly. |
+
+#### Flutter Hooks Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_conditional_hooks` | Essential | ERROR | Hooks cannot be called conditionally - violates rules of hooks. |
+| `avoid_hooks_outside_build` | Essential | ERROR | Hooks can only be called inside build methods. |
+| `avoid_misused_hooks` | Essential | WARNING | Detect common hook misuse patterns. |
+| `avoid_unnecessary_hook_widgets` | Recommended | INFO | Use HookWidget only when using hooks. |
+| `prefer_use_callback` | Professional | INFO | Use useCallback for memoizing callback functions. |
+| `prefer_use_prefix` | Stylistic | INFO | Custom hooks should start with `use` prefix. |
+
+#### Equatable Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `extend_equatable` | Professional | INFO | Classes implementing == should extend Equatable for consistency. |
+| `list_all_equatable_fields` | Essential | WARNING | All fields must be listed in Equatable.props for correct equality. |
+| `prefer_equatable_mixin` | Professional | INFO | Use EquatableMixin instead of extending Equatable when needed. |
+
+#### Flame Engine Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_creating_vector_in_update` | Essential | WARNING | Creating Vector2/3 in update() causes GC pressure - reuse vectors. |
+| `avoid_redundant_async_on_load` | Recommended | INFO | onLoad doesn't need async if it doesn't await anything. |
+
+#### Intl/Localization Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_missing_tr` | Essential | WARNING | Detect strings that should be translated but aren't. |
+| `avoid_missing_tr_on_strings` | Essential | WARNING | User-visible strings should use translation methods. |
+| `prefer_date_format` | Recommended | INFO | Use DateFormat with locale for consistent date formatting. |
+| `prefer_intl_name` | Professional | INFO | Intl.message name parameter should match the getter name. |
+| `prefer_number_format` | Recommended | INFO | Use NumberFormat with locale for consistent number formatting. |
+| `prefer_providing_intl_description` | Professional | INFO | Intl.message should include description for translators. |
+| `prefer_providing_intl_examples` | Professional | INFO | Intl.message should include examples for complex strings. |
+| `provide_correct_intl_args` | Essential | ERROR | Intl.message args must match placeholders in the message. |
+
+#### Firebase Analytics Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `incorrect_firebase_event_name` | Essential | ERROR | Firebase Analytics event names must follow naming conventions. |
+| `incorrect_firebase_parameter_name` | Essential | ERROR | Firebase Analytics parameter names must follow conventions. |
+
+#### Testing Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_async_callback_in_fake_async` | Essential | ERROR | Async callbacks in fakeAsync won't execute synchronously. |
+| `avoid_missing_controller` | Essential | WARNING | Widgets with controllers should have controllers provided. |
+| `avoid_missing_test_files` | Professional | INFO | `[CROSS-FILE]` Source files should have corresponding test files. |
+| `avoid_misused_test_matchers` | Recommended | WARNING | Detect incorrect usage of test matchers. |
+| `format_test_name` | Stylistic | INFO | Test names should follow a consistent format. |
+| `missing_test_assertion` | Essential | WARNING | Tests without assertions don't actually verify anything. |
+| `prefer_custom_finder_over_find` | Professional | INFO | Use custom finders for better test readability and maintenance. |
+| `prefer_symbol_over_key` | Professional | INFO | Use Symbols over String keys for test identifiers. |
+
+#### Patrol Testing Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `prefer_custom_finder_over_find` | Professional | INFO | Use Patrol's custom finders for clearer integration tests. |
+| `prefer_symbol_over_key` | Professional | INFO | Use Symbols for Patrol test identifiers. |
+
+#### GetIt/DI Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_functions_in_register_singleton` | Essential | WARNING | Don't pass functions directly to registerSingleton - use factory. |
+
+#### Pubspec Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `add_resolution_workspace` | Professional | INFO | Add resolution workspace for monorepo dependency management. |
+| `avoid_any_version` | Essential | WARNING | Avoid `any` version constraint - specify version ranges. |
+| `avoid_dependency_overrides` | Recommended | WARNING | dependency_overrides should only be used temporarily. |
+| `dependencies_ordering` | Stylistic | INFO | Dependencies should be sorted alphabetically. |
+| `newline_before_pubspec_entry` | Stylistic | INFO | Add blank lines between major pubspec sections. |
+| `prefer_caret_version_syntax` | Stylistic | INFO | Use `^1.0.0` caret syntax for version constraints. |
+| `prefer_commenting_pubspec_ignores` | Professional | INFO | Document why pubspec rules are ignored. |
+| `prefer_correct_package_name` | Essential | ERROR | Package name must follow Dart naming conventions. |
+| `prefer_correct_screenshots` | Professional | INFO | Screenshots in pubspec should have valid paths and descriptions. |
+| `prefer_correct_topics` | Professional | INFO | Topics should be valid pub.dev topics. |
+| `prefer_pinned_version_syntax` | Professional | INFO | Pin exact versions for production stability. |
+| `prefer_publish_to_none` | Recommended | INFO | Private packages should have `publish_to: none`. |
+| `prefer_semver_version` | Essential | WARNING | Version should follow semantic versioning (major.minor.patch). |
+| `pubspec_ordering` | Stylistic | INFO | Pubspec fields should follow recommended ordering. |
+
+#### Widget/Flutter Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `add_copy_with` | Professional | INFO | Immutable classes should have copyWith method. |
+| `avoid_collection_mutating_methods` | Professional | WARNING | Avoid methods that mutate collections in place. |
+| `avoid_missing_controller` | Essential | WARNING | Widgets requiring controllers should have them provided. |
+| `avoid_unnecessary_consumer_widgets` | Recommended | INFO | Don't use ConsumerWidget if not using ref. |
+| `avoid_unnecessary_null_aware_elements` | Recommended | INFO | Null-aware elements in collections that can't be null. |
+| `dispose_class_fields` | Essential | WARNING | Class fields that are disposable should be disposed. |
+| `prefer_action_button_tooltip` | Recommended | INFO | Action buttons should have tooltips for accessibility. |
+| `prefer_align_over_container` | Recommended | INFO | Use Align instead of Container when only aligning. |
+| `prefer_center_over_align` | Recommended | INFO | Use Center instead of Align(alignment: Alignment.center). |
+| `prefer_compute_over_isolate_run` | Professional | INFO | Use compute() for simpler isolate operations. |
+| `prefer_constrained_box_over_container` | Recommended | INFO | Use ConstrainedBox instead of Container for constraints only. |
+| `prefer_container` | Comprehensive | INFO | Use Container when combining multiple decorations. |
+| `prefer_dedicated_media_query_methods` | Recommended | INFO | Use MediaQuery.sizeOf() instead of MediaQuery.of().size. |
+| `prefer_for_loop_in_children` | Professional | INFO | Use for loops instead of List.generate in widget children. |
+| `prefer_padding_over_container` | Recommended | INFO | Use Padding instead of Container for padding only. |
+| `prefer_single_setstate` | Professional | INFO | Batch multiple state changes into single setState call. |
+| `prefer_sized_box_square` | Recommended | INFO | Use SizedBox.square() for equal width/height. |
+| `prefer_spacing` | Recommended | INFO | Use Spacing widget (or SizedBox) for consistent spacing. |
+| `prefer_transform_over_container` | Recommended | INFO | Use Transform instead of Container for transforms only. |
+| `prefer_void_callback` | Professional | INFO | Use VoidCallback typedef for void Function() parameters. |
+| `use_closest_build_context` | Professional | INFO | Use the closest available BuildContext for better performance. |
+
+#### Formatting/Style Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `enum_constants_ordering` | Stylistic | INFO | Enum constants should be ordered consistently. |
+| `newline_before_case` | Stylistic | INFO | Add blank line before case statements in switch. |
+| `newline_before_constructor` | Stylistic | INFO | Add blank line before constructor declarations. |
+| `newline_before_method` | Stylistic | INFO | Add blank line before method declarations. |
+| `newline_before_return` | Stylistic | INFO | Add blank line before return statements. |
 
 ---
 

@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 1.8.1)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 1.8.2)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~821+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~860+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -151,6 +151,9 @@ custom_lint:
     - require_minimum_contrast: false
     - prefer_scalable_text: false
     - avoid_text_scale_factor_ignore: false
+    - require_avatar_alt_text: false
+    - require_badge_semantics: false
+    - require_badge_count_limit: false
 
     # =========================================================================
     # COLLECTIONS
@@ -307,6 +310,8 @@ custom_lint:
     - nullify_after_dispose: false
     - require_media_player_dispose: false
     - require_tab_controller_dispose: false
+    - require_text_editing_controller_dispose: false
+    - require_page_controller_dispose: false
 
     # =========================================================================
     # FLUTTER FORMS
@@ -324,6 +329,8 @@ custom_lint:
     - require_text_overflow_in_row: false
     - require_keyboard_type: false
     - require_secure_keyboard: false
+    - require_keyboard_action_type: false
+    - require_keyboard_dismiss_on_scroll: false
 
     # =========================================================================
     # FLUTTER LIFECYCLE (CRITICAL)
@@ -458,6 +465,55 @@ custom_lint:
     - avoid_gesture_without_behavior: false
     - require_overflow_box_rationale: false
     - avoid_unconstrained_images: false
+    - avoid_image_rebuild_on_scroll: false
+    - require_avatar_fallback: false
+    - prefer_video_loading_placeholder: false
+
+    # =========================================================================
+    # FLUTTER DIALOGS & SNACKBARS
+    # =========================================================================
+    - require_snackbar_duration: false
+    - require_dialog_barrier_dismissible: false
+    - require_dialog_result_handling: false
+    - avoid_snackbar_queue_buildup: false
+
+    # =========================================================================
+    # FLUTTER UI/UX PATTERNS
+    # =========================================================================
+    - require_responsive_breakpoints: false
+    - prefer_cached_paint_objects: false
+    - require_custom_painter_shouldrepaint: false
+    - require_currency_formatting_locale: false
+    - require_number_formatting_locale: false
+    - require_graphql_operation_names: false
+    - avoid_badge_without_meaning: false
+    - prefer_logger_over_print: false
+    - prefer_itemextent_when_known: false
+    - require_tab_state_preservation: false
+    - prefer_image_size_constraints: false
+
+    # =========================================================================
+    # BLUETOOTH & HARDWARE
+    # =========================================================================
+    - avoid_bluetooth_scan_without_timeout: false
+    - require_bluetooth_state_check: false
+    - require_ble_disconnect_handling: false
+    - require_audio_focus_handling: false
+
+    # =========================================================================
+    # QR SCANNER & CAMERA
+    # =========================================================================
+    - require_qr_permission_check: false
+    - require_qr_scan_feedback: false
+    - avoid_qr_scanner_always_active: false
+
+    # =========================================================================
+    # FILE & ERROR HANDLING
+    # =========================================================================
+    - require_file_exists_check: false
+    - require_pdf_error_handling: false
+    - require_graphql_error_handling: false
+    - require_lifecycle_observer: false
 
     # =========================================================================
     # FUNCTIONS
@@ -775,6 +831,8 @@ custom_lint:
     - avoid_double_for_money: false
     - require_websocket_error_handling: false
     - avoid_autoplay_audio: false
+    - prefer_duration_constants: false
+    - avoid_datetime_now_in_tests: false
 
     # =========================================================================
     # VARIABLES & ASSIGNMENTS

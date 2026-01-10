@@ -138,3 +138,125 @@ class _GoodTabWidgetState extends State<GoodTabWidget>
     );
   }
 }
+
+// =========================================================================
+// require_text_editing_controller_dispose
+// =========================================================================
+
+// BAD: TextEditingController not disposed
+class BadFormWidget extends StatefulWidget {
+  const BadFormWidget({super.key});
+
+  @override
+  State<BadFormWidget> createState() => _BadFormWidgetState();
+}
+
+class _BadFormWidgetState extends State<BadFormWidget> {
+  // expect_lint: require_text_editing_controller_dispose
+  final TextEditingController _emailController = TextEditingController();
+  // expect_lint: require_text_editing_controller_dispose
+  final TextEditingController _passwordController = TextEditingController();
+
+  // Missing dispose!
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(controller: _emailController),
+        TextField(controller: _passwordController),
+      ],
+    );
+  }
+}
+
+// GOOD: TextEditingController properly disposed
+class GoodFormWidget extends StatefulWidget {
+  const GoodFormWidget({super.key});
+
+  @override
+  State<GoodFormWidget> createState() => _GoodFormWidgetState();
+}
+
+class _GoodFormWidgetState extends State<GoodFormWidget> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TextField(controller: _emailController),
+        TextField(controller: _passwordController),
+      ],
+    );
+  }
+}
+
+// =========================================================================
+// require_page_controller_dispose
+// =========================================================================
+
+// BAD: PageController not disposed
+class BadPageViewWidget extends StatefulWidget {
+  const BadPageViewWidget({super.key});
+
+  @override
+  State<BadPageViewWidget> createState() => _BadPageViewWidgetState();
+}
+
+class _BadPageViewWidgetState extends State<BadPageViewWidget> {
+  // expect_lint: require_page_controller_dispose
+  final PageController _pageController = PageController();
+
+  // Missing dispose!
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
+      controller: _pageController,
+      children: const [
+        Text('Page 1'),
+        Text('Page 2'),
+        Text('Page 3'),
+      ],
+    );
+  }
+}
+
+// GOOD: PageController properly disposed
+class GoodPageViewWidget extends StatefulWidget {
+  const GoodPageViewWidget({super.key});
+
+  @override
+  State<GoodPageViewWidget> createState() => _GoodPageViewWidgetState();
+}
+
+class _GoodPageViewWidgetState extends State<GoodPageViewWidget> {
+  final PageController _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return PageView(
+      controller: _pageController,
+      children: const [
+        Text('Page 1'),
+        Text('Page 2'),
+        Text('Page 3'),
+      ],
+    );
+  }
+}

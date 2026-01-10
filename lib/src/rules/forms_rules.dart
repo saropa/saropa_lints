@@ -1155,3 +1155,143 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when TextField or TextFormField lacks textInputAction parameter.
+///
+/// The textInputAction parameter controls the keyboard action button
+/// (e.g., Next, Done). This improves form navigation and UX.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   controller: _controller,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   controller: _controller,
+///   textInputAction: TextInputAction.next,
+/// )
+/// ```
+class RequireKeyboardActionTypeRule extends SaropaLintRule {
+  const RequireKeyboardActionTypeRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_keyboard_action_type',
+    problemMessage: 'Text field should have textInputAction for better UX.',
+    correctionMessage:
+        'Add textInputAction: TextInputAction.next or TextInputAction.done.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _textFieldTypes = <String>{
+    'TextField',
+    'TextFormField',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_textFieldTypes.contains(typeName)) return;
+
+      // Check for textInputAction parameter
+      bool hasTextInputAction = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'textInputAction') {
+          hasTextInputAction = true;
+          break;
+        }
+      }
+
+      if (!hasTextInputAction) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when scroll views lack keyboardDismissBehavior parameter.
+///
+/// ScrollViews containing text fields should specify how the keyboard
+/// dismisses when the user scrolls. This provides better UX for forms
+/// in scrollable content.
+///
+/// **BAD:**
+/// ```dart
+/// ListView(
+///   children: [TextField(), TextField()],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView(
+///   keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+///   children: [TextField(), TextField()],
+/// )
+/// ```
+class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
+  const RequireKeyboardDismissOnScrollRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_keyboard_dismiss_on_scroll',
+    problemMessage:
+        'Scroll view should have keyboardDismissBehavior for form UX.',
+    correctionMessage:
+        'Add keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _scrollViewTypes = <String>{
+    'ListView',
+    'CustomScrollView',
+    'SingleChildScrollView',
+    'GridView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_scrollViewTypes.contains(typeName)) return;
+
+      // Check for keyboardDismissBehavior parameter
+      bool hasKeyboardDismissBehavior = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'keyboardDismissBehavior') {
+          hasKeyboardDismissBehavior = true;
+          break;
+        }
+      }
+
+      if (!hasKeyboardDismissBehavior) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

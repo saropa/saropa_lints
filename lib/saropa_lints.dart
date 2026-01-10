@@ -989,6 +989,8 @@ const List<LintRule> _allRules = <LintRule>[
   // Disposal rules (NEW)
   RequireMediaPlayerDisposeRule(),
   RequireTabControllerDisposeRule(),
+  RequireTextEditingControllerDisposeRule(),
+  RequirePageControllerDisposeRule(),
 
   // Build method anti-pattern rules (NEW)
   AvoidGradientInBuildRule(),
@@ -1024,6 +1026,64 @@ const List<LintRule> _allRules = <LintRule>[
   RequireGetItResetInTestsRule(),
   RequireWebSocketErrorHandlingRule(),
   AvoidAutoplayAudioRule(),
+
+  // Accessibility rules (Plan Group C)
+  RequireAvatarAltTextRule(),
+  RequireBadgeSemanticsRule(),
+  RequireBadgeCountLimitRule(),
+
+  // Image & Media rules (Plan Group A)
+  AvoidImageRebuildOnScrollRule(),
+  RequireAvatarFallbackRule(),
+  PreferVideoLoadingPlaceholderRule(),
+
+  // Dialog & Snackbar rules (Plan Group D)
+  RequireSnackbarDurationRule(),
+  RequireDialogBarrierDismissibleRule(),
+  RequireDialogResultHandlingRule(),
+  AvoidSnackbarQueueBuildupRule(),
+
+  // Form & Input rules (Plan Group E)
+  RequireKeyboardActionTypeRule(),
+  RequireKeyboardDismissOnScrollRule(),
+
+  // Duration & DateTime rules (Plan Group F)
+  PreferDurationConstantsRule(),
+  AvoidDatetimeNowInTestsRule(),
+
+  // UI/UX Pattern rules (Plan Groups G, J, K)
+  RequireResponsiveBreakpointsRule(),
+  PreferCachedPaintObjectsRule(),
+  RequireCustomPainterShouldRepaintRule(),
+  RequireCurrencyFormattingLocaleRule(),
+  RequireNumberFormattingLocaleRule(),
+  RequireGraphqlOperationNamesRule(),
+  AvoidBadgeWithoutMeaningRule(),
+  PreferLoggerOverPrintRule(),
+  PreferItemExtentWhenKnownRule(),
+  RequireTabStatePreservationRule(),
+
+  // Bluetooth & Hardware rules (Plan Group H)
+  AvoidBluetoothScanWithoutTimeoutRule(),
+  RequireBluetoothStateCheckRule(),
+  RequireBleDisconnectHandlingRule(),
+  RequireAudioFocusHandlingRule(),
+  RequireQrPermissionCheckRule(),
+
+  // QR Scanner rules (Plan Group I)
+  RequireQrScanFeedbackRule(),
+  AvoidQrScannerAlwaysActiveRule(),
+
+  // File & Error Handling rules (Plan Group G)
+  RequireFileExistsCheckRule(),
+  RequirePdfErrorHandlingRule(),
+  RequireGraphqlErrorHandlingRule(),
+
+  // Image rules (Plan Group A)
+  PreferImageSizeConstraintsRule(),
+
+  // Lifecycle rules (Plan Group B)
+  RequireLifecycleObserverRule(),
 ];
 
 class _SaropaLints extends PluginBase {
