@@ -70,19 +70,16 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only process build methods
       if (node.name.lexeme != 'build') return;
 
-      // Check if it's a widget build method
-      final String? returnType = node.returnType?.toSource();
-      if (returnType != 'Widget') return;
-
-      // Look for gradient construction in the body
+      // Visit all nodes in the build method body
       node.body.visitChildren(_GradientVisitor(reporter, code, _gradientTypes));
     });
   }
 }
 
-class _GradientVisitor extends RecursiveAstVisitor<void> {
+class _GradientVisitor extends GeneralizingAstVisitor<void> {
   _GradientVisitor(this.reporter, this.code, this.gradientTypes);
 
   final SaropaDiagnosticReporter reporter;
@@ -91,14 +88,26 @@ class _GradientVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName = node.constructorName.type.name2.lexeme;
+    final String typeName = node.constructorName.type.element?.name ??
+        node.constructorName.type.name2.lexeme;
+
     if (gradientTypes.contains(typeName)) {
-      // Skip if it's const
+      // Skip const gradients - they're properly reused
       if (node.keyword?.lexeme != 'const') {
         reporter.atNode(node, code);
       }
     }
     super.visitInstanceCreationExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Implicit constructor calls may appear as method invocations
+    final String methodName = node.methodName.name;
+    if (gradientTypes.contains(methodName)) {
+      reporter.atNode(node, code);
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

@@ -1,4 +1,5 @@
 // ignore_for_file: unused_local_variable, unused_element, depend_on_referenced_packages
+// ignore_for_file: avoid_hardcoded_credentials
 // Test fixture for cryptography rules
 
 import 'dart:math';

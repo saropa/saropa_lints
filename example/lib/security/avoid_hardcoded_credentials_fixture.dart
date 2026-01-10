@@ -1,4 +1,4 @@
-// ignore_for_file: unused_local_variable
+// ignore_for_file: unused_local_variable, avoid_hardcoded_encryption_keys
 // Test fixture for avoid_hardcoded_credentials rule
 
 void testHardcodedCredentials() {

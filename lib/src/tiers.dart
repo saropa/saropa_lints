@@ -19,6 +19,8 @@ const Set<String> essentialRules = <String>{
   'require_scroll_controller_dispose',
   'require_focus_node_dispose',
   'require_bloc_close',
+  'require_media_player_dispose',
+  'require_tab_controller_dispose',
   // Memory Leaks - Timers & Subscriptions (cancel)
   'require_timer_cancellation',
   'avoid_unassigned_stream_subscriptions',
@@ -44,12 +46,17 @@ const Set<String> essentialRules = <String>{
   // Security
   'avoid_hardcoded_credentials',
   'avoid_logging_sensitive_data',
+  'avoid_sensitive_data_in_logs',
   'avoid_eval_like_patterns',
   'avoid_weak_cryptographic_algorithms',
   'avoid_token_in_url',
   'avoid_clipboard_sensitive',
   'avoid_storing_passwords',
   'avoid_dynamic_sql',
+  'avoid_hardcoded_encryption_keys',
+  'prefer_secure_random_for_crypto',
+  'avoid_deprecated_crypto_algorithms',
+  'require_unique_iv_per_encryption',
 
   // Null Safety
   'avoid_null_assertion',
@@ -91,6 +98,14 @@ const Set<String> essentialRules = <String>{
   // Widget Structure
   'avoid_nested_scaffolds',
   'avoid_multiple_material_apps',
+
+  // Build Method Anti-patterns (Critical)
+  'avoid_dialog_in_build',
+  'require_tab_controller_length_sync',
+
+  // Type Safety (Critical - throws runtime exceptions)
+  'prefer_try_parse_for_dynamic_data',
+  'avoid_double_for_money',
 
   // Animation (Essential - prevent crashes)
   'require_vsync_mixin',
@@ -155,6 +170,25 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_const_string_list',
   'prefer_const_widgets_in_lists',
   'prefer_value_listenable_builder',
+
+  // Build Method Anti-patterns (Performance/UX)
+  'avoid_gradient_in_build',
+  'avoid_snackbar_in_build',
+  'avoid_analytics_in_build',
+  'avoid_json_encode_in_build',
+  'avoid_canvas_operations_in_build',
+
+  // Scroll and List Performance
+  'avoid_shrinkwrap_in_scrollview',
+  'avoid_nested_scrollables_conflict',
+  'avoid_listview_children_for_large_lists',
+  'avoid_refresh_without_await',
+  'avoid_multiple_autofocus',
+
+  // JSON/DateTime Error Handling
+  'require_json_decode_try_catch',
+  'avoid_datetime_parse_unvalidated',
+  'require_websocket_error_handling',
 
   // Accessibility
   'require_semantics_label',
@@ -458,6 +492,8 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_singleton_for_scoped_dependencies',
   'prefer_null_object_pattern',
   'require_typed_di_registration',
+  'avoid_getit_in_build',
+  'require_getit_reset_in_tests',
 
   // Memory Management
   'require_image_disposal',
@@ -633,6 +669,13 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_widget_private_members',
   'avoid_text_span_in_build',
   'require_overflow_box_rationale',
+  'avoid_excessive_bottom_nav_items',
+
+  // Code Quality - Feature Flags
+  'avoid_hardcoded_feature_flags',
+
+  // Media/Audio
+  'avoid_autoplay_audio',
 
   // Network Performance
   'prefer_streaming_response',
