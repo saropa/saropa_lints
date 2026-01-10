@@ -4,20 +4,52 @@
 
 import 'dart:math';
 
+// Mock classes to simulate encryption libraries
+class Key {
+  Key.fromUtf8(String data);
+  Key.fromBase64(String data);
+}
+
+class SecretKey {
+  SecretKey.fromUtf8(String data);
+}
+
+class CipherKey {
+  CipherKey.fromUtf8(String data);
+}
+
 void testCryptoRules() {
   // =========================================================================
   // avoid_hardcoded_encryption_keys
   // =========================================================================
+  //
+  // This rule ONLY flags encryption library Key constructors with string
+  // literals. It does NOT flag variables just because they have "key" in
+  // their name - that approach produces too many false positives.
 
-  // BAD: Hardcoded encryption key
+  // BAD: Hardcoded key in encryption library constructor
   // expect_lint: avoid_hardcoded_encryption_keys
-  const encryptionKey = 'my-super-secret-key-12345';
+  final key1 = Key.fromUtf8('my-super-secret-key-12345');
 
   // expect_lint: avoid_hardcoded_encryption_keys
-  final secretKey = 'another-secret-key-value';
+  final key2 = Key.fromBase64('bXktc2VjcmV0LWtleQ==');
 
-  // GOOD: Key loaded from environment
-  const envKey = String.fromEnvironment('ENCRYPTION_KEY');
+  // expect_lint: avoid_hardcoded_encryption_keys
+  final key3 = SecretKey.fromUtf8('another-hardcoded-key');
+
+  // expect_lint: avoid_hardcoded_encryption_keys
+  final key4 = CipherKey.fromUtf8('cipher-key-value-123');
+
+  // GOOD: Key loaded from variable (not hardcoded literal)
+  final keyFromEnv = const String.fromEnvironment('ENCRYPTION_KEY');
+  final goodKey = Key.fromUtf8(keyFromEnv);
+
+  // GOOD: These variables have "key" in the name but are NOT encryption keys.
+  // We intentionally don't flag these - variable name matching is unreliable.
+  const jsonKeyName = 'userId'; // JSON field name
+  const primaryKey = 'id'; // Database key
+  const keyboardShortcut = 'Ctrl+C'; // UI shortcut
+  const searchKeyword = 'flutter encryption'; // Search term
 
   // =========================================================================
   // prefer_secure_random_for_crypto

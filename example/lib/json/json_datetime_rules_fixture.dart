@@ -107,35 +107,56 @@ void goodUriTryParse(String url) {
 // =========================================================================
 // avoid_double_for_money
 // =========================================================================
+// Rule is now STRICT: only flags unambiguous money terms like price, salary,
+// wage, and currency codes (usd, eur, gbp, etc.)
 
 class BadMoneyClass {
   // expect_lint: avoid_double_for_money
   double price = 19.99;
 
   // expect_lint: avoid_double_for_money
-  double totalAmount = 0.0;
+  double itemPrice = 9.99;
 
   // expect_lint: avoid_double_for_money
-  double balance = 100.50;
+  double salary = 50000.0;
+
+  // expect_lint: avoid_double_for_money
+  double hourlyWage = 15.50;
+
+  // expect_lint: avoid_double_for_money
+  double usdAmount = 100.0;
+
+  // expect_lint: avoid_double_for_money
+  double dollarValue = 50.0;
 }
 
 class GoodMoneyClass {
   // GOOD: Use int cents
   int priceInCents = 1999;
-  int totalAmountInCents = 0;
-  int balanceInCents = 10050;
+  int salaryInCents = 5000000;
 }
 
-class FalsePositiveExclusions {
-  // GOOD: These should NOT trigger avoid_double_for_money
-  // because they contain false positive patterns
-  double?
-      imageUrlVerticalOffsetPercent; // "percent" contains "cent" but is not money
-  double centerX = 0.0; // "center" contains "cent" but is not money
-  double accentColorOpacity = 1.0; // "accent" contains "cent" but is not money
-  double recentProgress = 0.0; // "recent" contains "cent" but is not money
-  double descentOffset = 0.0; // "descent" contains "cent" but is not money
-  double centimeterScale = 1.0; // "centimeter" contains "cent" but is not money
+class NotMoneyDoubles {
+  // GOOD: Generic terms no longer trigger the lint
+  double totalAmount = 0.0; // "total" and "amount" are too generic
+  double balance = 100.50; // could be work-life balance
+  double cost = 0.0; // could be computational cost
+  double fee = 0.0; // too generic
+  double total = 0.0; // too generic
+  double amount = 0.0; // too generic
+  double payment = 0.0; // could be non-monetary
+  double discount = 0.0; // too generic
+  double revenue = 0.0; // business context varies
+  double profit = 0.0; // business context varies
+  double budget = 0.0; // could be time budget
+  double expense = 0.0; // too generic
+  double income = 0.0; // too generic
+
+  // Non-monetary aggregates
+  double totalPoints = 0.0;
+  double totalSteps = 0.0;
+  double totalCalories = 0.0;
+  double progressPercent = 0.0;
 }
 
 // =========================================================================
@@ -153,6 +174,15 @@ void badLogging(String password, String token) {
 void goodLogging(String userId) {
   // GOOD: Log non-sensitive data
   print('User logged in: $userId');
+}
+
+void goodLoggingNullChecks(Object? credential, String? token) {
+  // GOOD: Null checks don't expose sensitive data
+  print(
+    'Auth ${credential != null ? "succeeded" : "failed (null credential)"}',
+  );
+  print('Token status: ${token == null ? "missing" : "present"}');
+  print('Token length: ${token?.length}');
 }
 
 // =========================================================================

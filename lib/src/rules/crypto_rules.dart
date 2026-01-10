@@ -19,10 +19,28 @@ import '../saropa_lint_rule.dart';
 /// compiled applications (APK, IPA). Keys should be stored securely
 /// or derived at runtime.
 ///
+/// ## Detection approach
+///
+/// This rule ONLY detects calls to encryption library Key constructors with
+/// string literals, e.g. `Key.fromUtf8('secret')`. This is reliable because
+/// it requires both:
+/// 1. A known encryption Key class (Key, SecretKey, CipherKey, etc.)
+/// 2. A key construction method (fromUtf8, fromBase64, etc.)
+/// 3. A hardcoded string literal argument
+///
+/// We intentionally do NOT flag variables just because they have "key" in
+/// their name. Variable name matching produces too many false positives:
+/// - `jsonKeyName` (JSON field names)
+/// - `primaryKey` (database keys)
+/// - `keyboardShortcut`, `hotkey` (UI)
+/// - `searchKeyword`, `keyPath`, etc.
+///
+/// The word "key" is too common in programming to be a reliable indicator.
+///
 /// **BAD:**
 /// ```dart
 /// final key = encrypt.Key.fromUtf8('my-secret-key-123');
-/// final encrypter = Encrypter(AES(key));
+/// final key = CipherKey.fromUtf8('hardcoded-secret');
 /// ```
 ///
 /// **GOOD:**
@@ -48,6 +66,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  /// Methods used to construct encryption keys from data.
   static const Set<String> _keyMethods = <String>{
     'fromUtf8',
     'fromBase64',
@@ -56,11 +75,17 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
     'fromLength',
   };
 
+  /// Known encryption Key classes from popular Dart crypto libraries:
+  /// - encrypt package: Key
+  /// - crypto_x package: CipherKey
+  /// - cryptography package: SecretKey
+  /// - Custom implementations: EncryptionKey, AesKey
   static const Set<String> _keyClasses = <String>{
     'Key',
     'SecretKey',
     'EncryptionKey',
     'AesKey',
+    'CipherKey',
   };
 
   @override
@@ -69,6 +94,9 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    // Only flag encryption library Key constructors with string literals.
+    // This approach is reliable because it requires a specific class + method
+    // + literal combination that unambiguously indicates a hardcoded key.
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
@@ -79,42 +107,13 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      bool isKeyClass = false;
-      for (final String keyClass in _keyClasses) {
-        if (targetSource.contains(keyClass)) {
-          isKeyClass = true;
-          break;
-        }
-      }
+      if (!_keyClasses.any(targetSource.contains)) return;
 
-      if (!isKeyClass) return;
-
-      // Check if argument is a string literal
+      // Check if argument is a string literal (hardcoded key)
       if (node.argumentList.arguments.isNotEmpty) {
         final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is StringLiteral) {
           reporter.atNode(firstArg, code);
-        }
-      }
-    });
-
-    // Also check for direct key assignments
-    context.registry.addVariableDeclaration((VariableDeclaration node) {
-      // Check variable name patterns
-      final String varName = node.name.lexeme.toLowerCase();
-      if (!varName.contains('key') &&
-          !varName.contains('secret') &&
-          !varName.contains('password')) {
-        return;
-      }
-
-      // Check if initialized with a string literal
-      final Expression? initializer = node.initializer;
-      if (initializer is StringLiteral) {
-        final String value = initializer.toSource();
-        // Skip short strings that are likely not keys
-        if (value.length > 10) {
-          reporter.atNode(initializer, code);
         }
       }
     });
