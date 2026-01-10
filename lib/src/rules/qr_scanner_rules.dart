@@ -37,7 +37,8 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_qr_scan_feedback',
     problemMessage: 'QR scan callback should provide user feedback.',
-    correctionMessage: 'Add HapticFeedback.mediumImpact() or visual feedback on scan.',
+    correctionMessage:
+        'Add HapticFeedback.mediumImpact() or visual feedback on scan.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -124,7 +125,8 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_qr_scanner_always_active',
     problemMessage: 'QR scanner should pause when app is backgrounded.',
-    correctionMessage: 'Add WidgetsBindingObserver and pause camera in didChangeAppLifecycleState.',
+    correctionMessage:
+        'Add WidgetsBindingObserver and pause camera in didChangeAppLifecycleState.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
