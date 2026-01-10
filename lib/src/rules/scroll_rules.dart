@@ -78,11 +78,35 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
       final AstNode? scrollableWidget = _findParentScrollable(node);
       if (scrollableWidget == null) return;
 
+      // Skip if the scrollable has NeverScrollableScrollPhysics
+      // Check the siblings of shrinkWrap for physics argument
+      if (_hasNeverScrollablePhysicsInSiblings(node)) return;
+
       // Check if that scrollable is inside another scrollable
       if (_isInsideScrollable(scrollableWidget)) {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  /// Check if sibling arguments include physics: NeverScrollableScrollPhysics()
+  bool _hasNeverScrollablePhysicsInSiblings(NamedExpression shrinkWrapNode) {
+    final AstNode? argumentList = shrinkWrapNode.parent;
+    if (argumentList is! ArgumentList) return false;
+
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'physics') {
+        final Expression physicsValue = arg.expression;
+        if (physicsValue is InstanceCreationExpression) {
+          final String typeName =
+              physicsValue.constructorName.type.name2.lexeme;
+          if (typeName == 'NeverScrollableScrollPhysics') {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   /// Find the parent scrollable widget (ListView, GridView, etc.)
