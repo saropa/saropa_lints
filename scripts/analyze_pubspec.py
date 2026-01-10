@@ -38,7 +38,7 @@ except ImportError:
     sys.exit(1)
 
 
-SCRIPT_VERSION = "2.3"
+SCRIPT_VERSION = "2.5"
 
 
 # =============================================================================
@@ -253,16 +253,6 @@ class RelevantRule:
 
 TIER_ORDER = ["essential", "recommended", "professional", "comprehensive", "insanity"]
 
-TIER_RULE_COUNTS = {
-    "essential": 50,
-    "recommended": 150,
-    "professional": 250,
-    "comprehensive": 400,
-    "insanity": 475,
-}
-
-TOTAL_RULES = TIER_RULE_COUNTS["insanity"]
-
 TIER_DESCRIPTIONS = {
     "essential": "Critical safety (crashes, security, memory leaks)",
     "recommended": "Essential + performance, accessibility, common mistakes",
@@ -270,6 +260,60 @@ TIER_DESCRIPTIONS = {
     "comprehensive": "Professional + thorough code quality",
     "insanity": "Everything (noisy, for greenfield projects)",
 }
+
+
+def count_tier_rules() -> tuple[dict[str, int], int]:
+    """
+    Count rules in each tier by reading the YAML files.
+    Returns (tier_counts, total_rules).
+    """
+    script_dir = Path(__file__).parent
+    tiers_dir = script_dir.parent / "lib" / "tiers"
+
+    # Fallback counts if files not found
+    fallback_counts = {
+        "essential": 45,
+        "recommended": 150,
+        "professional": 350,
+        "comprehensive": 700,
+        "insanity": 1025,
+    }
+
+    if not tiers_dir.exists():
+        return fallback_counts, fallback_counts["insanity"]
+
+    tier_counts: dict[str, int] = {}
+    cumulative = 0
+
+    for tier in TIER_ORDER:
+        tier_file = tiers_dir / f"{tier}.yaml"
+        if not tier_file.exists():
+            tier_counts[tier] = fallback_counts.get(tier, 0)
+            continue
+
+        try:
+            with open(tier_file, 'r', encoding='utf-8') as f:
+                tier_data = yaml.safe_load(f)
+
+            # Count rules in this tier's custom_lint.rules section
+            rules_in_tier = 0
+            if tier_data and 'custom_lint' in tier_data:
+                rules = tier_data['custom_lint'].get('rules', {})
+                if isinstance(rules, dict):
+                    rules_in_tier = len([k for k, v in rules.items() if v is True])
+
+            cumulative += rules_in_tier
+            tier_counts[tier] = cumulative
+
+        except Exception:
+            tier_counts[tier] = fallback_counts.get(tier, 0)
+
+    total = tier_counts.get("insanity", fallback_counts["insanity"])
+    return tier_counts, total
+
+
+# Initialize tier counts
+TIER_RULE_COUNTS, TOTAL_RULES = count_tier_rules()
 
 
 # =============================================================================
