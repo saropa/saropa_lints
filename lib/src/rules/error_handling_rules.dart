@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when catch block swallows exception without logging.
 ///
+/// Alias: empty_catch, silent_catch, no_empty_catch_block
+///
 /// Empty catch blocks hide errors and make debugging difficult.
 ///
 /// **BAD:**
@@ -133,6 +135,8 @@ class _IdentifierUsageVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when stack trace is lost in catch block.
+///
+/// Alias: preserve_stack_trace, lost_stack_trace, capture_stack_trace
 ///
 /// Losing stack trace makes debugging production issues nearly impossible.
 ///
@@ -254,6 +258,8 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when Future errors are not handled.
+///
+/// Alias: unhandled_future, fire_and_forget_future, add_catch_error
 ///
 /// Unhandled Future errors crash the app or go unnoticed. When a Future
 /// is "fire and forget" (called without awaiting), any errors it throws
@@ -441,6 +447,8 @@ class _AddCatchErrorFix extends DartFix {
 
 /// Warns when using generic Exception instead of specific types.
 ///
+/// Alias: specific_exception, no_generic_exception, typed_exception
+///
 /// Generic exceptions provide less context for error handling.
 ///
 /// **BAD:**
@@ -486,6 +494,8 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
 }
 
 /// Warns when error messages don't include context.
+///
+/// Alias: descriptive_error, error_message_context, detailed_exception
 ///
 /// Error messages without context are hard to debug.
 ///
@@ -544,6 +554,8 @@ class RequireErrorContextRule extends SaropaLintRule {
 }
 
 /// Warns when Result pattern is not used for expected failures.
+///
+/// Alias: use_result_type, either_pattern, result_vs_exception
 ///
 /// Functions that can fail should return Result instead of throwing.
 ///
@@ -627,6 +639,8 @@ class _ThrowCountVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when async function doesn't handle errors internally.
+///
+/// Alias: document_throws, async_error_handling, throws_annotation
 ///
 /// Async functions should either handle errors or document that they throw.
 ///
@@ -720,7 +734,83 @@ class _AsyncAnalysisVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
+/// Warns when try statements are nested.
+///
+/// Alias: nested_try_catch, flatten_try_catch, extract_try_block
+///
+/// Nested try-catch blocks make code harder to read and maintain.
+/// Consider extracting nested logic into separate functions.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   try {
+///     await riskyOperation();
+///   } catch (e) {
+///     // Handle inner error
+///   }
+/// } catch (e) {
+///   // Handle outer error
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await _safeRiskyOperation();
+/// } catch (e) {
+///   // Handle error
+/// }
+///
+/// Future<void> _safeRiskyOperation() async {
+///   try {
+///     await riskyOperation();
+///   } catch (e) {
+///     // Handle or transform error
+///     rethrow;
+///   }
+/// }
+/// ```
+class AvoidNestedTryStatementsRule extends SaropaLintRule {
+  const AvoidNestedTryStatementsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_nested_try_statements',
+    problemMessage: 'Avoid nested try statements.',
+    correctionMessage: 'Extract inner try-catch into a separate function.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addTryStatement((TryStatement node) {
+      // Check if this try is nested inside another try
+      AstNode? parent = node.parent;
+      while (parent != null) {
+        if (parent is TryStatement) {
+          reporter.atNode(node, code);
+          return;
+        }
+        // Stop at function/method boundaries
+        if (parent is FunctionExpression || parent is MethodDeclaration) {
+          break;
+        }
+        parent = parent.parent;
+      }
+    });
+  }
+}
+
 /// Warns when error boundary widget is missing.
+///
+/// Alias: app_error_boundary, error_widget, crash_handler
 ///
 /// Apps should have error boundaries to prevent crashes from propagating.
 ///
@@ -781,5 +871,97 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+}
+
+/// Warns when Future lacks error handling.
+///
+/// Alias: catch_future_errors, future_error_handler, handle_future_exception
+///
+/// Unhandled Future errors can crash the app or cause silent failures.
+/// Always use catchError, try-catch, or onError handling.
+///
+/// **BAD:**
+/// ```dart
+/// fetchData(); // Fire-and-forget without error handling
+/// await fetchData(); // Without try-catch
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// fetchData().catchError((e) => handleError(e));
+/// try {
+///   await fetchData();
+/// } catch (e) {
+///   handleError(e);
+/// }
+/// unawaited(fetchData().catchError(handleError));
+/// ```
+class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
+  const AvoidUncaughtFutureErrorsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_uncaught_future_errors',
+    problemMessage: 'Future without error handling may crash app.',
+    correctionMessage: 'Add .catchError(), try-catch, or handle with onError.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addExpressionStatement((ExpressionStatement node) {
+      final Expression expression = node.expression;
+
+      // Check for fire-and-forget Future calls
+      if (expression is MethodInvocation) {
+        final String? returnType = expression.staticType?.toString();
+        if (returnType != null &&
+            (returnType.startsWith('Future') ||
+                returnType.startsWith('Future<'))) {
+          // Check if it has .catchError or .onError
+          if (!_hasCatchError(expression)) {
+            reporter.atNode(expression, code);
+          }
+        }
+      }
+
+      // Check for await without try-catch
+      if (expression is AwaitExpression) {
+        if (!_isInsideTryCatch(node)) {
+          reporter.atNode(expression, code);
+        }
+      }
+    });
+  }
+
+  bool _hasCatchError(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName == 'catchError' || methodName == 'onError') {
+      return true;
+    }
+    // Check if it's chained .catchError
+    final Expression? target = node.target;
+    if (target is MethodInvocation) {
+      return _hasCatchError(target);
+    }
+    return false;
+  }
+
+  bool _isInsideTryCatch(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is TryStatement) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }

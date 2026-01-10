@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when Gradient objects are created inside build().
 ///
+/// Alias: gradient_in_build, no_gradient_in_build, cache_gradient
+///
 /// Creating Gradient objects in build() prevents Flutter from reusing them,
 /// causing unnecessary object allocations on every rebuild.
 ///
@@ -112,6 +114,8 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
 }
 
 /// Warns when showDialog is called inside build().
+///
+/// Alias: dialog_in_build, no_show_dialog_in_build, infinite_dialog_loop
 ///
 /// Calling showDialog in build() causes infinite dialog loops because
 /// build() is called repeatedly and each call opens a new dialog.
@@ -246,6 +250,8 @@ class _DialogVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when showSnackBar is called inside build().
 ///
+/// Alias: snackbar_in_build, no_snackbar_in_build, repeated_snackbar
+///
 /// Calling showSnackBar in build() causes repeated snackbars on every
 /// rebuild, flooding the snackbar queue.
 ///
@@ -337,6 +343,8 @@ class _SnackbarVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when analytics calls are made inside build().
+///
+/// Alias: analytics_in_build, no_tracking_in_build, duplicate_analytics_events
 ///
 /// Analytics calls in build() fire on every rebuild, causing duplicate
 /// events and inaccurate tracking data.
@@ -443,6 +451,8 @@ class _AnalyticsVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when jsonEncode is called inside build().
 ///
+/// Alias: json_in_build, no_json_encode_in_build, expensive_build_operation
+///
 /// JSON encoding is expensive. Doing it in build() causes performance issues
 /// because build() is called frequently (60fps during animations).
 ///
@@ -526,6 +536,8 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when GetIt.I or GetIt.instance is used inside build().
+///
+/// Alias: getit_in_build, service_locator_in_build, inject_dependencies
 ///
 /// Service locator calls in build() hide dependencies and make
 /// testing difficult. Inject dependencies via constructor instead.
@@ -616,6 +628,8 @@ class _GetItVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when Canvas operations are used outside of CustomPainter.
 ///
+/// Alias: canvas_in_build, no_canvas_in_build, use_custom_painter
+///
 /// Canvas operations should only be in CustomPainter.paint(), not in
 /// build methods or other locations.
 ///
@@ -675,6 +689,8 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
 }
 
 /// Warns when hardcoded feature flags (if true/false) are used.
+///
+/// Alias: literal_boolean_condition, if_true_if_false, dead_code_condition
 ///
 /// Hardcoded conditions like `if (true)` or `if (false)` suggest
 /// incomplete feature flag implementation or dead code.
@@ -756,6 +772,280 @@ class _AddFeatureFlagTodoFix extends DartFix {
           '// TODO: Replace hardcoded ${condition.value} with feature flag\n    ',
         );
       });
+    });
+  }
+}
+
+/// Warns when multiple setState calls are made in the same method.
+///
+/// Alias: combine_setstate, multiple_setstate, batch_setstate
+///
+/// Multiple setState calls cause multiple rebuilds. Combine them for
+/// better performance.
+///
+/// **BAD:**
+/// ```dart
+/// void updateData() {
+///   setState(() { _name = 'John'; });
+///   setState(() { _age = 30; });
+///   setState(() { _email = 'j@e.com'; });
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void updateData() {
+///   setState(() {
+///     _name = 'John';
+///     _age = 30;
+///     _email = 'j@e.com';
+///   });
+/// }
+/// ```
+class PreferSingleSetStateRule extends SaropaLintRule {
+  const PreferSingleSetStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_single_setstate',
+    problemMessage: 'Multiple setState calls cause unnecessary rebuilds.',
+    correctionMessage: 'Combine setState calls into a single call.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Skip build methods - this rule is for other methods
+      if (node.name.lexeme == 'build') return;
+
+      int setStateCount = 0;
+      MethodInvocation? firstSetState;
+
+      node.body.visitChildren(_SetStateCountVisitor(
+        onSetState: (MethodInvocation inv) {
+          setStateCount++;
+          firstSetState ??= inv;
+        },
+      ));
+
+      if (setStateCount > 1 && firstSetState != null) {
+        reporter.atNode(firstSetState!, code);
+      }
+    });
+  }
+}
+
+class _SetStateCountVisitor extends RecursiveAstVisitor<void> {
+  _SetStateCountVisitor({required this.onSetState});
+
+  final void Function(MethodInvocation) onSetState;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState') {
+      onSetState(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when Isolate.run is used for simple computations.
+///
+/// Alias: use_compute, isolate_run_overhead, prefer_compute_function
+///
+/// For simple, quick operations, the overhead of spawning an isolate
+/// is greater than running inline. Use compute() for heavy work.
+///
+/// **BAD:**
+/// ```dart
+/// final result = await Isolate.run(() => a + b); // Too simple
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = a + b; // Simple math - no isolate needed
+///
+/// // For heavy computation:
+/// final result = await compute(parseJson, jsonString);
+/// ```
+class PreferComputeOverIsolateRunRule extends SaropaLintRule {
+  const PreferComputeOverIsolateRunRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_compute_over_isolate_run',
+    problemMessage: 'Consider using compute() instead of Isolate.run().',
+    correctionMessage: 'compute() provides better error handling and typing.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'run') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Isolate') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when List.generate is used in widget children.
+///
+/// Alias: no_list_generate_in_children, collection_for_children, prefer_collection_for
+///
+/// For building widget lists, prefer for-in collection or spread
+/// for better readability and performance.
+///
+/// **BAD:**
+/// ```dart
+/// Column(
+///   children: List.generate(items.length, (i) => Text(items[i])),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Column(
+///   children: [for (final item in items) Text(item)],
+/// )
+/// // Or:
+/// Column(
+///   children: items.map((item) => Text(item)).toList(),
+/// )
+/// ```
+class PreferForLoopInChildrenRule extends SaropaLintRule {
+  const PreferForLoopInChildrenRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_for_loop_in_children',
+    problemMessage: 'Prefer collection-for over List.generate in children.',
+    correctionMessage: 'Use [for (final item in items) Widget(item)].',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'generate') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'List') return;
+
+      // Check if inside a children argument
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is NamedExpression &&
+            current.name.label.name == 'children') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when multiple decoration widgets could be a Container.
+///
+/// Alias: combine_decoration_widgets, nested_padding_decoratedbox, use_container
+///
+/// Using nested Padding, DecoratedBox, etc. is verbose when
+/// Container provides all these features in one widget.
+///
+/// **BAD:**
+/// ```dart
+/// Padding(
+///   padding: EdgeInsets.all(8),
+///   child: DecoratedBox(
+///     decoration: BoxDecoration(color: Colors.red),
+///     child: SizedBox(width: 100, height: 100, child: child),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Container(
+///   padding: EdgeInsets.all(8),
+///   decoration: BoxDecoration(color: Colors.red),
+///   width: 100,
+///   height: 100,
+///   child: child,
+/// )
+/// ```
+class PreferContainerRule extends SaropaLintRule {
+  const PreferContainerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_container',
+    problemMessage: 'Nested decoration widgets could be a single Container.',
+    correctionMessage: 'Use Container with padding, decoration, and size.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _containerRelatedWidgets = <String>{
+    'Padding',
+    'DecoratedBox',
+    'SizedBox',
+    'ColoredBox',
+    'Align',
+    'Center',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (!_containerRelatedWidgets.contains(typeName)) return;
+
+      // Check if child is also a container-related widget
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression childExpr = arg.expression;
+          if (childExpr is InstanceCreationExpression) {
+            final String? childType =
+                childExpr.constructorName.type.element?.name;
+            if (_containerRelatedWidgets.contains(childType)) {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
     });
   }
 }

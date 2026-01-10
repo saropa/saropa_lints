@@ -16,6 +16,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when sensitive data might be logged.
 ///
+/// Alias: no_sensitive_logs, pii_in_logs, credential_logging
+///
 /// Logging PII (Personally Identifiable Information) or sensitive data
 /// can expose it in crash reports, log files, or debugging tools.
 ///
@@ -218,6 +220,8 @@ class _AddTodoForSensitiveLoggingFix extends DartFix {
 
 /// Warns when SharedPreferences is used for sensitive data.
 ///
+/// Alias: use_secure_storage, no_plaintext_storage, encrypted_storage
+///
 /// SharedPreferences stores data in plain text and is not suitable
 /// for sensitive information like tokens, passwords, or PII.
 ///
@@ -306,6 +310,8 @@ class RequireSecureStorageRule extends SaropaLintRule {
 }
 
 /// Warns when hardcoded credentials are detected in source code.
+///
+/// Alias: no_hardcoded_secrets, embedded_credentials, hardcoded_password
 ///
 /// Credentials should never be hardcoded. Use environment variables,
 /// secure vaults, or configuration files that are not committed.
@@ -447,6 +453,8 @@ class _AddTodoForHardcodedCredentialsFix extends DartFix {
 }
 
 /// Warns when user input is used without sanitization.
+///
+/// Alias: validate_input, sanitize_user_input, injection_prevention
 ///
 /// Unsanitized user input can lead to injection attacks, XSS,
 /// or other security vulnerabilities.

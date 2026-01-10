@@ -365,6 +365,90 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
   }
 }
 
+/// Warns when the non-null assertion operator (!) is used.
+///
+/// The `!` operator can cause runtime crashes if the value is null.
+/// Prefer null-aware operators or explicit null checks.
+///
+/// **BAD:**
+/// ```dart
+/// final name = user.name!; // Crashes if null
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final name = user.name ?? 'Unknown';
+/// // Or use null-aware access
+/// final length = user.name?.length;
+/// ```
+class AvoidNonNullAssertionRule extends SaropaLintRule {
+  const AvoidNonNullAssertionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_non_null_assertion',
+    problemMessage: 'Avoid using the non-null assertion operator (!).',
+    correctionMessage: 'Use null-aware operators or explicit null checks.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPostfixExpression((PostfixExpression node) {
+      if (node.operator.lexeme == '!') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when `as` keyword is used for type casting.
+///
+/// Type casts with `as` can throw at runtime. Prefer `is` checks
+/// or pattern matching for safer type narrowing.
+///
+/// **BAD:**
+/// ```dart
+/// final widget = obj as Widget;
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (obj is Widget) {
+///   // obj is automatically cast to Widget
+/// }
+/// ```
+class AvoidTypeCastsRule extends SaropaLintRule {
+  const AvoidTypeCastsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_type_casts',
+    problemMessage: 'Type cast with "as" may throw at runtime.',
+    correctionMessage: 'Use "is" check or pattern matching instead.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAsExpression((AsExpression node) {
+      reporter.atNode(node, code);
+    });
+  }
+}
+
 /// Warns when FutureOr is used in public API without documentation.
 ///
 /// FutureOr can be confusing for API consumers and should be documented.
@@ -409,6 +493,84 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
       // Check if method has documentation
       if (node.documentationComment == null) {
         reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when generic types lack explicit type arguments.
+///
+/// Explicit type arguments improve code clarity and prevent
+/// accidental type inference issues.
+///
+/// **BAD:**
+/// ```dart
+/// final list = []; // List<dynamic>
+/// final map = {}; // Map<dynamic, dynamic>
+/// final future = Future.value(1); // Inferred
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final list = <String>[];
+/// final map = <String, int>{};
+/// final future = Future<int>.value(1);
+/// ```
+class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
+  const PreferExplicitTypeArgumentsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_explicit_type_arguments',
+    problemMessage: 'Generic type without explicit type arguments.',
+    correctionMessage: 'Add explicit type arguments for clarity.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addListLiteral((ListLiteral node) {
+      // Check for empty list without type args
+      if (node.typeArguments == null && node.elements.isEmpty) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+      // Check for empty map/set without type args
+      if (node.typeArguments == null && node.elements.isEmpty) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      // Check for generic types without explicit args
+      final TypeArgumentList? typeArgs = node.constructorName.type.typeArguments;
+      final String? typeName = node.constructorName.type.element?.name;
+
+      // Only check common generic types
+      const Set<String> genericTypes = <String>{
+        'Future',
+        'Stream',
+        'Completer',
+        'StreamController',
+        'ValueNotifier',
+        'BehaviorSubject',
+        'PublishSubject',
+      };
+
+      if (typeName != null &&
+          genericTypes.contains(typeName) &&
+          typeArgs == null) {
+        reporter.atNode(node.constructorName, code);
       }
     });
   }

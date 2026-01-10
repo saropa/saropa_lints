@@ -3054,3 +3054,543 @@ class _KeyConsistencyVisitor extends RecursiveAstVisitor<void> {
     super.visitReturnStatement(node);
   }
 }
+
+// =============================================================================
+// Platform-Specific Rules
+// =============================================================================
+
+/// Warns when MethodChannel is used without web platform check.
+///
+/// MethodChannel is not available on web. Using it without a platform check
+/// will crash the web build.
+///
+/// **BAD:**
+/// ```dart
+/// final platform = MethodChannel('my_channel');
+/// final result = await platform.invokeMethod('getData');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (!kIsWeb) {
+///   final platform = MethodChannel('my_channel');
+///   final result = await platform.invokeMethod('getData');
+/// }
+/// ```
+class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
+  const AvoidPlatformChannelOnWebRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_platform_channel_on_web',
+    problemMessage: 'MethodChannel is not available on web platform.',
+    correctionMessage: 'Wrap with kIsWeb check or use conditional imports.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'MethodChannel' &&
+          typeName != 'EventChannel' &&
+          typeName != 'BasicMessageChannel') {
+        return;
+      }
+
+      // Check if wrapped in platform check
+      if (_hasWebPlatformCheck(node)) return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  bool _hasWebPlatformCheck(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (condition.contains('kIsWeb') ||
+            condition.contains('Platform.') ||
+            condition.contains('defaultTargetPlatform')) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when HTTP calls on web lack CORS handling.
+///
+/// Web browsers enforce CORS restrictions. HTTP calls may fail without
+/// proper CORS headers from the server or proxy configuration.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(Uri.parse('https://api.example.com/data'));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Either configure server CORS headers, or:
+/// final response = await http.get(
+///   Uri.parse('https://api.example.com/data'),
+///   headers: {'Access-Control-Allow-Origin': '*'},
+/// );
+/// // Or use a CORS proxy in development
+/// ```
+class RequireCorsHandlingRule extends SaropaLintRule {
+  const RequireCorsHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_cors_handling',
+    problemMessage: 'HTTP calls on web may require CORS handling.',
+    correctionMessage:
+        'Ensure server returns CORS headers or use appropriate configuration.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // This is a web-specific concern - check file path or conditionally run
+    final String path = resolver.path;
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for HTTP method calls
+      if (methodName != 'get' &&
+          methodName != 'post' &&
+          methodName != 'put' &&
+          methodName != 'delete' &&
+          methodName != 'patch') {
+        return;
+      }
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('http') && !targetSource.contains('Http')) {
+        return;
+      }
+
+      // Check if inside web-specific code or has CORS consideration
+      if (path.contains('_web.dart') || path.contains('/web/')) {
+        // Web-specific file, check for CORS handling
+        final String source = node.toSource();
+        if (!source.contains('cors') &&
+            !source.contains('CORS') &&
+            !source.contains('Access-Control')) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when large imports are not deferred on web.
+///
+/// Web apps should defer loading large libraries to improve initial load time.
+/// Use deferred loading for heavy packages.
+///
+/// **BAD:**
+/// ```dart
+/// import 'package:heavy_charts/charts.dart';
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:heavy_charts/charts.dart' deferred as charts;
+///
+/// // Then load when needed:
+/// await charts.loadLibrary();
+/// charts.LineChart(...)
+/// ```
+class PreferDeferredLoadingWebRule extends SaropaLintRule {
+  const PreferDeferredLoadingWebRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_deferred_loading_web',
+    problemMessage: 'Consider deferred loading for large packages on web.',
+    correctionMessage: 'Use "deferred as" import for better web load times.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // Packages that are typically large and should be deferred on web
+  static const Set<String> _heavyPackages = <String>{
+    'fl_chart',
+    'syncfusion',
+    'charts',
+    'flutter_map',
+    'google_maps',
+    'video_player',
+    'camera',
+    'pdf',
+    'printing',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+
+      // Check if importing a heavy package
+      bool isHeavy = false;
+      for (final String pkg in _heavyPackages) {
+        if (uri.contains(pkg)) {
+          isHeavy = true;
+          break;
+        }
+      }
+
+      if (!isHeavy) return;
+
+      // Check if deferred
+      if (node.deferredKeyword == null) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when desktop app lacks menu bar.
+///
+/// Desktop apps should have a menu bar for keyboard shortcuts and
+/// standard desktop interactions.
+///
+/// **BAD:**
+/// ```dart
+/// MaterialApp(
+///   home: Scaffold(...),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MaterialApp(
+///   builder: (context, child) => PlatformMenuBar(
+///     menus: [...],
+///     child: child!,
+///   ),
+///   home: Scaffold(...),
+/// )
+/// ```
+class RequireMenuBarForDesktopRule extends SaropaLintRule {
+  const RequireMenuBarForDesktopRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_menu_bar_for_desktop',
+    problemMessage: 'Desktop app should have a PlatformMenuBar.',
+    correctionMessage: 'Add PlatformMenuBar for standard desktop experience.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    bool hasPlatformMenuBar = false;
+    InstanceCreationExpression? materialApp;
+
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName == 'PlatformMenuBar' || typeName == 'MenuBar') {
+        hasPlatformMenuBar = true;
+      }
+
+      if (typeName == 'MaterialApp' || typeName == 'CupertinoApp') {
+        materialApp = node;
+      }
+    });
+
+    context.addPostRunCallback(() {
+      // Only report for desktop platforms
+      final String path = resolver.path;
+      if (path.contains('_desktop') ||
+          path.contains('_macos') ||
+          path.contains('_windows') ||
+          path.contains('_linux')) {
+        if (materialApp != null && !hasPlatformMenuBar) {
+          reporter.atNode(materialApp!.constructorName, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when touch-only gestures are used on desktop.
+///
+/// Desktop apps should support mouse interactions. GestureDetector without
+/// mouse handlers limits desktop usability.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: _handleTap,
+///   child: widget,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MouseRegion(
+///   cursor: SystemMouseCursors.click,
+///   child: GestureDetector(
+///     onTap: _handleTap,
+///     child: widget,
+///   ),
+/// )
+/// // Or better:
+/// InkWell(
+///   onTap: _handleTap,
+///   hoverColor: Colors.grey,
+///   child: widget,
+/// )
+/// ```
+class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
+  const AvoidTouchOnlyGesturesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_touch_only_gestures',
+    problemMessage: 'GestureDetector should support mouse on desktop.',
+    correctionMessage: 'Add MouseRegion or use InkWell for desktop support.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GestureDetector') return;
+
+      // Check for tap handler without mouse handling
+      bool hasTap = false;
+      bool hasMouseHandling = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'onTap') hasTap = true;
+          if (name.contains('onSecondary') ||
+              name.contains('onHover') ||
+              name.contains('cursor')) {
+            hasMouseHandling = true;
+          }
+        }
+      }
+
+      if (!hasTap) return;
+
+      // Check if wrapped in MouseRegion
+      if (_hasMouseRegionAncestor(node)) return;
+
+      if (!hasMouseHandling) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  bool _hasMouseRegionAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 5) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'MouseRegion') {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+}
+
+/// Warns when desktop app lacks window close confirmation.
+///
+/// Desktop apps with unsaved data should confirm before closing to
+/// prevent data loss.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   runApp(MyApp());
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() {
+///   WidgetsBinding.instance.addObserver(AppLifecycleObserver());
+///   runApp(MyApp());
+/// }
+///
+/// class AppLifecycleObserver extends WidgetsBindingObserver {
+///   @override
+///   Future<bool> didRequestAppExit() async {
+///     if (hasUnsavedChanges) {
+///       return showSaveDialog();
+///     }
+///     return true;
+///   }
+/// }
+/// ```
+class RequireWindowCloseConfirmationRule extends SaropaLintRule {
+  const RequireWindowCloseConfirmationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_window_close_confirmation',
+    problemMessage: 'Desktop app should handle window close confirmation.',
+    correctionMessage: 'Implement didRequestAppExit for save confirmation.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only check desktop-specific files
+    final String path = resolver.path;
+    if (!path.contains('_desktop') &&
+        !path.contains('_macos') &&
+        !path.contains('_windows') &&
+        !path.contains('_linux') &&
+        !path.contains('/macos/') &&
+        !path.contains('/windows/') &&
+        !path.contains('/linux/')) {
+      return;
+    }
+
+    bool hasAppExitHandler = false;
+    ClassDeclaration? observerClass;
+
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme == 'didRequestAppExit') {
+        hasAppExitHandler = true;
+      }
+    });
+
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name2.lexeme;
+        if (superName == 'WidgetsBindingObserver') {
+          observerClass = node;
+        }
+      }
+    });
+
+    context.addPostRunCallback(() {
+      if (observerClass != null && !hasAppExitHandler) {
+        reporter.atNode(observerClass!, code);
+      }
+    });
+  }
+}
+
+/// Warns when custom file dialog is used instead of native on desktop.
+///
+/// Desktop platforms have native file dialogs that users expect.
+/// Using custom dialogs creates inconsistent UX.
+///
+/// **BAD:**
+/// ```dart
+/// showDialog(
+///   context: context,
+///   builder: (context) => CustomFilePicker(),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await FilePicker.platform.pickFiles();
+/// // Or use file_selector package for desktop-native experience
+/// ```
+class PreferNativeFileDialogsRule extends SaropaLintRule {
+  const PreferNativeFileDialogsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_native_file_dialogs',
+    problemMessage: 'Consider using native file dialogs on desktop.',
+    correctionMessage: 'Use file_picker or file_selector for native experience.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'showDialog') return;
+
+      // Check if dialog is for file selection
+      final ArgumentList args = node.argumentList;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
+          if (builderSource.contains('File') &&
+              (builderSource.contains('Picker') ||
+                  builderSource.contains('Selector') ||
+                  builderSource.contains('Browser'))) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+}

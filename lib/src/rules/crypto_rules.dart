@@ -15,6 +15,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when encryption keys appear to be hardcoded.
 ///
+/// Alias: no_hardcoded_key, hardcoded_secret_key, embedded_encryption_key
+///
 /// Hardcoded encryption keys in source code can be extracted from
 /// compiled applications (APK, IPA). Keys should be stored securely
 /// or derived at runtime.
@@ -121,6 +123,8 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
 }
 
 /// Warns when Random() is used for cryptographic purposes.
+///
+/// Alias: use_secure_random, random_vs_secure_random, insecure_random
 ///
 /// Random() uses a predictable PRNG that can be reverse-engineered.
 /// Use Random.secure() for any security-sensitive random generation.
@@ -248,6 +252,8 @@ class _UseSecureRandomFix extends DartFix {
 
 /// Warns when deprecated cryptographic algorithms are used.
 ///
+/// Alias: no_md5, no_sha1, weak_hash_algorithm, insecure_hash
+///
 /// MD5 and SHA1 are broken for security purposes. DES and 3DES
 /// are also deprecated. Use modern algorithms instead.
 ///
@@ -327,6 +333,8 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
 }
 
 /// Warns when static or reused IVs are detected in encryption.
+///
+/// Alias: static_iv, reused_iv, iv_reuse, nonce_reuse
 ///
 /// Reusing an IV (Initialization Vector) with the same key breaks
 /// the security of most encryption modes. Each encryption operation

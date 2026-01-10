@@ -616,3 +616,282 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when raw DateTime formatting is used instead of DateFormat.
+///
+/// DateTime.toString() and manual formatting produce inconsistent results
+/// across locales. Use DateFormat from intl package for proper i18n.
+///
+/// **BAD:**
+/// ```dart
+/// Text(dateTime.toString())
+/// Text('${date.year}-${date.month}-${date.day}')
+/// Text(date.toIso8601String()) // In UI
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(DateFormat.yMd(locale).format(dateTime))
+/// Text(DateFormat('yyyy-MM-dd').format(date))
+/// ```
+class PreferDateFormatRule extends SaropaLintRule {
+  const PreferDateFormatRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_date_format',
+    problemMessage: 'Raw DateTime formatting ignores user locale.',
+    correctionMessage: 'Use DateFormat from intl package for locale-aware formatting.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for DateTime.toString() in UI context
+      if (methodName == 'toString' || methodName == 'toIso8601String') {
+        final Expression? target = node.realTarget;
+        if (target != null) {
+          final String? targetType = target.staticType?.toString();
+          if (targetType == 'DateTime' || targetType == 'DateTime?') {
+            // Check if inside string interpolation or Text widget
+            if (_isInUiContext(node)) {
+              reporter.atNode(node, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  bool _isInUiContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InterpolationExpression ||
+          current is StringInterpolation) {
+        return true;
+      }
+      if (current is InstanceCreationExpression) {
+        final String? name = current.constructorName.type.element?.name;
+        if (name == 'Text' || name == 'RichText') {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when Intl.message lacks the name parameter.
+///
+/// The name parameter is required for message extraction tools and
+/// enables proper identification of messages across the codebase.
+///
+/// **BAD:**
+/// ```dart
+/// Intl.message('Welcome back')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Intl.message('Welcome back', name: 'welcomeBack')
+/// ```
+class PreferIntlNameRule extends SaropaLintRule {
+  const PreferIntlNameRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_intl_name',
+    problemMessage: 'Intl.message without name parameter.',
+    correctionMessage: 'Add name parameter for message extraction tools.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_isIntlMessage(node)) return;
+
+      if (!_hasNamedParameter(node, 'name')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isIntlMessage(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName != 'message') return false;
+
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier && target.name == 'Intl') {
+      return true;
+    }
+    return false;
+  }
+
+  bool _hasNamedParameter(MethodInvocation node, String paramName) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == paramName) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Warns when Intl.message lacks a description parameter.
+///
+/// Descriptions help translators understand context and produce
+/// accurate translations.
+///
+/// **BAD:**
+/// ```dart
+/// Intl.message('Save', name: 'save')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Intl.message(
+///   'Save',
+///   name: 'save',
+///   desc: 'Button label to save current document',
+/// )
+/// ```
+class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
+  const PreferProvidingIntlDescriptionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_providing_intl_description',
+    problemMessage: 'Intl.message without description.',
+    correctionMessage: 'Add desc parameter to help translators understand context.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_isIntlMessage(node)) return;
+
+      if (!_hasNamedParameter(node, 'desc')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isIntlMessage(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName != 'message') return false;
+
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier && target.name == 'Intl') {
+      return true;
+    }
+    return false;
+  }
+
+  bool _hasNamedParameter(MethodInvocation node, String paramName) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == paramName) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Warns when Intl.message with placeholders lacks examples.
+///
+/// Examples help translators see how placeholders are used and
+/// produce grammatically correct translations.
+///
+/// **BAD:**
+/// ```dart
+/// Intl.message(
+///   'Hello $name',
+///   name: 'greeting',
+///   args: [name],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Intl.message(
+///   'Hello $name',
+///   name: 'greeting',
+///   args: [name],
+///   examples: const {'name': 'John'},
+/// )
+/// ```
+class PreferProvidingIntlExamplesRule extends SaropaLintRule {
+  const PreferProvidingIntlExamplesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_providing_intl_examples',
+    problemMessage: 'Intl.message with args but no examples.',
+    correctionMessage: 'Add examples parameter to help translators.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_isIntlMessage(node)) return;
+
+      // Only check if args parameter is present
+      if (!_hasNamedParameter(node, 'args')) return;
+
+      if (!_hasNamedParameter(node, 'examples')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isIntlMessage(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (methodName != 'message') return false;
+
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier && target.name == 'Intl') {
+      return true;
+    }
+    return false;
+  }
+
+  bool _hasNamedParameter(MethodInvocation node, String paramName) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == paramName) {
+        return true;
+      }
+    }
+    return false;
+  }
+}

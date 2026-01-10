@@ -2944,6 +2944,8 @@ class _DisposableField {
 
 /// Requires Timer and StreamSubscription fields to be cancelled in dispose().
 ///
+/// Alias: require_timer_cancel
+///
 /// Timers and stream subscriptions that aren't cancelled will continue running
 /// after the widget is disposed, causing:
 /// - Crashes if they call setState on a disposed widget
@@ -3797,8 +3799,9 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Future rule: require-animation-disposal
 /// Warns when AnimationController is created without proper disposal.
+///
+/// Alias: require_animation_controller_dispose
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -8672,6 +8675,8 @@ class _AddTextOverflowFix extends DartFix {
 }
 
 /// Requires Image.network to have an errorBuilder for handling load failures.
+///
+/// Alias: require_image_error_fallback
 ///
 /// Network images can fail to load due to connectivity issues, invalid URLs,
 /// or server errors. Without an errorBuilder, users see broken image icons.
@@ -13940,5 +13945,1047 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
       depth++;
     }
     return false;
+  }
+}
+
+/// Warns when `SizedBox(width: X, height: X)` with identical dimensions is used.
+///
+/// Use `SizedBox.square(dimension: X)` for clearer intent when width and height
+/// are the same value.
+///
+/// **BAD:**
+/// ```dart
+/// SizedBox(width: 50, height: 50)
+/// SizedBox(width: size, height: size)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SizedBox.square(dimension: 50)
+/// SizedBox.square(dimension: size)
+/// ```
+///
+/// **Quick fix available:** Replaces with `SizedBox.square(dimension: X)`.
+class PreferSizedBoxSquareRule extends SaropaLintRule {
+  const PreferSizedBoxSquareRule() : super(code: _code);
+
+  /// Style preference. Large counts acceptable.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sized_box_square',
+    problemMessage:
+        'SizedBox has identical width and height. Use SizedBox.square() instead.',
+    correctionMessage:
+        'Replace with SizedBox.square(dimension: X) for clearer intent.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      // Only check SizedBox constructors (not SizedBox.square, etc.)
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (typeName != 'SizedBox') return;
+
+      // Skip named constructors like SizedBox.square, SizedBox.shrink
+      if (constructorName.name != null) return;
+
+      String? widthSource;
+      String? heightSource;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'width') {
+            widthSource = arg.expression.toSource();
+          } else if (name == 'height') {
+            heightSource = arg.expression.toSource();
+          }
+        }
+      }
+
+      // Must have both width and height
+      if (widthSource == null || heightSource == null) return;
+
+      // Check if they are identical
+      if (widthSource == heightSource) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferSizedBoxSquareFix()];
+}
+
+class _PreferSizedBoxSquareFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (typeName != 'SizedBox') return;
+      if (constructorName.name != null) return;
+
+      String? dimensionSource;
+      String? keySource;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'width') {
+            dimensionSource = arg.expression.toSource();
+          } else if (name == 'key') {
+            keySource = arg.expression.toSource();
+          }
+        }
+      }
+
+      if (dimensionSource == null) return;
+
+      // Check for const context
+      final bool hasConst =
+          node.keyword?.lexeme == 'const' || _isInConstContext(node);
+      final String constPrefix = hasConst ? 'const ' : '';
+
+      // Build replacement
+      final StringBuffer replacement = StringBuffer();
+      replacement.write('${constPrefix}SizedBox.square(');
+
+      final List<String> args = <String>[];
+      if (keySource != null) args.add('key: $keySource');
+      args.add('dimension: $dimensionSource');
+      replacement.write(args.join(', '));
+      replacement.write(')');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with SizedBox.square',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          replacement.toString(),
+        );
+      });
+    });
+  }
+
+  bool _isInConstContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression &&
+          current.keyword?.lexeme == 'const') {
+        return true;
+      }
+      if (current is ListLiteral && current.constKeyword != null) {
+        return true;
+      }
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when `Align(alignment: Alignment.center, ...)` is used.
+///
+/// Use `Center` widget for clearer intent when centering content.
+/// `Center` is semantically clearer and slightly more efficient.
+///
+/// **BAD:**
+/// ```dart
+/// Align(
+///   alignment: Alignment.center,
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Center(
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **Quick fix available:** Replaces with `Center(child: ...)`.
+class PreferCenterOverAlignRule extends SaropaLintRule {
+  const PreferCenterOverAlignRule() : super(code: _code);
+
+  /// Style preference. Large counts acceptable.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_center_over_align',
+    problemMessage:
+        'Align with Alignment.center should use Center widget instead.',
+    correctionMessage: 'Replace with Center(child: ...) for clearer intent.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Align') return;
+
+      // Check if alignment is Alignment.center
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'alignment') {
+            final String alignmentSource = arg.expression.toSource();
+            if (alignmentSource == 'Alignment.center') {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferCenterOverAlignFix()];
+}
+
+class _PreferCenterOverAlignFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Align') return;
+
+      String? childSource;
+      String? keySource;
+      String? widthFactorSource;
+      String? heightFactorSource;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'child') {
+            childSource = arg.expression.toSource();
+          } else if (name == 'key') {
+            keySource = arg.expression.toSource();
+          } else if (name == 'widthFactor') {
+            widthFactorSource = arg.expression.toSource();
+          } else if (name == 'heightFactor') {
+            heightFactorSource = arg.expression.toSource();
+          }
+        }
+      }
+
+      // Check for const context
+      final bool hasConst =
+          node.keyword?.lexeme == 'const' || _isInConstContext(node);
+      final String constPrefix = hasConst ? 'const ' : '';
+
+      // Build replacement
+      final StringBuffer replacement = StringBuffer();
+      replacement.write('${constPrefix}Center(');
+
+      final List<String> args = <String>[];
+      if (keySource != null) args.add('key: $keySource');
+      if (widthFactorSource != null) {
+        args.add('widthFactor: $widthFactorSource');
+      }
+      if (heightFactorSource != null) {
+        args.add('heightFactor: $heightFactorSource');
+      }
+      if (childSource != null) args.add('child: $childSource');
+      replacement.write(args.join(', '));
+      replacement.write(')');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with Center',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          replacement.toString(),
+        );
+      });
+    });
+  }
+
+  bool _isInConstContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression &&
+          current.keyword?.lexeme == 'const') {
+        return true;
+      }
+      if (current is ListLiteral && current.constKeyword != null) {
+        return true;
+      }
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when `Container` is used only for alignment.
+///
+/// Use `Align` widget when Container is only used for the alignment property.
+/// This makes the intent clearer and is more efficient.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   alignment: Alignment.topLeft,
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Align(
+///   alignment: Alignment.topLeft,
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **Quick fix available:** Replaces with `Align(alignment: ..., child: ...)`.
+class PreferAlignOverContainerRule extends SaropaLintRule {
+  const PreferAlignOverContainerRule() : super(code: _code);
+
+  /// Style preference. Large counts acceptable.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_align_over_container',
+    problemMessage:
+        'Container with only alignment should use Align widget instead.',
+    correctionMessage:
+        'Replace with Align(alignment: ..., child: ...) for clearer intent.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      bool hasAlignment = false;
+      bool hasOtherArgs = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          switch (name) {
+            case 'alignment':
+              hasAlignment = true;
+            case 'child':
+            case 'key':
+              // These are allowed
+              break;
+            default:
+              hasOtherArgs = true;
+          }
+        } else {
+          hasOtherArgs = true;
+        }
+      }
+
+      // Report if Container only has alignment (+ optional key and child)
+      if (hasAlignment && !hasOtherArgs) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferAlignOverContainerFix()];
+}
+
+class _PreferAlignOverContainerFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      String? alignmentSource;
+      String? childSource;
+      String? keySource;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'alignment') {
+            alignmentSource = arg.expression.toSource();
+          } else if (name == 'child') {
+            childSource = arg.expression.toSource();
+          } else if (name == 'key') {
+            keySource = arg.expression.toSource();
+          }
+        }
+      }
+
+      if (alignmentSource == null) return;
+
+      // Check for const context
+      final bool hasConst =
+          node.keyword?.lexeme == 'const' || _isInConstContext(node);
+      final String constPrefix = hasConst ? 'const ' : '';
+
+      // Build replacement
+      final StringBuffer replacement = StringBuffer();
+      replacement.write('${constPrefix}Align(');
+
+      final List<String> args = <String>[];
+      if (keySource != null) args.add('key: $keySource');
+      args.add('alignment: $alignmentSource');
+      if (childSource != null) args.add('child: $childSource');
+      replacement.write(args.join(', '));
+      replacement.write(')');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with Align',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          replacement.toString(),
+        );
+      });
+    });
+  }
+
+  bool _isInConstContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression &&
+          current.keyword?.lexeme == 'const') {
+        return true;
+      }
+      if (current is ListLiteral && current.constKeyword != null) {
+        return true;
+      }
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when `Container` is used only for padding.
+///
+/// Use `Padding` widget when Container is only used for the padding property.
+/// This makes the intent clearer and is more efficient.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   padding: EdgeInsets.all(16),
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Padding(
+///   padding: EdgeInsets.all(16),
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **Quick fix available:** Replaces with `Padding(padding: ..., child: ...)`.
+class PreferPaddingOverContainerRule extends SaropaLintRule {
+  const PreferPaddingOverContainerRule() : super(code: _code);
+
+  /// Style preference. Large counts acceptable.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_padding_over_container',
+    problemMessage:
+        'Container with only padding should use Padding widget instead.',
+    correctionMessage:
+        'Replace with Padding(padding: ..., child: ...) for clearer intent.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      bool hasPadding = false;
+      bool hasOtherArgs = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          switch (name) {
+            case 'padding':
+              hasPadding = true;
+            case 'child':
+            case 'key':
+              // These are allowed
+              break;
+            default:
+              hasOtherArgs = true;
+          }
+        } else {
+          hasOtherArgs = true;
+        }
+      }
+
+      // Report if Container only has padding (+ optional key and child)
+      if (hasPadding && !hasOtherArgs) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferPaddingOverContainerFix()];
+}
+
+class _PreferPaddingOverContainerFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      String? paddingSource;
+      String? childSource;
+      String? keySource;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'padding') {
+            paddingSource = arg.expression.toSource();
+          } else if (name == 'child') {
+            childSource = arg.expression.toSource();
+          } else if (name == 'key') {
+            keySource = arg.expression.toSource();
+          }
+        }
+      }
+
+      if (paddingSource == null) return;
+
+      // Check for const context
+      final bool hasConst =
+          node.keyword?.lexeme == 'const' || _isInConstContext(node);
+      final String constPrefix = hasConst ? 'const ' : '';
+
+      // Build replacement
+      final StringBuffer replacement = StringBuffer();
+      replacement.write('${constPrefix}Padding(');
+
+      final List<String> args = <String>[];
+      if (keySource != null) args.add('key: $keySource');
+      args.add('padding: $paddingSource');
+      if (childSource != null) args.add('child: $childSource');
+      replacement.write(args.join(', '));
+      replacement.write(')');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with Padding',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          replacement.toString(),
+        );
+      });
+    });
+  }
+
+  bool _isInConstContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression &&
+          current.keyword?.lexeme == 'const') {
+        return true;
+      }
+      if (current is ListLiteral && current.constKeyword != null) {
+        return true;
+      }
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when `Container` is used only for constraints.
+///
+/// Use `ConstrainedBox` widget when Container is only used for constraints.
+/// This makes the intent clearer and is more efficient.
+///
+/// **BAD:**
+/// ```dart
+/// Container(
+///   constraints: BoxConstraints(maxWidth: 200),
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ConstrainedBox(
+///   constraints: BoxConstraints(maxWidth: 200),
+///   child: Text('Hello'),
+/// )
+/// ```
+///
+/// **Quick fix available:** Replaces with `ConstrainedBox(constraints: ..., child: ...)`.
+class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
+  const PreferConstrainedBoxOverContainerRule() : super(code: _code);
+
+  /// Style preference. Large counts acceptable.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_constrained_box_over_container',
+    problemMessage:
+        'Container with only constraints should use ConstrainedBox instead.',
+    correctionMessage:
+        'Replace with ConstrainedBox(constraints: ...) for clearer intent.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      bool hasConstraints = false;
+      bool hasOtherArgs = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          switch (name) {
+            case 'constraints':
+              hasConstraints = true;
+            case 'child':
+            case 'key':
+              // These are allowed
+              break;
+            default:
+              hasOtherArgs = true;
+          }
+        } else {
+          hasOtherArgs = true;
+        }
+      }
+
+      // Report if Container only has constraints (+ optional key and child)
+      if (hasConstraints && !hasOtherArgs) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferConstrainedBoxOverContainerFix()];
+}
+
+class _PreferConstrainedBoxOverContainerFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Container') return;
+
+      String? constraintsSource;
+      String? childSource;
+      String? keySource;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'constraints') {
+            constraintsSource = arg.expression.toSource();
+          } else if (name == 'child') {
+            childSource = arg.expression.toSource();
+          } else if (name == 'key') {
+            keySource = arg.expression.toSource();
+          }
+        }
+      }
+
+      if (constraintsSource == null) return;
+
+      // Check for const context
+      final bool hasConst =
+          node.keyword?.lexeme == 'const' || _isInConstContext(node);
+      final String constPrefix = hasConst ? 'const ' : '';
+
+      // Build replacement
+      final StringBuffer replacement = StringBuffer();
+      replacement.write('${constPrefix}ConstrainedBox(');
+
+      final List<String> args = <String>[];
+      if (keySource != null) args.add('key: $keySource');
+      args.add('constraints: $constraintsSource');
+      if (childSource != null) args.add('child: $childSource');
+      replacement.write(args.join(', '));
+      replacement.write(')');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with ConstrainedBox',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          replacement.toString(),
+        );
+      });
+    });
+  }
+
+  bool _isInConstContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression &&
+          current.keyword?.lexeme == 'const') {
+        return true;
+      }
+      if (current is ListLiteral && current.constKeyword != null) {
+        return true;
+      }
+      if (current is SetOrMapLiteral && current.constKeyword != null) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when Container is used only for a transform.
+///
+/// When Container only has a transform property, use Transform widget
+/// instead for better semantics and performance.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// Container(
+///   transform: Matrix4.rotationZ(0.5),
+///   child: Text('Rotated'),
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// Transform(
+///   transform: Matrix4.rotationZ(0.5),
+///   child: Text('Rotated'),
+/// )
+/// ```
+class PreferTransformOverContainerRule extends SaropaLintRule {
+  const PreferTransformOverContainerRule() : super(code: _code);
+
+  /// Code quality improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_transform_over_container',
+    problemMessage: 'Container with only transform should be a Transform.',
+    correctionMessage: 'Use Transform widget for transform-only containers.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'Container') return;
+
+      final ArgumentList args = node.argumentList;
+
+      bool hasTransform = false;
+      bool hasOtherProperties = false;
+
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'transform') {
+            hasTransform = true;
+          } else if (name != 'child' && name != 'key') {
+            // Has other visual properties
+            hasOtherProperties = true;
+          }
+        }
+      }
+
+      if (hasTransform && !hasOtherProperties) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when IconButton lacks a tooltip for accessibility.
+///
+/// IconButtons should have tooltips for accessibility - they describe
+/// the action for screen readers and on long-press for all users.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// IconButton(
+///   icon: Icon(Icons.delete),
+///   onPressed: () => deleteItem(),
+/// )
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// IconButton(
+///   icon: Icon(Icons.delete),
+///   onPressed: () => deleteItem(),
+///   tooltip: 'Delete item',
+/// )
+/// ```
+class PreferActionButtonTooltipRule extends SaropaLintRule {
+  const PreferActionButtonTooltipRule() : super(code: _code);
+
+  /// Accessibility improvement.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_action_button_tooltip',
+    problemMessage: 'IconButton should have a tooltip for accessibility.',
+    correctionMessage: 'Add tooltip parameter to describe the button action.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Buttons that should have tooltips
+  static const Set<String> _buttonTypes = <String>{
+    'IconButton',
+    'FloatingActionButton',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (!_buttonTypes.contains(typeName)) return;
+
+      final ArgumentList args = node.argumentList;
+
+      bool hasTooltip = false;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'tooltip') {
+          hasTooltip = true;
+          break;
+        }
+      }
+
+      if (!hasTooltip) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when void Function() is used instead of VoidCallback typedef.
+///
+/// Using VoidCallback typedef is cleaner and more conventional in Flutter.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final void Function() onPressed;
+/// void doSomething(void Function() callback) {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final VoidCallback onPressed;
+/// void doSomething(VoidCallback callback) {}
+/// ```
+class PreferVoidCallbackRule extends SaropaLintRule {
+  const PreferVoidCallbackRule() : super(code: _code);
+
+  /// Style improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_void_callback',
+    problemMessage: 'Use VoidCallback instead of void Function().',
+    correctionMessage: 'Replace with VoidCallback typedef.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addGenericFunctionType((GenericFunctionType node) {
+      // Check for void Function()
+      final TypeAnnotation? returnType = node.returnType;
+      if (returnType == null) return;
+
+      // Return type should be void
+      final String returnTypeName = returnType.toSource();
+      if (returnTypeName != 'void') return;
+
+      // Should have no parameters
+      final FormalParameterList? params = node.parameters;
+      if (params == null || params.parameters.isNotEmpty) return;
+
+      // Should have no type parameters
+      if (node.typeParameters != null) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceWithVoidCallbackFix()];
+}
+
+class _ReplaceWithVoidCallbackFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addGenericFunctionType((GenericFunctionType node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with VoidCallback',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.sourceRange,
+          'VoidCallback',
+        );
+      });
+    });
   }
 }

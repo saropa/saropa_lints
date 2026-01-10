@@ -17,6 +17,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when IconButton is used without a tooltip for accessibility.
 ///
+/// Alias: prefer_action_button_tooltip
+///
 /// IconButtons without tooltips are not accessible to screen readers.
 /// The tooltip provides the accessible label that screen readers announce.
 ///
@@ -1081,6 +1083,8 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
 
 /// Warns when Image widget lacks a semanticLabel for screen readers.
 ///
+/// Alias: require_image_description
+///
 /// Images without semanticLabel are invisible to screen readers, making
 /// content inaccessible to users with visual impairments. Use
 /// excludeFromSemantics: true only for purely decorative images.
@@ -2136,6 +2140,570 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+/// Warns when Image widget lacks semanticLabel or excludeFromSemantics.
+///
+/// Images need descriptions for screen reader users. Either provide a
+/// semanticLabel describing the image or explicitly exclude decorative
+/// images from semantics.
+///
+/// **BAD:**
+/// ```dart
+/// Image.network('https://example.com/photo.jpg')
+/// Image.asset('assets/logo.png')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.network(
+///   'https://example.com/photo.jpg',
+///   semanticLabel: 'Product photo showing blue widget',
+/// )
+/// // Or for decorative images:
+/// Image.asset(
+///   'assets/decoration.png',
+///   excludeFromSemantics: true,
+/// )
+/// ```
+class RequireImageDescriptionRule extends SaropaLintRule {
+  const RequireImageDescriptionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_description',
+    problemMessage:
+        'Image should have semanticLabel or excludeFromSemantics.',
+    correctionMessage:
+        'Add semanticLabel for content images or excludeFromSemantics: true '
+        'for decorative images.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Image') return;
+
+      bool hasSemanticLabel = false;
+      bool hasExclude = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'semanticLabel') hasSemanticLabel = true;
+          if (name == 'excludeFromSemantics') hasExclude = true;
+        }
+      }
+
+      if (!hasSemanticLabel && !hasExclude) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when excludeFromSemantics is used without a comment explaining why.
+///
+/// Excluding content from semantics should be a conscious decision.
+/// Add a comment explaining why the content is decorative.
+///
+/// **BAD:**
+/// ```dart
+/// Image.asset(
+///   'assets/icon.png',
+///   excludeFromSemantics: true,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Decorative background pattern, no informational content
+/// Image.asset(
+///   'assets/pattern.png',
+///   excludeFromSemantics: true,
+/// )
+/// ```
+class AvoidSemanticsExclusionRule extends SaropaLintRule {
+  const AvoidSemanticsExclusionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_semantics_exclusion',
+    problemMessage:
+        'excludeFromSemantics: true should have a comment explaining why.',
+    correctionMessage: 'Add a comment explaining why this is decorative content.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'excludeFromSemantics') return;
+
+      // Check if value is true
+      final Expression value = node.expression;
+      if (value is! BooleanLiteral || !value.value) return;
+
+      // Check for preceding comment
+      final bool hasComment = node.beginToken.precedingComments != null;
+
+      // Check parent for comment
+      AstNode? parent = node.parent;
+      while (parent != null && parent is! Statement) {
+        if (parent.beginToken.precedingComments != null) {
+          return; // Has comment
+        }
+        parent = parent.parent;
+      }
+
+      if (!hasComment) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Icon and Text are adjacent without MergeSemantics.
+///
+/// Icon + Text combinations should be wrapped in MergeSemantics so
+/// screen readers announce them as a single unit.
+///
+/// **BAD:**
+/// ```dart
+/// Row(children: [
+///   Icon(Icons.star),
+///   Text('Favorite'),
+/// ])
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MergeSemantics(
+///   child: Row(children: [
+///     Icon(Icons.star),
+///     Text('Favorite'),
+///   ]),
+/// )
+/// ```
+class PreferMergeSemanticsRule extends SaropaLintRule {
+  const PreferMergeSemanticsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_merge_semantics',
+    problemMessage: 'Icon + Text should be wrapped in MergeSemantics.',
+    correctionMessage:
+        'Wrap Row/Column with MergeSemantics for unified screen reader output.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Row' && typeName != 'Column') return;
+
+      // Check children for Icon + Text combination
+      bool hasIcon = false;
+      bool hasText = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression children = arg.expression;
+          if (children is ListLiteral) {
+            for (final CollectionElement element in children.elements) {
+              if (element is InstanceCreationExpression) {
+                final String childType =
+                    element.constructorName.type.name.lexeme;
+                if (childType == 'Icon') hasIcon = true;
+                if (childType == 'Text') hasText = true;
+              }
+            }
+          }
+        }
+      }
+
+      if (!hasIcon || !hasText) return;
+
+      // Check if already wrapped in MergeSemantics
+      if (_hasMergeSemanticsAncestor(node)) return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  bool _hasMergeSemanticsAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 5) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'MergeSemantics') {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+}
+
+/// Warns when interactive widget lacks visible focus styling.
+///
+/// Keyboard users need visible focus indicators to know which element
+/// is currently focused. Use Focus widget with visual feedback.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   onTap: _handleTap,
+///   child: Container(...),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Focus(
+///   child: Builder(builder: (context) {
+///     final hasFocus = Focus.of(context).hasFocus;
+///     return GestureDetector(
+///       onTap: _handleTap,
+///       child: Container(
+///         decoration: BoxDecoration(
+///           border: hasFocus ? Border.all(color: Colors.blue, width: 2) : null,
+///         ),
+///         ...
+///       ),
+///     );
+///   }),
+/// )
+/// ```
+class RequireFocusIndicatorRule extends SaropaLintRule {
+  const RequireFocusIndicatorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_focus_indicator',
+    problemMessage: 'Interactive widget should have visible focus indicator.',
+    correctionMessage: 'Wrap in Focus widget and show visual feedback on focus.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check for custom interactive widgets (not built-in buttons)
+      if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
+
+      // Check if has tap handler
+      bool hasTapHandler = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'onTap' || name == 'onPressed') {
+            hasTapHandler = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasTapHandler) return;
+
+      // Check if wrapped in Focus widget
+      if (_hasFocusAncestor(node)) return;
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  bool _hasFocusAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 5) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'Focus' || typeName == 'FocusableActionDetector') {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+}
+
+/// Warns when animation may flash more than 3 times per second.
+///
+/// Rapidly flashing content can trigger seizures in photosensitive users.
+/// WCAG requires no more than 3 flashes per second.
+///
+/// **BAD:**
+/// ```dart
+/// AnimationController(
+///   duration: Duration(milliseconds: 100), // 10 flashes/second!
+/// )..repeat(reverse: true);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// AnimationController(
+///   duration: Duration(milliseconds: 500), // 2 flashes/second
+/// )..repeat(reverse: true);
+/// ```
+class AvoidFlashingContentRule extends SaropaLintRule {
+  const AvoidFlashingContentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_flashing_content',
+    problemMessage: 'Animation may flash more than 3 times per second.',
+    correctionMessage:
+        'Increase duration to at least 333ms to stay under 3 flashes/second.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'AnimationController') return;
+
+      // Check duration argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'duration') {
+          final Expression duration = arg.expression;
+          if (duration is InstanceCreationExpression) {
+            final String durationTypeName =
+                duration.constructorName.type.name.lexeme;
+            if (durationTypeName == 'Duration') {
+              // Check milliseconds
+              for (final Expression durationArg
+                  in duration.argumentList.arguments) {
+                if (durationArg is NamedExpression &&
+                    durationArg.name.label.name == 'milliseconds') {
+                  final Expression millisExpr = durationArg.expression;
+                  if (millisExpr is IntegerLiteral) {
+                    final int millis = millisExpr.value ?? 0;
+                    // Less than 333ms means more than 3 flashes/second
+                    if (millis > 0 && millis < 333) {
+                      reporter.atNode(arg, code);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when touch targets have insufficient spacing.
+///
+/// Touch targets that are too close together make it difficult for
+/// users with motor impairments to tap the correct target.
+/// Recommended minimum spacing is 8dp.
+///
+/// **BAD:**
+/// ```dart
+/// Row(children: [
+///   IconButton(onPressed: _action1, icon: Icon(Icons.add)),
+///   IconButton(onPressed: _action2, icon: Icon(Icons.remove)),
+/// ])
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Row(children: [
+///   IconButton(onPressed: _action1, icon: Icon(Icons.add)),
+///   SizedBox(width: 8),
+///   IconButton(onPressed: _action2, icon: Icon(Icons.remove)),
+/// ])
+/// ```
+class PreferAdequateSpacingRule extends SaropaLintRule {
+  const PreferAdequateSpacingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_adequate_spacing',
+    problemMessage: 'Adjacent touch targets should have spacing between them.',
+    correctionMessage: 'Add SizedBox(width/height: 8) between touch targets.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // Interactive widgets that are touch targets
+  static const Set<String> _touchTargets = <String>{
+    'IconButton',
+    'TextButton',
+    'ElevatedButton',
+    'OutlinedButton',
+    'FloatingActionButton',
+    'GestureDetector',
+    'InkWell',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addListLiteral((ListLiteral node) {
+      // Check if this is likely a children list
+      final AstNode? parent = node.parent;
+      if (parent is! NamedExpression) return;
+      if (parent.name.label.name != 'children') return;
+
+      // Check for adjacent touch targets
+      bool lastWasTouchTarget = false;
+
+      for (final CollectionElement element in node.elements) {
+        if (element is InstanceCreationExpression) {
+          final String typeName = element.constructorName.type.name.lexeme;
+          final bool isTouchTarget = _touchTargets.contains(typeName);
+
+          if (lastWasTouchTarget && isTouchTarget) {
+            reporter.atNode(element, code);
+          }
+
+          lastWasTouchTarget = isTouchTarget;
+
+          // SizedBox resets the pattern
+          if (typeName == 'SizedBox' || typeName == 'Padding') {
+            lastWasTouchTarget = false;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when animation plays without respecting user's reduce motion preference.
+///
+/// Users with vestibular disorders may have enabled "Reduce Motion" in their
+/// accessibility settings. Respect this preference for non-essential animations.
+///
+/// **BAD:**
+/// ```dart
+/// AnimatedContainer(
+///   duration: Duration(milliseconds: 500),
+///   ...
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// AnimatedContainer(
+///   duration: MediaQuery.of(context).disableAnimations
+///       ? Duration.zero
+///       : Duration(milliseconds: 500),
+///   ...
+/// )
+/// ```
+class AvoidMotionWithoutReduceRule extends SaropaLintRule {
+  const AvoidMotionWithoutReduceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_motion_without_reduce',
+    problemMessage: 'Animation should respect disableAnimations preference.',
+    correctionMessage:
+        'Check MediaQuery.disableAnimations and reduce/skip animation if true.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // Animated widgets that should respect reduce motion
+  static const Set<String> _animatedWidgets = <String>{
+    'AnimatedContainer',
+    'AnimatedOpacity',
+    'AnimatedPositioned',
+    'AnimatedSize',
+    'AnimatedCrossFade',
+    'AnimatedSwitcher',
+    'SlideTransition',
+    'FadeTransition',
+    'ScaleTransition',
+    'RotationTransition',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_animatedWidgets.contains(typeName)) return;
+
+      // Check if duration references disableAnimations
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'duration') {
+          final String durationSource = arg.expression.toSource();
+          if (durationSource.contains('disableAnimations') ||
+              durationSource.contains('reduceMotion') ||
+              durationSource.contains('accessibleNavigation')) {
+            return; // Good - respects preference
+          }
+        }
+      }
+
+      reporter.atNode(node.constructorName, code);
     });
   }
 }

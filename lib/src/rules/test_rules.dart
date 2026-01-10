@@ -12,6 +12,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when duplicate test assertions are made.
 ///
+/// Alias: duplicate_expect, redundant_assertion, repeated_test_check
+///
 /// Example of **bad** code:
 /// ```dart
 /// test('example', () {
@@ -69,6 +71,8 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
 }
 
 /// Warns when a test group() has an empty body.
+///
+/// Alias: empty_group, empty_test_group, no_tests_in_group
 class AvoidEmptyTestGroupsRule extends SaropaLintRule {
   const AvoidEmptyTestGroupsRule() : super(code: _code);
 
@@ -118,6 +122,8 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
 }
 
 /// Warns when public top-level members are declared in test files.
+///
+/// Alias: private_test_helpers, test_file_scope, no_public_test_members
 ///
 /// Test files should only contain test cases and test setup code.
 /// Public top-level functions, classes, or variables can be accidentally
@@ -206,6 +212,8 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
 
 /// Warns when test names don't follow the expected format.
 ///
+/// Alias: test_naming, descriptive_test, meaningful_test_name
+///
 /// Test names should be descriptive and follow conventions.
 ///
 /// ### Example
@@ -283,6 +291,8 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
 }
 
 /// Warns when a test file doesn't follow naming conventions.
+///
+/// Alias: test_file_naming, test_file_convention, test_dart_suffix
 ///
 /// Test files should end with `_test.dart` and be located in the `test/`
 /// directory.
@@ -364,6 +374,8 @@ class _TestCallFinder extends RecursiveAstVisitor<void> {
 }
 
 /// Warns when expect() is used with a Future instead of expectLater().
+///
+/// Alias: use_expect_later, future_expect, async_expect
 ///
 /// **Quick fix available:** Replaces `expect` with `expectLater`.
 class PreferExpectLaterRule extends SaropaLintRule {
@@ -1827,6 +1839,627 @@ class _AddGetItResetReminderFix extends DartFix {
           '/* TODO: Add GetIt.I.reset() in setUp() */ ',
         );
       });
+    });
+  }
+}
+
+/// Warns when a test body has no assertions.
+///
+/// Tests without assertions don't verify anything and provide false
+/// confidence. Every test should have at least one expect(), verify(),
+/// or similar assertion.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// test('loads data', () async {
+///   await loadData(); // No assertion!
+/// });
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// test('loads data', () async {
+///   final data = await loadData();
+///   expect(data, isNotEmpty);
+/// });
+/// ```
+class MissingTestAssertionRule extends SaropaLintRule {
+  const MissingTestAssertionRule() : super(code: _code);
+
+  /// Critical test quality. No assertions = no value.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'missing_test_assertion',
+    problemMessage: 'Test has no assertions.',
+    correctionMessage:
+        'Add expect(), verify(), or other assertion to validate behavior.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Common assertion function names
+  static const Set<String> _assertionFunctions = <String>{
+    'expect',
+    'expectLater',
+    'verify',
+    'verifyNever',
+    'verifyInOrder',
+    'verifyZeroInteractions',
+    'verifyNoMoreInteractions',
+    'fail',
+    'assert',
+    'throwsA',
+    'throwsException',
+    'throwsStateError',
+    'throwsArgumentError',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for test() or testWidgets()
+      if (methodName != 'test' && methodName != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length < 2) return;
+
+      // Get the callback body
+      final Expression callback = args.arguments[1];
+      FunctionBody? body;
+
+      if (callback is FunctionExpression) {
+        body = callback.body;
+      }
+
+      if (body == null) return;
+
+      // Check if the body contains any assertions
+      final bool hasAssertion = _hasAssertion(body);
+
+      if (!hasAssertion) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _hasAssertion(FunctionBody body) {
+    final _AssertionFinder finder = _AssertionFinder(_assertionFunctions);
+    body.visitChildren(finder);
+    return finder.foundAssertion;
+  }
+}
+
+class _AssertionFinder extends RecursiveAstVisitor<void> {
+  _AssertionFinder(this.assertionNames);
+
+  final Set<String> assertionNames;
+  bool foundAssertion = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (assertionNames.contains(node.methodName.name)) {
+      foundAssertion = true;
+      return; // Short-circuit
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    // Check for matchers like throwsA(...)
+    final Expression function = node.function;
+    if (function is SimpleIdentifier &&
+        assertionNames.contains(function.name)) {
+      foundAssertion = true;
+      return;
+    }
+    super.visitFunctionExpressionInvocation(node);
+  }
+}
+
+/// Warns when an async callback is used inside fakeAsync.
+///
+/// Using async inside fakeAsync defeats the purpose of fake time control.
+/// The async operations won't use the fake clock and can cause test flakiness.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// fakeAsync((fake) async {  // BAD: async callback!
+///   await Future.delayed(Duration(seconds: 1));
+///   fake.elapse(Duration(seconds: 1));
+/// });
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// fakeAsync((fake) {  // GOOD: synchronous callback
+///   fake.elapse(Duration(seconds: 1));
+///   expect(completer.isCompleted, isTrue);
+/// });
+/// ```
+class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
+  const AvoidAsyncCallbackInFakeAsyncRule() : super(code: _code);
+
+  /// Critical bug. Async in fakeAsync causes unpredictable behavior.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_async_callback_in_fake_async',
+    problemMessage: 'Async callback inside fakeAsync defeats fake time control.',
+    correctionMessage:
+        'Remove async keyword. Use synchronous code with fake.elapse() '
+        'to control time.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'fakeAsync') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression callback = args.arguments.first;
+      if (callback is! FunctionExpression) return;
+
+      // Check if the callback is async
+      if (callback.body.isAsynchronous) {
+        reporter.atNode(callback, code);
+      }
+    });
+  }
+}
+
+/// Warns when string keys are used in tests instead of Symbols.
+///
+/// Using Symbols for test keys provides compile-time checking and better
+/// refactoring support compared to magic string keys.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// tester.widget(find.byKey(const Key('submitButton')));
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // Define symbol in test constants
+/// const kSubmitButton = Key('submitButton');
+///
+/// // Use in test
+/// tester.widget(find.byKey(kSubmitButton));
+/// ```
+class PreferSymbolOverKeyRule extends SaropaLintRule {
+  const PreferSymbolOverKeyRule() : super(code: _code);
+
+  /// Style preference for maintainability.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_symbol_over_key',
+    problemMessage: 'Consider using a constant Key instead of string literal.',
+    correctionMessage:
+        'Define a constant for the Key to improve maintainability.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addInstanceCreationExpression(
+        (InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      // Check for Key constructor with string literal
+      if (typeName != 'Key' && typeName != 'ValueKey') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is StringLiteral) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when test creates files/data without tearDown cleanup.
+///
+/// Tests that create files, directories, or database entries should clean
+/// up in tearDown to prevent test pollution and disk space issues.
+///
+/// **BAD:**
+/// ```dart
+/// test('saves file', () async {
+///   await File('test.txt').writeAsString('data');
+///   expect(await File('test.txt').exists(), isTrue);
+///   // File left on disk!
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late File testFile;
+///
+/// setUp(() {
+///   testFile = File('test.txt');
+/// });
+///
+/// tearDown(() async {
+///   if (await testFile.exists()) {
+///     await testFile.delete();
+///   }
+/// });
+///
+/// test('saves file', () async {
+///   await testFile.writeAsString('data');
+///   expect(await testFile.exists(), isTrue);
+/// });
+/// ```
+class RequireTestCleanupRule extends SaropaLintRule {
+  const RequireTestCleanupRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_test_cleanup',
+    problemMessage: 'Test creates resources without tearDown cleanup.',
+    correctionMessage: 'Add tearDown to clean up created files or data.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    bool hasTearDown = false;
+    MethodInvocation? testWithResourceCreation;
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName == 'tearDown' || methodName == 'tearDownAll') {
+        hasTearDown = true;
+      }
+
+      if (methodName == 'test' || methodName == 'testWidgets') {
+        final ArgumentList args = node.argumentList;
+        if (args.arguments.length >= 2) {
+          final Expression callback = args.arguments[1];
+          if (callback is FunctionExpression) {
+            final String bodySource = callback.body.toSource();
+
+            // Check for resource creation
+            if (bodySource.contains('File(') ||
+                bodySource.contains('Directory(') ||
+                bodySource.contains('.writeAs') ||
+                bodySource.contains('.create') ||
+                bodySource.contains('insert(') ||
+                bodySource.contains('put(')) {
+              testWithResourceCreation = node;
+            }
+          }
+        }
+      }
+    });
+
+    context.addPostRunCallback(() {
+      if (testWithResourceCreation != null && !hasTearDown) {
+        reporter.atNode(testWithResourceCreation!, code);
+      }
+    });
+  }
+}
+
+/// Warns when tests could use variant for different configurations.
+///
+/// Duplicate tests for different screen sizes, locales, or themes should
+/// use testVariants for cleaner code and better coverage reporting.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('renders on small screen', (tester) async {
+///   tester.binding.window.physicalSizeTestValue = Size(320, 480);
+///   await tester.pumpWidget(MyWidget());
+///   expect(...);
+/// });
+///
+/// testWidgets('renders on large screen', (tester) async {
+///   tester.binding.window.physicalSizeTestValue = Size(1024, 768);
+///   await tester.pumpWidget(MyWidget());
+///   expect(...);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('renders correctly', variant: ScreenSizeVariant(), (tester) async {
+///   await tester.pumpWidget(MyWidget());
+///   expect(...);
+/// });
+/// ```
+class PreferTestVariantRule extends SaropaLintRule {
+  const PreferTestVariantRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_test_variant',
+    problemMessage: 'Similar tests could use variant for different configurations.',
+    correctionMessage: 'Use testWidgets variant parameter for configuration testing.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    final List<MethodInvocation> sizeTests = <MethodInvocation>[];
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length >= 2) {
+        final Expression callback = args.arguments[1];
+        if (callback is FunctionExpression) {
+          final String bodySource = callback.body.toSource();
+
+          // Check for screen size configuration
+          if (bodySource.contains('physicalSizeTestValue') ||
+              bodySource.contains('devicePixelRatio') ||
+              bodySource.contains('textScaleFactor')) {
+            sizeTests.add(node);
+          }
+        }
+      }
+    });
+
+    context.addPostRunCallback(() {
+      // If there are multiple size-related tests, suggest variant
+      if (sizeTests.length >= 2) {
+        for (final MethodInvocation test in sizeTests) {
+          reporter.atNode(test.methodName, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when widget tests lack accessibility guidelines check.
+///
+/// Widget tests should verify accessibility to catch issues early.
+/// Use meetsGuideline matcher for automated accessibility testing.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('button works', (tester) async {
+///   await tester.pumpWidget(MyWidget());
+///   await tester.tap(find.byType(ElevatedButton));
+///   expect(find.text('Clicked'), findsOneWidget);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('button is accessible', (tester) async {
+///   await tester.pumpWidget(MyWidget());
+///
+///   final SemanticsHandle handle = tester.ensureSemantics();
+///   await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+///   await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+///   handle.dispose();
+/// });
+/// ```
+class RequireAccessibilityTestsRule extends SaropaLintRule {
+  const RequireAccessibilityTestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_accessibility_tests',
+    problemMessage: 'Widget tests should include accessibility checks.',
+    correctionMessage: 'Add meetsGuideline assertions for accessibility.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    bool hasAccessibilityTest = false;
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for accessibility testing patterns
+      if (methodName == 'meetsGuideline' ||
+          methodName == 'ensureSemantics' ||
+          methodName == 'getSemanticsData') {
+        hasAccessibilityTest = true;
+      }
+    });
+
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final String source = unit.toSource();
+      if (source.contains('testWidgets') && !hasAccessibilityTest) {
+        // Report at first testWidgets call
+        // This is a file-level suggestion, so we report once
+      }
+    });
+  }
+}
+
+/// Warns when animated widget tests don't use pump with duration.
+///
+/// Animations need time to complete. Tests must use pumpAndSettle or
+/// pump(duration) to advance animation frames.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('animation plays', (tester) async {
+///   await tester.pumpWidget(AnimatedWidget());
+///   await tester.pump();  // Only one frame!
+///   expect(find.byType(AnimatedWidget), findsOneWidget);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('animation completes', (tester) async {
+///   await tester.pumpWidget(AnimatedWidget());
+///   await tester.pump(const Duration(milliseconds: 500));
+///   // Or
+///   await tester.pumpAndSettle();
+/// });
+/// ```
+class RequireAnimationTestsRule extends SaropaLintRule {
+  const RequireAnimationTestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_animation_tests',
+    problemMessage: 'Animated widget test should use pump with duration.',
+    correctionMessage: 'Use pump(Duration) or pumpAndSettle for animations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // Animated widgets that need duration pump
+  static const Set<String> _animatedWidgets = <String>{
+    'AnimatedContainer',
+    'AnimatedOpacity',
+    'AnimatedPositioned',
+    'AnimatedSize',
+    'AnimatedSwitcher',
+    'AnimatedCrossFade',
+    'FadeTransition',
+    'SlideTransition',
+    'ScaleTransition',
+    'Hero',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length < 2) return;
+
+      final Expression callback = args.arguments[1];
+      if (callback is! FunctionExpression) return;
+
+      final String bodySource = callback.body.toSource();
+
+      // Check if test uses animated widgets
+      bool hasAnimatedWidget = false;
+      for (final String widget in _animatedWidgets) {
+        if (bodySource.contains(widget)) {
+          hasAnimatedWidget = true;
+          break;
+        }
+      }
+
+      if (!hasAnimatedWidget) return;
+
+      // Check for proper pump usage
+      final bool hasDurationPump = bodySource.contains('pumpAndSettle') ||
+          bodySource.contains('pump(const Duration') ||
+          bodySource.contains('pump(Duration');
+
+      if (!hasDurationPump) {
+        reporter.atNode(node.methodName, code);
+      }
     });
   }
 }

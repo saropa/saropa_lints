@@ -13,6 +13,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when comparing collections using == operator.
 ///
+/// Alias: no_collection_equality, use_deep_equals
+///
 /// Collections (List, Set, Map) use reference equality by default,
 /// not value equality. Use listEquals, setEquals, or mapEquals instead.
 ///
@@ -122,6 +124,8 @@ class _AddHackCommentForCollectionEqualityFix extends DartFix {
 
 /// Warns when duplicate keys are used in a map literal.
 ///
+/// Alias: no_duplicate_keys, map_duplicate_key
+///
 /// Example of **bad** code:
 /// ```dart
 /// final map = {'a': 1, 'b': 2, 'a': 3};
@@ -170,6 +174,8 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
 }
 
 /// Warns when .keys.contains() is used instead of .containsKey().
+///
+/// Alias: use_contains_key, no_keys_contains
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -259,6 +265,8 @@ class _UseContainsKeyFix extends DartFix {
 
 /// Warns when unnecessary collection wrappers are used.
 ///
+/// Alias: prefer_collection_literals, no_list_of_literal
+///
 /// Using collection literals is preferred over constructors.
 ///
 /// ### Example
@@ -328,6 +336,8 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 }
 
 /// Warns when using .first or .last on potentially empty collections.
+///
+/// Alias: no_unsafe_first_last, prefer_first_or_null
 ///
 /// Calling .first or .last on an empty collection throws a StateError.
 /// Use .firstOrNull/.lastOrNull or check isEmpty first.
@@ -839,6 +849,8 @@ class _UseNullSafeCollectionMethodFix extends DartFix {
 
 /// Warns when reduce() is called on a potentially empty collection.
 ///
+/// Alias: no_unsafe_reduce, prefer_fold
+///
 /// Calling reduce() on an empty collection throws a StateError.
 /// Use fold() with an initial value instead.
 ///
@@ -927,6 +939,8 @@ class _AddHackCommentForReduceFix extends DartFix {
 }
 
 /// Warns when firstWhere/lastWhere/singleWhere is used without orElse.
+///
+/// Alias: no_unsafe_where, require_or_else
 ///
 /// These methods throw StateError if no element matches the predicate.
 /// Use firstWhereOrNull/lastWhereOrNull/singleWhereOrNull from
@@ -1049,6 +1063,8 @@ class _UseWhereOrNullFix extends DartFix {
 }
 
 /// Suggests using *OrNull methods instead of *Where with orElse callback.
+///
+/// Alias: use_where_or_null, prefer_or_null_methods
 ///
 /// While using orElse is safe, the *OrNull pattern from package:collection
 /// is more concise and idiomatic.
@@ -1207,6 +1223,8 @@ class _ReplaceWithWhereOrNullFix extends DartFix {
 
 /// Warns when map literal keys are not in alphabetical order.
 ///
+/// Alias: sort_map_keys, alphabetical_map_keys
+///
 /// Consistent key ordering improves readability.
 ///
 /// ### Example
@@ -1269,6 +1287,8 @@ class MapKeysOrderingRule extends SaropaLintRule {
 }
 
 /// Warns when indexOf is used to check for element presence.
+///
+/// Alias: no_index_of_for_contains, use_contains
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -1371,6 +1391,8 @@ class _UseContainsFix extends DartFix {
 
 /// Warns when `list[0]` is used instead of `list.first`.
 ///
+/// Alias: use_first_not_index, no_list_zero
+///
 /// Example of **bad** code:
 /// ```dart
 /// final first = list[0];
@@ -1449,6 +1471,8 @@ class _UseFirstFix extends DartFix {
 
 /// Warns when List.from/Set.from/Map.from is used instead of .of constructors.
 ///
+/// Alias: prefer_of_over_from, no_collection_from
+///
 /// The `.of` constructors are more efficient for creating collections from iterables
 /// when you don't need the type casting behavior of `.from`.
 ///
@@ -1506,6 +1530,8 @@ class PreferIterableOfRule extends SaropaLintRule {
 }
 
 /// Warns when `list[length-1]` is used instead of `list.last`.
+///
+/// Alias: use_last_not_index, no_length_minus_one
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -1599,6 +1625,8 @@ class _UseLastFix extends DartFix {
 
 /// Warns when forEach with add is used instead of addAll.
 ///
+/// Alias: use_add_all, no_foreach_add
+///
 /// Example of **bad** code:
 /// ```dart
 /// items.forEach((item) => list.add(item));
@@ -1690,6 +1718,8 @@ class PreferAddAllRule extends SaropaLintRule {
 
 /// Warns when duplicate elements appear in collection literals.
 ///
+/// Alias: no_duplicate_elements, unique_collection_elements
+///
 /// Example of **bad** code:
 /// ```dart
 /// final list = [1, 2, 1, 3];  // 1 is duplicated
@@ -1755,6 +1785,8 @@ class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
 
 /// Warns when a List is used for frequent contains() checks.
 ///
+/// Alias: use_set_for_contains, set_over_list_lookup
+///
 /// Using Set for lookups is O(1) vs O(n) for List.
 ///
 /// Example of **bad** code:
@@ -1802,6 +1834,209 @@ class PreferSetForLookupRule extends SaropaLintRule {
       // Only warn for List types (not Set or other collections)
       if (typeName.startsWith('List<')) {
         reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when for loop uses non-standard increment patterns.
+///
+/// Alias: standard_for_increment, no_non_standard_increment
+///
+/// Standard for loop increments make code more readable and predictable.
+///
+/// **BAD:**
+/// ```dart
+/// for (int i = 0; i < 10; i += 2) { } // Non-standard increment
+/// for (int i = 0; i < 10; i = i + 3) { } // Verbose increment
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// for (int i = 0; i < 10; i++) { } // Standard increment
+/// for (int i = 0; i < 10; i += 1) { } // Also acceptable
+/// ```
+class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
+  const PreferCorrectForLoopIncrementRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_correct_for_loop_increment',
+    problemMessage: 'For loop uses non-standard increment pattern.',
+    correctionMessage: 'Consider using i++ for standard iteration.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addForStatement((ForStatement node) {
+      final ForLoopParts parts = node.forLoopParts;
+      if (parts is! ForParts) return;
+
+      // Check for updaters (the part after the second semicolon)
+      final NodeList<Expression> updaters = parts.updaters;
+      if (updaters.isEmpty) return;
+
+      for (final Expression updater in updaters) {
+        // Check for compound assignment like i += 2
+        if (updater is AssignmentExpression) {
+          final String op = updater.operator.lexeme;
+          if (op == '+=' || op == '-=') {
+            final Expression right = updater.rightHandSide;
+            if (right is IntegerLiteral && right.value != 1) {
+              // Non-standard increment (not by 1)
+              reporter.atNode(updater, code);
+            }
+          }
+        }
+        // Check for verbose i = i + n pattern
+        if (updater is AssignmentExpression &&
+            updater.operator.lexeme == '=') {
+          final Expression right = updater.rightHandSide;
+          if (right is BinaryExpression) {
+            // i = i + n or i = i - n
+            if (right.operator.type == TokenType.PLUS ||
+                right.operator.type == TokenType.MINUS) {
+              final Expression rightOperand = right.rightOperand;
+              if (rightOperand is IntegerLiteral && rightOperand.value != 1) {
+                reporter.atNode(updater, code);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when a for loop has impossible or unreachable bounds.
+///
+/// Alias: no_impossible_for_loop, unreachable_loop_body
+///
+/// For loops with impossible conditions never execute or run infinitely.
+///
+/// **BAD:**
+/// ```dart
+/// for (int i = 10; i < 5; i++) { } // Never executes
+/// for (int i = 0; i > 10; i++) { } // Never executes
+/// for (int i = 0; i < 10; i--) { } // Infinite loop
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// for (int i = 0; i < 10; i++) { } // Standard ascending
+/// for (int i = 10; i > 0; i--) { } // Standard descending
+/// ```
+class AvoidUnreachableForLoopRule extends SaropaLintRule {
+  const AvoidUnreachableForLoopRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unreachable_for_loop',
+    problemMessage: 'For loop has impossible bounds and will never execute.',
+    correctionMessage: 'Check the loop condition and increment direction.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addForStatement((ForStatement node) {
+      final ForLoopParts parts = node.forLoopParts;
+      if (parts is! ForParts) return;
+
+      // Get initialization value if it's a simple integer
+      int? initValue;
+      if (parts is ForPartsWithDeclarations) {
+        final NodeList<VariableDeclaration> vars = parts.variables.variables;
+        if (vars.length == 1) {
+          final Expression? init = vars.first.initializer;
+          if (init is IntegerLiteral) {
+            initValue = init.value;
+          }
+        }
+      }
+
+      // Get condition
+      final Expression? condition = parts.condition;
+      if (condition is! BinaryExpression) return;
+
+      final TokenType op = condition.operator.type;
+      final Expression left = condition.leftOperand;
+      final Expression right = condition.rightOperand;
+
+      // Get bound value if it's a simple integer
+      int? boundValue;
+      if (right is IntegerLiteral) {
+        boundValue = right.value;
+      }
+
+      // Check for impossible initial conditions
+      if (initValue != null && boundValue != null) {
+        // i = 10; i < 5 (start > end with <)
+        if ((op == TokenType.LT || op == TokenType.LT_EQ) &&
+            initValue > boundValue) {
+          reporter.atNode(condition, code);
+          return;
+        }
+        // i = 5; i > 10 (start < end with >)
+        if ((op == TokenType.GT || op == TokenType.GT_EQ) &&
+            initValue < boundValue) {
+          reporter.atNode(condition, code);
+          return;
+        }
+      }
+
+      // Check for mismatched increment direction
+      final NodeList<Expression> updaters = parts.updaters;
+      if (updaters.isEmpty) return;
+
+      final Expression updater = updaters.first;
+      bool? isIncrementing;
+
+      if (updater is PostfixExpression) {
+        isIncrementing = updater.operator.type == TokenType.PLUS_PLUS;
+      } else if (updater is PrefixExpression) {
+        isIncrementing = updater.operator.type == TokenType.PLUS_PLUS;
+      } else if (updater is AssignmentExpression) {
+        final String opLex = updater.operator.lexeme;
+        if (opLex == '+=') {
+          final Expression r = updater.rightHandSide;
+          if (r is IntegerLiteral && r.value != null) {
+            isIncrementing = r.value! > 0;
+          }
+        } else if (opLex == '-=') {
+          final Expression r = updater.rightHandSide;
+          if (r is IntegerLiteral && r.value != null) {
+            isIncrementing = r.value! < 0;
+          }
+        }
+      }
+
+      if (isIncrementing == null) return;
+
+      // Check for mismatched direction: i < n with i-- or i > n with i++
+      final String varName = left is SimpleIdentifier ? left.name : '';
+      if (varName.isEmpty) return;
+
+      // i < bound with decrement = infinite loop
+      if ((op == TokenType.LT || op == TokenType.LT_EQ) && !isIncrementing) {
+        reporter.atNode(condition, code);
+      }
+      // i > bound with increment = infinite loop (if start < bound)
+      if ((op == TokenType.GT || op == TokenType.GT_EQ) && isIncrementing) {
+        reporter.atNode(condition, code);
       }
     });
   }
