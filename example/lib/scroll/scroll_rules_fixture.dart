@@ -8,17 +8,20 @@ import 'package:flutter/material.dart';
 // avoid_shrinkwrap_in_scrollview
 // =========================================================================
 
-class BadShrinkWrapWidget extends StatelessWidget {
-  const BadShrinkWrapWidget({super.key});
+// Moved to dedicated test - this widget triggers both shrinkwrap and nested rules
+// which makes expect_lint testing complex. See scroll_rules_shrinkwrap_test.dart
+
+class BadNestedScrollOnlyWidget extends StatelessWidget {
+  const BadNestedScrollOnlyWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
         children: [
+          // This ListView is nested without physics - triggers conflict rule
+          // expect_lint: avoid_nested_scrollables_conflict
           ListView(
-            // expect_lint: avoid_shrinkwrap_in_scrollview
-            shrinkWrap: true,
             children: [Text('Item 1'), Text('Item 2')],
           ),
         ],
@@ -41,6 +44,7 @@ class BadNestedScrollWidget extends StatelessWidget {
         children: [
           // expect_lint: avoid_nested_scrollables_conflict
           ListView(
+            // expect_lint: avoid_shrinkwrap_in_scrollview
             shrinkWrap: true,
             children: [Text('Item 1')],
           ),

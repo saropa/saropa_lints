@@ -1,5 +1,5 @@
 // ignore_for_file: unused_local_variable, unused_element, depend_on_referenced_packages
-// ignore_for_file: unused_field
+// ignore_for_file: unused_field, require_dispose, avoid_undisposed_instances
 // Test fixture for disposal rules
 
 import 'package:flutter/material.dart';

@@ -31,3 +31,6 @@ custom_lint:
     - avoid_excessive_bottom_nav_items: true
     - require_media_player_dispose: true
     - require_tab_controller_dispose: true
+    # Disable general disposal rules - fixtures test specific disposal rules
+    - require_dispose: false
+    - avoid_undisposed_instances: false
