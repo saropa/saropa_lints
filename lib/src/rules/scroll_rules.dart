@@ -90,8 +90,8 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String? typeName = current.constructorName.type.element?.name ??
-            _getTypeName(current);
+        final String? typeName =
+            current.constructorName.type.element?.name ?? _getTypeName(current);
         if (typeName != null && _scrollableTypes.contains(typeName)) {
           return current;
         }
@@ -115,8 +115,8 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String? typeName = current.constructorName.type.element?.name ??
-            _getTypeName(current);
+        final String? typeName =
+            current.constructorName.type.element?.name ?? _getTypeName(current);
         if (typeName != null && _scrollableTypes.contains(typeName)) {
           return true;
         }
