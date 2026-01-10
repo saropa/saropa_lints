@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.6.0.
 
+## [1.8.1] - 2026-01-10
+
+### Fixed
+- **`avoid_double_for_money`**: Fixed remaining false positives:
+  - Switched from substring matching to **word-boundary matching** - variable names are now split into words (camelCase/snake_case aware) and only exact word matches trigger the rule
+  - Fixes issues like `audioVolume` matching `aud` or `imageUrlVerticalOffsetPercent` triggering false positives
+  - Removed short currency codes (`usd`, `eur`, `gbp`, `jpy`, `cad`, `aud`, `yen`) - still too ambiguous even as complete words (e.g., "cad" for CAD files, "aud" for audio-related)
+
+### Changed
+- **Refactored rule files** for better organization:
+  - Created `money_rules.dart` - moved `AvoidDoubleForMoneyRule`
+  - Created `media_rules.dart` - moved `AvoidAutoplayAudioRule`
+  - Moved `AvoidSensitiveDataInLogsRule` to `security_rules.dart`
+  - Moved `RequireGetItResetInTestsRule` to `test_rules.dart`
+  - Moved `RequireWebSocketErrorHandlingRule` to `api_network_rules.dart`
+  - `json_datetime_rules.dart` now only contains JSON and DateTime parsing rules
+
+### Quick Fixes
+- `avoid_double_for_money`: Adds review comment for manual attention
+- `avoid_sensitive_data_in_logs`: Comments out the sensitive log statement
+- `require_getit_reset_in_tests`: Adds reminder comment for GetIt reset
+- `require_websocket_error_handling`: Adds onError handler stub
+
 ## [1.8.0] - 2026-01-10
 
 ### Changed

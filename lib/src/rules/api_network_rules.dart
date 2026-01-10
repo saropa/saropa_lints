@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -1449,6 +1449,115 @@ class RequireCancelTokenRule extends SaropaLintRule {
       if (!hasCancellation && !hasMountedCheck) {
         reporter.atNode(node, code);
       }
+    });
+  }
+}
+
+/// Warns when WebSocket listeners don't have error handlers.
+///
+/// WebSocket streams can emit errors. Without error handling,
+/// the app may crash or behave unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// socket.stream.listen((data) {
+///   processData(data);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// socket.stream.listen(
+///   (data) => processData(data),
+///   onError: (error) => handleError(error),
+///   onDone: () => handleDisconnect(),
+/// );
+/// ```
+///
+/// **Quick fix available:** Adds an onError handler stub.
+class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
+  const RequireWebSocketErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_websocket_error_handling',
+    problemMessage: 'WebSocket listener without onError can crash on errors.',
+    correctionMessage: 'Add onError handler to WebSocket stream.listen().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'listen') return;
+
+      // Check if target is WebSocket-related
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('socket') &&
+          !targetSource.contains('Socket') &&
+          !targetSource.contains('channel') &&
+          !targetSource.contains('Channel') &&
+          !targetSource.contains('.stream')) {
+        return;
+      }
+
+      // Check for onError parameter
+      bool hasOnError = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onError') {
+          hasOnError = true;
+          break;
+        }
+      }
+
+      if (!hasOnError) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddOnErrorHandlerFix()];
+}
+
+class _AddOnErrorHandlerFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'listen') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add onError handler',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert before closing parenthesis
+        final int insertOffset = args.rightParenthesis.offset;
+        builder.addSimpleInsertion(
+          insertOffset,
+          ', onError: (error) { /* TODO: Handle error */ }',
+        );
+      });
     });
   }
 }

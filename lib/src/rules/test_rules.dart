@@ -1698,3 +1698,135 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when GetIt is used in tests without reset in setUp.
+///
+/// GetIt singletons persist across tests, causing test pollution.
+/// Reset the container in setUp to ensure test isolation.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   test('my test', () {
+///     final service = GetIt.I<MyService>();
+///     // Uses stale singleton from previous test!
+///   });
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() {
+///   setUp(() {
+///     GetIt.I.reset();
+///     GetIt.I.registerSingleton<MyService>(MockMyService());
+///   });
+///
+///   test('my test', () {
+///     final service = GetIt.I<MyService>();
+///   });
+/// }
+/// ```
+///
+/// **Quick fix available:** Adds a reminder comment.
+class RequireGetItResetInTestsRule extends SaropaLintRule {
+  const RequireGetItResetInTestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  bool get skipTestFiles => false; // This rule specifically targets test files
+
+  // cspell:ignore getit
+  static const LintCode _code = LintCode(
+    name: 'require_getit_reset_in_tests',
+    problemMessage: 'GetIt singletons persist across tests. Reset in setUp.',
+    correctionMessage: 'Add GetIt.I.reset() in setUp() or setUpAll().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.source.fullName.replaceAll('\\', '/');
+    if (!path.contains('_test.dart') && !path.contains('/test/')) {
+      return;
+    }
+
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final String source = unit.toSource();
+
+      // Check if GetIt is used
+      if (!source.contains('GetIt.I') && !source.contains('GetIt.instance')) {
+        return;
+      }
+
+      // Check if reset is called (typically in setUp/setUpAll)
+      final bool hasReset = source.contains('.reset()') ||
+          source.contains('.resetLazySingleton') ||
+          source.contains('GetIt.I.reset') ||
+          source.contains('getIt.reset');
+
+      // Only report if GetIt is used but never reset
+      if (!hasReset) {
+        // Find the first GetIt usage and report there
+        unit.visitChildren(_GetItUsageVisitor(reporter, code));
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddGetItResetReminderFix()];
+}
+
+class _GetItUsageVisitor extends RecursiveAstVisitor<void> {
+  _GetItUsageVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  bool _reported = false;
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (_reported) return;
+
+    if (node.prefix.name == 'GetIt' &&
+        (node.identifier.name == 'I' || node.identifier.name == 'instance')) {
+      reporter.atNode(node, code);
+      _reported = true;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+}
+
+class _AddGetItResetReminderFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add reminder to reset GetIt',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '/* TODO: Add GetIt.I.reset() in setUp() */ ',
+        );
+      });
+    });
+  }
+}
