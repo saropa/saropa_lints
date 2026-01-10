@@ -2171,3 +2171,808 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 7: Dio HTTP Client Rules
+// =============================================================================
+
+/// Warns when Dio debug logging is enabled without kDebugMode check.
+///
+/// Alias: dio_debug_logging_prod, dio_debug_interceptor
+///
+/// Debug logging in production exposes sensitive data and hurts performance.
+///
+/// **BAD:**
+/// ```dart
+/// dio.interceptors.add(LogInterceptor());  // Logs in prod!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (kDebugMode) {
+///   dio.interceptors.add(LogInterceptor());
+/// }
+/// ```
+class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
+  const AvoidDioDebugPrintProductionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dio_debug_print_production',
+    problemMessage: 'Dio LogInterceptor without kDebugMode check.',
+    correctionMessage: 'Wrap with: if (kDebugMode) { dio.interceptors.add... }',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'add') return;
+
+      // Check if adding LogInterceptor
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final firstArg = args.first;
+      if (!firstArg.toSource().contains('LogInterceptor')) return;
+
+      // Check if target is interceptors
+      final target = node.target;
+      if (target == null || !target.toSource().contains('interceptor')) return;
+
+      // Check for kDebugMode guard
+      AstNode? current = node.parent;
+      bool hasDebugGuard = false;
+
+      while (current != null) {
+        if (current is IfStatement) {
+          final condition = current.expression.toSource();
+          if (condition.contains('kDebugMode')) {
+            hasDebugGuard = true;
+            break;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (!hasDebugGuard) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when multiple Dio instances are created instead of using singleton.
+///
+/// Alias: dio_multiple_instances, dio_no_singleton
+///
+/// Creating multiple Dio instances wastes resources and makes interceptor
+/// configuration inconsistent.
+///
+/// **BAD:**
+/// ```dart
+/// class ApiService {
+///   Future<Response> get() => Dio().get('/endpoint');
+/// }
+/// class OtherService {
+///   Future<Response> get() => Dio().get('/other');  // Another instance!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class DioClient {
+///   static final Dio instance = Dio()..interceptors.add(...);
+/// }
+/// ```
+class RequireDioSingletonRule extends SaropaLintRule {
+  const RequireDioSingletonRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dio_singleton',
+    problemMessage: 'Consider using a singleton Dio instance.',
+    correctionMessage:
+        'Create a shared Dio instance with consistent configuration.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression(
+        (InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'Dio') return;
+
+      // Check if it's being assigned to a static final field
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is VariableDeclaration) {
+          final parent = current.parent;
+          if (parent is VariableDeclarationList) {
+            final grandParent = parent.parent;
+            if (grandParent is FieldDeclaration &&
+                grandParent.isStatic &&
+                parent.isFinal) {
+              return; // Singleton pattern - OK
+            }
+          }
+        }
+        if (current is MethodInvocation ||
+            current is ExpressionStatement ||
+            current is ReturnStatement) {
+          // Inline Dio() usage
+          reporter.atNode(node.constructorName, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when request options are repeated instead of using BaseOptions.
+///
+/// Alias: dio_repeated_options, dio_use_base_options
+///
+/// Repeated headers/timeouts across requests should be in BaseOptions.
+///
+/// **BAD:**
+/// ```dart
+/// dio.get('/a', options: Options(headers: {'Auth': token}));
+/// dio.get('/b', options: Options(headers: {'Auth': token}));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final dio = Dio(BaseOptions(headers: {'Auth': token}));
+/// dio.get('/a');
+/// dio.get('/b');
+/// ```
+class PreferDioBaseOptionsRule extends SaropaLintRule {
+  const PreferDioBaseOptionsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_dio_base_options',
+    problemMessage:
+        'Repeated options in Dio requests. Consider using BaseOptions.',
+    correctionMessage:
+        'Move common headers/timeouts to BaseOptions in Dio constructor.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track options usage in file
+    final List<MethodInvocation> dioRequestsWithOptions = [];
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+      if (!['get', 'post', 'put', 'patch', 'delete'].contains(methodName)) {
+        return;
+      }
+
+      final target = node.target;
+      if (target == null) return;
+
+      final targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('dio')) return;
+
+      // Check for options parameter
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'options') {
+          dioRequestsWithOptions.add(node);
+          break;
+        }
+      }
+
+      // If we've seen multiple requests with options, report
+      if (dioRequestsWithOptions.length >= 3) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Dio is used without baseUrl.
+///
+/// Alias: dio_missing_base_url, dio_full_urls
+///
+/// Using full URLs in each request is error-prone. Set baseUrl once.
+///
+/// **BAD:**
+/// ```dart
+/// dio.get('https://api.example.com/users');
+/// dio.get('https://api.example.com/posts');  // Repeated base!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final dio = Dio(BaseOptions(baseUrl: 'https://api.example.com'));
+/// dio.get('/users');
+/// dio.get('/posts');
+/// ```
+class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
+  const AvoidDioWithoutBaseUrlRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dio_without_base_url',
+    problemMessage: 'Dio request with full URL. Consider setting baseUrl.',
+    correctionMessage:
+        'Set baseUrl in BaseOptions and use relative paths in requests.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+      if (!['get', 'post', 'put', 'patch', 'delete'].contains(methodName)) {
+        return;
+      }
+
+      final target = node.target;
+      if (target == null) return;
+
+      final targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('dio')) return;
+
+      // Check first argument for full URL
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final firstArg = args.first;
+      if (firstArg is SimpleStringLiteral) {
+        final url = firstArg.value;
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+          reporter.atNode(firstArg, code);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 7: URL Launcher Rules
+// =============================================================================
+
+/// Warns when launchUrl is called without try-catch error handling.
+///
+/// Alias: url_launch_unhandled, launch_url_try_catch
+///
+/// launchUrl can throw PlatformException if no app can handle the URL.
+///
+/// **BAD:**
+/// ```dart
+/// await launchUrl(Uri.parse(url));  // May throw!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   if (await canLaunchUrl(uri)) {
+///     await launchUrl(uri);
+///   }
+/// } catch (e) {
+///   // Handle error
+/// }
+/// ```
+class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
+  const RequireUrlLauncherErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_url_launcher_error_handling',
+    problemMessage: 'launchUrl without error handling can crash.',
+    correctionMessage:
+        'Wrap in try-catch or check with canLaunchUrl first.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'launchUrl' &&
+          node.methodName.name != 'launch') {
+        return;
+      }
+
+      // Check if inside try block
+      AstNode? current = node.parent;
+      bool inTryBlock = false;
+      bool hasCanLaunchCheck = false;
+
+      while (current != null) {
+        if (current is TryStatement) {
+          inTryBlock = true;
+          break;
+        }
+        if (current is IfStatement) {
+          final condition = current.expression.toSource();
+          if (condition.contains('canLaunchUrl') ||
+              condition.contains('canLaunch')) {
+            hasCanLaunchCheck = true;
+            break;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (!inTryBlock && !hasCanLaunchCheck) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 7: Image Picker Rules
+// =============================================================================
+
+/// Warns when pickImage is called without null check or try-catch.
+///
+/// Alias: image_picker_no_error_handling, pick_image_crash
+///
+/// pickImage returns null if user cancels and can throw on permission denied.
+///
+/// **BAD:**
+/// ```dart
+/// final image = await picker.pickImage(source: ImageSource.camera);
+/// File file = File(image!.path);  // Crash if cancelled!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   final image = await picker.pickImage(source: ImageSource.camera);
+///   if (image == null) return;  // User cancelled
+///   File file = File(image.path);
+/// } catch (e) {
+///   // Handle permission error
+/// }
+/// ```
+class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
+  const RequireImagePickerErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_picker_error_handling',
+    problemMessage: 'pickImage without null check or error handling.',
+    correctionMessage: 'Add null check for cancelled and try-catch for errors.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'pickImage' &&
+          node.methodName.name != 'pickVideo' &&
+          node.methodName.name != 'pickMultiImage') {
+        return;
+      }
+
+      // Check if inside try block
+      AstNode? current = node.parent;
+      bool inTryBlock = false;
+
+      while (current != null) {
+        if (current is TryStatement) {
+          inTryBlock = true;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (!inTryBlock) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when ImageSource is hardcoded without giving user choice.
+///
+/// Alias: image_picker_source_fixed, no_source_choice
+///
+/// Users should be able to choose between camera and gallery.
+///
+/// **BAD:**
+/// ```dart
+/// picker.pickImage(source: ImageSource.camera);  // No gallery option
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// showModalBottomSheet(
+///   builder: (_) => Column(children: [
+///     ListTile(onTap: () => pickImage(ImageSource.camera)),
+///     ListTile(onTap: () => pickImage(ImageSource.gallery)),
+///   ]),
+/// );
+/// ```
+class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
+  const RequireImagePickerSourceChoiceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_picker_source_choice',
+    problemMessage: 'Hardcoded ImageSource. Consider offering user a choice.',
+    correctionMessage: 'Show dialog letting user choose camera or gallery.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'pickImage') return;
+
+      // Check for hardcoded ImageSource
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'source') {
+          final sourceValue = arg.expression.toSource();
+          if (sourceValue == 'ImageSource.camera' ||
+              sourceValue == 'ImageSource.gallery') {
+            // Hardcoded source - check if in a method that handles both
+            AstNode? current = node.parent;
+            MethodDeclaration? enclosingMethod;
+
+            while (current != null) {
+              if (current is MethodDeclaration) {
+                enclosingMethod = current;
+                break;
+              }
+              current = current.parent;
+            }
+
+            // If method has ImageSource parameter, it's OK
+            if (enclosingMethod != null) {
+              final params = enclosingMethod.parameters?.toSource() ?? '';
+              if (params.contains('ImageSource')) return;
+            }
+
+            reporter.atNode(arg.expression, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 7: Geolocator Rules
+// =============================================================================
+
+/// Warns when getCurrentPosition is called without timeLimit.
+///
+/// Alias: geolocator_no_timeout, position_timeout_missing
+///
+/// Without timeout, getCurrentPosition can hang indefinitely.
+///
+/// **BAD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition();  // May hang!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition(
+///   timeLimit: Duration(seconds: 10),
+/// );
+/// ```
+class RequireGeolocatorTimeoutRule extends SaropaLintRule {
+  const RequireGeolocatorTimeoutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_geolocator_timeout',
+    problemMessage: 'getCurrentPosition without timeLimit can hang.',
+    correctionMessage: 'Add timeLimit parameter (e.g., Duration(seconds: 10)).',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getCurrentPosition') return;
+
+      final target = node.target;
+      if (target == null) return;
+      if (!target.toSource().contains('Geolocator')) return;
+
+      // Check for timeLimit parameter
+      bool hasTimeLimit = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'timeLimit') {
+          hasTimeLimit = true;
+          break;
+        }
+      }
+
+      if (!hasTimeLimit) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 7: Connectivity Rules
+// =============================================================================
+
+/// Warns when connectivity subscription isn't cancelled.
+///
+/// Alias: connectivity_leak, connectivity_no_cancel
+///
+/// Connectivity subscriptions must be cancelled to prevent memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class _State extends State<W> {
+///   @override
+///   void initState() {
+///     super.initState();
+///     Connectivity().onConnectivityChanged.listen((_) {});  // Leak!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _State extends State<W> {
+///   StreamSubscription? _connectivitySub;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _connectivitySub = Connectivity().onConnectivityChanged.listen((_) {});
+///   }
+///
+///   @override
+///   void dispose() {
+///     _connectivitySub?.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
+  const RequireConnectivitySubscriptionCancelRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_connectivity_subscription_cancel',
+    problemMessage:
+        'Connectivity subscription without cancel causes memory leak.',
+    correctionMessage: 'Store subscription and cancel in dispose().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'listen') return;
+
+      final target = node.target;
+      if (target == null) return;
+      if (!target.toSource().contains('onConnectivityChanged')) return;
+
+      // Check if result is stored
+      AstNode? parent = node.parent;
+      if (parent is AssignmentExpression ||
+          (parent is VariableDeclaration && parent.name.lexeme.isNotEmpty)) {
+        return; // Result is stored - assume proper handling
+      }
+
+      // Check if we're in initState without storing result
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration &&
+            current.name.lexeme == 'initState') {
+          reporter.atNode(node.methodName, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 7: Notification Rules
+// =============================================================================
+
+/// Warns when background notification handler is an instance method.
+///
+/// Alias: notification_handler_instance, fcm_handler_top_level
+///
+/// Firebase messaging background handler must be a top-level function.
+///
+/// **BAD:**
+/// ```dart
+/// class MyService {
+///   void handleBackground(RemoteMessage msg) {}  // Won't work!
+/// }
+/// FirebaseMessaging.onBackgroundMessage(service.handleBackground);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @pragma('vm:entry-point')
+/// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage msg) async {}
+///
+/// FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+/// ```
+class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
+  const RequireNotificationHandlerTopLevelRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_notification_handler_top_level',
+    problemMessage:
+        'Background message handler must be top-level or static function.',
+    correctionMessage:
+        'Move handler to top-level function with @pragma("vm:entry-point").',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'onBackgroundMessage') return;
+
+      final target = node.target;
+      if (target == null) return;
+      if (!target.toSource().contains('FirebaseMessaging')) return;
+
+      // Check the handler argument
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final handler = args.first;
+      final handlerSource = handler.toSource();
+
+      // If handler uses 'this.' or is a method reference with dot, it's instance
+      if (handlerSource.contains('.') && !handlerSource.startsWith('_')) {
+        reporter.atNode(handler, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 7: Permission Handler Rules
+// =============================================================================
+
+/// Warns when permission denied state is not handled.
+///
+/// Alias: permission_denied_unhandled, missing_denied_handler
+///
+/// Users may deny permissions. Apps must handle denied state gracefully.
+///
+/// **BAD:**
+/// ```dart
+/// await Permission.camera.request();
+/// // Proceeds assuming permission granted!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final status = await Permission.camera.request();
+/// if (status.isDenied || status.isPermanentlyDenied) {
+///   // Show explanation or alternative
+///   return;
+/// }
+/// ```
+class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
+  const RequirePermissionDeniedHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_permission_denied_handling',
+    problemMessage: 'Permission request without denied state handling.',
+    correctionMessage:
+        'Check and handle isDenied and isPermanentlyDenied states.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'request') return;
+
+      final target = node.target;
+      if (target == null) return;
+      if (!target.toSource().contains('Permission')) return;
+
+      // Find enclosing method and check for status handling
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) return;
+
+      final methodSource = enclosingMethod.body.toSource();
+      final hasStatusCheck = methodSource.contains('isDenied') ||
+          methodSource.contains('isPermanentlyDenied') ||
+          methodSource.contains('isGranted');
+
+      if (!hasStatusCheck) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}

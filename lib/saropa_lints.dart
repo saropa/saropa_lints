@@ -1374,6 +1374,27 @@ const List<LintRule> _allRules = <LintRule>[
   RequireFutureWaitErrorHandlingRule(),
   RequireStreamOnDoneRule(),
   RequireCompleterErrorHandlingRule(),
+
+  // Package-specific rules (NEW)
+  RequireGoogleSigninErrorHandlingRule(),
+  RequireAppleSigninNonceRule(),
+  RequireSupabaseErrorHandlingRule(),
+  AvoidSupabaseAnonKeyInCodeRule(),
+  RequireSupabaseRealtimeUnsubscribeRule(),
+  RequireWebviewSslErrorHandlingRule(),
+  AvoidWebviewFileAccessRule(),
+  RequireWorkmanagerConstraintsRule(),
+  RequireWorkmanagerResultReturnRule(),
+  RequireCalendarTimezoneHandlingRule(),
+  RequireKeyboardVisibilityDisposeRule(),
+  RequireSpeechStopOnDisposeRule(),
+  AvoidAppLinksSensitiveParamsRule(),
+  RequireEnviedObfuscationRule(),
+  AvoidOpenaiKeyInCodeRule(),
+  RequireOpenaiErrorHandlingRule(),
+  RequireSvgErrorHandlerRule(),
+  RequireGoogleFontsFallbackRule(),
+  PreferUuidV4Rule(),
 ];
 
 class _SaropaLints extends PluginBase {

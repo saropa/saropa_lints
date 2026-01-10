@@ -1,0 +1,2038 @@
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
+
+/// Package-specific lint rules for common Flutter/Dart packages.
+///
+/// These rules ensure proper usage patterns for popular packages like
+/// google_sign_in, supabase, webview_flutter, workmanager, and others.
+library;
+
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/source/source_range.dart';
+import 'package:custom_lint_builder/custom_lint_builder.dart';
+
+import '../saropa_lint_rule.dart';
+
+// =============================================================================
+// AUTHENTICATION RULES
+// =============================================================================
+
+/// Warns when Google Sign-In calls lack try-catch error handling.
+///
+/// Alias: google_signin_try_catch, handle_google_signin_errors
+///
+/// Google Sign-In can fail for various reasons (network, user cancellation,
+/// configuration issues). Without error handling, the app may crash.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> signIn() async {
+///   final GoogleSignInAccount? account = await _googleSignIn.signIn();
+///   // No error handling!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> signIn() async {
+///   try {
+///     final GoogleSignInAccount? account = await _googleSignIn.signIn();
+///   } catch (e) {
+///     // Handle sign-in failure
+///   }
+/// }
+/// ```
+class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
+  const RequireGoogleSigninErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_google_signin_error_handling',
+    problemMessage: 'Google Sign-In calls should be wrapped in try-catch.',
+    correctionMessage:
+        'Wrap the signIn() call in try-catch to handle failures gracefully.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'signIn' && methodName != 'signInSilently') return;
+
+      // Check if it's likely a GoogleSignIn call
+      final String? targetType = node.target?.toSource();
+      if (targetType == null) return;
+
+      final bool isGoogleSignIn = targetType.contains('googleSignIn') ||
+          targetType.contains('GoogleSignIn') ||
+          targetType.contains('_googleSignIn');
+
+      if (!isGoogleSignIn) return;
+
+      // Check if wrapped in try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return; // Has try-catch, OK
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTryCatchTodoFix(code)];
+}
+
+class _AddTryCatchTodoFix extends DartFix {
+  _AddTryCatchTodoFix(this._code);
+  final LintCode _code;
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Wrap in try-catch',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Wrap this ${_code.name.contains('google') ? 'Google Sign-In' : _code.name.contains('supabase') ? 'Supabase' : 'API'} call in try-catch\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when Apple Sign-In is used without rawNonce parameter.
+///
+/// Alias: apple_signin_nonce, require_apple_nonce
+///
+/// Apple Sign-In requires a nonce for security. Without it, replay attacks
+/// are possible where an attacker reuses a valid token.
+///
+/// **BAD:**
+/// ```dart
+/// final credential = await SignInWithApple.getAppleIDCredential(
+///   scopes: [AppleIDAuthorizationScopes.email],
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final rawNonce = generateNonce();
+/// final credential = await SignInWithApple.getAppleIDCredential(
+///   scopes: [AppleIDAuthorizationScopes.email],
+///   nonce: sha256ofString(rawNonce),
+/// );
+/// ```
+class RequireAppleSigninNonceRule extends SaropaLintRule {
+  const RequireAppleSigninNonceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_apple_signin_nonce',
+    problemMessage: 'Apple Sign-In should include nonce parameter for security.',
+    correctionMessage:
+        'Add nonce parameter to getAppleIDCredential() to prevent replay attacks.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getAppleIDCredential') return;
+
+      // Check for nonce parameter
+      final ArgumentList args = node.argumentList;
+      final bool hasNonce = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'nonce';
+        }
+        return false;
+      });
+
+      if (!hasNonce) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddNonceParameterFix()];
+}
+
+class _AddNonceParameterFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add nonce parameter',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add nonce parameter to prevent replay attacks\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// SUPABASE RULES
+// =============================================================================
+
+/// Warns when Supabase calls lack try-catch error handling.
+///
+/// Alias: supabase_try_catch, handle_supabase_errors
+///
+/// Supabase operations can fail due to network issues, auth problems, or
+/// database constraints. Unhandled errors will crash the app.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> fetchData() async {
+///   final response = await supabase.from('users').select();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> fetchData() async {
+///   try {
+///     final response = await supabase.from('users').select();
+///   } on PostgrestException catch (e) {
+///     // Handle database error
+///   }
+/// }
+/// ```
+class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
+  const RequireSupabaseErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_supabase_error_handling',
+    problemMessage: 'Supabase calls should be wrapped in try-catch.',
+    correctionMessage:
+        'Wrap Supabase operations in try-catch to handle failures gracefully.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Look for the .from('table') pattern which is unique to Supabase
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'from') return;
+
+      // Must be called on something containing 'supabase' or 'Supabase'
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('supabase')) return;
+
+      // Found a supabase.from() call - now check if it's in a try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return; // Has try-catch, OK
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTryCatchTodoFix(code)];
+}
+
+/// Warns when Supabase anon key is hardcoded in source code.
+///
+/// Alias: no_supabase_key_in_code, supabase_key_security
+///
+/// Supabase anon keys should come from environment variables or secure storage,
+/// not hardcoded in source files that may be committed to version control.
+///
+/// **BAD:**
+/// ```dart
+/// final supabase = Supabase.initialize(
+///   url: 'https://xxx.supabase.co',
+///   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final supabase = Supabase.initialize(
+///   url: Env.supabaseUrl,
+///   anonKey: Env.supabaseAnonKey,
+/// );
+/// ```
+class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
+  const AvoidSupabaseAnonKeyInCodeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_supabase_anon_key_in_code',
+    problemMessage: 'Supabase anon key should not be hardcoded in source code.',
+    correctionMessage:
+        'Use environment variables or secure configuration for API keys.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  // Supabase JWT tokens start with this pattern
+  static final RegExp _jwtPattern = RegExp(r'eyJ[A-Za-z0-9_-]{20,}');
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String value = node.value;
+      if (value.length < 50) return; // JWT tokens are long
+
+      if (_jwtPattern.hasMatch(value)) {
+        // Check if it's in a Supabase context
+        AstNode? current = node.parent;
+        while (current != null) {
+          final String source = current.toSource();
+          if (source.contains('Supabase') ||
+              source.contains('anonKey') ||
+              source.contains('supabase')) {
+            reporter.atNode(node, code);
+            return;
+          }
+          if (current is FunctionBody || current is ClassDeclaration) break;
+          current = current.parent;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddEnvVarTodoFix()];
+}
+
+class _AddEnvVarTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Use environment variable',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Use environment variable or secure storage instead\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when Supabase realtime subscriptions are not unsubscribed in dispose.
+///
+/// Alias: supabase_realtime_dispose, unsubscribe_supabase_channel
+///
+/// Supabase realtime channels must be unsubscribed when the widget is disposed
+/// to prevent memory leaks and unexpected behavior.
+///
+/// **BAD:**
+/// ```dart
+/// class _ChatState extends State<Chat> {
+///   late RealtimeChannel _channel;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _channel = supabase.channel('room').subscribe();
+///   }
+///   // Missing unsubscribe in dispose!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _ChatState extends State<Chat> {
+///   late RealtimeChannel _channel;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _channel = supabase.channel('room').subscribe();
+///   }
+///
+///   @override
+///   void dispose() {
+///     _channel.unsubscribe();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
+  const RequireSupabaseRealtimeUnsubscribeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_supabase_realtime_unsubscribe',
+    problemMessage:
+        'Supabase realtime channel must be unsubscribed in dispose().',
+    correctionMessage:
+        'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'State') return;
+
+      // Find RealtimeChannel fields
+      final List<String> channelNames = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null && typeName.contains('RealtimeChannel')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              channelNames.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (channelNames.isEmpty) return;
+
+      // Find dispose method
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check if channels are unsubscribed
+      for (final String name in channelNames) {
+        final bool isUnsubscribed = disposeBody != null &&
+            (disposeBody.contains('$name.unsubscribe(') ||
+                disposeBody.contains('$name?.unsubscribe(') ||
+                disposeBody.contains('removeChannel'));
+
+        if (!isUnsubscribed) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == name) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDisposeTodoFix('unsubscribe()')];
+}
+
+class _AddDisposeTodoFix extends DartFix {
+  _AddDisposeTodoFix(this._methodCall);
+  final String _methodCall;
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add $_methodCall in dispose()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add $_methodCall in dispose() to prevent memory leaks\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// WEBVIEW RULES
+// =============================================================================
+
+/// Warns when WebView lacks SSL error handling callback.
+///
+/// Alias: webview_ssl_handler, require_ssl_error_callback
+///
+/// Without SSL error handling, WebView may silently fail on certificate issues
+/// or allow insecure connections without user awareness.
+///
+/// **Note:** This rule supports both the legacy WebView constructor pattern
+/// and the modern webview_flutter 4.0+ NavigationDelegate pattern.
+///
+/// **BAD (Legacy):**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+/// )
+/// ```
+///
+/// **GOOD (Legacy):**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+///   onSslError: (controller, error) {
+///     // Handle SSL error appropriately
+///   },
+/// )
+/// ```
+///
+/// **BAD (Modern webview_flutter 4.0+):**
+/// ```dart
+/// NavigationDelegate()
+/// ```
+///
+/// **GOOD (Modern webview_flutter 4.0+):**
+/// ```dart
+/// NavigationDelegate(
+///   onSslError: (controller, error, callback) {
+///     // Handle SSL error appropriately
+///   },
+/// )
+/// ```
+class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
+  const RequireWebviewSslErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_webview_ssl_error_handling',
+    problemMessage: 'WebView should handle SSL errors explicitly.',
+    correctionMessage:
+        'Add onSslError callback to NavigationDelegate or WebView constructor.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression(
+        (InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      // Check for legacy WebView/InAppWebView constructors
+      if (typeName == 'WebView' || typeName == 'InAppWebView') {
+        final bool hasOnSslError = node.argumentList.arguments.any((arg) {
+          if (arg is NamedExpression) {
+            final String name = arg.name.label.name;
+            return name == 'onSslError' ||
+                name == 'onReceivedServerTrustAuthRequest';
+          }
+          return false;
+        });
+
+        if (!hasOnSslError) {
+          reporter.atNode(node, code);
+        }
+        return;
+      }
+
+      // Check for modern webview_flutter 4.0+ NavigationDelegate pattern
+      if (typeName == 'NavigationDelegate') {
+        final bool hasOnSslError = node.argumentList.arguments.any((arg) {
+          if (arg is NamedExpression) {
+            final String name = arg.name.label.name;
+            return name == 'onSslError' ||
+                name == 'onHttpAuthRequest' ||
+                name == 'onSslAuthError';
+          }
+          return false;
+        });
+
+        if (!hasOnSslError) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddSslHandlerTodoFix()];
+}
+
+class _AddSslHandlerTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add onSslError handler',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add onSslError callback to handle SSL certificate issues\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when WebView has file access enabled.
+///
+/// Alias: webview_no_file_access, disable_webview_file_access
+///
+/// Enabling file access in WebView is a security risk as malicious web content
+/// could potentially access local files on the device.
+///
+/// **BAD:**
+/// ```dart
+/// WebViewController()
+///   ..setJavaScriptMode(JavaScriptMode.unrestricted)
+///   ..allowFileAccess(true);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// WebViewController()
+///   ..setJavaScriptMode(JavaScriptMode.unrestricted);
+/// // File access disabled by default
+/// ```
+class AvoidWebviewFileAccessRule extends SaropaLintRule {
+  const AvoidWebviewFileAccessRule() : super(code: _code);
+
+  // WARNING severity with high impact - security concern but not crash-causing
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_webview_file_access',
+    problemMessage: 'WebView file access should be disabled for security.',
+    correctionMessage:
+        'Remove allowFileAccess: true or set it to false explicitly.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for allowFileAccess method call
+      if (methodName == 'allowFileAccess' ||
+          methodName == 'setAllowFileAccess') {
+        final ArgumentList args = node.argumentList;
+        if (args.arguments.isNotEmpty) {
+          final String argValue = args.arguments.first.toSource();
+          if (argValue == 'true') {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+
+    // Also check named parameters
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (!typeName.contains('WebView') && !typeName.contains('Settings')) {
+        return;
+      }
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'allowFileAccess' ||
+              name == 'allowFileAccessFromFileURLs') {
+            final String value = arg.expression.toSource();
+            if (value == 'true') {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveFileAccessFix()];
+}
+
+class _RemoveFileAccessFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Remove file access',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Remove file access for security\n',
+        );
+      });
+    });
+
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Remove file access',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Remove file access for security\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// WORKMANAGER RULES
+// =============================================================================
+
+/// Warns when WorkManager task registration lacks constraints.
+///
+/// Alias: workmanager_constraints, require_task_constraints
+///
+/// WorkManager tasks without constraints may run at inappropriate times,
+/// draining battery or using metered data unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// Workmanager().registerPeriodicTask(
+///   'sync',
+///   'syncTask',
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Workmanager().registerPeriodicTask(
+///   'sync',
+///   'syncTask',
+///   constraints: Constraints(
+///     networkType: NetworkType.connected,
+///     requiresBatteryNotLow: true,
+///   ),
+/// );
+/// ```
+class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
+  const RequireWorkmanagerConstraintsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_workmanager_constraints',
+    problemMessage: 'WorkManager tasks should specify constraints.',
+    correctionMessage:
+        'Add constraints parameter to prevent unwanted battery/data usage.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _taskMethods = <String>{
+    'registerPeriodicTask',
+    'registerOneOffTask',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_taskMethods.contains(methodName)) return;
+
+      // Check if it's a Workmanager call
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+      if (!targetSource.contains('Workmanager') &&
+          !targetSource.contains('workmanager')) {
+        return;
+      }
+
+      // Check for constraints parameter
+      final bool hasConstraints =
+          node.argumentList.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'constraints';
+        }
+        return false;
+      });
+
+      if (!hasConstraints) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddConstraintsTodoFix()];
+}
+
+class _AddConstraintsTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add constraints parameter',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add constraints parameter to specify network/battery requirements\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when WorkManager callback does not return a result.
+///
+/// Alias: workmanager_return_result, require_task_result
+///
+/// WorkManager callbacks must return a bool (or Future<bool>) to indicate
+/// success or failure. Without proper returns, task scheduling may behave
+/// unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// Workmanager().executeTask((task, inputData) async {
+///   await doWork();
+///   // No return!
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Workmanager().executeTask((task, inputData) async {
+///   try {
+///     await doWork();
+///     return true;
+///   } catch (e) {
+///     return false;
+///   }
+/// });
+/// ```
+class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
+  const RequireWorkmanagerResultReturnRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_workmanager_result_return',
+    problemMessage: 'WorkManager callback must return a result.',
+    correctionMessage:
+        'Return true/false from the executeTask callback to indicate success.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'executeTask') return;
+
+      // Check if it's a Workmanager call
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+      if (!targetSource.contains('Workmanager') &&
+          !targetSource.contains('workmanager')) {
+        return;
+      }
+
+      // Find the callback
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression callback = args.arguments.first;
+      if (callback is! FunctionExpression) return;
+
+      final FunctionBody body = callback.body;
+      final String bodySource = body.toSource();
+
+      // Check for any return statement - the callback must return something
+      // We use a simple heuristic: if there's no 'return' keyword followed by
+      // something, the callback likely doesn't return properly
+      if (!bodySource.contains('return ')) {
+        reporter.atNode(callback, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddReturnTodoFix()];
+}
+
+class _AddReturnTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addFunctionExpression((FunctionExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Return true/false from callback',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Ensure this callback returns true (success) or false (failure)\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// CALENDAR/DATETIME RULES
+// =============================================================================
+
+/// Warns when device_calendar Event doesn't specify time zone handling.
+///
+/// Alias: calendar_timezone, device_calendar_timezone
+///
+/// Calendar events without explicit time zone handling may display at wrong
+/// times when users travel or when syncing across devices.
+///
+/// **Note:** This rule specifically targets device_calendar package Events.
+/// It requires both a positional calendarId AND start/end parameters to match,
+/// reducing false positives from other Event classes.
+///
+/// **BAD:**
+/// ```dart
+/// final event = Event(
+///   calendarId,
+///   title: 'Meeting',
+///   start: TZDateTime.now(local),
+///   end: TZDateTime.now(local).add(Duration(hours: 1)),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final event = Event(
+///   calendarId,
+///   title: 'Meeting',
+///   start: TZDateTime.now(local),
+///   end: TZDateTime.now(local).add(Duration(hours: 1)),
+///   timeZone: 'America/New_York', // or local.name
+/// );
+/// ```
+class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
+  const RequireCalendarTimezoneHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_calendar_timezone_handling',
+    problemMessage:
+        'device_calendar Event should specify time zone explicitly.',
+    correctionMessage: 'Add timeZone parameter to handle cross-timezone usage.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'Event') return;
+
+      final ArgumentList args = node.argumentList;
+
+      // device_calendar Event requires a positional calendarId as first arg
+      // This helps distinguish it from other Event classes
+      final bool hasPositionalArg = args.arguments.isNotEmpty &&
+          args.arguments.first is! NamedExpression;
+      if (!hasPositionalArg) return;
+
+      // Must have both 'start' and 'end' named parameters (device_calendar pattern)
+      bool hasStart = false;
+      bool hasEnd = false;
+      bool hasTimeZone = false;
+
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'start') hasStart = true;
+          if (name == 'end') hasEnd = true;
+          if (name == 'timeZone') hasTimeZone = true;
+        }
+      }
+
+      // Only flag if it looks like a device_calendar Event (has start AND end)
+      if (!hasStart || !hasEnd) return;
+
+      if (!hasTimeZone) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTimezoneParameterFix()];
+}
+
+class _AddTimezoneParameterFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add timeZone parameter',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add timeZone parameter for cross-timezone support\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// DISPOSE PATTERN RULES
+// =============================================================================
+
+/// Warns when KeyboardVisibilityController is not disposed.
+///
+/// Alias: dispose_keyboard_visibility, keyboard_visibility_leak
+///
+/// KeyboardVisibilityController listeners must be cancelled to prevent
+/// memory leaks and callbacks to disposed widgets.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   late KeyboardVisibilityController _keyboardController;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _keyboardController = KeyboardVisibilityController();
+///     _keyboardController.onChange.listen((visible) {});
+///   }
+///   // Missing dispose!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   late KeyboardVisibilityController _keyboardController;
+///   StreamSubscription? _subscription;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _keyboardController = KeyboardVisibilityController();
+///     _subscription = _keyboardController.onChange.listen((visible) {});
+///   }
+///
+///   @override
+///   void dispose() {
+///     _subscription?.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
+  const RequireKeyboardVisibilityDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_keyboard_visibility_dispose',
+    problemMessage:
+        'KeyboardVisibilityController subscription must be cancelled.',
+    correctionMessage: 'Store and cancel the stream subscription in dispose().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'State') return;
+
+      // Check for KeyboardVisibilityController usage
+      final String classSource = node.toSource();
+      if (!classSource.contains('KeyboardVisibilityController')) return;
+
+      // Check for proper cleanup patterns
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check for cancel() or dispose() in dispose method
+      final bool hasCleanup = disposeBody != null &&
+          (disposeBody.contains('.cancel(') ||
+              disposeBody.contains('dispose()') ||
+              disposeBody.contains('?.cancel('));
+
+      if (!hasCleanup && classSource.contains('.listen(')) {
+        // Find the field declaration to report on
+        for (final ClassMember member in node.members) {
+          if (member is FieldDeclaration) {
+            final String fieldSource = member.toSource();
+            if (fieldSource.contains('KeyboardVisibilityController')) {
+              reporter.atNode(member, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDisposeTodoFix('cancel()')];
+}
+
+/// Warns when SpeechToText is not stopped in dispose.
+///
+/// Alias: dispose_speech_to_text, speech_to_text_leak
+///
+/// SpeechToText must be stopped when the widget is disposed to release
+/// microphone resources and stop background processing.
+///
+/// **BAD:**
+/// ```dart
+/// class _VoiceState extends State<Voice> {
+///   final SpeechToText _speech = SpeechToText();
+///
+///   void startListening() async {
+///     await _speech.listen(onResult: (result) {});
+///   }
+///   // Missing stop in dispose!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _VoiceState extends State<Voice> {
+///   final SpeechToText _speech = SpeechToText();
+///
+///   void startListening() async {
+///     await _speech.listen(onResult: (result) {});
+///   }
+///
+///   @override
+///   void dispose() {
+///     _speech.stop();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
+  const RequireSpeechStopOnDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_speech_stop_on_dispose',
+    problemMessage: 'SpeechToText must be stopped in dispose() method.',
+    correctionMessage:
+        'Add _speech.stop() in dispose() to release microphone resources.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'State') return;
+
+      // Find SpeechToText fields
+      final List<String> speechFieldNames = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null && typeName.contains('SpeechToText')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              speechFieldNames.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (speechFieldNames.isEmpty) return;
+
+      // Find dispose method
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Check if speech is stopped
+      for (final String name in speechFieldNames) {
+        final bool isStopped = disposeBody != null &&
+            (disposeBody.contains('$name.stop(') ||
+                disposeBody.contains('$name?.stop(') ||
+                disposeBody.contains('$name.cancel('));
+
+        if (!isStopped) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == name) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDisposeTodoFix('stop()')];
+}
+
+// =============================================================================
+// DEEP LINKING RULES
+// =============================================================================
+
+/// Warns when deep links contain sensitive parameters in URL.
+///
+/// Alias: no_tokens_in_deep_links, secure_app_links
+///
+/// Sensitive data like tokens, passwords, or API keys should never appear
+/// in deep link URLs as they may be logged or exposed.
+///
+/// **BAD:**
+/// ```dart
+/// final link = 'myapp://auth?token=$accessToken';
+/// final link = 'myapp://reset?password=$newPassword';
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final link = 'myapp://auth?code=$oneTimeCode';
+/// // Exchange code for token server-side
+/// ```
+class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
+  const AvoidAppLinksSensitiveParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_app_links_sensitive_params',
+    problemMessage: 'Deep links should not contain sensitive parameters.',
+    correctionMessage:
+        'Use one-time codes instead of tokens or passwords in URLs.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _sensitiveParams = <String>{
+    'token',
+    'access_token',
+    'accessToken',
+    'refresh_token',
+    'refreshToken',
+    'password',
+    'secret',
+    'api_key',
+    'apiKey',
+    'auth_token',
+    'authToken',
+    'bearer',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final String fullString = node.toSource();
+
+      // Check if it looks like a URL with app scheme
+      if (!fullString.contains('://')) return;
+
+      // Check for sensitive parameter names
+      for (final String param in _sensitiveParams) {
+        if (fullString.contains('$param=') ||
+            fullString.contains('$param\$') ||
+            fullString.contains('?$param')) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+
+    // Also check simple string concatenation
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (node.operator.lexeme != '+') return;
+
+      final String source = node.toSource();
+      if (!source.contains('://')) return;
+
+      for (final String param in _sensitiveParams) {
+        if (source.contains('$param=')) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddSensitiveUrlTodoFix()];
+}
+
+class _AddSensitiveUrlTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Use one-time code instead',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Use one-time codes instead of sensitive tokens in deep links\n',
+        );
+      });
+    });
+
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Use one-time code instead',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Use one-time codes instead of sensitive tokens in deep links\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// ENVIRONMENT/SECRETS RULES
+// =============================================================================
+
+/// Warns when Envied annotation lacks obfuscate parameter.
+///
+/// Alias: envied_obfuscate, require_env_obfuscation
+///
+/// Environment variables generated by Envied should be obfuscated to prevent
+/// easy extraction from compiled binaries.
+///
+/// **BAD:**
+/// ```dart
+/// @Envied()
+/// abstract class Env {
+///   @EnviedField()
+///   static const String apiKey = _Env.apiKey;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @Envied(obfuscate: true)
+/// abstract class Env {
+///   @EnviedField(obfuscate: true)
+///   static const String apiKey = _Env.apiKey;
+/// }
+/// ```
+class RequireEnviedObfuscationRule extends SaropaLintRule {
+  const RequireEnviedObfuscationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_envied_obfuscation',
+    problemMessage: 'Envied should use obfuscation for security.',
+    correctionMessage: 'Add obfuscate: true to @Envied or @EnviedField.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAnnotation((Annotation node) {
+      final String name = node.name.name;
+      if (name != 'Envied' && name != 'EnviedField') return;
+
+      // Check for obfuscate: true
+      final ArgumentList? args = node.arguments;
+      if (args == null) {
+        reporter.atNode(node, code);
+        return;
+      }
+
+      final bool hasObfuscate = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'obfuscate') {
+            return arg.expression.toSource() == 'true';
+          }
+        }
+        return false;
+      });
+
+      if (!hasObfuscate) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddObfuscateTodoFix()];
+}
+
+class _AddObfuscateTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addAnnotation((Annotation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add obfuscate: true',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add obfuscate: true to prevent key extraction from binaries\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when OpenAI API key pattern is found in source code.
+///
+/// Alias: no_openai_key_in_code, openai_key_security
+///
+/// OpenAI API keys (sk-...) should never be hardcoded in source files.
+/// They should come from environment variables or secure storage.
+///
+/// **BAD:**
+/// ```dart
+/// final openAI = OpenAI.instance.build(
+///   token: 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final openAI = OpenAI.instance.build(
+///   token: Env.openAiKey,
+/// );
+/// ```
+class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
+  const AvoidOpenaiKeyInCodeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_openai_key_in_code',
+    problemMessage: 'OpenAI API key should not be hardcoded in source code.',
+    correctionMessage:
+        'Use environment variables or secure configuration for API keys.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  // OpenAI keys start with sk- followed by alphanumeric characters
+  static final RegExp _openAiKeyPattern = RegExp(r'sk-[a-zA-Z0-9]{20,}');
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String value = node.value;
+      if (_openAiKeyPattern.hasMatch(value)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddEnvVarTodoFix()];
+}
+
+/// Warns when OpenAI API calls (chat_gpt_sdk) lack try-catch error handling.
+///
+/// Alias: openai_try_catch, handle_openai_errors
+///
+/// OpenAI API calls can fail due to rate limits, network issues, or invalid
+/// requests. Without error handling, the app may crash unexpectedly.
+///
+/// **Note:** This rule targets the chat_gpt_sdk package's OpenAI class methods.
+///
+/// **BAD:**
+/// ```dart
+/// Future<String> chat(String message) async {
+///   final response = await openAI.onChatCompletion(request: request);
+///   return response!.choices.first.message!.content;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<String?> chat(String message) async {
+///   try {
+///     final response = await openAI.onChatCompletion(request: request);
+///     return response?.choices.first.message?.content;
+///   } catch (e) {
+///     // Handle API error
+///     return null;
+///   }
+/// }
+/// ```
+class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
+  const RequireOpenaiErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_openai_error_handling',
+    problemMessage: 'OpenAI API calls should be wrapped in try-catch.',
+    correctionMessage:
+        'Wrap OpenAI calls in try-catch to handle rate limits and failures.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  // chat_gpt_sdk specific method names
+  static const Set<String> _openAiMethods = <String>{
+    'onChatCompletion',
+    'onCompletion',
+    'generateImage',
+    'onModeration',
+    'createEmbeddings',
+    'audioTranscription',
+    'audioTranslation',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_openAiMethods.contains(methodName)) return;
+
+      // Validate target looks like OpenAI instance
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource().toLowerCase();
+        // Should be called on something containing 'openai' or 'gpt'
+        if (!targetSource.contains('openai') &&
+            !targetSource.contains('gpt') &&
+            !targetSource.contains('_ai')) {
+          return;
+        }
+      }
+
+      // Check if wrapped in try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return;
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTryCatchTodoFix(code)];
+}
+
+// =============================================================================
+// UI COMPONENT RULES
+// =============================================================================
+
+/// Warns when SvgPicture lacks errorBuilder callback.
+///
+/// Alias: svg_error_handler, require_svg_error_builder
+///
+/// SVG loading can fail for various reasons. Without an error builder,
+/// the UI may break or show nothing when an SVG fails to load.
+///
+/// **BAD:**
+/// ```dart
+/// SvgPicture.asset('assets/icon.svg')
+/// SvgPicture.network('https://example.com/icon.svg')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SvgPicture.asset(
+///   'assets/icon.svg',
+///   placeholderBuilder: (context) => CircularProgressIndicator(),
+///   errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+/// )
+/// ```
+class RequireSvgErrorHandlerRule extends SaropaLintRule {
+  const RequireSvgErrorHandlerRule() : super(code: _code);
+
+  // Medium impact - UI fallback, not crash-causing
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_svg_error_handler',
+    problemMessage: 'SvgPicture should have an errorBuilder callback.',
+    correctionMessage: 'Add errorBuilder to handle SVG loading failures.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for SvgPicture factory constructors
+      final String? target = node.target?.toSource();
+      if (target != 'SvgPicture') return;
+
+      final String methodName = node.methodName.name;
+      if (methodName != 'asset' &&
+          methodName != 'network' &&
+          methodName != 'file' &&
+          methodName != 'memory') {
+        return;
+      }
+
+      // Check for errorBuilder parameter
+      final bool hasErrorBuilder =
+          node.argumentList.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'errorBuilder';
+        }
+        return false;
+      });
+
+      if (!hasErrorBuilder) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddErrorBuilderTodoFix()];
+}
+
+class _AddErrorBuilderTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add errorBuilder',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add errorBuilder callback to handle loading failures\n',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when GoogleFonts usage lacks fontFamilyFallback.
+///
+/// Alias: google_fonts_fallback, require_font_fallback
+///
+/// Google Fonts may fail to load on slow connections or offline. Without a
+/// fallback, text may be invisible or use system default unexpectedly.
+///
+/// **BAD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: GoogleFonts.roboto(),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(
+///   'Hello',
+///   style: GoogleFonts.roboto(
+///     fontFamilyFallback: ['Arial', 'sans-serif'],
+///   ),
+/// )
+/// ```
+class RequireGoogleFontsFallbackRule extends SaropaLintRule {
+  const RequireGoogleFontsFallbackRule() : super(code: _code);
+
+  // Medium impact - UI fallback, not crash-causing
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_google_fonts_fallback',
+    problemMessage: 'GoogleFonts should specify fontFamilyFallback.',
+    correctionMessage:
+        'Add fontFamilyFallback to handle font loading failures.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for GoogleFonts calls
+      final String? target = node.target?.toSource();
+      if (target != 'GoogleFonts') return;
+
+      // Check for fontFamilyFallback parameter
+      final bool hasFallback =
+          node.argumentList.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'fontFamilyFallback';
+        }
+        return false;
+      });
+
+      if (!hasFallback) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddFontFallbackTodoFix()];
+}
+
+class _AddFontFallbackTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Add fontFamilyFallback',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add fontFamilyFallback for offline/slow network fallback\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// UUID RULES
+// =============================================================================
+
+/// Suggests using UUID v4 instead of v1 for better randomness.
+///
+/// Alias: prefer_uuid_v4_over_v1, use_uuid_v4
+///
+/// UUID v1 is time-based and includes MAC address, which may leak information.
+/// UUID v4 is random and more suitable for most use cases.
+///
+/// **BAD:**
+/// ```dart
+/// final id = Uuid().v1();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final id = Uuid().v4();
+/// ```
+class PreferUuidV4Rule extends SaropaLintRule {
+  const PreferUuidV4Rule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_uuid_v4',
+    problemMessage: 'Prefer UUID v4 over v1 for better randomness and privacy.',
+    correctionMessage: 'Use Uuid().v4() instead of Uuid().v1().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'v1') return;
+
+      // Check if it's a Uuid call
+      final String source = node.toSource();
+      if (source.contains('Uuid()') || source.contains('uuid.')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceV1WithV4Fix()];
+}
+
+class _ReplaceV1WithV4Fix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'v1') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace v1() with v4()',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(node.methodName.offset, node.methodName.length),
+          'v4',
+        );
+      });
+    });
+  }
+}

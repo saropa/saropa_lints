@@ -919,3 +919,57 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 5: API Pattern Rules
+// =============================================================================
+
+/// Warns when `riverpod` is imported without `flutter_riverpod` in Flutter.
+///
+/// Alias: wrong_riverpod_import, riverpod_without_flutter
+///
+/// In Flutter apps, use `flutter_riverpod` not the base `riverpod` package.
+/// The base package lacks Flutter-specific widgets like ConsumerWidget.
+///
+/// **BAD:**
+/// ```dart
+/// import 'package:riverpod/riverpod.dart';  // Wrong in Flutter!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:flutter_riverpod/flutter_riverpod.dart';
+/// ```
+class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
+  const RequireFlutterRiverpodPackageRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_flutter_riverpod_package',
+    problemMessage:
+        'Use flutter_riverpod instead of riverpod in Flutter apps.',
+    correctionMessage:
+        'Import package:flutter_riverpod/flutter_riverpod.dart instead.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addImportDirective((ImportDirective node) {
+      final uri = node.uri.stringValue;
+      if (uri == null) return;
+
+      // Check for plain riverpod import
+      if (uri == 'package:riverpod/riverpod.dart') {
+        // This is likely wrong in a Flutter app - should use flutter_riverpod
+        reporter.atNode(node.uri, code);
+      }
+    });
+  }
+}

@@ -569,6 +569,8 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
 
 /// Warns when Form widget doesn't have a GlobalKey.
 ///
+/// Alias: require_form_global_key
+///
 /// Forms without GlobalKey can't call validate() or save(). The FormState
 /// is inaccessible without a key.
 ///

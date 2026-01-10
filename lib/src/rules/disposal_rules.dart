@@ -837,7 +837,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 
 /// Warns when StreamSubscription is not cancelled in dispose().
 ///
-/// Alias: cancel_stream_subscription, stream_subscription_leak
+/// Alias: cancel_stream_subscription, stream_subscription_leak, avoid_unassigned_stream_subscriptions
 ///
 /// StreamSubscription holds references that prevent garbage collection
 /// and will continue to receive events after the widget is disposed,
@@ -933,6 +933,655 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
         if (!cancelledFields.contains(field)) {
           reporter.atNode(node, code);
           return;
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Part 2: Additional Dispose Pattern Rules
+// =============================================================================
+
+/// Warns when ChangeNotifier is not disposed.
+///
+/// Alias: dispose_change_notifier, change_notifier_leak
+///
+/// ChangeNotifier maintains a list of listeners that must be cleared.
+/// Not disposing can cause memory leaks and stale listener callbacks.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   final MyNotifier _notifier = MyNotifier();
+///   // Missing dispose!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   final MyNotifier _notifier = MyNotifier();
+///
+///   @override
+///   void dispose() {
+///     _notifier.dispose();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireChangeNotifierDisposeRule extends SaropaLintRule {
+  const RequireChangeNotifierDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_change_notifier_dispose',
+    problemMessage: 'ChangeNotifier must be disposed to clear listeners.',
+    correctionMessage: 'Add notifier.dispose() in the dispose() method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _changeNotifierTypes = <String>{
+    'ChangeNotifier',
+    'ValueNotifier',
+    'TextEditingController',
+    'ScrollController',
+    'AnimationController',
+    'TabController',
+    'PageController',
+    'FocusNode',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!_extendsState(node)) return;
+
+      // Find ChangeNotifier-derived fields
+      final List<String> notifierFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null) {
+            for (final String notifierType in _changeNotifierTypes) {
+              if (typeName.contains(notifierType)) {
+                for (final VariableDeclaration variable
+                    in member.fields.variables) {
+                  notifierFields.add(variable.name.lexeme);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (notifierFields.isEmpty) return;
+
+      final String? disposeBody = _getDisposeMethodBody(node);
+      _reportUndisposedFields(node, notifierFields, disposeBody, reporter, code);
+    });
+  }
+}
+
+/// Warns when ReceivePort is not closed in dispose().
+///
+/// Alias: close_receive_port, receive_port_leak
+///
+/// ReceivePort holds isolate communication resources that must be closed.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   late ReceivePort _receivePort;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _receivePort = ReceivePort();
+///   }
+///   // Missing close!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   late ReceivePort _receivePort;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _receivePort = ReceivePort();
+///   }
+///
+///   @override
+///   void dispose() {
+///     _receivePort.close();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireReceivePortCloseRule extends SaropaLintRule {
+  const RequireReceivePortCloseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_receive_port_close',
+    problemMessage: 'ReceivePort must be closed to release isolate resources.',
+    correctionMessage: 'Add _receivePort.close() in the dispose() method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!_extendsState(node)) return;
+
+      // Find ReceivePort fields
+      final List<String> portFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null && typeName.contains('ReceivePort')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              portFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (portFields.isEmpty) return;
+
+      // Check dispose method for close calls
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      for (final String field in portFields) {
+        final bool isClosed = disposeBody != null &&
+            (disposeBody.contains('$field.close()') ||
+                disposeBody.contains('$field?.close()'));
+        if (!isClosed) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == field) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Socket is not closed in dispose().
+///
+/// Alias: close_socket, socket_leak
+///
+/// Socket connections must be closed to release network resources.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   Socket? _socket;
+///
+///   Future<void> connect() async {
+///     _socket = await Socket.connect('host', 80);
+///   }
+///   // Missing close!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   Socket? _socket;
+///
+///   Future<void> connect() async {
+///     _socket = await Socket.connect('host', 80);
+///   }
+///
+///   @override
+///   void dispose() {
+///     _socket?.close();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireSocketCloseRule extends SaropaLintRule {
+  const RequireSocketCloseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_socket_close',
+    problemMessage: 'Socket must be closed to release network resources.',
+    correctionMessage: 'Add _socket?.close() in the dispose() method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!_extendsState(node)) return;
+
+      // Find Socket fields
+      final List<String> socketFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null &&
+              (typeName == 'Socket' ||
+                  typeName == 'Socket?' ||
+                  typeName.contains('SecureSocket'))) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              socketFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (socketFields.isEmpty) return;
+
+      // Check dispose method for close calls
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      for (final String field in socketFields) {
+        final bool isClosed = disposeBody != null &&
+            (disposeBody.contains('$field.close()') ||
+                disposeBody.contains('$field?.close()') ||
+                disposeBody.contains('$field.destroy()') ||
+                disposeBody.contains('$field?.destroy()'));
+        if (!isClosed) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == field) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when a debouncer Timer is not cancelled in dispose().
+///
+/// Alias: cancel_debouncer, debouncer_leak
+///
+/// Debounce timers used for search or input delay must be cancelled
+/// to prevent callbacks firing after widget disposal.
+///
+/// **BAD:**
+/// ```dart
+/// class _SearchState extends State<Search> {
+///   Timer? _debounce;
+///
+///   void _onSearchChanged(String query) {
+///     _debounce?.cancel();
+///     _debounce = Timer(Duration(milliseconds: 500), () {
+///       performSearch(query);
+///     });
+///   }
+///   // Missing cancel in dispose!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _SearchState extends State<Search> {
+///   Timer? _debounce;
+///
+///   void _onSearchChanged(String query) {
+///     _debounce?.cancel();
+///     _debounce = Timer(Duration(milliseconds: 500), () {
+///       performSearch(query);
+///     });
+///   }
+///
+///   @override
+///   void dispose() {
+///     _debounce?.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireDebouncerCancelRule extends SaropaLintRule {
+  const RequireDebouncerCancelRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_debouncer_cancel',
+    problemMessage: 'Debounce timer must be cancelled in dispose().',
+    correctionMessage: 'Add _debounce?.cancel() in the dispose() method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!_extendsState(node)) return;
+
+      // Find Timer fields
+      final List<String> timerFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null &&
+              (typeName == 'Timer' || typeName == 'Timer?')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              timerFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (timerFields.isEmpty) return;
+
+      // Check dispose method for cancel calls
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      for (final String field in timerFields) {
+        final bool isCancelled = disposeBody != null &&
+            (disposeBody.contains('$field.cancel()') ||
+                disposeBody.contains('$field?.cancel()'));
+        if (!isCancelled) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == field) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Timer.periodic is not cancelled in dispose().
+///
+/// Alias: cancel_interval_timer, periodic_timer_leak
+///
+/// Periodic timers keep firing indefinitely. Not cancelling them
+/// wastes resources and can call setState on disposed widgets.
+///
+/// **BAD:**
+/// ```dart
+/// class _ClockState extends State<Clock> {
+///   Timer? _timer;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) {
+///       setState(() {});
+///     });
+///   }
+///   // Missing cancel - timer runs forever!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _ClockState extends State<Clock> {
+///   Timer? _timer;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) {
+///       setState(() {});
+///     });
+///   }
+///
+///   @override
+///   void dispose() {
+///     _timer?.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireIntervalTimerCancelRule extends SaropaLintRule {
+  const RequireIntervalTimerCancelRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_interval_timer_cancel',
+    problemMessage: 'Timer.periodic must be cancelled in dispose().',
+    correctionMessage: 'Add _timer?.cancel() in the dispose() method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track Timer.periodic assignments in State classes
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Timer.periodic
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (targetSource != 'Timer') return;
+      if (node.methodName.name != 'periodic') return;
+
+      // Find enclosing class
+      AstNode? current = node.parent;
+      ClassDeclaration? enclosingClass;
+
+      while (current != null) {
+        if (current is ClassDeclaration) {
+          enclosingClass = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingClass == null) return;
+      if (!_extendsState(enclosingClass)) return;
+
+      // Check if the result is assigned to a field
+      AstNode? parent = node.parent;
+      String? fieldName;
+
+      if (parent is AssignmentExpression) {
+        final leftSide = parent.leftHandSide;
+        if (leftSide is SimpleIdentifier) {
+          fieldName = leftSide.name;
+        } else if (leftSide is PrefixedIdentifier) {
+          fieldName = leftSide.identifier.name;
+        }
+      } else if (parent is VariableDeclaration) {
+        fieldName = parent.name.lexeme;
+      }
+
+      if (fieldName == null) {
+        // Timer.periodic called but not stored - always a problem
+        reporter.atNode(node.methodName, code);
+        return;
+      }
+
+      // Check dispose method for cancel call
+      String? disposeBody;
+      for (final ClassMember member in enclosingClass.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      final bool isCancelled = disposeBody != null &&
+          (disposeBody.contains('$fieldName.cancel()') ||
+              disposeBody.contains('$fieldName?.cancel()'));
+
+      if (!isCancelled) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when RandomAccessFile is not closed.
+///
+/// Alias: close_file_handle, file_handle_leak
+///
+/// RandomAccessFile holds a file handle that must be released.
+/// Not closing it can exhaust file descriptors.
+///
+/// **BAD:**
+/// ```dart
+/// class _FileReaderState extends State<FileReader> {
+///   RandomAccessFile? _file;
+///
+///   Future<void> openFile() async {
+///     _file = await File('path').open();
+///   }
+///   // Missing close!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _FileReaderState extends State<FileReader> {
+///   RandomAccessFile? _file;
+///
+///   Future<void> openFile() async {
+///     _file = await File('path').open();
+///   }
+///
+///   @override
+///   void dispose() {
+///     _file?.closeSync();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireFileHandleCloseRule extends SaropaLintRule {
+  const RequireFileHandleCloseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_file_handle_close',
+    problemMessage:
+        'RandomAccessFile must be closed to release file descriptors.',
+    correctionMessage: 'Add _file?.closeSync() in the dispose() method.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!_extendsState(node)) return;
+
+      // Find RandomAccessFile fields
+      final List<String> fileFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null &&
+              (typeName == 'RandomAccessFile' ||
+                  typeName == 'RandomAccessFile?')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              fileFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (fileFields.isEmpty) return;
+
+      // Check dispose method for close calls
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      for (final String field in fileFields) {
+        final bool isClosed = disposeBody != null &&
+            (disposeBody.contains('$field.close()') ||
+                disposeBody.contains('$field?.close()') ||
+                disposeBody.contains('$field.closeSync()') ||
+                disposeBody.contains('$field?.closeSync()'));
+        if (!isClosed) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == field) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
         }
       }
     });
