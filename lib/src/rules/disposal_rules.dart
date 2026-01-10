@@ -266,7 +266,7 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
 // Generic Controller Dispose Rules
 // ============================================================================
 
-/// Helper to check if a class extends State<T>.
+/// Helper to check if a class extends `State<T>`.
 bool _extendsState(ClassDeclaration node) {
   final ExtendsClause? extendsClause = node.extendsClause;
   if (extendsClause == null) return false;
@@ -365,8 +365,7 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
     name: 'require_text_editing_controller_dispose',
     problemMessage:
         'TextEditingController must be disposed to prevent memory leaks.',
-    correctionMessage:
-        'Add _textController.dispose() in the dispose() method.',
+    correctionMessage: 'Add _textController.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -422,10 +421,8 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_page_controller_dispose',
-    problemMessage:
-        'PageController must be disposed to prevent memory leaks.',
-    correctionMessage:
-        'Add _pageController.dispose() in the dispose() method.',
+    problemMessage: 'PageController must be disposed to prevent memory leaks.',
+    correctionMessage: 'Add _pageController.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
