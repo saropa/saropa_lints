@@ -54,34 +54,6 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
-
-      // Check for ListView, GridView, etc.
-      if (!_scrollableTypes.contains(typeName)) return;
-
-      // Check for shrinkWrap: true
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
-          final Expression value = arg.expression;
-          if (value is BooleanLiteral && value.value) {
-            // Check if inside another scrollable
-            if (_isInsideScrollable(node)) {
-              reporter.atNode(arg, code);
-            }
-          }
-        }
-      }
-    });
-  }
-
   static const Set<String> _scrollableTypes = <String>{
     'ListView',
     'GridView',
@@ -89,26 +61,69 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
     'CustomScrollView',
   };
 
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Look for shrinkWrap: true arguments directly
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'shrinkWrap') return;
+
+      final Expression value = node.expression;
+      if (value is! BooleanLiteral || !value.value) return;
+
+      // Check if this shrinkWrap is on a scrollable widget
+      final AstNode? scrollableWidget = _findParentScrollable(node);
+      if (scrollableWidget == null) return;
+
+      // Check if that scrollable is inside another scrollable
+      if (_isInsideScrollable(scrollableWidget)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  /// Find the parent scrollable widget (ListView, GridView, etc.)
+  AstNode? _findParentScrollable(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String? typeName = current.constructorName.type.element?.name ??
+            _getTypeName(current);
+        if (typeName != null && _scrollableTypes.contains(typeName)) {
+          return current;
+        }
+      } else if (current is MethodInvocation) {
+        // Handle implicit constructor calls
+        final String methodName = current.methodName.name;
+        if (_scrollableTypes.contains(methodName)) {
+          return current;
+        }
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  String? _getTypeName(InstanceCreationExpression node) {
+    return node.constructorName.type.name2.lexeme;
+  }
+
   bool _isInsideScrollable(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String typeName = current.constructorName.type.name2.lexeme;
-        if (_scrollableTypes.contains(typeName) ||
-            typeName == 'Column' ||
-            typeName == 'Row') {
-          // Check if this scrollable is inside another scrollable
-          AstNode? parent = current.parent;
-          while (parent != null) {
-            if (parent is InstanceCreationExpression) {
-              final String parentType =
-                  parent.constructorName.type.name2.lexeme;
-              if (_scrollableTypes.contains(parentType)) {
-                return true;
-              }
-            }
-            parent = parent.parent;
-          }
+        final String? typeName = current.constructorName.type.element?.name ??
+            _getTypeName(current);
+        if (typeName != null && _scrollableTypes.contains(typeName)) {
+          return true;
+        }
+      } else if (current is MethodInvocation) {
+        final String methodName = current.methodName.name;
+        if (_scrollableTypes.contains(methodName)) {
+          return true;
         }
       }
       current = current.parent;
@@ -169,28 +184,53 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
-
-      if (!_scrollableTypes.contains(typeName)) return;
-
-      // Check if this is inside another scrollable
-      if (!_isInsideScrollable(node)) return;
-
-      // Check if physics is specified
-      bool hasPhysics = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'physics') {
-          hasPhysics = true;
-          break;
-        }
-      }
-
-      if (!hasPhysics) {
-        reporter.atNode(node.constructorName, code);
-      }
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+      node.body.visitChildren(
+          _NestedScrollableVisitor(reporter, code, _scrollableTypes));
     });
+  }
+}
+
+class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
+  _NestedScrollableVisitor(this.reporter, this.code, this.scrollableTypes);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> scrollableTypes;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    _checkScrollable(
+        node, node.constructorName.type.name2.lexeme, node.argumentList);
+    super.visitInstanceCreationExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Handle implicit constructor calls
+    _checkScrollable(node, node.methodName.name, node.argumentList);
+    super.visitMethodInvocation(node);
+  }
+
+  void _checkScrollable(AstNode node, String typeName, ArgumentList args) {
+    if (!scrollableTypes.contains(typeName)) return;
+
+    // Check if inside another scrollable
+    if (!_isInsideScrollable(node)) return;
+
+    // Check if physics is specified
+    bool hasPhysics = false;
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'physics') {
+        hasPhysics = true;
+        break;
+      }
+    }
+
+    if (!hasPhysics) {
+      reporter.atNode(node, code);
+    }
   }
 
   bool _isInsideScrollable(AstNode node) {
@@ -198,7 +238,11 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
     while (current != null) {
       if (current is InstanceCreationExpression) {
         final String typeName = current.constructorName.type.name2.lexeme;
-        if (_scrollableTypes.contains(typeName)) {
+        if (scrollableTypes.contains(typeName)) {
+          return true;
+        }
+      } else if (current is MethodInvocation) {
+        if (scrollableTypes.contains(current.methodName.name)) {
           return true;
         }
       }
@@ -312,32 +356,45 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
   static const int _maxItems = 5;
 
+  static const Set<String> _navTypes = <String>{
+    'BottomNavigationBar',
+    'NavigationBar',
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+    // Look for items/destinations arguments directly
+    context.registry.addNamedExpression((NamedExpression node) {
+      final String argName = node.name.label.name;
+      if (argName != 'items' && argName != 'destinations') return;
 
-      if (typeName != 'BottomNavigationBar' && typeName != 'NavigationBar') {
-        return;
-      }
+      // Check if the value is a list with too many items
+      final Expression value = node.expression;
+      if (value is! ListLiteral || value.elements.length <= _maxItems) return;
 
-      // Check for items argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            (arg.name.label.name == 'items' ||
-                arg.name.label.name == 'destinations')) {
-          final Expression value = arg.expression;
-          if (value is ListLiteral && value.elements.length > _maxItems) {
-            reporter.atNode(arg, code);
-          }
-        }
+      // Check if this is on a nav bar widget
+      if (_isOnNavBar(node)) {
+        reporter.atNode(node, code);
       }
     });
+  }
+
+  bool _isOnNavBar(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name2.lexeme;
+        if (_navTypes.contains(typeName)) return true;
+      } else if (current is MethodInvocation) {
+        if (_navTypes.contains(current.methodName.name)) return true;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 

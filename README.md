@@ -53,6 +53,20 @@ Saropa Lints detects these patterns and hundreds more:
 
 **Accuracy focused**: Rules use proper AST type checking instead of string matching, reducing false positives on variable names like "upstream" or "spinning".
 
+### Essential for reactive libraries
+
+If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, or **Isar**, these audits are critical. These libraries are powerful but have patterns that fail silently at runtime:
+
+| Library | Common issues caught |
+|---------|---------------------|
+| **GetX** | Undisposed controllers, memory leaks from listeners |
+| **Riverpod** | Circular provider deps, ref.read() in build, missing ProviderScope |
+| **Provider** | Provider.of in build causing rebuilds, recreated providers losing state |
+| **Bloc** | Events in constructor, mutable state, unclosed Blocs, BlocListener in build |
+| **Isar** | Enum fields causing data corruption on schema changes |
+
+Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 20+ rules specifically for state management anti-patterns that cause crashes, memory leaks, and data corruption in production.
+
 ### Why it matters
 
 The [European Accessibility Act](https://accessible-eu-centre.ec.europa.eu/content-corner/news/eaa-comes-effect-june-2025-are-you-ready-2025-01-31_en) takes effect June 2025, requiring accessible apps in retail, banking, and travel. GitHub detected [39 million leaked secrets](https://github.blog/security/application-security/next-evolution-github-advanced-security/) in repositories during 2024.

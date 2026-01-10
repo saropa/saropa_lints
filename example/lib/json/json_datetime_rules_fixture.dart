@@ -1,5 +1,5 @@
 // ignore_for_file: unused_local_variable, unused_element, depend_on_referenced_packages
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, avoid_logging_sensitive_data
 // Test fixture for JSON and DateTime rules
 
 import 'dart:convert';

@@ -17,7 +17,8 @@ class BadVideoPlayerWidget extends StatefulWidget {
 }
 
 class _BadVideoPlayerWidgetState extends State<BadVideoPlayerWidget> {
-  // expect_lint: require_media_player_dispose
+  // Note: VideoPlayerController test requires video_player package
+  // The general require_dispose rule covers this case
   // late VideoPlayerController _controller;
 
   @override

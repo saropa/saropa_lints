@@ -185,6 +185,14 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
             return;
           }
         }
+        // Also check local functions (FunctionDeclaration)
+        if (current is FunctionDeclaration) {
+          final String funcName = current.name.lexeme.toLowerCase();
+          if (_securityIndicators.any((s) => funcName.contains(s))) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
         current = current.parent;
       }
     });
