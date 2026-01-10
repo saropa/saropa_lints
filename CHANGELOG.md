@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.6.0.
 
+## [1.7.12] - 2026-01-10
+
+### Fixed
+- **`avoid_double_for_money`**: Fixed false positive where "percent" in variable names (e.g., `imageUrlVerticalOffsetPercent`) was matching the "cent" money indicator. Added exclusion list for common non-money patterns: percent, percentage, center, centered, centimeter, accent, recent, descent, etc.
+- **`require_unique_iv_per_encryption`**: Improved IV variable name detection to avoid false positives like "activity", "private", "derivative" - now uses proper word boundary detection for camelCase and snake_case patterns
+
+### Quick Fixes
+- **`require_unique_iv_per_encryption`**: Auto-replaces `IV.fromUtf8`/`IV.fromBase64` with `IV.fromSecureRandom(16)`
+
 ## [1.7.11] - 2026-01-10
 
 ### Fixed
