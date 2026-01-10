@@ -989,8 +989,7 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
         // Check if inside a method body (not a field declaration)
         AstNode? current = parent;
         while (current != null) {
-          if (current is MethodDeclaration ||
-              current is FunctionDeclaration) {
+          if (current is MethodDeclaration || current is FunctionDeclaration) {
             // Inline usage inside method - should reuse
             reporter.atNode(node, code);
             return;
@@ -1046,8 +1045,7 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
     name: 'avoid_redundant_requests',
     problemMessage:
         'API call in build() or similar may cause redundant requests.',
-    correctionMessage:
-        'Cache results or use request deduplication pattern.',
+    correctionMessage: 'Cache results or use request deduplication pattern.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1162,8 +1160,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check for GET requests
-      if (!bodySource.contains('.get(') &&
-          !bodySource.contains('http.get')) {
+      if (!bodySource.contains('.get(') && !bodySource.contains('http.get')) {
         return;
       }
 
@@ -1353,10 +1350,9 @@ class AvoidOverFetchingRule extends SaropaLintRule {
         if (bodySource.contains('.name') ||
             bodySource.contains('.title') ||
             bodySource.contains('.id')) {
-          final int totalProps =
-              RegExp(r'\.(name|title|id|label|text)\b')
-                  .allMatches(bodySource)
-                  .length;
+          final int totalProps = RegExp(r'\.(name|title|id|label|text)\b')
+              .allMatches(bodySource)
+              .length;
           if (totalProps >= 1 && totalProps <= 2) {
             reporter.atNode(node, code);
           }

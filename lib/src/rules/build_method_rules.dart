@@ -499,7 +499,8 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'jsonEncode' || node.methodName.name == 'json.encode') {
+    if (node.methodName.name == 'jsonEncode' ||
+        node.methodName.name == 'json.encode') {
       reporter.atNode(node, code);
     }
     super.visitMethodInvocation(node);
@@ -549,8 +550,7 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getit_in_build',
-    problemMessage:
-        'GetIt service locator in build() hides dependencies.',
+    problemMessage: 'GetIt service locator in build() hides dependencies.',
     correctionMessage:
         'Inject dependencies via constructor or access in initState().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -699,8 +699,7 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
     name: 'avoid_hardcoded_feature_flags',
     problemMessage:
         'Hardcoded if(true)/if(false) suggests incomplete feature flag.',
-    correctionMessage:
-        'Use a proper feature flag system or remove dead code.',
+    correctionMessage: 'Use a proper feature flag system or remove dead code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
