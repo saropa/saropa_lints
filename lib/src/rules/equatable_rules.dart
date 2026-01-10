@@ -92,8 +92,7 @@ class ExtendEquatableRule extends SaropaLintRule {
     final ExtendsClause? extendsClause = node.extendsClause;
     if (extendsClause == null) return false;
 
-    final String superclassName =
-        extendsClause.superclass.name2.lexeme;
+    final String superclassName = extendsClause.superclass.name2.lexeme;
     return superclassName == 'Equatable';
   }
 
@@ -171,8 +170,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
       final Set<String> instanceFields = <String>{};
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration && !member.isStatic) {
-          for (final VariableDeclaration variable
-              in member.fields.variables) {
+          for (final VariableDeclaration variable in member.fields.variables) {
             instanceFields.add(variable.name.lexeme);
           }
         }
@@ -223,8 +221,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
     // Check extends Equatable
     final ExtendsClause? extendsClause = node.extendsClause;
     if (extendsClause != null) {
-      final String superclassName =
-          extendsClause.superclass.name2.lexeme;
+      final String superclassName = extendsClause.superclass.name2.lexeme;
       if (superclassName == 'Equatable') return true;
     }
 
@@ -349,8 +346,7 @@ class PreferEquatableMixinRule extends SaropaLintRule {
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause == null) return;
 
-      final String superclassName =
-          extendsClause.superclass.name2.lexeme;
+      final String superclassName = extendsClause.superclass.name2.lexeme;
 
       // Only suggest for classes that directly extend Equatable
       if (superclassName != 'Equatable') return;
@@ -410,8 +406,7 @@ class _ConvertToEquatableMixinFix extends DartFix {
           );
 
           // Add EquatableMixin to existing with clause
-          final int insertOffset =
-              withClause.mixinTypes.last.end;
+          final int insertOffset = withClause.mixinTypes.last.end;
           builder.addSimpleInsertion(insertOffset, ', EquatableMixin');
         } else {
           // Replace 'extends Equatable' with 'with EquatableMixin'

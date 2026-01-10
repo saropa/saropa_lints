@@ -2005,7 +2005,8 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_async_callback_in_fake_async',
-    problemMessage: 'Async callback inside fakeAsync defeats fake time control.',
+    problemMessage:
+        'Async callback inside fakeAsync defeats fake time control.',
     correctionMessage:
         'Remove async keyword. Use synchronous code with fake.elapse() '
         'to control time.',
@@ -2092,8 +2093,8 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
       return;
     }
 
-    context.registry.addInstanceCreationExpression(
-        (InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for Key constructor with string literal
@@ -2243,8 +2244,10 @@ class PreferTestVariantRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_variant',
-    problemMessage: 'Similar tests could use variant for different configurations.',
-    correctionMessage: 'Use testWidgets variant parameter for configuration testing.',
+    problemMessage:
+        'Similar tests could use variant for different configurations.',
+    correctionMessage:
+        'Use testWidgets variant parameter for configuration testing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

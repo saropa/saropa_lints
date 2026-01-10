@@ -606,7 +606,8 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
       if (extendsClause == null) return;
 
       final String superName = extendsClause.superclass.name.lexeme;
-      if (superName != 'ConsumerWidget' && superName != 'ConsumerStatefulWidget') {
+      if (superName != 'ConsumerWidget' &&
+          superName != 'ConsumerStatefulWidget') {
         return;
       }
 

@@ -4717,8 +4717,7 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression childExpr = arg.expression;
           if (childExpr is InstanceCreationExpression) {
-            final String childType =
-                childExpr.constructorName.type.name.lexeme;
+            final String childType = childExpr.constructorName.type.name.lexeme;
             if (childType == 'BlocProvider') {
               reporter.atNode(node, code);
               return;
@@ -4765,8 +4764,7 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_bloc_value_provider',
-    problemMessage:
-        'BlocProvider.value should not create a new bloc instance. '
+    problemMessage: 'BlocProvider.value should not create a new bloc instance. '
         'The bloc will not be automatically closed.',
     correctionMessage:
         'Use BlocProvider(create: ...) for new instances, or pass an existing '
@@ -5039,8 +5037,7 @@ class PreferMultiProviderRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression childExpr = arg.expression;
           if (childExpr is InstanceCreationExpression) {
-            final String childType =
-                childExpr.constructorName.type.name.lexeme;
+            final String childType = childExpr.constructorName.type.name.lexeme;
             if (_providerTypes.contains(childType)) {
               reporter.atNode(node, code);
               return;
@@ -5087,8 +5084,7 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_value_provider',
-    problemMessage:
-        'Provider.value should not create a new instance. '
+    problemMessage: 'Provider.value should not create a new instance. '
         'The instance lifecycle will not be properly managed.',
     correctionMessage:
         'Use Provider(create: ...) for new instances, or pass an existing '
@@ -5256,8 +5252,7 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
-    problemMessage:
-        'GetxController lifecycle method must call super. '
+    problemMessage: 'GetxController lifecycle method must call super. '
         'Missing super call breaks controller lifecycle.',
     correctionMessage:
         'Add super.onInit() at the start or super.onClose() at the end.',
@@ -5313,8 +5308,7 @@ class _SuperCallVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.target is SuperExpression &&
-        node.methodName.name == methodName) {
+    if (node.target is SuperExpression && node.methodName.name == methodName) {
       hasSuperCall = true;
     }
     super.visitMethodInvocation(node);
@@ -5364,8 +5358,7 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'always_remove_getx_listener',
-    problemMessage:
-        'GetX worker is not assigned to a variable for cleanup. '
+    problemMessage: 'GetX worker is not assigned to a variable for cleanup. '
         'This will cause a memory leak.',
     correctionMessage:
         'Assign the worker to a variable and call dispose() in onClose().',
@@ -5434,8 +5427,7 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hooks_outside_build',
-    problemMessage:
-        'Hook function called outside of build method. '
+    problemMessage: 'Hook function called outside of build method. '
         'Hooks must only be called from build().',
     correctionMessage: 'Move this hook call inside the build() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -5508,8 +5500,7 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditional_hooks',
-    problemMessage:
-        'Hook function called conditionally. '
+    problemMessage: 'Hook function called conditionally. '
         'Hooks must be called unconditionally in the same order.',
     correctionMessage:
         'Move hook calls outside of conditionals. Use the hook value conditionally instead.',
@@ -5614,8 +5605,7 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
     name: 'avoid_unnecessary_hook_widgets',
     problemMessage:
         'HookWidget without any hook calls. Use StatelessWidget instead.',
-    correctionMessage:
-        'Change to StatelessWidget if no hooks are needed.',
+    correctionMessage: 'Change to StatelessWidget if no hooks are needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5780,9 +5770,7 @@ class _EmitAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'emit' &&
-        _foundAwait &&
-        !_insideClosedCheck) {
+    if (node.methodName.name == 'emit' && _foundAwait && !_insideClosedCheck) {
       emitCallsAfterAwait.add(node);
     }
     super.visitMethodInvocation(node);
@@ -6174,7 +6162,8 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_event_suffix',
     problemMessage: 'Bloc event class should end with "Event" suffix.',
-    correctionMessage: 'Rename class to include Event suffix (e.g., LoadUserEvent).',
+    correctionMessage:
+        'Rename class to include Event suffix (e.g., LoadUserEvent).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6226,7 +6215,8 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_state_suffix',
     problemMessage: 'Bloc state class should end with "State" suffix.',
-    correctionMessage: 'Rename class to include State suffix (e.g., UserLoadingState).',
+    correctionMessage:
+        'Rename class to include State suffix (e.g., UserLoadingState).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6281,7 +6271,8 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_selector_value',
-    problemMessage: 'Selector uses mutable type that may cause incorrect rebuilds.',
+    problemMessage:
+        'Selector uses mutable type that may cause incorrect rebuilds.',
     correctionMessage: 'Return an immutable value or use a primitive type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6305,7 +6296,8 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
       if (typeName != 'Selector') return;
 
       // Check type argument
-      final TypeArgumentList? typeArgs = node.constructorName.type.typeArguments;
+      final TypeArgumentList? typeArgs =
+          node.constructorName.type.typeArguments;
       if (typeArgs == null || typeArgs.arguments.length < 2) return;
 
       final TypeAnnotation selectedType = typeArgs.arguments[1];
@@ -6359,7 +6351,9 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'read' && methodName != 'watch' && methodName != 'select') {
+      if (methodName != 'read' &&
+          methodName != 'watch' &&
+          methodName != 'select') {
         return;
       }
 
@@ -6768,8 +6762,7 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_provider_types',
-    problemMessage:
-        'Provider type is non-nullable but create may return null.',
+    problemMessage: 'Provider type is non-nullable but create may return null.',
     correctionMessage: 'Use nullable type parameter: Provider<Type?>.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

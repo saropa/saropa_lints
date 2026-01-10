@@ -1896,8 +1896,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
           }
         }
         // Check for verbose i = i + n pattern
-        if (updater is AssignmentExpression &&
-            updater.operator.lexeme == '=') {
+        if (updater is AssignmentExpression && updater.operator.lexeme == '=') {
           final Expression right = updater.rightHandSide;
           if (right is BinaryExpression) {
             // i = i + n or i = i - n

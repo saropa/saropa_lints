@@ -2176,8 +2176,7 @@ class RequireImageDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_description',
-    problemMessage:
-        'Image should have semanticLabel or excludeFromSemantics.',
+    problemMessage: 'Image should have semanticLabel or excludeFromSemantics.',
     correctionMessage:
         'Add semanticLabel for content images or excludeFromSemantics: true '
         'for decorative images.',
@@ -2245,7 +2244,8 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
     name: 'avoid_semantics_exclusion',
     problemMessage:
         'excludeFromSemantics: true should have a comment explaining why.',
-    correctionMessage: 'Add a comment explaining why this is decorative content.',
+    correctionMessage:
+        'Add a comment explaining why this is decorative content.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2415,7 +2415,8 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_focus_indicator',
     problemMessage: 'Interactive widget should have visible focus indicator.',
-    correctionMessage: 'Wrap in Focus widget and show visual feedback on focus.',
+    correctionMessage:
+        'Wrap in Focus widget and show visual feedback on focus.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

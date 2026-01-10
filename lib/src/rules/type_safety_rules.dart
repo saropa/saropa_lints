@@ -553,7 +553,8 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       // Check for generic types without explicit args
-      final TypeArgumentList? typeArgs = node.constructorName.type.typeArguments;
+      final TypeArgumentList? typeArgs =
+          node.constructorName.type.typeArguments;
       final String? typeName = node.constructorName.type.element?.name;
 
       // Only check common generic types

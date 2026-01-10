@@ -3565,7 +3565,8 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_native_file_dialogs',
     problemMessage: 'Consider using native file dialogs on desktop.',
-    correctionMessage: 'Use file_picker or file_selector for native experience.',
+    correctionMessage:
+        'Use file_picker or file_selector for native experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
