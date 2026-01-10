@@ -583,3 +583,556 @@ class _AddFirebaseInitFix extends DartFix {
     });
   }
 }
+
+/// Warns when database schema changes lack migration support.
+///
+/// Breaking schema changes without migrations corrupt existing user data.
+/// Use versioned migrations for schema evolution.
+///
+/// **BAD:**
+/// ```dart
+/// @HiveType(typeId: 1)
+/// class User {
+///   @HiveField(0)
+///   String id;
+///
+///   @HiveField(1)
+///   String name;
+///
+///   @HiveField(2) // Added field - breaks existing data!
+///   String email;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class DatabaseMigrator {
+///   static const int currentVersion = 2;
+///
+///   static Future<void> migrate(int fromVersion) async {
+///     if (fromVersion < 2) {
+///       await _addEmailField();
+///     }
+///   }
+/// }
+/// ```
+class RequireDatabaseMigrationRule extends SaropaLintRule {
+  const RequireDatabaseMigrationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_database_migration',
+    problemMessage:
+        'Database model without migration support. Schema changes may break data.',
+    correctionMessage:
+        'Implement versioned migrations for database schema changes.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String classSource = node.toSource();
+
+      // Check for Hive model patterns
+      if (classSource.contains('@HiveType') ||
+          classSource.contains('@HiveField')) {
+        // Check if project has migration infrastructure
+        // (This is a heuristic - real check would need project context)
+
+        // Check for versioning in class or nearby
+        if (!classSource.contains('version') &&
+            !classSource.contains('Version') &&
+            !classSource.contains('migration') &&
+            !classSource.contains('Migration') &&
+            !classSource.contains('schema') &&
+            !classSource.contains('Schema')) {
+          // Count HiveFields to estimate complexity
+          final int fieldCount =
+              RegExp(r'@HiveField\(\d+\)').allMatches(classSource).length;
+
+          // If many fields, more likely to evolve and need migrations
+          if (fieldCount >= 5) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+
+      // Check for Isar model patterns
+      if (classSource.contains('@collection') ||
+          classSource.contains('@Collection')) {
+        if (!classSource.contains('migration') &&
+            !classSource.contains('Migration') &&
+            !classSource.contains('schema') &&
+            !classSource.contains('version')) {
+          final String className = node.name.lexeme;
+          if (!className.contains('Migration') &&
+              !className.contains('Version')) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when frequently queried database fields lack indices.
+///
+/// Queries on non-indexed fields are slow. Add indices for fields
+/// used in where clauses, especially in large collections.
+///
+/// **BAD:**
+/// ```dart
+/// @collection
+/// class Product {
+///   Id id = Isar.autoIncrement;
+///   String category; // Queried but not indexed
+///   double price;
+/// }
+///
+/// // Slow query!
+/// final products = await isar.products
+///     .filter()
+///     .categoryEqualTo('electronics')
+///     .findAll();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @collection
+/// class Product {
+///   Id id = Isar.autoIncrement;
+///
+///   @Index()
+///   String category;
+///
+///   @Index()
+///   double price;
+/// }
+/// ```
+class RequireDatabaseIndexRule extends SaropaLintRule {
+  const RequireDatabaseIndexRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_database_index',
+    problemMessage:
+        'Database query on non-indexed field. Add @Index for better performance.',
+    correctionMessage:
+        'Add @Index() annotation to fields used in queries and filters.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for query/filter methods
+      if (!methodName.contains('filter') &&
+          !methodName.contains('where') &&
+          !methodName.contains('query') &&
+          !methodName.contains('find')) {
+        return;
+      }
+
+      // Check parent chain for database patterns
+      AstNode? current = node.parent;
+      bool isDatabaseQuery = false;
+
+      while (current != null) {
+        final String source = current.toSource();
+        if (source.contains('.products') ||
+            source.contains('.users') ||
+            source.contains('.items') ||
+            source.contains('.documents') ||
+            source.contains('collection(') ||
+            source.contains('isar.') ||
+            source.contains('realm.')) {
+          isDatabaseQuery = true;
+          break;
+        }
+        if (current is MethodDeclaration) break;
+        current = current.parent;
+      }
+
+      if (!isDatabaseQuery) return;
+
+      // Check if the query includes field filtering
+      final String nodeSource = node.toSource();
+      if (nodeSource.contains('EqualTo') ||
+          nodeSource.contains('GreaterThan') ||
+          nodeSource.contains('LessThan') ||
+          nodeSource.contains('Between') ||
+          nodeSource.contains('where(')) {
+        // This is a filter query - suggest indexing
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when multiple database writes are not batched in transactions.
+///
+/// Individual writes are slower and can leave data inconsistent.
+/// Use transactions or batch writes for multiple related changes.
+///
+/// **BAD:**
+/// ```dart
+/// await box.put('user1', user1);
+/// await box.put('user2', user2);
+/// await box.put('user3', user3);
+/// // Three separate writes - slow and not atomic
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await isar.writeTxn(() async {
+///   await isar.users.putAll([user1, user2, user3]);
+/// });
+///
+/// // Or with Firestore:
+/// final batch = firestore.batch();
+/// batch.set(ref1, data1);
+/// batch.set(ref2, data2);
+/// await batch.commit();
+/// ```
+class PreferTransactionForBatchRule extends SaropaLintRule {
+  const PreferTransactionForBatchRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_transaction_for_batch',
+    problemMessage:
+        'Multiple sequential database writes. Use transaction for atomicity.',
+    correctionMessage:
+        'Wrap related writes in a transaction or use batch operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Count individual write operations, excluding batch variants
+      final int putCount = '.put('.allMatches(bodySource).length -
+          '.putIfAbsent('.allMatches(bodySource).length -
+          '.putAll('.allMatches(bodySource).length;
+      final int addCount = '.add('.allMatches(bodySource).length -
+          '.addAll('.allMatches(bodySource).length;
+      final int insertCount = '.insert('.allMatches(bodySource).length -
+          '.insertAll('.allMatches(bodySource).length;
+      final int deleteCount = '.delete('.allMatches(bodySource).length -
+          '.deleteAll('.allMatches(bodySource).length;
+      final int updateCount = '.update('.allMatches(bodySource).length -
+          '.updateAll('.allMatches(bodySource).length;
+      final int setCount = '.set('.allMatches(bodySource).length;
+
+      final int writeOps =
+          putCount + addCount + insertCount + deleteCount + updateCount + setCount;
+
+      // If few writes, not a concern
+      if (writeOps < 3) return;
+
+      // Check if already using transactions/batches
+      if (bodySource.contains('writeTxn') ||
+          bodySource.contains('transaction') ||
+          bodySource.contains('Transaction') ||
+          bodySource.contains('.batch()') ||
+          bodySource.contains('batch.') ||
+          bodySource.contains('Batch') ||
+          bodySource.contains('putAll') ||
+          bodySource.contains('addAll') ||
+          bodySource.contains('insertAll')) {
+        return; // Already using batch/transaction pattern
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when database connections are not properly closed.
+///
+/// Unclosed database connections cause resource leaks and can prevent
+/// proper app shutdown. Always close databases in dispose.
+///
+/// **BAD:**
+/// ```dart
+/// class DataService {
+///   Isar? _isar;
+///
+///   Future<void> init() async {
+///     _isar = await Isar.open([UserSchema]);
+///   }
+///   // Missing close()!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class DataService {
+///   Isar? _isar;
+///
+///   Future<void> init() async {
+///     _isar = await Isar.open([UserSchema]);
+///   }
+///
+///   Future<void> dispose() async {
+///     await _isar?.close();
+///   }
+/// }
+/// ```
+class RequireHiveDatabaseCloseRule extends SaropaLintRule {
+  const RequireHiveDatabaseCloseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_database_close',
+    problemMessage:
+        'Database opened but no close() method found. Resource leak risk.',
+    correctionMessage:
+        'Add dispose() method that calls database.close().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String classSource = node.toSource();
+
+      // Check for database open patterns
+      final bool opensDatabase = classSource.contains('Isar.open') ||
+          classSource.contains('Hive.openBox') ||
+          classSource.contains('openDatabase') ||
+          classSource.contains('Realm.open') ||
+          classSource.contains('Database.open');
+
+      if (!opensDatabase) return;
+
+      // Check for close patterns
+      final bool hasClose = classSource.contains('.close()') ||
+          classSource.contains('dispose()') ||
+          classSource.contains('_close') ||
+          classSource.contains('closeDatabase');
+
+      if (!hasClose) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Hive type adapters are used without registration.
+///
+/// Custom Hive types require adapters to be registered before use.
+/// Unregistered adapters cause runtime errors.
+///
+/// **BAD:**
+/// ```dart
+/// void main() async {
+///   await Hive.initFlutter();
+///   await Hive.openBox<User>('users'); // Error: No adapter for User!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() async {
+///   await Hive.initFlutter();
+///   Hive.registerAdapter(UserAdapter());
+///   await Hive.openBox<User>('users');
+/// }
+/// ```
+class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
+  const RequireTypeAdapterRegistrationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_type_adapter_registration',
+    problemMessage:
+        'Hive box opened with custom type but adapter may not be registered.',
+    correctionMessage:
+        'Ensure Hive.registerAdapter() is called before opening typed boxes.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for Hive openBox calls
+      if (methodName != 'openBox' && methodName != 'openLazyBox') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('Hive')) return;
+
+      // Check if opening a typed box
+      final NodeList<TypeAnnotation>? typeArgs = node.typeArguments?.arguments;
+      if (typeArgs == null || typeArgs.isEmpty) return;
+
+      final String typeArg = typeArgs.first.toSource();
+
+      // Skip primitive types
+      if (typeArg == 'String' ||
+          typeArg == 'int' ||
+          typeArg == 'double' ||
+          typeArg == 'bool' ||
+          typeArg == 'dynamic') {
+        return;
+      }
+
+      // Check if there's a registerAdapter call nearby
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (current == null) return;
+
+      final String scopeSource = current.toSource();
+      final String adapterName = '${typeArg}Adapter';
+
+      if (!scopeSource.contains('registerAdapter') ||
+          !scopeSource.contains(adapterName)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when large data is loaded into regular Hive boxes instead of lazy.
+///
+/// Regular boxes load all data into memory at open time. For large
+/// datasets, use lazy boxes that load values on demand.
+///
+/// **BAD:**
+/// ```dart
+/// // Loads ALL products into memory
+/// final box = await Hive.openBox<Product>('products');
+/// final product = box.get(id);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Only loads requested product
+/// final box = await Hive.openLazyBox<Product>('products');
+/// final product = await box.get(id);
+/// ```
+class PreferLazyBoxForLargeRule extends SaropaLintRule {
+  const PreferLazyBoxForLargeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_lazy_box_for_large',
+    problemMessage:
+        'Large collection uses regular Hive box. Consider openLazyBox for memory.',
+    correctionMessage:
+        'Use Hive.openLazyBox() for collections that may grow large.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Box names that typically contain many items
+  static const Set<String> _largeCollectionNames = {
+    'products',
+    'items',
+    'messages',
+    'logs',
+    'events',
+    'transactions',
+    'orders',
+    'history',
+    'cache',
+    'records',
+    'data',
+    'entries',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Only check regular openBox (not openLazyBox)
+      if (methodName != 'openBox') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('Hive')) return;
+
+      // Check box name argument
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      final String boxName = firstArg.toSource().toLowerCase();
+
+      // Check if this looks like a potentially large collection
+      for (final String largeName in _largeCollectionNames) {
+        if (boxName.contains(largeName)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+
+      // Also check type argument for collection-like types
+      final NodeList<TypeAnnotation>? typeArgs = node.typeArguments?.arguments;
+      if (typeArgs != null && typeArgs.isNotEmpty) {
+        final String typeArg = typeArgs.first.toSource().toLowerCase();
+        for (final String largeName in _largeCollectionNames) {
+          if (typeArg.contains(largeName)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}

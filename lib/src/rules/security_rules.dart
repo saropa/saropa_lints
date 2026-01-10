@@ -2371,3 +2371,624 @@ class _AddDeepLinkValidationFix extends DartFix {
     });
   }
 }
+
+/// Warns when sensitive data is stored without encryption.
+///
+/// Sensitive data (PII, financial, health) must be encrypted at rest.
+/// Use AES-256 or platform encryption APIs, not custom schemes.
+///
+/// **BAD:**
+/// ```dart
+/// await prefs.setString('credit_card', cardNumber);
+/// await file.writeAsString(jsonEncode(userProfile));
+/// box.put('ssn', socialSecurityNumber);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await secureStorage.write(key: 'credit_card', value: cardNumber);
+/// await encryptedBox.put('ssn', socialSecurityNumber);
+/// final encrypted = await encrypter.encrypt(data);
+/// await file.writeAsBytes(encrypted);
+/// ```
+class RequireDataEncryptionRule extends SaropaLintRule {
+  const RequireDataEncryptionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_data_encryption',
+    problemMessage:
+        'Sensitive data stored without encryption. Use secure storage.',
+    correctionMessage:
+        'Use flutter_secure_storage, encrypted Hive box, or AES encryption.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _sensitiveKeywords = {
+    'password',
+    'passwd',
+    'secret',
+    'token',
+    'api_key',
+    'apikey',
+    'credit',
+    'card',
+    'ssn',
+    'social_security',
+    'bank',
+    'account_number',
+    'pin',
+    'cvv',
+    'auth',
+    'credential',
+    'private_key',
+    'privatekey',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for storage write operations
+      if (methodName != 'setString' &&
+          methodName != 'put' &&
+          methodName != 'write' &&
+          methodName != 'writeAsString' &&
+          methodName != 'writeAsBytes' &&
+          methodName != 'insert') {
+        return;
+      }
+
+      // Check if target is secure storage (allowed)
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource().toLowerCase();
+        if (targetSource.contains('secure') ||
+            targetSource.contains('encrypt') ||
+            targetSource.contains('encryptedbox')) {
+          return; // Using secure storage
+        }
+      }
+
+      // Check if key/value contains sensitive data
+      final String nodeSource = node.toSource().toLowerCase();
+
+      for (final String keyword in _sensitiveKeywords) {
+        if (nodeSource.contains(keyword)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when sensitive data is displayed without masking.
+///
+/// Sensitive data (SSN, credit cards, passwords) should be partially masked
+/// when displayed to prevent shoulder surfing.
+///
+/// **BAD:**
+/// ```dart
+/// Text(creditCardNumber); // Shows full number
+/// Text(socialSecurityNumber);
+/// Text(user.phoneNumber);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text('****-****-****-${creditCardNumber.substring(12)}'); // Show last 4
+/// Text('***-**-${ssn.substring(7)}');
+/// Text(maskPhoneNumber(user.phoneNumber)); // Custom masking
+/// ```
+class PreferDataMaskingRule extends SaropaLintRule {
+  const PreferDataMaskingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_data_masking',
+    problemMessage:
+        'Sensitive data displayed without masking. Consider partial masking.',
+    correctionMessage:
+        'Mask sensitive data: "****-****-****-1234" instead of full number.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _sensitivePatterns = {
+    'creditcard',
+    'credit_card',
+    'cardnumber',
+    'card_number',
+    'ssn',
+    'socialsecurity',
+    'social_security',
+    'accountnumber',
+    'account_number',
+    'routingnumber',
+    'routing_number',
+    'phonenumber',
+    'phone_number',
+    'taxid',
+    'tax_id',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      // Check for Text widgets
+      if (typeName != 'Text' && typeName != 'SelectableText') return;
+
+      final String nodeSource = node.toSource().toLowerCase();
+
+      // Check if displaying sensitive data
+      for (final String pattern in _sensitivePatterns) {
+        if (nodeSource.contains(pattern)) {
+          // Check if already masked
+          if (nodeSource.contains('mask') ||
+              nodeSource.contains('****') ||
+              nodeSource.contains('•••') ||
+              nodeSource.contains('substring')) {
+            return; // Already masked
+          }
+
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when sensitive screens don't disable screenshots.
+///
+/// Financial and authentication screens should disable screenshots using
+/// platform APIs to prevent sensitive data exposure.
+///
+/// **BAD:**
+/// ```dart
+/// class PaymentScreen extends StatelessWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     return Scaffold(...); // No screenshot protection
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class PaymentScreen extends StatefulWidget {
+///   @override
+///   void initState() {
+///     super.initState();
+///     FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+///   }
+///
+///   @override
+///   void dispose() {
+///     FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+///     super.dispose();
+///   }
+/// }
+/// ```
+class AvoidScreenshotSensitiveRule extends SaropaLintRule {
+  const AvoidScreenshotSensitiveRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_screenshot_sensitive',
+    problemMessage:
+        'Sensitive screen without screenshot protection. Consider FLAG_SECURE.',
+    correctionMessage:
+        'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _sensitiveScreenNames = {
+    'payment',
+    'checkout',
+    'login',
+    'signin',
+    'signup',
+    'password',
+    'creditcard',
+    'banking',
+    'transfer',
+    'auth',
+    'otp',
+    'verify',
+    'pin',
+    'biometric',
+    'settings',
+    'account',
+    'profile',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme.toLowerCase();
+
+      // Check if this looks like a sensitive screen
+      bool isSensitive = false;
+      for (final String pattern in _sensitiveScreenNames) {
+        if (className.contains(pattern) &&
+            (className.contains('screen') ||
+                className.contains('page') ||
+                className.contains('view') ||
+                className.contains('widget'))) {
+          isSensitive = true;
+          break;
+        }
+      }
+
+      if (!isSensitive) return;
+
+      // Check if has screenshot protection
+      final String classSource = node.toSource();
+      if (classSource.contains('FLAG_SECURE') ||
+          classSource.contains('WindowManager') ||
+          classSource.contains('secureFlag') ||
+          classSource.contains('screenshot') ||
+          classSource.contains('Screenshot')) {
+        return; // Has protection
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when password fields don't use secure keyboard settings.
+///
+/// Password fields should use secure text entry to disable keyboard
+/// autocomplete, suggestions, and clipboard history.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   controller: passwordController,
+///   obscureText: true,
+///   // Missing security settings
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   controller: passwordController,
+///   obscureText: true,
+///   enableSuggestions: false,
+///   autocorrect: false,
+///   keyboardType: TextInputType.visiblePassword,
+/// )
+/// ```
+class RequireSecurePasswordFieldRule extends SaropaLintRule {
+  const RequireSecurePasswordFieldRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_secure_password_field',
+    problemMessage:
+        'Password field missing secure keyboard settings.',
+    correctionMessage:
+        'Add enableSuggestions: false and autocorrect: false for passwords.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      if (typeName != 'TextField' &&
+          typeName != 'TextFormField' &&
+          typeName != 'CupertinoTextField') {
+        return;
+      }
+
+      final String nodeSource = node.toSource();
+
+      // Check if this is a password field
+      if (!nodeSource.contains('obscureText: true') &&
+          !nodeSource.contains('obscureText:true')) {
+        return; // Not a password field
+      }
+
+      // Check for secure keyboard settings
+      final bool hasEnableSuggestions =
+          nodeSource.contains('enableSuggestions: false');
+      final bool hasAutocorrect = nodeSource.contains('autocorrect: false');
+
+      if (!hasEnableSuggestions || !hasAutocorrect) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddSecureKeyboardSettingsFix()];
+}
+
+class _AddSecureKeyboardSettingsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'TextField' &&
+          typeName != 'TextFormField' &&
+          typeName != 'CupertinoTextField') {
+        return;
+      }
+
+      final String nodeSource = node.toSource();
+      final bool hasEnableSuggestions =
+          nodeSource.contains('enableSuggestions: false');
+      final bool hasAutocorrect = nodeSource.contains('autocorrect: false');
+
+      if (hasEnableSuggestions && hasAutocorrect) return;
+
+      // Build the properties to add
+      final List<String> propsToAdd = <String>[];
+      if (!hasEnableSuggestions) propsToAdd.add('enableSuggestions: false');
+      if (!hasAutocorrect) propsToAdd.add('autocorrect: false');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add secure keyboard settings',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the last named argument to insert after
+        final ArgumentList args = node.argumentList;
+        if (args.arguments.isEmpty) return;
+
+        final Expression lastArg = args.arguments.last;
+        final String insertion = ', ${propsToAdd.join(', ')}';
+
+        builder.addSimpleInsertion(lastArg.end, insertion);
+      });
+    });
+  }
+}
+
+/// Warns when file paths from user input might allow path traversal.
+///
+/// File paths like `../../../etc/passwd` can access arbitrary files.
+/// Sanitize paths and validate they stay within allowed directories.
+///
+/// **BAD:**
+/// ```dart
+/// Future<String> readFile(String userPath) async {
+///   final file = File('/data/$userPath');
+///   return file.readAsString();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<String> readFile(String userPath) async {
+///   // Sanitize path
+///   final sanitized = path.basename(userPath);
+///   if (sanitized != userPath || userPath.contains('..')) {
+///     throw SecurityException('Invalid path');
+///   }
+///   final file = File('/data/$sanitized');
+///   final resolved = file.resolveSymbolicLinksSync();
+///   if (!resolved.startsWith('/data/')) {
+///     throw SecurityException('Path outside allowed directory');
+///   }
+///   return file.readAsString();
+/// }
+/// ```
+class AvoidPathTraversalRule extends SaropaLintRule {
+  const AvoidPathTraversalRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_path_traversal',
+    problemMessage:
+        'File path may be vulnerable to path traversal attack.',
+    correctionMessage:
+        'Validate paths: check for "..", use basename, verify resolved path.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      // Check for File/Directory creation
+      if (typeName != 'File' && typeName != 'Directory') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      final String argSource = firstArg.toSource();
+
+      // Check if path uses string interpolation with variable
+      if (argSource.contains(r'$') || argSource.contains('+')) {
+        // Path includes dynamic content
+
+        // Check if there's nearby validation
+        AstNode? current = node.parent;
+        bool hasValidation = false;
+
+        while (current != null) {
+          final String source = current.toSource();
+
+          // Check for path traversal validation patterns
+          if (source.contains('..') &&
+              (source.contains('throw') || source.contains('return'))) {
+            hasValidation = true;
+            break;
+          }
+          if (source.contains('basename') ||
+              source.contains('resolveSymbolicLinks') ||
+              source.contains('startsWith') ||
+              source.contains('sanitize') ||
+              source.contains('validate')) {
+            hasValidation = true;
+            break;
+          }
+
+          if (current is MethodDeclaration || current is FunctionDeclaration) {
+            break;
+          }
+          current = current.parent;
+        }
+
+        if (!hasValidation) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when user content is displayed in WebViews without HTML escaping.
+///
+/// User content displayed in WebViews must be HTML-escaped to prevent XSS
+/// attacks. Use html.escape() or sanitization libraries.
+///
+/// **BAD:**
+/// ```dart
+/// WebView(
+///   initialUrl: 'data:text/html,<html><body>$userComment</body></html>',
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'dart:convert' show htmlEscape;
+///
+/// WebView(
+///   initialUrl: 'data:text/html,<html><body>${htmlEscape.convert(userComment)}</body></html>',
+/// )
+///
+/// // Or use a sanitization library
+/// final sanitized = sanitizeHtml(userComment);
+/// ```
+class PreferHtmlEscapeRule extends SaropaLintRule {
+  const PreferHtmlEscapeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_html_escape',
+    problemMessage:
+        'User content in WebView without HTML escaping. XSS vulnerability.',
+    correctionMessage:
+        'Use htmlEscape.convert() or a sanitization library for user content.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      // Check for WebView widgets
+      if (typeName != 'WebView' &&
+          typeName != 'WebViewWidget' &&
+          typeName != 'InAppWebView') {
+        return;
+      }
+
+      final String nodeSource = node.toSource();
+
+      // Check for data URL with HTML content
+      if (!nodeSource.contains('data:text/html') &&
+          !nodeSource.contains('loadHtml') &&
+          !nodeSource.contains('loadData')) {
+        return;
+      }
+
+      // Check if content has interpolation (user content)
+      if (nodeSource.contains(r'$')) {
+        // Check for escaping/sanitization
+        if (nodeSource.contains('htmlEscape') ||
+            nodeSource.contains('sanitize') ||
+            nodeSource.contains('escape') ||
+            nodeSource.contains('HtmlUnescape')) {
+          return; // Has escaping
+        }
+
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Also check for direct loadHtml calls
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (methodName != 'loadHtml' &&
+          methodName != 'loadHtmlString' &&
+          methodName != 'loadData') {
+        return;
+      }
+
+      final String nodeSource = node.toSource();
+
+      // Check for interpolation without escaping
+      if (nodeSource.contains(r'$') &&
+          !nodeSource.contains('htmlEscape') &&
+          !nodeSource.contains('sanitize') &&
+          !nodeSource.contains('escape')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

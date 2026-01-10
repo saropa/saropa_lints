@@ -1298,3 +1298,402 @@ class RequireTextInputTestsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when tests use excessive mocking instead of simpler fakes.
+///
+/// Fakes (simple implementations) are easier to maintain than mocks with
+/// verify() chains. Use mocks only when you need to verify interactions.
+///
+/// **BAD:**
+/// ```dart
+/// test('loads user', () async {
+///   final mockRepo = MockUserRepository();
+///   when(mockRepo.getUser(any)).thenAnswer((_) async => user);
+///
+///   final result = await service.loadUser(1);
+///
+///   verify(mockRepo.getUser(1)).called(1); // Over-specified
+///   expect(result, user);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('loads user', () async {
+///   final fakeRepo = FakeUserRepository()..users = {1: user};
+///
+///   final result = await service.loadUser(1);
+///
+///   expect(result, user); // Test behavior, not implementation
+/// });
+/// ```
+class PreferFakeOverMockRule extends SaropaLintRule {
+  const PreferFakeOverMockRule() : super(code: _code);
+
+  /// Team preference - some prefer fakes, others prefer mocks.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  bool get skipTestFiles => false; // Run specifically in test files
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_fake_over_mock',
+    problemMessage:
+        'Test uses mock with verify(). Consider using a fake for simpler tests.',
+    correctionMessage:
+        'Fakes are easier to maintain. Use mocks only when verifying interactions.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains('\\test\\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for common test method names
+      if (methodName != 'test' && methodName != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length < 2) return;
+
+      final Expression callback = args.arguments[1];
+      if (callback is! FunctionExpression) return;
+
+      final String bodySource = callback.body.toSource();
+
+      // Count mock patterns
+      final int mockCount =
+          RegExp(r'\bMock\w+\(').allMatches(bodySource).length;
+      final int whenCount = 'when('.allMatches(bodySource).length;
+      final int verifyCount = 'verify('.allMatches(bodySource).length;
+      final int verifyNeverCount = 'verifyNever('.allMatches(bodySource).length;
+
+      // If using many mocks with verify chains, suggest fakes
+      if (mockCount >= 2 && (verifyCount + verifyNeverCount) >= 3) {
+        reporter.atNode(node.methodName, code);
+      }
+
+      // Also flag tests with complex when() chains but simple assertions
+      if (whenCount >= 3 && verifyCount == 0) {
+        // Many setup stubs but no interaction verification
+        // Suggests mocks are being used as data providers (should be fakes)
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when tests don't cover edge cases.
+///
+/// Test boundary conditions: empty lists, null values, max int, empty strings,
+/// unicode, negative numbers. Edge cases cause most production bugs.
+///
+/// **BAD:**
+/// ```dart
+/// test('calculates total', () {
+///   expect(calculateTotal([10, 20, 30]), 60); // Only happy path
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('calculates total', () {
+///   expect(calculateTotal([10, 20, 30]), 60);
+/// });
+///
+/// test('calculates total with empty list', () {
+///   expect(calculateTotal([]), 0);
+/// });
+///
+/// test('calculates total with negative numbers', () {
+///   expect(calculateTotal([-10, 20]), 10);
+/// });
+/// ```
+class RequireEdgeCaseTestsRule extends SaropaLintRule {
+  const RequireEdgeCaseTestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  bool get skipTestFiles => false;
+
+  static const LintCode _code = LintCode(
+    name: 'require_edge_case_tests',
+    problemMessage:
+        'Test file may be missing edge case tests (empty, null, boundary).',
+    correctionMessage:
+        'Add tests for: empty collections, null values, boundary numbers, etc.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains('\\test\\')) {
+      return;
+    }
+
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final String source = unit.toSource();
+
+      // Count test cases
+      final int testCount = RegExp(r"\btest\s*\(").allMatches(source).length +
+          RegExp(r"\btestWidgets\s*\(").allMatches(source).length;
+
+      if (testCount < 3) return; // Not enough tests to analyze
+
+      // Check for edge case patterns in test descriptions or assertions
+      final bool hasEmptyTest = source.contains('empty') ||
+          source.contains('[]') ||
+          source.contains('isEmpty');
+      final bool hasNullTest = source.contains('null') ||
+          source.contains('isNull') ||
+          source.contains('Null');
+      final bool hasBoundaryTest = source.contains('max') ||
+          source.contains('min') ||
+          source.contains('boundary') ||
+          source.contains('limit') ||
+          source.contains('overflow');
+      final bool hasNegativeTest =
+          source.contains('negative') || source.contains('-1');
+      final bool hasErrorTest =
+          source.contains('throws') || source.contains('error');
+
+      // Count how many edge case categories are covered
+      int edgeCaseCoverage = 0;
+      if (hasEmptyTest) edgeCaseCoverage++;
+      if (hasNullTest) edgeCaseCoverage++;
+      if (hasBoundaryTest) edgeCaseCoverage++;
+      if (hasNegativeTest) edgeCaseCoverage++;
+      if (hasErrorTest) edgeCaseCoverage++;
+
+      // If file has multiple tests but low edge case coverage, warn
+      if (testCount >= 5 && edgeCaseCoverage < 2) {
+        // Report at the compilation unit (first declaration)
+        if (unit.declarations.isNotEmpty) {
+          reporter.atNode(unit.declarations.first, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when tests create complex test objects without using builders.
+///
+/// Builder pattern for test objects is cleaner than constructors with many
+/// parameters and makes tests more readable.
+///
+/// **BAD:**
+/// ```dart
+/// test('user profile', () {
+///   final user = User(
+///     id: 1,
+///     name: 'Test',
+///     email: 'test@example.com',
+///     age: 30,
+///     address: Address(...),
+///     preferences: Preferences(...),
+///   );
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('user profile', () {
+///   final user = UserBuilder()
+///     .withName('Test')
+///     .withEmail('test@example.com')
+///     .build();
+/// });
+/// ```
+class PreferTestDataBuilderRule extends SaropaLintRule {
+  const PreferTestDataBuilderRule() : super(code: _code);
+
+  /// Team preference - builder pattern is one of several valid approaches.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  bool get skipTestFiles => false;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_test_data_builder',
+    problemMessage:
+        'Complex object construction in test. Consider using builder pattern.',
+    correctionMessage:
+        'Create a TestDataBuilder class: UserBuilder().withName("Test").build()',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const int _maxConstructorArgs = 5;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains('\\test\\')) {
+      return;
+    }
+
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ArgumentList args = node.argumentList;
+      final int argCount = args.arguments.length;
+
+      // Skip if few arguments
+      if (argCount < _maxConstructorArgs) return;
+
+      // Skip mock objects
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName.startsWith('Mock') || typeName.startsWith('Fake')) {
+        return;
+      }
+
+      // Skip common Flutter widgets
+      if (typeName.endsWith('Widget') ||
+          typeName.endsWith('Button') ||
+          typeName.endsWith('Page') ||
+          typeName.endsWith('Screen')) {
+        return;
+      }
+
+      // Check if there's nested object construction
+      int nestedObjects = 0;
+      for (final Expression arg in args.arguments) {
+        if (arg is InstanceCreationExpression ||
+            (arg is NamedExpression &&
+                arg.expression is InstanceCreationExpression)) {
+          nestedObjects++;
+        }
+      }
+
+      // If complex construction (many args + nested), suggest builder
+      if (argCount >= _maxConstructorArgs && nestedObjects >= 2) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when tests verify internal implementation details.
+///
+/// Tests that verify internal method calls break when you refactor.
+/// Test observable behavior (outputs, state changes) instead.
+///
+/// **BAD:**
+/// ```dart
+/// test('loads data', () async {
+///   await service.loadData();
+///
+///   // Testing implementation details:
+///   verify(mockCache.get('key')).called(1);
+///   verify(mockApi.fetch()).called(1);
+///   verify(mockCache.set('key', any)).called(1);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('loads data', () async {
+///   final result = await service.loadData();
+///
+///   // Testing observable behavior:
+///   expect(result.items, hasLength(3));
+///   expect(result.isLoaded, isTrue);
+/// });
+/// ```
+class AvoidTestImplementationDetailsRule extends SaropaLintRule {
+  const AvoidTestImplementationDetailsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  bool get skipTestFiles => false;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_test_implementation_details',
+    problemMessage:
+        'Test verifies internal calls. Test behavior, not implementation.',
+    correctionMessage:
+        'Focus on outputs and state changes, not internal method calls.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only run in test files
+    final String path = resolver.source.fullName;
+    if (!path.contains('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains('\\test\\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for test method names
+      if (methodName != 'test' && methodName != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length < 2) return;
+
+      final Expression callback = args.arguments[1];
+      if (callback is! FunctionExpression) return;
+
+      final String bodySource = callback.body.toSource();
+
+      // Count verify calls vs expect calls
+      final int verifyCount = 'verify('.allMatches(bodySource).length +
+          'verifyNever('.allMatches(bodySource).length +
+          'verifyInOrder('.allMatches(bodySource).length;
+      final int expectCount = 'expect('.allMatches(bodySource).length;
+
+      // If more verifies than expects, test is likely over-specified
+      if (verifyCount > 0 && verifyCount > expectCount) {
+        reporter.atNode(node.methodName, code);
+      }
+
+      // Also check for deep internal call verification patterns
+      // e.g., verify(mock.internalMethod().subMethod()).called(1)
+      final int chainedVerifies =
+          RegExp(r'verify\([^)]+\.[^)]+\.[^)]+\)').allMatches(bodySource).length;
+
+      if (chainedVerifies >= 2) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}

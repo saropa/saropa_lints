@@ -21,6 +21,7 @@
   "words": [
     "apikey",
     "assetlinks",
+    "autoplay",
     "autovalidate",
     "backgrounded",
     "backgrounding",
@@ -70,6 +71,7 @@
     "unindexed",
     "unpushed",
     "Unsanitized",
+    "unvalidated",
     "vsync",
     "WCAG",
     "Wiegers",
