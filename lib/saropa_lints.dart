@@ -634,7 +634,7 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Resource Management rules (NEW)
   RequireFileCloseInFinallyRule(),
-  RequireDatabaseCloseRule(),
+  RequireHiveDatabaseCloseRule(),
   RequireHttpClientCloseRule(),
   RequireNativeResourceCleanupRule(),
   RequireWebSocketCloseRule(),
@@ -950,6 +950,79 @@ const List<LintRule> _allRules = <LintRule>[
   RequireListPreallocateRule(),
   PreferBuilderForConditionalRule(),
   RequireWidgetKeyStrategyRule(),
+
+  // Network performance rules (batch 5)
+  PreferHttpConnectionReuseRule(),
+  AvoidRedundantRequestsRule(),
+  RequireResponseCachingRule(),
+  PreferPaginationRule(),
+  AvoidOverFetchingRule(),
+  RequireCancelTokenRule(),
+
+  // State management rules (batch 5)
+  RequireRiverpodLintRule(),
+  RequireMultiProviderRule(),
+  AvoidNestedProvidersRule(),
+
+  // Testing rules (batch 5)
+  PreferFakeOverMockRule(),
+  RequireEdgeCaseTestsRule(),
+  PreferTestDataBuilderRule(),
+  AvoidTestImplementationDetailsRule(),
+
+  // Security rules (batch 5)
+  RequireDataEncryptionRule(),
+  PreferDataMaskingRule(),
+  AvoidScreenshotSensitiveRule(),
+  RequireSecurePasswordFieldRule(),
+  AvoidPathTraversalRule(),
+  PreferHtmlEscapeRule(),
+
+  // Database rules (batch 5)
+  RequireDatabaseMigrationRule(),
+  RequireDatabaseIndexRule(),
+  PreferTransactionForBatchRule(),
+  RequireHiveDatabaseCloseRule(),
+  RequireTypeAdapterRegistrationRule(),
+  PreferLazyBoxForLargeRule(),
+
+  // Disposal rules (NEW)
+  RequireMediaPlayerDisposeRule(),
+  RequireTabControllerDisposeRule(),
+
+  // Build method anti-pattern rules (NEW)
+  AvoidGradientInBuildRule(),
+  AvoidDialogInBuildRule(),
+  AvoidSnackbarInBuildRule(),
+  AvoidAnalyticsInBuildRule(),
+  AvoidJsonEncodeInBuildRule(),
+  AvoidGetItInBuildRule(),
+  AvoidCanvasInBuildRule(),
+  AvoidHardcodedFeatureFlagsRule(),
+
+  // Scroll and list rules (NEW)
+  AvoidShrinkWrapInScrollViewRule(),
+  AvoidNestedScrollablesConflictRule(),
+  AvoidListViewChildrenForLargeListsRule(),
+  AvoidExcessiveBottomNavItemsRule(),
+  RequireTabControllerLengthSyncRule(),
+  AvoidRefreshWithoutAwaitRule(),
+  AvoidMultipleAutofocusRule(),
+
+  // Cryptography rules (NEW)
+  AvoidHardcodedEncryptionKeysRule(),
+  PreferSecureRandomForCryptoRule(),
+  AvoidDeprecatedCryptoAlgorithmsRule(),
+  RequireUniqueIvPerEncryptionRule(),
+
+  // JSON and DateTime rules (NEW)
+  RequireJsonDecodeTryCatchRule(),
+  AvoidDateTimeParseUnvalidatedRule(),
+  AvoidDoubleForMoneyRule(),
+  AvoidSensitiveDataInLogsRule(),
+  RequireGetItResetInTestsRule(),
+  RequireWebSocketErrorHandlingRule(),
+  AvoidAutoplayAudioRule(),
 ];
 
 class _SaropaLints extends PluginBase {
