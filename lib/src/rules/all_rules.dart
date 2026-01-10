@@ -1,4 +1,3 @@
-
 /// Barrel export for all lint rules organized by category
 library;
 

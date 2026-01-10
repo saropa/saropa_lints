@@ -223,7 +223,8 @@ class _ExternalControllerWidgetState extends State<ExternalControllerWidget> {
   @override
   Widget build(BuildContext context) {
     return Autocomplete<String>(
-      optionsBuilder: (TextEditingValue value) => const Iterable<String>.empty(),
+      optionsBuilder: (TextEditingValue value) =>
+          const Iterable<String>.empty(),
       fieldViewBuilder: (
         BuildContext context,
         TextEditingController controller,

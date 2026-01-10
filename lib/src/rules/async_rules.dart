@@ -1599,8 +1599,10 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'check_mounted_after_async',
-    problemMessage: 'setState or context used after await without mounted check.',
-    correctionMessage: 'Add if (mounted) check before using setState or context.',
+    problemMessage:
+        'setState or context used after await without mounted check.',
+    correctionMessage:
+        'Add if (mounted) check before using setState or context.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1703,7 +1705,8 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_websocket_message_validation',
     problemMessage: 'WebSocket message should be validated before processing.',
-    correctionMessage: 'Add try-catch and type checking for WebSocket messages.',
+    correctionMessage:
+        'Add try-catch and type checking for WebSocket messages.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1784,7 +1787,8 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_feature_flag_default',
     problemMessage: 'Feature flag should have a default/fallback value.',
-    correctionMessage: 'Use ?? operator or provide default in getBool/getString.',
+    correctionMessage:
+        'Use ?? operator or provide default in getBool/getString.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1934,7 +1938,8 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_location_timeout',
     problemMessage: 'Location request should have a timeout.',
-    correctionMessage: 'Add timeLimit or timeout parameter to location request.',
+    correctionMessage:
+        'Add timeLimit or timeout parameter to location request.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1971,9 +1976,7 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String name = arg.name.label.name;
-          if (name == 'timeLimit' ||
-              name == 'timeout' ||
-              name == 'duration') {
+          if (name == 'timeLimit' || name == 'timeout' || name == 'duration') {
             hasTimeout = true;
             break;
           }

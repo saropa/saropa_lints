@@ -1197,7 +1197,8 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_event_name',
-    problemMessage: 'Firebase Analytics event name does not follow conventions.',
+    problemMessage:
+        'Firebase Analytics event name does not follow conventions.',
     correctionMessage:
         'Event names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
@@ -1523,8 +1524,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String typeName =
-            current.constructorName.type.name.lexeme;
+        final String typeName = current.constructorName.type.name.lexeme;
         if (typeName.contains('Builder')) {
           return true;
         }
@@ -1638,7 +1638,8 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_fcm_token_refresh_handler',
     problemMessage: 'FCM token refresh should be handled.',
-    correctionMessage: 'Listen to onTokenRefresh to update server with new tokens.',
+    correctionMessage:
+        'Listen to onTokenRefresh to update server with new tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -6965,7 +6965,8 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
             // Check for { return true; }
             else if (body is BlockFunctionBody) {
               final List<Statement> statements = body.block.statements;
-              if (statements.length == 1 && statements.first is ReturnStatement) {
+              if (statements.length == 1 &&
+                  statements.first is ReturnStatement) {
                 final Expression? returnExpr =
                     (statements.first as ReturnStatement).expression;
                 if (returnExpr is BooleanLiteral && returnExpr.value) {
