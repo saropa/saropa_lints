@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.6.0.
 
+## [1.8.2] - 2026-01-10
+
+### Added
+- **`require_text_editing_controller_dispose`**: Warns when TextEditingController is not disposed in StatefulWidget - very common source of memory leaks in forms
+- **`require_page_controller_dispose`**: Warns when PageController is not disposed - prevents memory leaks in PageView widgets
+- **`require_avatar_alt_text`**: Warns when CircleAvatar lacks semanticLabel - accessibility requirement for screen readers
+- **`require_badge_semantics`**: Warns when Badge widget is not wrapped in Semantics - notification badges need accessible labels
+- **`require_badge_count_limit`**: Warns when Badge shows count > 99 - UX best practice to show "99+" for large counts
+- **`avoid_image_rebuild_on_scroll`**: Warns when Image.network is used in ListView.builder - causes unnecessary rebuilds and network requests
+- **`require_avatar_fallback`**: Warns when CircleAvatar with NetworkImage lacks onBackgroundImageError - network failures leave broken avatars
+- **`prefer_video_loading_placeholder`**: Warns when video player widgets (Chewie, BetterPlayer) lack placeholder - improves UX during load
+- **`require_snackbar_duration`**: Warns when SnackBar lacks explicit duration - ensures consistent UX timing
+- **`require_dialog_barrier_dismissible`**: Warns when showDialog lacks explicit barrierDismissible - makes dismiss behavior explicit
+- **`require_dialog_result_handling`**: Warns when showDialog result is not awaited - prevents missed user confirmations
+- **`avoid_snackbar_queue_buildup`**: Warns when showSnackBar is called without clearing previous - prevents stale message queues
+- **`require_keyboard_action_type`**: Warns when TextField/TextFormField lacks textInputAction - improves form navigation UX
+- **`require_keyboard_dismiss_on_scroll`**: Warns when scroll views lack keyboardDismissBehavior - better form UX on scroll
+- **`prefer_duration_constants`**: Warns when Duration can use cleaner units (e.g., seconds: 60 -> minutes: 1)
+- **`avoid_datetime_now_in_tests`**: Warns when DateTime.now() is used in test files - causes flaky tests
+- **`require_responsive_breakpoints`**: Warns when MediaQuery width is compared to magic numbers - promotes named breakpoint constants
+- **`prefer_cached_paint_objects`**: Warns when Paint() is created inside CustomPainter.paint() - recreated every frame
+- **`require_custom_painter_shouldrepaint`**: Warns when shouldRepaint always returns true - causes unnecessary repaints
+- **`require_currency_formatting_locale`**: Warns when NumberFormat.currency lacks locale - currency format varies by locale
+- **`require_number_formatting_locale`**: Warns when NumberFormat lacks locale - number format varies by locale
+- **`require_graphql_operation_names`**: Warns when GraphQL query/mutation lacks operation name - harder to debug
+- **`avoid_badge_without_meaning`**: Warns when Badge shows count 0 without hiding - empty badges confuse users
+- **`prefer_logger_over_print`**: Warns when print() is used instead of dart:developer log() - better log management
+- **`prefer_itemextent_when_known`**: Warns when ListView.builder lacks itemExtent - improves scroll performance
+- **`require_tab_state_preservation`**: Warns when TabBarView children may lose state on tab switch
+- **`avoid_bluetooth_scan_without_timeout`**: Warns when BLE scan lacks timeout - drains battery
+- **`require_bluetooth_state_check`**: Warns when BLE operations start without adapter state check
+- **`require_ble_disconnect_handling`**: Warns when BLE connection lacks disconnect state listener
+- **`require_audio_focus_handling`**: Warns when audio playback lacks AudioSession configuration
+- **`require_qr_permission_check`**: Warns when QR scanner is used without camera permission check - critical for app store
+- **`require_qr_scan_feedback`**: Warns when QR scan callback lacks haptic/visual feedback
+- **`avoid_qr_scanner_always_active`**: Warns when QR scanner lacks lifecycle pause/resume handling
+- **`require_file_exists_check`**: Warns when file read operations lack exists() check or try-catch
+- **`require_pdf_error_handling`**: Warns when PDF loading lacks error handling
+- **`require_graphql_error_handling`**: Warns when GraphQL result is used without checking hasException
+- **`prefer_image_size_constraints`**: Warns when Image lacks cacheWidth/cacheHeight for memory optimization
+- **`require_lifecycle_observer`**: Warns when Timer.periodic is used without WidgetsBindingObserver lifecycle handling
+
+### Documentation
+- **Migration from solid_lints**: Complete rewrite of [migration_from_solid_lints.md](doc/guides/migration_from_solid_lints.md):
+  - Corrected rule count: solid_lints has 16 custom rules (not ~50)
+  - Full rule mapping table: saropa_lints implements 15 of 16 rules (94% coverage)
+  - Fixed mappings: `avoid_final_with_getter` → `avoid_unnecessary_getter`, `avoid_unnecessary_return_variable` → `prefer_immediate_return`
+  - Added `no_magic_number` and `avoid_late_keyword` mappings that were missing
+  - Documented the one missing rule: `avoid_using_api` (configurable API restriction)
+- **ROADMAP.md**: Added `avoid_banned_api` to Architecture Rules section (inspired by solid_lints' `avoid_using_api`)
+- **State management guides**: New "Using with" guides for popular libraries:
+  - [using_with_riverpod.md](doc/guides/using_with_riverpod.md) - 8 Riverpod-specific rules with examples
+  - [using_with_bloc.md](doc/guides/using_with_bloc.md) - 8 Bloc-specific rules with examples
+  - [using_with_provider.md](doc/guides/using_with_provider.md) - 4 Provider-specific rules with examples
+  - [using_with_getx.md](doc/guides/using_with_getx.md) - 3 GetX-specific rules with examples
+  - [using_with_isar.md](doc/guides/using_with_isar.md) - Isar enum corruption prevention
+- **ROADMAP.md**: Added 12 new planned rules based on community research:
+  - Riverpod: AsyncValue order, navigation patterns, package confusion
+  - Bloc: BlocSelector usage, state over-engineering, manual dispose
+  - GetX: Context access patterns, static context testing issues
+
 ## [1.8.1] - 2026-01-10
 
 ### Fixed
