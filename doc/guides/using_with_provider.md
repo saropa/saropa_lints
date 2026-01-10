@@ -1,0 +1,341 @@
+# Using saropa_lints with Provider
+
+This guide explains how saropa_lints enhances your Provider development with specialized rules that catch common anti-patterns.
+
+## What Provider Issues Are Caught
+
+Provider is Flutter's recommended state management for simple apps. But it has patterns that cause unnecessary rebuilds, state loss, and memory leaks.
+
+| Issue Type | What Happens | Rule |
+|------------|--------------|------|
+| Provider.of in build | Unnecessary widget rebuilds | `avoid_provider_of_in_build` |
+| Recreated providers | State lost on rebuild | `avoid_provider_recreate` |
+| BuildContext in providers | Lifecycle issues | `avoid_build_context_in_providers` |
+| Missing dispose | Memory leaks | `require_provider_dispose` |
+
+## What saropa_lints Catches
+
+### Provider.of in Build Methods
+
+```dart
+// BAD - rebuilds entire widget tree on any change
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final user = Provider.of<UserModel>(context);  // Triggers rebuild!
+    return Column(
+      children: [
+        ExpensiveWidget(),  // Rebuilds unnecessarily
+        Text(user.name),
+      ],
+    );
+  }
+}
+
+// GOOD - use Consumer for scoped rebuilds
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ExpensiveWidget(),  // Doesn't rebuild
+        Consumer<UserModel>(
+          builder: (context, user, child) => Text(user.name),
+        ),
+      ],
+    );
+  }
+}
+
+// GOOD - use context.watch() or context.select()
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final userName = context.select<UserModel, String>((u) => u.name);
+    return Text(userName);  // Only rebuilds when name changes
+  }
+}
+```
+
+**Rule**: `avoid_provider_of_in_build`
+
+### Recreated Providers
+
+```dart
+// BAD - provider recreated on every build, loses state
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => CounterModel(),  // New instance every build!
+      child: CounterView(),
+    );
+  }
+}
+
+// GOOD - provider at stable location
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => CounterModel(),  // Created once
+      child: MaterialApp(
+        home: CounterView(),
+      ),
+    );
+  }
+}
+
+// GOOD - use .value for existing instances
+class MyWidget extends StatelessWidget {
+  final CounterModel counter;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider.value(
+      value: counter,  // Existing instance, not recreated
+      child: CounterView(),
+    );
+  }
+}
+```
+
+**Rule**: `avoid_provider_recreate`
+
+### BuildContext in Providers
+
+```dart
+// BAD - storing BuildContext causes lifecycle issues
+class MyProvider extends ChangeNotifier {
+  BuildContext? _context;  // Dangerous!
+
+  void setContext(BuildContext context) {
+    _context = context;
+  }
+
+  void navigate() {
+    Navigator.of(_context!).push(...);  // Context may be invalid!
+  }
+}
+
+// GOOD - pass context when needed, don't store it
+class MyProvider extends ChangeNotifier {
+  void navigate(BuildContext context) {
+    Navigator.of(context).push(...);
+  }
+}
+
+// GOOD - use callbacks for navigation
+class MyProvider extends ChangeNotifier {
+  final void Function(String route) onNavigate;
+
+  MyProvider({required this.onNavigate});
+
+  void goToDetails() {
+    onNavigate('/details');
+  }
+}
+```
+
+**Rule**: `avoid_build_context_in_providers`
+
+### Missing Dispose
+
+```dart
+// BAD - resources never cleaned up
+class DataProvider extends ChangeNotifier {
+  StreamSubscription? _subscription;
+  Timer? _refreshTimer;
+
+  void init() {
+    _subscription = dataStream.listen((data) {
+      notifyListeners();
+    });
+    _refreshTimer = Timer.periodic(
+      Duration(minutes: 5),
+      (_) => refresh(),
+    );
+  }
+
+  // Missing dispose()!
+}
+
+// GOOD - proper cleanup
+class DataProvider extends ChangeNotifier {
+  StreamSubscription? _subscription;
+  Timer? _refreshTimer;
+
+  void init() {
+    _subscription = dataStream.listen((data) {
+      notifyListeners();
+    });
+    _refreshTimer = Timer.periodic(
+      Duration(minutes: 5),
+      (_) => refresh(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+}
+```
+
+**Rule**: `require_provider_dispose`
+
+## Recommended Setup
+
+### 1. Update pubspec.yaml
+
+```yaml
+dependencies:
+  provider: ^6.1.0
+
+dev_dependencies:
+  custom_lint: ^0.8.0
+  saropa_lints: ^1.3.0
+```
+
+### 2. Update analysis_options.yaml
+
+```yaml
+analyzer:
+  plugins:
+    - custom_lint
+
+custom_lint:
+  saropa_lints:
+    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+```
+
+### 3. Run the linter
+
+```bash
+dart run custom_lint
+```
+
+## Rule Summary
+
+| Rule | Tier | What It Catches |
+|------|------|-----------------|
+| `avoid_provider_of_in_build` | essential | Provider.of causing unnecessary rebuilds |
+| `avoid_provider_recreate` | essential | Providers recreated in build methods |
+| `avoid_build_context_in_providers` | recommended | BuildContext stored in ChangeNotifier |
+| `require_provider_dispose` | recommended | Missing dispose in ChangeNotifier |
+
+## Common Patterns
+
+### MultiProvider Setup
+
+```dart
+// GOOD - all providers at app root
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProxyProvider<AuthProvider, UserProvider>(
+          create: (_) => UserProvider(),
+          update: (_, auth, user) => user!..updateAuth(auth),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
+}
+```
+
+### Selector for Granular Rebuilds
+
+```dart
+// Only rebuilds when specific field changes
+class UserAvatar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final avatarUrl = context.select<UserModel, String?>((u) => u.avatarUrl);
+    return CircleAvatar(
+      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+    );
+  }
+}
+```
+
+### Read vs Watch
+
+```dart
+class MyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // context.watch - rebuilds when provider changes
+    final user = context.watch<UserModel>();
+
+    // context.read - doesn't rebuild, use in callbacks
+    return ElevatedButton(
+      onPressed: () {
+        context.read<CartModel>().addItem(user.favoriteItem);
+      },
+      child: Text('Add to cart'),
+    );
+  }
+}
+```
+
+### Lazy Initialization
+
+```dart
+class DataProvider extends ChangeNotifier {
+  List<Item>? _items;
+  bool _isLoading = false;
+
+  List<Item> get items => _items ?? [];
+  bool get isLoading => _isLoading;
+
+  Future<void> loadIfNeeded() async {
+    if (_items != null || _isLoading) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _items = await fetchItems();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+}
+```
+
+## Provider vs Other State Management
+
+| Library | Best For | saropa_lints Rules |
+|---------|----------|-------------------|
+| **Provider** | Simple apps, learning Flutter | 4 rules |
+| **Riverpod** | Type-safe, testable, compile-time safety | 8 rules |
+| **GetX** | Rapid development, all-in-one solution | 3 rules |
+| **Bloc** | Enterprise, strict separation of concerns | 8 rules |
+
+See our other guides:
+- [Using with Riverpod](using_with_riverpod.md)
+- [Using with GetX](using_with_getx.md)
+- [Using with Bloc](using_with_bloc.md)
+
+## Contributing
+
+Have ideas for more Provider rules? Found a pattern we should catch? Contributions are welcome!
+
+See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) for guidelines on adding new rules.
+
+## Getting Help
+
+- [GitHub Issues](https://github.com/saropa/saropa_lints/issues)
+- [Full Documentation](https://pub.dev/packages/saropa_lints)
+- [Provider Documentation](https://pub.dev/packages/provider)
+
+---
+
+Questions about Provider rules? Open an issue - we're happy to help.

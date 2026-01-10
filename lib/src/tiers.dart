@@ -18,6 +18,8 @@ const Set<String> essentialRules = <String>{
   'require_value_notifier_dispose',
   'require_scroll_controller_dispose',
   'require_focus_node_dispose',
+  'require_text_editing_controller_dispose',
+  'require_page_controller_dispose',
   'require_bloc_close',
   'require_media_player_dispose',
   'require_tab_controller_dispose',
@@ -146,6 +148,15 @@ const Set<String> essentialRules = <String>{
 
   // Notification (Essential - required for Android 8+)
   'require_notification_channel_android',
+
+  // Testing (Essential - prevent flaky tests)
+  'avoid_datetime_now_in_tests',
+
+  // QR/Camera (Essential - app store compliance)
+  'require_qr_permission_check',
+
+  // Lifecycle (Essential - battery/stability)
+  'require_lifecycle_observer',
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -351,6 +362,44 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // GetX (Batch 17)
   'avoid_obs_outside_controller',
+
+  // Accessibility (Plan Group C)
+  'require_avatar_alt_text',
+  'require_badge_semantics',
+  'require_badge_count_limit',
+
+  // Image & Media (Plan Group A)
+  'require_avatar_fallback',
+  'prefer_video_loading_placeholder',
+
+  // Dialog & Snackbar (Plan Group D)
+  'require_snackbar_duration',
+  'require_dialog_barrier_dismissible',
+
+  // Form & Input (Plan Group E)
+  'require_keyboard_action_type',
+  'require_keyboard_dismiss_on_scroll',
+
+  // Duration & DateTime (Plan Group F)
+  'prefer_duration_constants',
+
+  // UI/UX (Plan Groups G, J, K)
+  'require_responsive_breakpoints',
+  'require_currency_formatting_locale',
+  'require_graphql_operation_names',
+
+  // Bluetooth & Hardware (Plan Group H)
+  'avoid_bluetooth_scan_without_timeout',
+  'require_bluetooth_state_check',
+  'require_ble_disconnect_handling',
+
+  // File & Error Handling (Plan Group G)
+  'require_file_exists_check',
+  'require_pdf_error_handling',
+  'require_graphql_error_handling',
+
+  // QR Scanner (Plan Group I)
+  'require_qr_scan_feedback',
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -636,6 +685,31 @@ const Set<String> professionalOnlyRules = <String>{
   'require_list_preallocate',
   'prefer_builder_for_conditional',
   'require_widget_key_strategy',
+
+  // Image & Media (Plan Group A)
+  'avoid_image_rebuild_on_scroll',
+
+  // Dialog & Snackbar (Plan Group D)
+  'require_dialog_result_handling',
+  'avoid_snackbar_queue_buildup',
+
+  // UI/UX (Plan Groups J, K)
+  'prefer_cached_paint_objects',
+  'require_custom_painter_shouldrepaint',
+  'require_number_formatting_locale',
+  'avoid_badge_without_meaning',
+  'prefer_logger_over_print',
+  'prefer_itemextent_when_known',
+  'require_tab_state_preservation',
+
+  // Hardware (Plan Group H)
+  'require_audio_focus_handling',
+
+  // QR Scanner (Plan Group I)
+  'avoid_qr_scanner_always_active',
+
+  // Image (Plan Group A)
+  'prefer_image_size_constraints',
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.

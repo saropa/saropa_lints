@@ -1930,3 +1930,215 @@ class RequireMinimumContrastRule extends SaropaLintRule {
     return false;
   }
 }
+
+/// Warns when CircleAvatar lacks a semanticLabel for accessibility.
+///
+/// Screen readers need a description to announce what the avatar represents.
+/// Without semanticLabel, the avatar is invisible to blind users.
+///
+/// **BAD:**
+/// ```dart
+/// CircleAvatar(
+///   backgroundImage: NetworkImage(user.photoUrl),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CircleAvatar(
+///   backgroundImage: NetworkImage(user.photoUrl),
+///   semanticLabel: 'Profile photo of ${user.name}',
+/// )
+/// ```
+class RequireAvatarAltTextRule extends SaropaLintRule {
+  const RequireAvatarAltTextRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_avatar_alt_text',
+    problemMessage:
+        'CircleAvatar lacks semanticLabel. Screen readers cannot describe it.',
+    correctionMessage:
+        'Add semanticLabel: "Description of avatar" for accessibility.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CircleAvatar') return;
+
+      // Check for semanticLabel argument
+      bool hasSemanticLabel = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'semanticLabel') {
+          hasSemanticLabel = true;
+          break;
+        }
+      }
+
+      if (!hasSemanticLabel) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Badge widget lacks accessibility semantics.
+///
+/// Badges convey important information (like notification counts) that
+/// screen reader users need to hear. Without proper semantics, this
+/// information is hidden from blind users.
+///
+/// **BAD:**
+/// ```dart
+/// Badge(
+///   label: Text('5'),
+///   child: Icon(Icons.mail),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Semantics(
+///   label: '5 unread messages',
+///   child: Badge(
+///     label: Text('5'),
+///     child: Icon(Icons.mail),
+///   ),
+/// )
+/// ```
+class RequireBadgeSemanticsRule extends SaropaLintRule {
+  const RequireBadgeSemanticsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_badge_semantics',
+    problemMessage:
+        'Badge lacks accessibility semantics. Screen readers cannot announce it.',
+    correctionMessage:
+        'Wrap Badge in Semantics widget with descriptive label.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Badge') return;
+
+      // Check if wrapped in Semantics widget
+      if (!_hasSemanticAncestor(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _hasSemanticAncestor(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 5) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name.lexeme;
+        if (typeName == 'Semantics') {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+}
+
+/// Warns when Badge displays count greater than 99 without truncation.
+///
+/// Large numbers in badges are hard to read and look unprofessional.
+/// The convention is to show "99+" for counts above 99.
+///
+/// **BAD:**
+/// ```dart
+/// Badge(
+///   label: Text('150'),
+///   child: Icon(Icons.mail),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Badge(
+///   label: Text(count > 99 ? '99+' : '$count'),
+///   child: Icon(Icons.mail),
+/// )
+/// ```
+class RequireBadgeCountLimitRule extends SaropaLintRule {
+  const RequireBadgeCountLimitRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_badge_count_limit',
+    problemMessage:
+        'Badge count exceeds 99. Use "99+" pattern for large numbers.',
+    correctionMessage:
+        'Replace with: Text(count > 99 ? "99+" : "\$count")',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Badge') return;
+
+      // Check label argument for literal number > 99
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'label') {
+          final Expression labelExpr = arg.expression;
+
+          // Check if it's a Text widget with a literal number
+          if (labelExpr is InstanceCreationExpression) {
+            final String labelTypeName =
+                labelExpr.constructorName.type.name.lexeme;
+            if (labelTypeName == 'Text' &&
+                labelExpr.argumentList.arguments.isNotEmpty) {
+              final Expression textArg =
+                  labelExpr.argumentList.arguments.first;
+              if (textArg is SimpleStringLiteral) {
+                final int? number = int.tryParse(textArg.value);
+                if (number != null && number > 99) {
+                  reporter.atNode(arg, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
