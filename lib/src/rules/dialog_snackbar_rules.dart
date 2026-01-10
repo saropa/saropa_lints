@@ -285,3 +285,184 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when showDialog doesn't use adaptive styling.
+///
+/// Dialogs should adapt to the platform (Material on Android,
+/// Cupertino on iOS) for native look and feel.
+///
+/// **BAD:**
+/// ```dart
+/// showDialog(
+///   context: context,
+///   builder: (ctx) => AlertDialog(
+///     title: Text('Confirm'),
+///     actions: [TextButton(...)],
+///   ),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// showDialog(
+///   context: context,
+///   builder: (ctx) => AlertDialog.adaptive(
+///     title: Text('Confirm'),
+///     actions: [TextButton(...)],
+///   ),
+/// );
+/// ```
+///
+/// **ALSO GOOD:**
+/// ```dart
+/// // Use platform check for full customization
+/// showDialog(
+///   context: context,
+///   builder: (ctx) => Platform.isIOS
+///       ? CupertinoAlertDialog(...)
+///       : AlertDialog(...),
+/// );
+/// ```
+class PreferAdaptiveDialogRule extends SaropaLintRule {
+  const PreferAdaptiveDialogRule() : super(code: _code);
+
+  /// UX improvement - native platform feel.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_adaptive_dialog',
+    problemMessage:
+        'AlertDialog without adaptive styling. May look non-native on iOS.',
+    correctionMessage:
+        'Use AlertDialog.adaptive() or platform-specific dialogs.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      final constructorName = node.constructorName.name?.name;
+
+      // Check for AlertDialog (not AlertDialog.adaptive)
+      if (typeName != 'AlertDialog') {
+        return;
+      }
+
+      if (constructorName == 'adaptive') {
+        return;
+      }
+
+      // Check if there's platform checking nearby
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is ConditionalExpression ||
+            current is IfStatement ||
+            current is IfElement) {
+          final source = current.toSource().toLowerCase();
+          if (source.contains('platform.is') ||
+              source.contains('defaulttargetplatform')) {
+            return;
+          }
+        }
+        if (current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+/// Warns when SnackBar for delete operation doesn't have undo action.
+///
+/// Destructive actions should provide an undo option. SnackBars
+/// are perfect for this pattern with their action button.
+///
+/// **BAD:**
+/// ```dart
+/// ScaffoldMessenger.of(context).showSnackBar(
+///   SnackBar(content: Text('Item deleted')),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ScaffoldMessenger.of(context).showSnackBar(
+///   SnackBar(
+///     content: Text('Item deleted'),
+///     action: SnackBarAction(
+///       label: 'Undo',
+///       onPressed: () => restoreItem(item),
+///     ),
+///   ),
+/// );
+/// ```
+class RequireSnackbarActionForUndoRule extends SaropaLintRule {
+  const RequireSnackbarActionForUndoRule() : super(code: _code);
+
+  /// UX improvement - allows recovery from accidents.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_snackbar_action_for_undo',
+    problemMessage:
+        'SnackBar for delete/remove without undo action. Users can\'t recover.',
+    correctionMessage:
+        'Add action parameter with SnackBarAction for undo functionality.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const _deleteTerms = [
+    'delete',
+    'remove',
+    'clear',
+    'erase',
+    'discard',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'SnackBar') {
+        return;
+      }
+
+      // Check if content mentions delete-related terms
+      final snackbarSource = node.toSource().toLowerCase();
+      final isDeleteRelated =
+          _deleteTerms.any((term) => snackbarSource.contains(term));
+
+      if (!isDeleteRelated) {
+        return;
+      }
+
+      // Check if has action parameter
+      bool hasAction = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'action') {
+          hasAction = true;
+          break;
+        }
+      }
+
+      if (!hasAction) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

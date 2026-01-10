@@ -736,3 +736,462 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when CircularProgressIndicator is used for content loading.
+///
+/// Skeleton loaders provide better perceived performance than spinners.
+/// They give users a preview of content structure while loading.
+///
+/// **BAD:**
+/// ```dart
+/// if (isLoading) {
+///   return Center(child: CircularProgressIndicator());
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (isLoading) {
+///   return ShimmerLoading(child: ContentSkeleton());
+/// }
+/// ```
+class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
+  const PreferSkeletonOverSpinnerRule() : super(code: _code);
+
+  /// UX improvement, not a bug. Track for later.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_skeleton_over_spinner',
+    problemMessage:
+        'CircularProgressIndicator for content loading. Consider skeleton loaders.',
+    correctionMessage:
+        'Use skeleton/shimmer loaders for better perceived performance.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'CircularProgressIndicator' &&
+          typeName != 'LinearProgressIndicator') {
+        return;
+      }
+
+      // Check if inside conditional (loading state)
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is ConditionalExpression ||
+            current is IfStatement ||
+            current is IfElement) {
+          // Found in conditional - likely a loading state
+          reporter.atNode(node.constructorName, code);
+          return;
+        }
+        // Stop at method boundary
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when search results view has no empty state handling.
+///
+/// Search results should show a helpful message when no results are found.
+/// Empty ListView/GridView with no indicator confuses users.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: searchResults.length,
+///   itemBuilder: (ctx, i) => ResultTile(searchResults[i]),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// searchResults.isEmpty
+///   ? EmptyState(message: 'No results found')
+///   : ListView.builder(
+///       itemCount: searchResults.length,
+///       itemBuilder: (ctx, i) => ResultTile(searchResults[i]),
+///     );
+/// ```
+class RequireEmptyResultsStateRule extends SaropaLintRule {
+  const RequireEmptyResultsStateRule() : super(code: _code);
+
+  /// UX issue that confuses users.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_empty_results_state',
+    problemMessage:
+        'List with search-related name missing empty state check.',
+    correctionMessage:
+        'Add isEmpty check with empty state UI for better UX.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const _searchTerms = [
+    'search',
+    'result',
+    'filter',
+    'query',
+    'found',
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      // Check list builders
+      if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
+        return;
+      }
+
+      // Check if itemCount references search-related variable
+      final itemCountArg = node.argumentList.arguments
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemCount')
+          .firstOrNull;
+
+      if (itemCountArg == null) {
+        return;
+      }
+
+      final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
+
+      // Check if it's search-related
+      final isSearchRelated =
+          _searchTerms.any((term) => itemCountSource.contains(term));
+
+      if (!isSearchRelated) {
+        return;
+      }
+
+      // Check if there's an isEmpty check in the parent
+      AstNode? current = node.parent;
+      while (current != null) {
+        final source = current.toSource().toLowerCase();
+        if (source.contains('.isempty') || source.contains('.isnotempty')) {
+          return; // Has empty check
+        }
+        if (current is ConditionalExpression ||
+            current is IfStatement ||
+            current is IfElement) {
+          // Check if condition checks for empty
+          if (source.contains('length') && source.contains('0')) {
+            return;
+          }
+        }
+        if (current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      reporter.atNode(node.constructorName, code);
+    });
+  }
+}
+
+/// Warns when search triggers without loading indicator.
+///
+/// When triggering a search (API call), users need feedback that
+/// something is happening. Missing loading state causes confusion.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   onSubmitted: (query) => searchApi(query),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   onSubmitted: (query) {
+///     setState(() => isLoading = true);
+///     searchApi(query).whenComplete(() {
+///       setState(() => isLoading = false);
+///     });
+///   },
+/// );
+/// ```
+class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
+  const RequireSearchLoadingIndicatorRule() : super(code: _code);
+
+  /// UX issue that confuses users.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_search_loading_indicator',
+    problemMessage:
+        'Search callback without loading state management.',
+    correctionMessage:
+        'Set loading state before search and clear it on completion.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      // Check text fields
+      if (typeName != 'TextField' && typeName != 'TextFormField') {
+        return;
+      }
+
+      // Find onSubmitted or controller.addListener
+      for (final arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+
+        final paramName = arg.name.label.name;
+        if (paramName != 'onSubmitted' && paramName != 'onEditingComplete') {
+          continue;
+        }
+
+        // Check if callback contains search-related terms
+        final callbackSource = arg.expression.toSource().toLowerCase();
+        if (!callbackSource.contains('search') &&
+            !callbackSource.contains('query') &&
+            !callbackSource.contains('find') &&
+            !callbackSource.contains('fetch')) {
+          continue;
+        }
+
+        // Check if it sets loading state
+        if (!callbackSource.contains('loading') &&
+            !callbackSource.contains('isloading') &&
+            !callbackSource.contains('isSearching')) {
+          reporter.atNode(arg, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when search TextField triggers API calls without debounce.
+///
+/// Typing in search fields should be debounced to avoid excessive
+/// API calls. Each keystroke triggering a request wastes resources.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   onChanged: (text) => searchApi(text),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   onChanged: (text) => _debouncer.run(() => searchApi(text)),
+/// );
+/// ```
+///
+/// **ALSO GOOD:**
+/// ```dart
+/// // Using onSubmitted instead of onChanged
+/// TextField(
+///   onSubmitted: (text) => searchApi(text),
+/// );
+/// ```
+class RequireSearchDebounceRule extends SaropaLintRule {
+  const RequireSearchDebounceRule() : super(code: _code);
+
+  /// Performance and cost issue from excessive API calls.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_search_debounce',
+    problemMessage:
+        'Search API called on each keystroke. Add debounce to reduce calls.',
+    correctionMessage:
+        'Use a Debouncer or Timer to delay search until user stops typing.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'TextField' && typeName != 'TextFormField') {
+        return;
+      }
+
+      // Find onChanged callback
+      NamedExpression? onChangedArg;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onChanged') {
+          onChangedArg = arg;
+          break;
+        }
+      }
+
+      if (onChangedArg == null) {
+        return;
+      }
+
+      final callbackSource = onChangedArg.expression.toSource().toLowerCase();
+
+      // Check if it's search-related
+      final isSearchRelated = callbackSource.contains('search') ||
+          callbackSource.contains('query') ||
+          callbackSource.contains('find') ||
+          callbackSource.contains('fetch') ||
+          callbackSource.contains('api');
+
+      if (!isSearchRelated) {
+        return;
+      }
+
+      // Check for debounce mechanisms
+      final hasDebounce = callbackSource.contains('debounce') ||
+          callbackSource.contains('throttle') ||
+          callbackSource.contains('timer') ||
+          callbackSource.contains('delay') ||
+          callbackSource.contains('cancellable');
+
+      if (!hasDebounce) {
+        reporter.atNode(onChangedArg, code);
+      }
+    });
+  }
+}
+
+/// Warns when paginated list has no loading state for next page.
+///
+/// Infinite scroll lists should show a loading indicator when
+/// fetching the next page of results.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   itemBuilder: (ctx, i) {
+///     if (i == items.length - 1) loadMore();
+///     return ItemTile(items[i]);
+///   },
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length + (isLoadingMore ? 1 : 0),
+///   itemBuilder: (ctx, i) {
+///     if (i == items.length) return LoadingIndicator();
+///     if (i == items.length - 1) loadMore();
+///     return ItemTile(items[i]);
+///   },
+/// );
+/// ```
+class RequirePaginationLoadingStateRule extends SaropaLintRule {
+  const RequirePaginationLoadingStateRule() : super(code: _code);
+
+  /// UX issue affecting user experience during loading.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_pagination_loading_state',
+    problemMessage:
+        'Paginated list triggers loadMore but shows no loading indicator.',
+    correctionMessage:
+        'Add +1 to itemCount when loading and show indicator at the end.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+
+      if (!typeName.contains('ListView') && !typeName.contains('GridView')) {
+        return;
+      }
+
+      // Check if it's a builder pattern
+      final constructorName = node.constructorName.name?.name ?? '';
+      if (constructorName != 'builder' && constructorName != 'separated') {
+        return;
+      }
+
+      // Find itemBuilder
+      final itemBuilderArg = node.argumentList.arguments
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemBuilder')
+          .firstOrNull;
+
+      if (itemBuilderArg == null) {
+        return;
+      }
+
+      final builderSource = itemBuilderArg.expression.toSource().toLowerCase();
+
+      // Check for pagination pattern (loadMore, fetchMore, nextPage)
+      final hasPagination = builderSource.contains('loadmore') ||
+          builderSource.contains('fetchmore') ||
+          builderSource.contains('nextpage') ||
+          builderSource.contains('loadnext');
+
+      if (!hasPagination) {
+        return;
+      }
+
+      // Check itemCount for loading indicator
+      final itemCountArg = node.argumentList.arguments
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemCount')
+          .firstOrNull;
+
+      if (itemCountArg == null) {
+        return;
+      }
+
+      final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
+
+      // Check if itemCount includes loading state
+      final hasLoadingInCount = itemCountSource.contains('loading') ||
+          itemCountSource.contains('+ 1') ||
+          itemCountSource.contains('+1');
+
+      if (!hasLoadingInCount) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

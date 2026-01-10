@@ -1989,3 +1989,690 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 5 Rules: Stream/Future Rules
+// =============================================================================
+
+/// Warns when StreamController is created inside build() method.
+///
+/// Creating streams in build causes them to be recreated on every rebuild,
+/// leading to memory leaks and lost events.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final controller = StreamController<int>(); // Recreated every build!
+///   return StreamBuilder(stream: controller.stream, ...);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late final StreamController<int> _controller;
+///
+/// void initState() {
+///   super.initState();
+///   _controller = StreamController<int>();
+/// }
+/// ```
+class AvoidStreamInBuildRule extends SaropaLintRule {
+  const AvoidStreamInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_stream_in_build',
+    problemMessage:
+        'StreamController created in build(). Will be recreated on every rebuild.',
+    correctionMessage:
+        'Create StreamController in initState() and store as field.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!typeName.contains('StreamController')) return;
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when StreamController is not closed in dispose().
+///
+/// StreamControllers must be closed to prevent memory leaks and
+/// allow garbage collection.
+///
+/// **BAD:**
+/// ```dart
+/// final _controller = StreamController<int>();
+/// // dispose() never closes it!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void dispose() {
+///   _controller.close();
+///   super.dispose();
+/// }
+/// ```
+class RequireStreamControllerCloseRule extends SaropaLintRule {
+  const RequireStreamControllerCloseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_stream_controller_close',
+    problemMessage:
+        'StreamController field without close() in dispose. Memory leak.',
+    correctionMessage:
+        'Call controller.close() in dispose() method.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Find StreamController fields
+      final List<VariableDeclaration> controllers = <VariableDeclaration>[];
+
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeStr = member.fields.type?.toSource();
+          if (typeStr != null && typeStr.contains('StreamController')) {
+            for (final variable in member.fields.variables) {
+              controllers.add(variable);
+            }
+          }
+        }
+      }
+
+      if (controllers.isEmpty) return;
+
+      // Check for dispose method with close() calls
+      bool hasClose = false;
+
+      for (final member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          final String? bodySource = member.body.toSource();
+          if (bodySource != null && bodySource.contains('.close()')) {
+            hasClose = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasClose) {
+        for (final controller in controllers) {
+          reporter.atNode(controller, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when multiple listeners are added to a non-broadcast stream.
+///
+/// Regular streams can only have one listener. Adding multiple causes an error.
+///
+/// **BAD:**
+/// ```dart
+/// final stream = controller.stream;
+/// stream.listen((data) => handleA(data));
+/// stream.listen((data) => handleB(data)); // Error!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final stream = controller.stream.asBroadcastStream();
+/// stream.listen((data) => handleA(data));
+/// stream.listen((data) => handleB(data)); // OK
+/// ```
+class AvoidMultipleStreamListenersRule extends SaropaLintRule {
+  const AvoidMultipleStreamListenersRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_multiple_stream_listeners',
+    problemMessage:
+        'Multiple listen() on same stream. Non-broadcast streams only allow one listener.',
+    correctionMessage:
+        'Use .asBroadcastStream() or share subscriptions.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBlock((Block node) {
+      // Track stream.listen calls by target
+      final Map<String, List<MethodInvocation>> listenCalls =
+          <String, List<MethodInvocation>>{};
+
+      _findListenCalls(node, (MethodInvocation call, String targetId) {
+        listenCalls.putIfAbsent(targetId, () => <MethodInvocation>[]).add(call);
+      });
+
+      // Report streams with multiple listeners
+      for (final entry in listenCalls.entries) {
+        if (entry.value.length > 1) {
+          // Report on second and subsequent listeners
+          for (int i = 1; i < entry.value.length; i++) {
+            reporter.atNode(entry.value[i], code);
+          }
+        }
+      }
+    });
+  }
+
+  void _findListenCalls(
+    AstNode node,
+    void Function(MethodInvocation, String) callback,
+  ) {
+    if (node is MethodInvocation && node.methodName.name == 'listen') {
+      final Expression? target = node.target;
+      if (target != null) {
+        // Use target source as identifier
+        callback(node, target.toSource());
+      }
+    }
+
+    for (final child in node.childEntities) {
+      if (child is AstNode) {
+        _findListenCalls(child, callback);
+      }
+    }
+  }
+}
+
+/// Warns when stream.listen() is called without onError handler.
+///
+/// Streams can emit errors. Unhandled errors cause uncaught exceptions.
+///
+/// **BAD:**
+/// ```dart
+/// stream.listen((data) => print(data));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// stream.listen(
+///   (data) => print(data),
+///   onError: (error) => handleError(error),
+/// );
+/// ```
+class RequireStreamErrorHandlingRule extends SaropaLintRule {
+  const RequireStreamErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_stream_error_handling',
+    problemMessage:
+        'Stream.listen() without onError handler. Errors will be uncaught.',
+    correctionMessage:
+        'Add onError callback to handle stream errors.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'listen') return;
+
+      // Check if target is a stream
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String? typeName = target.staticType?.element?.name;
+      // Check type or source for stream indicators
+      final String targetSource = target.toSource().toLowerCase();
+      if (typeName != 'Stream' &&
+          !targetSource.contains('stream') &&
+          !targetSource.contains('controller')) {
+        return;
+      }
+
+      // Check for onError parameter
+      bool hasOnError = false;
+
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onError') {
+          hasOnError = true;
+          break;
+        }
+      }
+
+      if (!hasOnError) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when FutureBuilder's future is created inline in build().
+///
+/// Creating a new Future in build() causes it to restart on every rebuild.
+///
+/// **BAD:**
+/// ```dart
+/// FutureBuilder(
+///   future: fetchData(), // Restarts on every build!
+///   builder: (context, snapshot) => ...,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late final Future<Data> _dataFuture;
+///
+/// void initState() {
+///   super.initState();
+///   _dataFuture = fetchData();
+/// }
+///
+/// FutureBuilder(future: _dataFuture, ...)
+/// ```
+class AvoidFutureBuilderRebuildRule extends SaropaLintRule {
+  const AvoidFutureBuilderRebuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_future_builder_rebuild',
+    problemMessage:
+        'FutureBuilder with inline future. Restarts on every rebuild.',
+    correctionMessage:
+        'Cache the Future in initState() and reference it.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'FutureBuilder') return;
+
+      // Check if inside build method
+      bool insideBuild = false;
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          insideBuild = true;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (!insideBuild) return;
+
+      // Check for future parameter
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'future') {
+          final Expression futureExpr = arg.expression;
+
+          // Check if it's a method invocation (inline future creation)
+          if (futureExpr is MethodInvocation) {
+            reporter.atNode(arg, code);
+          }
+          // Check for Future constructor
+          else if (futureExpr is InstanceCreationExpression) {
+            reporter.atNode(arg, code);
+          }
+          break;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when long-running Futures don't have a timeout.
+///
+/// Futures without timeouts can hang indefinitely, causing poor UX.
+///
+/// **BAD:**
+/// ```dart
+/// final result = await expensiveOperation();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await expensiveOperation()
+///     .timeout(Duration(seconds: 30));
+/// ```
+class RequireFutureTimeoutRule extends SaropaLintRule {
+  const RequireFutureTimeoutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_future_timeout',
+    problemMessage:
+        'Long-running Future without timeout. May hang indefinitely.',
+    correctionMessage:
+        'Add .timeout(Duration(...)) to prevent hanging.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  // Methods that typically involve network or I/O
+  static const Set<String> _longRunningMethods = <String>{
+    'download',
+    'upload',
+    'fetch',
+    'load',
+    'sync',
+    'process',
+    'compute',
+    'analyze',
+    'convert',
+    'export',
+    'import',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAwaitExpression((AwaitExpression node) {
+      final Expression expr = node.expression;
+      if (expr is! MethodInvocation) return;
+
+      final String methodName = expr.methodName.name.toLowerCase();
+
+      // Check if method name suggests long-running operation
+      bool isLongRunning = false;
+      for (final pattern in _longRunningMethods) {
+        if (methodName.contains(pattern)) {
+          isLongRunning = true;
+          break;
+        }
+      }
+
+      if (!isLongRunning) return;
+
+      // Check if .timeout() is called
+      AstNode? parent = node.parent;
+      while (parent != null) {
+        if (parent is MethodInvocation && parent.methodName.name == 'timeout') {
+          return; // Has timeout
+        }
+        if (parent is Statement) break;
+        parent = parent.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when Future.wait is used without error handling for partial failures.
+///
+/// When one Future in Future.wait fails, all results are lost by default.
+/// Use eagerError: false to get partial results on failure.
+///
+/// **BAD:**
+/// ```dart
+/// final results = await Future.wait([
+///   fetchUser(),
+///   fetchPosts(),
+///   fetchComments(),
+/// ]);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final results = await Future.wait([
+///   fetchUser(),
+///   fetchPosts(),
+///   fetchComments(),
+/// ], eagerError: false);
+/// ```
+///
+/// **ALSO GOOD:**
+/// ```dart
+/// // Handle each future individually
+/// final results = await Future.wait([
+///   fetchUser().catchError((_) => null),
+///   fetchPosts().catchError((_) => []),
+///   fetchComments().catchError((_) => []),
+/// ]);
+/// ```
+class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
+  const RequireFutureWaitErrorHandlingRule() : super(code: _code);
+
+  /// Error handling - partial results lost on failure.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_future_wait_error_handling',
+    problemMessage:
+        'Future.wait without eagerError: false. Partial results lost on failure.',
+    correctionMessage:
+        'Add eagerError: false or wrap individual futures with catchError.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Future') return;
+
+      if (node.methodName.name != 'wait') return;
+
+      // Check for eagerError parameter
+      bool hasEagerError = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'eagerError') {
+          hasEagerError = true;
+          break;
+        }
+      }
+
+      if (!hasEagerError) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when Stream is listened to without onDone handler.
+///
+/// Streams should handle completion to clean up resources
+/// and update UI state appropriately.
+///
+/// **BAD:**
+/// ```dart
+/// stream.listen((data) {
+///   updateUI(data);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// stream.listen(
+///   (data) => updateUI(data),
+///   onDone: () => showCompleted(),
+///   onError: (e) => showError(e),
+/// );
+/// ```
+class RequireStreamOnDoneRule extends SaropaLintRule {
+  const RequireStreamOnDoneRule() : super(code: _code);
+
+  /// Resource cleanup and UX issue.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_stream_on_done',
+    problemMessage:
+        'Stream.listen without onDone. Completion state not handled.',
+    correctionMessage:
+        'Add onDone callback to handle stream completion.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'listen') return;
+
+      // Check if target is a stream
+      final targetType = node.target?.staticType;
+      if (targetType == null) return;
+
+      final typeName = targetType.getDisplayString();
+      if (!typeName.contains('Stream')) return;
+
+      // Check for onDone parameter
+      bool hasOnDone = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onDone') {
+          hasOnDone = true;
+          break;
+        }
+      }
+
+      if (!hasOnDone) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Completer is created but never completed in error paths.
+///
+/// Uncomopleted Completers can cause futures to hang forever.
+/// Always complete with error in catch blocks.
+///
+/// **BAD:**
+/// ```dart
+/// Future<String> fetch() {
+///   final completer = Completer<String>();
+///   try {
+///     completer.complete(await api.get());
+///   } catch (e) {
+///     // Completer never completed!
+///   }
+///   return completer.future;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<String> fetch() {
+///   final completer = Completer<String>();
+///   try {
+///     completer.complete(await api.get());
+///   } catch (e) {
+///     completer.completeError(e);
+///   }
+///   return completer.future;
+/// }
+/// ```
+class RequireCompleterErrorHandlingRule extends SaropaLintRule {
+  const RequireCompleterErrorHandlingRule() : super(code: _code);
+
+  /// Bug - futures may hang indefinitely.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_completer_error_handling',
+    problemMessage:
+        'Completer in try-catch without completeError. May hang on error.',
+    correctionMessage:
+        'Add completer.completeError(e) in catch block.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Completer') return;
+
+      // Find enclosing method
+      AstNode? current = node.parent;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingMethod == null) return;
+
+      final methodSource = enclosingMethod.toSource();
+
+      // Check if method has try-catch
+      if (!methodSource.contains('try') || !methodSource.contains('catch')) {
+        return;
+      }
+
+      // Check if completeError is called
+      if (!methodSource.contains('completeError')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
