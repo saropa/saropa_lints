@@ -2990,3 +2990,193 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when sensitive data appears in log statements.
+///
+/// Logging passwords, tokens, or credentials creates security risks
+/// if logs are stored or transmitted insecurely.
+///
+/// **BAD:**
+/// ```dart
+/// logger.info('Login with password: $password');
+/// print('Token: $authToken');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// logger.info('Login attempt for user: $userId');
+/// logger.debug('Auth token received', {'tokenLength': token.length});
+/// ```
+///
+/// **Quick fix available:** Comments out the log statement for review.
+class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
+  const AvoidSensitiveDataInLogsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_sensitive_data_in_logs',
+    problemMessage: 'Sensitive data in logs creates security risks.',
+    correctionMessage: 'Remove sensitive data or log only non-sensitive metadata.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  // cspell:disable
+  static const Set<String> _sensitiveNames = <String>{
+    'password',
+    'passwd',
+    'pwd',
+    'secret',
+    'token',
+    'authtoken',
+    'accesstoken',
+    'refreshtoken',
+    'apikey',
+    'api_key',
+    'privatekey',
+    'private_key',
+    'credential',
+    'ssn',
+    'creditcard',
+    'cardnumber',
+    'cvv',
+    'pin',
+  };
+  // cspell:enable
+
+  static const Set<String> _logMethods = <String>{
+    'print',
+    'debugPrint',
+    'log',
+    'info',
+    'debug',
+    'warning',
+    'error',
+    'severe',
+    'fine',
+    'finer',
+    'finest',
+    'trace',
+    'verbose',
+  };
+
+  /// Pre-compiled regex patterns for each sensitive name.
+  /// Pattern 1: $password at word boundary (not inside braces)
+  /// Pattern 2: ${password} with ONLY the variable name inside braces
+  static final Map<String, (RegExp, RegExp)> _sensitivePatterns = {
+    for (final String name in _sensitiveNames)
+      name: (
+        RegExp(r'\$' + RegExp.escape(name) + r'(?![a-z0-9_\{])'),
+        RegExp(r'\$\{\s*' + RegExp.escape(name) + r'\s*\}'),
+      ),
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_logMethods.contains(node.methodName.name)) return;
+
+      // Check arguments for sensitive variable names
+      for (final Expression arg in node.argumentList.arguments) {
+        if (_containsSensitiveData(arg)) {
+          reporter.atNode(arg, code);
+        }
+      }
+    });
+
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+      final String funcName = node.function.toSource();
+      if (!_logMethods.contains(funcName)) return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (_containsSensitiveData(arg)) {
+          reporter.atNode(arg, code);
+        }
+      }
+    });
+  }
+
+  /// Checks if the argument contains direct interpolation of sensitive data.
+  /// Only flags patterns that actually expose the value:
+  /// - `$password` (direct interpolation)
+  /// - `${password}` (braced direct interpolation)
+  ///
+  /// Does NOT flag expressions that don't expose the value:
+  /// - `${password != null}` (null check)
+  /// - `${password.length}` (property access)
+  /// - `${password?.isEmpty}` (null-safe method call)
+  bool _containsSensitiveData(Expression arg) {
+    final String source = arg.toSource().toLowerCase();
+    for (final patterns in _sensitivePatterns.values) {
+      final (directPattern, bracedPattern) = patterns;
+      if (directPattern.hasMatch(source) || bracedPattern.hasMatch(source)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutSensitiveLogFix()];
+}
+
+class _CommentOutSensitiveLogFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the statement containing this method invocation
+      AstNode? current = node;
+      while (current != null && current is! Statement) {
+        current = current.parent;
+      }
+      if (current == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out sensitive log statement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          current!.sourceRange,
+          '// SECURITY: ${current.toSource()}',
+        );
+      });
+    });
+
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      AstNode? current = node;
+      while (current != null && current is! Statement) {
+        current = current.parent;
+      }
+      if (current == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out sensitive log statement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          current!.sourceRange,
+          '// SECURITY: ${current.toSource()}',
+        );
+      });
+    });
+  }
+}
