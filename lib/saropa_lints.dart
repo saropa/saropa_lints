@@ -147,6 +147,9 @@ const List<LintRule> _allRules = <LintRule>[
   PreferUsingListViewRule(),
   AvoidMissingImageAltRule(),
   AvoidDuplicateTestAssertionsRule(),
+  MissingTestAssertionRule(),
+  AvoidAsyncCallbackInFakeAsyncRule(),
+  PreferSymbolOverKeyRule(),
   UseSetStateSynchronouslyRule(),
   AvoidSubstringRule(),
   AvoidTopLevelMembersInTestsRule(),
@@ -193,6 +196,9 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidThrowObjectsWithoutToStringRule(),
   AvoidDuplicateCascadesRule(),
   AvoidEqualExpressionsRule(),
+  ExtendEquatableRule(),
+  ListAllEquatableFieldsRule(),
+  PreferEquatableMixinRule(),
   AvoidCollectionEqualityChecksRule(),
   AvoidDuplicateSwitchCaseConditionsRule(),
   AvoidMixingNamedAndPositionalFieldsRule(),
@@ -256,6 +262,7 @@ const List<LintRule> _allRules = <LintRule>[
   MapKeysOrderingRule(),
   MatchClassNamePatternRule(),
   NewlineBeforeCaseRule(),
+  EnumConstantsOrderingRule(),
   ParametersOrderingConventionRule(),
   PreferCorrectHandlerNameRule(),
   PreferUniqueTestNamesRule(),
@@ -474,6 +481,14 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidEmptyTextWidgetsRule(),
   AvoidFontWeightAsNumberRule(),
   PreferSizedBoxForWhitespaceRule(),
+  PreferSizedBoxSquareRule(),
+  PreferCenterOverAlignRule(),
+  PreferAlignOverContainerRule(),
+  PreferPaddingOverContainerRule(),
+  PreferConstrainedBoxOverContainerRule(),
+  PreferTransformOverContainerRule(),
+  PreferActionButtonTooltipRule(),
+  PreferVoidCallbackRule(),
   AvoidNestedScaffoldsRule(),
   AvoidMultipleMaterialAppsRule(),
   AvoidRawKeyboardListenerRule(),
@@ -613,6 +628,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidCircularDiDependenciesRule(),
   PreferNullObjectPatternRule(),
   RequireTypedDiRegistrationRule(),
+  AvoidFunctionsInRegisterSingletonRule(),
 
   // Memory Management rules (NEW)
   AvoidLargeObjectsInStateRule(),
@@ -795,6 +811,8 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidDatabaseInBuildRule(),
   RequirePrefsKeyConstantsRule(),
   AvoidSecureStorageOnWebRule(),
+  IncorrectFirebaseEventNameRule(),
+  IncorrectFirebaseParameterNameRule(),
 
   // New state management rules
   AvoidProviderOfInBuildRule(),
@@ -829,6 +847,16 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidProviderInWidgetRule(),
   PreferFamilyForParamsRule(),
 
+  // Riverpod rules (from roadmap)
+  AvoidRefReadInsideBuildRule(),
+  AvoidRefWatchOutsideBuildRule(),
+  AvoidRefInsideStateDisposeRule(),
+  UseRefReadSynchronouslyRule(),
+  UseRefAndStateSynchronouslyRule(),
+  AvoidAssigningNotifiersRule(),
+  AvoidNotifierConstructorsRule(),
+  PreferImmutableProviderArgumentsRule(),
+
   AvoidScrollListenerInBuildRule(),
   PreferValueListenableBuilderRule(),
   AvoidGlobalKeyMisuseRule(),
@@ -854,12 +882,30 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidAuthInQueryParamsRule(),
 
   AvoidBlocEventMutationRule(),
+  PreferMultiBlocProviderRule(),
+  AvoidInstantiatingInBlocValueProviderRule(),
+  AvoidExistingInstancesInBlocProviderRule(),
+  PreferCorrectBlocProviderRule(),
+  PreferMultiProviderRule(),
+  AvoidInstantiatingInValueProviderRule(),
+  DisposeProvidersRule(),
+  ProperGetxSuperCallsRule(),
+  AlwaysRemoveGetxListenerRule(),
+  AvoidHooksOutsideBuildRule(),
+  AvoidConditionalHooksRule(),
+  AvoidUnnecessaryHookWidgetsRule(),
   PreferCopyWithForStateRule(),
   AvoidBlocListenInBuildRule(),
   RequireInitialStateRule(),
   RequireErrorStateRule(),
   AvoidBlocInBlocRule(),
   PreferSealedEventsRule(),
+  CheckIsNotClosedAfterAsyncGapRule(),
+  AvoidDuplicateBlocEventHandlersRule(),
+  PreferImmutableBlocEventsRule(),
+  PreferImmutableBlocStateRule(),
+  PreferSealedBlocEventsRule(),
+  PreferSealedBlocStateRule(),
 
   PreferConstWidgetsRule(),
   AvoidExpensiveComputationInBuildRule(),
@@ -1084,6 +1130,124 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Lifecycle rules (Plan Group B)
   RequireLifecycleObserverRule(),
+
+  // Collection & Loop rules (Phase 2)
+  PreferCorrectForLoopIncrementRule(),
+  AvoidUnreachableForLoopRule(),
+
+  // Widget Optimization rules (Phase 2)
+  PreferSingleSetStateRule(),
+  PreferComputeOverIsolateRunRule(),
+  PreferForLoopInChildrenRule(),
+  PreferContainerRule(),
+
+  // Flame Engine rules (Phase 2)
+  AvoidCreatingVectorInUpdateRule(),
+  AvoidRedundantAsyncOnLoadRule(),
+
+  // Bloc Naming rules (Phase 2)
+  PreferBlocEventSuffixRule(),
+  PreferBlocStateSuffixRule(),
+
+  // Code Quality rules (Phase 2)
+  PreferTypedefsForCallbacksRule(),
+  PreferRedirectingSuperclassConstructorRule(),
+  AvoidEmptyBuildWhenRule(),
+  PreferUsePrefixRule(),
+
+  // Provider Advanced rules (Phase 2)
+  PreferImmutableSelectorValueRule(),
+  PreferProviderExtensionsRule(),
+
+  // Riverpod Widget rules (Phase 2)
+  AvoidUnnecessaryConsumerWidgetsRule(),
+  AvoidNullableAsyncValuePatternRule(),
+
+  // GetX Build rules (Phase 2)
+  AvoidGetxRxInsideBuildRule(),
+  AvoidMutableRxVariablesRule(),
+
+  // Remaining ROADMAP_NEXT rules
+  DisposeProvidedInstancesRule(),
+  DisposeGetxFieldsRule(),
+  PreferNullableProviderTypesRule(),
+
+  // Internationalization rules (ROADMAP_NEXT)
+  PreferDateFormatRule(),
+  PreferIntlNameRule(),
+  PreferProvidingIntlDescriptionRule(),
+  PreferProvidingIntlExamplesRule(),
+
+  // Error handling rules (ROADMAP_NEXT)
+  AvoidUncaughtFutureErrorsRule(),
+
+  // Type safety rules (ROADMAP_NEXT)
+  PreferExplicitTypeArgumentsRule(),
+
+  // Image rules (roadmap_up_next)
+  RequireImageLoadingPlaceholderRule(),
+  RequireMediaLoadingStateRule(),
+  RequirePdfLoadingIndicatorRule(),
+  PreferClipboardFeedbackRule(),
+
+  // Disposal rules (roadmap_up_next)
+  RequireStreamSubscriptionCancelRule(),
+
+  // Async rules (roadmap_up_next)
+  AvoidDialogContextAfterAsyncRule(),
+  RequireWebsocketMessageValidationRule(),
+  RequireFeatureFlagDefaultRule(),
+  PreferUtcForStorageRule(),
+  RequireLocationTimeoutRule(),
+
+  // Firebase/Maps rules (roadmap_up_next)
+  PreferFirestoreBatchWriteRule(),
+  AvoidFirestoreInWidgetBuildRule(),
+  PreferFirebaseRemoteConfigDefaultsRule(),
+  RequireFcmTokenRefreshHandlerRule(),
+  RequireBackgroundMessageHandlerRule(),
+  AvoidMapMarkersInBuildRule(),
+  RequireMapIdleCallbackRule(),
+  PreferMarkerClusteringRule(),
+
+  // Accessibility rules (roadmap_up_next)
+  RequireImageDescriptionRule(),
+  AvoidSemanticsExclusionRule(),
+  PreferMergeSemanticsRule(),
+  RequireFocusIndicatorRule(),
+  AvoidFlashingContentRule(),
+  PreferAdequateSpacingRule(),
+  AvoidMotionWithoutReduceRule(),
+
+  // Navigation rules (roadmap_up_next)
+  RequireDeepLinkFallbackRule(),
+  AvoidDeepLinkSensitiveParamsRule(),
+  PreferTypedRouteParamsRule(),
+  RequireStepperValidationRule(),
+  RequireStepCountIndicatorRule(),
+  RequireRefreshIndicatorOnListsRule(),
+
+  // Animation rules (roadmap_up_next)
+  PreferTweenSequenceRule(),
+  RequireAnimationStatusListenerRule(),
+  AvoidOverlappingAnimationsRule(),
+  AvoidAnimationRebuildWasteRule(),
+  PreferPhysicsSimulationRule(),
+
+  // Platform-specific rules (roadmap_up_next)
+  AvoidPlatformChannelOnWebRule(),
+  RequireCorsHandlingRule(),
+  PreferDeferredLoadingWebRule(),
+  RequireMenuBarForDesktopRule(),
+  AvoidTouchOnlyGesturesRule(),
+  RequireWindowCloseConfirmationRule(),
+  PreferNativeFileDialogsRule(),
+
+  // Test rules (roadmap_up_next)
+  RequireTestCleanupRule(),
+  PreferTestVariantRule(),
+  RequireAccessibilityTestsRule(),
+  RequireAnimationTestsRule(),
 ];
 
 class _SaropaLints extends PluginBase {

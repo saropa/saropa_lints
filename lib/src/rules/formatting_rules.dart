@@ -11,6 +11,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when case clauses don't have newlines before them.
 ///
+/// Alias: blank_line_before_case, newline_before_case, case_spacing
+///
 /// Newlines before case clauses improve readability.
 ///
 /// ### Example
@@ -79,6 +81,8 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 }
 
 /// Warns when constructors don't have blank lines before them.
+///
+/// Alias: blank_line_before_constructor, constructor_spacing, newline_before_constructor
 ///
 /// Blank lines before constructors improve readability.
 ///
@@ -157,6 +161,8 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 }
 
 /// Warns when methods don't have blank lines before them.
+///
+/// Alias: blank_line_before_method, method_spacing, newline_before_method
 ///
 /// Blank lines before methods improve readability.
 ///
@@ -239,6 +245,8 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 
 /// Warns when there's no blank line before a return statement.
 ///
+/// Alias: blank_line_before_return, return_spacing, newline_before_return
+///
 /// Adding a blank line before return statements can improve readability
 /// by visually separating the return from the preceding logic.
 class NewlineBeforeReturnRule extends SaropaLintRule {
@@ -313,6 +321,8 @@ class _AddBlankLineBeforeReturnFix extends DartFix {
 }
 
 /// Warns when multi-line constructs are missing trailing commas.
+///
+/// Alias: require_trailing_comma, add_trailing_comma, multiline_comma
 ///
 /// Trailing commas make diffs cleaner and prevent formatting issues.
 ///
@@ -468,6 +478,8 @@ class _AddTrailingCommaFix extends DartFix {
 
 /// Warns when trailing commas are unnecessary.
 ///
+/// Alias: remove_trailing_comma, single_element_comma, extra_comma
+///
 /// Single-element lists/parameters don't need trailing commas.
 ///
 /// ### Example
@@ -588,6 +600,8 @@ class _RemoveTrailingCommaFix extends DartFix {
 
 /// Warns when comments don't follow formatting conventions.
 ///
+/// Alias: comment_style, comment_capitalization, comment_punctuation
+///
 /// Comments should start with a capital letter and end with punctuation.
 ///
 /// ### Example
@@ -679,6 +693,8 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 
 /// Warns when class members are not in the conventional order.
 ///
+/// Alias: sort_class_members, class_member_order, fields_before_methods
+///
 /// Members should be ordered: fields, constructors, methods.
 ///
 /// ### Example
@@ -752,6 +768,8 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
 
 /// Warns when parameters are not in conventional order.
 ///
+/// Alias: sort_parameters, parameter_order, required_before_optional
+///
 /// Parameters should be ordered: required positional, optional positional,
 /// then named parameters (required named before optional named).
 ///
@@ -819,5 +837,73 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
     if (param.isOptionalPositional) return 1;
     if (param.isRequiredNamed) return 2;
     return 3; // Optional named
+  }
+}
+
+/// Warns when enum constants are not in alphabetical order.
+///
+/// Alias: sort_enum_constants, alphabetical_enum, enum_alphabetical_order
+///
+/// Keeping enum constants in alphabetical order improves readability
+/// and makes it easier to find specific values.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// enum Priority {
+///   high,
+///   critical,
+///   low,
+///   medium,
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// enum Priority {
+///   critical,
+///   high,
+///   low,
+///   medium,
+/// }
+/// ```
+class EnumConstantsOrderingRule extends SaropaLintRule {
+  const EnumConstantsOrderingRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'enum_constants_ordering',
+    problemMessage: 'Enum constants are not in alphabetical order.',
+    correctionMessage: 'Consider ordering enum constants alphabetically.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addEnumDeclaration((EnumDeclaration node) {
+      final List<EnumConstantDeclaration> constants = node.constants.toList();
+      if (constants.length < 2) return;
+
+      // Check if already sorted
+      String? previousName;
+      for (final EnumConstantDeclaration constant in constants) {
+        final String currentName = constant.name.lexeme;
+        if (previousName != null &&
+            currentName.toLowerCase().compareTo(previousName.toLowerCase()) <
+                0) {
+          reporter.atNode(node, code);
+          return; // Only report once per enum
+        }
+        previousName = currentName;
+      }
+    });
   }
 }

@@ -692,3 +692,72 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when a function literal is passed to registerSingleton.
+///
+/// registerSingleton expects an already-created instance, not a factory
+/// function. Use registerLazySingleton or registerFactory for factories.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// getIt.registerSingleton<UserService>(() => UserService()); // Function!
+/// getIt.registerSingleton(() => MyService()); // Wrong!
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// getIt.registerSingleton<UserService>(UserService()); // Instance
+/// // OR for lazy initialization:
+/// getIt.registerLazySingleton<UserService>(() => UserService());
+/// // OR for factories:
+/// getIt.registerFactory<UserService>(() => UserService());
+/// ```
+class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
+  const AvoidFunctionsInRegisterSingletonRule() : super(code: _code);
+
+  /// Potential bug. Wrong method used.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_functions_in_register_singleton',
+    problemMessage:
+        'registerSingleton expects an instance, not a factory function.',
+    correctionMessage:
+        'Use registerLazySingleton(() => ...) or registerFactory(() => ...) '
+        'for lazy instantiation. Use registerSingleton(MyService()) for eager.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'registerSingleton') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      // Get the first positional argument
+      Expression? firstArg;
+      for (final Expression arg in args.arguments) {
+        if (arg is! NamedExpression) {
+          firstArg = arg;
+          break;
+        }
+      }
+
+      if (firstArg == null) return;
+
+      // Check if it's a function expression
+      if (firstArg is FunctionExpression) {
+        reporter.atNode(firstArg, code);
+      }
+    });
+  }
+}

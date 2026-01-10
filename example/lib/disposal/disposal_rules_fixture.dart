@@ -200,6 +200,43 @@ class _GoodFormWidgetState extends State<GoodFormWidget> {
   }
 }
 
+// GOOD: TextEditingController from external source (e.g., Autocomplete callback)
+// This should NOT trigger the lint - the external widget owns the controller
+class ExternalControllerWidget extends StatefulWidget {
+  const ExternalControllerWidget({super.key});
+
+  @override
+  State<ExternalControllerWidget> createState() =>
+      _ExternalControllerWidgetState();
+}
+
+class _ExternalControllerWidgetState extends State<ExternalControllerWidget> {
+  // No lint expected - controller is assigned from external source, not created here
+  TextEditingController? _autocompleteController;
+
+  @override
+  void dispose() {
+    // No need to dispose - external widget owns it
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue value) => const Iterable<String>.empty(),
+      fieldViewBuilder: (
+        BuildContext context,
+        TextEditingController controller,
+        FocusNode focusNode,
+        VoidCallback onSubmitted,
+      ) {
+        _autocompleteController = controller; // Assigned, not created
+        return TextField(controller: controller, focusNode: focusNode);
+      },
+    );
+  }
+}
+
 // =========================================================================
 // require_page_controller_dispose
 // =========================================================================

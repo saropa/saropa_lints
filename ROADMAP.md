@@ -4,6 +4,108 @@
 
 See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 1000 rules.
 
+## Moved to Implementation (57 rules)
+
+The following rules have been added to `tiers.dart` and are tracked in [roadmap_up_next.md](roadmap_up_next.md). Rules marked with (alias) map to existing implementations.
+
+### Disposal Rules
+- `require_scroll_controller_dispose` - Essential
+- `require_focus_node_dispose` - Essential
+- `require_animation_controller_dispose` → (alias: `require_animation_disposal`)
+- `require_stream_subscription_cancel` → (alias: `avoid_unassigned_stream_subscriptions`)
+- `require_timer_cancel` → (alias: `require_timer_cancellation`)
+- `require_text_editing_controller_dispose` - Essential
+- `require_page_controller_dispose` - Essential
+- `require_tab_controller_dispose` - Essential
+- `require_video_player_controller_dispose` → (alias: `require_media_player_dispose`)
+- `avoid_websocket_memory_leak` - Essential (NEW)
+
+### Widget/Image Rules
+- `require_image_error_fallback` → (alias: `require_image_error_builder`)
+- `require_image_loading_placeholder` - Recommended (NEW)
+- `prefer_cached_network_image` - Recommended
+- `prefer_image_size_constraints` - DEFERRED (heuristic)
+- `prefer_action_button_tooltip` → (alias: `avoid_icon_buttons_without_tooltip`)
+- `require_avatar_fallback` - Recommended
+- `require_avatar_alt_text` - Recommended
+- `prefer_video_loading_placeholder` - DEFERRED (heuristic)
+- `require_media_loading_state` - DEFERRED (state analysis)
+- `require_pdf_loading_indicator` - DEFERRED (package-specific)
+- `require_pdf_error_handling` - Recommended (NEW)
+- `require_qr_scan_feedback` - Recommended
+- `prefer_clipboard_feedback` - DEFERRED (cross-method)
+- `require_keyboard_action_type` - DEFERRED (Form detection)
+- `require_keyboard_dismiss_on_scroll` - DEFERRED (Form detection)
+
+### Async/Context Rules
+- `avoid_dialog_context_after_async` → (alias: `avoid_context_after_navigation`)
+- `check_mounted_after_async` → (alias: `require_mounted_check`)
+- `require_graphql_error_handling` - Essential (NEW)
+- `require_websocket_message_validation` - DEFERRED (vague)
+- `require_feature_flag_default` - DEFERRED (package-specific)
+- `prefer_utc_for_storage` - DEFERRED (heuristic)
+- `require_file_exists_check` - Recommended
+- `require_location_timeout` - Essential (NEW)
+
+### Firebase/Maps Rules
+- `prefer_firestore_batch_write` - Professional (NEW)
+- `avoid_firestore_in_widget_build` → (alias: `avoid_database_in_build`)
+- `prefer_firebase_remote_config_defaults` - DEFERRED (cross-file)
+- `require_fcm_token_refresh_handler` - DEFERRED (class-level)
+- `require_background_message_handler` - DEFERRED (cross-file)
+- `avoid_bluetooth_scan_without_timeout` - Recommended
+- `require_bluetooth_state_check` - Recommended
+- `require_ble_disconnect_handling` - Recommended
+- `require_graphql_operation_names` - Recommended
+- `avoid_map_markers_in_build` - DEFERRED (package-specific)
+- `require_map_idle_callback` - DEFERRED (package-specific)
+- `prefer_marker_clustering` - DEFERRED (heuristic)
+
+### Accessibility Rules
+- `require_image_description` → (alias: `require_image_semantics`)
+- `avoid_semantics_exclusion` - DEFERRED (comment detection)
+- `prefer_merge_semantics` - DEFERRED (sibling detection)
+- `require_focus_indicator` - DEFERRED (runtime)
+- `avoid_flashing_content` - DEFERRED (timing analysis)
+- `require_badge_semantics` - Recommended
+- `avoid_badge_without_meaning` - Professional
+- `require_badge_count_limit` - Recommended (NEW)
+- `prefer_adequate_spacing` - DEFERRED (layout calc)
+- `avoid_motion_without_reduce` - Recommended (NEW)
+
+### Navigation/Dialog Rules
+- `require_deep_link_fallback` - DEFERRED (package-specific)
+- `avoid_deep_link_sensitive_params` - DEFERRED (heuristic)
+- `prefer_typed_route_params` - DEFERRED (package-specific)
+- `require_dialog_result_handling` - Professional
+- `avoid_snackbar_queue_buildup` - Professional
+- `require_stepper_validation` - DEFERRED (validation detection)
+- `require_step_count_indicator` - DEFERRED (too abstract)
+- `require_refresh_indicator_on_lists` - Recommended (NEW)
+
+### Animation Rules
+- `prefer_tween_sequence` - DEFERRED (detection unclear)
+- `require_animation_status_listener` - Professional (NEW)
+- `avoid_overlapping_animations` - DEFERRED (cross-context)
+- `avoid_animation_rebuild_waste` - DEFERRED (heuristic)
+- `prefer_physics_simulation` - DEFERRED (package-specific)
+
+### Platform Rules
+- `avoid_platform_channel_on_web` - DEFERRED (cross-file)
+- `require_cors_handling` - REMOVED (server-side)
+- `prefer_deferred_loading_web` - DEFERRED (import size unknown)
+- `require_menu_bar_for_desktop` - DEFERRED (cross-file)
+- `avoid_touch_only_gestures` - Professional (NEW)
+- `require_window_close_confirmation` - DEFERRED (cross-file)
+- `prefer_native_file_dialogs` - DEFERRED (detection unclear)
+
+### Testing Rules
+- `avoid_real_dependencies` → (alias: `avoid_real_network_calls_in_tests`)
+- `require_test_cleanup` - Professional (NEW)
+- `prefer_test_variant` - DEFERRED (too abstract)
+- `require_accessibility_tests` - Professional (NEW)
+- `require_animation_tests` - DEFERRED (cross-file)
+
 ## Implementation Difficulty Warning
 
 > **Not all rules are created equal.** Rules that appear simple often require multiple revisions due to false positives from heuristic-based detection.
@@ -799,84 +901,45 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | `avoid_bloc_public_fields` | Professional | WARNING | Bloc fields should be private - expose state through streams only. |
 | `avoid_bloc_public_methods` | Professional | WARNING | Bloc should only expose event handling - use add() for events. |
 | `avoid_cubits` | Stylistic | INFO | Prefer Bloc over Cubit for better event traceability. |
-| `avoid_duplicate_bloc_event_handlers` | Essential | ERROR | Multiple handlers for the same event type cause undefined behavior. |
 | `avoid_empty_build_when` | Recommended | WARNING | Empty buildWhen in BlocBuilder means it always rebuilds. |
-| `avoid_existing_instances_in_bloc_provider` | Essential | ERROR | BlocProvider.value with existing instances breaks proper disposal. |
-| `avoid_instantiating_in_bloc_value_provider` | Essential | ERROR | BlocProvider.value should receive existing instance, not create new one. |
 | `avoid_passing_bloc_to_bloc` | Professional | WARNING | Blocs should not directly depend on other Blocs - use streams or events. |
 | `avoid_passing_build_context_to_blocs` | Essential | WARNING | BuildContext in Blocs couples UI to business logic. |
 | `avoid_returning_value_from_cubit_methods` | Professional | INFO | Cubit methods should emit states, not return values. |
-| `check_is_not_closed_after_async_gap` | Essential | ERROR | Check `isClosed` before emitting state after async operations. |
 | `emit_new_bloc_state_instances` | Professional | WARNING | Always emit new state instances - mutating existing state breaks equality checks. |
 | `handle_bloc_event_subclasses` | Professional | INFO | Ensure all event subclasses are handled in event handlers. |
 | `prefer_bloc_event_suffix` | Stylistic | INFO | Bloc event classes should have `Event` suffix. |
 | `prefer_bloc_extensions` | Professional | INFO | Use Bloc extension methods for cleaner code. |
 | `prefer_bloc_state_suffix` | Stylistic | INFO | Bloc state classes should have `State` suffix. |
-| `prefer_correct_bloc_provider` | Recommended | INFO | Use appropriate BlocProvider variant (create vs value). |
-| `prefer_immutable_bloc_events` | Professional | WARNING | Bloc events should be immutable for predictable behavior. |
-| `prefer_immutable_bloc_state` | Professional | WARNING | Bloc states should be immutable for proper equality checks. |
-| `prefer_multi_bloc_provider` | Recommended | INFO | Use MultiBlocProvider instead of nested BlocProviders. |
-| `prefer_sealed_bloc_events` | Professional | INFO | Use sealed classes for Bloc events for exhaustive handling. |
-| `prefer_sealed_bloc_state` | Professional | INFO | Use sealed classes for Bloc states for exhaustive handling. |
 
 #### Riverpod Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_assigning_notifiers` | Essential | ERROR | Notifiers should not be reassigned - they manage their own state. |
-| `avoid_calling_notifier_members_inside_build` | Essential | WARNING | Calling notifier methods in build causes side effects during rendering. |
-| `avoid_notifier_constructors` | Professional | WARNING | Notifiers should use build() method, not constructors for initialization. |
-| `avoid_nullable_async_value_pattern` | Recommended | INFO | Prefer AsyncValue.when() over nullable pattern matching. |
-| `avoid_public_notifier_properties` | Professional | INFO | Notifier properties should be private - expose through state only. |
-| `avoid_read_inside_build` | Essential | WARNING | Use ref.watch() in build, ref.read() only in callbacks. |
-| `avoid_ref_inside_state_dispose` | Essential | ERROR | Ref is not available during dispose - cache values in initState. |
-| `avoid_ref_read_inside_build` | Essential | WARNING | ref.read() in build doesn't track dependencies - use ref.watch(). |
-| `avoid_ref_watch_outside_build` | Essential | ERROR | ref.watch() outside build causes subscription leaks. |
-| `avoid_watch_outside_build` | Essential | ERROR | Watching providers outside build causes memory leaks. |
-| `prefer_immutable_provider_arguments` | Professional | INFO | Provider arguments should be immutable for consistent behavior. |
-| `use_ref_and_state_synchronously` | Essential | WARNING | Use ref and state synchronously in async methods. |
-| `use_ref_read_synchronously` | Essential | WARNING | Cache ref.read() results before async gaps. |
 
 #### Provider Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_instantiating_in_value_provider` | Essential | ERROR | Provider.value should receive existing instance, not create new one. |
 | `prefer_immutable_selector_value` | Professional | INFO | Selector values should be immutable for proper equality checks. |
-| `prefer_multi_provider` | Recommended | INFO | Use MultiProvider instead of nested Providers. |
 | `prefer_nullable_provider_types` | Professional | INFO | Provider types should be nullable when the value can be absent. |
 | `prefer_provider_extensions` | Professional | INFO | Use Provider extension methods for cleaner code. |
 | `dispose_provided_instances` | Essential | WARNING | Instances created in Provider.create should be disposed. |
-| `dispose_providers` | Essential | WARNING | Providers with disposable resources need proper cleanup. |
 
 #### GetX Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `always_remove_getx_listener` | Essential | WARNING | GetX listeners must be removed to prevent memory leaks. |
 | `avoid_getx_rx_inside_build` | Professional | WARNING | Creating Rx variables in build causes unnecessary rebuilds. |
 | `avoid_mutable_rx_variables` | Professional | INFO | Rx variables should not be reassigned - update their values instead. |
 | `dispose_getx_fields` | Essential | WARNING | GetX controllers and workers must be disposed. |
-| `proper_getx_super_calls` | Essential | ERROR | GetX lifecycle methods must call super properly. |
 
 #### Flutter Hooks Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_conditional_hooks` | Essential | ERROR | Hooks cannot be called conditionally - violates rules of hooks. |
-| `avoid_hooks_outside_build` | Essential | ERROR | Hooks can only be called inside build methods. |
 | `avoid_misused_hooks` | Essential | WARNING | Detect common hook misuse patterns. |
-| `avoid_unnecessary_hook_widgets` | Recommended | INFO | Use HookWidget only when using hooks. |
 | `prefer_use_callback` | Professional | INFO | Use useCallback for memoizing callback functions. |
 | `prefer_use_prefix` | Stylistic | INFO | Custom hooks should start with `use` prefix. |
-
-#### Equatable Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `extend_equatable` | Professional | INFO | Classes implementing == should extend Equatable for consistency. |
-| `list_all_equatable_fields` | Essential | WARNING | All fields must be listed in Equatable.props for correct equality. |
-| `prefer_equatable_mixin` | Professional | INFO | Use EquatableMixin instead of extending Equatable when needed. |
 
 #### Flame Engine Rules
 
@@ -898,38 +961,21 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | `prefer_providing_intl_examples` | Professional | INFO | Intl.message should include examples for complex strings. |
 | `provide_correct_intl_args` | Essential | ERROR | Intl.message args must match placeholders in the message. |
 
-#### Firebase Analytics Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `incorrect_firebase_event_name` | Essential | ERROR | Firebase Analytics event names must follow naming conventions. |
-| `incorrect_firebase_parameter_name` | Essential | ERROR | Firebase Analytics parameter names must follow conventions. |
-
 #### Testing Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_async_callback_in_fake_async` | Essential | ERROR | Async callbacks in fakeAsync won't execute synchronously. |
 | `avoid_missing_controller` | Essential | WARNING | Widgets with controllers should have controllers provided. |
 | `avoid_missing_test_files` | Professional | INFO | `[CROSS-FILE]` Source files should have corresponding test files. |
 | `avoid_misused_test_matchers` | Recommended | WARNING | Detect incorrect usage of test matchers. |
 | `format_test_name` | Stylistic | INFO | Test names should follow a consistent format. |
-| `missing_test_assertion` | Essential | WARNING | Tests without assertions don't actually verify anything. |
 | `prefer_custom_finder_over_find` | Professional | INFO | Use custom finders for better test readability and maintenance. |
-| `prefer_symbol_over_key` | Professional | INFO | Use Symbols over String keys for test identifiers. |
 
 #### Patrol Testing Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `prefer_custom_finder_over_find` | Professional | INFO | Use Patrol's custom finders for clearer integration tests. |
-| `prefer_symbol_over_key` | Professional | INFO | Use Symbols for Patrol test identifiers. |
-
-#### GetIt/DI Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `avoid_functions_in_register_singleton` | Essential | WARNING | Don't pass functions directly to registerSingleton - use factory. |
 
 #### Pubspec Rules
 
@@ -960,31 +1006,13 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | `avoid_unnecessary_consumer_widgets` | Recommended | INFO | Don't use ConsumerWidget if not using ref. |
 | `avoid_unnecessary_null_aware_elements` | Recommended | INFO | Null-aware elements in collections that can't be null. |
 | `dispose_class_fields` | Essential | WARNING | Class fields that are disposable should be disposed. |
-| `prefer_action_button_tooltip` | Recommended | INFO | Action buttons should have tooltips for accessibility. |
-| `prefer_align_over_container` | Recommended | INFO | Use Align instead of Container when only aligning. |
-| `prefer_center_over_align` | Recommended | INFO | Use Center instead of Align(alignment: Alignment.center). |
 | `prefer_compute_over_isolate_run` | Professional | INFO | Use compute() for simpler isolate operations. |
-| `prefer_constrained_box_over_container` | Recommended | INFO | Use ConstrainedBox instead of Container for constraints only. |
 | `prefer_container` | Comprehensive | INFO | Use Container when combining multiple decorations. |
 | `prefer_dedicated_media_query_methods` | Recommended | INFO | Use MediaQuery.sizeOf() instead of MediaQuery.of().size. |
 | `prefer_for_loop_in_children` | Professional | INFO | Use for loops instead of List.generate in widget children. |
-| `prefer_padding_over_container` | Recommended | INFO | Use Padding instead of Container for padding only. |
 | `prefer_single_setstate` | Professional | INFO | Batch multiple state changes into single setState call. |
-| `prefer_sized_box_square` | Recommended | INFO | Use SizedBox.square() for equal width/height. |
 | `prefer_spacing` | Recommended | INFO | Use Spacing widget (or SizedBox) for consistent spacing. |
-| `prefer_transform_over_container` | Recommended | INFO | Use Transform instead of Container for transforms only. |
-| `prefer_void_callback` | Professional | INFO | Use VoidCallback typedef for void Function() parameters. |
 | `use_closest_build_context` | Professional | INFO | Use the closest available BuildContext for better performance. |
-
-#### Formatting/Style Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `enum_constants_ordering` | Stylistic | INFO | Enum constants should be ordered consistently. |
-| `newline_before_case` | Stylistic | INFO | Add blank line before case statements in switch. |
-| `newline_before_constructor` | Stylistic | INFO | Add blank line before constructor declarations. |
-| `newline_before_method` | Stylistic | INFO | Add blank line before method declarations. |
-| `newline_before_return` | Stylistic | INFO | Add blank line before return statements. |
 
 ---
 

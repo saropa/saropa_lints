@@ -12,6 +12,8 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when calling .ignore() on a Future.
 ///
+/// Alias: no_future_ignore, future_ignore_error, silent_future_discard
+///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureIgnoreRule extends SaropaLintRule {
   const AvoidFutureIgnoreRule() : super(code: _code);
@@ -58,6 +60,8 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 }
 
 /// Warns when calling toString() or using string interpolation on a Future.
+///
+/// Alias: no_future_tostring, future_to_string, await_before_tostring
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidFutureToStringRule extends SaropaLintRule {
@@ -115,6 +119,8 @@ class AvoidFutureToStringRule extends SaropaLintRule {
 
 /// Warns when `Future<Future<T>>` is used (nested futures).
 ///
+/// Alias: nested_future, future_future, flatten_future
+///
 /// Example of **bad** code:
 /// ```dart
 /// Future<Future<int>> nestedFuture() async { ... }
@@ -164,6 +170,8 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
 }
 
 /// Warns when `Stream<Future<T>>` or `Future<Stream<T>>` is used.
+///
+/// Alias: stream_future_mix, nested_stream_future, flatten_stream
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -223,6 +231,8 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
 }
 
 /// Warns when an async function is passed where a sync function is expected.
+///
+/// Alias: async_callback_in_sync, async_where_sync_expected, ignored_future_return
 ///
 /// Passing an async function to a parameter expecting a synchronous function
 /// can lead to unexpected behavior where the returned Future is ignored.
@@ -288,6 +298,8 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
 }
 
 /// Warns when async is used but no await is present in the function body.
+///
+/// Alias: unnecessary_async, async_without_await, remove_async
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -372,6 +384,8 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
 
 /// Warns when a Stream is converted to String via toString().
 ///
+/// Alias: no_stream_tostring, stream_to_string, stream_tolist_instead
+///
 /// Example of **bad** code:
 /// ```dart
 /// print(myStream.toString());
@@ -422,6 +436,8 @@ class AvoidStreamToStringRule extends SaropaLintRule {
 }
 
 /// Warns when .listen() result is not assigned to a variable.
+///
+/// Alias: require_stream_subscription_cancel
 ///
 /// **Quick fix available:** Adds a comment to flag for manual review.
 class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
@@ -478,6 +494,8 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
 
 /// Warns when .then() is used instead of async/await in async functions.
 ///
+/// Alias: use_async_await, then_to_await, avoid_then_chain
+///
 /// Using async/await is generally more readable than .then() chains.
 /// Only flags .then() when used inside an async function where await
 /// could be used instead.
@@ -524,6 +542,8 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 }
 
 /// Warns when await is used inline instead of assigning to a variable first.
+///
+/// Alias: inline_await, extract_await, await_variable
 class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   const PreferAssigningAwaitExpressionsRule() : super(code: _code);
 
@@ -579,6 +599,8 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
 
 /// Warns when Future.delayed doesn't have a comment explaining why.
 ///
+/// Alias: document_future_delayed, explain_delay, delay_comment
+///
 /// Delays should be documented to explain their purpose.
 ///
 /// ### Example
@@ -633,6 +655,8 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
 }
 
 /// Warns when Future-returning functions have incorrect return type annotations.
+///
+/// Alias: async_return_type, future_return_type, explicit_future_type
 class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
   const PreferCorrectFutureReturnTypeRule() : super(code: _code);
 
@@ -685,6 +709,8 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
 }
 
 /// Warns when Stream-returning functions have incorrect return type annotations.
+///
+/// Alias: async_star_return_type, stream_return_type, explicit_stream_type
 class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
   const PreferCorrectStreamReturnTypeRule() : super(code: _code);
 
@@ -1409,6 +1435,554 @@ class _ReplaceAsyncCallbackWithFutureVoidFunctionFix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleReplacement(node.sourceRange, replacement);
       });
+    });
+  }
+}
+
+/// Warns when Navigator.pop or context is used after await in a dialog callback.
+///
+/// After an async operation in a dialog, the dialog may have been dismissed
+/// or the context may no longer be valid. Using context after await can crash.
+///
+/// **BAD:**
+/// ```dart
+/// onPressed: () async {
+///   await saveData();
+///   Navigator.pop(context);  // Context may be invalid!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// onPressed: () async {
+///   await saveData();
+///   if (context.mounted) {
+///     Navigator.pop(context);
+///   }
+/// }
+/// ```
+class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
+  const AvoidDialogContextAfterAsyncRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dialog_context_after_async',
+    problemMessage: 'Navigator.pop after await may use invalid context.',
+    correctionMessage: 'Check context.mounted before using Navigator.pop.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Navigator.pop or Navigator.of(context).pop
+      final String methodName = node.methodName.name;
+      if (methodName != 'pop' && methodName != 'maybePop') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('Navigator')) return;
+
+      // Check if there's an await before this in the same function
+      final FunctionBody? body = _findEnclosingFunctionBody(node);
+      if (body == null) return;
+      if (!body.isAsynchronous) return;
+
+      // Check if there's an await expression before this node
+      final bool hasAwaitBefore = _hasAwaitBefore(body, node);
+      if (!hasAwaitBefore) return;
+
+      // Check if there's a mounted check between the await and this
+      final bool hasMountedCheck = _hasMountedCheckBefore(body, node);
+      if (hasMountedCheck) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  FunctionBody? _findEnclosingFunctionBody(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionBody) return current;
+      current = current.parent;
+    }
+    return null;
+  }
+
+  bool _hasAwaitBefore(FunctionBody body, AstNode target) {
+    bool foundAwait = false;
+    bool reachedTarget = false;
+
+    body.visitChildren(_AwaitBeforeChecker((AwaitExpression awaitNode) {
+      if (reachedTarget) return;
+      if (awaitNode.offset < target.offset) {
+        foundAwait = true;
+      }
+    }, () {
+      reachedTarget = true;
+    }, target));
+
+    return foundAwait;
+  }
+
+  bool _hasMountedCheckBefore(FunctionBody body, AstNode target) {
+    final String bodySource = body.toSource();
+    final int targetOffset = target.offset - body.offset;
+
+    // Check for mounted check patterns before the target
+    final String beforeTarget = bodySource.substring(0, targetOffset);
+    return beforeTarget.contains('.mounted') ||
+        beforeTarget.contains('context.mounted') ||
+        beforeTarget.contains('!mounted') ||
+        beforeTarget.contains('if (mounted)') ||
+        beforeTarget.contains('if (!mounted)');
+  }
+}
+
+class _AwaitBeforeChecker extends RecursiveAstVisitor<void> {
+  _AwaitBeforeChecker(this.onAwait, this.onReachTarget, this.target);
+
+  final void Function(AwaitExpression) onAwait;
+  final void Function() onReachTarget;
+  final AstNode target;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    onAwait(node);
+    super.visitAwaitExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node == target) {
+      onReachTarget();
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when setState or context is accessed after await without mounted check.
+///
+/// After an async gap, the widget may have been disposed. Calling setState
+/// or using context without checking mounted will cause errors.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> _loadData() async {
+///   final data = await fetchData();
+///   setState(() => _data = data);  // Widget may be unmounted!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> _loadData() async {
+///   final data = await fetchData();
+///   if (mounted) {
+///     setState(() => _data = data);
+///   }
+/// }
+/// ```
+class CheckMountedAfterAsyncRule extends SaropaLintRule {
+  const CheckMountedAfterAsyncRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'check_mounted_after_async',
+    problemMessage: 'setState or context used after await without mounted check.',
+    correctionMessage: 'Add if (mounted) check before using setState or context.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for setState or context-using methods
+      if (methodName != 'setState' &&
+          methodName != 'showDialog' &&
+          methodName != 'showModalBottomSheet' &&
+          methodName != 'showSnackBar') {
+        return;
+      }
+
+      // Find enclosing async function
+      final FunctionBody? body = _findEnclosingFunctionBody(node);
+      if (body == null) return;
+      if (!body.isAsynchronous) return;
+
+      // Check if there's an await before this
+      if (!_hasAwaitBefore(body, node)) return;
+
+      // Check for mounted check
+      if (_hasMountedGuard(body, node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  FunctionBody? _findEnclosingFunctionBody(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionBody) return current;
+      current = current.parent;
+    }
+    return null;
+  }
+
+  bool _hasAwaitBefore(FunctionBody body, AstNode target) {
+    final String bodySource = body.toSource();
+    final int targetOffset = target.offset - body.offset;
+    final String beforeTarget = bodySource.substring(0, targetOffset);
+    return beforeTarget.contains('await ');
+  }
+
+  bool _hasMountedGuard(FunctionBody body, AstNode target) {
+    // Check if the target is inside an if statement checking mounted
+    AstNode? current = target.parent;
+    while (current != null && current != body) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (condition.contains('mounted')) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when WebSocket message is handled without validation.
+///
+/// WebSocket messages from external sources should be validated
+/// before processing to prevent security issues and crashes.
+///
+/// **BAD:**
+/// ```dart
+/// socket.listen((message) {
+///   final data = jsonDecode(message);
+///   processData(data['value']);  // No validation!
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// socket.listen((message) {
+///   try {
+///     final data = jsonDecode(message);
+///     if (data is Map && data.containsKey('value')) {
+///       processData(data['value']);
+///     }
+///   } catch (e) {
+///     handleError(e);
+///   }
+/// });
+/// ```
+class RequireWebsocketMessageValidationRule extends SaropaLintRule {
+  const RequireWebsocketMessageValidationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_websocket_message_validation',
+    problemMessage: 'WebSocket message should be validated before processing.',
+    correctionMessage: 'Add try-catch and type checking for WebSocket messages.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for WebSocketChannel stream listen
+      if (node.methodName.name != 'listen') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      // Check for WebSocket-related patterns
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('socket') &&
+          !targetSource.contains('Socket') &&
+          !targetSource.contains('channel') &&
+          !targetSource.contains('Channel')) {
+        return;
+      }
+
+      // Check the callback body for validation
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is! FunctionExpression) return;
+
+      final FunctionBody body = firstArg.body;
+      final String bodySource = body.toSource();
+
+      // Check for validation patterns
+      final bool hasValidation = bodySource.contains('try') ||
+          bodySource.contains('catch') ||
+          bodySource.contains('is Map') ||
+          bodySource.contains('is List') ||
+          bodySource.contains('containsKey') ||
+          bodySource.contains('?[') ||
+          bodySource.contains('?.') ||
+          bodySource.contains('if (');
+
+      if (!hasValidation) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when feature flag is checked without a default/fallback value.
+///
+/// Feature flags may not be available (network issues, not loaded yet).
+/// Always provide a default value for graceful degradation.
+///
+/// **BAD:**
+/// ```dart
+/// if (remoteConfig.getBool('new_feature')) {
+///   // May throw if config not loaded!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final isEnabled = remoteConfig.getBool('new_feature') ?? false;
+/// if (isEnabled) {
+///   // Safe with default
+/// }
+/// ```
+class RequireFeatureFlagDefaultRule extends SaropaLintRule {
+  const RequireFeatureFlagDefaultRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_feature_flag_default',
+    problemMessage: 'Feature flag should have a default/fallback value.',
+    correctionMessage: 'Use ?? operator or provide default in getBool/getString.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for RemoteConfig get methods
+      final String methodName = node.methodName.name;
+      if (!methodName.startsWith('get')) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('remoteConfig') &&
+          !targetSource.contains('RemoteConfig') &&
+          !targetSource.contains('featureFlag') &&
+          !targetSource.contains('FeatureFlag')) {
+        return;
+      }
+
+      // Check if there's a null-aware operator or default
+      final AstNode? parent = node.parent;
+
+      // OK if used with ?? operator
+      if (parent is BinaryExpression &&
+          parent.operator.type == TokenType.QUESTION_QUESTION) {
+        return;
+      }
+
+      // OK if passed to a parameter with default
+      if (parent is NamedExpression) return;
+
+      // OK if assigned to a variable with default
+      if (parent is VariableDeclaration) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when DateTime is stored without converting to UTC.
+///
+/// Storing local DateTime values causes inconsistency across time zones.
+/// Always convert to UTC before storage and back to local for display.
+///
+/// **BAD:**
+/// ```dart
+/// await db.insert({'timestamp': DateTime.now().toIso8601String()});
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await db.insert({'timestamp': DateTime.now().toUtc().toIso8601String()});
+/// ```
+class PreferUtcForStorageRule extends SaropaLintRule {
+  const PreferUtcForStorageRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_utc_for_storage',
+    problemMessage: 'DateTime should be converted to UTC before storage.',
+    correctionMessage: 'Call .toUtc() before storing DateTime values.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for toIso8601String or millisecondsSinceEpoch
+      final String methodName = node.methodName.name;
+      if (methodName != 'toIso8601String' &&
+          methodName != 'toString' &&
+          !methodName.contains('milliseconds') &&
+          !methodName.contains('microseconds')) {
+        return;
+      }
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      // Check if called on DateTime
+      final DartType? type = target.staticType;
+      if (type == null) return;
+
+      final String typeName = type.getDisplayString();
+      if (!typeName.startsWith('DateTime')) return;
+
+      // Check if already UTC
+      final String targetSource = target.toSource();
+      if (targetSource.contains('.toUtc()') || targetSource.contains('.utc')) {
+        return;
+      }
+
+      // Check if inside a storage-related context
+      AstNode? current = node.parent;
+      while (current != null) {
+        final String source = current.toSource().toLowerCase();
+        if (source.contains('insert') ||
+            source.contains('update') ||
+            source.contains('save') ||
+            source.contains('store') ||
+            source.contains('write') ||
+            source.contains('put') ||
+            source.contains('set')) {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when location request is made without a timeout.
+///
+/// Location requests can hang indefinitely if GPS is unavailable.
+/// Always specify a timeout to prevent blocking the UI.
+///
+/// **BAD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition(
+///   timeLimit: Duration(seconds: 10),
+/// );
+/// ```
+class RequireLocationTimeoutRule extends SaropaLintRule {
+  const RequireLocationTimeoutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_location_timeout',
+    problemMessage: 'Location request should have a timeout.',
+    correctionMessage: 'Add timeLimit or timeout parameter to location request.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for location-related methods
+      final String methodName = node.methodName.name;
+      if (!methodName.contains('Position') &&
+          !methodName.contains('Location') &&
+          !methodName.contains('location') &&
+          methodName != 'getCurrentPosition' &&
+          methodName != 'getLastKnownPosition' &&
+          methodName != 'getLocation') {
+        return;
+      }
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('Geolocator') &&
+          !targetSource.contains('Location') &&
+          !targetSource.contains('location')) {
+        return;
+      }
+
+      // Check for timeout parameter
+      bool hasTimeout = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'timeLimit' ||
+              name == 'timeout' ||
+              name == 'duration') {
+            hasTimeout = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasTimeout) {
+        reporter.atNode(node, code);
+      }
     });
   }
 }

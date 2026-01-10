@@ -6795,3 +6795,269 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
     return false;
   }
 }
+
+/// Suggests using typedefs for callback function types.
+///
+/// Inline function types are harder to read and reuse.
+///
+/// **BAD:**
+/// ```dart
+/// void doAsync(void Function(String error) onError) {}
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// typedef ErrorCallback = void Function(String error);
+/// void doAsync(ErrorCallback onError) {}
+/// ```
+class PreferTypedefsForCallbacksRule extends SaropaLintRule {
+  const PreferTypedefsForCallbacksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_typedefs_for_callbacks',
+    problemMessage: 'Inline function type could be a typedef.',
+    correctionMessage: 'Create a typedef for this callback type.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFormalParameterList((FormalParameterList node) {
+      for (final FormalParameter param in node.parameters) {
+        if (param is SimpleFormalParameter) {
+          final TypeAnnotation? type = param.type;
+          if (type is GenericFunctionType) {
+            reporter.atNode(type, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Suggests using redirecting constructors for super calls.
+///
+/// Redirecting constructors are cleaner than calling super directly.
+///
+/// **BAD:**
+/// ```dart
+/// class Child extends Parent {
+///   Child(String name) : super(name);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class Child extends Parent {
+///   Child(super.name);
+/// }
+/// ```
+class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
+  const PreferRedirectingSuperclassConstructorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_redirecting_superclass_constructor',
+    problemMessage: 'Consider using super parameters.',
+    correctionMessage: 'Use super.paramName instead of super(paramName).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      final NodeList<ConstructorInitializer> initializers = node.initializers;
+      if (initializers.isEmpty) return;
+
+      for (final ConstructorInitializer init in initializers) {
+        if (init is SuperConstructorInvocation) {
+          // Check if super call has simple parameter forwarding
+          final ArgumentList args = init.argumentList;
+          for (final Expression arg in args.arguments) {
+            if (arg is SimpleIdentifier) {
+              // Check if the identifier matches a constructor parameter
+              final FormalParameterList? params = node.parameters;
+              if (params != null) {
+                for (final FormalParameter param in params.parameters) {
+                  if (param.name?.lexeme == arg.name) {
+                    reporter.atNode(init, code);
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when buildWhen callback is empty or always returns true.
+///
+/// Empty buildWhen defeats the purpose of BlocBuilder optimization.
+///
+/// **BAD:**
+/// ```dart
+/// BlocBuilder<MyBloc, MyState>(
+///   buildWhen: (previous, current) => true, // Always rebuilds
+///   builder: (context, state) => Text('$state'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// BlocBuilder<MyBloc, MyState>(
+///   buildWhen: (previous, current) => previous.value != current.value,
+///   builder: (context, state) => Text('${state.value}'),
+/// )
+/// ```
+class AvoidEmptyBuildWhenRule extends SaropaLintRule {
+  const AvoidEmptyBuildWhenRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_empty_build_when',
+    problemMessage: 'buildWhen always returns true, defeating optimization.',
+    correctionMessage: 'Add meaningful comparison or remove buildWhen.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (typeName != 'BlocBuilder' && typeName != 'BlocConsumer') return;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'buildWhen') {
+          final Expression expr = arg.expression;
+          if (expr is FunctionExpression) {
+            final FunctionBody body = expr.body;
+            // Check for => true
+            if (body is ExpressionFunctionBody) {
+              final Expression returnExpr = body.expression;
+              if (returnExpr is BooleanLiteral && returnExpr.value) {
+                reporter.atNode(arg, code);
+              }
+            }
+            // Check for { return true; }
+            else if (body is BlockFunctionBody) {
+              final List<Statement> statements = body.block.statements;
+              if (statements.length == 1 && statements.first is ReturnStatement) {
+                final Expression? returnExpr =
+                    (statements.first as ReturnStatement).expression;
+                if (returnExpr is BooleanLiteral && returnExpr.value) {
+                  reporter.atNode(arg, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Suggests using 'use' prefix for custom hooks.
+///
+/// Flutter Hooks convention requires hooks to start with 'use'.
+///
+/// **BAD:**
+/// ```dart
+/// T myHook<T>() => useHook(); // Missing use prefix
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// T useMyHook<T>() => useHook();
+/// ```
+class PreferUsePrefixRule extends SaropaLintRule {
+  const PreferUsePrefixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_use_prefix',
+    problemMessage: 'Custom hook should start with "use" prefix.',
+    correctionMessage: 'Rename function to useYourHookName.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _hookMethods = <String>{
+    'useState',
+    'useEffect',
+    'useMemoized',
+    'useCallback',
+    'useRef',
+    'useContext',
+    'useValueListenable',
+    'useAnimation',
+    'useAnimationController',
+    'useFuture',
+    'useStream',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      final String name = node.name.lexeme;
+
+      // Skip if already has use prefix
+      if (name.startsWith('use')) return;
+
+      // Check if body calls hook methods
+      bool usesHooks = false;
+      node.functionExpression.body.visitChildren(_HookCallVisitor(
+        hookMethods: _hookMethods,
+        onHookFound: () => usesHooks = true,
+      ));
+
+      if (usesHooks) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+class _HookCallVisitor extends RecursiveAstVisitor<void> {
+  _HookCallVisitor({required this.hookMethods, required this.onHookFound});
+
+  final Set<String> hookMethods;
+  final void Function() onHookFound;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    if (hookMethods.contains(methodName) || methodName.startsWith('use')) {
+      onHookFound();
+    }
+    super.visitMethodInvocation(node);
+  }
+}
