@@ -1237,6 +1237,8 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
 
 /// Warns when using `MediaQuery.of(context).size` instead of dedicated methods.
 ///
+/// Alias: prefer_dedicated_media_query_methods
+///
 /// Flutter provides dedicated methods like `MediaQuery.sizeOf(context)` which
 /// are more efficient and clearer.
 ///
