@@ -3690,3 +3690,140 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when HTTP requests don't have a timeout specified.
+///
+/// Alias: http_timeout, network_timeout, request_timeout
+///
+/// HTTP requests without timeouts can hang indefinitely, freezing the UI
+/// or consuming resources. Always set a reasonable timeout.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(Uri.parse(url));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final response = await http.get(Uri.parse(url))
+///     .timeout(const Duration(seconds: 30));
+/// ```
+class PreferTimeoutOnRequestsRule extends SaropaLintRule {
+  const PreferTimeoutOnRequestsRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_timeout_on_requests',
+    problemMessage:
+        'HTTP request without timeout. Request may hang indefinitely.',
+    correctionMessage:
+        'Add .timeout(Duration(seconds: 30)) or configure client timeout.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _httpMethods = <String>{
+    'get',
+    'post',
+    'put',
+    'delete',
+    'patch',
+    'head',
+    'read',
+    'readBytes',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_httpMethods.contains(methodName)) return;
+
+      // Check if target looks like an http call
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('http') &&
+          !targetSource.contains('client') &&
+          !targetSource.contains('Client') &&
+          !targetSource.contains('dio') &&
+          !targetSource.contains('Dio')) {
+        return;
+      }
+
+      // Check if .timeout is chained
+      AstNode? parent = node.parent;
+      if (parent is MethodInvocation && parent.methodName.name == 'timeout') {
+        return;
+      }
+
+      // Check if wrapped in await with timeout
+      if (parent is AwaitExpression) {
+        AstNode? awaitParent = parent.parent;
+        if (awaitParent is MethodInvocation &&
+            awaitParent.methodName.name == 'timeout') {
+          return;
+        }
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when using the http package instead of Dio.
+///
+/// Alias: use_dio, prefer_dio, http_to_dio
+///
+/// Dio provides better features than the http package: interceptors,
+/// request cancellation, FormData, better error handling.
+///
+/// **BAD:**
+/// ```dart
+/// import 'package:http/http.dart' as http;
+/// final response = await http.get(Uri.parse(url));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:dio/dio.dart';
+/// final dio = Dio();
+/// final response = await dio.get(url);
+/// ```
+class PreferDioOverHttpRule extends SaropaLintRule {
+  const PreferDioOverHttpRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_dio_over_http',
+    problemMessage:
+        'Using http package. Dio provides better features for production apps.',
+    correctionMessage:
+        'Consider using Dio for interceptors, cancellation, and error handling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == 'package:http/http.dart') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

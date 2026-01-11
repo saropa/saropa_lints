@@ -15,6 +15,7 @@ export 'class_constructor_rules.dart';
 export 'code_quality_rules.dart';
 export 'collection_rules.dart';
 export 'complexity_rules.dart';
+export 'context_rules.dart';
 export 'control_flow_rules.dart';
 export 'debug_rules.dart';
 export 'dependency_injection_rules.dart';

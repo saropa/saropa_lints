@@ -2689,3 +2689,408 @@ class RequireAnimationTestsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when print() is used in test files.
+///
+/// Alias: no_print_in_tests, test_print, debug_print_test
+///
+/// Print statements in tests add noise to test output and can hide
+/// actual test failures. Use proper logging or debugging tools instead.
+///
+/// **BAD:**
+/// ```dart
+/// test('example', () {
+///   print('Debug: value = $value'); // Clutters test output
+///   expect(value, equals(1));
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('example', () {
+///   // Use debugger or proper assertions
+///   expect(value, equals(1));
+/// });
+/// ```
+class AvoidTestPrintStatementsRule extends SaropaLintRule {
+  const AvoidTestPrintStatementsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_test_print_statements',
+    problemMessage: 'Print statement in test file clutters output.',
+    correctionMessage:
+        'Remove debug print or use proper logging for test debugging.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only check test files
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name == 'print') {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addFunctionExpressionInvocation((
+      FunctionExpressionInvocation node,
+    ) {
+      if (node.function.toSource() == 'print') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when real HTTP clients are used in tests without mocking.
+///
+/// Alias: mock_http, real_http_in_tests, no_network_tests
+///
+/// Real network calls in tests cause flakiness, slowness, and failure when
+/// offline. Always mock HTTP clients for deterministic, fast tests.
+///
+/// **BAD:**
+/// ```dart
+/// test('fetch user', () async {
+///   final response = await http.get(Uri.parse('https://api.example.com/user'));
+///   expect(response.statusCode, 200);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('fetch user', () async {
+///   final mockClient = MockClient((request) async {
+///     return Response('{"name": "John"}', 200);
+///   });
+///   final response = await mockClient.get(Uri.parse('https://api.example.com/user'));
+///   expect(response.statusCode, 200);
+/// });
+/// ```
+class RequireMockHttpClientRule extends SaropaLintRule {
+  const RequireMockHttpClientRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_mock_http_client',
+    problemMessage:
+        'Real HTTP call in test. Tests should use mocked HTTP clients.',
+    correctionMessage:
+        'Use MockClient or mock the HTTP layer for deterministic tests.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _httpMethods = <String>{
+    'get',
+    'post',
+    'put',
+    'delete',
+    'patch',
+    'head',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only check test files
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_httpMethods.contains(methodName)) return;
+
+      // Check if target is http package
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (targetSource == 'http' ||
+          targetSource.contains('http.') ||
+          targetSource == 'client' ||
+          targetSource.contains('Client')) {
+        // Check if this looks like a mock
+        if (!targetSource.toLowerCase().contains('mock')) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when widget test interactions are not followed by pump.
+///
+/// Alias: pump_after_tap, widget_test_pump, test_pump_required
+///
+/// In widget tests, user interactions like tap, enterText, and drag need
+/// pump() or pumpAndSettle() to process the event and rebuild the widget tree.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('button tap', (tester) async {
+///   await tester.pumpWidget(MyWidget());
+///   await tester.tap(find.byType(ElevatedButton)); // Missing pump!
+///   expect(find.text('Tapped'), findsOneWidget); // Fails
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('button tap', (tester) async {
+///   await tester.pumpWidget(MyWidget());
+///   await tester.tap(find.byType(ElevatedButton));
+///   await tester.pump(); // Process the tap
+///   expect(find.text('Tapped'), findsOneWidget);
+/// });
+/// ```
+///
+/// **Quick fix available:** Inserts `await tester.pump();` after the interaction.
+class RequireTestWidgetPumpRule extends SaropaLintRule {
+  const RequireTestWidgetPumpRule() : super(code: _code);
+
+  /// Flaky tests from missing pump cause CI failures.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_test_widget_pump',
+    problemMessage:
+        'Widget interaction without pump(). Event may not be processed.',
+    correctionMessage:
+        'Call await tester.pump() or pumpAndSettle() after the interaction.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Widget interaction methods that require pump after.
+  static const Set<String> _interactionMethods = <String>{
+    'tap',
+    'longPress',
+    'enterText',
+    'drag',
+    'dragFrom',
+    'dragUntilVisible',
+    'fling',
+    'flingFrom',
+    'press',
+    'scrollUntilVisible',
+  };
+
+  /// Methods that process the event queue.
+  static const Set<String> _pumpMethods = <String>{
+    'pump',
+    'pumpAndSettle',
+    'pumpWidget',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only check test files
+    final String path = resolver.path;
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addBlock((Block block) {
+      final List<Statement> statements = block.statements;
+
+      for (int i = 0; i < statements.length; i++) {
+        final Statement stmt = statements[i];
+        if (stmt is! ExpressionStatement) continue;
+
+        final Expression expr = stmt.expression;
+        MethodInvocation? interaction;
+
+        // Handle await tester.tap(...) pattern
+        if (expr is AwaitExpression &&
+            expr.expression is MethodInvocation) {
+          interaction = expr.expression as MethodInvocation;
+        } else if (expr is MethodInvocation) {
+          interaction = expr;
+        }
+
+        if (interaction == null) continue;
+
+        final String methodName = interaction.methodName.name;
+        if (!_interactionMethods.contains(methodName)) continue;
+
+        // Check if target is tester
+        final Expression? target = interaction.target;
+        if (target == null) continue;
+        final String targetSource = target.toSource();
+        if (!targetSource.contains('tester') &&
+            !targetSource.contains('Tester')) {
+          continue;
+        }
+
+        // Check if next statement is a pump
+        bool hasPump = false;
+        if (i + 1 < statements.length) {
+          final Statement nextStmt = statements[i + 1];
+          if (nextStmt is ExpressionStatement) {
+            final Expression nextExpr = nextStmt.expression;
+            MethodInvocation? nextMethod;
+
+            if (nextExpr is AwaitExpression &&
+                nextExpr.expression is MethodInvocation) {
+              nextMethod = nextExpr.expression as MethodInvocation;
+            } else if (nextExpr is MethodInvocation) {
+              nextMethod = nextExpr;
+            }
+
+            if (nextMethod != null &&
+                _pumpMethods.contains(nextMethod.methodName.name)) {
+              hasPump = true;
+            }
+          }
+        }
+
+        if (!hasPump) {
+          reporter.atNode(interaction, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddPumpAfterInteractionFix()];
+}
+
+class _AddPumpAfterInteractionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      // Find the statement containing this method invocation
+      AstNode? current = node.parent;
+      while (current != null && current is! Statement) {
+        current = current.parent;
+      }
+
+      if (current == null) return;
+      final Statement stmt = current as Statement;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add await tester.pump() after interaction',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          stmt.end,
+          '\n    await tester.pump();',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when integration tests don't have a timeout.
+///
+/// Alias: test_timeout, integration_test_limit, test_time_limit
+///
+/// Long-running tests without timeouts can hang CI indefinitely.
+/// Always set timeouts on integration tests to catch infinite loops.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('complex flow', (tester) async {
+///   // Long test without timeout
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('complex flow', (tester) async {
+///   // Test code
+/// }, timeout: Timeout(Duration(minutes: 2)));
+/// ```
+class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
+  const RequireIntegrationTestTimeoutRule() : super(code: _code);
+
+  /// Hanging tests block CI pipelines.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_integration_test_timeout',
+    problemMessage:
+        'Integration test without timeout. May hang CI indefinitely.',
+    correctionMessage:
+        'Add timeout: Timeout(Duration(minutes: X)) to the test.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Only check integration test files
+    final String path = resolver.path;
+    if (!path.contains('integration_test') &&
+        !path.contains('_integration_test.dart')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'testWidgets' && methodName != 'test') return;
+
+      // Check for timeout argument
+      final ArgumentList args = node.argumentList;
+      final bool hasTimeout = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'timeout';
+        }
+        return false;
+      });
+
+      if (!hasTimeout) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

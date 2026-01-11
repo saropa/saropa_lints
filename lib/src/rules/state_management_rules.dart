@@ -9549,3 +9549,424 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when BuildContext is passed to Bloc constructor.
+///
+/// Alias: bloc_context, context_in_bloc
+///
+/// Blocs should be independent of the widget tree. Passing BuildContext
+/// to a Bloc couples it to the UI and makes testing difficult.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc(BuildContext context) : super(MyInitial()) {
+///     // Using context in bloc
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc(MyRepository repository) : super(MyInitial()) {
+///     // Inject dependencies, not context
+///   }
+/// }
+/// ```
+class AvoidBlocContextDependencyRule extends SaropaLintRule {
+  const AvoidBlocContextDependencyRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_context_dependency',
+    problemMessage:
+        'Bloc should not depend on BuildContext. This couples Bloc to UI.',
+    correctionMessage:
+        'Inject dependencies through constructor instead of passing context.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _blocSuperclasses = <String>{
+    'Bloc',
+    'Cubit',
+    'StateNotifier',
+    'ChangeNotifier',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if this is a Bloc/Cubit
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclassName = extendsClause.superclass.name.lexeme;
+      if (!_blocSuperclasses.contains(superclassName)) return;
+
+      // Check constructors for BuildContext parameter
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration) {
+          final FormalParameterList? params = member.parameters;
+          if (params == null) continue;
+
+          for (final FormalParameter param in params.parameters) {
+            final String paramSource = param.toSource();
+            if (paramSource.contains('BuildContext')) {
+              reporter.atNode(param, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Provider.value is used with inline notifier creation.
+///
+/// Alias: provider_value_inline, notifier_in_provider_value
+///
+/// Provider.value should only be used with existing notifiers. Creating
+/// a notifier inline causes it to be recreated on every build.
+///
+/// **BAD:**
+/// ```dart
+/// Provider.value(
+///   value: MyNotifier(), // Created inline!
+///   child: child,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Create notifier in state
+/// final _notifier = MyNotifier();
+///
+/// Provider.value(
+///   value: _notifier, // Existing instance
+///   child: child,
+/// )
+///
+/// // Or use Provider constructor
+/// Provider(
+///   create: (_) => MyNotifier(),
+///   child: child,
+/// )
+/// ```
+class AvoidProviderValueRebuildRule extends SaropaLintRule {
+  const AvoidProviderValueRebuildRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_provider_value_rebuild',
+    problemMessage:
+        'Provider.value with inline creation. Notifier recreated every build.',
+    correctionMessage:
+        'Use existing instance with Provider.value or use Provider constructor.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      // Check for Provider.value, ChangeNotifierProvider.value, etc.
+      final String constructorName = node.constructorName.toSource();
+      if (!constructorName.contains('.value')) return;
+
+      // Check if it's a Provider-like class
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!typeName.contains('Provider')) return;
+
+      // Check value parameter
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          final Expression valueExpr = arg.expression;
+          // Check if value is an inline constructor call
+          if (valueExpr is InstanceCreationExpression) {
+            reporter.atNode(valueExpr, code);
+          } else if (valueExpr is MethodInvocation) {
+            // Also check for factory methods like MyNotifier.create()
+            reporter.atNode(valueExpr, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when Riverpod Notifiers are instantiated in build methods.
+///
+/// Alias: riverpod_notifier_build, no_notifier_in_build
+///
+/// Creating StateNotifier or Notifier instances in build methods causes
+/// them to be recreated on every rebuild, losing state.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends ConsumerWidget {
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     final notifier = StateNotifier<int>(0); // Recreated every build!
+///     return Text('$notifier');
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final counterProvider = StateNotifierProvider<CounterNotifier, int>(
+///   (ref) => CounterNotifier(),
+/// );
+///
+/// class MyWidget extends ConsumerWidget {
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     final count = ref.watch(counterProvider);
+///     return Text('$count');
+///   }
+/// }
+/// ```
+class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
+  const AvoidRiverpodNotifierInBuildRule() : super(code: _code);
+
+  /// State is lost on every rebuild.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_riverpod_notifier_in_build',
+    problemMessage:
+        'Notifier created in build. State will be lost on every rebuild.',
+    correctionMessage:
+        'Define the provider outside the widget and use ref.watch() to access it.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Notifier types that shouldn't be created in build.
+  static const Set<String> _notifierTypes = <String>{
+    'StateNotifier',
+    'ChangeNotifier',
+    'ValueNotifier',
+    'Notifier',
+    'AsyncNotifier',
+    'StreamNotifier',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      // Check if it's a Notifier type
+      bool isNotifier = _notifierTypes.contains(typeName);
+      if (!isNotifier) {
+        // Also check if type ends with Notifier
+        isNotifier = typeName.endsWith('Notifier');
+      }
+
+      if (!isNotifier) return;
+
+      // Check if inside a build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when try-catch is used instead of AsyncValue.guard in Riverpod.
+///
+/// Alias: use_async_value_guard, riverpod_error_handling
+///
+/// AsyncValue.guard provides better error handling and state management
+/// for async operations in Riverpod providers.
+///
+/// **BAD:**
+/// ```dart
+/// class MyNotifier extends AsyncNotifier<Data> {
+///   Future<Data> build() async {
+///     try {
+///       return await fetchData();
+///     } catch (e) {
+///       throw e; // Poor error handling
+///     }
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyNotifier extends AsyncNotifier<Data> {
+///   Future<Data> build() async {
+///     return AsyncValue.guard(() => fetchData());
+///   }
+/// }
+/// ```
+class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
+  const RequireRiverpodAsyncValueGuardRule() : super(code: _code);
+
+  /// AsyncValue.guard provides consistent error state handling.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_riverpod_async_value_guard',
+    problemMessage:
+        'Try-catch in async provider. Consider using AsyncValue.guard for consistent error handling.',
+    correctionMessage:
+        'Replace try-catch with AsyncValue.guard(() => yourAsyncOperation()).',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addTryStatement((TryStatement node) {
+      // Check if inside an AsyncNotifier or async provider
+      AstNode? current = node.parent;
+      bool inAsyncNotifier = false;
+
+      while (current != null) {
+        if (current is ClassDeclaration) {
+          final String? extendsName = current.extendsClause?.superclass.name2.lexeme;
+          if (extendsName != null &&
+              (extendsName.contains('AsyncNotifier') ||
+                  extendsName.contains('FutureProvider'))) {
+            inAsyncNotifier = true;
+          }
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (!inAsyncNotifier) return;
+
+      // Check if catch block just rethrows
+      for (final CatchClause catchClause in node.catchClauses) {
+        final Block body = catchClause.body;
+        if (body.statements.length == 1) {
+          final Statement stmt = body.statements.first;
+          if (stmt is ExpressionStatement) {
+            final Expression expr = stmt.expression;
+            if (expr is ThrowExpression || expr is RethrowExpression) {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when Bloc contains BuildContext usage or UI dependencies.
+///
+/// Alias: bloc_no_context, bloc_separation, bloc_business_logic
+///
+/// Blocs should contain only business logic, not UI-related code.
+/// BuildContext dependencies make Blocs harder to test and reuse.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   void _onEvent(Event event, Emitter<State> emit) {
+///     Navigator.of(context).push(...); // UI in Bloc!
+///     ScaffoldMessenger.of(context).showSnackBar(...); // UI in Bloc!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<Event, State> {
+///   void _onEvent(Event event, Emitter<State> emit) {
+///     emit(NavigateToDetailState()); // Emit state for UI to handle
+///   }
+/// }
+/// ```
+class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
+  const AvoidBlocBusinessLogicInUiRule() : super(code: _code);
+
+  /// Blocs with UI code are hard to test and violate separation.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_bloc_business_logic_in_ui',
+    problemMessage:
+        'UI code detected in Bloc. Blocs should contain only business logic.',
+    correctionMessage:
+        'Emit a state instead and handle the UI action in BlocListener.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Methods that indicate UI code.
+  static const Set<String> _uiMethods = <String>{
+    'showSnackBar',
+    'showDialog',
+    'showModalBottomSheet',
+    'push',
+    'pushNamed',
+    'pop',
+    'pushReplacement',
+    'pushReplacementNamed',
+    'showDatePicker',
+    'showTimePicker',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_uiMethods.contains(methodName)) return;
+
+      // Check if inside a Bloc class
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is ClassDeclaration) {
+          final String? extendsName = current.extendsClause?.superclass.name2.lexeme;
+          if (extendsName != null &&
+              (extendsName == 'Bloc' || extendsName == 'Cubit')) {
+            reporter.atNode(node, code);
+          }
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}

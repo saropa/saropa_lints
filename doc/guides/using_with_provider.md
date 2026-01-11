@@ -14,6 +14,7 @@ Provider is Flutter's recommended state management for simple apps. But it has p
 | Missing dispose | Memory leaks | `require_provider_dispose` |
 | Provider.of for reactivity | Use Consumer instead | `prefer_consumer_over_provider_of` |
 | context.watch in async | Subscription leaks | `avoid_listen_in_async` |
+| Provider.value inline | Rebuilds create new instances | `avoid_provider_value_rebuild` |
 
 ## What saropa_lints Catches
 

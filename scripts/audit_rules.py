@@ -5,6 +5,7 @@ Audit implemented lint rules against ROADMAP.md entries.
 This script identifies:
   - Rules in ROADMAP.md that are already implemented (as rules or aliases)
   - Near-matches that may indicate naming inconsistencies
+  - Quick fixes (classes extending DartFix)
 
 Version:   1.0
 Author:    Saropa
@@ -146,22 +147,26 @@ def print_stat(label: str, value: int | str, color: Color = Color.WHITE) -> None
 # RULE EXTRACTION
 # =============================================================================
 
-def get_implemented_rules(rules_dir: Path) -> tuple[set[str], set[str]]:
-    """Extract rule names and aliases from Dart files.
+def get_implemented_rules(rules_dir: Path) -> tuple[set[str], set[str], int]:
+    """Extract rule names, aliases, and quick fix count from Dart files.
 
     Returns:
-        Tuple of (rule_names, aliases)
+        Tuple of (rule_names, aliases, quick_fix_count)
     """
     rules: set[str] = set()
     aliases: set[str] = set()
+    fix_count = 0
 
     name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
     # Match: /// Alias: name1, name2, name3
     alias_pattern = re.compile(r"///\s*Alias:\s*([a-z_,\s]+)")
+    # Match: class _SomeFix extends DartFix
+    fix_pattern = re.compile(r"class \w+ extends DartFix")
 
     for dart_file in rules_dir.glob("*.dart"):
         content = dart_file.read_text(encoding="utf-8")
         rules.update(name_pattern.findall(content))
+        fix_count += len(fix_pattern.findall(content))
 
         # Extract aliases
         for match in alias_pattern.findall(content):
@@ -170,7 +175,7 @@ def get_implemented_rules(rules_dir: Path) -> tuple[set[str], set[str]]:
                 if alias:
                     aliases.add(alias)
 
-    return rules, aliases
+    return rules, aliases, fix_count
 
 
 def get_roadmap_rules(roadmap_path: Path) -> set[str]:
@@ -201,12 +206,13 @@ def main() -> int:
 
     # Extract rules
     print_subheader("Extracting Rules")
-    rules, aliases = get_implemented_rules(rules_dir)
+    rules, aliases, quick_fixes = get_implemented_rules(rules_dir)
     implemented = rules | aliases
     roadmap = get_roadmap_rules(roadmap_path)
 
     # Print statistics
     print_stat("Implemented rules", len(rules), Color.GREEN)
+    print_stat("Quick fixes", quick_fixes, Color.MAGENTA)
     print_stat("Documented aliases", len(aliases), Color.CYAN)
     print_stat("ROADMAP entries", len(roadmap), Color.YELLOW)
     print()

@@ -16644,3 +16644,301 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when Stack children are not Positioned widgets.
+///
+/// Alias: stack_positioned, positioned_in_stack
+///
+/// Stack children without Positioned are placed at the top-left by default.
+/// For overlay layouts, use Positioned to control child placement.
+///
+/// **BAD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     Container(color: Colors.blue),
+///     Text('Overlay'), // Not positioned!
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     Container(color: Colors.blue),
+///     Positioned(
+///       top: 10,
+///       right: 10,
+///       child: Text('Overlay'),
+///     ),
+///   ],
+/// )
+/// ```
+class AvoidStackWithoutPositionedRule extends SaropaLintRule {
+  const AvoidStackWithoutPositionedRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_stack_without_positioned',
+    problemMessage: 'Stack child without Positioned. Layout may be unexpected.',
+    correctionMessage:
+        'Wrap child in Positioned to explicitly control its position.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _positionedTypes = <String>{
+    'Positioned',
+    'AnimatedPositioned',
+    'PositionedDirectional',
+    'Align',
+    'Center',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Stack') return;
+
+      // Find children parameter
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression childrenExpr = arg.expression;
+          if (childrenExpr is ListLiteral) {
+            // Skip if first child is a background (common pattern)
+            final elements = childrenExpr.elements;
+            if (elements.length < 2) return;
+
+            // Check non-first children (first is usually background)
+            for (int i = 1; i < elements.length; i++) {
+              final element = elements[i];
+              if (element is Expression) {
+                _checkStackChild(element, reporter);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  void _checkStackChild(Expression child, SaropaDiagnosticReporter reporter) {
+    String? childType;
+
+    if (child is InstanceCreationExpression) {
+      childType = child.constructorName.type.name.lexeme;
+    } else {
+      return; // Skip complex expressions
+    }
+
+    // Skip if it's a positioning widget
+    if (_positionedTypes.contains(childType)) return;
+
+    // Skip common fill widgets
+    if (childType == 'Expanded' ||
+        childType == 'Container' ||
+        childType == 'SizedBox' ||
+        childType == 'DecoratedBox') {
+      return;
+    }
+
+    reporter.atNode(child, code);
+  }
+}
+
+/// Warns when Expanded or Flexible is used outside Row, Column, or Flex.
+///
+/// Alias: expanded_outside_flex, flexible_parent
+///
+/// Expanded and Flexible only work inside Flex widgets (Row, Column, Flex).
+/// Using them elsewhere causes runtime errors.
+///
+/// **BAD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     Expanded(child: Container()), // CRASH!
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Column(
+///   children: [
+///     Expanded(child: Container()),
+///   ],
+/// )
+/// ```
+class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
+  const AvoidExpandedOutsideFlexRule() : super(code: _code);
+
+  /// Expanded/Flexible outside Flex causes runtime crash.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_expanded_outside_flex',
+    problemMessage:
+        'Expanded/Flexible outside Flex widget. This will crash at runtime.',
+    correctionMessage: 'Use Expanded only inside Row, Column, or Flex.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _flexTypes = <String>{
+    'Row',
+    'Column',
+    'Flex',
+    'Wrap',
+  };
+
+  static const Set<String> _flexChildTypes = <String>{
+    'Expanded',
+    'Flexible',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_flexChildTypes.contains(typeName)) return;
+
+      // Walk up to find parent widget
+      AstNode? current = node.parent;
+      bool foundFlexParent = false;
+      int depth = 0;
+
+      while (current != null && depth < 20) {
+        if (current is InstanceCreationExpression) {
+          final String parentType =
+              current.constructorName.type.name.lexeme;
+          if (_flexTypes.contains(parentType)) {
+            foundFlexParent = true;
+            break;
+          }
+          // If we find a non-flex container, it might be wrong
+          if (_isNonFlexContainer(parentType)) {
+            break;
+          }
+        }
+        // Stop at method/function boundaries
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          break;
+        }
+        current = current.parent;
+        depth++;
+      }
+
+      if (!foundFlexParent) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  bool _isNonFlexContainer(String name) {
+    return name == 'Stack' ||
+        name == 'ListView' ||
+        name == 'GridView' ||
+        name == 'CustomScrollView';
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when ListView.builder itemBuilder may access index out of bounds.
+///
+/// Alias: builder_bounds, itembuilder_bounds, list_index_check
+///
+/// When itemCount is based on a variable that might change, accessing
+/// the underlying list directly in itemBuilder can cause index out of bounds.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   itemBuilder: (context, index) {
+///     return Text(items[index].name); // items might change!
+///   },
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   itemBuilder: (context, index) {
+///     if (index >= items.length) return SizedBox.shrink();
+///     return Text(items[index].name);
+///   },
+/// );
+/// ```
+class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
+  const AvoidBuilderIndexOutOfBoundsRule() : super(code: _code);
+
+  /// Index out of bounds crashes the app.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_builder_index_out_of_bounds',
+    problemMessage:
+        'itemBuilder accesses list without bounds check. Index may be out of bounds if list changes.',
+    correctionMessage:
+        'Add bounds check: if (index >= items.length) return fallback;',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'itemBuilder') return;
+
+      final Expression builderExpr = node.expression;
+      if (builderExpr is! FunctionExpression) return;
+
+      final FunctionBody body = builderExpr.body;
+      final String bodySource = body.toSource();
+
+      // Check if body accesses array with index
+      final bool hasIndexAccess = bodySource.contains('[index]') ||
+          bodySource.contains('[i]');
+
+      if (!hasIndexAccess) return;
+
+      // Check if body has bounds check
+      final bool hasBoundsCheck = bodySource.contains('.length') &&
+          (bodySource.contains('>=') ||
+              bodySource.contains('>') ||
+              bodySource.contains('<') ||
+              bodySource.contains('<=') ||
+              bodySource.contains('isEmpty') ||
+              bodySource.contains('isNotEmpty'));
+
+      if (!hasBoundsCheck) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

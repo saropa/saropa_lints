@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -757,6 +758,264 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
       // Check if it's a function expression
       if (firstArg is FunctionExpression) {
         reporter.atNode(firstArg, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when GetIt registration order may cause unresolved dependencies.
+///
+/// Alias: getit_order, getit_registration_sequence, di_order
+///
+/// When registering services with GetIt, dependent services must be
+/// registered before services that use them. Order matters for eager singletons.
+///
+/// **BAD:**
+/// ```dart
+/// getIt.registerSingleton<UserService>(UserService(getIt<AuthService>()));
+/// getIt.registerSingleton<AuthService>(AuthServiceImpl()); // Too late!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// getIt.registerSingleton<AuthService>(AuthServiceImpl());
+/// getIt.registerSingleton<UserService>(UserService(getIt<AuthService>()));
+/// ```
+class RequireGetItRegistrationOrderRule extends SaropaLintRule {
+  const RequireGetItRegistrationOrderRule() : super(code: _code);
+
+  /// Wrong registration order crashes at startup.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_getit_registration_order',
+    problemMessage:
+        'GetIt registration uses dependency not yet registered at this point.',
+    correctionMessage:
+        'Register dependencies before services that depend on them, or use registerLazySingleton.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track registered types in the current function scope
+    context.registry.addFunctionBody((FunctionBody body) {
+      if (body is! BlockFunctionBody) return;
+
+      final Set<String> registeredTypes = <String>{};
+      final List<(MethodInvocation, Set<String>)> registrations = [];
+
+      // First pass: collect all registrations and their dependencies
+      body.accept(_GetItRegistrationVisitor(
+        onRegistration: (MethodInvocation node, String? registeredType,
+            Set<String> dependencies) {
+          registrations.add((node, dependencies));
+          if (registeredType != null) {
+            registeredTypes.add(registeredType);
+          }
+        },
+      ));
+
+      // Second pass: check for unregistered dependencies at registration time
+      final Set<String> seenTypes = <String>{};
+      for (final registration in registrations) {
+        final node = registration.$1;
+        final deps = registration.$2;
+
+        // Check if any dependency wasn't registered before this point
+        for (final dep in deps) {
+          if (!seenTypes.contains(dep) && registeredTypes.contains(dep)) {
+            // This dependency exists but wasn't registered yet
+            reporter.atNode(node, code);
+            break;
+          }
+        }
+
+        // Get the type being registered from this node
+        final typeArg = _extractRegisteredType(node);
+        if (typeArg != null) {
+          seenTypes.add(typeArg);
+        }
+      }
+    });
+  }
+
+  static String? _extractRegisteredType(MethodInvocation node) {
+    final TypeArgumentList? typeArgs = node.typeArguments;
+    if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
+      return typeArgs.arguments.first.toSource();
+    }
+    return null;
+  }
+}
+
+class _GetItRegistrationVisitor extends RecursiveAstVisitor<void> {
+  _GetItRegistrationVisitor({required this.onRegistration});
+
+  final void Function(MethodInvocation, String?, Set<String>) onRegistration;
+
+  static const Set<String> _registerMethods = <String>{
+    'registerSingleton',
+    'registerLazySingleton',
+    'registerFactory',
+    'registerFactoryParam',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    if (_registerMethods.contains(methodName)) {
+      // Get registered type
+      String? registeredType;
+      final TypeArgumentList? typeArgs = node.typeArguments;
+      if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
+        registeredType = typeArgs.arguments.first.toSource();
+      }
+
+      // Find dependencies (getIt<T>() calls in the registration)
+      final Set<String> dependencies = <String>{};
+      node.argumentList.accept(_DependencyFinder(dependencies));
+
+      onRegistration(node, registeredType, dependencies);
+    }
+
+    super.visitMethodInvocation(node);
+  }
+}
+
+class _DependencyFinder extends RecursiveAstVisitor<void> {
+  _DependencyFinder(this.dependencies);
+
+  final Set<String> dependencies;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Look for getIt<Type>() or GetIt.I<Type>() patterns
+    if (node.methodName.name == 'call' || node.methodName.name == 'get') {
+      final TypeArgumentList? typeArgs = node.typeArguments;
+      if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
+        dependencies.add(typeArgs.arguments.first.toSource());
+      }
+    }
+
+    // Also check for getIt<Type>() pattern (function call on getIt variable)
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier &&
+        (target.name == 'getIt' || target.name == 'GetIt')) {
+      final TypeArgumentList? typeArgs = node.typeArguments;
+      if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
+        dependencies.add(typeArgs.arguments.first.toSource());
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    // Handle getIt<Type>() syntax
+    final TypeArgumentList? typeArgs = node.typeArguments;
+    if (typeArgs != null && typeArgs.arguments.isNotEmpty) {
+      final Expression function = node.function;
+      if (function is SimpleIdentifier &&
+          (function.name == 'getIt' || function.name.contains('GetIt'))) {
+        dependencies.add(typeArgs.arguments.first.toSource());
+      }
+    }
+
+    super.visitFunctionExpressionInvocation(node);
+  }
+}
+
+/// Warns when config access doesn't provide defaults for missing values.
+///
+/// Alias: config_default, env_default, settings_fallback
+///
+/// Environment variables and config values can be missing. Always provide
+/// defaults or validate required values at startup.
+///
+/// **BAD:**
+/// ```dart
+/// final apiUrl = dotenv.get('API_URL'); // Crashes if missing
+/// final timeout = int.parse(env['TIMEOUT']!); // Null pointer if missing
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final apiUrl = dotenv.get('API_URL', fallback: 'https://api.example.com');
+/// final timeout = int.tryParse(env['TIMEOUT'] ?? '') ?? 30;
+/// ```
+class RequireDefaultConfigRule extends SaropaLintRule {
+  const RequireDefaultConfigRule() : super(code: _code);
+
+  /// Missing config causes startup crashes in production.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_default_config',
+    problemMessage:
+        'Config access without default value. Will crash if value is missing.',
+    correctionMessage:
+        'Provide a fallback value or use nullable access with null check.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Methods that get config values.
+  static const Set<String> _configMethods = <String>{
+    'get',
+    'getString',
+    'getInt',
+    'getDouble',
+    'getBool',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_configMethods.contains(methodName)) return;
+
+      // Check if target looks like config/env
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('dotenv') &&
+          !targetSource.contains('config') &&
+          !targetSource.contains('env') &&
+          !targetSource.contains('prefs')) {
+        return;
+      }
+
+      // Check if a default/fallback is provided
+      final ArgumentList args = node.argumentList;
+      final bool hasDefault = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          return name == 'fallback' ||
+              name == 'defaultValue' ||
+              name == 'orElse';
+        }
+        return false;
+      });
+
+      if (!hasDefault) {
+        reporter.atNode(node, code);
       }
     });
   }

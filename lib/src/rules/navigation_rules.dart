@@ -1530,6 +1530,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
           // Check if builder contains auth-related checks
           final String builderSource = builderExpr.toSource().toLowerCase();
 
+          // cspell:ignore isloggedin isauthenticated isauth currentuser authstate
           // Look for common auth patterns
           if ((builderSource.contains('isloggedin') ||
                   builderSource.contains('isauthenticated') ||
@@ -1609,6 +1610,8 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
       while (current != null) {
         if (current is MethodInvocation) {
           final String methodName = current.methodName.name.toLowerCase();
+
+          // cspell:ignore tryparse
           if (methodName.contains('parse') ||
               methodName.contains('tryparse') ||
               methodName == 'tostring') {
@@ -1919,6 +1922,370 @@ class _ReplaceWithMaybePopFix extends DartFix {
           'maybePop',
         );
       });
+    });
+  }
+}
+
+/// Warns when launchUrl is used with string parsing instead of Uri objects.
+///
+/// Alias: url_launcher_uri, launch_with_uri
+///
+/// Using Uri objects instead of parsing strings reduces parsing overhead
+/// and provides compile-time validation of URL structure.
+///
+/// **BAD:**
+/// ```dart
+/// await launchUrl(Uri.parse('https://example.com'));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final uri = Uri.https('example.com', '/path');
+/// await launchUrl(uri);
+/// ```
+class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
+  const PreferUrlLauncherUriOverStringRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_url_launcher_uri_over_string',
+    problemMessage: 'launchUrl with Uri.parse. Prefer constructing Uri directly.',
+    correctionMessage:
+        'Use Uri.https() or Uri.http() for compile-time validation.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'launchUrl' &&
+          node.methodName.name != 'launch' &&
+          node.methodName.name != 'canLaunchUrl') {
+        return;
+      }
+
+      // Check if argument is Uri.parse()
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is MethodInvocation && firstArg.methodName.name == 'parse') {
+        final Expression? target = firstArg.target;
+        if (target is SimpleIdentifier && target.name == 'Uri') {
+          reporter.atNode(firstArg, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns about potential confusion between go() and push() in GoRouter.
+///
+/// Alias: go_router_navigation, go_vs_push
+///
+/// go() replaces the entire stack, push() adds to it. Using the wrong one
+/// can cause unexpected navigation behavior.
+///
+/// **Use go() when:** You want to replace the current route completely
+/// **Use push() when:** You want to add to the navigation stack
+///
+/// **SUSPICIOUS (may want push instead of go):**
+/// ```dart
+/// context.go('/details/$id'); // Replaces stack - back button won't work
+/// ```
+///
+/// **BETTER:**
+/// ```dart
+/// context.push('/details/$id'); // Adds to stack - back button works
+/// ```
+class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
+  const AvoidGoRouterPushReplacementConfusionRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_go_router_push_replacement_confusion',
+    problemMessage:
+        'Using go() replaces the navigation stack. Did you mean push()?',
+    correctionMessage:
+        'Use push() to add to stack (back button works), go() to replace.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Route path segments that typically represent detail/item views
+  /// where push() is usually more appropriate than go().
+  static const Set<String> _detailPathSegments = <String>{
+    '/detail',
+    '/details',
+    '/item',
+    '/view',
+    '/edit',
+    '/show',
+    '/profile',
+    '/settings/',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'go') return;
+
+      // Check if it's called on context (context.go)
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (targetSource != 'context' && !targetSource.contains('context')) {
+        return;
+      }
+
+      // Check if the path looks like a detail route
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression pathArg = args.arguments.first;
+      final String pathSource = pathArg.toSource().toLowerCase();
+
+      // Only flag if path contains both:
+      // 1. A known detail-style path segment
+      // 2. A dynamic parameter (interpolation)
+      final bool hasDetailSegment = _detailPathSegments.any(
+        (String segment) => pathSource.contains(segment),
+      );
+
+      final bool hasDynamicParam = pathSource.contains(r'$') ||
+          pathSource.contains(':id') ||
+          pathSource.contains(':userid') ||
+          pathSource.contains(':itemid');
+
+      // Only warn if it's clearly a detail route with dynamic ID
+      if (hasDetailSegment && hasDynamicParam) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when URL strings are not properly encoded before launching.
+///
+/// Alias: encode_url, url_encode_required, url_launcher_encoding
+///
+/// URLs with special characters must be encoded before using with url_launcher.
+/// Unencoded URLs may fail to open or cause security issues.
+///
+/// **BAD:**
+/// ```dart
+/// await launchUrl(Uri.parse('https://example.com/search?q=$query')); // query may have spaces
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await launchUrl(Uri.parse('https://example.com/search?q=${Uri.encodeComponent(query)}'));
+/// // Or use Uri constructor which auto-encodes:
+/// await launchUrl(Uri.https('example.com', '/search', {'q': query}));
+/// ```
+///
+/// **Quick fix available:** Wraps interpolated variable with `Uri.encodeComponent()`.
+class RequireUrlLauncherEncodingRule extends SaropaLintRule {
+  const RequireUrlLauncherEncodingRule() : super(code: _code);
+
+  /// Unencoded URLs fail or cause injection vulnerabilities.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_url_launcher_encoding',
+    problemMessage:
+        'URL with interpolation may have unencoded characters. Use Uri.encodeComponent or Uri constructor.',
+    correctionMessage:
+        'Use Uri.encodeComponent() for query params or Uri.https() constructor.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for launchUrl, launch, openUrl
+      if (methodName != 'launchUrl' &&
+          methodName != 'launch' &&
+          methodName != 'openUrl' &&
+          methodName != 'canLaunchUrl') {
+        return;
+      }
+
+      // Check if argument contains Uri.parse with string interpolation
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+
+      // Check for Uri.parse('...$var...')
+      if (firstArg is MethodInvocation &&
+          firstArg.methodName.name == 'parse') {
+        final ArgumentList parseArgs = firstArg.argumentList;
+        if (parseArgs.arguments.isEmpty) return;
+
+        final Expression urlArg = parseArgs.arguments.first;
+        if (urlArg is StringInterpolation) {
+          // Check if interpolation uses encodeComponent
+          final String source = urlArg.toSource();
+          if (!source.contains('encodeComponent') &&
+              !source.contains('encodeQueryComponent')) {
+            reporter.atNode(urlArg, code);
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapWithEncodeComponentFix()];
+}
+
+class _WrapWithEncodeComponentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      // Find interpolation elements that are simple identifiers (variables)
+      for (final InterpolationElement element in node.elements) {
+        if (element is InterpolationExpression) {
+          final Expression expr = element.expression;
+          if (expr is SimpleIdentifier) {
+            final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+              message: 'Wrap ${expr.name} with Uri.encodeComponent()',
+              priority: 80,
+            );
+
+            changeBuilder.addDartFileEdit((builder) {
+              // Replace $varName with ${Uri.encodeComponent(varName)}
+              builder.addSimpleReplacement(
+                element.sourceRange,
+                '\${Uri.encodeComponent(${expr.name})}',
+              );
+            });
+            return; // Fix the first one found
+          }
+        }
+      }
+
+      // If no simple identifier found, add a `HACK` comment
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for manual encoding review',
+        priority: 70,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the statement containing this interpolation
+        AstNode? current = node.parent;
+        while (current != null && current is! Statement) {
+          current = current.parent;
+        }
+
+        if (current != null) {
+          builder.addSimpleInsertion(
+            current.offset,
+            '// HACK: Wrap interpolated values with Uri.encodeComponent()\n    ',
+          );
+        }
+      });
+    });
+  }
+}
+
+/// Warns when navigating to nested routes without ensuring parent is in stack.
+///
+/// Alias: nested_route_parent, route_hierarchy, go_router_nested
+///
+/// In go_router, navigating directly to a nested route without its parent
+/// in the stack can cause back button issues and navigation errors.
+///
+/// **BAD:**
+/// ```dart
+/// // From unrelated screen:
+/// context.go('/products/details/123'); // Parent '/products' may not be in stack
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Navigate to parent first, then to child
+/// context.go('/products');
+/// context.push('/products/details/123');
+/// // Or ensure the route is designed for deep linking
+/// ```
+class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
+  const AvoidNestedRoutesWithoutParentRule() : super(code: _code);
+
+  /// Broken back button navigation frustrates users.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_nested_routes_without_parent',
+    problemMessage:
+        'Navigating to deeply nested route. Ensure parent routes are in navigation stack.',
+    correctionMessage:
+        'Use push() instead of go(), or verify route hierarchy supports deep linking.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'go' && node.methodName.name != 'goNamed') {
+        return;
+      }
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression pathArg = args.arguments.first;
+      if (pathArg is! SimpleStringLiteral) return;
+
+      final String path = pathArg.value;
+
+      // Count path segments
+      final List<String> segments =
+          path.split('/').where((s) => s.isNotEmpty).toList();
+
+      // Warn if navigating to path with 3+ segments (deeply nested)
+      if (segments.length >= 3) {
+        reporter.atNode(node, code);
+      }
     });
   }
 }

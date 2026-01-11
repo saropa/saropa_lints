@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -890,5 +891,381 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
     }
 
     return null;
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when @HiveField on nullable fields lacks defaultValue.
+///
+/// Alias: hive_field_default, hive_migration_safe, hive_nullable_field
+///
+/// When adding new nullable fields to existing Hive types, they need
+/// defaultValue for existing data that was stored before the field existed.
+///
+/// **BAD:**
+/// ```dart
+/// @HiveType(typeId: 1)
+/// class User {
+///   @HiveField(0)
+///   String? nickname; // Existing data won't have this field!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @HiveType(typeId: 1)
+/// class User {
+///   @HiveField(0, defaultValue: null)
+///   String? nickname; // Safe for existing data
+/// }
+/// ```
+class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
+  const RequireHiveFieldDefaultValueRule() : super(code: _code);
+
+  /// Missing defaults cause crashes when reading existing data.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_field_default_value',
+    problemMessage:
+        '@HiveField on nullable field without defaultValue. Existing data may fail to load.',
+    correctionMessage:
+        'Add defaultValue parameter: @HiveField(0, defaultValue: null)',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      // Check if field has @HiveField annotation
+      final Annotation? hiveFieldAnnotation = node.metadata
+          .cast<Annotation?>()
+          .firstWhere(
+            (Annotation? a) => a?.name.name == 'HiveField',
+            orElse: () => null,
+          );
+
+      if (hiveFieldAnnotation == null) return;
+
+      // Check if the type is nullable
+      final TypeAnnotation? type = node.fields.type;
+      if (type == null) return;
+
+      final String typeSource = type.toSource();
+      if (!typeSource.endsWith('?')) return;
+
+      // Check if defaultValue is provided
+      final ArgumentList? args = hiveFieldAnnotation.arguments;
+      if (args == null) {
+        reporter.atNode(hiveFieldAnnotation, code);
+        return;
+      }
+
+      final bool hasDefaultValue = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'defaultValue';
+        }
+        return false;
+      });
+
+      if (!hasDefaultValue) {
+        reporter.atNode(hiveFieldAnnotation, code);
+      }
+    });
+  }
+}
+
+/// Warns when Hive.openBox is called before registering all adapters.
+///
+/// Alias: hive_adapter_order, hive_register_before_open
+///
+/// TypeAdapters must be registered before opening boxes that use them.
+/// Opening a box before registering the adapter causes a runtime error.
+///
+/// **BAD:**
+/// ```dart
+/// void main() async {
+///   await Hive.initFlutter();
+///   final box = await Hive.openBox<User>('users'); // Crash!
+///   Hive.registerAdapter(UserAdapter()); // Too late
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() async {
+///   await Hive.initFlutter();
+///   Hive.registerAdapter(UserAdapter());
+///   final box = await Hive.openBox<User>('users');
+/// }
+/// ```
+class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
+  const RequireHiveAdapterRegistrationOrderRule() : super(code: _code);
+
+  /// Wrong order causes runtime crash.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_adapter_registration_order',
+    problemMessage:
+        'Hive.openBox may be called before registering adapters in this function.',
+    correctionMessage:
+        'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionBody((FunctionBody body) {
+      if (body is! BlockFunctionBody) return;
+
+      int? firstOpenBoxLine;
+      int? lastRegisterAdapterLine;
+      MethodInvocation? openBoxNode;
+
+      // Collect line numbers for openBox and registerAdapter
+      body.accept(_HiveOrderVisitor(
+        onOpenBox: (MethodInvocation node) {
+          final int line = node.offset;
+          if (firstOpenBoxLine == null || line < firstOpenBoxLine!) {
+            firstOpenBoxLine = line;
+            openBoxNode = node;
+          }
+        },
+        onRegisterAdapter: (MethodInvocation node) {
+          final int line = node.offset;
+          if (lastRegisterAdapterLine == null ||
+              line > lastRegisterAdapterLine!) {
+            lastRegisterAdapterLine = line;
+          }
+        },
+      ));
+
+      // If registerAdapter appears after openBox, report
+      if (firstOpenBoxLine != null &&
+          lastRegisterAdapterLine != null &&
+          lastRegisterAdapterLine! > firstOpenBoxLine! &&
+          openBoxNode != null) {
+        reporter.atNode(openBoxNode!, code);
+      }
+    });
+  }
+}
+
+class _HiveOrderVisitor extends RecursiveAstVisitor<void> {
+  _HiveOrderVisitor({
+    required this.onOpenBox,
+    required this.onRegisterAdapter,
+  });
+
+  final void Function(MethodInvocation) onOpenBox;
+  final void Function(MethodInvocation) onRegisterAdapter;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    final Expression? target = node.target;
+
+    if (target is SimpleIdentifier && target.name == 'Hive') {
+      if (methodName.startsWith('openBox') ||
+          methodName.startsWith('openLazyBox')) {
+        onOpenBox(node);
+      } else if (methodName == 'registerAdapter') {
+        onRegisterAdapter(node);
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when nested objects in @HiveType don't have their own adapters.
+///
+/// Alias: hive_nested_adapter, hive_custom_field_type
+///
+/// Hive can't serialize nested objects unless they have TypeAdapters too.
+/// Each custom class used as a field needs @HiveType annotation.
+///
+/// **BAD:**
+/// ```dart
+/// @HiveType(typeId: 1)
+/// class User {
+///   @HiveField(0)
+///   Address address; // Address has no TypeAdapter!
+/// }
+/// class Address { ... } // Missing @HiveType
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @HiveType(typeId: 1)
+/// class User {
+///   @HiveField(0)
+///   Address address;
+/// }
+/// @HiveType(typeId: 2)
+/// class Address { ... }
+/// ```
+class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
+  const RequireHiveNestedObjectAdapterRule() : super(code: _code);
+
+  /// Missing nested adapter causes runtime crash.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_nested_object_adapter',
+    problemMessage:
+        '@HiveField contains custom type. Ensure it has @HiveType annotation.',
+    correctionMessage:
+        'Add @HiveType annotation to the nested class or use a primitive type.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Primitive types that don't need adapters.
+  static const Set<String> _primitiveTypes = <String>{
+    'String',
+    'int',
+    'double',
+    'bool',
+    'num',
+    'DateTime',
+    'Uint8List',
+    'List',
+    'Map',
+    'Set',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      // Check if field has @HiveField annotation
+      final bool hasHiveField = node.metadata.any(
+        (Annotation a) => a.name.name == 'HiveField',
+      );
+
+      if (!hasHiveField) return;
+
+      // Check if the type is a custom class
+      final TypeAnnotation? type = node.fields.type;
+      if (type == null) return;
+
+      String typeSource = type.toSource();
+      // Remove nullability suffix
+      if (typeSource.endsWith('?')) {
+        typeSource = typeSource.substring(0, typeSource.length - 1);
+      }
+
+      // Skip generic types like List<T>, Map<K, V>
+      if (typeSource.contains('<')) {
+        typeSource = typeSource.substring(0, typeSource.indexOf('<'));
+      }
+
+      // If it's not a primitive, warn
+      if (!_primitiveTypes.contains(typeSource)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when duplicate Hive box names are used.
+///
+/// Alias: hive_box_name_unique, hive_duplicate_box
+///
+/// Box names must be unique across the application. Using the same name
+/// for different types causes data corruption or type errors.
+///
+/// **BAD:**
+/// ```dart
+/// // In users_service.dart
+/// final usersBox = await Hive.openBox<User>('data');
+/// // In settings_service.dart
+/// final settingsBox = await Hive.openBox<Settings>('data'); // Same name!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final usersBox = await Hive.openBox<User>('users');
+/// final settingsBox = await Hive.openBox<Settings>('settings');
+/// ```
+class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
+  const AvoidHiveBoxNameCollisionRule() : super(code: _code);
+
+  /// HEURISTIC: This rule checks for common generic box names
+  /// that are likely to cause collisions. Cross-file detection
+  /// requires static analysis of the entire codebase.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hive_box_name_collision',
+    problemMessage:
+        'Generic Hive box name may cause collision. Use a specific name.',
+    correctionMessage:
+        'Use a unique, descriptive box name like "users" or "settings".',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Common generic names that are likely to cause collisions.
+  static const Set<String> _genericNames = <String>{
+    'data',
+    'box',
+    'cache',
+    'store',
+    'db',
+    'database',
+    'storage',
+    'main',
+    'default',
+    'app',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!methodName.startsWith('openBox') &&
+          !methodName.startsWith('openLazyBox')) {
+        return;
+      }
+
+      // Check if target is Hive
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Hive') return;
+
+      // Get the box name argument
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is! SimpleStringLiteral) return;
+
+      final String boxName = firstArg.value.toLowerCase();
+      if (_genericNames.contains(boxName)) {
+        reporter.atNode(firstArg, code);
+      }
+    });
   }
 }
