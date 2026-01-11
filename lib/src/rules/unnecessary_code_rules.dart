@@ -1199,7 +1199,7 @@ class _AddEmptyBlockCommentFix extends DartFix {
         final int insertOffset = node.leftBracket.end;
         builder.addSimpleInsertion(
           insertOffset,
-          '\n  // TODO: Intentionally empty - explain why\n',
+          '\n  // HACK: Intentionally empty - explain why\n',
         );
       });
     });

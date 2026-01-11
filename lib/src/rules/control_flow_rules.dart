@@ -177,14 +177,14 @@ class _AddHackForCollapsibleIfFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment to collapse if statements',
+        message: 'Add HACK comment to collapse if statements',
         priority: 2,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: collapse nested if using && operator\n    ',
+          '// HACK: collapse nested if using && operator\n    ',
         );
       });
     });

@@ -281,7 +281,7 @@ class _AddMissingFieldsToPropsHint extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Ensure all instance fields are included in props\n  ',
+          '// HACK: Ensure all instance fields are included in props\n  ',
         );
       });
     });

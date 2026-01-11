@@ -1841,7 +1841,7 @@ class _AddGetItResetReminderFix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* TODO: Add GetIt.I.reset() in setUp() */ ',
+          '/* HACK: Add GetIt.I.reset() in setUp() */ ',
         );
       });
     });
@@ -2069,7 +2069,7 @@ class _AddAssertionReminderFix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           insertOffset,
-          '\n    // TODO: Add assertion\n    expect(result, expected);\n  ',
+          '\n    // HACK: Add assertion\n    expect(result, expected);\n  ',
         );
       });
     });

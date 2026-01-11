@@ -259,14 +259,14 @@ class _AddTodoForStreamControllerDisposeFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for missing StreamController close',
+        message: 'Add HACK comment for missing StreamController close',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: close this StreamController in dispose()\n',
+          '// HACK: close this StreamController in dispose()\n',
         );
       });
     });
@@ -1154,14 +1154,14 @@ class _AddTodoForGlobalKeyInBuildFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for GlobalKey in build',
+        message: 'Add HACK comment for GlobalKey in build',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: move this GlobalKey to a class field\n',
+          '// HACK: move this GlobalKey to a class field\n',
         );
       });
     });
@@ -4084,7 +4084,7 @@ class _AddOnCloseFix extends DartFix {
 
         builder.addSimpleInsertion(
           insertOffset,
-          '\n\n  @override\n  void onClose() {\n    // TODO: Dispose resources here\n    super.onClose();\n  }\n',
+          '\n\n  @override\n  void onClose() {\n    // HACK: Dispose resources here\n    super.onClose();\n  }\n',
         );
       });
     });

@@ -762,14 +762,14 @@ class _AddFeatureFlagTodoFix extends DartFix {
       if (condition is! BooleanLiteral) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO to replace with feature flag',
+        message: 'Add HACK to replace with feature flag',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Replace hardcoded ${condition.value} with feature flag\n    ',
+          '// HACK: Replace hardcoded ${condition.value} with feature flag\n    ',
         );
       });
     });
