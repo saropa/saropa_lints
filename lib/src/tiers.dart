@@ -46,6 +46,9 @@ const Set<String> essentialRules = <String>{
   'pass_existing_stream_to_stream_builder',
   'avoid_duplicate_widget_keys',
   'avoid_mounted_in_setstate',
+  'avoid_storing_context',
+  'avoid_context_across_async',
+  'avoid_context_in_static_methods',
 
   // Security
   'avoid_hardcoded_credentials',
@@ -349,6 +352,28 @@ const Set<String> essentialRules = <String>{
 
   // Notification Rules (Essential - silent failure prevention)
   'require_notification_initialize_per_platform', // WARNING - missing platform settings
+
+  // NEW v2.3.10 - Essential Rules
+  'avoid_unawaited_future', // WARNING - lost errors
+  'avoid_catch_all', // WARNING - catches too much
+  'require_form_key_in_stateful_widget', // WARNING - form state loss
+  'prefer_timeout_on_requests', // WARNING - hang prevention
+  'avoid_bloc_context_dependency', // WARNING - testability
+  'avoid_provider_value_rebuild', // WARNING - memory leak
+  'avoid_notification_same_id', // WARNING - overwrites
+  'require_intl_plural_rules', // WARNING - i18n correctness
+  'require_mock_http_client', // WARNING - test reliability
+  'require_image_cache_dimensions', // WARNING - OOM prevention
+  'avoid_expanded_outside_flex', // ERROR - runtime crash
+
+  // NEW v2.3.11 - Essential Rules
+  'require_test_widget_pump', // ERROR - flaky tests
+  'require_hive_adapter_registration_order', // ERROR - runtime crash
+  'require_hive_nested_object_adapter', // ERROR - runtime crash
+  'avoid_api_key_in_code', // ERROR - security critical
+  'avoid_storing_sensitive_unencrypted', // ERROR - security critical
+  'require_intl_args_match', // ERROR - runtime crash
+  'require_cache_key_determinism', // ERROR - memory bloat
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -729,6 +754,53 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Firebase Auth (Recommended - UX on web)
   'prefer_firebase_auth_persistence', // INFO - remember me on web
+
+  // Test Rules (Recommended - test quality)
+  'avoid_test_print_statements', // WARNING - use expect() instead
+
+  // Async Rules (Recommended - readability)
+  'avoid_future_then_in_async', // WARNING - use await instead
+
+  // Forms Rules (Recommended - UX)
+  'require_text_input_type', // INFO - better keyboard for input
+  'prefer_text_input_action', // INFO - better UX flow
+
+  // Lifecycle Rules (Recommended - correctness)
+  'require_did_update_widget_check', // WARNING - check widget changes
+
+  // Equatable Rules (Recommended - immutability)
+  'require_equatable_copy_with', // INFO - pattern for immutable updates
+
+  // Image Rules (Recommended - performance)
+  'prefer_cached_image_cache_manager', // INFO - optimize image caching
+
+  // Navigation Rules (Recommended - clarity)
+  'avoid_go_router_push_replacement_confusion', // WARNING - clear routing
+
+  // Flutter Widget Rules (Recommended - correctness)
+  'avoid_stack_without_positioned', // WARNING - layout correctness
+
+  // =========================================================================
+  // NEW v2.3.11 - Recommended Rules
+  // =========================================================================
+  'require_integration_test_timeout', // WARNING - CI hang prevention
+  'require_hive_field_default_value', // WARNING - migration safety
+  'avoid_hive_box_name_collision', // WARNING - data corruption prevention
+  'avoid_riverpod_notifier_in_build', // WARNING - state loss
+  'require_riverpod_async_value_guard', // WARNING - error handling
+  'avoid_bloc_business_logic_in_ui', // WARNING - testability
+  'require_url_launcher_encoding', // WARNING - URL failure
+  'avoid_nested_routes_without_parent', // WARNING - navigation issues
+  'require_copy_with_null_handling', // WARNING - state management
+  'avoid_string_concatenation_for_l10n', // WARNING - i18n correctness
+  'avoid_blocking_database_ui', // WARNING - UI jank
+  'avoid_money_arithmetic_on_double', // WARNING - precision issues
+  'avoid_rebuild_on_scroll', // WARNING - memory leak
+  'avoid_exception_in_constructor', // WARNING - error handling
+  'require_permission_permanent_denial_handling', // WARNING - UX
+  'require_getit_registration_order', // WARNING - startup crash
+  'require_default_config', // WARNING - startup crash
+  'avoid_builder_index_out_of_bounds', // WARNING - runtime crash
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1241,6 +1313,12 @@ const Set<String> professionalOnlyRules = <String>{
 
   // SQLite Rules (Professional - performance)
   'avoid_sqflite_read_all_columns', // INFO - memory/bandwidth efficiency
+
+  // Navigation Rules (Professional - type safety)
+  'prefer_url_launcher_uri_over_string', // INFO - type-safe URI
+
+  // API/Network Rules (Professional - architecture)
+  'prefer_dio_over_http', // INFO - better features, interceptors
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.

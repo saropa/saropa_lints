@@ -1398,3 +1398,141 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when CachedNetworkImage doesn't use a custom CacheManager.
+///
+/// Alias: network_image_cache, custom_cache_manager
+///
+/// Without a custom CacheManager, cached images can grow unbounded and
+/// consume excessive storage. Configure limits for production apps.
+///
+/// **BAD:**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: 'https://example.com/image.jpg',
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: 'https://example.com/image.jpg',
+///   cacheManager: CacheManager(
+///     Config(
+///       'imageCache',
+///       maxNrOfCacheObjects: 100,
+///       stalePeriod: Duration(days: 7),
+///     ),
+///   ),
+/// )
+/// ```
+class PreferCachedImageCacheManagerRule extends SaropaLintRule {
+  const PreferCachedImageCacheManagerRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_cached_image_cache_manager',
+    problemMessage:
+        'CachedNetworkImage without CacheManager. Cache may grow unbounded.',
+    correctionMessage:
+        'Add cacheManager parameter to limit cache size and stale period.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'CachedNetworkImage') return;
+
+      // Check for cacheManager parameter
+      bool hasCacheManager = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'cacheManager') {
+          hasCacheManager = true;
+          break;
+        }
+      }
+
+      if (!hasCacheManager) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when Image.network is used without a cacheWidth/cacheHeight.
+///
+/// Alias: image_cache_dimensions, network_image_size
+///
+/// Without cacheWidth/cacheHeight, images are decoded at full resolution,
+/// consuming excessive memory. Always specify cache dimensions for memory efficiency.
+///
+/// **BAD:**
+/// ```dart
+/// Image.network('https://example.com/large-image.jpg')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.network(
+///   'https://example.com/large-image.jpg',
+///   cacheWidth: 400,
+///   cacheHeight: 400,
+/// )
+/// ```
+class RequireImageCacheDimensionsRule extends SaropaLintRule {
+  const RequireImageCacheDimensionsRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_cache_dimensions',
+    problemMessage:
+        'Image.network without cacheWidth/cacheHeight. High memory usage.',
+    correctionMessage:
+        'Add cacheWidth and/or cacheHeight to limit decoded image size.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String constructorSource = node.constructorName.toSource();
+      if (constructorSource != 'Image.network') return;
+
+      // Check for cacheWidth or cacheHeight parameter
+      bool hasCacheDimensions = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'cacheWidth' || name == 'cacheHeight') {
+            hasCacheDimensions = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasCacheDimensions) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

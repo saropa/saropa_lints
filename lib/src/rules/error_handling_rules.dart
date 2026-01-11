@@ -1122,3 +1122,299 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
     return false;
   }
 }
+
+/// Warns when catching generic Exception or Object without specific type.
+///
+/// Alias: catch_all, generic_catch, broad_exception_catch
+///
+/// Catching Exception or Object catches everything, including errors that
+/// should crash the app. Catch specific exception types instead.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } catch (e) {
+///   // Catches everything including programmer errors
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } on HttpException catch (e) {
+///   // Handle network errors
+/// } on FormatException catch (e) {
+///   // Handle parsing errors
+/// }
+/// ```
+class AvoidCatchAllRule extends SaropaLintRule {
+  const AvoidCatchAllRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_catch_all',
+    problemMessage:
+        'Catching generic exception. This catches everything including bugs.',
+    correctionMessage: 'Catch specific exception types (HttpException, etc.).',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      // Check if it's a generic catch (no exception type specified)
+      final TypeAnnotation? exceptionType = node.exceptionType;
+
+      if (exceptionType == null) {
+        // catch (e) without type
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Check if catching Exception or Object
+      if (exceptionType is NamedType) {
+        final String typeName = exceptionType.name.lexeme;
+        if (typeName == 'Exception' ||
+            typeName == 'Object' ||
+            typeName == 'dynamic') {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when constructors throw exceptions.
+///
+/// Alias: constructor_throw, no_throw_constructor, factory_for_errors
+///
+/// Throwing in constructors makes error handling difficult because the
+/// object is never fully constructed. Use factory constructors or
+/// static methods for operations that can fail.
+///
+/// **BAD:**
+/// ```dart
+/// class User {
+///   User(String email) {
+///     if (!isValidEmail(email)) {
+///       throw ArgumentError('Invalid email'); // Hard to handle!
+///     }
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class User {
+///   User._(this.email);
+///   final String email;
+///
+///   static User? tryCreate(String email) {
+///     if (!isValidEmail(email)) return null;
+///     return User._(email);
+///   }
+/// }
+/// ```
+class AvoidExceptionInConstructorRule extends SaropaLintRule {
+  const AvoidExceptionInConstructorRule() : super(code: _code);
+
+  /// Exceptions in constructors are hard to handle properly.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_exception_in_constructor',
+    problemMessage:
+        'Throwing in constructor. Use factory or static method for fallible operations.',
+    correctionMessage:
+        'Use factory constructor, static method, or return null for invalid input.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addThrowExpression((ThrowExpression node) {
+      // Check if inside a constructor
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is ConstructorDeclaration) {
+          // Allow in factory constructors
+          if (current.factoryKeyword != null) return;
+          reporter.atNode(node, code);
+          return;
+        }
+        // Stop at method/function boundary
+        if (current is MethodDeclaration || current is FunctionDeclaration) {
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when cache keys use non-deterministic values.
+///
+/// Alias: cache_key_stable, deterministic_cache, cache_key_pure
+///
+/// Cache keys must produce the same value for the same input. Using
+/// DateTime.now(), random values, or object hashCodes causes cache misses.
+///
+/// **BAD:**
+/// ```dart
+/// final key = 'user_${DateTime.now().millisecondsSinceEpoch}';
+/// final key = 'item_${hashCode}'; // hashCode changes between runs
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final key = 'user_$userId';
+/// final key = 'item_${item.id}';
+/// ```
+class RequireCacheKeyDeterminismRule extends SaropaLintRule {
+  const RequireCacheKeyDeterminismRule() : super(code: _code);
+
+  /// Non-deterministic cache keys cause cache misses and memory bloat.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_cache_key_determinism',
+    problemMessage:
+        'Cache key may be non-deterministic. Use stable identifiers for cache keys.',
+    correctionMessage:
+        'Use deterministic values like IDs or stable hashes for cache keys.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Patterns that indicate non-deterministic values.
+  static const Set<String> _nonDeterministicPatterns = <String>{
+    'DateTime.now',
+    'Random',
+    'hashCode',
+    'identityHashCode',
+    'uuid',
+    'generateId',
+    'Uuid().v4',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      final String varName = node.name.lexeme.toLowerCase();
+
+      // Check if variable name suggests a cache key
+      if (!varName.contains('key') && !varName.contains('cache')) return;
+
+      final Expression? initializer = node.initializer;
+      if (initializer == null) return;
+
+      final String source = initializer.toSource();
+
+      for (final String pattern in _nonDeterministicPatterns) {
+        if (source.contains(pattern)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when permission denials aren't handled with settings redirect.
+///
+/// Alias: permission_settings, permanent_denial_handling
+///
+/// When permissions are permanently denied, apps should guide users to
+/// settings instead of repeatedly requesting. Check for isPermanentlyDenied.
+///
+/// **BAD:**
+/// ```dart
+/// final status = await Permission.camera.request();
+/// if (status.isDenied) {
+///   // Just give up or keep asking
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final status = await Permission.camera.request();
+/// if (status.isPermanentlyDenied) {
+///   await openAppSettings(); // Guide user to enable manually
+/// }
+/// ```
+class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
+  const RequirePermissionPermanentDenialHandlingRule() : super(code: _code);
+
+  /// Users stuck on permission denied screen is poor UX.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_permission_permanent_denial_handling',
+    problemMessage:
+        'Permission request without permanent denial handling.',
+    correctionMessage:
+        'Check isPermanentlyDenied and call openAppSettings() to guide users.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'request') return;
+
+      // Check if it's a Permission.X.request() call
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('Permission.')) return;
+
+      // Look for isPermanentlyDenied check in surrounding code
+      AstNode? current = node.parent;
+      FunctionBody? enclosingBody;
+
+      while (current != null) {
+        if (current is FunctionBody) {
+          enclosingBody = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingBody == null) return;
+
+      final String bodySource = enclosingBody.toSource();
+      if (!bodySource.contains('isPermanentlyDenied') &&
+          !bodySource.contains('openAppSettings')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

@@ -8,6 +8,63 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'ignore_utils.dart';
 
+// =============================================================================
+// AST Utilities
+// =============================================================================
+
+/// Extension on [InstanceCreationExpression] for common pattern checks.
+extension InstanceCreationExpressionUtils on InstanceCreationExpression {
+  /// Returns the simple type name of this constructor call.
+  ///
+  /// Example: `MyWidget()` → `'MyWidget'`
+  /// Example: `MyWidget.named()` → `'MyWidget'`
+  String get typeName => constructorName.type.name.lexeme;
+
+  /// Checks if this constructor has a named parameter with the given [name].
+  ///
+  /// Example:
+  /// ```dart
+  /// // Given: TextField(controller: _ctrl, keyboardType: TextInputType.text)
+  /// node.hasNamedParameter('keyboardType')  // true
+  /// node.hasNamedParameter('obscureText')   // false
+  /// ```
+  bool hasNamedParameter(String name) {
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == name) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Checks if this constructor has any of the given named parameters.
+  ///
+  /// Example:
+  /// ```dart
+  /// node.hasAnyNamedParameter({'keyboardType', 'inputType'})
+  /// ```
+  bool hasAnyNamedParameter(Set<String> names) {
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && names.contains(arg.name.label.name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Gets the value of a named parameter if it exists.
+  ///
+  /// Returns the [Expression] for the parameter value, or null if not found.
+  Expression? getNamedParameterValue(String name) {
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == name) {
+        return arg.expression;
+      }
+    }
+    return null;
+  }
+}
+
 /// Impact classification for lint rules.
 ///
 /// Helps teams understand the practical severity of violations:
