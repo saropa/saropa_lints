@@ -1003,4 +1003,3 @@ class _AddCatchErrorToFutureFix extends DartFix {
     });
   }
 }
-
