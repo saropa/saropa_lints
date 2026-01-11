@@ -2690,8 +2690,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
           if (fieldParent is FieldDeclaration) {
             final String? fieldType = fieldParent.fields.type?.toSource();
             // If the field type is StreamSubscription, this is proper storage
-            if (fieldType != null &&
-                fieldType.contains('StreamSubscription')) {
+            if (fieldType != null && fieldType.contains('StreamSubscription')) {
               return;
             }
             // If stored to a non-subscription field (like _ or void), it's bad
@@ -2723,8 +2722,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
 
         // If assigned to a local variable declaration, check its type
         if (current is VariableDeclarationStatement) {
-          final String? declType =
-              current.variables.type?.toSource();
+          final String? declType = current.variables.type?.toSource();
           if (declType != null && declType.contains('StreamSubscription')) {
             return;
           }
