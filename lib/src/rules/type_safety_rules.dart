@@ -678,7 +678,7 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
 /// Detects chained JSON access without null checks.
 ///
 /// Accessing nested JSON with chained bracket notation like
-/// json['key']['nested'] without null checks can cause
+/// `json['key']['nested']` without null checks can cause
 /// null pointer exceptions when intermediate keys don't exist.
 ///
 /// **BAD:**
@@ -759,7 +759,7 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
 
 /// Detects JSON map access without null safety handling.
 ///
-/// Accessing a JSON map with bracket notation json['key'] returns
+/// Accessing a JSON map with bracket notation `json['key']` returns
 /// dynamic and can be null. Directly using this value without
 /// null check causes runtime errors.
 ///
@@ -848,7 +848,7 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
 /// Detects deeply chained JSON access patterns.
 ///
 /// Accessing JSON with deeply chained bracket notation like
-/// json['a']['b']['c'] is error-prone and difficult to maintain.
+/// `json['a']['b']['c']` is error-prone and difficult to maintain.
 /// Prefer flattening or using helper methods.
 ///
 /// **BAD:**
