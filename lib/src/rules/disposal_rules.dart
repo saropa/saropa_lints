@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -1102,7 +1103,8 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
         final String disposeSource = disposeMethod.body.toSource();
         uncancelledFields.removeWhere((field) {
           if (field.isCollection) {
-            return _hasCollectionCancellationInSource(disposeSource, field.name);
+            return _hasCollectionCancellationInSource(
+                disposeSource, field.name);
           } else {
             return disposeSource.contains('${field.name}.cancel()') ||
                 disposeSource.contains('${field.name}?.cancel()');

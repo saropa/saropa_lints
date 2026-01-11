@@ -917,7 +917,7 @@ class _AddConstraintsTodoFix extends DartFix {
 ///
 /// Alias: workmanager_return_result, require_task_result
 ///
-/// WorkManager callbacks must return a bool (or Future<bool>) to indicate
+/// WorkManager callbacks must return a bool (or `Future<bool>`) to indicate
 /// success or failure. Without proper returns, task scheduling may behave
 /// unexpectedly.
 ///
