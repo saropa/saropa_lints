@@ -1876,3 +1876,416 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Part 3: Resource Lifecycle Rules
+// =============================================================================
+
+/// Warns when a StatefulWidget has disposable resources but no dispose() method.
+///
+/// StatefulWidgets that create controllers, subscriptions, timers, or other
+/// resources must implement dispose() to clean up those resources. Missing
+/// dispose() leads to memory leaks, dangling callbacks, and resource exhaustion.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   final TextEditingController _controller = TextEditingController();
+///   StreamSubscription? _subscription;
+///   Timer? _timer;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _subscription = stream.listen((_) {});
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) {});
+///   }
+///   // Missing dispose() - all resources leak!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   final TextEditingController _controller = TextEditingController();
+///   StreamSubscription? _subscription;
+///   Timer? _timer;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _subscription = stream.listen((_) {});
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) {});
+///   }
+///
+///   @override
+///   void dispose() {
+///     _controller.dispose();
+///     _subscription?.cancel();
+///     _timer?.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireDisposeImplementationRule extends SaropaLintRule {
+  const RequireDisposeImplementationRule() : super(code: _code);
+
+  /// Critical - resources leak without dispose.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dispose_implementation',
+    problemMessage:
+        'StatefulWidget has disposable resources but no dispose() method.',
+    correctionMessage:
+        'Add dispose() method to clean up controllers, subscriptions, and timers.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Types that require disposal or cleanup.
+  static const Set<String> _disposableTypes = <String>{
+    // Controllers
+    'TextEditingController',
+    'AnimationController',
+    'TabController',
+    'PageController',
+    'ScrollController',
+    'VideoPlayerController',
+    'FocusNode',
+    'StreamController',
+
+    // Subscriptions and timers
+    'StreamSubscription',
+    'Timer',
+
+    // Other disposables
+    'ChangeNotifier',
+    'ValueNotifier',
+    'WebSocketChannel',
+    'Socket',
+    'ReceivePort',
+    'RandomAccessFile',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!_extendsState(node)) return;
+
+      // Find disposable resource fields
+      final List<String> disposableFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null) {
+            for (final String disposableType in _disposableTypes) {
+              if (typeName.contains(disposableType)) {
+                for (final VariableDeclaration variable
+                    in member.fields.variables) {
+                  disposableFields.add(variable.name.lexeme);
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      if (disposableFields.isEmpty) return;
+
+      // Check if dispose method exists
+      bool hasDispose = false;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          hasDispose = true;
+          break;
+        }
+      }
+
+      if (!hasDispose) {
+        // Report on the class name token
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDisposeMethodFix()];
+}
+
+class _AddDisposeMethodFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the last member to insert after
+      int insertOffset = node.rightBracket.offset;
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration || member is ConstructorDeclaration) {
+          insertOffset = member.end;
+        }
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add dispose() method',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          insertOffset,
+          '\n\n  @override\n  void dispose() {\n    // TODO: Dispose resources here\n    super.dispose();\n  }',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when a disposable field is reassigned without disposing the old value.
+///
+/// When a field holding a disposable resource (controller, subscription, etc.)
+/// is reassigned, the old value must be disposed first. Otherwise, the old
+/// resource leaks and continues holding memory or executing callbacks.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   TextEditingController? _controller;
+///
+///   void _updateController() {
+///     // Old controller leaks!
+///     _controller = TextEditingController(text: 'new value');
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   TextEditingController? _controller;
+///
+///   void _updateController() {
+///     _controller?.dispose();  // Dispose old value first
+///     _controller = TextEditingController(text: 'new value');
+///   }
+/// }
+/// ```
+///
+/// **ALSO GOOD (using cascade):**
+/// ```dart
+/// void _updateController() {
+///   _controller
+///     ?..dispose()
+///     ..text = '';
+///   _controller = TextEditingController(text: 'new value');
+/// }
+/// ```
+class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
+  const PreferDisposeBeforeNewInstanceRule() : super(code: _code);
+
+  /// Critical - old resources leak on reassignment.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_dispose_before_new_instance',
+    problemMessage:
+        'Disposable field reassigned without disposing old value.',
+    correctionMessage:
+        'Call dispose() on the old value before assigning a new instance.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Types that require disposal before reassignment.
+  static const Set<String> _disposableTypes = <String>{
+    'TextEditingController',
+    'AnimationController',
+    'TabController',
+    'PageController',
+    'ScrollController',
+    'VideoPlayerController',
+    'FocusNode',
+    'StreamController',
+    'ChangeNotifier',
+    'ValueNotifier',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      // Only check simple assignments (=), not compound (+=, etc.)
+      if (node.operator.lexeme != '=') return;
+
+      // Check if assigning to a field (not a local variable)
+      final Expression leftSide = node.leftHandSide;
+      String? fieldName;
+
+      if (leftSide is SimpleIdentifier) {
+        fieldName = leftSide.name;
+      } else if (leftSide is PrefixedIdentifier) {
+        // this.fieldName or similar
+        fieldName = leftSide.identifier.name;
+      } else {
+        return;
+      }
+
+      // Check if the right side is creating a new instance of a disposable type
+      final Expression rightSide = node.rightHandSide;
+      if (rightSide is! InstanceCreationExpression) return;
+
+      final String typeName = rightSide.constructorName.type.name.lexeme;
+      if (!_disposableTypes.contains(typeName)) return;
+
+      // Find enclosing class to verify this is a field assignment
+      AstNode? current = node.parent;
+      ClassDeclaration? enclosingClass;
+      MethodDeclaration? enclosingMethod;
+
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          enclosingMethod = current;
+        }
+        if (current is ClassDeclaration) {
+          enclosingClass = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingClass == null || enclosingMethod == null) return;
+
+      // Skip if this is in initState (first initialization)
+      if (enclosingMethod.name.lexeme == 'initState') return;
+
+      // Skip if this is in a constructor
+      if (enclosingMethod.name.lexeme == enclosingClass.name.lexeme) return;
+
+      // Check if fieldName is actually a field of this class
+      bool isField = false;
+      for (final ClassMember member in enclosingClass.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            if (variable.name.lexeme == fieldName) {
+              isField = true;
+              break;
+            }
+          }
+        }
+        if (isField) break;
+      }
+
+      if (!isField) return;
+
+      // Check if there's a dispose() call before this assignment in the same block
+      final Block? enclosingBlock = _findEnclosingBlock(node);
+      if (enclosingBlock == null) return;
+
+      final bool hasDisposeBeforeAssignment =
+          _hasDisposeCallBefore(enclosingBlock, node, fieldName);
+
+      if (!hasDisposeBeforeAssignment) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  Block? _findEnclosingBlock(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is Block) return current;
+      current = current.parent;
+    }
+    return null;
+  }
+
+  bool _hasDisposeCallBefore(
+    Block block,
+    AssignmentExpression targetAssignment,
+    String fieldName,
+  ) {
+    // Look for fieldName.dispose() or fieldName?.dispose() before the assignment
+    final int assignmentOffset = targetAssignment.offset;
+
+    for (final Statement statement in block.statements) {
+      // Only check statements before our assignment
+      if (statement.offset >= assignmentOffset) break;
+
+      final String statementSource = statement.toSource();
+
+      // Check for dispose patterns
+      if (statementSource.contains('$fieldName.dispose()') ||
+          statementSource.contains('$fieldName?.dispose()') ||
+          statementSource.contains('$fieldName..dispose()') ||
+          statementSource.contains('$fieldName?..dispose()')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDisposeBeforeAssignmentFix()];
+}
+
+class _AddDisposeBeforeAssignmentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression leftSide = node.leftHandSide;
+      String? fieldName;
+
+      if (leftSide is SimpleIdentifier) {
+        fieldName = leftSide.name;
+      } else if (leftSide is PrefixedIdentifier) {
+        fieldName = leftSide.identifier.name;
+      }
+
+      if (fieldName == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add dispose() call before reassignment',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the start of the statement containing this assignment
+        AstNode? current = node.parent;
+        while (current != null && current is! Statement) {
+          current = current.parent;
+        }
+
+        final int insertOffset = current?.offset ?? node.offset;
+
+        builder.addSimpleInsertion(
+          insertOffset,
+          '$fieldName?.dispose();\n    ',
+        );
+      });
+    });
+  }
+}

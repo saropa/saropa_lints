@@ -2605,3 +2605,190 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when stream.listen() is called in a field initializer without
+/// storing the subscription for later cancellation.
+///
+/// Stream subscriptions in field initializers are particularly dangerous
+/// because they execute before initState() where cleanup setup typically
+/// happens. The subscription must be stored to be cancelled in dispose().
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   // Subscription created but never stored - cannot be cancelled!
+///   final _ = someStream.listen((data) => print(data));
+///
+///   // Or assigned to void
+///   void _init() {
+///     myStream.listen((data) => doSomething(data)); // Lost reference!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   StreamSubscription<Data>? _subscription;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _subscription = myStream.listen((data) => doSomething(data));
+///   }
+///
+///   @override
+///   void dispose() {
+///     _subscription?.cancel();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
+  const AvoidStreamSubscriptionInFieldRule() : super(code: _code);
+
+  /// Critical - memory leaks and callbacks after disposal.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_stream_subscription_in_field',
+    problemMessage:
+        'Stream.listen() called without storing subscription for cancellation.',
+    correctionMessage:
+        'Store the subscription in a field and cancel it in dispose().',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'listen') return;
+
+      // Check if the target is a Stream
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final DartType? type = target.staticType;
+      if (type == null) return;
+
+      final String typeName = type.getDisplayString();
+      if (!typeName.startsWith('Stream')) return;
+
+      // Check if this is in a field initializer context
+      // Field initializers are problematic because they run before initState
+      AstNode? current = node.parent;
+
+      while (current != null) {
+        // If we find an assignment to a proper StreamSubscription field, it's OK
+        if (current is VariableDeclaration) {
+          final AstNode? fieldParent = current.parent?.parent;
+          if (fieldParent is FieldDeclaration) {
+            final String? fieldType = fieldParent.fields.type?.toSource();
+            // If the field type is StreamSubscription, this is proper storage
+            if (fieldType != null &&
+                fieldType.contains('StreamSubscription')) {
+              return;
+            }
+            // If stored to a non-subscription field (like _ or void), it's bad
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+
+        // If assigned to a variable that IS StreamSubscription, it's OK
+        if (current is AssignmentExpression) {
+          final Expression leftSide = current.leftHandSide;
+          if (leftSide is SimpleIdentifier) {
+            // Check if the left side is a StreamSubscription field
+            final String leftSource = leftSide.name;
+            if (leftSource.contains('subscription') ||
+                leftSource.contains('Subscription')) {
+              return; // Likely storing properly
+            }
+          }
+          // Check static type of left side
+          final DartType? leftType = leftSide.staticType;
+          if (leftType != null) {
+            final String leftTypeName = leftType.getDisplayString();
+            if (leftTypeName.contains('StreamSubscription')) {
+              return;
+            }
+          }
+        }
+
+        // If assigned to a local variable declaration, check its type
+        if (current is VariableDeclarationStatement) {
+          final String? declType =
+              current.variables.type?.toSource();
+          if (declType != null && declType.contains('StreamSubscription')) {
+            return;
+          }
+        }
+
+        // Stop at method or class level
+        if (current is MethodDeclaration ||
+            current is FunctionDeclaration ||
+            current is ClassDeclaration) {
+          break;
+        }
+
+        current = current.parent;
+      }
+
+      // Check if inside an expression statement (bare listen call)
+      current = node.parent;
+      while (current != null) {
+        if (current is ExpressionStatement) {
+          // This is a bare stream.listen() call without assignment
+          reporter.atNode(node, code);
+          return;
+        }
+        if (current is VariableDeclaration ||
+            current is AssignmentExpression ||
+            current is ReturnStatement) {
+          // Being assigned or returned, check if it's to a subscription type
+          break;
+        }
+        if (current is Block || current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddStreamSubscriptionStorageFix()];
+}
+
+class _AddStreamSubscriptionStorageFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for unassigned stream subscription',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Store this subscription in a field and cancel in dispose()\n',
+        );
+      });
+    });
+  }
+}

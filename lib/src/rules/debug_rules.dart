@@ -523,3 +523,106 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
     return line.length - start;
   }
 }
+
+// =============================================================================
+// Debug Output Rules
+// =============================================================================
+
+/// Suggests using debugPrint instead of print for better output throttling.
+///
+/// The print() function can overwhelm the system console and cause message
+/// loss when called rapidly. debugPrint() throttles output to avoid this
+/// issue and is the recommended way to log debug information.
+///
+/// **BAD:**
+/// ```dart
+/// for (final item in largeList) {
+///   print('Processing: $item'); // Can overflow console buffer!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// for (final item in largeList) {
+///   debugPrint('Processing: $item'); // Throttled output
+/// }
+/// ```
+///
+/// **Note:** In production code, consider using a proper logging framework
+/// instead of either print() or debugPrint().
+class PreferDebugPrintRule extends SaropaLintRule {
+  const PreferDebugPrintRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_debugPrint',
+    problemMessage:
+        'print() should use debugPrint() for throttled console output.',
+    correctionMessage:
+        'Replace print() with debugPrint() to prevent console buffer overflow.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Only check for print function calls
+      if (node.methodName.name != 'print') return;
+
+      // Make sure it's a top-level print call (no target)
+      // This avoids matching object.print() methods
+      if (node.target != null) return;
+
+      // Skip if inside a test file - print is often acceptable there
+      // (handled by skipTestFiles if enabled on the rule)
+
+      reporter.atNode(node, code);
+    });
+
+    // Also check for function expression invocations of print
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+      final Expression function = node.function;
+      if (function is SimpleIdentifier && function.name == 'print') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceWithDebugPrintFix()];
+}
+
+class _ReplaceWithDebugPrintFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'print') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with debugPrint',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'debugPrint',
+        );
+      });
+    });
+  }
+}

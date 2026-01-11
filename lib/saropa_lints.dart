@@ -120,6 +120,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidWeakCryptographicAlgorithmsRule(),
   NoObjectDeclarationRule(),
   PreferReturningConditionRule(),
+  PreferSimplerBooleanExpressionsRule(),
   PreferWhenGuardOverIfRule(),
   PreferDedicatedMediaQueryMethodRule(),
   AvoidCascadeAfterIfNullRule(),
@@ -260,6 +261,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferReturningConditionalsRule(),
   AvoidExcessiveExpressionsRule(),
   MapKeysOrderingRule(),
+  ArgumentsOrderingRule(),
   MatchClassNamePatternRule(),
   NewlineBeforeCaseRule(),
   EnumConstantsOrderingRule(),
@@ -926,6 +928,9 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidClearingFormOnErrorRule(),
   RequireFormFieldControllerRule(),
   AvoidFormInAlertDialogRule(),
+  RequireFormAutoValidateModeRule(),
+  RequireAutofillHintsRule(),
+  PreferOnFieldSubmittedRule(),
 
   PreferSystemThemeDefaultRule(),
   AvoidAbsorbPointerMisuseRule(),
@@ -1056,6 +1061,11 @@ const List<LintRule> _allRules = <LintRule>[
   RequireTabControllerLengthSyncRule(),
   AvoidRefreshWithoutAwaitRule(),
   AvoidMultipleAutofocusRule(),
+  AvoidShrinkWrapExpensiveRule(),
+  PreferItemExtentRule(),
+  PreferPrototypeItemRule(),
+  RequireKeyForReorderableRule(),
+  RequireAddAutomaticKeepAlivesOffRule(),
 
   // Cryptography rules (NEW)
   AvoidHardcodedEncryptionKeysRule(),
@@ -1115,15 +1125,21 @@ const List<LintRule> _allRules = <LintRule>[
   RequireBleDisconnectHandlingRule(),
   RequireAudioFocusHandlingRule(),
   RequireQrPermissionCheckRule(),
+  PreferBleMtuNegotiationRule(),
 
   // QR Scanner rules (Plan Group I)
   RequireQrScanFeedbackRule(),
   AvoidQrScannerAlwaysActiveRule(),
+  RequireQrContentValidationRule(),
 
   // File & Error Handling rules (Plan Group G)
   RequireFileExistsCheckRule(),
   RequirePdfErrorHandlingRule(),
   RequireGraphqlErrorHandlingRule(),
+  AvoidLoadingFullPdfInMemoryRule(),
+
+  // GraphQL rules
+  AvoidGraphqlStringQueriesRule(),
 
   // Image rules (Plan Group A)
   PreferImageSizeConstraintsRule(),
@@ -1218,6 +1234,9 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidFlashingContentRule(),
   PreferAdequateSpacingRule(),
   AvoidMotionWithoutReduceRule(),
+  RequireSemanticLabelIconsRule(),
+  RequireAccessibleImagesRule(),
+  AvoidAutoPlayMediaRule(),
 
   // Navigation rules (roadmap_up_next)
   RequireDeepLinkFallbackRule(),
@@ -1319,6 +1338,13 @@ const List<LintRule> _allRules = <LintRule>[
   PreferSelectorRule(),
   RequireGetxBindingRule(),
 
+  // Provider dependency rules
+  PreferProxyProviderRule(),
+  RequireUpdateCallbackRule(),
+
+  // GetX context safety rules
+  AvoidGetxContextOutsideWidgetRule(),
+
   // Part 6 - Theming rules
   RequireDarkModeTestingRule(),
   AvoidElevationOpacityInDarkRule(),
@@ -1394,6 +1420,30 @@ const List<LintRule> _allRules = <LintRule>[
   RequireSvgErrorHandlerRule(),
   RequireGoogleFontsFallbackRule(),
   PreferUuidV4Rule(),
+
+  // Disposal pattern detection rules (NEW)
+  RequireBlocManualDisposeRule(),
+  RequireGetxWorkerDisposeRule(),
+  RequireGetxPermanentCleanupRule(),
+  RequireAnimationTickerDisposalRule(),
+  RequireImageStreamDisposeRule(),
+  RequireSseSubscriptionCancelRule(),
+
+  // Late keyword rules (NEW)
+  PreferLateFinalRule(),
+  AvoidLateForNullableRule(),
+
+  // go_router type safety rules (NEW)
+  PreferGoRouterExtraTypedRule(),
+
+  // Firebase Auth persistence rule (NEW)
+  PreferFirebaseAuthPersistenceRule(),
+
+  // Geolocator battery optimization rule (NEW)
+  PreferGeolocatorDistanceFilterRule(),
+
+  // Image picker OOM prevention (NEW)
+  PreferImagePickerMaxDimensionsRule(),
 ];
 
 class _SaropaLints extends PluginBase {

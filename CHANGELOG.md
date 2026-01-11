@@ -7,11 +7,112 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.3.7] - 2026-01-11
+
+### Added
+
+#### Scroll & List Performance Rules (5 rules)
+- **`avoid_shrink_wrap_expensive`**: Warns when `shrinkWrap: true` is used in expensive scroll contexts
+- **`prefer_item_extent`**: Suggests setting `itemExtent` for uniform ListView items
+- **`prefer_prototype_item`**: Suggests using `prototypeItem` for consistent list item sizing
+- **`require_key_for_reorderable`**: Requires unique keys for ReorderableListView items (ERROR)
+- **`require_add_automatic_keep_alives_off`**: Suggests disabling keep-alives for long lists
+
+#### Accessibility Rules (3 rules)
+- **`require_semantic_label_icons`**: Requires `semanticLabel` on Icon widgets (WARNING)
+- **`require_accessible_images`**: Requires accessibility attributes on images (WARNING)
+- **`avoid_auto_play_media`**: Warns against auto-playing media without user control
+
+#### Form UX Rules (3 rules)
+- **`require_form_auto_validate_mode`**: Suggests setting `autovalidateMode` on Forms
+- **`require_autofill_hints`**: Suggests `autofillHints` for better autofill support
+- **`prefer_on_field_submitted`**: Suggests handling field submission for form navigation
+
+#### Equatable & Freezed Rules (5 rules)
+- **`prefer_equatable_stringify`**: Suggests enabling `stringify: true` on Equatable
+- **`prefer_immutable_annotation`**: Suggests `@immutable` annotation on Equatable classes
+- **`require_freezed_explicit_json`**: Warns when Freezed lacks `explicit_to_json` for nested objects
+- **`prefer_freezed_default_values`**: Suggests using `@Default` annotation
+- **`prefer_record_over_equatable`**: Suggests Dart 3 records for simple value types
+
+#### Boolean & Control Flow Rules (1 rule)
+- **`prefer_simpler_boolean_expressions`**: Detects boolean expressions simplifiable via De Morgan's laws
+
+#### Dispose Pattern Rules (9 rules)
+- **`require_bloc_manual_dispose`**: Warns when Bloc controllers lack cleanup
+- **`require_getx_worker_dispose`**: Warns when GetX Workers lack `onClose` cleanup
+- **`require_getx_permanent_cleanup`**: Warns about permanent GetX instances
+- **`require_animation_ticker_disposal`**: Requires Ticker `stop()` in dispose (ERROR)
+- **`require_image_stream_dispose`**: Warns when ImageStream listeners not removed
+- **`require_sse_subscription_cancel`**: Requires EventSource `close()` (ERROR)
+- **`avoid_stream_subscription_in_field`**: Warns when subscriptions aren't stored for cancellation
+- **`require_dispose_implementation`**: Warns when StatefulWidget with resources lacks `dispose()`
+- **`prefer_dispose_before_new_instance`**: Warns when disposable fields are reassigned without cleanup
+
+#### Type Safety Rules (6 rules)
+- **`avoid_unrelated_type_casts`**: Detects casts between unrelated types (ERROR)
+- **`avoid_dynamic_json_access`**: Warns against chained JSON access without null checks
+- **`require_null_safe_json_access`**: Requires null check before JSON key access (ERROR)
+- **`avoid_dynamic_json_chains`**: Warns against deeply chained JSON access (ERROR)
+- **`require_enum_unknown_value`**: Requires fallback for enum parsing from API
+- **`require_validator_return_null`**: Requires form validators to return null for valid input (ERROR)
+
+#### Widget Replacement & State Management Rules (6 rules)
+- **`prefer_selector_over_consumer`**: Suggests Selector for granular Provider rebuilds
+- **`prefer_cubit_for_simple_state`**: Suggests Cubit for single-event Blocs
+- **`prefer_bloc_listener_for_side_effects`**: Detects side effects in BlocBuilder
+- **`require_bloc_consumer_when_both`**: Suggests BlocConsumer for nested listener+builder
+- **`prefer_proxy_provider`**: Suggests ProxyProvider for dependent providers
+- **`require_update_callback`**: Warns when ProxyProvider update callback is unused
+
+#### Navigation & Debug Rules (3 rules)
+- **`prefer_maybe_pop`**: Suggests `maybePop()` instead of `pop()` for route safety
+- **`prefer_go_router_extra_typed`**: Warns against untyped `extra` parameter in go_router
+- **`prefer_debugPrint`**: Suggests `debugPrint` instead of `print` for throttling
+
+#### Code Quality Rules (2 rules)
+- **`prefer_late_final`**: Suggests `late final` for singly-assigned late variables
+- **`avoid_late_for_nullable`**: Warns against `late` for nullable types
+
+#### WebView Security Rules (4 rules)
+- **`prefer_webview_javascript_disabled`**: Warns when JavaScript enabled without justification
+- **`avoid_webview_insecure_content`**: Warns against allowing mixed content (ERROR)
+- **`require_webview_error_handling`**: Requires `onWebResourceError` handler
+- **`require_webview_progress_indicator`**: Suggests progress indicator for WebViews
+
+#### Image Picker Rules (2 rules)
+- **`prefer_image_picker_request_full_metadata`**: Suggests disabling full metadata when not needed
+- **`avoid_image_picker_large_files`**: Warns when `imageQuality` not set for compression
+
+#### Package-Specific Rules (7 rules)
+- **`avoid_graphql_string_queries`**: Warns against raw GraphQL query strings
+- **`prefer_ble_mtu_negotiation`**: Suggests MTU negotiation for large BLE transfers
+- **`avoid_loading_full_pdf_in_memory`**: Warns against loading large PDFs entirely (WARNING)
+- **`require_qr_content_validation`**: Requires validation of QR code content (WARNING)
+- **`require_notification_timezone_awareness`**: Suggests `TZDateTime` for scheduled notifications
+- **`require_intl_locale_initialization`**: Warns when Intl locale not initialized
+- **`prefer_geolocator_distance_filter`**: Suggests `distanceFilter` to reduce GPS battery drain
+
+#### Firebase Rules (1 rule)
+- **`prefer_firebase_auth_persistence`**: Suggests explicit persistence setting on web
+
+#### GetX Rules (1 rule)
+- **`avoid_getx_context_outside_widget`**: Warns against GetX context access outside widgets
+
+#### Stylistic Rules (1 rule)
+- **`arguments_ordering`**: Enforces consistent ordering of function arguments
+
+### Fixed
+
+- **`prefer_late_final`**: Now correctly counts inline initializers and only flags fields assigned exactly once (not zero times)
+- **`require_qr_content_validation`**: Added explicit parentheses to fix operator precedence in validation check
+
 ## [2.3.6] - 2026-01-11
 
 ### Fixed
 
 - **CI/CD**: Reverted example project to pure Dart (no Flutter SDK dependency) to fix CI failures caused by `dart pub get` requiring Flutter SDK
+- **ROADMAP cleanup**: Removed 72 entries from ROADMAP.md that were already implemented (14 as aliases, 58 as rules)
 
 ### Added
 
@@ -22,10 +123,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Controllers: `TextEditingController`, `TabController`, `PageController`, `FocusNode`
   - Provider mocks: `Provider`, `MultiProvider`, `ChangeNotifierProvider`
   - BLoC mocks: `Bloc`, `BlocProvider`, `MultiBlocProvider`
+- **scripts/audit_rules.py**: New script to audit implemented rules against ROADMAP entries
+  - Detects rules that are already implemented (as rules or aliases)
+  - Finds near-matches that may need aliases added
+  - Features colorful output with Saropa ASCII logo
+  - Returns exit code 1 if duplicates found for CI integration
 
 ### Changed
 
 - Updated 12 fixture files to import `flutter_mocks.dart` instead of Flutter/external packages
+- **prefer_dedicated_media_query_method**: Added alias `prefer_dedicated_media_query_methods`
 
 ## [2.3.5] - 2026-01-11
 
