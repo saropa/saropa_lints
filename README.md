@@ -137,7 +137,7 @@ Pick the tier that matches your team:
 | **Comprehensive** | Quality obsessed. Best practices everywhere. |
 | **Insanity** | Greenfield projects. Every single rule. |
 
-**Plus 21 optional [stylistic rules](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** — team preferences, not in any tier.
+**Plus 21 optional [stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** — team preferences, not in any tier.
 
 ### Configuration template
 
@@ -221,7 +221,7 @@ Each rule has a fixed severity (ERROR, WARNING, or INFO) defined in the rule its
 
 Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_functions`, `prefer_trailing_comma_always`
 
-**See [STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)** for the full list with examples, pros/cons, and quick fixes.
+**See [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for the full list with examples, pros/cons, and quick fixes.
 
 ## Performance
 
@@ -515,7 +515,7 @@ Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:service
 
 | Document | Description |
 |----------|-------------|
-| [STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md) | 20 optional stylistic rules with examples and quick fixes |
+| [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md) | 20 optional stylistic rules with examples and quick fixes |
 | [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) | Planned rules and project direction |
 | [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) | How to contribute rules and report issues |
 | [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) | Version history and release notes |

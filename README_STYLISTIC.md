@@ -752,7 +752,7 @@ Some stylistic rules have valid opposites. Pick what fits your team:
 See [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) for planned opposing rules.
 
 ---
-
+<!-- cspell:ignore Rossum -->
 ## About This Document
 
 > "Code is read more often than it is written." — Guido van Rossum
