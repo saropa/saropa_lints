@@ -8,6 +8,8 @@
 /// - insanity: Everything (~475+ rules) - greenfield projects
 library;
 
+// cspell:ignore require_sqflite_whereargs getit futureor shouldrepaint itemextent singlechildscrollview
+
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 const Set<String> essentialRules = <String>{
   // Memory Leaks - Controllers (dispose)
@@ -229,7 +231,6 @@ const Set<String> essentialRules = <String>{
   // Part 5 - Stream/Future Rules (Essential)
   'avoid_stream_in_build',
   'require_stream_controller_close',
-  'avoid_future_builder_rebuild',
 
   // Part 5 - Riverpod Rules (Essential)
   'require_riverpod_error_handling',
