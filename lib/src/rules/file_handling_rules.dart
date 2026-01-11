@@ -1143,3 +1143,108 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when SELECT * is used in sqflite rawQuery() calls.
+///
+/// Alias: sqflite_select_columns, avoid_select_star
+///
+/// ## Why This Matters
+///
+/// Using SELECT * fetches all columns from the database, which:
+/// - Wastes memory by loading unused data
+/// - Increases network/disk bandwidth
+/// - Breaks when table schema changes (new columns appear unexpectedly)
+/// - Prevents SQLite query optimization
+///
+/// ## Detection
+///
+/// This rule checks `rawQuery()` calls for SQL strings containing `SELECT *`.
+/// The `query()` method is not checked because it uses column parameters, not
+/// raw SQL. Methods like `rawInsert`, `rawUpdate`, `rawDelete` are not checked
+/// because they don't use SELECT statements.
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// // Fetches ALL columns, including large blob fields you don't need
+/// final users = await db.rawQuery('SELECT * FROM users WHERE id = ?', [id]);
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// // Only fetches what you need
+/// final users = await db.rawQuery(
+///   'SELECT id, name, email FROM users WHERE id = ?',
+///   [id],
+/// );
+/// ```
+class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
+  const AvoidSqfliteReadAllColumnsRule() : super(code: _code);
+
+  /// Medium impact - performance issue, not a crash.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_sqflite_read_all_columns',
+    problemMessage:
+        'SELECT * fetches unnecessary columns, wasting memory and bandwidth.',
+    correctionMessage:
+        'Specify only the columns you need: SELECT id, name, email FROM ...',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // Only check rawQuery - the method that takes raw SQL strings with SELECT.
+  // query() uses column parameters, not raw SQL.
+  // rawInsert/rawUpdate/rawDelete don't use SELECT.
+  static const Set<String> _sqfliteMethods = <String>{
+    'rawQuery',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!_sqfliteMethods.contains(node.methodName.name)) return;
+
+      // Check the first argument (SQL string) for SELECT *
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      // Get the first positional argument
+      Expression? sqlArg;
+      for (final arg in args) {
+        if (arg is! NamedExpression) {
+          sqlArg = arg;
+          break;
+        }
+      }
+
+      if (sqlArg == null) return;
+
+      // Check if it's a string literal containing SELECT *
+      String? sqlString;
+
+      if (sqlArg is SimpleStringLiteral) {
+        sqlString = sqlArg.value;
+      } else if (sqlArg is AdjacentStrings) {
+        sqlString = sqlArg.strings.map((s) {
+          if (s is SimpleStringLiteral) return s.value;
+          return '';
+        }).join();
+      }
+
+      if (sqlString != null) {
+        // Case-insensitive check for SELECT *
+        final String upperSql = sqlString.toUpperCase();
+        if (upperSql.contains('SELECT *') || upperSql.contains('SELECT  *')) {
+          reporter.atNode(sqlArg, code);
+        }
+      }
+    });
+  }
+}

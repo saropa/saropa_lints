@@ -143,7 +143,7 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
 
 /// Warns when `ref` is accessed inside a `dispose()` method.
 ///
-/// Alias: ref_in_dispose, dispose_ref_access, cache_ref_in_initstate
+/// Alias: ref_in_dispose, dispose_ref_access, cache_ref_in_initstate, avoid_riverpod_ref_in_dispose
 ///
 /// The `ref` object is not available during widget disposal. Accessing it
 /// in `dispose()` causes runtime errors. Cache values you need in
