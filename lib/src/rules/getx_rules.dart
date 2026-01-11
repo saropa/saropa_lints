@@ -902,7 +902,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
     name: 'require_getx_worker_dispose',
     problemMessage:
         'GetX Worker field is not disposed in onClose(). This causes memory leaks.',
-    correctionMessage: 'Call worker.dispose() in onClose() before super.onClose().',
+    correctionMessage:
+        'Call worker.dispose() in onClose() before super.onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

@@ -464,8 +464,7 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_stringify',
-    problemMessage:
-        'Equatable class does not override stringify to true.',
+    problemMessage: 'Equatable class does not override stringify to true.',
     correctionMessage:
         'Add: @override bool get stringify => true; for better debugging.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -601,8 +600,7 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_annotation',
-    problemMessage:
-        'Equatable class is not annotated with @immutable.',
+    problemMessage: 'Equatable class is not annotated with @immutable.',
     correctionMessage:
         'Add @immutable annotation to document immutability intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -676,9 +674,8 @@ class _AddImmutableAnnotationFix extends DartFix {
 
       changeBuilder.addDartFileEdit((builder) {
         // Insert before class declaration or first annotation
-        final int insertOffset = node.metadata.isNotEmpty
-            ? node.metadata.first.offset
-            : node.offset;
+        final int insertOffset =
+            node.metadata.isNotEmpty ? node.metadata.first.offset : node.offset;
         builder.addSimpleInsertion(insertOffset, '@immutable\n');
       });
     });

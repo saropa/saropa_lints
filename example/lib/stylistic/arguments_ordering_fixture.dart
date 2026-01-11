@@ -76,7 +76,8 @@ void badExamples() {
 
 void mixedPositionalAndNamedExamples() {
   // Example with positional and named arguments
-  void mixedFunction(String positional, {required String alpha, required String beta}) {}
+  void mixedFunction(String positional,
+      {required String alpha, required String beta}) {}
 
   // GOOD: Named arguments alphabetically ordered after positional
   mixedFunction(

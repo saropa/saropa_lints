@@ -1346,8 +1346,7 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_large_files',
-    problemMessage:
-        'pickImage without imageQuality. Raw photos can be 10+ MB.',
+    problemMessage: 'pickImage without imageQuality. Raw photos can be 10+ MB.',
     correctionMessage:
         'Add imageQuality (e.g., 85) to compress images and reduce file size.',
     errorSeverity: DiagnosticSeverity.WARNING,
