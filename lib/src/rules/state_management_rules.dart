@@ -706,6 +706,14 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Skip nested lambdas - they have their own async context.
+    // This prevents false positives when setState is in a callback
+    // that has its own mounted check pattern.
+    return;
+  }
+
+  @override
   void visitIfStatement(IfStatement node) {
     // Check for mounted check: if (!mounted) return; or if (mounted)
     final String condition = node.expression.toSource();
@@ -718,9 +726,31 @@ class _AsyncSetStateVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (node.methodName.name == 'setState' && _sawAwait && !_hasMountedCheck) {
-      reporter.atNode(node, code);
+      // Double-check with ancestor mounted check
+      if (!_hasAncestorMountedCheck(node)) {
+        reporter.atNode(node, code);
+      }
     }
     super.visitMethodInvocation(node);
+  }
+
+  /// Checks if node has an ancestor if statement checking mounted.
+  bool _hasAncestorMountedCheck(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (condition.contains('mounted')) {
+          return true;
+        }
+      }
+      // Stop at function boundaries
+      if (current is FunctionExpression || current is MethodDeclaration) {
+        break;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 

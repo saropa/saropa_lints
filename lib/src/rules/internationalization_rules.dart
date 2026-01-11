@@ -1033,3 +1033,422 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when DateFormat is used without explicit locale parameter.
+///
+/// Alias: dateformat_locale, date_format_locale_required
+///
+/// DateFormat without locale uses the system default, which varies across
+/// devices and can produce unexpected results for users.
+///
+/// **BAD:**
+/// ```dart
+/// DateFormat('yyyy-MM-dd').format(date)
+/// DateFormat.yMd().format(date)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// DateFormat('yyyy-MM-dd', 'en_US').format(date)
+/// DateFormat.yMd(locale).format(date)
+/// ```
+class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
+  const RequireIntlDateFormatLocaleRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_intl_date_format_locale',
+    problemMessage:
+        'DateFormat without explicit locale. Format varies by device/platform.',
+    correctionMessage: 'Add locale parameter: DateFormat.yMd(locale).format(d)',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check DateFormat constructor: DateFormat('pattern')
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'DateFormat') return;
+
+      // DateFormat constructor takes pattern as first arg, locale as second
+      // If only one arg, locale is missing
+      final args = node.argumentList.arguments;
+      if (args.length < 2) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Check DateFormat factory constructors: DateFormat.yMd()
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'DateFormat') return;
+
+      // Factory constructors like yMd, yMMM, etc. take locale as first arg
+      final String methodName = node.methodName.name;
+      // Skip the main constructor (handled above)
+      if (methodName == 'DateFormat') return;
+
+      // Common factory constructors that need locale
+      const Set<String> factoryMethods = <String>{
+        'yMd',
+        'yMMMd',
+        'yMMMMd',
+        'yMMMM',
+        'yMMM',
+        'yM',
+        'y',
+        'Hm',
+        'Hms',
+        'jm',
+        'jms',
+        'E',
+        'EEEE',
+        'MMMd',
+        'MMMMd',
+        'Md',
+        'MEd',
+        'MMMEd',
+        'MMMMEEEEd',
+      };
+
+      if (factoryMethods.contains(methodName)) {
+        // Factory methods take optional locale as first argument
+        if (node.argumentList.arguments.isEmpty) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when NumberFormat is used without explicit locale parameter.
+///
+/// Alias: numberformat_locale, number_format_locale_required
+///
+/// NumberFormat without locale uses system defaults which vary by device.
+/// Decimal separators and grouping differ by locale (1,234.56 vs 1.234,56).
+///
+/// **BAD:**
+/// ```dart
+/// NumberFormat('#,###').format(number)
+/// NumberFormat.compact().format(number)
+/// NumberFormat.decimalPattern().format(number)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// NumberFormat('#,###', 'en_US').format(number)
+/// NumberFormat.compact(locale: locale).format(number)
+/// NumberFormat.decimalPattern(locale).format(number)
+/// ```
+class RequireNumberFormatLocaleRule extends SaropaLintRule {
+  const RequireNumberFormatLocaleRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_number_format_locale',
+    problemMessage:
+        'NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device.',
+    correctionMessage:
+        'Add locale parameter: NumberFormat.decimalPattern(locale)',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check NumberFormat constructor
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'NumberFormat') return;
+
+      // NumberFormat constructor takes pattern as first arg, locale as second
+      final args = node.argumentList.arguments;
+      if (args.length < 2) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Check NumberFormat factory constructors
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'NumberFormat') return;
+
+      // Factory constructors that need locale
+      const Set<String> factoryMethods = <String>{
+        'compact',
+        'compactLong',
+        'compactSimpleCurrency',
+        'compactCurrency',
+        'currency',
+        'decimalPattern',
+        'decimalPercentPattern',
+        'percentPattern',
+        'scientificPattern',
+        'simpleCurrency',
+      };
+
+      final String methodName = node.methodName.name;
+      if (!factoryMethods.contains(methodName)) return;
+
+      // Check if locale is provided (as first positional or named 'locale')
+      bool hasLocale = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'locale') {
+          hasLocale = true;
+          break;
+        }
+        // First positional argument for methods that take locale positionally
+        if (arg is! NamedExpression &&
+            node.argumentList.arguments.first == arg) {
+          // Some methods like decimalPattern take locale as first positional
+          if (methodName == 'decimalPattern' ||
+              methodName == 'percentPattern' ||
+              methodName == 'scientificPattern') {
+            hasLocale = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasLocale) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when dates are formatted manually instead of using DateFormat.
+///
+/// Alias: no_manual_date_format, use_dateformat
+///
+/// Manual date formatting produces inconsistent results across locales
+/// and is error-prone. Use DateFormat from intl package instead.
+///
+/// **BAD:**
+/// ```dart
+/// '${date.day}/${date.month}/${date.year}'
+/// '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day}'
+/// date.toIso8601String().substring(0, 10)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// DateFormat.yMd(locale).format(date)
+/// DateFormat('yyyy-MM-dd', locale).format(date)
+/// ```
+class AvoidManualDateFormattingRule extends SaropaLintRule {
+  const AvoidManualDateFormattingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_manual_date_formatting',
+    problemMessage:
+        'Manual date formatting is error-prone and ignores locale.',
+    correctionMessage: 'Use DateFormat from intl: DateFormat.yMd(locale).format(date)',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// DateTime properties that indicate manual formatting.
+  static const Set<String> _dateProperties = <String>{
+    'day',
+    'month',
+    'year',
+    'hour',
+    'minute',
+    'second',
+    'weekday',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      int datePropertyCount = 0;
+
+      for (final element in node.elements) {
+        if (element is InterpolationExpression) {
+          final expr = element.expression;
+          if (expr is PropertyAccess) {
+            final propertyName = expr.propertyName.name;
+            if (_dateProperties.contains(propertyName)) {
+              datePropertyCount++;
+            }
+          } else if (expr is PrefixedIdentifier) {
+            final propertyName = expr.identifier.name;
+            if (_dateProperties.contains(propertyName)) {
+              datePropertyCount++;
+            }
+          }
+        }
+      }
+
+      // If 2+ date properties are used, it's likely manual date formatting
+      if (datePropertyCount >= 2) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Check for toIso8601String with substring (common manual pattern)
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'substring') return;
+
+      final target = node.target;
+      if (target is MethodInvocation &&
+          target.methodName.name == 'toIso8601String') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when currency/money values are formatted manually.
+///
+/// Alias: use_currency_format, no_manual_currency
+///
+/// Currency formatting requires proper symbol placement, decimal handling,
+/// and grouping which varies by locale. Use NumberFormat.currency instead.
+///
+/// **BAD:**
+/// ```dart
+/// '\$${price.toStringAsFixed(2)}'
+/// '${price} USD'
+/// 'USD ' + price.toString()
+/// '\$' + amount.toStringAsFixed(2)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// NumberFormat.currency(locale: locale, symbol: '\$').format(price)
+/// NumberFormat.simpleCurrency(locale: locale).format(price)
+/// ```
+class RequireIntlCurrencyFormatRule extends SaropaLintRule {
+  const RequireIntlCurrencyFormatRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_intl_currency_format',
+    problemMessage:
+        'Manual currency formatting. Symbol placement and decimals vary by locale.',
+    correctionMessage:
+        'Use NumberFormat.currency(locale: locale, symbol: s).format(n)',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Currency symbols that indicate manual currency formatting.
+  static const Set<String> _currencySymbols = <String>{
+    r'$',
+    '€',
+    '£',
+    '¥',
+    '₹',
+    '₽',
+    '₩',
+    'USD',
+    'EUR',
+    'GBP',
+    'JPY',
+    'INR',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final source = node.toSource();
+
+      // Check if contains currency symbol
+      bool hasCurrencySymbol = false;
+      for (final symbol in _currencySymbols) {
+        if (source.contains(symbol)) {
+          hasCurrencySymbol = true;
+          break;
+        }
+      }
+
+      if (!hasCurrencySymbol) return;
+
+      // Check if contains number interpolation (likely price)
+      for (final element in node.elements) {
+        if (element is InterpolationExpression) {
+          final expr = element.expression;
+          // Check for toStringAsFixed which is common for prices
+          if (expr is MethodInvocation &&
+              expr.methodName.name == 'toStringAsFixed') {
+            reporter.atNode(node, code);
+            return;
+          }
+          // Check for simple variable that might be a price
+          if (expr is SimpleIdentifier) {
+            final name = expr.name.toLowerCase();
+            if (name.contains('price') ||
+                name.contains('amount') ||
+                name.contains('cost') ||
+                name.contains('total') ||
+                name.contains('money')) {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+
+    // Check for string concatenation with currency symbols
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (node.operator.lexeme != '+') return;
+
+      final left = node.leftOperand;
+      final right = node.rightOperand;
+
+      // Check if either side is a currency symbol string
+      bool hasCurrencyString = false;
+      if (left is SimpleStringLiteral) {
+        for (final symbol in _currencySymbols) {
+          if (left.value.contains(symbol)) {
+            hasCurrencyString = true;
+            break;
+          }
+        }
+      }
+      if (right is SimpleStringLiteral) {
+        for (final symbol in _currencySymbols) {
+          if (right.value.contains(symbol)) {
+            hasCurrencyString = true;
+            break;
+          }
+        }
+      }
+
+      if (hasCurrencyString) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

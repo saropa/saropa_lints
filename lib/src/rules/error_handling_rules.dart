@@ -1003,3 +1003,122 @@ class _AddCatchErrorToFutureFix extends DartFix {
     });
   }
 }
+
+/// Warns when print() is used for error logging in catch blocks.
+///
+/// Alias: no_print_error, print_error, use_logger
+///
+/// Using print() for error logging is not appropriate for production apps.
+/// Errors should be logged through proper logging infrastructure.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } catch (e) {
+///   print(e);
+///   print('Error: $e');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } catch (e, stackTrace) {
+///   logger.error('Failed to fetch', error: e, stackTrace: stackTrace);
+///   // Or use crashlytics, sentry, etc.
+/// }
+/// ```
+class AvoidPrintErrorRule extends SaropaLintRule {
+  const AvoidPrintErrorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_print_error',
+    problemMessage:
+        'Using print() for error logging. Errors may be lost in production.',
+    correctionMessage:
+        'Use a proper logging framework like logger, crashlytics, or sentry.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
+      if (exceptionParam == null) return;
+
+      final String exceptionName = exceptionParam.name.lexeme;
+
+      // Visit the catch body to find print calls using the exception
+      node.body.visitChildren(
+        _PrintErrorVisitor(
+          exceptionName: exceptionName,
+          onPrintError: (AstNode printNode) {
+            reporter.atNode(printNode, code);
+          },
+        ),
+      );
+    });
+  }
+}
+
+class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
+  _PrintErrorVisitor({
+    required this.exceptionName,
+    required this.onPrintError,
+  });
+
+  final String exceptionName;
+  final void Function(AstNode) onPrintError;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Check for print() or debugPrint() calls
+    final String methodName = node.methodName.name;
+    if (methodName != 'print' && methodName != 'debugPrint') {
+      super.visitMethodInvocation(node);
+      return;
+    }
+
+    // Check if the exception variable is used in the print call
+    if (node.argumentList.arguments.isNotEmpty) {
+      final Expression arg = node.argumentList.arguments.first;
+      if (_usesException(arg)) {
+        onPrintError(node);
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  bool _usesException(Expression expr) {
+    if (expr is SimpleIdentifier) {
+      return expr.name == exceptionName;
+    }
+    if (expr is StringInterpolation) {
+      for (final InterpolationElement element in expr.elements) {
+        if (element is InterpolationExpression) {
+          if (_usesException(element.expression)) {
+            return true;
+          }
+        }
+      }
+    }
+    if (expr is BinaryExpression) {
+      return _usesException(expr.leftOperand) ||
+          _usesException(expr.rightOperand);
+    }
+    if (expr is MethodInvocation && expr.target != null) {
+      return _usesException(expr.target!);
+    }
+    return false;
+  }
+}

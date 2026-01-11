@@ -66,3 +66,5 @@ custom_lint:
     - require_workmanager_constraints: true
     - require_svg_error_handler: true
     - require_google_fonts_fallback: true
+    # Explicitly enable security rules for testing
+    - avoid_redirect_injection: true

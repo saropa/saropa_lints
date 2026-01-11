@@ -816,24 +816,53 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
       if (value is! BooleanLiteral || !value.value) return;
 
       // Check if this shrinkWrap is on a scrollable widget
-      if (_isOnScrollableWidget(node)) {
-        reporter.atNode(node, code);
-      }
+      final scrollableNode = _findScrollableWidget(node);
+      if (scrollableNode == null) return;
+
+      // Skip if NeverScrollableScrollPhysics is used - this is intentional
+      // for nested non-scrolling lists inside another scrollable
+      if (_hasNeverScrollablePhysics(scrollableNode)) return;
+
+      reporter.atNode(node, code);
     });
   }
 
-  bool _isOnScrollableWidget(AstNode node) {
+  /// Finds the scrollable widget containing this shrinkWrap argument.
+  AstNode? _findScrollableWidget(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
         final String typeName = current.constructorName.type.name2.lexeme;
-        if (_scrollableTypes.contains(typeName)) return true;
+        if (_scrollableTypes.contains(typeName)) return current;
       } else if (current is MethodInvocation) {
-        if (_scrollableTypes.contains(current.methodName.name)) return true;
+        if (_scrollableTypes.contains(current.methodName.name)) return current;
       }
       // Stop at widget boundary (another widget or method declaration)
       if (current is MethodDeclaration) break;
       current = current.parent;
+    }
+    return null;
+  }
+
+  /// Checks if the scrollable widget has physics: NeverScrollableScrollPhysics.
+  bool _hasNeverScrollablePhysics(AstNode scrollableNode) {
+    ArgumentList? argList;
+
+    if (scrollableNode is InstanceCreationExpression) {
+      argList = scrollableNode.argumentList;
+    } else if (scrollableNode is MethodInvocation) {
+      argList = scrollableNode.argumentList;
+    }
+
+    if (argList == null) return false;
+
+    for (final arg in argList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'physics') {
+        final source = arg.expression.toSource().toLowerCase();
+        if (source.contains('neverscrollablescrollphysics')) {
+          return true;
+        }
+      }
     }
     return false;
   }

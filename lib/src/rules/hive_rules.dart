@@ -786,3 +786,110 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when @HiveField indices are reused within the same class.
+///
+/// Alias: hive_field_duplicate, hive_field_conflict
+///
+/// @HiveField indices must be unique within a class. Reusing an index
+/// causes data corruption as Hive cannot distinguish between fields.
+///
+/// **BAD:**
+/// ```dart
+/// @HiveType(typeId: 0)
+/// class User extends HiveObject {
+///   @HiveField(0)
+///   final String name;
+///
+///   @HiveField(0) // Duplicate index!
+///   final String email;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @HiveType(typeId: 0)
+/// class User extends HiveObject {
+///   @HiveField(0)
+///   final String name;
+///
+///   @HiveField(1)
+///   final String email;
+/// }
+/// ```
+class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
+  const AvoidHiveFieldIndexReuseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hive_field_index_reuse',
+    problemMessage:
+        '@HiveField index is duplicated within this class. Data corruption will occur.',
+    correctionMessage:
+        'Use a unique index for each @HiveField annotation in the class.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if this is a HiveType class
+      bool isHiveType = false;
+      for (final metadata in node.metadata) {
+        if (metadata.name.name == 'HiveType') {
+          isHiveType = true;
+          break;
+        }
+      }
+
+      if (!isHiveType) return;
+
+      // Collect all @HiveField indices and their annotations
+      final Map<int, List<Annotation>> fieldIndices =
+          <int, List<Annotation>>{};
+
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final metadata in member.metadata) {
+            if (metadata.name.name == 'HiveField') {
+              final int? index = _extractHiveFieldIndex(metadata);
+              if (index != null) {
+                fieldIndices.putIfAbsent(index, () => <Annotation>[]);
+                fieldIndices[index]!.add(metadata);
+              }
+            }
+          }
+        }
+      }
+
+      // Report duplicates
+      for (final entry in fieldIndices.entries) {
+        if (entry.value.length > 1) {
+          // Report all occurrences of the duplicate
+          for (final annotation in entry.value) {
+            reporter.atNode(annotation, code);
+          }
+        }
+      }
+    });
+  }
+
+  /// Extracts the index value from a @HiveField annotation.
+  int? _extractHiveFieldIndex(Annotation annotation) {
+    final ArgumentList? args = annotation.arguments;
+    if (args == null || args.arguments.isEmpty) return null;
+
+    final Expression firstArg = args.arguments.first;
+    if (firstArg is IntegerLiteral) {
+      return firstArg.value;
+    }
+
+    return null;
+  }
+}
