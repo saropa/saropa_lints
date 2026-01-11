@@ -724,3 +724,119 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when BLE data transfer occurs without MTU negotiation.
+///
+/// BLE default MTU is only 23 bytes (20 bytes payload). Without negotiating
+/// a larger MTU, data transfers are fragmented into many small packets,
+/// causing poor throughput and increased latency. Always request MTU
+/// negotiation before transferring data.
+///
+/// **BAD:**
+/// ```dart
+/// await device.connect();
+/// final services = await device.discoverServices();
+/// final characteristic = services.first.characteristics.first;
+/// await characteristic.write(largeData); // Slow, fragmented transfer!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await device.connect();
+/// await device.requestMtu(512); // Request larger MTU
+/// final services = await device.discoverServices();
+/// final characteristic = services.first.characteristics.first;
+/// await characteristic.write(largeData); // Faster transfer
+/// ```
+class PreferBleMtuNegotiationRule extends SaropaLintRule {
+  const PreferBleMtuNegotiationRule() : super(code: _code);
+
+  /// Important for BLE performance.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_ble_mtu_negotiation',
+    problemMessage:
+        'BLE data transfer without MTU negotiation causes slow, fragmented transfers.',
+    correctionMessage:
+        'Call device.requestMtu(512) after connect() and before write operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Methods that transfer data over BLE.
+  static const Set<String> _dataTransferMethods = <String>{
+    'write',
+    'writeCharacteristic',
+    'setNotifyValue',
+    'read',
+    'readCharacteristic',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_dataTransferMethods.contains(methodName)) return;
+
+      // Check if target is a BLE characteristic or device using type resolution
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      // Check the target's static type
+      final String? typeName = target.staticType?.element?.name;
+      final bool isBleCharacteristic = typeName == 'BluetoothCharacteristic' ||
+          typeName == 'BleCharacteristic' ||
+          typeName == 'Characteristic';
+
+      if (!isBleCharacteristic) return;
+
+      // Look for requestMtu call in same class
+      bool hasMtuNegotiation = false;
+      AstNode? current = node.parent;
+      ClassDeclaration? enclosingClass;
+
+      while (current != null) {
+        if (current is ClassDeclaration) {
+          enclosingClass = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (enclosingClass != null) {
+        final String classSource = enclosingClass.toSource();
+        if (classSource.contains('requestMtu') ||
+            classSource.contains('mtuRequest') ||
+            classSource.contains('negotiateMtu') ||
+            classSource.contains('setMtu')) {
+          hasMtuNegotiation = true;
+        }
+      }
+
+      // Also check enclosing method for MTU negotiation
+      if (!hasMtuNegotiation) {
+        current = node.parent;
+        while (current != null) {
+          if (current is MethodDeclaration) {
+            final String methodSource = current.toSource();
+            if (methodSource.contains('requestMtu') ||
+                methodSource.contains('mtuRequest')) {
+              hasMtuNegotiation = true;
+            }
+            break;
+          }
+          current = current.parent;
+        }
+      }
+
+      if (!hasMtuNegotiation) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}

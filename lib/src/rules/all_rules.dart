@@ -42,6 +42,7 @@ export 'flutter_widget_rules.dart';
 export 'formatting_rules.dart';
 export 'forms_rules.dart';
 export 'getx_rules.dart';
+export 'graphql_rules.dart';
 export 'hive_rules.dart';
 export 'image_rules.dart';
 export 'internationalization_rules.dart';

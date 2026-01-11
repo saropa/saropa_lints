@@ -759,3 +759,477 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when shrinkWrap: true is used in scrollables (expensive operation).
+///
+/// Using shrinkWrap: true forces the scrollable to calculate the size of all
+/// its children immediately, disabling virtualization and causing performance
+/// issues with large lists.
+///
+/// **BAD:**
+/// ```dart
+/// ListView(
+///   shrinkWrap: true, // Forces all children to be built
+///   children: items,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   itemBuilder: (context, i) => items[i],
+/// )
+/// // Or use a SliverList in a CustomScrollView
+/// ```
+class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
+  const AvoidShrinkWrapExpensiveRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_shrink_wrap_expensive',
+    problemMessage:
+        'shrinkWrap: true disables virtualization and can cause performance issues.',
+    correctionMessage:
+        'Use a fixed-height container, Slivers, or reconsider the layout.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _scrollableTypes = <String>{
+    'ListView',
+    'GridView',
+    'SingleChildScrollView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'shrinkWrap') return;
+
+      final Expression value = node.expression;
+      if (value is! BooleanLiteral || !value.value) return;
+
+      // Check if this shrinkWrap is on a scrollable widget
+      if (_isOnScrollableWidget(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isOnScrollableWidget(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name2.lexeme;
+        if (_scrollableTypes.contains(typeName)) return true;
+      } else if (current is MethodInvocation) {
+        if (_scrollableTypes.contains(current.methodName.name)) return true;
+      }
+      // Stop at widget boundary (another widget or method declaration)
+      if (current is MethodDeclaration) break;
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when ListView with uniform items doesn't specify itemExtent.
+///
+/// When all items have the same height, specifying itemExtent improves
+/// scroll performance by avoiding per-item layout calculations.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: 100,
+///   itemBuilder: (context, i) => ListTile(...), // All same height
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: 100,
+///   itemExtent: 56.0, // Standard ListTile height
+///   itemBuilder: (context, i) => ListTile(...),
+/// )
+/// ```
+class PreferItemExtentRule extends SaropaLintRule {
+  const PreferItemExtentRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_item_extent',
+    problemMessage:
+        'ListView with uniform items should specify itemExtent for better performance.',
+    correctionMessage:
+        'Add itemExtent parameter if all items have the same height.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      if (typeName != 'ListView') return;
+
+      // Check if using builder constructor
+      final String? constructorName = node.constructorName.name?.name;
+      if (constructorName != 'builder' && constructorName != 'separated') {
+        return;
+      }
+
+      // Check if itemExtent or prototypeItem is already specified
+      bool hasItemExtent = false;
+      bool hasPrototypeItem = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'itemExtent') hasItemExtent = true;
+          if (argName == 'prototypeItem') hasPrototypeItem = true;
+        }
+      }
+
+      if (!hasItemExtent && !hasPrototypeItem) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when ListView doesn't use prototypeItem for consistent sizing.
+///
+/// prototypeItem allows Flutter to determine item sizes from a single
+/// prototype widget, which is more efficient than calculating each item.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   itemBuilder: (context, i) => MyCard(items[i]),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: items.length,
+///   prototypeItem: MyCard(items.first), // For consistent sizing
+///   itemBuilder: (context, i) => MyCard(items[i]),
+/// )
+/// ```
+class PreferPrototypeItemRule extends SaropaLintRule {
+  const PreferPrototypeItemRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_prototype_item',
+    problemMessage:
+        'Consider using prototypeItem for ListView with consistent item sizes.',
+    correctionMessage:
+        'Add prototypeItem parameter if items have consistent dimensions.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      if (typeName != 'ListView') return;
+
+      // Check if using builder constructor
+      final String? constructorName = node.constructorName.name?.name;
+      if (constructorName != 'builder') return;
+
+      // Check if prototypeItem or itemExtent is already specified
+      bool hasPrototypeItem = false;
+      bool hasItemExtent = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'prototypeItem') hasPrototypeItem = true;
+          if (argName == 'itemExtent') hasItemExtent = true;
+        }
+      }
+
+      if (!hasPrototypeItem && !hasItemExtent) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when ReorderableListView items don't have keys.
+///
+/// ReorderableListView requires each item to have a unique key to properly
+/// track items during reordering. Without keys, reordering will not work
+/// correctly and may cause visual glitches or data corruption.
+///
+/// **BAD:**
+/// ```dart
+/// ReorderableListView(
+///   children: items.map((item) => ListTile(
+///     title: Text(item.name), // Missing key!
+///   )).toList(),
+///   onReorder: (old, new) => ...,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ReorderableListView(
+///   children: items.map((item) => ListTile(
+///     key: ValueKey(item.id),
+///     title: Text(item.name),
+///   )).toList(),
+///   onReorder: (old, new) => ...,
+/// )
+/// ```
+class RequireKeyForReorderableRule extends SaropaLintRule {
+  const RequireKeyForReorderableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_key_for_reorderable',
+    problemMessage:
+        'ReorderableListView items must have unique keys for proper reordering.',
+    correctionMessage: 'Add a key parameter (e.g., ValueKey) to each item.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _reorderableTypes = <String>{
+    'ReorderableListView',
+    'ReorderableList',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      if (!_reorderableTypes.contains(typeName)) return;
+
+      // Check for children argument or itemBuilder
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+
+          if (argName == 'children') {
+            _checkChildrenForKeys(arg.expression, reporter);
+          } else if (argName == 'itemBuilder') {
+            _checkItemBuilderForKeys(arg.expression, reporter);
+          }
+        }
+      }
+    });
+  }
+
+  void _checkChildrenForKeys(
+      Expression childrenExpr, SaropaDiagnosticReporter reporter) {
+    if (childrenExpr is ListLiteral) {
+      for (final CollectionElement element in childrenExpr.elements) {
+        if (element is InstanceCreationExpression) {
+          if (!_hasKeyArgument(element.argumentList)) {
+            reporter.atNode(element, code);
+          }
+        }
+      }
+    } else if (childrenExpr is MethodInvocation) {
+      // Check for .map(...).toList() pattern
+      if (childrenExpr.methodName.name == 'toList') {
+        final Expression? target = childrenExpr.target;
+        if (target is MethodInvocation && target.methodName.name == 'map') {
+          _checkMapCallback(target, reporter);
+        }
+      } else if (childrenExpr.methodName.name == 'map') {
+        _checkMapCallback(childrenExpr, reporter);
+      }
+    }
+  }
+
+  void _checkMapCallback(
+      MethodInvocation mapInvocation, SaropaDiagnosticReporter reporter) {
+    if (mapInvocation.argumentList.arguments.isNotEmpty) {
+      final Expression callback = mapInvocation.argumentList.arguments.first;
+      if (callback is FunctionExpression) {
+        _checkBuilderBodyForKey(callback.body, reporter);
+      }
+    }
+  }
+
+  void _checkItemBuilderForKeys(
+      Expression builderExpr, SaropaDiagnosticReporter reporter) {
+    if (builderExpr is FunctionExpression) {
+      _checkBuilderBodyForKey(builderExpr.body, reporter);
+    }
+  }
+
+  void _checkBuilderBodyForKey(
+      FunctionBody body, SaropaDiagnosticReporter reporter) {
+    if (body is ExpressionFunctionBody) {
+      final Expression expr = body.expression;
+      if (expr is InstanceCreationExpression) {
+        if (!_hasKeyArgument(expr.argumentList)) {
+          reporter.atNode(expr, code);
+        }
+      }
+    } else if (body is BlockFunctionBody) {
+      body.block.visitChildren(_ReturnKeyVisitor(reporter, code));
+    }
+  }
+
+  bool _hasKeyArgument(ArgumentList args) {
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'key') {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+class _ReturnKeyVisitor extends RecursiveAstVisitor<void> {
+  _ReturnKeyVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    final Expression? expr = node.expression;
+    if (expr is InstanceCreationExpression) {
+      bool hasKey = false;
+      for (final Expression arg in expr.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'key') {
+          hasKey = true;
+          break;
+        }
+      }
+      if (!hasKey) {
+        reporter.atNode(expr, code);
+      }
+    }
+    super.visitReturnStatement(node);
+  }
+}
+
+/// Warns when long lists have addAutomaticKeepAlives enabled (default).
+///
+/// addAutomaticKeepAlives: true (the default) keeps list items alive in
+/// memory even when scrolled off-screen. For long lists, this can cause
+/// excessive memory usage. Set it to false for better memory efficiency.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: 1000, // Long list with automatic keep-alives
+///   itemBuilder: (context, i) => ExpensiveWidget(items[i]),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: 1000,
+///   addAutomaticKeepAlives: false, // Better memory usage
+///   itemBuilder: (context, i) => ExpensiveWidget(items[i]),
+/// )
+/// ```
+class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
+  const RequireAddAutomaticKeepAlivesOffRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_add_automatic_keep_alives_off',
+    problemMessage:
+        'Long lists with addAutomaticKeepAlives: true (default) can cause memory issues.',
+    correctionMessage:
+        'Add addAutomaticKeepAlives: false for better memory efficiency.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _listTypes = <String>{
+    'ListView',
+    'GridView',
+  };
+
+  /// Threshold for considering a list "long"
+  static const int _longListThreshold = 50;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      if (!_listTypes.contains(typeName)) return;
+
+      // Check if using builder constructor (implies potentially large list)
+      final String? constructorName = node.constructorName.name?.name;
+      if (constructorName != 'builder') return;
+
+      // Check arguments
+      bool hasAddAutomaticKeepAlives = false;
+      int? itemCount;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
+          if (argName == 'addAutomaticKeepAlives') {
+            hasAddAutomaticKeepAlives = true;
+          } else if (argName == 'itemCount') {
+            final Expression countExpr = arg.expression;
+            if (countExpr is IntegerLiteral) {
+              itemCount = countExpr.value;
+            }
+          }
+        }
+      }
+
+      // Only warn if itemCount is known and large, or if using builder pattern
+      // (which typically implies dynamic/large lists)
+      if (!hasAddAutomaticKeepAlives) {
+        if (itemCount != null && itemCount >= _longListThreshold) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    });
+  }
+}

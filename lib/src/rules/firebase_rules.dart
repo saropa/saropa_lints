@@ -2225,3 +2225,118 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when Firebase Auth on web doesn't set persistence to LOCAL.
+///
+/// By default, Firebase Auth on web uses session persistence, meaning users
+/// are logged out when they close the browser tab. For "remember me"
+/// functionality, you need to explicitly set persistence to LOCAL.
+///
+/// **Note:** This rule only applies to web applications.
+///
+/// **BAD:**
+/// ```dart
+/// // On web, user will be logged out when closing browser tab
+/// await FirebaseAuth.instance.signInWithEmailAndPassword(
+///   email: email,
+///   password: password,
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Set persistence before sign-in for "remember me" on web
+/// await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+/// await FirebaseAuth.instance.signInWithEmailAndPassword(
+///   email: email,
+///   password: password,
+/// );
+/// ```
+class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
+  const PreferFirebaseAuthPersistenceRule() : super(code: _code);
+
+  /// Medium impact - affects user experience on web.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_firebase_auth_persistence',
+    problemMessage:
+        'Firebase Auth on web defaults to session persistence. Consider setting LOCAL persistence.',
+    correctionMessage:
+        'Call FirebaseAuth.instance.setPersistence(Persistence.LOCAL) before sign-in for "remember me".',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _signInMethods = <String>{
+    'signInWithEmailAndPassword',
+    'signInWithCredential',
+    'signInWithPopup',
+    'signInWithRedirect',
+    'signInWithPhoneNumber',
+    'signInAnonymously',
+    'signInWithCustomToken',
+    'createUserWithEmailAndPassword',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_signInMethods.contains(methodName)) return;
+
+      // Check if this is a FirebaseAuth call
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('FirebaseAuth') &&
+          !targetSource.contains('firebaseAuth') &&
+          !targetSource.contains('_auth')) {
+        return;
+      }
+
+      // Check if there's a setPersistence call in the same function
+      AstNode? functionBody;
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionBody) {
+          functionBody = current;
+          break;
+        }
+        if (current is MethodDeclaration ||
+            current is FunctionDeclaration ||
+            current is FunctionExpression) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (functionBody == null) return;
+
+      // Look for setPersistence call before this sign-in
+      final String functionSource = functionBody.toSource();
+      if (functionSource.contains('setPersistence')) {
+        return; // Already handles persistence
+      }
+
+      // Check if file has web check (kIsWeb) - only relevant for web
+      final CompilationUnit? root = node.root as CompilationUnit?;
+      if (root != null) {
+        final String fullSource = root.toSource();
+        // If there's platform checking, assume developer is aware
+        if (fullSource.contains('kIsWeb') ||
+            fullSource.contains('Platform.isWeb') ||
+            fullSource.contains('defaultTargetPlatform')) {
+          return;
+        }
+      }
+
+      reporter.atNode(node.methodName, code);
+    });
+  }
+}

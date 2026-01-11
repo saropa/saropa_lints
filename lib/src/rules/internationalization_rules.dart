@@ -897,3 +897,139 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
     return false;
   }
 }
+
+/// Warns when intl package is used without initializing Intl.defaultLocale.
+///
+/// The intl package requires Intl.defaultLocale to be set for proper locale
+/// handling. Without initialization, date/number formatting and pluralization
+/// may use unexpected system defaults, causing inconsistent behavior across
+/// platforms and devices.
+///
+/// **BAD:**
+/// ```dart
+/// // Using intl without initialization
+/// void main() {
+///   runApp(MyApp());
+/// }
+///
+/// // Later in the code
+/// final formatted = DateFormat.yMd().format(date); // Uses unpredictable default
+/// final message = Intl.message('Hello'); // Locale unknown
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:intl/intl.dart';
+/// import 'package:intl/date_symbol_data_local.dart';
+///
+/// void main() async {
+///   Intl.defaultLocale = 'en_US';
+///   await initializeDateFormatting('en_US');
+///   runApp(MyApp());
+/// }
+///
+/// // Or with locale from device
+/// void main() async {
+///   final deviceLocale = Platform.localeName;
+///   Intl.defaultLocale = deviceLocale;
+///   await initializeDateFormatting(deviceLocale);
+///   runApp(MyApp());
+/// }
+/// ```
+class RequireIntlLocaleInitializationRule extends SaropaLintRule {
+  const RequireIntlLocaleInitializationRule() : super(code: _code);
+
+  /// Medium impact - affects formatting but not crashes.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_intl_locale_initialization',
+    problemMessage:
+        'Intl package used without Intl.defaultLocale initialization.',
+    correctionMessage:
+        'Initialize Intl.defaultLocale in main() before using DateFormat, NumberFormat, or Intl.message.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Intl APIs that require locale initialization.
+  static const Set<String> _intlTypes = <String>{
+    'DateFormat',
+    'NumberFormat',
+    'Intl',
+  };
+
+  /// Methods on Intl that require locale.
+  static const Set<String> _intlMethods = <String>{
+    'message',
+    'plural',
+    'select',
+    'gender',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track if we've seen Intl.defaultLocale assignment in this file
+    bool hasLocaleInit = false;
+    final List<AstNode> intlUsages = <AstNode>[];
+
+    // First pass: check for Intl.defaultLocale assignment
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      final String leftSource = node.leftHandSide.toSource();
+      if (leftSource == 'Intl.defaultLocale' ||
+          leftSource.endsWith('.defaultLocale')) {
+        hasLocaleInit = true;
+      }
+    });
+
+    // Check for initializeDateFormatting call (also indicates proper setup)
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName == 'initializeDateFormatting') {
+        hasLocaleInit = true;
+        return;
+      }
+
+      // Track Intl.message, Intl.plural, etc. usage
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'Intl') {
+        if (_intlMethods.contains(methodName)) {
+          intlUsages.add(node);
+        }
+      }
+    });
+
+    // Check for DateFormat, NumberFormat constructor usage
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (_intlTypes.contains(typeName)) {
+        intlUsages.add(node);
+      }
+    });
+
+    // Check for DateFormat.xxx() or NumberFormat.xxx() factory constructors
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier) {
+        final String targetName = target.name;
+        if (targetName == 'DateFormat' || targetName == 'NumberFormat') {
+          intlUsages.add(node);
+        }
+      }
+    });
+
+    // Report at the end of file processing if intl is used without init
+    context.addPostRunCallback(() {
+      if (!hasLocaleInit && intlUsages.isNotEmpty) {
+        // Report only the first usage to avoid noise
+        reporter.atNode(intlUsages.first, code);
+      }
+    });
+  }
+}

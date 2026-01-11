@@ -2711,3 +2711,339 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when Icon widget is used without a semanticLabel for accessibility.
+///
+/// Icons without semanticLabel are invisible to screen readers. Provide a
+/// semanticLabel to describe the icon's meaning or purpose.
+///
+/// **BAD:**
+/// ```dart
+/// Icon(Icons.add)
+/// Icon(Icons.home)
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Icon(Icons.add, semanticLabel: 'Add item')
+/// Icon(Icons.home, semanticLabel: 'Home')
+/// // Or for decorative icons that should be ignored:
+/// Semantics(
+///   excludeSemantics: true,
+///   child: Icon(Icons.star),
+/// )
+/// ```
+class RequireSemanticLabelIconsRule extends SaropaLintRule {
+  const RequireSemanticLabelIconsRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_semantic_label_icons',
+    problemMessage:
+        'Icon lacks semanticLabel. Screen readers cannot describe this icon.',
+    correctionMessage:
+        "Add semanticLabel: 'description' to describe the icon's meaning.",
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+      if (constructorName != 'Icon') return;
+
+      bool hasSemanticLabel = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'semanticLabel') {
+            hasSemanticLabel = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasSemanticLabel) {
+        // Check if wrapped in ExcludeSemantics or Semantics with excludeSemantics: true
+        if (!_hasSemanticExclusion(node)) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    });
+  }
+
+  bool _hasSemanticExclusion(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+
+    while (current != null && depth < 5) {
+      if (current is InstanceCreationExpression) {
+        final String? typeName = current.constructorName.type.element?.name;
+
+        // Check for ExcludeSemantics widget
+        if (typeName == 'ExcludeSemantics') {
+          return true;
+        }
+
+        // Check for Semantics with excludeSemantics: true
+        if (typeName == 'Semantics') {
+          for (final Expression arg in current.argumentList.arguments) {
+            if (arg is NamedExpression &&
+                arg.name.label.name == 'excludeSemantics') {
+              if (arg.expression is BooleanLiteral) {
+                if ((arg.expression as BooleanLiteral).value) {
+                  return true;
+                }
+              }
+            }
+          }
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+}
+
+/// Warns when Image widget lacks semanticLabel or excludeFromSemantics.
+///
+/// Images need descriptions for screen reader users. Either provide a
+/// semanticLabel describing the image content, or explicitly mark decorative
+/// images with excludeFromSemantics: true.
+///
+/// **BAD:**
+/// ```dart
+/// Image.network('https://example.com/photo.jpg')
+/// Image.asset('assets/logo.png')
+/// Image(image: AssetImage('assets/icon.png'))
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Image.network(
+///   'https://example.com/photo.jpg',
+///   semanticLabel: 'Profile photo of user',
+/// )
+/// // For decorative images:
+/// Image.asset(
+///   'assets/decoration.png',
+///   excludeFromSemantics: true,
+/// )
+/// ```
+class RequireAccessibleImagesRule extends SaropaLintRule {
+  const RequireAccessibleImagesRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_accessible_images',
+    problemMessage:
+        'Image lacks accessibility handling. Screen readers cannot describe it.',
+    correctionMessage:
+        "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check Image constructor calls
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+      if (constructorName != 'Image') return;
+
+      if (!_hasAccessibilityHandling(node.argumentList.arguments)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+
+    // Check Image.network, Image.asset, Image.file, Image.memory factory methods
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      final Expression? target = node.target;
+
+      if (target is! SimpleIdentifier || target.name != 'Image') return;
+      if (!<String>{'network', 'asset', 'file', 'memory'}
+          .contains(methodName)) {
+        return;
+      }
+
+      if (!_hasAccessibilityHandling(node.argumentList.arguments)) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+
+  bool _hasAccessibilityHandling(NodeList<Expression> arguments) {
+    bool hasSemanticLabel = false;
+    bool hasExcludeFromSemantics = false;
+
+    for (final Expression arg in arguments) {
+      if (arg is NamedExpression) {
+        final String name = arg.name.label.name;
+        if (name == 'semanticLabel') {
+          hasSemanticLabel = true;
+        }
+        if (name == 'excludeFromSemantics') {
+          if (arg.expression is BooleanLiteral) {
+            hasExcludeFromSemantics = (arg.expression as BooleanLiteral).value;
+          }
+        }
+      }
+    }
+
+    return hasSemanticLabel || hasExcludeFromSemantics;
+  }
+}
+
+/// Warns when video or audio widgets have autoPlay: true enabled.
+///
+/// Auto-playing media can be disorienting and problematic for users with
+/// vestibular disorders, cognitive disabilities, or those using screen readers.
+/// Users should have control over when media plays.
+///
+/// **BAD:**
+/// ```dart
+/// VideoPlayer(
+///   autoPlay: true,
+///   ...
+/// )
+/// AudioPlayer(
+///   autoPlay: true,
+///   ...
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// VideoPlayer(
+///   autoPlay: false,
+///   ...
+/// )
+/// // Or without autoPlay (defaults to false in most players)
+/// VideoPlayer(...)
+/// ```
+class AvoidAutoPlayMediaRule extends SaropaLintRule {
+  const AvoidAutoPlayMediaRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_auto_play_media',
+    problemMessage:
+        'Auto-playing media can be disorienting for users with disabilities.',
+    correctionMessage:
+        'Set autoPlay: false and let users control when media plays.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  // Common video/audio player widget names
+  static const Set<String> _mediaWidgets = <String>{
+    'VideoPlayer',
+    'VideoPlayerController',
+    'AudioPlayer',
+    'AudioPlayerController',
+    'Chewie',
+    'ChewieController',
+    'BetterPlayer',
+    'BetterPlayerController',
+    'FlickVideoPlayer',
+    'FlickManager',
+    'VlcPlayer',
+    'VlcPlayerController',
+    'PodVideoPlayer',
+    'PodPlayerController',
+    'JustAudioPlayer',
+    'AssetsAudioPlayer',
+  };
+
+  // Common parameter names for autoplay functionality
+  static const Set<String> _autoPlayParams = <String>{
+    'autoPlay',
+    'autoplay',
+    'autoStart',
+    'autostart',
+    'playOnInit',
+    'playAutomatically',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check if this is a media-related widget (by type name or constructor name)
+      final bool isMediaWidget = _mediaWidgets.contains(constructorName) ||
+          _mediaWidgets.contains(typeName) ||
+          typeName.toLowerCase().contains('video') ||
+          typeName.toLowerCase().contains('audio') ||
+          typeName.toLowerCase().contains('player');
+
+      if (!isMediaWidget) return;
+
+      // Check for autoPlay parameter set to true
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
+          if (_autoPlayParams.contains(paramName)) {
+            // Check if value is true
+            final Expression value = arg.expression;
+            if (value is BooleanLiteral && value.value) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+
+    // Also check method invocations for controller configurations
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check common configuration methods
+      if (methodName == 'initialize' ||
+          methodName == 'init' ||
+          methodName == 'configure' ||
+          methodName == 'setConfig') {
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression) {
+            final String paramName = arg.name.label.name;
+            if (_autoPlayParams.contains(paramName)) {
+              final Expression value = arg.expression;
+              if (value is BooleanLiteral && value.value) {
+                reporter.atNode(arg, code);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}

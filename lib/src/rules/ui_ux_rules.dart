@@ -1192,3 +1192,127 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when WebView lacks a progress indicator for page loading.
+///
+/// WebView page loads can take significant time. Without a progress indicator,
+/// users may think the app is frozen or broken. Show loading state while
+/// content loads.
+///
+/// **BAD:**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+/// ) // No loading feedback!
+///
+/// InAppWebView(
+///   initialUrlRequest: URLRequest(url: Uri.parse(url)),
+/// ) // User sees blank page during load
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Stack(
+///   children: [
+///     WebView(
+///       initialUrl: 'https://example.com',
+///       onProgress: (progress) => setState(() => _progress = progress),
+///       onPageFinished: (_) => setState(() => _isLoading = false),
+///     ),
+///     if (_isLoading)
+///       LinearProgressIndicator(value: _progress / 100),
+///   ],
+/// )
+///
+/// InAppWebView(
+///   initialUrlRequest: URLRequest(url: Uri.parse(url)),
+///   onProgressChanged: (controller, progress) {
+///     setState(() => _progress = progress / 100);
+///   },
+///   onLoadStop: (controller, url) {
+///     setState(() => _isLoading = false);
+///   },
+/// )
+/// ```
+class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
+  const RequireWebViewProgressIndicatorRule() : super(code: _code);
+
+  /// Missing loading indicator creates poor UX.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_webview_progress_indicator',
+    problemMessage:
+        'WebView without progress indicator. Users see no loading feedback.',
+    correctionMessage:
+        'Add onProgress/onProgressChanged callback to show loading state.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _webViewTypes = <String>{
+    'WebView',
+    'WebViewWidget',
+    'InAppWebView',
+    'WebViewX',
+  };
+
+  static const Set<String> _progressParams = <String>{
+    'onprogress',
+    'onprogresschanged',
+    'onloadprogress',
+    'progressindicator',
+    'loadingbuilder',
+    'onpagestarted',
+    'onloadstart',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_webViewTypes.contains(typeName)) return;
+
+      // Check for progress-related callbacks
+      bool hasProgressIndicator = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name.toLowerCase();
+          if (_progressParams.contains(paramName)) {
+            hasProgressIndicator = true;
+            break;
+          }
+        }
+      }
+
+      // Also check if the WebView is wrapped in a Stack (common pattern)
+      AstNode? parent = node.parent;
+      while (parent != null) {
+        if (parent is InstanceCreationExpression) {
+          final String parentType =
+              parent.constructorName.type.name.lexeme;
+          if (parentType == 'Stack') {
+            // Assume Stack contains loading indicator
+            hasProgressIndicator = true;
+            break;
+          }
+        }
+        if (parent is MethodDeclaration || parent is FunctionDeclaration) {
+          break;
+        }
+        parent = parent.parent;
+      }
+
+      if (!hasProgressIndicator) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

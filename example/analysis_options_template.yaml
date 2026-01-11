@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.4)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.7)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1189+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~1248+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -88,7 +88,7 @@ custom_lint:
     #   - recommended    : ~150 rules (default) ← START HERE
     #   - professional   : ~350 rules (strict)
     #   - comprehensive  : ~700 rules (very strict)
-    #   - insanity       : ~1184+ rules (everything)
+    #   - insanity       : ~1248+ rules (everything)
     tier: recommended
 
   # ===========================================================================

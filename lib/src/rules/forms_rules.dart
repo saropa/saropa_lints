@@ -1493,3 +1493,257 @@ class _AddKeyboardHandlingCommentFix extends DartFix {
     });
   }
 }
+
+/// Warns when Form widget doesn't have autovalidateMode parameter.
+///
+/// Forms should specify how validation is triggered for consistent UX.
+/// The autovalidateMode parameter controls when the form fields validate.
+///
+/// **BAD:**
+/// ```dart
+/// Form(
+///   key: _formKey,
+///   child: TextFormField(...),
+/// )
+/// // Uses default AutovalidateMode.disabled - no automatic validation
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Form(
+///   key: _formKey,
+///   autovalidateMode: AutovalidateMode.onUserInteraction,
+///   child: TextFormField(...),
+/// )
+/// // Validates when user interacts with fields
+/// ```
+class RequireFormAutoValidateModeRule extends SaropaLintRule {
+  const RequireFormAutoValidateModeRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_form_auto_validate_mode',
+    problemMessage: 'Form should specify autovalidateMode for consistent UX.',
+    correctionMessage:
+        'Add autovalidateMode: AutovalidateMode.onUserInteraction.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Form') return;
+
+      // Check if autovalidateMode argument exists
+      bool hasAutovalidateMode = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'autovalidateMode') {
+          hasAutovalidateMode = true;
+          break;
+        }
+      }
+
+      if (!hasAutovalidateMode) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddAutoValidateModeFix()];
+}
+
+class _AddAutoValidateModeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add autovalidateMode: AutovalidateMode.onUserInteraction',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final ArgumentList args = node.argumentList;
+        if (args.arguments.isEmpty) {
+          builder.addSimpleInsertion(
+            args.leftParenthesis.end,
+            'autovalidateMode: AutovalidateMode.onUserInteraction',
+          );
+        } else {
+          builder.addSimpleInsertion(
+            args.arguments.last.end,
+            ', autovalidateMode: AutovalidateMode.onUserInteraction',
+          );
+        }
+      });
+    });
+  }
+}
+
+/// Warns when TextField or TextFormField lacks autofillHints parameter.
+///
+/// The autofillHints parameter enables system autofill to help users complete
+/// forms faster. This improves UX especially for common fields like email,
+/// password, name, and address.
+///
+/// **BAD:**
+/// ```dart
+/// TextFormField(
+///   decoration: InputDecoration(labelText: 'Email'),
+/// )
+/// // User must type email manually
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextFormField(
+///   decoration: InputDecoration(labelText: 'Email'),
+///   autofillHints: [AutofillHints.email],
+/// )
+/// // System can suggest saved email addresses
+/// ```
+class RequireAutofillHintsRule extends SaropaLintRule {
+  const RequireAutofillHintsRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_autofill_hints',
+    problemMessage:
+        'Form field should have autofillHints for better user experience.',
+    correctionMessage:
+        'Add autofillHints: [AutofillHints.email] or appropriate hint.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _textFieldTypes = <String>{
+    'TextField',
+    'TextFormField',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_textFieldTypes.contains(typeName)) return;
+
+      // Check for autofillHints parameter
+      bool hasAutofillHints = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'autofillHints') {
+          hasAutofillHints = true;
+          break;
+        }
+      }
+
+      if (!hasAutofillHints) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when form fields lack onFieldSubmitted handler.
+///
+/// The onFieldSubmitted callback is triggered when the user presses the
+/// keyboard action button (e.g., Done, Next). This should be used to move
+/// focus to the next field or submit the form for better UX.
+///
+/// **BAD:**
+/// ```dart
+/// TextFormField(
+///   decoration: InputDecoration(labelText: 'Email'),
+///   textInputAction: TextInputAction.next,
+/// )
+/// // Pressing "Next" does nothing
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextFormField(
+///   decoration: InputDecoration(labelText: 'Email'),
+///   textInputAction: TextInputAction.next,
+///   onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
+/// )
+/// // Pressing "Next" moves focus to password field
+/// ```
+class PreferOnFieldSubmittedRule extends SaropaLintRule {
+  const PreferOnFieldSubmittedRule() : super(code: _code);
+
+  /// Minor improvement. Track for later review.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_on_field_submitted',
+    problemMessage:
+        'Form field should have onFieldSubmitted to handle keyboard action.',
+    correctionMessage:
+        'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _textFieldTypes = <String>{
+    'TextField',
+    'TextFormField',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_textFieldTypes.contains(typeName)) return;
+
+      // Check for onFieldSubmitted or onSubmitted parameter
+      bool hasOnSubmitted = false;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'onFieldSubmitted' || name == 'onSubmitted') {
+            hasOnSubmitted = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasOnSubmitted) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

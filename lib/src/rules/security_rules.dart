@@ -4112,3 +4112,312 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// WebView Security Rules
+// =============================================================================
+
+/// Warns when WebView is created without explicitly disabling JavaScript.
+///
+/// Many WebViews don't need JavaScript, and leaving it enabled increases
+/// the attack surface for XSS vulnerabilities. Explicitly disable JavaScript
+/// when it's not required.
+///
+/// **BAD:**
+/// ```dart
+/// WebView(initialUrl: 'https://example.com') // JS enabled by default!
+///
+/// InAppWebView(
+///   initialSettings: InAppWebViewSettings(
+///     javaScriptEnabled: true, // Explicitly enabling JS
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+///   javascriptMode: JavascriptMode.disabled, // Explicitly disabled
+/// )
+///
+/// // Or if JS is needed, document why:
+/// WebView(
+///   initialUrl: trustedUrl, // Only trusted content
+///   javascriptMode: JavascriptMode.unrestricted, // Required for X feature
+///   navigationDelegate: validateNavigation, // With navigation validation
+/// )
+/// ```
+class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
+  const PreferWebViewJavaScriptDisabledRule() : super(code: _code);
+
+  /// JavaScript in WebView increases XSS attack surface.
+  /// Review each occurrence for security implications.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_webview_javascript_disabled',
+    problemMessage:
+        'WebView without explicit JavaScript setting. Disable JS if not needed.',
+    correctionMessage:
+        'Add javascriptMode: JavascriptMode.disabled or javaScriptEnabled: false.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _webViewTypes = <String>{
+    'WebView',
+    'WebViewWidget',
+    'InAppWebView',
+    'WebViewX',
+    'FlutterWebView',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (!_webViewTypes.contains(typeName)) return;
+
+      // Check for JavaScript-related parameters
+      bool hasJavaScriptSetting = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name.toLowerCase();
+          if (paramName == 'javascriptmode' ||
+              paramName == 'javascriptenabled' ||
+              paramName == 'javaScriptEnabled'.toLowerCase()) {
+            hasJavaScriptSetting = true;
+            break;
+          }
+          // Check for settings objects that might contain JS settings
+          if (paramName == 'initialsettings' ||
+              paramName == 'settings' ||
+              paramName == 'options') {
+            final String argSource = arg.expression.toSource().toLowerCase();
+            if (argSource.contains('javascript')) {
+              hasJavaScriptSetting = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!hasJavaScriptSetting) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when WebView allows loading mixed (HTTP) content on HTTPS pages.
+///
+/// Loading insecure HTTP content in a secure HTTPS context bypasses
+/// encryption and enables man-in-the-middle attacks.
+///
+/// **BAD:**
+/// ```dart
+/// InAppWebView(
+///   initialSettings: InAppWebViewSettings(
+///     mixedContentMode: MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+///   ),
+/// )
+///
+/// AndroidWebViewController()
+///   ..setJavaScriptMode(JavaScriptMode.unrestricted)
+///   ..loadRequest(Uri.parse(url))
+///   ..enableDebugging(true)
+///   ..setMediaPlaybackRequiresUserGesture(true)
+///   ..setBackgroundColor(Colors.white);
+/// // Missing: setMixedContentMode
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// InAppWebView(
+///   initialSettings: InAppWebViewSettings(
+///     mixedContentMode: MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
+///   ),
+/// )
+/// ```
+class AvoidWebViewInsecureContentRule extends SaropaLintRule {
+  const AvoidWebViewInsecureContentRule() : super(code: _code);
+
+  /// Mixed content bypasses HTTPS encryption.
+  /// Critical security vulnerability.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_webview_insecure_content',
+    problemMessage:
+        'WebView configured to allow mixed (insecure) content. Security risk.',
+    correctionMessage:
+        'Set mixedContentMode to MIXED_CONTENT_NEVER_ALLOW or never.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+
+      // Check for InAppWebViewSettings or similar
+      if (typeName != 'InAppWebViewSettings' &&
+          typeName != 'AndroidInAppWebViewOptions' &&
+          typeName != 'WebSettings') {
+        return;
+      }
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name.toLowerCase();
+          if (paramName == 'mixedcontentmode') {
+            final String value = arg.expression.toSource().toLowerCase();
+            if (value.contains('always_allow') ||
+                value.contains('alwaysallow') ||
+                value.contains('compatibility_mode') ||
+                value.contains('compatibilitymode')) {
+              reporter.atNode(arg, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+
+    // Also check for method invocations
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name.toLowerCase();
+
+      if (methodName == 'setmixedcontentmode' ||
+          methodName == 'allowmixedcontent') {
+        for (final Expression arg in node.argumentList.arguments) {
+          final String argSource = arg.toSource().toLowerCase();
+          if (argSource.contains('always') ||
+              argSource.contains('compatibility')) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when WebView lacks error handling for resource loading failures.
+///
+/// WebViews can fail to load resources due to network issues, invalid URLs,
+/// SSL errors, or blocked content. Without error handling, users see blank
+/// pages or confusing behavior.
+///
+/// **BAD:**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+/// ) // No error handling!
+///
+/// InAppWebView(
+///   initialUrlRequest: URLRequest(url: Uri.parse(url)),
+/// ) // No onLoadError or onReceivedError
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+///   onWebResourceError: (error) {
+///     showErrorDialog(error.description);
+///   },
+/// )
+///
+/// InAppWebView(
+///   initialUrlRequest: URLRequest(url: Uri.parse(url)),
+///   onLoadError: (controller, url, code, message) {
+///     showErrorPage(message);
+///   },
+///   onReceivedError: (controller, request, error) {
+///     handleError(error);
+///   },
+/// )
+/// ```
+class RequireWebViewErrorHandlingRule extends SaropaLintRule {
+  const RequireWebViewErrorHandlingRule() : super(code: _code);
+
+  /// Missing error handling creates poor UX on network failures.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_webview_error_handling',
+    problemMessage:
+        'WebView without error handler. Network failures show blank page.',
+    correctionMessage:
+        'Add onWebResourceError, onLoadError, or onReceivedError callback.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _webViewTypes = <String>{
+    'WebView',
+    'WebViewWidget',
+    'InAppWebView',
+    'WebViewX',
+  };
+
+  static const Set<String> _errorHandlerParams = <String>{
+    'onwebresourceerror',
+    'onloaderror',
+    'onreceivederror',
+    'onreceivedservertrust',
+    'onerror',
+    'onhttperror',
+    'onreceivedservererror',
+    'onreceivedsslerror',
+    'errorbuilder',
+    'onpageerror',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (!_webViewTypes.contains(typeName)) return;
+
+      // Check for error handling callbacks
+      bool hasErrorHandler = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name.toLowerCase();
+          if (_errorHandlerParams.contains(paramName)) {
+            hasErrorHandler = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasErrorHandler) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
