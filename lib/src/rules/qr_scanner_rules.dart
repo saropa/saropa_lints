@@ -233,8 +233,7 @@ class RequireQrContentValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_qr_content_validation',
-    problemMessage:
-        'QR scan result used without validation. Security risk.',
+    problemMessage: 'QR scan result used without validation. Security risk.',
     correctionMessage:
         'Validate URL scheme and optionally domain before using scanned content.',
     errorSeverity: DiagnosticSeverity.WARNING,
