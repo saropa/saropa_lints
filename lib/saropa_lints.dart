@@ -1282,7 +1282,6 @@ const List<LintRule> _allRules = <LintRule>[
   RequireStreamControllerCloseRule(),
   AvoidMultipleStreamListenersRule(),
   RequireStreamErrorHandlingRule(),
-  AvoidFutureBuilderRebuildRule(),
   RequireFutureTimeoutRule(),
 
   // Part 5 - go_router Navigation rules
