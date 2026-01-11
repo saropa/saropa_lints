@@ -1,7 +1,7 @@
 // ignore_for_file: unused_local_variable, prefer_const_constructors
 // Test fixture for prefer_center_over_align rule
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 void testPreferCenterOverAlign() {
   // BAD: Align with Alignment.center

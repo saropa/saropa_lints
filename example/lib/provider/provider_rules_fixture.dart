@@ -2,8 +2,7 @@
 // ignore_for_file: unused_element, avoid_print
 // Test fixture for Provider package rules
 
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import '../flutter_mocks.dart';
 
 // Mock service classes for testing
 class AuthService {
