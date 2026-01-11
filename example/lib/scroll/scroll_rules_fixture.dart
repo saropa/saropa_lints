@@ -2,7 +2,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 // Test fixture for scroll and list rules
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 // =========================================================================
 // avoid_shrinkwrap_in_scrollview

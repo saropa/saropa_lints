@@ -1,7 +1,7 @@
 // ignore_for_file: unused_local_variable, prefer_const_constructors
 // Test fixture for Container widget replacement rules
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 void testPreferAlignOverContainer() {
   // BAD: Container with only alignment

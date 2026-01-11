@@ -2,7 +2,7 @@
 // ignore_for_file: prefer_const_constructors
 // Test fixture for accessibility rules (Plan Group C)
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 // =========================================================================
 // require_avatar_alt_text (C1)

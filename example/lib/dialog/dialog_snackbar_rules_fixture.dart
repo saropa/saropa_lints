@@ -2,7 +2,7 @@
 // ignore_for_file: prefer_const_constructors
 // Test fixture for dialog and snackbar rules (Plan Group D)
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 // =========================================================================
 // require_snackbar_duration (D1)
