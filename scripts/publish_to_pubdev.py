@@ -68,7 +68,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.11"
+SCRIPT_VERSION = "3.12"
 
 
 # =============================================================================
@@ -672,16 +672,33 @@ def run_tests(project_dir: Path) -> bool:
             print_warning("Could not install example dependencies, skipping lint tests")
             return True
 
-        # Run custom_lint
-        result = run_command(
+        # Run custom_lint (capture output since fixtures intentionally trigger lints)
+        print_info("Running custom_lint tests...")
+        print_colored("      $ dart run custom_lint", Color.WHITE)
+
+        use_shell = get_shell_mode()
+        result = subprocess.run(
             ["dart", "run", "custom_lint"],
-            example_dir,
-            "Running custom_lint tests",
-            allow_failure=True
+            cwd=example_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell
         )
-        if result.returncode != 0:
-            print_warning("Custom lint tests found issues (this may be expected for expect_lint tests)")
-            # Don't fail on custom_lint issues - they may be expected test failures
+
+        # Count issues by severity from output
+        output = result.stdout + result.stderr
+        error_count = output.count(" • ERROR")
+        warning_count = output.count(" • WARNING")
+        info_count = output.count(" • INFO")
+        total_count = error_count + warning_count + info_count
+
+        if total_count > 0:
+            print_success(f"Custom lint tests completed: {total_count} issues found ({error_count} errors, {warning_count} warnings, {info_count} info)")
+            print_colored("      (These are expected - fixture files intentionally trigger lints)", Color.WHITE)
+        else:
+            print_success("Custom lint tests completed: no issues found")
+
+        # Don't fail on custom_lint issues - they are expected test results
     else:
         print_warning("No example directory with pubspec.yaml found, skipping custom_lint tests")
 
@@ -1059,18 +1076,70 @@ def git_commit_and_push(project_dir: Path, version: str, branch: str) -> bool:
         if result.returncode != 0:
             return False
 
-        # Push
-        result = run_command(
-            ["git", "push", "origin", branch],
-            project_dir,
-            f"Pushing to {branch}"
-        )
-        if result.returncode != 0:
+        # Push (with retry on rejection)
+        if not _push_with_retry(project_dir, branch):
             return False
     else:
         print_warning("No changes to commit. Skipping commit step.")
 
     return True
+
+
+def _push_with_retry(project_dir: Path, branch: str, max_retries: int = 2) -> bool:
+    """Push to remote, pulling and retrying if rejected due to remote changes."""
+    use_shell = get_shell_mode()
+
+    for attempt in range(max_retries + 1):
+        print_info(f"Pushing to {branch}...")
+        print_colored(f"      $ git push origin {branch}", Color.WHITE)
+
+        result = subprocess.run(
+            ["git", "push", "origin", branch],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell
+        )
+
+        if result.returncode == 0:
+            print_success(f"Pushing to {branch} completed")
+            return True
+
+        # Check if push was rejected due to remote changes
+        output = (result.stdout or "") + (result.stderr or "")
+        if "rejected" in output and ("fetch first" in output or "non-fast-forward" in output):
+            if attempt < max_retries:
+                print_warning("Push rejected - remote has new changes. Pulling and retrying...")
+
+                # Pull with rebase to integrate remote changes
+                pull_result = subprocess.run(
+                    ["git", "pull", "--rebase", "origin", branch],
+                    cwd=project_dir,
+                    capture_output=True,
+                    text=True,
+                    shell=use_shell
+                )
+
+                if pull_result.returncode != 0:
+                    print_error("Failed to pull remote changes:")
+                    if pull_result.stderr:
+                        print_colored(pull_result.stderr, Color.RED)
+                    print_info("Resolve conflicts manually and try again.")
+                    return False
+
+                print_success("Pulled and rebased remote changes")
+                continue
+            else:
+                print_error("Push failed after multiple attempts. Remote may have conflicting changes.")
+                return False
+        else:
+            # Some other push error
+            print_error(f"Push failed (exit code {result.returncode})")
+            if output:
+                print_colored(output, Color.RED)
+            return False
+
+    return False
 
 
 def create_git_tag(project_dir: Path, version: str) -> bool:
