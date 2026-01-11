@@ -37,8 +37,8 @@ void testPreferMultiBlocProvider() {
 
 void testAvoidInstantiatingInBlocValueProvider() {
   // BAD: Creating new instance in BlocProvider.value
-  // expect_lint: avoid_instantiating_in_bloc_value_provider
   final bad1 = BlocProvider.value(
+    // expect_lint: avoid_instantiating_in_bloc_value_provider
     value: AuthBloc(), // New instance - won't be closed!
     child: Container(),
   );
@@ -62,8 +62,8 @@ void testAvoidExistingInstancesInBlocProvider() {
   final existingBloc = AuthBloc();
 
   // BAD: Returning existing variable from create
-  // expect_lint: avoid_existing_instances_in_bloc_provider
   final bad1 = BlocProvider<AuthBloc>(
+    // expect_lint: avoid_existing_instances_in_bloc_provider
     create: (_) => existingBloc, // Will close existing bloc!
     child: Container(),
   );

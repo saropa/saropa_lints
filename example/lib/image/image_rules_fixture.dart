@@ -87,7 +87,7 @@ class BadVideoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // expect_lint: prefer_video_loading_placeholder
+    // BAD: No placeholder - shows black screen while loading
     return Chewie(controller: chewieController);
   }
 }

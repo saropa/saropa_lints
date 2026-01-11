@@ -40,6 +40,11 @@ void testCryptoRules() {
   // expect_lint: avoid_hardcoded_encryption_keys
   final key4 = CipherKey.fromUtf8('cipher-key-value-123');
 
+  // BAD: Named constructor with hardcoded key (encrypt package style)
+  // The encrypt package uses Key.fromUtf8() as a named constructor, not static method.
+  // expect_lint: avoid_hardcoded_encryption_keys
+  final key5 = Key.fromBase64('c2VjcmV0LWtleS1iYXNlNjQ=');
+
   // GOOD: Key loaded from variable (not hardcoded literal)
   final keyFromEnv = const String.fromEnvironment('ENCRYPTION_KEY');
   final goodKey = Key.fromUtf8(keyFromEnv);

@@ -1303,6 +1303,8 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
 /// When keyboard appears, TextFields at the bottom can be hidden.
 /// Use viewInsets or resizeToAvoidBottomInset to handle this.
 ///
+/// **Quick fix available:** Adds a comment for manual keyboard handling.
+///
 /// **BAD:**
 /// ```dart
 /// Scaffold(
@@ -1397,6 +1399,15 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
             return;
           }
         }
+        // Check if the enclosing CLASS has 'Dialog' in its name.
+        // This handles widgets designed for dialog use, e.g., _DialogContent,
+        // _DialogOrganizationAdd, where the class itself is dialog content.
+        if (current is ClassDeclaration) {
+          final className = current.name.lexeme;
+          if (className.toLowerCase().contains('dialog')) {
+            return;
+          }
+        }
         if (current is MethodDeclaration) {
           break;
         }
@@ -1411,25 +1422,74 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
         return;
       }
 
-      // Check the ENTIRE FILE for viewInsets handling, not just the current method.
-      // This handles cases where a TextField is in a nested widget class (e.g., ProgressWrapper)
-      // but the parent screen class (e.g., _ProgressDesignerScreenState) handles viewInsets.
-      // Static analysis can't follow widget composition at runtime, so we check if ANY
-      // code in the same file handles viewInsets - if so, the developer is likely aware.
+      // Check the ENTIRE FILE for various dialog-related patterns.
+      // Static analysis can't follow widget composition at runtime, so we check
+      // if ANY code in the same file suggests dialog usage.
       current = node.parent;
       while (current != null) {
         if (current is CompilationUnit) {
           final fileSource = current.toSource().toLowerCase();
+
+          // Skip if file handles viewInsets, resize behavior, or Scrollable.ensureVisible
           if (fileSource.contains('viewinsets') ||
-              fileSource.contains('resizetobottominset')) {
+              fileSource.contains('resizetobottominset') ||
+              fileSource.contains('ensurevisible')) {
             return;
           }
+
+          // Skip if file contains showDialog calls - widgets in such files
+          // are likely designed as dialog content. This handles cases where
+          // a widget class is defined alongside its showDialog wrapper function.
+          if (fileSource.contains('showdialog') ||
+              fileSource.contains('showdialogcommon')) {
+            return;
+          }
+
           break;
         }
         current = current.parent;
       }
 
+      // Also skip if file path contains 'dialog' - files in dialog/ folders
+      // or with 'dialog' in name are likely dialog components.
+      final filePath = resolver.path.toLowerCase();
+      if (filePath.contains('dialog')) {
+        return;
+      }
+
       reporter.atNode(node.constructorName, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddKeyboardHandlingCommentFix()];
+}
+
+class _AddKeyboardHandlingCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TextField' && typeName != 'TextFormField') return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add keyboard handling comment',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Wrap parent in SingleChildScrollView or use MediaQuery.viewInsets\n              ',
+        );
+      });
     });
   }
 }

@@ -11,6 +11,12 @@ custom_lint:
   saropa_lints:
     tier: recommended  # essential | recommended | professional | comprehensive | insanity
   rules:
+    # Explicitly enable widget preference rules for testing
+    - prefer_sized_box_square: true
+    - prefer_center_over_align: true
+    - prefer_align_over_container: true
+    - prefer_padding_over_container: true
+    - prefer_constrained_box_over_container: true
     # Enable for testing fixture files
     - prefer_async_callback: true
     # Enable debug rules for testing (they're in higher tiers)
@@ -34,3 +40,29 @@ custom_lint:
     # Disable general disposal rules - fixtures test specific disposal rules
     - require_dispose: false
     - avoid_undisposed_instances: false
+    # Enable rules from higher tiers for testing
+    - extend_equatable: true
+    - prefer_equatable_mixin: true
+    - avoid_image_rebuild_on_scroll: true
+    - require_dialog_result_handling: true
+    - avoid_snackbar_queue_buildup: true
+    - prefer_uuid_v4: true
+    # Explicitly enable accessibility rules
+    - require_avatar_alt_text: true
+    - require_badge_semantics: true
+    - require_badge_count_limit: true
+    - require_avatar_fallback: true
+    - prefer_video_loading_placeholder: true
+    # Explicitly enable state management rules
+    - prefer_multi_bloc_provider: true
+    - prefer_correct_bloc_provider: true
+    - prefer_multi_provider: true
+    # Explicitly enable dialog/snackbar rules
+    - require_snackbar_duration: true
+    - require_dialog_barrier_dismissible: true
+    # Explicitly enable package-specific rules
+    - require_google_signin_error_handling: true
+    - require_supabase_error_handling: true
+    - require_workmanager_constraints: true
+    - require_svg_error_handler: true
+    - require_google_fonts_fallback: true
