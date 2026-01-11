@@ -96,6 +96,7 @@ const Set<String> essentialRules = <String>{
 
   // Equatable (Essential - missing fields cause equality bugs)
   'list_all_equatable_fields',
+  'avoid_mutable_field_in_equatable', // Mutable fields break equality
 
   // Architecture
   'avoid_circular_dependencies',
@@ -113,6 +114,7 @@ const Set<String> essentialRules = <String>{
   'avoid_swallowing_exceptions',
   'avoid_losing_stack_trace',
   'no_empty_block',
+  'avoid_print_error', // Print for error logging loses errors in production
 
   // Collection/Loop Safety (Phase 2)
   'avoid_unreachable_for_loop',
@@ -240,6 +242,7 @@ const Set<String> essentialRules = <String>{
   'require_hive_type_adapter',
   'require_hive_encryption_key_secure',
   'require_type_adapter_registration', // ERROR - adapter not registered before openBox
+  'avoid_hive_field_index_reuse', // ERROR - data corruption from duplicate indices
 
   // Part 5 - HTTP/Dio Rules (Essential)
   'require_dio_timeout',
@@ -384,6 +387,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_listview_children_for_large_lists',
   'avoid_refresh_without_await',
   'avoid_multiple_autofocus',
+  'require_key_for_collection', // Widgets in list builders need keys
 
   // JSON/DateTime Error Handling
   'require_json_decode_try_catch',
@@ -596,6 +600,12 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_responsive_breakpoints',
   'require_currency_formatting_locale',
   'require_graphql_operation_names',
+
+  // Internationalization - Format Rules (Recommended)
+  'require_intl_date_format_locale', // DateFormat without locale varies by device
+  'require_number_format_locale', // NumberFormat without locale varies by device
+  'avoid_manual_date_formatting', // Manual date formatting is error-prone
+  'require_intl_currency_format', // Manual currency formatting ignores locale
 
   // Bluetooth & Hardware (Plan Group H)
   'avoid_bluetooth_scan_without_timeout',
@@ -1116,6 +1126,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_sqflite_batch',
   'require_sqflite_error_handling',
   'require_sqflite_close',
+  'avoid_sqflite_reserved_words', // SQLite reserved words cause syntax errors
   'require_hive_box_close',
   'prefer_hive_encryption',
   'require_hive_database_close', // WARNING - database opened without close method

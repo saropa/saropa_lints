@@ -141,6 +141,8 @@ class ExtendEquatableRule extends SaropaLintRule {
 ///   List<Object?> get props => [name, age, email]; // All fields included
 /// }
 /// ```
+///
+/// Alias: require_props_consistency
 class ListAllEquatableFieldsRule extends SaropaLintRule {
   const ListAllEquatableFieldsRule() : super(code: _code);
 
@@ -1150,7 +1152,8 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
           // Check if fields are final
           if (!member.fields.isFinal && !member.fields.isConst) {
             // Report each non-final field
-            for (final VariableDeclaration variable in member.fields.variables) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
               reporter.atNode(variable, code);
             }
           }
@@ -1178,4 +1181,3 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
     return false;
   }
 }
-

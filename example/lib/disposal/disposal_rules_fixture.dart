@@ -700,3 +700,123 @@ class _GoodNoFalsePositivesWidgetState
   @override
   Widget build(BuildContext context) => Container();
 }
+
+// =========================================================================
+// avoid_hive_field_index_reuse
+// =========================================================================
+
+// Mock Hive annotations
+class HiveType {
+  final int typeId;
+  const HiveType({required this.typeId});
+}
+
+class HiveField {
+  final int index;
+  const HiveField(this.index);
+}
+
+abstract class HiveObject {}
+
+// BAD: Duplicate @HiveField indices
+@HiveType(typeId: 0)
+class BadUserWithDuplicateIndices extends HiveObject {
+  // expect_lint: avoid_hive_field_index_reuse
+  @HiveField(0)
+  final String name;
+
+  // expect_lint: avoid_hive_field_index_reuse
+  @HiveField(0) // Duplicate index!
+  final String email;
+
+  @HiveField(1)
+  final int age;
+
+  BadUserWithDuplicateIndices(this.name, this.email, this.age);
+}
+
+// BAD: Multiple duplicates
+@HiveType(typeId: 1)
+class BadProductWithDuplicates extends HiveObject {
+  // expect_lint: avoid_hive_field_index_reuse
+  @HiveField(0)
+  final String id;
+
+  // expect_lint: avoid_hive_field_index_reuse
+  @HiveField(0) // Duplicate!
+  final String sku;
+
+  // expect_lint: avoid_hive_field_index_reuse
+  @HiveField(1)
+  final String name;
+
+  // expect_lint: avoid_hive_field_index_reuse
+  @HiveField(1) // Duplicate!
+  final String description;
+
+  BadProductWithDuplicates(this.id, this.sku, this.name, this.description);
+}
+
+// GOOD: Unique @HiveField indices
+@HiveType(typeId: 2)
+class GoodUserWithUniqueIndices extends HiveObject {
+  @HiveField(0)
+  final String name;
+
+  @HiveField(1)
+  final String email;
+
+  @HiveField(2)
+  final int age;
+
+  GoodUserWithUniqueIndices(this.name, this.email, this.age);
+}
+
+// =========================================================================
+// avoid_sqflite_reserved_words
+// =========================================================================
+
+// Mock Database class
+class Database {
+  Future<void> execute(String sql) async {}
+  Future<List<Map<String, dynamic>>> rawQuery(String sql) async => [];
+}
+
+Future<void> testSqliteReservedWords() async {
+  final Database db = Database();
+
+  // BAD: Using 'order' as column name (reserved word)
+  // expect_lint: avoid_sqflite_reserved_words
+  await db.execute('''
+    CREATE TABLE items (
+      id INTEGER PRIMARY KEY,
+      order INTEGER
+    )
+  ''');
+
+  // BAD: Using 'group' as column name
+  // expect_lint: avoid_sqflite_reserved_words
+  await db.execute('''
+    CREATE TABLE categories (
+      id INTEGER PRIMARY KEY,
+      group TEXT
+    )
+  ''');
+
+  // GOOD: Using escaped reserved word
+  await db.execute('''
+    CREATE TABLE items (
+      id INTEGER PRIMARY KEY,
+      "order" INTEGER
+    )
+  ''');
+
+  // GOOD: Using non-reserved column names
+  await db.execute('''
+    CREATE TABLE products (
+      id INTEGER PRIMARY KEY,
+      sort_order INTEGER,
+      category_name TEXT
+    )
+  ''');
+}
