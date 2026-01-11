@@ -13506,14 +13506,14 @@ class _AddOverflowBoxCommentFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment explaining overflow',
+        message: 'Add HACK comment explaining overflow',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Explain why OverflowBox is needed here\n',
+          '// HACK: Explain why OverflowBox is needed here\n',
         );
       });
     });

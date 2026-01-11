@@ -118,14 +118,14 @@ class _AddNotificationChannelFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: specify channel description',
+        message: 'Add HACK comment for missing channel settings',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add channelDescription and importance for Android 8.0+\n',
+          '// HACK: Add channelDescription and importance for Android 8.0+\n',
         );
       });
     });
@@ -303,14 +303,14 @@ class _AddSensitiveNotificationTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Remove sensitive data from notification',
+        message: 'Add HACK: Remove sensitive data from notification',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Remove sensitive data - notifications are visible on lock screen\n',
+          '// HACK: Remove sensitive data - notifications are visible on lock screen\n',
         );
       });
     });
@@ -321,14 +321,14 @@ class _AddSensitiveNotificationTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Remove sensitive data from notification',
+        message: 'Add HACK: Remove sensitive data from notification',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Remove sensitive data - notifications are visible on lock screen\n',
+          '// HACK: Remove sensitive data - notifications are visible on lock screen\n',
         );
       });
     });
@@ -340,7 +340,7 @@ class _AddSensitiveNotificationTodoFix extends DartFix {
 ///
 /// Alias: notification_platform_settings, require_notification_settings
 ///
-/// **Quick fix available:** Adds TODO comment for missing platform settings.
+/// **Quick fix available:** Adds reminder comment for missing platform settings.
 ///
 /// ## Why This Matters
 ///
@@ -468,7 +468,7 @@ class _AddPlatformSettingsTodoFix extends DartFix {
       );
 
       changeBuilder.addDartFileEdit((builder) {
-        String todoText = '// TODO: Add ';
+        String todoText = '// HACK: Add ';
         if (!hasAndroid && !hasIOS) {
           todoText +=
               'both android: and iOS: parameters for cross-platform support\n';

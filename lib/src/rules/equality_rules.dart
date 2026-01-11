@@ -76,14 +76,14 @@ class _AddHackForEqualExpressionsFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for identical expressions',
+        message: 'Add HACK comment for identical expressions',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: both sides are identical - fix one side\n',
+          '// HACK: both sides are identical - fix one side\n',
         );
       });
     });
@@ -249,14 +249,14 @@ class _AddHackForSelfAssignmentFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for self-assignment',
+        message: 'Add HACK comment for self-assignment',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: self-assignment - remove or assign different value\n',
+          '// HACK: self-assignment - remove or assign different value\n',
         );
       });
     });
@@ -333,14 +333,14 @@ class _AddHackForSelfCompareFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for self-compare',
+        message: 'Add HACK comment for self-compare',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: comparing to itself - use .isNaN or compare different values\n',
+          '// HACK: comparing to itself - use .isNaN or compare different values\n',
         );
       });
     });
@@ -536,14 +536,14 @@ class _AddHackForEqualArgumentsFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for duplicate argument',
+        message: 'Add HACK comment for duplicate argument',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* TODO: duplicate argument - check if intentional */ ',
+          '/* HACK: duplicate argument - check if intentional */ ',
         );
       });
     });

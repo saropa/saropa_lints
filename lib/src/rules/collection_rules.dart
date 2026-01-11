@@ -108,14 +108,14 @@ class _AddHackCommentForCollectionEqualityFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for collection comparison',
+        message: 'Add HACK comment for collection comparison',
         priority: 2,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* TODO: use listEquals/setEquals/mapEquals */ ',
+          '/* HACK: use listEquals/setEquals/mapEquals */ ',
         );
       });
     });
@@ -924,14 +924,14 @@ class _AddHackCommentForReduceFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for unsafe reduce',
+        message: 'Add HACK comment for unsafe reduce',
         priority: 2,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '/* TODO: use fold() or check empty */ ',
+          '/* HACK: use fold() or check empty */ ',
         );
       });
     });
