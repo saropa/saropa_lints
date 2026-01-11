@@ -11,7 +11,12 @@ import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../import_utils.dart';
 import '../saropa_lint_rule.dart';
+
+// =============================================================================
+// HTTP Rules
+// =============================================================================
 
 /// Warns when HTTP response status is not checked.
 ///
@@ -71,98 +76,6 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
       // Check if statusCode is checked
       if (!bodySource.contains('statusCode') &&
           !bodySource.contains('isSuccessful')) {
-        reporter.atNode(node, code);
-      }
-    });
-  }
-}
-
-/// Warns when API calls lack timeout configuration.
-///
-/// Network requests should have timeouts to prevent indefinite waiting.
-///
-/// **BAD:**
-/// ```dart
-/// final response = await http.get(url);
-/// final response = await dio.get(path);
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// final response = await http.get(url).timeout(Duration(seconds: 30));
-/// final response = await dio.get(path,
-///   options: Options(sendTimeout: 30000, receiveTimeout: 30000));
-/// ```
-class RequireApiTimeoutRule extends SaropaLintRule {
-  const RequireApiTimeoutRule() : super(code: _code);
-
-  /// Significant issue. Address when count exceeds 10.
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  static const LintCode _code = LintCode(
-    name: 'require_api_timeout',
-    problemMessage:
-        'API call has no timeout. Request may hang indefinitely on poor networks.',
-    correctionMessage:
-        'Add .timeout(Duration(seconds: 30)) or configure timeout in client options.',
-    errorSeverity: DiagnosticSeverity.WARNING,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-
-      // Check for common HTTP methods
-      if (methodName != 'get' &&
-          methodName != 'post' &&
-          methodName != 'put' &&
-          methodName != 'delete' &&
-          methodName != 'patch') {
-        return;
-      }
-
-      // Check target - should be http client
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('http') &&
-          !targetSource.contains('dio') &&
-          !targetSource.contains('client')) {
-        return;
-      }
-
-      // Check if parent chain contains .timeout()
-      AstNode? current = node.parent;
-      bool hasTimeout = false;
-
-      while (current != null) {
-        if (current is MethodInvocation &&
-            current.methodName.name == 'timeout') {
-          hasTimeout = true;
-          break;
-        }
-        // Check if statement block contains timeout
-        if (current is MethodDeclaration) {
-          final String bodySource = current.body.toSource();
-          if (bodySource.contains('Timeout') ||
-              bodySource.contains('timeout') ||
-              bodySource.contains('connectTimeout') ||
-              bodySource.contains('receiveTimeout')) {
-            hasTimeout = true;
-          }
-          break;
-        }
-        current = current.parent;
-      }
-
-      if (!hasTimeout) {
         reporter.atNode(node, code);
       }
     });
@@ -541,6 +454,8 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
 
 /// Warns when HTTP requests don't specify a timeout.
 ///
+/// Alias: require_api_timeout
+///
 /// Network requests without timeouts can hang indefinitely, leading to poor
 /// user experience. Always specify a reasonable timeout for HTTP calls.
 ///
@@ -610,6 +525,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 
       final String targetSource = target.toSource().toLowerCase();
 
+      // cspell:ignore httpclient
       // Check if this is an HTTP-related call
       // Be specific to avoid false positives (e.g., apiResponse.get() is not HTTP)
       // Look for actual HTTP client patterns, not just 'api' which matches too broadly
@@ -2071,6 +1987,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
 
       final methodSource = enclosingMethod.toSource().toLowerCase();
 
+      // cspell:ignore contenttype
       // Check for Content-Type check
       if (methodSource.contains('content-type') ||
           methodSource.contains('contenttype')) {
@@ -2213,16 +2130,28 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'add') return;
 
-      // Check if adding LogInterceptor
+      // Only apply to files that import Dio
+      if (!fileImportsPackage(node, PackageImports.dio)) return;
+
+      // Check if adding LogInterceptor - use type check, not string contains
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final firstArg = args.first;
-      if (!firstArg.toSource().contains('LogInterceptor')) return;
+      // Check for LogInterceptor constructor or type
+      if (firstArg is! InstanceCreationExpression) return;
+      final typeName = firstArg.constructorName.type.element?.name;
+      if (typeName != 'LogInterceptor') return;
 
-      // Check if target is interceptors
+      // Check if target is interceptors property
       final target = node.target;
-      if (target == null || !target.toSource().contains('interceptor')) return;
+      if (target == null) return;
+      // Use property access check instead of string contains
+      if (target is! PropertyAccess || target.propertyName.name != 'interceptors') {
+        if (target is! SimpleIdentifier || !target.name.endsWith('interceptors')) {
+          return;
+        }
+      }
 
       // Check for kDebugMode guard
       AstNode? current = node.parent;
@@ -2722,9 +2651,14 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'getCurrentPosition') return;
 
+      // Only apply to files that import geolocator
+      if (!fileImportsPackage(node, PackageImports.geolocator)) return;
+
+      // Check if target is Geolocator class (static method call)
       final target = node.target;
       if (target == null) return;
-      if (!target.toSource().contains('Geolocator')) return;
+      // Use type-based check: target should be SimpleIdentifier 'Geolocator'
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
 
       // Check for timeLimit parameter
       bool hasTimeLimit = false;
@@ -2804,9 +2738,20 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'listen') return;
 
+      // Only apply to files that import connectivity package
+      if (!fileImportsPackage(node, PackageImports.connectivity)) return;
+
+      // Check if target is onConnectivityChanged property access
       final target = node.target;
       if (target == null) return;
-      if (!target.toSource().contains('onConnectivityChanged')) return;
+      // Use property-based check instead of string contains
+      if (target is PropertyAccess) {
+        if (target.propertyName.name != 'onConnectivityChanged') return;
+      } else if (target is PrefixedIdentifier) {
+        if (target.identifier.name != 'onConnectivityChanged') return;
+      } else {
+        return; // Not a recognized pattern
+      }
 
       // Check if result is stored
       AstNode? parent = node.parent;
@@ -2878,21 +2823,38 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'onBackgroundMessage') return;
 
+      // Only apply to files that import firebase_messaging
+      if (!fileImportsPackage(node, PackageImports.firebaseMessaging)) return;
+
+      // Check if target is FirebaseMessaging class
       final target = node.target;
       if (target == null) return;
-      if (!target.toSource().contains('FirebaseMessaging')) return;
+      // Use type-based check: target should be SimpleIdentifier 'FirebaseMessaging'
+      if (target is! SimpleIdentifier || target.name != 'FirebaseMessaging') {
+        // Also check for property access like FirebaseMessaging.instance
+        if (target is! PropertyAccess) return;
+        final targetExpr = target.target;
+        if (targetExpr is! SimpleIdentifier ||
+            targetExpr.name != 'FirebaseMessaging') {
+          return;
+        }
+      }
 
       // Check the handler argument
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final handler = args.first;
-      final handlerSource = handler.toSource();
 
-      // If handler uses 'this.' or is a method reference with dot, it's instance
-      if (handlerSource.contains('.') && !handlerSource.startsWith('_')) {
+      // Check if handler is an instance method reference (contains dot but not a simple identifier)
+      if (handler is PrefixedIdentifier) {
+        // e.g., service.handleBackground - instance method
+        reporter.atNode(handler, code);
+      } else if (handler is PropertyAccess) {
+        // e.g., this.handleBackground or obj.method
         reporter.atNode(handler, code);
       }
+      // SimpleIdentifier like _handleBackground or handleBackground are OK (top-level or static)
     });
   }
 }
@@ -2944,9 +2906,23 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'request') return;
 
+      // Only apply to files that import permission_handler
+      if (!fileImportsPackage(node, PackageImports.permissionHandler)) return;
+
+      // Check if target is a Permission property (e.g., Permission.camera)
       final target = node.target;
       if (target == null) return;
-      if (!target.toSource().contains('Permission')) return;
+      // Use type-based check: should be PropertyAccess on Permission class
+      if (target is PropertyAccess) {
+        final targetExpr = target.target;
+        if (targetExpr is! SimpleIdentifier || targetExpr.name != 'Permission') {
+          return;
+        }
+      } else if (target is PrefixedIdentifier) {
+        if (target.prefix.name != 'Permission') return;
+      } else {
+        return; // Not a recognized Permission pattern
+      }
 
       // Find enclosing method and check for status handling
       AstNode? current = node.parent;
@@ -2962,14 +2938,579 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
 
       if (enclosingMethod == null) return;
 
-      final methodSource = enclosingMethod.body.toSource();
-      final hasStatusCheck = methodSource.contains('isDenied') ||
-          methodSource.contains('isPermanentlyDenied') ||
-          methodSource.contains('isGranted');
+      // Check for status property access patterns
+      // These property names are specific to PermissionStatus and safe to check
+      final hasStatusCheck = _hasPermissionStatusCheck(enclosingMethod.body);
 
       if (!hasStatusCheck) {
         reporter.atNode(node.methodName, code);
       }
+    });
+  }
+
+  /// Check if the method body contains permission status property access.
+  /// Uses AST walking to find PropertyAccess or PrefixedIdentifier nodes.
+  bool _hasPermissionStatusCheck(FunctionBody body) {
+    const statusProperties = <String>{
+      'isDenied',
+      'isPermanentlyDenied',
+      'isGranted',
+      'isLimited',
+      'isRestricted',
+    };
+
+    bool found = false;
+
+    void checkNode(AstNode node) {
+      if (found) return;
+
+      if (node is PropertyAccess) {
+        if (statusProperties.contains(node.propertyName.name)) {
+          found = true;
+          return;
+        }
+      } else if (node is PrefixedIdentifier) {
+        if (statusProperties.contains(node.identifier.name)) {
+          found = true;
+          return;
+        }
+      }
+
+      node.childEntities.whereType<AstNode>().forEach(checkNode);
+    }
+
+    checkNode(body);
+    return found;
+  }
+}
+
+// =============================================================================
+// ROADMAP_NEXT Part 7 Rules - Additional
+// =============================================================================
+
+/// Warns when pickImage result is not checked for null.
+///
+/// Alias: image_picker_result, handle_picker_null
+///
+/// ImagePicker.pickImage returns null when the user cancels. Ignoring the
+/// result leads to null pointer errors.
+///
+/// **BAD:**
+/// ```dart
+/// final image = await picker.pickImage(source: ImageSource.camera);
+/// final bytes = await image.readAsBytes(); // Crashes if null!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final image = await picker.pickImage(source: ImageSource.camera);
+/// if (image == null) return;
+/// final bytes = await image.readAsBytes();
+/// ```
+class RequireImagePickerResultHandlingRule extends SaropaLintRule {
+  const RequireImagePickerResultHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_picker_result_handling',
+    problemMessage: 'pickImage result should be checked for null.',
+    correctionMessage: 'Add null check: if (image == null) return;',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+      if (methodName != 'pickImage' && methodName != 'pickVideo') return;
+
+      // Check if result is used directly without null check
+      AstNode? parent = node.parent;
+
+      // Skip if this is inside a null-aware operation
+      while (parent != null) {
+        if (parent is AwaitExpression) {
+          parent = parent.parent;
+          continue;
+        }
+        if (parent is ConditionalExpression ||
+            parent is IfStatement ||
+            parent is BinaryExpression) {
+          final source = parent.toSource();
+          if (source.contains('== null') ||
+              source.contains('!= null') ||
+              source.contains('?')) {
+            return; // Has null check
+          }
+        }
+        if (parent is VariableDeclaration) {
+          // Check if followed by null check
+          AstNode? stmt = parent.parent?.parent;
+          if (stmt is VariableDeclarationStatement) {
+            AstNode? nextNode = stmt.parent;
+            if (nextNode is Block) {
+              final statements = nextNode.statements;
+              final stmtIndex = statements.indexOf(stmt);
+              if (stmtIndex >= 0 && stmtIndex < statements.length - 1) {
+                final nextStmt = statements[stmtIndex + 1];
+                if (nextStmt.toSource().contains('== null') ||
+                    nextStmt.toSource().contains('!= null')) {
+                  return; // Has null check after
+                }
+              }
+            }
+          }
+          break;
+        }
+        parent = parent.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when CachedNetworkImage uses a variable cacheKey in build.
+///
+/// Alias: cached_image_key, stable_cache_key
+///
+/// Using a changing cacheKey in build causes the image to reload on every
+/// rebuild, defeating the purpose of caching.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(context) {
+///   return CachedNetworkImage(
+///     imageUrl: url,
+///     cacheKey: DateTime.now().toString(), // Changes every build!
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Widget build(context) {
+///   return CachedNetworkImage(
+///     imageUrl: url,
+///     cacheKey: 'stable_key_$id', // Stable key
+///   );
+/// }
+/// ```
+class AvoidCachedImageInBuildRule extends SaropaLintRule {
+  const AvoidCachedImageInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_cached_image_in_build',
+    problemMessage: 'Variable cacheKey in build method defeats caching.',
+    correctionMessage: 'Use a stable cacheKey that does not change on rebuild.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'CachedNetworkImage') return;
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      bool inBuild = false;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          inBuild = true;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (!inBuild) return;
+
+      // Check cacheKey argument
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'cacheKey') {
+          final valueSource = arg.expression.toSource();
+          // Flag if using DateTime.now(), Random, uuid generation, etc.
+          if (valueSource.contains('DateTime.now') ||
+              valueSource.contains('Random') ||
+              valueSource.contains('.v4()') ||
+              valueSource.contains('.v1()') ||
+              valueSource.contains('uuid')) {
+            reporter.atNode(arg, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when SQLite onUpgrade doesn't check oldVersion properly.
+///
+/// Alias: sqflite_version_check, database_migration
+///
+/// Database migrations must check oldVersion to apply only necessary changes.
+/// Missing version checks can corrupt data or skip migrations.
+///
+/// **BAD:**
+/// ```dart
+/// database.onUpgrade = (db, oldVersion, newVersion) async {
+///   await db.execute('ALTER TABLE users ADD COLUMN age INTEGER');
+/// };
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// database.onUpgrade = (db, oldVersion, newVersion) async {
+///   if (oldVersion < 2) {
+///     await db.execute('ALTER TABLE users ADD COLUMN age INTEGER');
+///   }
+///   if (oldVersion < 3) {
+///     await db.execute('ALTER TABLE users ADD COLUMN email TEXT');
+///   }
+/// };
+/// ```
+class RequireSqfliteMigrationRule extends SaropaLintRule {
+  const RequireSqfliteMigrationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_sqflite_migration',
+    problemMessage: 'Database onUpgrade should check oldVersion.',
+    correctionMessage:
+        'Add version checks: if (oldVersion < 2) { ... migrations ... }',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionExpression((FunctionExpression node) {
+      // Check if this is an onUpgrade callback (has oldVersion parameter)
+      final params = node.parameters;
+      if (params == null) return;
+
+      final paramNames =
+          params.parameters.map((p) => p.name?.lexeme ?? '').toList();
+      if (!paramNames.contains('oldVersion') &&
+          !paramNames.contains('old') &&
+          !paramNames.any((p) => p.toLowerCase().contains('version'))) {
+        return;
+      }
+
+      // Check if body contains version check
+      final bodySource = node.body.toSource();
+      if (bodySource.contains('oldVersion <') ||
+          bodySource.contains('oldVersion <=') ||
+          bodySource.contains('oldVersion >') ||
+          bodySource.contains('oldVersion >=') ||
+          bodySource.contains('oldVersion ==')) {
+        return; // Has version check
+      }
+
+      // cspell:ignore onupgrade
+      // Check if parent is assignment to onUpgrade
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is AssignmentExpression) {
+          final leftSource = current.leftHandSide.toSource().toLowerCase();
+          if (leftSource.contains('onupgrade') ||
+              leftSource.contains('on_upgrade')) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+        if (current is NamedExpression) {
+          final name = current.name.label.name.toLowerCase();
+          if (name.contains('onupgrade') || name.contains('on_upgrade')) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Permission Rules (Part 7)
+// =============================================================================
+
+/// Warns when requesting permissions without showing a rationale first.
+///
+/// Alias: permission_rationale, show_rationale
+///
+/// Android best practice is to explain why the app needs a permission before
+/// requesting it using shouldShowRequestRationale.
+///
+/// **BAD:**
+/// ```dart
+/// await Permission.camera.request();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (await Permission.camera.shouldShowRequestRationale) {
+///   showRationaleDialog();
+/// }
+/// await Permission.camera.request();
+/// ```
+class RequirePermissionRationaleRule extends SaropaLintRule {
+  const RequirePermissionRationaleRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_permission_rationale',
+    problemMessage:
+        'Permission request without checking shouldShowRequestRationale.',
+    correctionMessage:
+        'Check shouldShowRequestRationale() before requesting permission.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+
+      // Check for permission request patterns
+      if (methodName != 'request' && methodName != 'requestPermission') {
+        return;
+      }
+
+      // Check if target is Permission related
+      final target = node.target;
+      if (target == null) return;
+
+      final targetType = target.staticType?.toString() ?? '';
+      final targetSource = target.toSource().toLowerCase();
+      if (!targetType.contains('Permission') &&
+          !targetSource.contains('permission')) {
+        return;
+      }
+
+      // Look for shouldShowRequestRationale check in parent method
+      final methodDeclaration = node.thisOrAncestorOfType<MethodDeclaration>();
+      if (methodDeclaration == null) return;
+
+      // cspell:ignore shouldshowrequestrationale shouldshowrationale
+      final bodySource = methodDeclaration.body.toSource().toLowerCase();
+      if (bodySource.contains('shouldshowrequestrationale') ||
+          bodySource.contains('shouldshowrationale') ||
+          bodySource.contains('show') && bodySource.contains('rationale')) {
+        return; // Has rationale check
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when using permission-gated features without checking status.
+///
+/// Alias: check_permission_status, permission_before_use
+///
+/// Using features like camera, location, or microphone without checking if
+/// permission was granted leads to crashes or silent failures.
+///
+/// **BAD:**
+/// ```dart
+/// final position = await Geolocator.getCurrentPosition();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (await Permission.location.isGranted) {
+///   final position = await Geolocator.getCurrentPosition();
+/// }
+/// ```
+class RequirePermissionStatusCheckRule extends SaropaLintRule {
+  const RequirePermissionStatusCheckRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_permission_status_check',
+    problemMessage:
+        'Using permission-gated feature without checking permission status.',
+    correctionMessage: 'Check permission.status.isGranted before use.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const _gatedFeatures = <String>{
+    'getCurrentPosition',
+    'getLastKnownPosition',
+    'takePicture',
+    'pickImage',
+    'scanBarcodes',
+    'startScan',
+    'startListening',
+    'requestContactsPermission',
+    'getContacts',
+    'openCamera',
+    'accessMicrophone',
+    'recordAudio',
+    'startRecording',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+
+      if (!_gatedFeatures.contains(methodName)) {
+        return;
+      }
+
+      // Look for permission check in parent method
+      final methodDeclaration = node.thisOrAncestorOfType<MethodDeclaration>();
+      if (methodDeclaration == null) return;
+
+      final bodySource = methodDeclaration.body.toSource().toLowerCase();
+
+      // cspell:ignore isgranted permissionstatus haspermission checkpermission
+      // Check for common permission check patterns
+      if (bodySource.contains('isgranted') ||
+          bodySource.contains('is_granted') ||
+          bodySource.contains('permissionstatus.granted') ||
+          bodySource.contains('status == permissionstatus.granted') ||
+          bodySource.contains('.request()') ||
+          bodySource.contains('haspermission') ||
+          bodySource.contains('checkpermission')) {
+        return; // Has permission check
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when showing notifications without Android 13+ permission check.
+///
+/// Alias: android13_notification, post_notifications
+///
+/// Android 13 (API 33) requires explicit POST_NOTIFICATIONS permission.
+/// Without this check, notifications silently fail on Android 13+ devices.
+///
+/// **BAD:**
+/// ```dart
+/// await notificationsPlugin.show(0, 'Title', 'Body', details);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (await Permission.notification.isGranted) {
+///   await notificationsPlugin.show(0, 'Title', 'Body', details);
+/// }
+/// ```
+class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
+  const RequireNotificationPermissionAndroid13Rule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_notification_permission_android13',
+    problemMessage:
+        'Notification shown without POST_NOTIFICATIONS permission check.',
+    correctionMessage:
+        'Request Permission.notification before showing notifications.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const _notificationMethods = <String>{
+    'show',
+    'showNotification',
+    'displayNotification',
+    'createNotification',
+    'schedule',
+    'scheduleNotification',
+    'zonedSchedule',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+
+      if (!_notificationMethods.contains(methodName)) {
+        return;
+      }
+
+      // Check if target is notification-related
+      final target = node.target;
+      if (target == null) return;
+
+      // cspell:ignore flutterlocalnoti
+      final targetType = target.staticType?.toString() ?? '';
+      final targetSource = target.toSource().toLowerCase();
+      if (!targetType.toLowerCase().contains('notification') &&
+          !targetSource.contains('notification') &&
+          !targetSource.contains('local_notifications') &&
+          !targetSource.contains('flutterlocalnoti')) {
+        return;
+      }
+
+      // Look for notification permission check in the method or class
+      final methodDeclaration = node.thisOrAncestorOfType<MethodDeclaration>();
+      if (methodDeclaration == null) return;
+
+      final bodySource = methodDeclaration.body.toSource().toLowerCase();
+
+      // cspell:ignore notificationpermission requestnotificationpermission
+      // Check for notification permission patterns
+      if (bodySource.contains('permission.notification') ||
+          bodySource.contains('post_notifications') ||
+          bodySource.contains('notificationpermission') ||
+          bodySource.contains('notification_permission') ||
+          bodySource.contains('requestnotificationpermission')) {
+        return; // Has permission check
+      }
+
+      // Check class-level for permission check
+      final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl != null) {
+        final classSource = classDecl.toSource().toLowerCase();
+        if (classSource.contains('permission.notification') ||
+            classSource.contains('notificationpermission')) {
+          return;
+        }
+      }
+
+      reporter.atNode(node, code);
     });
   }
 }

@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
@@ -1582,8 +1583,12 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
       // Skip if few arguments
       if (argCount < _maxConstructorArgs) return;
 
+      // Get type name safely - name2 may be null for complex types
+      final Token? typeToken = node.constructorName.type.name2;
+      if (typeToken == null) return;
+
       // Skip mock objects
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = typeToken.lexeme;
       if (typeName.startsWith('Mock') || typeName.startsWith('Fake')) {
         return;
       }
@@ -1845,9 +1850,63 @@ class _AddGetItResetReminderFix extends DartFix {
 
 /// Warns when a test body has no assertions.
 ///
+/// Alias: no_assertion_in_test, test_without_expect, empty_test_body
+///
 /// Tests without assertions don't verify anything and provide false
 /// confidence. Every test should have at least one expect(), verify(),
-/// or similar assertion.
+/// or similar assertion. This is a critical test quality issue - tests
+/// that don't assert anything give the illusion of coverage without
+/// actually catching bugs.
+///
+/// ## Detection Approach
+///
+/// This rule uses a two-pass AST analysis:
+///
+/// 1. **Helper Collection Pass**: Scans the compilation unit for functions
+///    (top-level, local, and function expressions) that contain built-in
+///    assertions. These function names are collected as "assertion helpers".
+///
+/// 2. **Test Validation Pass**: For each `test()` or `testWidgets()` call,
+///    checks if the callback body contains any calls to built-in assertions
+///    OR calls to the identified helper functions.
+///
+/// ## Recognized Assertions
+///
+/// Built-in: `expect`, `expectLater`, `verify`, `verifyNever`, `verifyInOrder`,
+/// `verifyZeroInteractions`, `verifyNoMoreInteractions`, `fail`, `assert`,
+/// `throwsA`, `throwsException`, `throwsStateError`, `throwsArgumentError`
+///
+/// ## Helper Function Recognition
+///
+/// The rule recognizes user-defined helper functions that wrap assertions:
+/// - Top-level functions: `void expectValid(x) { expect(x, isNotNull); }`
+/// - Local functions: `void check() { expect(result, expected); }`
+/// - Function variables: `final verify = (x) { expect(x, isTrue); };`
+///
+/// ## Related Rules
+///
+/// - **`require_test_assertions`** (Recommended tier): A simpler/faster
+///   alternative that uses string matching instead of AST analysis. Use
+///   that rule if you don't have custom assertion helpers and want
+///   faster analysis. This rule (`missing_test_assertion`) is preferred
+///   when you have helper functions that wrap assertions.
+///
+/// ## Limitations
+///
+/// - Only recognizes helpers defined in the same file (not imported helpers)
+/// - Single level of indirection only (helper calling helper not detected)
+/// - Class methods used as assertion helpers are not detected
+/// - Does not verify assertion quality (e.g., `expect(true, isTrue)`)
+///
+/// ## Why This is High Impact
+///
+/// Tests without assertions:
+/// - Give false confidence in code coverage metrics
+/// - Waste CI/CD time running tests that verify nothing
+/// - Can mask regressions when developers assume tests are passing
+/// - Often indicate incomplete test implementations
+///
+/// **Quick fix available:** Adds an `expect()` placeholder with a reminder comment.
 ///
 /// ### Example
 ///
@@ -1863,6 +1922,18 @@ class _AddGetItResetReminderFix extends DartFix {
 /// test('loads data', () async {
 ///   final data = await loadData();
 ///   expect(data, isNotEmpty);
+/// });
+/// ```
+///
+/// #### ALSO GOOD (helper function with assertion):
+/// ```dart
+/// void expectLoaded(Data data) {
+///   expect(data, isNotEmpty);
+/// }
+///
+/// test('loads data', () async {
+///   final data = await loadData();
+///   expectLoaded(data); // Helper contains expect()
 /// });
 /// ```
 class MissingTestAssertionRule extends SaropaLintRule {
@@ -1881,7 +1952,7 @@ class MissingTestAssertionRule extends SaropaLintRule {
   );
 
   /// Common assertion function names
-  static const Set<String> _assertionFunctions = <String>{
+  static const Set<String> _builtInAssertionFunctions = <String>{
     'expect',
     'expectLater',
     'verify',
@@ -1911,6 +1982,19 @@ class MissingTestAssertionRule extends SaropaLintRule {
       return;
     }
 
+    // Track helper functions that contain assertions
+    final Set<String> helperFunctionsWithAssertions = <String>{};
+
+    // First pass: find all helper functions that contain assertions
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final _HelperFunctionCollector collector = _HelperFunctionCollector(
+        _builtInAssertionFunctions,
+      );
+      unit.visitChildren(collector);
+      helperFunctionsWithAssertions.addAll(collector.functionsWithAssertions);
+    });
+
+    // Second pass: check tests for assertions (including helper calls)
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
@@ -1930,19 +2014,120 @@ class MissingTestAssertionRule extends SaropaLintRule {
 
       if (body == null) return;
 
-      // Check if the body contains any assertions
-      final bool hasAssertion = _hasAssertion(body);
+      // Build combined set of assertion functions
+      final Set<String> allAssertionFunctions = <String>{
+        ..._builtInAssertionFunctions,
+        ...helperFunctionsWithAssertions,
+      };
 
-      if (!hasAssertion) {
+      // Check if the body contains any assertions
+      final _AssertionFinder finder = _AssertionFinder(allAssertionFunctions);
+      body.visitChildren(finder);
+
+      if (!finder.foundAssertion) {
         reporter.atNode(node, code);
       }
     });
   }
 
-  bool _hasAssertion(FunctionBody body) {
-    final _AssertionFinder finder = _AssertionFinder(_assertionFunctions);
+  @override
+  List<Fix> getFixes() => <Fix>[_AddAssertionReminderFix()];
+}
+
+class _AddAssertionReminderFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String methodName = node.methodName.name;
+      if (methodName != 'test' && methodName != 'testWidgets') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length < 2) return;
+
+      final Expression callback = args.arguments[1];
+      if (callback is! FunctionExpression) return;
+
+      final FunctionBody body = callback.body;
+      if (body is! BlockFunctionBody) return;
+
+      // Find the position before the closing brace of the test body
+      final int insertOffset = body.block.rightBracket.offset;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add expect() assertion placeholder',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          insertOffset,
+          '\n    // TODO: Add assertion\n    expect(result, expected);\n  ',
+        );
+      });
+    });
+  }
+}
+
+/// Collects names of helper functions that contain assertion calls.
+class _HelperFunctionCollector extends RecursiveAstVisitor<void> {
+  _HelperFunctionCollector(this.builtInAssertions);
+
+  final Set<String> builtInAssertions;
+  final Set<String> functionsWithAssertions = <String>{};
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    // Check if this function's body contains any assertions
+    final FunctionBody body = node.functionExpression.body;
+    final _AssertionFinder finder = _AssertionFinder(builtInAssertions);
     body.visitChildren(finder);
-    return finder.foundAssertion;
+
+    if (finder.foundAssertion) {
+      functionsWithAssertions.add(node.name.lexeme);
+    }
+
+    super.visitFunctionDeclaration(node);
+  }
+
+  @override
+  void visitFunctionDeclarationStatement(FunctionDeclarationStatement node) {
+    // Handle local function declarations (inside other functions/blocks)
+    final FunctionDeclaration declaration = node.functionDeclaration;
+    final FunctionBody body = declaration.functionExpression.body;
+    final _AssertionFinder finder = _AssertionFinder(builtInAssertions);
+    body.visitChildren(finder);
+
+    if (finder.foundAssertion) {
+      functionsWithAssertions.add(declaration.name.lexeme);
+    }
+
+    super.visitFunctionDeclarationStatement(node);
+  }
+
+  @override
+  void visitVariableDeclaration(VariableDeclaration node) {
+    // Handle function expressions assigned to variables:
+    // void Function() myHelper = () { expect(...); };
+    // or: final expectResult = (String input) { expect(...); };
+    final Expression? initializer = node.initializer;
+    if (initializer is FunctionExpression) {
+      final _AssertionFinder finder = _AssertionFinder(builtInAssertions);
+      initializer.body.visitChildren(finder);
+
+      if (finder.foundAssertion) {
+        functionsWithAssertions.add(node.name.lexeme);
+      }
+    }
+
+    super.visitVariableDeclaration(node);
   }
 }
 
@@ -2187,13 +2372,9 @@ class RequireTestCleanupRule extends SaropaLintRule {
           if (callback is FunctionExpression) {
             final String bodySource = callback.body.toSource();
 
-            // Check for resource creation
-            if (bodySource.contains('File(') ||
-                bodySource.contains('Directory(') ||
-                bodySource.contains('.writeAs') ||
-                bodySource.contains('.create') ||
-                bodySource.contains('insert(') ||
-                bodySource.contains('put(')) {
+            // Check for resource creation patterns
+            // Use specific patterns to avoid false positives like createWidget()
+            if (_createsTestResources(bodySource)) {
               testWithResourceCreation = node;
             }
           }
@@ -2206,6 +2387,46 @@ class RequireTestCleanupRule extends SaropaLintRule {
         reporter.atNode(testWithResourceCreation!, code);
       }
     });
+  }
+
+  /// Check for patterns that create test resources requiring cleanup.
+  /// Uses specific patterns to avoid false positives from methods like
+  /// createWidget(), insertText(), output(), etc.
+  bool _createsTestResources(String bodySource) {
+    // File system operations - exact constructor calls
+    if (bodySource.contains('File(') || bodySource.contains('Directory(')) {
+      return true;
+    }
+
+    // File write operations - specific method patterns
+    if (bodySource.contains('.writeAsBytes') ||
+        bodySource.contains('.writeAsString') ||
+        bodySource.contains('.writeAsBytesSync') ||
+        bodySource.contains('.writeAsStringSync')) {
+      return true;
+    }
+
+    // Directory/file creation - check for .create() on file-like objects
+    // Use regex to match file.create() or dir.create() patterns
+    final createPattern = RegExp(r'\b(file|dir|directory|temp)\w*\.create\(');
+    if (createPattern.hasMatch(bodySource.toLowerCase())) {
+      return true;
+    }
+
+    // Database operations - require specific target patterns
+    // e.g., db.insert(, collection.insert(, table.insert(
+    final dbInsertPattern = RegExp(r'\b(db|database|collection|table)\w*\.insert\(');
+    if (dbInsertPattern.hasMatch(bodySource.toLowerCase())) {
+      return true;
+    }
+
+    // Hive/SharedPrefs operations - require box. or prefs. prefix
+    final storagePattern = RegExp(r'\b(box|prefs|preferences|storage)\w*\.put\(');
+    if (storagePattern.hasMatch(bodySource.toLowerCase())) {
+      return true;
+    }
+
+    return false;
   }
 }
 

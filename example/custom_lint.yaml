@@ -113,7 +113,7 @@ custom_lint:
     # Error handling rules (NEW)
     avoid_swallowing_exceptions: false  # Catch swallows exception without handling. [HIGH]
     avoid_losing_stack_trace: false  # Stack trace lost when rethrowing. [HIGH]
-    require_future_error_handling: false  # Future called without error handling. [HIGH]
+    avoid_uncaught_future_errors: false  # Future without error handling. [HIGH] (Alias: require_future_error_handling)
     avoid_generic_exceptions: false  # Avoid throwing generic Exception. [MEDIUM]
     require_error_context: false  # Error message lacks context. [LOW]
     prefer_result_pattern: false  # Use Result pattern for expected failures. [LOW]
@@ -764,7 +764,7 @@ custom_lint:
     # =========================================================================
 
     require_http_status_check: false  # Check response.statusCode. [HIGH]
-    require_api_timeout: false  # API calls need timeout. [HIGH]
+    require_request_timeout: false  # API calls need timeout. [HIGH] (Alias: require_api_timeout)
     avoid_hardcoded_api_urls: false  # API URLs should be configured. [HIGH]
     require_retry_logic: false  # Network calls need retry. [MEDIUM]
     require_typed_api_response: false  # Parse responses to typed models. [MEDIUM]

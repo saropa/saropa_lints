@@ -113,7 +113,7 @@ custom_lint:
     # API & NETWORK - Robust networking
     # =========================================================================
     require_http_status_check: true
-    require_api_timeout: true
+    require_request_timeout: true  # Alias: require_api_timeout
     avoid_hardcoded_api_urls: true
 
     # =========================================================================

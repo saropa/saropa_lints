@@ -7,6 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.3.0] - 2026-01-10
+
+### Added
+
+#### ROADMAP_NEXT Parts 1-7 Rules (11 new rules + ~70 rules registered in tiers)
+
+**GoRouter Navigation Rules (2 rules)**
+- **`prefer_go_router_redirect_auth`**: Suggests using redirect callback instead of auth checks in page builders
+- **`require_go_router_typed_params`**: Warns when path parameters are used without type conversion
+
+**Provider State Management Rules (2 rules)**
+- **`avoid_provider_in_init_state`**: Warns when Provider.of or context.read/watch is used in initState
+- **`prefer_context_read_in_callbacks`**: Suggests using context.read instead of context.watch in callbacks
+
+**Hive Database Rules (1 rule)**
+- **`require_hive_type_id_management`**: Warns when @HiveType typeId may conflict with others
+
+**Image Picker Rules (1 rule)**
+- **`require_image_picker_result_handling`**: Warns when pickImage result is not checked for null
+
+**Cached Network Image Rules (1 rule)**
+- **`avoid_cached_image_in_build`**: Warns when CachedNetworkImage uses variable cacheKey in build
+
+**SQLite Migration Rules (1 rule)**
+- **`require_sqflite_migration`**: Warns when onUpgrade callback doesn't check oldVersion
+
+**Permission Handler Rules (3 rules)**
+- **`require_permission_rationale`**: Suggests checking shouldShowRequestRationale before requesting permission
+- **`require_permission_status_check`**: Warns when using permission-gated features without checking status
+- **`require_notification_permission_android13`**: Warns when notifications shown without POST_NOTIFICATIONS permission
+
+### Changed
+
+- Registered ~70 existing rules from Parts 1-7 into appropriate tiers (Essential, Recommended, Professional)
+- All Isar, Dispose, Lifecycle, Widget, API, and Package-Specific rules now properly included in tier system
+- **`prefer_test_wrapper`**: Added to Recommended tier
+
+### Fixed
+
+- **`avoid_uncaught_future_errors`**: Reduced false positives significantly:
+  - Now recognizes `.then(onError: ...)` as valid error handling
+  - Skips `unawaited()` wrapped futures (explicit acknowledgment)
+  - Skips `.ignore()` chained futures
+  - Added 20+ safe fire-and-forget methods: analytics (`logEvent`, `trackEvent`), cache (`prefetch`, `warmCache`), cleanup (`dispose`, `drain`)
+- **`require_stream_subscription_cancel`**: Fixed false positive for collection-based cancellation patterns. Now correctly recognizes `for (final sub in _subscriptions) { sub.cancel(); }` and `_subscriptions.forEach((s) => s.cancel())` patterns. Added support for LinkedHashSet and HashSet collection types. Improved loop variable validation to prevent false negatives. Added quick fix to insert cancel() calls (handles both single and collection subscriptions, creates dispose() if missing).
+- **`prefer_test_wrapper`**: Fixed false positive for teardown patterns where `SizedBox`, `Container`, or `Placeholder` are pumped to unmount widgets before disposing controllers. Added quick fix to wrap with `MaterialApp`.
+- **`missing_test_assertion`**: Fixed duplicate tier assignment (was in both Essential and Recommended). Now correctly only in Essential tier. Added quick fix to insert `expect()` placeholder.
+- **`avoid_assigning_notifiers`**: Fixed missing visitor class causing compilation error. Added Riverpod import check to only apply to files using Riverpod. Added RHS type fallback for `late final` variables. Added quick fix to comment out problematic assignments. Documented in using_with_riverpod.md guide.
+- **`require_api_timeout`**: Removed duplicate rule. Merged into `require_request_timeout` which has better logic (more HTTP methods, avoids apiClient false positives, handles await patterns). Old name kept as alias for migration.
+- **tiers.dart**: Added 9 missing rules that were implemented but not registered:
+  - `require_type_adapter_registration` → Essential (Hive adapter not registered)
+  - `require_hive_database_close` → Professional (database resource leak)
+  - `prefer_lazy_box_for_large` → Professional (Hive memory optimization)
+  - `prefer_http_connection_reuse` → Professional (network performance)
+  - `avoid_redundant_requests` → Professional (resource efficiency)
+  - `prefer_pagination` → Professional (memory efficiency)
+  - `require_cancel_token` → Professional (cancel on dispose)
+  - `require_response_caching` → Comprehensive (opinionated)
+  - `avoid_over_fetching` → Comprehensive (opinionated)
+- **test_rules.dart**: Added 7 test rules to tiers that were registered but never enabled:
+  - `prefer_descriptive_test_name` → Professional
+  - `prefer_fake_over_mock` → Professional
+  - `require_edge_case_tests` → Professional
+  - `avoid_test_implementation_details` → Professional
+  - `prefer_test_data_builder` → Professional
+  - `prefer_test_variant` → Professional
+  - `require_animation_tests` → Professional
+- **`avoid_uncaught_future_errors`**: Fixed false positives for awaited futures. Rule now only flags fire-and-forget futures (unawaited calls). Merged duplicate `require_future_error_handling` rule into this one (old name kept as alias). Added exceptions for `dispose()` methods, `cancel()`/`close()` methods, and futures inside try blocks. Added quick fix to add `.catchError()`.
+- **`require_test_cleanup`**: Fixed false positives from generic substring matching. Now uses specific patterns to avoid matching `createWidget()`, `insertText()`, `output()` and similar unrelated methods. Only flags actual File/Directory operations, database inserts, and Hive box operations.
+- **`require_pump_after_interaction`**: Fixed indexOf logic that only checked first interaction occurrence. Now tracks ALL interaction positions and checks each segment for proper pump() placement between interactions and expects.
+- **`prefer_test_data_builder`**: Added null check for `name2` token access to prevent runtime errors on complex type constructs.
+- **`require_hive_initialization`**: Changed LintImpact from medium to low since this is an informational heuristic that cannot verify cross-file initialization.
+- **hive_rules.dart**: Extracted shared `_isHiveBoxTarget()` and `_isHiveBoxField()` utilities to reduce duplication and improve box detection accuracy. Now uses word boundary matching to avoid false positives like 'infobox' or 'checkbox'.
+- **`require_error_identification`**: Fixed false positives from substring matching `.contains('red')`. Now uses regex pattern matching (`colors\.red`, `.red\b`, etc.) to avoid matching words like 'thread', 'spread', 'shredded'.
+- **api_network_rules.dart**: Added import validation for package-specific rules to prevent false positives:
+  - `avoid_dio_debug_print_production`: Now checks for Dio import and uses type-based detection for LogInterceptor
+  - `require_geolocator_timeout`: Only applies to files importing geolocator package
+  - `require_connectivity_subscription_cancel`: Only applies to files importing connectivity_plus package
+  - `require_notification_handler_top_level`: Only applies to files importing firebase_messaging package
+  - `require_permission_denied_handling`: Only applies to files importing permission_handler package; uses AST-based property access detection instead of string contains
+- **navigation_rules.dart**: Added import validation for all go_router rules to prevent false positives in projects not using go_router:
+  - `avoid_go_router_inline_creation`
+  - `require_go_router_error_handler`
+  - `require_go_router_refresh_listenable`
+  - `avoid_go_router_string_paths`
+  - `prefer_go_router_redirect_auth`
+  - `require_go_router_typed_params`
+- **state_management_rules.dart**: Fixed `prefer_context_read_in_callbacks` rule to properly detect Flutter callback conventions. Now checks for `on` prefix followed by uppercase letter (e.g., `onPressed`, `onTap`) to avoid false positives on words like `once`, `only`, `ongoing`.
+- **import_utils.dart**: New shared utility file for package import validation. Provides `fileImportsPackage()` function and `PackageImports` constants for Dio, Geolocator, Connectivity, Firebase Messaging, Permission Handler, GoRouter, Riverpod, Hive, GetIt, Provider, Bloc, and more. Reduces code duplication across rule files.
+
 ## [2.2.0] - 2026-01-10
 
 ### Added

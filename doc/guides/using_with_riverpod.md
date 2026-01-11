@@ -7,7 +7,7 @@ This guide explains how saropa_lints enhances your Riverpod development with spe
 | Aspect | riverpod_lint | saropa_lints |
 |--------|--------------|--------------|
 | **Focus** | Riverpod-specific syntax | Cross-cutting concerns |
-| **Rule count** | ~20 rules | 821+ rules (8+ Riverpod-specific) |
+| **Rule count** | ~20 rules | 1184+ rules (8+ Riverpod-specific) |
 | **Catches** | Provider syntax issues | Memory leaks, lifecycle bugs, architecture |
 
 **Key insight**: These packages are *complementary*. Use both for comprehensive coverage.
@@ -142,6 +142,26 @@ class MyNotifier extends _$MyNotifier {
 
 **Rule**: `avoid_ref_in_dispose`
 
+### Assigning to Notifier Variables
+
+```dart
+// BAD - breaks provider contract
+myNotifier = SomeNotifier();  // Direct assignment
+userNotifier = anotherNotifier;  // Reassignment
+
+// GOOD - use provider's own lifecycle
+ref.read(myProvider.notifier).updateState(newValue);
+
+// Flutter ValueNotifier in initState is OK (not flagged)
+@override
+void initState() {
+  super.initState();
+  _textNotifier = ValueNotifier<String>('');  // OK - Flutter type
+}
+```
+
+**Rule**: `avoid_assigning_notifiers`
+
 ### Global Providers Without Scoping
 
 ```dart
@@ -246,6 +266,7 @@ dart run custom_lint
 |------|------|-----------------|
 | `require_provider_scope` | essential | Missing ProviderScope at app root |
 | `avoid_ref_read_in_build` | essential | ref.read() instead of ref.watch() in build |
+| `avoid_assigning_notifiers` | essential | Direct assignment to notifier variables |
 | `avoid_circular_provider_deps` | recommended | Providers that depend on each other |
 | `avoid_provider_in_widget` | recommended | Providers declared inside widget classes |
 | `require_async_value_order` | recommended | Non-standard AsyncValue.when order |
