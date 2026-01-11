@@ -202,7 +202,8 @@ class GoodInstanceMethod extends StatefulWidget {
 class _GoodInstanceMethodState extends State<GoodInstanceMethod> {
   void showError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(); // Instance method can check mounted
+    ScaffoldMessenger.of(context)
+        .showSnackBar(); // Instance method can check mounted
   }
 
   @override

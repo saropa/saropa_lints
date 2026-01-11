@@ -9858,7 +9858,8 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
 
       while (current != null) {
         if (current is ClassDeclaration) {
-          final String? extendsName = current.extendsClause?.superclass.name2.lexeme;
+          final String? extendsName =
+              current.extendsClause?.superclass.name2.lexeme;
           if (extendsName != null &&
               (extendsName.contains('AsyncNotifier') ||
                   extendsName.contains('FutureProvider'))) {
@@ -9958,7 +9959,8 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is ClassDeclaration) {
-          final String? extendsName = current.extendsClause?.superclass.name2.lexeme;
+          final String? extendsName =
+              current.extendsClause?.superclass.name2.lexeme;
           if (extendsName != null &&
               (extendsName == 'Bloc' || extendsName == 'Cubit')) {
             reporter.atNode(node, code);
