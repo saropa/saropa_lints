@@ -1385,6 +1385,17 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
               parentType == 'CustomScrollView') {
             hasScrollParent = true;
           }
+          // Skip containers that handle keyboard overlap themselves.
+          // - Dialog/AlertDialog: Flutter pushes dialogs above keyboard
+          // - BottomSheet: Typically resizes or scrolls with keyboard
+          // NOTE: We intentionally do NOT skip ExpansionTile here.
+          // ExpansionTiles are collapsible sections that can appear anywhere
+          // in a screen. The PARENT screen must handle viewInsets - the linter
+          // should still warn so developers fix the parent, not suppress here.
+          if (parentType.contains('Dialog') ||
+              parentType.contains('BottomSheet')) {
+            return;
+          }
         }
         if (current is MethodDeclaration) {
           break;
@@ -1400,13 +1411,17 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
         return;
       }
 
-      // Check method for viewInsets handling
+      // Check the ENTIRE FILE for viewInsets handling, not just the current method.
+      // This handles cases where a TextField is in a nested widget class (e.g., ProgressWrapper)
+      // but the parent screen class (e.g., _ProgressDesignerScreenState) handles viewInsets.
+      // Static analysis can't follow widget composition at runtime, so we check if ANY
+      // code in the same file handles viewInsets - if so, the developer is likely aware.
       current = node.parent;
       while (current != null) {
-        if (current is MethodDeclaration) {
-          final methodSource = current.toSource().toLowerCase();
-          if (methodSource.contains('viewinsets') ||
-              methodSource.contains('resizetobottominset')) {
+        if (current is CompilationUnit) {
+          final fileSource = current.toSource().toLowerCase();
+          if (fileSource.contains('viewinsets') ||
+              fileSource.contains('resizetobottominset')) {
             return;
           }
           break;

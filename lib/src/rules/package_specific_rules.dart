@@ -123,15 +123,30 @@ class _AddTryCatchTodoFix extends DartFix {
   }
 }
 
-/// Warns when Apple Sign-In is used without rawNonce parameter.
+/// Warns when Apple Sign-In is used without nonce parameter.
 ///
 /// Alias: apple_signin_nonce, require_apple_nonce
 ///
-/// Apple Sign-In requires a nonce for security. Without it, replay attacks
-/// are possible where an attacker reuses a valid token.
+/// ## Why This Matters
+///
+/// The nonce is a critical security layer that prevents **replay attacks**.
+/// Without it, an attacker who intercepts a valid Apple ID token could reuse
+/// it to authenticate as the victim indefinitely. The nonce ensures each
+/// authentication attempt is unique and cannot be replayed.
+///
+/// ## How It Works
+///
+/// 1. Generate a cryptographically random nonce (raw nonce)
+/// 2. Hash it with SHA-256 and pass the **hash** to Apple
+/// 3. Apple embeds the hash in the ID token it returns
+/// 4. Pass the **raw nonce** to your backend (e.g., Supabase)
+/// 5. Backend hashes the raw nonce and verifies it matches the token
+///
+/// This two-step process ensures only the original requester can use the token.
 ///
 /// **BAD:**
 /// ```dart
+/// // INSECURE: No nonce means tokens can be replayed by attackers
 /// final credential = await SignInWithApple.getAppleIDCredential(
 ///   scopes: [AppleIDAuthorizationScopes.email],
 /// );
@@ -139,12 +154,24 @@ class _AddTryCatchTodoFix extends DartFix {
 ///
 /// **GOOD:**
 /// ```dart
-/// final rawNonce = generateNonce();
+/// // Generate nonce using Supabase's built-in method
+/// final rawNonce = Supabase.instance.client.auth.generateRawNonce();
+/// final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+///
 /// final credential = await SignInWithApple.getAppleIDCredential(
 ///   scopes: [AppleIDAuthorizationScopes.email],
-///   nonce: sha256ofString(rawNonce),
+///   nonce: hashedNonce, // Hash goes to Apple
+/// );
+///
+/// // Pass raw nonce to Supabase for verification
+/// await Supabase.instance.client.auth.signInWithIdToken(
+///   provider: OAuthProvider.apple,
+///   idToken: credential.identityToken!,
+///   nonce: rawNonce, // Raw nonce goes to Supabase
 /// );
 /// ```
+///
+/// See: https://supabase.com/docs/guides/auth/social-login/auth-apple
 class RequireAppleSigninNonceRule extends SaropaLintRule {
   const RequireAppleSigninNonceRule() : super(code: _code);
 
@@ -576,8 +603,9 @@ class _AddDisposeTodoFix extends DartFix {
 /// **GOOD (Modern webview_flutter 4.0+):**
 /// ```dart
 /// NavigationDelegate(
-///   onSslError: (controller, error, callback) {
-///     // Handle SSL error appropriately
+///   onSslAuthError: (SslAuthError error) async {
+///     // Handle SSL certificate error - call error.cancel() or error.proceed()
+///     await error.cancel();
 ///   },
 /// )
 /// ```
@@ -591,7 +619,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
     name: 'require_webview_ssl_error_handling',
     problemMessage: 'WebView should handle SSL errors explicitly.',
     correctionMessage:
-        'Add onSslError callback to NavigationDelegate or WebView constructor.',
+        'Add onSslAuthError callback to NavigationDelegate to handle certificate errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -623,13 +651,14 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
       }
 
       // Check for modern webview_flutter 4.0+ NavigationDelegate pattern
+      // Note: The correct callback is `onSslAuthError` (not `onSslError` which doesn't exist).
+      // `onHttpAuthRequest` is for HTTP Basic/Digest auth (401 challenges), NOT SSL errors.
+      // See: https://pub.dev/documentation/webview_flutter/latest/webview_flutter/NavigationDelegate-class.html
       if (typeName == 'NavigationDelegate') {
         final bool hasOnSslError = node.argumentList.arguments.any((arg) {
           if (arg is NamedExpression) {
             final String name = arg.name.label.name;
-            return name == 'onSslError' ||
-                name == 'onHttpAuthRequest' ||
-                name == 'onSslAuthError';
+            return name == 'onSslAuthError';
           }
           return false;
         });
@@ -659,14 +688,14 @@ class _AddSslHandlerTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add onSslError handler',
+        message: 'Add TODO: Add onSslAuthError handler',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add onSslError callback to handle SSL certificate issues\n',
+          '// TODO: Add onSslAuthError callback to handle SSL certificate issues\n',
         );
       });
     });

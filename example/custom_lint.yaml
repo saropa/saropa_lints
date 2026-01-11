@@ -243,7 +243,7 @@ custom_lint:
     avoid_singlechildscrollview_with_column: false  # ScrollView with Column layout issues. [HIGH]
     avoid_gesture_detector_in_scrollview: false  # GestureDetector in scrollable conflicts. [MEDIUM]
     avoid_unnecessary_gesture_detector: false  # GestureDetector has no callbacks. [MEDIUM]
-    pass_existing_future_to_future_builder: false  # New Future in FutureBuilder rebuilds. [CRITICAL]
+    pass_existing_future_to_future_builder: false  # New Future in FutureBuilder rebuilds. [HIGH]
     pass_existing_stream_to_stream_builder: false  # New Stream in StreamBuilder rebuilds. [CRITICAL]
     prefer_cached_network_image: false  # Consider CachedNetworkImage. [MEDIUM]
     prefer_sliver_list_delegate: false  # Use SliverChildBuilderDelegate. [MEDIUM]

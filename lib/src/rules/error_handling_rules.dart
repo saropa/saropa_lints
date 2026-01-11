@@ -693,50 +693,68 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 ///
 /// When a Future is called without awaiting ("fire and forget"), any errors
 /// it throws go to the global error handler or are silently lost. This rule
-/// detects unawaited Futures that lack `.catchError()` handling.
+/// detects unawaited Futures that lack error handling.
 ///
 /// Note: Awaited futures are NOT flagged because `await` propagates errors
 /// to the enclosing async function's Future - that's proper Dart error handling.
 ///
-/// **BAD:**
+/// ## BAD - Unhandled fire-and-forget
 /// ```dart
 /// void initState() {
 ///   super.initState();
-///   loadData(); // Future not awaited or caught - errors are lost!
+///   loadData(); // Future errors are lost!
+/// }
+///
+/// void _onTap() {
+///   _pageController.nextPage(...); // Errors silently ignored
 /// }
 /// ```
 ///
-/// **GOOD:**
+/// ## GOOD - Handle or explicitly acknowledge
 /// ```dart
-/// // Option 1: Add .catchError() (RECOMMENDED)
+/// // Option 1: Add try-catch to the async function (RECOMMENDED)
+/// // If the function has internal try-catch, this lint won't flag calls to it.
+/// Future<void> _loadData() async {
+///   try {
+///     await fetchFromApi();
+///   } on Exception catch (e, s) {
+///     debugException(e, s);
+///   }
+/// }
+///
+/// // Option 2: Use .ignore() for intentional fire-and-forget
+/// // Best for SDK methods like PageController, AnimationController, etc.
+/// _pageController.nextPage(...).ignore();
+/// _animationController.forward().ignore();
+///
+/// // Option 3: Use unawaited() from dart:async
+/// // Explicit acknowledgment that you don't care about the result or errors.
+/// unawaited(analytics.logEvent('button_pressed'));
+///
+/// // Option 4: Add .catchError() at the call site
 /// loadData().catchError((e, s) {
 ///   debugPrint('$e\n$s');
 ///   return null;
 /// });
-///
-/// // Option 2: Wrap in async helper with try/catch
-/// Future<void> _initAsync() async {
-///   try {
-///     await loadData();
-///   } catch (e, s) {
-///     debugPrint('$e\n$s');
-///   }
-/// }
-///
-/// // Option 3: Use unawaited() if you truly don't care about errors
-/// unawaited(loadData()); // Errors still lost - just silences the lint
 /// ```
+///
+/// ## When to use .ignore() vs unawaited()
+/// - `.ignore()` - Preferred for method chains, cleaner syntax
+/// - `unawaited()` - From `dart:async`, wraps the entire expression
+///
+/// Both explicitly acknowledge that you're intentionally ignoring the Future.
 ///
 /// ## Exceptions (not flagged)
 /// - Futures with `.catchError()` chained
 /// - Futures with `.then(onError: ...)` callback
+/// - Futures with `.ignore()` chained - explicit acknowledgment
 /// - Futures wrapped in `unawaited()` - explicit acknowledgment
-/// - Futures with `.ignore()` chained
 /// - Safe fire-and-forget methods: `cancel()`, `close()`, `dispose()`, `drain()`
 /// - Analytics methods: `logEvent()`, `trackEvent()`, `setCurrentScreen()`
 /// - Cache operations: `prefetch()`, `preload()`, `warmCache()`, `invalidate()`
 /// - Futures inside `dispose()` methods - synchronous context can't await
 /// - Futures already inside a try block
+/// - Functions defined in the same file that have try-catch in their body
 ///
 /// **Quick fix available:** Adds `.catchError()` with `debugPrint`.
 class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
@@ -748,7 +766,8 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_uncaught_future_errors',
     problemMessage: 'Future without error handling may crash app.',
-    correctionMessage: 'Add .catchError() or wrap in try-catch with await.',
+    correctionMessage:
+        'Add try-catch to the function, use .ignore(), or add .catchError().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -788,6 +807,15 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    // Collect all functions/methods with try-catch in their body.
+    // CompilationUnit is visited first in pre-order traversal, so this
+    // callback fires BEFORE addExpressionStatement callbacks.
+    final Set<String> functionsWithTryCatch = <String>{};
+
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      _collectFunctionsWithTryCatch(unit, functionsWithTryCatch);
+    });
+
     context.registry.addExpressionStatement((ExpressionStatement node) {
       final Expression expression = node.expression;
 
@@ -813,6 +841,11 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
             return;
           }
 
+          // Skip if the called function has internal try-catch error handling
+          if (functionsWithTryCatch.contains(methodName)) {
+            return;
+          }
+
           // Check if it has error handling (.catchError, .then(onError:), unawaited)
           if (!_hasErrorHandling(expression)) {
             reporter.atNode(expression, code);
@@ -820,6 +853,57 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Collects all function and method names that have try-catch in their body.
+  void _collectFunctionsWithTryCatch(
+    CompilationUnit unit,
+    Set<String> result,
+  ) {
+    for (final CompilationUnitMember declaration in unit.declarations) {
+      if (declaration is FunctionDeclaration) {
+        if (_bodyHasTryCatch(declaration.functionExpression.body)) {
+          result.add(declaration.name.lexeme);
+        }
+      } else if (declaration is ClassDeclaration) {
+        for (final ClassMember member in declaration.members) {
+          if (member is MethodDeclaration) {
+            if (_bodyHasTryCatch(member.body)) {
+              result.add(member.name.lexeme);
+            }
+          }
+        }
+      } else if (declaration is MixinDeclaration) {
+        for (final ClassMember member in declaration.members) {
+          if (member is MethodDeclaration) {
+            if (_bodyHasTryCatch(member.body)) {
+              result.add(member.name.lexeme);
+            }
+          }
+        }
+      } else if (declaration is ExtensionDeclaration) {
+        for (final ClassMember member in declaration.members) {
+          if (member is MethodDeclaration) {
+            if (_bodyHasTryCatch(member.body)) {
+              result.add(member.name.lexeme);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /// Checks if a function body contains a try-catch statement.
+  bool _bodyHasTryCatch(FunctionBody body) {
+    if (body is BlockFunctionBody) {
+      final Block block = body.block;
+      for (final Statement statement in block.statements) {
+        if (statement is TryStatement) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /// Checks if the node is inside a dispose() method.
@@ -836,7 +920,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   }
 
   /// Check if the Future has error handling via .catchError(), .then(onError:),
-  /// or is wrapped in unawaited().
+  /// .ignore(), or is wrapped in unawaited().
   bool _hasErrorHandling(MethodInvocation node) {
     final String methodName = node.methodName.name;
 
@@ -919,3 +1003,4 @@ class _AddCatchErrorToFutureFix extends DartFix {
     });
   }
 }
+
