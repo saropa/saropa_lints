@@ -484,3 +484,206 @@ class _AddPlatformSettingsTodoFix extends DartFix {
     });
   }
 }
+
+/// Warns when scheduled notifications use DateTime instead of TZDateTime.
+///
+/// Scheduled notifications require timezone-aware datetime handling to ensure
+/// notifications fire at the correct time across timezone changes, daylight
+/// saving time transitions, and for users in different time zones.
+///
+/// **BAD:**
+/// ```dart
+/// await flutterLocalNotificationsPlugin.zonedSchedule(
+///   0,
+///   'title',
+///   'body',
+///   DateTime.now().add(Duration(hours: 1)), // Wrong type!
+///   notificationDetails,
+/// );
+///
+/// // Using DateTime.parse or DateTime.now() for scheduling
+/// final scheduledTime = DateTime.now().add(Duration(days: 1));
+/// await plugin.schedule(0, 'title', 'body', scheduledTime, details);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:timezone/timezone.dart' as tz;
+///
+/// await flutterLocalNotificationsPlugin.zonedSchedule(
+///   0,
+///   'title',
+///   'body',
+///   tz.TZDateTime.now(tz.local).add(Duration(hours: 1)),
+///   notificationDetails,
+///   uiLocalNotificationDateInterpretation:
+///       UILocalNotificationDateInterpretation.absoluteTime,
+/// );
+/// ```
+class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
+  const RequireNotificationTimezoneAwarenessRule() : super(code: _code);
+
+  /// Medium impact - notifications may fire at wrong time, but not a crash.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_notification_timezone_awareness',
+    problemMessage:
+        'Scheduled notification should use TZDateTime instead of DateTime.',
+    correctionMessage:
+        'Use tz.TZDateTime.now(tz.local) or tz.TZDateTime.from() for timezone-aware scheduling.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Methods that schedule notifications and require timezone-aware datetime.
+  static const Set<String> _schedulingMethods = <String>{
+    'zonedSchedule',
+    'schedule',
+    'periodicallyShow',
+    'showDailyAtTime',
+    'showWeeklyAtDayAndTime',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check if it's a scheduling method
+      if (!_schedulingMethods.contains(methodName)) return;
+
+      // Check the target to ensure it's notification-related
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource().toLowerCase();
+        // Only check notification plugin calls
+        if (!targetSource.contains('notification') &&
+            !targetSource.contains('plugin')) {
+          return;
+        }
+      }
+
+      // Check arguments for DateTime usage instead of TZDateTime
+      for (final Expression arg in node.argumentList.arguments) {
+        // Skip named expressions that aren't time-related
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name.toLowerCase();
+          if (paramName != 'scheduleddate' &&
+              paramName != 'time' &&
+              paramName != 'datetime' &&
+              paramName != 'date') {
+            continue;
+          }
+          _checkForDateTime(arg.expression, node, reporter);
+        } else {
+          // Check positional arguments for DateTime expressions
+          _checkForDateTime(arg, node, reporter);
+        }
+      }
+    });
+
+    // Also check for DateTime.now() or DateTime.parse() in notification context
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      // Check for DateTime constructor usage near notification scheduling
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'DateTime') return;
+
+      // Check if this is in a notification scheduling context
+      if (_isInNotificationSchedulingContext(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  void _checkForDateTime(
+    Expression expr,
+    MethodInvocation parentCall,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final String exprSource = expr.toSource();
+
+    // Check for DateTime patterns that should be TZDateTime
+    if (exprSource.contains('DateTime.now()') ||
+        exprSource.contains('DateTime.parse(') ||
+        exprSource.contains('DateTime(')) {
+      // Verify this is a datetime argument, not some other type
+      final String? staticTypeName = expr.staticType?.element?.name;
+      if (staticTypeName == 'DateTime') {
+        reporter.atNode(expr, code);
+      }
+    }
+  }
+
+  bool _isInNotificationSchedulingContext(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+    const int maxDepth = 10;
+
+    while (current != null && depth < maxDepth) {
+      if (current is MethodInvocation) {
+        final String methodName = current.methodName.name;
+        if (_schedulingMethods.contains(methodName)) {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTimezoneAwarenessFix()];
+}
+
+class _AddTimezoneAwarenessFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for timezone-aware datetime',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Use TZDateTime instead of DateTime for timezone-aware scheduling\n',
+        );
+      });
+    });
+
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for timezone-aware datetime',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Use tz.TZDateTime instead of DateTime\n',
+        );
+      });
+    });
+  }
+}

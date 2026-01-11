@@ -2070,3 +2070,223 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
     // We intentionally do not flag traditional SwitchCase.
   }
 }
+
+/// Warns when boolean expressions can be simplified using De Morgan's laws
+/// or by removing double negation.
+///
+/// De Morgan's laws state:
+/// - `!(a && b)` is equivalent to `!a || !b`
+/// - `!(a || b)` is equivalent to `!a && !b`
+///
+/// This rule also detects double negation (`!!x`).
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// if (!(a && b)) { }  // Use !a || !b
+/// if (!(a || b)) { }  // Use !a && !b
+/// if (!!condition) { }  // Use condition
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// if (!a || !b) { }
+/// if (!a && !b) { }
+/// if (condition) { }
+/// ```
+///
+/// **Quick fix available:** Applies De Morgan's law or removes double negation.
+class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
+  const PreferSimplerBooleanExpressionsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_simpler_boolean_expressions',
+    problemMessage: 'Boolean expression can be simplified.',
+    correctionMessage:
+        'Apply De Morgan\'s law or remove double negation for clearer code.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addPrefixExpression((PrefixExpression node) {
+      if (node.operator.type != TokenType.BANG) return;
+
+      final Expression operand = node.operand;
+
+      // Check for double negation: !!x
+      if (operand is PrefixExpression &&
+          operand.operator.type == TokenType.BANG) {
+        reporter.atNode(node, _codeDoubleNegation);
+        return;
+      }
+
+      // Check for De Morgan's law opportunities: !(a && b) or !(a || b)
+      if (operand is ParenthesizedExpression) {
+        final Expression inner = operand.expression;
+        if (inner is BinaryExpression) {
+          final TokenType op = inner.operator.type;
+          if (op == TokenType.AMPERSAND_AMPERSAND ||
+              op == TokenType.BAR_BAR) {
+            // Check if both operands are simple enough that De Morgan's
+            // would actually improve readability
+            if (_isSimpleExpression(inner.leftOperand) &&
+                _isSimpleExpression(inner.rightOperand)) {
+              reporter.atNode(node, _codeDeMorgan);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /// Check if an expression is simple enough that negating it is readable.
+  /// We want to avoid suggesting De Morgan's for complex nested expressions.
+  bool _isSimpleExpression(Expression expr) {
+    // Simple identifiers, property accesses, method calls are OK
+    if (expr is SimpleIdentifier ||
+        expr is PrefixedIdentifier ||
+        expr is PropertyAccess ||
+        expr is MethodInvocation ||
+        expr is BooleanLiteral ||
+        expr is IndexExpression) {
+      return true;
+    }
+    // Already negated expressions are OK
+    if (expr is PrefixExpression && expr.operator.type == TokenType.BANG) {
+      return true;
+    }
+    // Simple comparisons are OK
+    if (expr is BinaryExpression) {
+      final TokenType op = expr.operator.type;
+      if (op == TokenType.EQ_EQ ||
+          op == TokenType.BANG_EQ ||
+          op == TokenType.LT ||
+          op == TokenType.GT ||
+          op == TokenType.LT_EQ ||
+          op == TokenType.GT_EQ) {
+        return true;
+      }
+    }
+    // Parenthesized simple expressions are OK
+    if (expr is ParenthesizedExpression) {
+      return _isSimpleExpression(expr.expression);
+    }
+    return false;
+  }
+
+  static const LintCode _codeDoubleNegation = LintCode(
+    name: 'prefer_simpler_boolean_expressions',
+    problemMessage: 'Double negation (!!x) can be simplified to x.',
+    correctionMessage: 'Remove the double negation.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const LintCode _codeDeMorgan = LintCode(
+    name: 'prefer_simpler_boolean_expressions',
+    problemMessage:
+        'Negated compound expression can be simplified using De Morgan\'s law.',
+    correctionMessage:
+        'Use !(a && b) → !a || !b, or !(a || b) → !a && !b.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  List<Fix> getFixes() => <Fix>[_SimplifyBooleanExpressionFix()];
+}
+
+class _SimplifyBooleanExpressionFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addPrefixExpression((PrefixExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.operator.type != TokenType.BANG) return;
+
+      final Expression operand = node.operand;
+
+      // Handle double negation: !!x -> x
+      if (operand is PrefixExpression &&
+          operand.operator.type == TokenType.BANG) {
+        final String innerExpr = operand.operand.toSource();
+
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Remove double negation',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(
+            SourceRange(node.offset, node.length),
+            innerExpr,
+          );
+        });
+        return;
+      }
+
+      // Handle De Morgan's law: !(a && b) -> !a || !b, !(a || b) -> !a && !b
+      if (operand is ParenthesizedExpression) {
+        final Expression inner = operand.expression;
+        if (inner is BinaryExpression) {
+          final TokenType op = inner.operator.type;
+          String? oppositeOp;
+          if (op == TokenType.AMPERSAND_AMPERSAND) {
+            oppositeOp = '||';
+          } else if (op == TokenType.BAR_BAR) {
+            oppositeOp = '&&';
+          }
+
+          if (oppositeOp == null) return;
+
+          final String left = _negateExpression(inner.leftOperand);
+          final String right = _negateExpression(inner.rightOperand);
+
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Apply De Morgan\'s law',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            builder.addSimpleReplacement(
+              SourceRange(node.offset, node.length),
+              '$left $oppositeOp $right',
+            );
+          });
+        }
+      }
+    });
+  }
+
+  /// Negate an expression, handling already-negated expressions.
+  String _negateExpression(Expression expr) {
+    // If already negated, remove the negation
+    if (expr is PrefixExpression && expr.operator.type == TokenType.BANG) {
+      return expr.operand.toSource();
+    }
+    // If it's a boolean literal, negate it directly
+    if (expr is BooleanLiteral) {
+      return expr.value ? 'false' : 'true';
+    }
+    // Otherwise, add negation
+    final String source = expr.toSource();
+    // Add parentheses if the expression is complex
+    if (expr is BinaryExpression || expr is ConditionalExpression) {
+      return '!($source)';
+    }
+    return '!$source';
+  }
+}

@@ -183,3 +183,196 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when QR scan result is used without URL or content validation.
+///
+/// QR codes can contain malicious URLs, scripts, or malformed data. Using
+/// scanned content directly without validation exposes the app to security
+/// risks including phishing, XSS, and injection attacks.
+///
+/// **BAD:**
+/// ```dart
+/// MobileScanner(
+///   onDetect: (capture) {
+///     final barcode = capture.barcodes.first;
+///     launchUrl(Uri.parse(barcode.rawValue!)); // Dangerous!
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// MobileScanner(
+///   onDetect: (capture) {
+///     final barcode = capture.barcodes.first;
+///     final content = barcode.rawValue;
+///     if (content == null) return;
+///
+///     // Validate URL scheme
+///     final uri = Uri.tryParse(content);
+///     if (uri == null || !['http', 'https'].contains(uri.scheme)) {
+///       showError('Invalid QR code');
+///       return;
+///     }
+///
+///     // Optional: Check against allowlist of domains
+///     if (!_allowedDomains.contains(uri.host)) {
+///       showWarning('Unknown domain: ${uri.host}');
+///     }
+///
+///     launchUrl(uri);
+///   },
+/// )
+/// ```
+class RequireQrContentValidationRule extends SaropaLintRule {
+  const RequireQrContentValidationRule() : super(code: _code);
+
+  /// Security issue - can lead to phishing or malicious redirects.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_qr_content_validation',
+    problemMessage:
+        'QR scan result used without validation. Security risk.',
+    correctionMessage:
+        'Validate URL scheme and optionally domain before using scanned content.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// QR scan callback parameter names.
+  static const Set<String> _scanCallbacks = <String>{
+    'onDetect',
+    'onQRViewCreated',
+    'onBarcodeDetected',
+    'onScan',
+    'onCapture',
+  };
+
+  /// Methods that use URLs dangerously.
+  static const Set<String> _dangerousMethods = <String>{
+    'launchUrl',
+    'launch',
+    'openUrl',
+    'canLaunchUrl',
+    'launchUrlString',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addNamedExpression((NamedExpression node) {
+      final String paramName = node.name.label.name;
+      if (!_scanCallbacks.contains(paramName)) return;
+
+      // Check the callback body
+      final Expression value = node.expression;
+      String callbackSource = '';
+
+      if (value is FunctionExpression) {
+        callbackSource = value.body.toSource();
+      } else {
+        // Method reference - skip (cannot analyze)
+        return;
+      }
+
+      if (callbackSource.isEmpty) return;
+
+      // Check if callback uses URL launching without validation
+      bool usesUrlLaunching = false;
+      for (final String method in _dangerousMethods) {
+        if (callbackSource.contains(method)) {
+          usesUrlLaunching = true;
+          break;
+        }
+      }
+
+      if (!usesUrlLaunching) return;
+
+      // Check for validation patterns
+      // Uri.tryParse is always safe (returns null on failure)
+      // Uri.parse is only safe if combined with scheme validation
+      final bool hasValidation = callbackSource.contains('Uri.tryParse') ||
+          (callbackSource.contains('Uri.parse') &&
+              callbackSource.contains('scheme')) ||
+          callbackSource.contains('isValidUrl') ||
+          callbackSource.contains('validateUrl') ||
+          callbackSource.contains('allowedDomains') ||
+          callbackSource.contains('allowList') ||
+          callbackSource.contains('whitelist') ||
+          callbackSource.contains('.host') ||
+          callbackSource.contains('startsWith(\'http') ||
+          callbackSource.contains('startsWith("http');
+
+      if (!hasValidation) {
+        reporter.atNode(node.name, code);
+      }
+    });
+
+    // Also check for direct usage of barcode rawValue with launchUrl
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_dangerousMethods.contains(methodName)) return;
+
+      // Check if any argument references barcode/rawValue directly
+      for (final Expression arg in node.argumentList.arguments) {
+        final String argSource = arg.toSource();
+        if (argSource.contains('rawValue') ||
+            argSource.contains('barcode') ||
+            argSource.contains('scanResult') ||
+            argSource.contains('qrCode')) {
+          // Check if there's validation before this call
+          AstNode? current = node.parent;
+          BlockFunctionBody? enclosingBody;
+
+          while (current != null) {
+            if (current is BlockFunctionBody) {
+              enclosingBody = current;
+              break;
+            }
+            current = current.parent;
+          }
+
+          if (enclosingBody != null) {
+            final String bodySource = enclosingBody.toSource();
+            final int launchPos = bodySource.indexOf(methodName);
+            final int validatePos = _findValidationPosition(bodySource);
+
+            // If validation appears before launch, it's okay
+            if (validatePos >= 0 && validatePos < launchPos) {
+              return;
+            }
+          }
+
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+
+  /// Find the position of URL validation in the source.
+  int _findValidationPosition(String source) {
+    final List<String> patterns = <String>[
+      'Uri.tryParse',
+      'isValidUrl',
+      'validateUrl',
+      '.scheme',
+      'allowedDomains',
+      'startsWith(\'http',
+      'startsWith("http',
+    ];
+
+    int earliest = -1;
+    for (final String pattern in patterns) {
+      final int pos = source.indexOf(pattern);
+      if (pos >= 0 && (earliest < 0 || pos < earliest)) {
+        earliest = pos;
+      }
+    }
+    return earliest;
+  }
+}

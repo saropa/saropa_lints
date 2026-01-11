@@ -1384,3 +1384,142 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Ticker Disposal Rules
+// =============================================================================
+
+/// Warns when Ticker is created without stop() in dispose.
+///
+/// Alias: ticker_dispose, ticker_stop, ticker_leak
+///
+/// Ticker objects created directly (not via AnimationController) must be
+/// explicitly stopped in dispose(). Failing to stop a Ticker causes memory
+/// leaks and can cause "Ticker was not disposed" errors.
+///
+/// Note: Most Flutter apps use AnimationController which manages its own
+/// Ticker internally. This rule targets cases where Ticker is used directly.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget>
+///     with SingleTickerProviderStateMixin {
+///   late Ticker _ticker;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _ticker = createTicker((elapsed) {
+///       // Frame callback
+///     });
+///     _ticker.start();
+///   }
+///   // Missing stop() in dispose - memory leak!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget>
+///     with SingleTickerProviderStateMixin {
+///   late Ticker _ticker;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _ticker = createTicker((elapsed) {
+///       // Frame callback
+///     });
+///     _ticker.start();
+///   }
+///
+///   @override
+///   void dispose() {
+///     _ticker.stop();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireAnimationTickerDisposalRule extends SaropaLintRule {
+  const RequireAnimationTickerDisposalRule() : super(code: _code);
+
+  /// Ticker leaks cause memory issues and error messages.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_animation_ticker_disposal',
+    problemMessage:
+        'Ticker must be stopped in dispose() to prevent memory leaks.',
+    correctionMessage:
+        'Add _ticker.stop() in dispose() method before super.dispose().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Find Ticker fields
+      final List<String> tickerFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null &&
+              (typeName == 'Ticker' || typeName == 'Ticker?')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              tickerFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (tickerFields.isEmpty) return;
+
+      // Find dispose method and check for stop calls
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Report tickers not stopped in dispose
+      for (final String fieldName in tickerFields) {
+        final bool isStopped = disposeBody != null &&
+            (disposeBody.contains('$fieldName.stop()') ||
+                disposeBody.contains('$fieldName?.stop()') ||
+                disposeBody.contains('$fieldName.dispose()') ||
+                disposeBody.contains('$fieldName?.dispose()'));
+
+        if (!isStopped) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == fieldName) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
