@@ -3513,10 +3513,10 @@ class _WrapSetStateInMountedCheckFix extends DartFix {
         final int lineStart = resolver.lineInfo.getOffsetOfLine(
           resolver.lineInfo.getLocation(statement.offset).lineNumber - 1,
         );
-        final String leadingText =
-            resolver.source.contents.data.substring(lineStart, statement.offset);
-        final String indent =
-            leadingText.replaceAll(RegExp(r'[^\s]'), ''); // Keep only whitespace
+        final String leadingText = resolver.source.contents.data
+            .substring(lineStart, statement.offset);
+        final String indent = leadingText.replaceAll(
+            RegExp(r'[^\s]'), ''); // Keep only whitespace
 
         builder.addSimpleReplacement(
           SourceRange(statement.offset, statement.length),
