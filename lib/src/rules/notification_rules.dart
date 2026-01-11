@@ -334,3 +334,153 @@ class _AddSensitiveNotificationTodoFix extends DartFix {
     });
   }
 }
+
+/// Warns when FlutterLocalNotificationsPlugin.initialize is called without
+/// both iOS and Android settings.
+///
+/// Alias: notification_platform_settings, require_notification_settings
+///
+/// **Quick fix available:** Adds TODO comment for missing platform settings.
+///
+/// ## Why This Matters
+///
+/// The flutter_local_notifications plugin requires platform-specific settings
+/// to function correctly. Missing settings will cause notifications to fail
+/// silently on that platform, which is difficult to debug:
+/// - Missing `android:` → Notifications won't show on Android
+/// - Missing `iOS:` → Notifications won't show on iOS
+///
+/// ## Detection
+///
+/// This rule checks `InitializationSettings` constructor calls for both
+/// `android:` and `iOS:` named parameters. macOS and Linux are not checked
+/// as they're less common for mobile apps.
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// // Notifications will fail silently on iOS!
+/// await plugin.initialize(
+///   InitializationSettings(android: androidSettings),
+/// );
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// await plugin.initialize(
+///   InitializationSettings(
+///     android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+///     iOS: DarwinInitializationSettings(),
+///   ),
+/// );
+/// ```
+class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
+  const RequireNotificationInitializePerPlatformRule() : super(code: _code);
+
+  /// High impact - notifications fail silently, hard to debug.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_notification_initialize_per_platform',
+    problemMessage:
+        'InitializationSettings should include both android and iOS settings.',
+    correctionMessage:
+        'Add both android: and iOS: parameters to ensure notifications work on all platforms.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'InitializationSettings') return;
+
+      // Check for android and iOS settings
+      bool hasAndroid = false;
+      bool hasIOS = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'android') hasAndroid = true;
+          if (name == 'iOS') hasIOS = true;
+        }
+      }
+
+      // Warn if either is missing
+      if (!hasAndroid || !hasIOS) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddPlatformSettingsTodoFix()];
+}
+
+class _AddPlatformSettingsTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Determine which settings are missing
+      bool hasAndroid = false;
+      bool hasIOS = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'android') hasAndroid = true;
+          if (name == 'iOS') hasIOS = true;
+        }
+      }
+
+      String message = 'Add TODO: Add ';
+      if (!hasAndroid && !hasIOS) {
+        message += 'android and iOS settings';
+      } else if (!hasAndroid) {
+        message += 'android settings';
+      } else {
+        message += 'iOS settings';
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: message,
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        String todoText = '// TODO: Add ';
+        if (!hasAndroid && !hasIOS) {
+          todoText +=
+              'both android: and iOS: parameters for cross-platform support\n';
+        } else if (!hasAndroid) {
+          todoText +=
+              'android: AndroidInitializationSettings for Android support\n';
+        } else {
+          todoText += 'iOS: DarwinInitializationSettings for iOS support\n';
+        }
+
+        builder.addSimpleInsertion(node.offset, todoText);
+      });
+    });
+  }
+}
