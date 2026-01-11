@@ -1,9 +1,9 @@
 # Package identity
 name: saropa_lints
 description: >-
-  1184+ custom lint rules for Flutter and Dart. Static analysis for security,
+  1189+ custom lint rules for Flutter and Dart. Static analysis for security,
   accessibility, and performance. Free and open source. 5 tiers plus optional stylistic rules.
-version: 2.3.0
+version: 2.3.2
 license: MIT
 
 # Project links for pub.dev

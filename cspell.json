@@ -37,6 +37,10 @@
     "node_modules/**", // Ignore this file (Self)
     "pub/cache" // Ignore this file (Self)
   ],
+  "ignoreWords": [
+    "realtime",
+    "timezone"
+  ],
   "useGitignore": true,
   "version": "0.2",
   "words": [
@@ -51,6 +55,7 @@
     "blocklists",
     "cachable",
     "Checkmarx",
+    "clippable",
     "COPPA",
     "Coverity",
     "Cupertino",
@@ -93,6 +98,7 @@
     "shouty",
     "signup",
     "sizedbox",
+    "snackbars",
     "SonarQube",
     "sqflite",
     "strobing",
@@ -100,6 +106,7 @@
     "unfocus",
     "Unfreed",
     "unindexed",
+    "unpositioned",
     "unpushed",
     "Unsanitized",
     "unvalidated",

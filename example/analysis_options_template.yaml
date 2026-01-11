@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.0)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.2)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1184+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~1189+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -917,6 +917,20 @@ custom_lint:
     - require_permission_rationale: false        # INFO - show rationale
     - require_permission_status_check: false     # WARNING - check granted
     - require_notification_permission_android13: false # WARNING - Android 13+
+
+    # =========================================================================
+    # IMAGE & PACKAGE-SPECIFIC RULES (v2.3.2)
+    # =========================================================================
+    # Image Picker
+    - prefer_image_picker_max_dimensions: false  # WARNING - OOM prevention
+    # Cached Network Image
+    - prefer_cached_image_fade_animation: false  # INFO - explicit fade duration
+    # URL Launcher
+    - require_url_launcher_mode: false           # INFO - cross-platform mode
+    # SQLite
+    - avoid_sqflite_read_all_columns: false      # INFO - avoid SELECT *
+    # Notifications
+    - require_notification_initialize_per_platform: false # WARNING - platform settings
 
     # =========================================================================
     # OPINIONATED RULES (Not in any tier - enable individually)
