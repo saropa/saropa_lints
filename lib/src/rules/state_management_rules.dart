@@ -9380,8 +9380,7 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
     name: 'prefer_bloc_listener_for_side_effects',
     problemMessage:
         'Side effect in BlocBuilder. Use BlocListener for navigation/snackbars.',
-    correctionMessage:
-        'Move side effects to BlocListener or use BlocConsumer.',
+    correctionMessage: 'Move side effects to BlocListener or use BlocConsumer.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
