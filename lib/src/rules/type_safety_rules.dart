@@ -610,8 +610,7 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_casts',
-    problemMessage:
-        'Cast between unrelated types will always fail at runtime.',
+    problemMessage: 'Cast between unrelated types will always fail at runtime.',
     correctionMessage: 'Use "is" check or verify type hierarchy.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -736,8 +735,7 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
 
       // Skip if inside null check pattern
       if (parent is BinaryExpression) {
-        if (parent.operator.lexeme == '??' ||
-            parent.operator.lexeme == '?.') {
+        if (parent.operator.lexeme == '??' || parent.operator.lexeme == '?.') {
           return;
         }
       }
@@ -1110,7 +1108,8 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
 
     // Check for conditional with null
     // Pattern: condition ? 'error' : null
-    final ternaryWithNullPattern = RegExp(r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null");
+    final ternaryWithNullPattern = RegExp(
+        r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null");
     if (ternaryWithNullPattern.hasMatch(source)) {
       return true;
     }

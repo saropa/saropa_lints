@@ -2101,8 +2101,7 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dispose_before_new_instance',
-    problemMessage:
-        'Disposable field reassigned without disposing old value.',
+    problemMessage: 'Disposable field reassigned without disposing old value.',
     correctionMessage:
         'Call dispose() on the old value before assigning a new instance.',
     errorSeverity: DiagnosticSeverity.WARNING,
