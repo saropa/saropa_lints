@@ -8,7 +8,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -48,7 +49,8 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_logging_sensitive_data',
-    problemMessage: 'Sensitive data in log. Will appear in crash reports and debug output.',
+    problemMessage:
+        'Sensitive data in log. Will appear in crash reports and debug output.',
     correctionMessage:
         'Remove passwords, tokens, and PII from logs. Log a success/failure message instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -108,7 +110,8 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
     // Check if any safe pattern contains this sensitive pattern
     // and appears in the source
     for (final String safePattern in _safePatterns) {
-      if (safePattern.contains(sensitivePattern) && source.contains(safePattern)) {
+      if (safePattern.contains(sensitivePattern) &&
+          source.contains(safePattern)) {
         return true;
       }
     }
@@ -140,7 +143,8 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
-          if (argSource.contains(pattern) && !_isSafeMatch(argSource, pattern)) {
+          if (argSource.contains(pattern) &&
+              !_isSafeMatch(argSource, pattern)) {
             reporter.atNode(node, code);
             return;
           }
@@ -160,7 +164,8 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
-          if (argSource.contains(pattern) && !_isSafeMatch(argSource, pattern)) {
+          if (argSource.contains(pattern) &&
+              !_isSafeMatch(argSource, pattern)) {
             reporter.atNode(node, code);
             return;
           }
@@ -248,7 +253,8 @@ class RequireSecureStorageRule extends SaropaLintRule {
     name: 'require_secure_storage',
     problemMessage:
         'SharedPreferences stores in plain text. Sensitive data will be readable on rooted devices.',
-    correctionMessage: 'Use flutter_secure_storage: secureStorage.write(key: k, value: v).',
+    correctionMessage:
+        'Use flutter_secure_storage: secureStorage.write(key: k, value: v).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -336,8 +342,10 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_credentials',
-    problemMessage: 'Hardcoded credential will be committed to version control and exposed.',
-    correctionMessage: "Use String.fromEnvironment('KEY') or read from secure storage at runtime.",
+    problemMessage:
+        'Hardcoded credential will be committed to version control and exposed.',
+    correctionMessage:
+        "Use String.fromEnvironment('KEY') or read from secure storage at runtime.",
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -482,7 +490,8 @@ class RequireInputSanitizationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_input_sanitization',
     problemMessage: 'User input should be validated or sanitized before use.',
-    correctionMessage: 'Validate and sanitize user input to prevent injection attacks.',
+    correctionMessage:
+        'Validate and sanitize user input to prevent injection attacks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -511,14 +520,18 @@ class RequireInputSanitizationRule extends SaropaLintRule {
       }
 
       // Check for URL loading
-      if (methodName == 'loadUrl' || methodName == 'loadRequest' || methodName == 'launchUrl') {
+      if (methodName == 'loadUrl' ||
+          methodName == 'loadRequest' ||
+          methodName == 'launchUrl') {
         if (node.argumentList.arguments.isEmpty) return;
 
         final Expression firstArg = node.argumentList.arguments.first;
         // If it's a direct variable without validation, flag it
         if (firstArg is SimpleIdentifier) {
           final String name = firstArg.name.toLowerCase();
-          if (name.contains('user') || name.contains('input') || name.contains('param')) {
+          if (name.contains('user') ||
+              name.contains('input') ||
+              name.contains('param')) {
             reporter.atNode(node, code);
           }
         }
@@ -560,8 +573,10 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_webview_javascript_enabled',
-    problemMessage: 'WebView with JavaScript enabled may be vulnerable to XSS attacks.',
-    correctionMessage: 'Consider disabling JavaScript or ensure only trusted content is loaded.',
+    problemMessage:
+        'WebView with JavaScript enabled may be vulnerable to XSS attacks.',
+    correctionMessage:
+        'Consider disabling JavaScript or ensure only trusted content is loaded.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -589,7 +604,8 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
               name == 'javaScriptEnabled' ||
               name == 'initialSettings') {
             final String argSource = arg.expression.toSource();
-            if (argSource.contains('unrestricted') || argSource.contains('true')) {
+            if (argSource.contains('unrestricted') ||
+                argSource.contains('true')) {
               reporter.atNode(arg, code);
               return;
             }
@@ -634,8 +650,10 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_biometric_fallback',
-    problemMessage: 'Biometric authentication should have a fallback mechanism.',
-    correctionMessage: 'Set biometricOnly to false or provide an alternative auth method.',
+    problemMessage:
+        'Biometric authentication should have a fallback mechanism.',
+    correctionMessage:
+        'Set biometricOnly to false or provide an alternative auth method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -706,7 +724,8 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_eval_like_patterns',
     problemMessage: 'Dynamic code execution pattern detected.',
-    correctionMessage: 'Avoid dynamic code execution. Use static dispatch or explicit mappings.',
+    correctionMessage:
+        'Avoid dynamic code execution. Use static dispatch or explicit mappings.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -818,7 +837,8 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
     problemMessage: 'HttpClient should implement certificate pinning.',
-    correctionMessage: 'Set badCertificateCallback to validate server certificates.',
+    correctionMessage:
+        'Set badCertificateCallback to validate server certificates.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -882,7 +902,8 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_token_in_url',
     problemMessage: 'Avoid putting tokens or API keys in URLs.',
-    correctionMessage: 'Use Authorization header or request body for sensitive data.',
+    correctionMessage:
+        'Use Authorization header or request body for sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -944,7 +965,8 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_clipboard_sensitive',
     problemMessage: 'Avoid copying sensitive data to clipboard.',
-    correctionMessage: 'Clipboard can be read by other apps. Never copy passwords or tokens.',
+    correctionMessage:
+        'Clipboard can be read by other apps. Never copy passwords or tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1014,7 +1036,8 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_passwords',
     problemMessage: 'Never store passwords in SharedPreferences.',
-    correctionMessage: 'Use flutter_secure_storage for passwords and sensitive data.',
+    correctionMessage:
+        'Use flutter_secure_storage for passwords and sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1078,8 +1101,10 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_sql',
-    problemMessage: 'SQL query built with string interpolation is vulnerable to SQL injection.',
-    correctionMessage: 'Use parameterized queries with ? placeholders and arguments list.',
+    problemMessage:
+        'SQL query built with string interpolation is vulnerable to SQL injection.',
+    correctionMessage:
+        'Use parameterized queries with ? placeholders and arguments list.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1194,8 +1219,10 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_generic_key_in_url',
-    problemMessage: 'Generic key/auth parameter in URL may contain sensitive data.',
-    correctionMessage: 'Consider using Authorization header instead of URL parameters.',
+    problemMessage:
+        'Generic key/auth parameter in URL may contain sensitive data.',
+    correctionMessage:
+        'Consider using Authorization header instead of URL parameters.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1255,8 +1282,10 @@ class PreferSecureRandomRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random',
-    problemMessage: 'Random() is predictable. Use Random.secure() for security-sensitive code.',
-    correctionMessage: 'Replace Random() with Random.secure() for tokens, passwords, or crypto.',
+    problemMessage:
+        'Random() is predictable. Use Random.secure() for security-sensitive code.',
+    correctionMessage:
+        'Replace Random() with Random.secure() for tokens, passwords, or crypto.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1340,8 +1369,10 @@ class PreferTypedDataRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_typed_data',
-    problemMessage: 'List<int> for binary data wastes memory. Use Uint8List instead.',
-    correctionMessage: 'Use Uint8List for binary data - 8x more memory efficient.',
+    problemMessage:
+        'List<int> for binary data wastes memory. Use Uint8List instead.',
+    correctionMessage:
+        'Use Uint8List for binary data - 8x more memory efficient.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1410,8 +1441,10 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_to_list',
-    problemMessage: '.toList() may be unnecessary here. Lazy iterables are more efficient.',
-    correctionMessage: 'Remove .toList() unless you need to modify the list or access by index.',
+    problemMessage:
+        '.toList() may be unnecessary here. Lazy iterables are more efficient.',
+    correctionMessage:
+        'Remove .toList() unless you need to modify the list or access by index.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1504,7 +1537,8 @@ class RequireAuthCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_auth_check',
     problemMessage: 'Protected endpoint may be missing authentication check.',
-    correctionMessage: 'Add authentication verification before processing protected requests.',
+    correctionMessage:
+        'Add authentication verification before processing protected requests.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1547,7 +1581,8 @@ class RequireAuthCheckRule extends SaropaLintRule {
       if (returnType == null) return;
 
       final String returnTypeStr = returnType.toSource();
-      if (!returnTypeStr.contains('Response') && !returnTypeStr.contains('Future')) {
+      if (!returnTypeStr.contains('Response') &&
+          !returnTypeStr.contains('Future')) {
         return;
       }
 
@@ -1612,8 +1647,10 @@ class RequireTokenRefreshRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_token_refresh',
-    problemMessage: 'Auth service stores access token but may lack refresh logic.',
-    correctionMessage: 'Implement token refresh to handle expiration gracefully.',
+    problemMessage:
+        'Auth service stores access token but may lack refresh logic.',
+    correctionMessage:
+        'Implement token refresh to handle expiration gracefully.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1641,10 +1678,12 @@ class RequireTokenRefreshRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource().toLowerCase();
-          if (fieldSource.contains('accesstoken') || fieldSource.contains('access_token')) {
+          if (fieldSource.contains('accesstoken') ||
+              fieldSource.contains('access_token')) {
             hasAccessToken = true;
           }
-          if (fieldSource.contains('refreshtoken') || fieldSource.contains('refresh_token')) {
+          if (fieldSource.contains('refreshtoken') ||
+              fieldSource.contains('refresh_token')) {
             hasRefreshToken = true;
           }
           if (fieldSource.contains('expir')) {
@@ -1707,7 +1746,8 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
     problemMessage: 'Decoding JWT on client for authorization is insecure.',
-    correctionMessage: 'Verify JWT claims on the server. Client-decoded JWTs can be manipulated.',
+    correctionMessage:
+        'Verify JWT claims on the server. Client-decoded JWTs can be manipulated.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1755,7 +1795,8 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
     ) {
-      final String typeName = node.constructorName.type.name.lexeme.toLowerCase();
+      final String typeName =
+          node.constructorName.type.name.lexeme.toLowerCase();
       if (typeName.contains('jwt') || typeName.contains('jsonwebtoken')) {
         reporter.atNode(node.constructorName, code);
       }
@@ -1797,7 +1838,8 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
     problemMessage: 'Logout may not clear all sensitive data.',
-    correctionMessage: 'Ensure logout clears tokens, cached user data, and resets auth state.',
+    correctionMessage:
+        'Ensure logout clears tokens, cached user data, and resets auth state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1810,7 +1852,9 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme.toLowerCase();
 
-      if (methodName != 'logout' && methodName != 'signout' && methodName != 'sign_out') {
+      if (methodName != 'logout' &&
+          methodName != 'signout' &&
+          methodName != 'sign_out') {
         return;
       }
 
@@ -1825,7 +1869,8 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
           bodySource.contains('credential') ||
           bodySource.contains('auth');
 
-      final bool clearsCache = bodySource.contains('cache') || bodySource.contains('storage');
+      final bool clearsCache =
+          bodySource.contains('cache') || bodySource.contains('storage');
 
       // If logout method is too simple, warn
       if (!clearsStorage || (!clearsToken && !clearsCache)) {
@@ -1863,8 +1908,10 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_auth_in_query_params',
-    problemMessage: 'Auth token in query parameter is insecure. Use Authorization header.',
-    correctionMessage: 'Move token to Authorization header to prevent logging and leakage.',
+    problemMessage:
+        'Auth token in query parameter is insecure. Use Authorization header.',
+    correctionMessage:
+        'Move token to Authorization header to prevent logging and leakage.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1950,8 +1997,10 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_auth_state_in_prefs',
-    problemMessage: 'Auth tokens in SharedPreferences are stored as plain text.',
-    correctionMessage: 'Use flutter_secure_storage or platform keychain for sensitive data.',
+    problemMessage:
+        'Auth tokens in SharedPreferences are stored as plain text.',
+    correctionMessage:
+        'Use flutter_secure_storage or platform keychain for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1981,7 +2030,9 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for SharedPreferences set methods
-      if (methodName != 'setString' && methodName != 'setStringList' && methodName != 'setBool') {
+      if (methodName != 'setString' &&
+          methodName != 'setStringList' &&
+          methodName != 'setBool') {
         return;
       }
 
@@ -2068,8 +2119,10 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_encrypted_prefs',
-    problemMessage: 'Sensitive data in SharedPreferences is stored unencrypted.',
-    correctionMessage: 'Use flutter_secure_storage or encrypted_shared_preferences.',
+    problemMessage:
+        'Sensitive data in SharedPreferences is stored unencrypted.',
+    correctionMessage:
+        'Use flutter_secure_storage or encrypted_shared_preferences.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2198,8 +2251,10 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_deep_link_validation',
-    problemMessage: 'Deep link parameter used without validation. Validate before use.',
-    correctionMessage: 'Add null check and format validation for deep link parameters.',
+    problemMessage:
+        'Deep link parameter used without validation. Validate before use.',
+    correctionMessage:
+        'Add null check and format validation for deep link parameters.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2357,8 +2412,10 @@ class RequireDataEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_data_encryption',
-    problemMessage: 'Sensitive data stored without encryption. Use secure storage.',
-    correctionMessage: 'Use flutter_secure_storage, encrypted Hive box, or AES encryption.',
+    problemMessage:
+        'Sensitive data stored without encryption. Use secure storage.',
+    correctionMessage:
+        'Use flutter_secure_storage, encrypted Hive box, or AES encryption.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2452,8 +2509,10 @@ class PreferDataMaskingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_data_masking',
-    problemMessage: 'Sensitive data displayed without masking. Consider partial masking.',
-    correctionMessage: 'Mask sensitive data: "****-****-****-1234" instead of full number.',
+    problemMessage:
+        'Sensitive data displayed without masking. Consider partial masking.',
+    correctionMessage:
+        'Mask sensitive data: "****-****-****-1234" instead of full number.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2481,7 +2540,8 @@ class PreferDataMaskingRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for Text widgets
@@ -2547,8 +2607,10 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_screenshot_sensitive',
-    problemMessage: 'Sensitive screen without screenshot protection. Consider FLAG_SECURE.',
-    correctionMessage: 'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens.',
+    problemMessage:
+        'Sensitive screen without screenshot protection. Consider FLAG_SECURE.',
+    correctionMessage:
+        'Use FlutterWindowManager.addFlags(FLAG_SECURE) for sensitive screens.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2644,7 +2706,8 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_secure_password_field',
     problemMessage: 'Password field missing secure keyboard settings.',
-    correctionMessage: 'Add enableSuggestions: false and autocorrect: false for passwords.',
+    correctionMessage:
+        'Add enableSuggestions: false and autocorrect: false for passwords.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2654,7 +2717,8 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'TextField' &&
@@ -2666,12 +2730,14 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
       final String nodeSource = node.toSource();
 
       // Check if this is a password field
-      if (!nodeSource.contains('obscureText: true') && !nodeSource.contains('obscureText:true')) {
+      if (!nodeSource.contains('obscureText: true') &&
+          !nodeSource.contains('obscureText:true')) {
         return; // Not a password field
       }
 
       // Check for secure keyboard settings
-      final bool hasEnableSuggestions = nodeSource.contains('enableSuggestions: false');
+      final bool hasEnableSuggestions =
+          nodeSource.contains('enableSuggestions: false');
       final bool hasAutocorrect = nodeSource.contains('autocorrect: false');
 
       if (!hasEnableSuggestions || !hasAutocorrect) {
@@ -2693,7 +2759,8 @@ class _AddSecureKeyboardSettingsFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final String typeName = node.constructorName.type.name2.lexeme;
@@ -2704,7 +2771,8 @@ class _AddSecureKeyboardSettingsFix extends DartFix {
       }
 
       final String nodeSource = node.toSource();
-      final bool hasEnableSuggestions = nodeSource.contains('enableSuggestions: false');
+      final bool hasEnableSuggestions =
+          nodeSource.contains('enableSuggestions: false');
       final bool hasAutocorrect = nodeSource.contains('autocorrect: false');
 
       if (hasEnableSuggestions && hasAutocorrect) return;
@@ -2771,7 +2839,8 @@ class AvoidPathTraversalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_path_traversal',
     problemMessage: 'File path may be vulnerable to path traversal attack.',
-    correctionMessage: 'Validate paths: check for "..", use basename, verify resolved path.',
+    correctionMessage:
+        'Validate paths: check for "..", use basename, verify resolved path.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2781,7 +2850,8 @@ class AvoidPathTraversalRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for File/Directory creation
@@ -2805,7 +2875,8 @@ class AvoidPathTraversalRule extends SaropaLintRule {
           final String source = current.toSource();
 
           // Check for path traversal validation patterns
-          if (source.contains('..') && (source.contains('throw') || source.contains('return'))) {
+          if (source.contains('..') &&
+              (source.contains('throw') || source.contains('return'))) {
             hasValidation = true;
             break;
           }
@@ -2863,8 +2934,10 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_html_escape',
-    problemMessage: 'User content in WebView without HTML escaping. XSS vulnerability.',
-    correctionMessage: 'Use htmlEscape.convert() or a sanitization library for user content.',
+    problemMessage:
+        'User content in WebView without HTML escaping. XSS vulnerability.',
+    correctionMessage:
+        'Use htmlEscape.convert() or a sanitization library for user content.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2874,11 +2947,14 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for WebView widgets
-      if (typeName != 'WebView' && typeName != 'WebViewWidget' && typeName != 'InAppWebView') {
+      if (typeName != 'WebView' &&
+          typeName != 'WebViewWidget' &&
+          typeName != 'InAppWebView') {
         return;
       }
 
@@ -2909,7 +2985,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      if (methodName != 'loadHtml' && methodName != 'loadHtmlString' && methodName != 'loadData') {
+      if (methodName != 'loadHtml' &&
+          methodName != 'loadHtmlString' &&
+          methodName != 'loadData') {
         return;
       }
 
@@ -2953,7 +3031,8 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_logs',
     problemMessage: 'Sensitive data in logs creates security risks.',
-    correctionMessage: 'Remove sensitive data or log only non-sensitive metadata.',
+    correctionMessage:
+        'Remove sensitive data or log only non-sensitive metadata.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3024,7 +3103,8 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final String funcName = node.function.toSource();
       if (!_logMethods.contains(funcName)) return;
 
@@ -3092,7 +3172,8 @@ class _CommentOutSensitiveLogFix extends DartFix {
       });
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       AstNode? current = node;
@@ -3145,8 +3226,10 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shared_prefs_sensitive_data',
-    problemMessage: 'Storing sensitive data in SharedPreferences. Data is unencrypted.',
-    correctionMessage: 'Use flutter_secure_storage for passwords, tokens, and API keys.',
+    problemMessage:
+        'Storing sensitive data in SharedPreferences. Data is unencrypted.',
+    correctionMessage:
+        'Use flutter_secure_storage for passwords, tokens, and API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3189,7 +3272,8 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('sharedpreferences')) {
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('sharedpreferences')) {
         return;
       }
 
@@ -3267,8 +3351,10 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_secure_storage_for_auth',
-    problemMessage: 'Auth token stored in SharedPreferences. Use flutter_secure_storage.',
-    correctionMessage: 'Use FlutterSecureStorage for JWT, bearer tokens, and auth credentials.',
+    problemMessage:
+        'Auth token stored in SharedPreferences. Use flutter_secure_storage.',
+    correctionMessage:
+        'Use FlutterSecureStorage for JWT, bearer tokens, and auth credentials.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3386,7 +3472,8 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (targetSource.contains('pref') || targetSource.contains('sharedpreferences')) {
+      if (targetSource.contains('pref') ||
+          targetSource.contains('sharedpreferences')) {
         reporter.atNode(node, code);
       }
     });
@@ -3418,8 +3505,10 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_key_constants',
-    problemMessage: 'String literal used as SharedPreferences key. Use named constants.',
-    correctionMessage: 'Define keys as constants (e.g., static const kUserName = "user_name").',
+    problemMessage:
+        'String literal used as SharedPreferences key. Use named constants.',
+    correctionMessage:
+        'Define keys as constants (e.g., static const kUserName = "user_name").',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3453,7 +3542,8 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('pref') && !targetSource.contains('sharedpreferences')) {
+      if (!targetSource.contains('pref') &&
+          !targetSource.contains('sharedpreferences')) {
         return;
       }
 
@@ -3497,8 +3587,10 @@ class RequireUrlValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_url_validation',
-    problemMessage: 'Uri.parse on variable without scheme validation. Potential SSRF risk.',
-    correctionMessage: 'Validate url.scheme is https/http before making requests.',
+    problemMessage:
+        'Uri.parse on variable without scheme validation. Potential SSRF risk.',
+    correctionMessage:
+        'Validate url.scheme is https/http before making requests.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3593,8 +3685,10 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_redirect_injection',
-    problemMessage: 'Redirect URL from parameter without domain validation. Open redirect risk.',
-    correctionMessage: 'Validate redirect URL host against trusted domains allowlist.',
+    problemMessage:
+        'Redirect URL from parameter without domain validation. Open redirect risk.',
+    correctionMessage:
+        'Validate redirect URL host against trusted domains allowlist.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3630,7 +3724,8 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
       // Check arguments for redirect-related variable names
       for (final arg in node.argumentList.arguments) {
         // Get the actual expression (unwrap NamedExpression if needed)
-        final Expression actualArg = arg is NamedExpression ? arg.expression : arg;
+        final Expression actualArg =
+            arg is NamedExpression ? arg.expression : arg;
 
         // Only flag String or Uri types - not object types like AppGridMenuItem
         final argType = actualArg.staticType;
@@ -3650,7 +3745,8 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
         final argSource = arg.toSource().toLowerCase();
 
         // Check if argument name suggests redirect
-        final isRedirectRelated = _redirectTerms.any((term) => argSource.contains(term));
+        final isRedirectRelated =
+            _redirectTerms.any((term) => argSource.contains(term));
 
         if (!isRedirectRelated) {
           continue;
@@ -3754,8 +3850,10 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_external_storage_sensitive',
-    problemMessage: 'Sensitive data written to external storage. Accessible by other apps.',
-    correctionMessage: 'Use getApplicationDocumentsDirectory() or encrypt data first.',
+    problemMessage:
+        'Sensitive data written to external storage. Accessible by other apps.',
+    correctionMessage:
+        'Use getApplicationDocumentsDirectory() or encrypt data first.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3817,11 +3915,13 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
           ? node.argumentList.arguments.first.toSource().toLowerCase()
           : '';
 
-      final isSensitive = _sensitiveTerms.any((term) => writeDataSource.contains(term));
+      final isSensitive =
+          _sensitiveTerms.any((term) => writeDataSource.contains(term));
 
       // Also check the file path
       final filePathSource = node.target?.toSource().toLowerCase() ?? '';
-      final pathSensitive = _sensitiveTerms.any((term) => filePathSource.contains(term));
+      final pathSensitive =
+          _sensitiveTerms.any((term) => filePathSource.contains(term));
 
       if (isSensitive || pathSensitive) {
         reporter.atNode(node, code);
@@ -3861,8 +3961,10 @@ class PreferLocalAuthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_local_auth',
-    problemMessage: 'Payment/sensitive operation without biometric authentication.',
-    correctionMessage: 'Add LocalAuthentication().authenticate() before sensitive operations.',
+    problemMessage:
+        'Payment/sensitive operation without biometric authentication.',
+    correctionMessage:
+        'Add LocalAuthentication().authenticate() before sensitive operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3888,7 +3990,8 @@ class PreferLocalAuthRule extends SaropaLintRule {
       final methodName = node.name.lexeme.toLowerCase();
 
       // Check if method name suggests sensitive operation
-      final isSensitive = _sensitiveOperations.any((op) => methodName.contains(op));
+      final isSensitive =
+          _sensitiveOperations.any((op) => methodName.contains(op));
 
       if (!isSensitive) {
         return;
@@ -3941,8 +4044,10 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_secure_storage_auth_data',
-    problemMessage: 'Auth tokens in SharedPreferences are insecure. Use FlutterSecureStorage.',
-    correctionMessage: 'Replace SharedPreferences with FlutterSecureStorage for sensitive data.',
+    problemMessage:
+        'Auth tokens in SharedPreferences are insecure. Use FlutterSecureStorage.',
+    correctionMessage:
+        'Replace SharedPreferences with FlutterSecureStorage for sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
