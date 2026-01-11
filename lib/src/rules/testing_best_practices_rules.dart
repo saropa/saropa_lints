@@ -2414,14 +2414,14 @@ class _AddPumpAndSettleTodoFix extends DartFix {
       if (node.methodName.name != 'delayed') return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Replace with tester.pumpAndSettle()',
+        message: 'Add HACK: Replace with tester.pumpAndSettle()',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Replace Future.delayed with await tester.pumpAndSettle()\n      ',
+          '// HACK: Replace Future.delayed with await tester.pumpAndSettle()\n      ',
         );
       });
     });

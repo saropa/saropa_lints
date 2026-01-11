@@ -1472,7 +1472,7 @@ class _AddOnErrorHandlerFix extends DartFix {
         final int insertOffset = args.rightParenthesis.offset;
         builder.addSimpleInsertion(
           insertOffset,
-          ', onError: (error) { /* TODO: Handle error */ }',
+          ', onError: (error) { /* HACK: Handle error */ }',
         );
       });
     });
