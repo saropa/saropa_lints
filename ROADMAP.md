@@ -17,15 +17,13 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 | `avoid_dependency_overrides` | Recommended | `dependency_overrides` without explanatory comment |
 | `prefer_correct_package_name` | Essential | Package name not matching Dart conventions |
 
-## Moved to Implementation (57 rules)
-
-The following rules have been added to `tiers.dart`. Rules marked with (alias) map to existing implementations.
+## Implementation Status (57 rules)
 
 ### Disposal Rules
 - `require_scroll_controller_dispose` - Essential
 - `require_focus_node_dispose` - Essential
 - `require_animation_controller_dispose` → (alias: `require_animation_disposal`)
-- `require_stream_subscription_cancel` → (alias: `avoid_unassigned_stream_subscriptions`)
+- `require_stream_subscription_cancel` - Essential (IMPLEMENTED - supports single & collection patterns)
 - `require_timer_cancel` → (alias: `require_timer_cancellation`)
 - `require_text_editing_controller_dispose` - Essential
 - `require_page_controller_dispose` - Essential
@@ -1440,8 +1438,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `avoid_go_router_inline_creation` | Essential | WARNING | GoRouter created inline in build causes hot reload issues. Detect GoRouter instantiated in build method. |
 | `require_go_router_error_handler` | Recommended | INFO | GoRouter should handle unknown routes. Detect GoRouter without errorBuilder or errorPageBuilder. |
-| `prefer_go_router_redirect_auth` | Professional | INFO | Auth checks should use redirect, not build-time checks. Detect auth logic in page builders instead of redirect. |
-| `require_go_router_typed_params` | Professional | INFO | Route parameters as strings are error-prone. Detect string path params without type conversion. |
 | `prefer_shell_route_shared_layout` | Professional | INFO | Use ShellRoute for shared AppBar/BottomNav. Detect duplicated Scaffold across routes. |
 | `require_stateful_shell_route_tabs` | Professional | INFO | Tab navigation should use StatefulShellRoute to preserve state. Detect tabs without StatefulShellRoute. |
 | `avoid_go_router_string_paths` | Recommended | INFO | Use go_router_builder for type-safe navigation. Detect string literals in context.go() calls. |
@@ -1460,11 +1456,9 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_provider_generic_type` | Essential | ERROR | Provider.of without generic type won't work. Detect Provider.of(context) without `<Type>`. |
 | `avoid_provider_circular_dependency` | Essential | ERROR | Circular provider dependencies cause stack overflow. Detect A watches B watches A patterns. |
 | `prefer_multi_provider` | Recommended | INFO | Use MultiProvider instead of nested providers. Detect deeply nested Provider widgets. |
-| `avoid_provider_in_init_state` | Essential | WARNING | Provider.of in initState may access disposed providers. Use WidgetsBinding.addPostFrameCallback. |
 | `prefer_change_notifier_proxy_provider` | Professional | INFO | Providers depending on others should use ProxyProvider. Detect manual dependency passing. |
 | `require_provider_dispose` | Essential | WARNING | ChangeNotifierProvider should dispose its notifier. Detect Provider.value without external disposal. |
 | `avoid_provider_value_rebuild` | Professional | WARNING | Provider.value shouldn't be used with notifiers created in build. Detect Provider.value with inline creation. |
-| `prefer_context_read_in_callbacks` | Essential | WARNING | Use context.read in callbacks, not context.watch. Detect context.watch in button handlers. |
 | `avoid_provider_listen_false_in_build` | Recommended | INFO | `listen: false` in build prevents rebuilds but may show stale data. Detect inappropriate usage. |
 | `require_provider_scope` | Professional | INFO | Providers should be scoped to where they're needed. Detect all providers at root. |
 | `prefer_selector_widget` | Professional | INFO | Selector limits rebuilds to specific fields. Detect Consumer rebuilding on unrelated changes. |
@@ -1535,7 +1529,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `require_hive_initialization` | Essential | ERROR | Hive.init must be called before box access. Detect box open without prior init. |
 | `require_hive_type_adapter` | Essential | ERROR | Custom types need TypeAdapters. Detect custom class in Hive without registered adapter. |
-| `require_hive_type_id_management` | Essential | WARNING | TypeIds must be unique and stable. Detect duplicate or changing typeIds. |
 | `prefer_hive_lazy_box` | Professional | INFO | Large boxes should use LazyBox to avoid memory issues. Detect Box with many entries. |
 | `require_hive_box_close` | Essential | WARNING | Boxes should be closed when done. Detect box.close() missing in dispose. |
 | `avoid_hive_binary_storage` | Professional | INFO | Store file paths, not binary data in Hive. Detect Uint8List fields in Hive types. |
@@ -1571,7 +1564,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_sqflite_error_handling` | Essential | WARNING | Database operations can fail. Detect db calls without try-catch. |
 | `avoid_sqflite_reserved_words` | Essential | WARNING | Avoid SQLite reserved words as column names. Detect reserved word usage. |
 | `prefer_sqflite_singleton` | Professional | INFO | Use singleton database instance. Detect multiple openDatabase calls. |
-| `require_sqflite_migration` | Essential | WARNING | Version upgrades need migration. Detect onUpgrade without version check. |
 | `prefer_sqflite_batch` | Professional | INFO | Bulk inserts should use batch. Detect loop with individual inserts. |
 | `require_sqflite_close` | Essential | WARNING | Close database when done. Detect openDatabase without close. |
 | `avoid_sqflite_type_mismatch` | Essential | ERROR | SQLite types must match Dart types. Detect type conversion issues. |
@@ -1588,7 +1580,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_cached_image_placeholder` | Recommended | INFO | Show placeholder while loading. Detect CachedNetworkImage without placeholder. |
 | `require_cached_image_error_widget` | Recommended | INFO | Handle broken images. Detect CachedNetworkImage without errorWidget. |
 | `prefer_cached_image_cache_manager` | Professional | INFO | Custom CacheManager limits cache size. Detect default unlimited caching. |
-| `avoid_cached_image_in_build` | Essential | WARNING | Don't create new cache keys in build. Detect variable cacheKey in build method. |
 | `require_cached_image_device_pixel_ratio` | Professional | INFO | Consider devicePixelRatio for sizing. Detect fixed sizes without DPR. |
 | `avoid_cached_image_web` | Recommended | WARNING | CachedNetworkImage lacks web caching. Detect web usage; suggest alternatives. |
 | `prefer_cached_image_fade_animation` | Recommended | INFO | Use fadeInDuration for smooth loading. Detect CachedNetworkImage without fade. |
@@ -1606,7 +1597,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `avoid_image_picker_quick_succession` | Professional | WARNING | Multiple rapid picks cause ALREADY_ACTIVE error. Detect pickImage without debounce. |
 | `require_image_picker_source_choice` | Recommended | INFO | Offer camera and gallery options. Detect hardcoded ImageSource. |
 | `prefer_image_picker_request_full_metadata` | Professional | INFO | Use requestFullMetadata: false if EXIF not needed. Reduces permission requirements. |
-| `require_image_picker_result_handling` | Essential | WARNING | XFile result must be processed. Detect pickImage result unused. |
 | `avoid_image_picker_large_files` | Professional | WARNING | Compress large images. Detect picks without imageQuality parameter. |
 | `prefer_image_picker_multi_selection` | Recommended | INFO | Use pickMultiImage for multiple selection. Detect loop calling pickImage. |
 
@@ -1616,11 +1606,9 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `require_permission_manifest_android` | Essential | ERROR | `[CROSS-FILE]` Android permissions need manifest entries. Detect runtime request without manifest. |
 | `require_permission_plist_ios` | Essential | ERROR | `[CROSS-FILE]` iOS permissions need Info.plist descriptions. Detect request without plist. |
-| `require_permission_rationale` | Recommended | INFO | Explain why permission is needed before requesting. Detect request without prior explanation. |
 | `require_permission_denied_handling` | Essential | WARNING | Handle denied permission gracefully. Detect request without denied state handling. |
 | `require_permission_permanent_denial_handling` | Essential | WARNING | Handle permanent denial with settings redirect. Detect missing openAppSettings flow. |
 | `prefer_permission_request_in_context` | Professional | INFO | Request permissions when needed, not at startup. Detect all permissions in main(). |
-| `require_permission_status_check` | Recommended | INFO | Check status before using feature. Detect feature usage without permission check. |
 | `avoid_permission_handler_null_safety | Essential | ERROR | Use null-safe permission_handler version. Detect outdated package version. |
 | `require_permission_lifecycle_observer` | Professional | INFO | Re-check permissions on app resume. Detect missing WidgetsBindingObserver. |
 | `prefer_permission_minimal_request` | Recommended | INFO | Request only needed permissions. Detect requesting unused permissions. |
@@ -1647,7 +1635,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_notification_icon_kept` | Essential | ERROR | `[CROSS-FILE]` ProGuard can remove notification icons. Check keep rules exist. |
-| `require_notification_permission_android13` | Essential | ERROR | Android 13+ needs POST_NOTIFICATIONS permission. Detect notification without permission. |
 | `require_notification_handler_top_level` | Essential | ERROR | Background handler must be top-level function. Detect instance method as handler. |
 | `avoid_notification_same_id` | Recommended | WARNING | Same ID overwrites previous notification. Detect static ID for unique notifications. |
 | `require_notification_channel_android` | Essential | ERROR | Android 8+ needs notification channel. Detect notification without channel configuration. |
@@ -1777,7 +1764,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_await_in_async` | Essential | WARNING | async function should await something. Detect async without await. |
 | `avoid_unawaited_future` | Essential | WARNING | Unawaited futures lose errors. Detect Future without await or unawaited(). |
 | `avoid_future_in_build` | Essential | WARNING | Create futures in initState. Detect Future creation in build triggering rebuilds. |
-| `require_future_error_handling` | Essential | WARNING | Handle Future errors. Detect future without catchError or try-catch. |
+| `require_future_error_handling` | Essential | WARNING | ~~MERGED into `avoid_uncaught_future_errors`~~ |
 | `avoid_future_builder_rebuild` | Essential | ERROR | Don't pass new Future to FutureBuilder on rebuild. Cache future reference. |
 | `prefer_compute_for_heavy_work` | Professional | INFO | Use compute() for expensive operations. Detect heavy sync work in async function. |
 | `require_mounted_check_after_await` | Essential | WARNING | Check mounted after await in StatefulWidget. Detect setState after await without check. |
@@ -1910,8 +1897,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `prefer_webview_javascript_disabled` | Essential | WARNING | Disable JavaScript unless needed. Detect WebView with JavaScript enabled by default. |
 | `avoid_webview_local_storage_access` | Professional | WARNING | Limit WebView local storage access. Detect unrestricted storage settings. |
-| `require_webview_navigation_delegate` | Essential | WARNING | Control navigation to prevent phishing. Detect WebView without navigationDelegate. |
-| `avoid_webview_file_access` | Essential | ERROR | Restrict file access in WebView. Detect WebView with file access enabled. |
 | `require_webview_user_agent` | Professional | INFO | Set custom user agent for analytics. Detect default user agent. |
 | `prefer_webview_sandbox` | Professional | INFO | Use sandbox attribute for iframes. Detect iframe without sandbox. |
 | `avoid_webview_insecure_content` | Essential | ERROR | Block mixed content. Detect WebView allowing insecure content. |
@@ -2502,47 +2487,38 @@ These rules should be revisited when:
 3. Runtime analysis tools are integrated
 4. Package-specific detection is implemented
 
-## Package-Specific Rules from saropa (38 remaining, 21 implemented)
+## Package-Specific Rules from saropa (38 remaining)
 
 > Generated on 2026-01-10 by `analyze_pubspec.py`
-> **v2.2.0**: 19 rules implemented in `package_specific_rules.dart`, 2 already existed in other files.
 
 ### Authentication
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
-| `require_google_signin_error_handling` | Recommended | google_sign_in | ✅ IMPLEMENTED - Ensure GoogleSignIn.signIn() has try-catch for PlatformException |
 | `require_google_signin_disconnect_on_logout` | Recommended | google_sign_in | Call GoogleSignIn.disconnect() on logout |
 | `avoid_google_signin_silent_without_fallback` | Stylistic | google_sign_in | signInSilently() should have fallback |
 | `require_google_sign_in_platform_interface_error_handling` | Recommended | google_sign_in_platform_interface | Handle auth errors |
 | `require_google_sign_in_platform_interface_logout_cleanup` | Recommended | google_sign_in_platform_interface | Cleanup on logout |
 | `require_googleapis_auth_error_handling` | Recommended | googleapis_auth | Handle auth errors |
 | `require_googleapis_auth_logout_cleanup` | Recommended | googleapis_auth | Cleanup on logout |
-| `require_apple_signin_nonce` | Essential | sign_in_with_apple | ✅ IMPLEMENTED - Use secure random nonce to prevent replay attacks |
 | `require_apple_credential_state_check` | Recommended | sign_in_with_apple | Check getCredentialState() before assuming signed in |
 | `avoid_storing_apple_identity_token` | Essential | sign_in_with_apple | Don't store identity tokens locally |
 | `require_sign_in_with_apple_platform_interface_error_handling` | Recommended | sign_in_with_apple_platform_interface | Handle auth errors |
 | `require_sign_in_with_apple_platform_interface_logout_cleanup` | Recommended | sign_in_with_apple_platform_interface | Cleanup on logout |
-| `require_supabase_error_handling` | Recommended | supabase_flutter | ✅ IMPLEMENTED - Wrap Supabase calls in try-catch |
-| `avoid_supabase_anon_key_in_code` | Essential | supabase_flutter | ✅ IMPLEMENTED - Don't hardcode Supabase anon key |
 | `require_supabase_auth_state_listener` | Recommended | supabase_flutter | Listen to onAuthStateChange |
-| `require_supabase_realtime_unsubscribe` | Essential | supabase_flutter | ✅ IMPLEMENTED - Unsubscribe from realtime on dispose |
 
 ### Background Processing
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
-| `require_workmanager_constraints` | Recommended | workmanager | ✅ IMPLEMENTED - Specify NetworkType/battery constraints |
 | `require_workmanager_unique_name` | Recommended | workmanager | Use unique names to prevent duplicates |
 | `require_workmanager_error_handling` | Recommended | workmanager | Handle task failures with retry |
-| `require_workmanager_result_return` | Essential | workmanager | ✅ IMPLEMENTED - Always return Result.success/failure/retry |
 
 ### Contacts & Calendar
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
 | `require_calendar_permission_check` | Essential | device_calendar | Request permission before accessing |
-| `require_calendar_timezone_handling` | Recommended | device_calendar | ✅ IMPLEMENTED - Handle timezone explicitly |
 | `require_contacts_permission_check` | Essential | flutter_contacts | Request permission before accessing |
 | `require_contacts_error_handling` | Recommended | flutter_contacts | Handle permission denied gracefully |
 | `avoid_contacts_full_fetch` | Stylistic | flutter_contacts | Use withProperties for needed fields only |
@@ -2562,16 +2538,8 @@ These rules should be revisited when:
 
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
-| `require_keyboard_visibility_dispose` | Recommended | flutter_keyboard_visibility | ✅ IMPLEMENTED - Dispose subscription |
 | `require_speech_permission_check` | Essential | speech_to_text | Check microphone permission |
-| `require_speech_stop_on_dispose` | Essential | speech_to_text | ✅ IMPLEMENTED - Call stop() in dispose |
 | `require_speech_availability_check` | Recommended | speech_to_text | Check isAvailable first |
-
-### Images & Media
-
-| Rule | Tier | Package | Description |
-|------|------|---------|-------------|
-| `require_svg_error_handler` | Recommended | flutter_svg | ✅ IMPLEMENTED - Provide errorBuilder |
 
 ### In-App Features
 
@@ -2579,10 +2547,7 @@ These rules should be revisited when:
 |------|------|---------|-------------|
 | `avoid_in_app_review_on_first_launch` | Recommended | in_app_review | Don't request on first launch |
 | `require_in_app_review_availability_check` | Recommended | in_app_review | Check isAvailable first |
-| `require_webview_navigation_delegate` | Recommended | webview_flutter | ✅ IMPLEMENTED (flutter_widget_rules.dart) - Set navigationDelegate to control URL loading |
-| `require_webview_ssl_error_handling` | Essential | webview_flutter | ✅ IMPLEMENTED - Handle SSL errors explicitly |
 | `require_webview_clear_on_logout` | Recommended | webview_flutter | Clear WebView cache/cookies on logout |
-| `avoid_webview_file_access` | Recommended | webview_flutter | ✅ IMPLEMENTED - Disable file:// access unless required |
 
 ### Location & Maps
 
@@ -2595,17 +2560,11 @@ These rules should be revisited when:
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
 | `require_app_links_validation` | Recommended | app_links | Validate deep link parameters |
-| `avoid_app_links_sensitive_params` | Essential | app_links | ✅ IMPLEMENTED - Don't pass tokens in URLs |
-| `avoid_openai_key_in_code` | Essential | chat_gpt_sdk | ✅ IMPLEMENTED - Don't hardcode API key |
-| `require_openai_error_handling` | Recommended | chat_gpt_sdk | ✅ IMPLEMENTED - Handle rate limits and errors |
 | `avoid_envied_secrets_in_repo` | Essential | envied | Ensure .env files are gitignored |
-| `require_envied_obfuscation` | Recommended | envied | ✅ IMPLEMENTED - Use obfuscate: true for secrets |
 | `require_file_picker_permission_check` | Recommended | file_picker | Check storage permission first |
 | `require_file_picker_type_validation` | Recommended | file_picker | Validate file type after picking |
 | `require_file_picker_size_check` | Recommended | file_picker | Check file size to prevent OOM |
 | `require_cache_manager_clear_on_logout` | Recommended | flutter_cache_manager | Clear cache on logout |
-| `require_google_fonts_fallback` | Recommended | google_fonts | ✅ IMPLEMENTED - Specify fontFamilyFallback |
-| `avoid_logging_sensitive_data` | Essential | logging | ✅ IMPLEMENTED (security_rules.dart) - Don't log PII or tokens |
 | `require_timezone_initialization` | Essential | timezone | Call initializeTimeZones() first |
 | `require_password_strength_threshold` | Recommended | zxcvbn | Enforce minimum score 3+ |
 
@@ -2614,4 +2573,3 @@ These rules should be revisited when:
 | Rule | Tier | Package | Description |
 |------|------|---------|-------------|
 | `require_intl_locale_initialization` | Recommended | intl | Initialize default locale on start |
-| `prefer_uuid_v4` | Stylistic | uuid | ✅ IMPLEMENTED - UUIDv4 for random IDs; v1 leaks MAC |

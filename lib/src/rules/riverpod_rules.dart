@@ -1,13 +1,15 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 // Riverpod-specific lint rules for Saropa Lints
 // Implements rules 45–52 from the roadmap
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../import_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when `ref.read()` is used inside a `build()` method.
@@ -372,11 +374,18 @@ class _RefAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 /// Direct assignment breaks the provider contract and can cause
 /// unexpected behavior.
 ///
+/// **Note:** This rule intentionally excludes:
+/// - Files that don't import Riverpod packages
+/// - Flutter's `ValueNotifier`, `ChangeNotifier`, and related types
+/// - Assignments inside `initState()` or other lifecycle methods
+///
+/// **Quick fix available:** Comments out the problematic assignment.
+///
 /// ### Example
 ///
 /// #### BAD:
 /// ```dart
-/// notifier = SomeNotifier();
+/// notifier = SomeNotifier();  // Riverpod notifier reassignment
 /// myNotifier = anotherNotifier;
 /// ```
 ///
@@ -384,6 +393,13 @@ class _RefAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 /// ```dart
 /// // Use provider's own lifecycle
 /// ref.read(myProvider.notifier).updateState(newValue);
+///
+/// // Flutter ValueNotifier in initState is OK
+/// @override
+/// void initState() {
+///   super.initState();
+///   _textNotifier = ValueNotifier<String>('');  // OK - Flutter type in initState
+/// }
 /// ```
 class AvoidAssigningNotifiersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
@@ -398,23 +414,134 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+
+  /// Flutter notifier types that should NOT trigger this rule.
+  static const Set<String> _flutterNotifierTypes = <String>{
+    'ValueNotifier',
+    'ChangeNotifier',
+    'SafeValueNotifier',
+    'TextEditingController',
+    'ScrollController',
+    'AnimationController',
+    'TabController',
+    'PageController',
+    'FocusNode',
+  };
+
+  /// Lifecycle methods where notifier initialization is valid.
+  static const Set<String> _lifecycleMethods = <String>{
+    'initState',
+    'didChangeDependencies',
+    'didUpdateWidget',
+  };
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    // Use direct assignment expression callback for reliable detection
     context.registry.addAssignmentExpression((AssignmentExpression node) {
       final lhs = node.leftHandSide;
-      // Only match exact 'notifier' or variables that are exactly named
-      // with 'notifier' as a word boundary (e.g., 'myNotifier' but not 'notifierWrapper')
-      if (lhs is SimpleIdentifier) {
-        final name = lhs.name.toLowerCase();
-        // Match 'notifier' exactly or as a suffix (e.g., 'myNotifier')
-        if (name == 'notifier' || name.endsWith('notifier')) {
-          reporter.atNode(node, code);
+
+      // Only match variables ending with 'notifier'
+      if (lhs is! SimpleIdentifier) return;
+
+      final name = lhs.name.toLowerCase();
+      if (name != 'notifier' && !name.endsWith('notifier')) return;
+
+      // Check if file imports Riverpod - if not, skip entirely
+      if (!_fileImportsRiverpod(node)) return;
+
+      // Skip if inside a lifecycle method - initial construction is valid there
+      if (_isInsideLifecycleMethod(node)) return;
+
+      // Check if the RHS type is a Flutter notifier (not Riverpod)
+      final rhs = node.rightHandSide;
+      if (_isFlutterNotifierConstruction(rhs)) return;
+
+      // Check if the variable's declared type is a Flutter notifier
+      final declaredType = lhs.staticType?.getDisplayString();
+      if (declaredType != null && _isFlutterNotifierType(declaredType)) return;
+
+      // Also check RHS static type for cases where LHS type isn't resolved
+      final rhsType = rhs.staticType?.getDisplayString();
+      if (rhsType != null && _isFlutterNotifierType(rhsType)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  /// Check if the containing file imports Riverpod packages.
+  bool _fileImportsRiverpod(AstNode node) =>
+      fileImportsPackage(node, PackageImports.riverpod);
+
+  /// Check if the node is inside a lifecycle method where initialization is valid.
+  bool _isInsideLifecycleMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        if (_lifecycleMethods.contains(current.name.lexeme)) {
+          return true;
         }
       }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Check if the expression is constructing a Flutter notifier type.
+  bool _isFlutterNotifierConstruction(Expression expr) {
+    if (expr is InstanceCreationExpression) {
+      final typeName = expr.constructorName.type.name.lexeme;
+      return _flutterNotifierTypes.contains(typeName) ||
+          typeName.contains('ValueNotifier') ||
+          typeName.contains('ChangeNotifier');
+    }
+    return false;
+  }
+
+  /// Check if a type string indicates a Flutter notifier.
+  bool _isFlutterNotifierType(String typeString) {
+    for (final flutterType in _flutterNotifierTypes) {
+      if (typeString.contains(flutterType)) return true;
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutNotifierAssignmentFix()];
+}
+
+/// Quick fix that comments out the problematic notifier assignment.
+class _CommentOutNotifierAssignmentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addAssignmentExpression((AssignmentExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final statement = node.thisOrAncestorOfType<ExpressionStatement>();
+      if (statement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out notifier assignment',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          statement.sourceRange,
+          '// HACK: Notifier assignment - use ref.read(provider.notifier) instead\n'
+          '// ${statement.toSource()}',
+        );
+      });
     });
   }
 }

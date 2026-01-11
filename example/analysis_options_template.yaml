@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.2.0)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.0)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1025+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~1184+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -88,7 +88,7 @@ custom_lint:
     #   - recommended    : ~150 rules (default) ← START HERE
     #   - professional   : ~350 rules (strict)
     #   - comprehensive  : ~700 rules (very strict)
-    #   - insanity       : ~821+ rules (everything)
+    #   - insanity       : ~1184+ rules (everything)
     tier: recommended
 
   # ===========================================================================
@@ -130,7 +130,8 @@ custom_lint:
     - prefer_unwrapping_future_or: false
     - prefer_specifying_future_value_type: false
     - prefer_expect_later: false
-    - require_future_error_handling: false
+    # Note: require_future_error_handling was merged into avoid_uncaught_future_errors
+    - avoid_uncaught_future_errors: false
     - avoid_unassigned_stream_subscriptions: false
     - require_stream_controller_dispose: false
 
@@ -312,6 +313,7 @@ custom_lint:
     - require_tab_controller_dispose: false
     - require_text_editing_controller_dispose: false
     - require_page_controller_dispose: false
+    - require_stream_subscription_cancel: false
 
     # =========================================================================
     # FLUTTER FORMS
@@ -639,7 +641,7 @@ custom_lint:
     # NETWORK & API
     # =========================================================================
     - require_http_status_check: false
-    - require_api_timeout: false
+    # Note: require_api_timeout was merged into require_request_timeout
     - require_request_timeout: false
     - avoid_hardcoded_api_urls: false
     - require_retry_logic: false
@@ -744,6 +746,7 @@ custom_lint:
     # STATE MANAGEMENT
     # =========================================================================
     - avoid_ref_in_dispose: false
+    - avoid_assigning_notifiers: false
     - require_provider_scope: false
     - prefer_select_for_partial: false
     - avoid_provider_in_widget: false
@@ -820,6 +823,8 @@ custom_lint:
     - require_edge_case_tests: false
     - prefer_test_data_builder: false
     - avoid_test_implementation_details: false
+    - prefer_test_variant: false
+    - require_animation_tests: false
     - require_getit_reset_in_tests: false
 
     # =========================================================================
@@ -890,6 +895,28 @@ custom_lint:
     - require_svg_error_handler: false
     - require_google_fonts_fallback: false
     - prefer_uuid_v4: false
+
+    # =========================================================================
+    # ROADMAP PART 7 RULES (v2.3.0)
+    # =========================================================================
+    # GoRouter
+    - prefer_go_router_redirect_auth: false      # INFO - auth in redirect
+    - require_go_router_typed_params: false      # INFO - type-safe params
+    # Provider
+    - avoid_provider_in_init_state: false        # WARNING - timing issue
+    - prefer_context_read_in_callbacks: false    # WARNING - avoid rebuilds
+    # Hive
+    - require_hive_type_id_management: false     # INFO - typeId registry
+    # Image Picker
+    - require_image_picker_result_handling: false # WARNING - null handling
+    # Cached Network Image
+    - avoid_cached_image_in_build: false         # WARNING - stable cache key
+    # SQLite
+    - require_sqflite_migration: false           # WARNING - version check
+    # Permissions
+    - require_permission_rationale: false        # INFO - show rationale
+    - require_permission_status_check: false     # WARNING - check granted
+    - require_notification_permission_android13: false # WARNING - Android 13+
 
     # =========================================================================
     # OPINIONATED RULES (Not in any tier - enable individually)

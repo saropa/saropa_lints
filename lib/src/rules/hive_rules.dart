@@ -12,6 +12,42 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
+// =============================================================================
+// Shared Utilities
+// =============================================================================
+
+/// Check if an expression target looks like a Hive box.
+/// Uses word boundary matching to avoid false positives like 'infobox'.
+bool _isHiveBoxTarget(Expression? target) {
+  if (target == null) return false;
+
+  final String source = target.toSource().toLowerCase();
+
+  // Check for exact 'box' variable or common patterns like myBox, userBox
+  // Use word boundary to avoid matching 'infobox', 'checkbox', etc.
+  final boxPattern = RegExp(r'\bbox\b|box$|^box|_box');
+  return boxPattern.hasMatch(source);
+}
+
+/// Check if a field declaration or variable name indicates a Hive Box type.
+bool _isHiveBoxField(String typeSource, String variableName) {
+  final String typeLower = typeSource.toLowerCase();
+  final String nameLower = variableName.toLowerCase();
+
+  // Type contains Box (LazyBox, Box<T>, etc.)
+  if (typeLower.contains('box<') || typeLower == 'box') {
+    return true;
+  }
+
+  // Variable name ends with 'box' or contains '_box'
+  final boxPattern = RegExp(r'\bbox$|_box\b|^box$');
+  return boxPattern.hasMatch(nameLower);
+}
+
+// =============================================================================
+// Hive Rules
+// =============================================================================
+
 /// Warns when Hive.openBox is called without verifying Hive.init was called.
 ///
 /// Alias: hive_init_check, ensure_hive_initialized
@@ -38,9 +74,9 @@ class RequireHiveInitializationRule extends SaropaLintRule {
 
   /// HEURISTIC: This rule cannot verify cross-file initialization.
   /// It serves as a reminder to ensure init is called somewhere.
-  /// Impact is medium since this is informational, not a definite bug.
+  /// Impact is low since this is informational, not a definite bug.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.low;
 
   static const LintCode _code = LintCode(
     name: 'require_hive_initialization',
@@ -133,11 +169,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       }
 
       // Check if target looks like a Hive box
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('box')) return;
+      if (!_isHiveBoxTarget(node.target)) return;
 
       // Check arguments - if it's a custom object (not primitive)
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -223,9 +255,9 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
             final String typeStr = member.fields.type?.toSource() ?? '';
-            final String nameStr = variable.name.lexeme.toLowerCase();
+            final String nameStr = variable.name.lexeme;
 
-            if (typeStr.contains('Box') || nameStr.contains('box')) {
+            if (_isHiveBoxField(typeStr, nameStr)) {
               boxFields.add(variable);
             }
           }
@@ -315,12 +347,8 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
       if (methodName != 'put' && methodName != 'add') return;
 
-      // Check if target is a box
-      final Expression? target = node.target;
-      if (target == null) return;
-
-      final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('box')) return;
+      // Check if target is a Hive box
+      if (!_isHiveBoxTarget(node.target)) return;
 
       // Check key for sensitive patterns
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -671,6 +699,90 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+// =============================================================================
+// ROADMAP_NEXT Part 7 Rules
+// =============================================================================
+
+/// Warns when @HiveType typeIds may conflict or change.
+///
+/// Alias: hive_type_id, manage_hive_type_ids
+///
+/// Hive typeIds must be unique and stable. Changing or duplicating typeIds
+/// corrupts stored data. Track typeIds in a central registry.
+///
+/// **BAD:**
+/// ```dart
+/// @HiveType(typeId: 0) // Same as User!
+/// class Settings extends HiveObject { ... }
+///
+/// @HiveType(typeId: 0)
+/// class User extends HiveObject { ... }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // In hive_type_ids.dart:
+/// // 0 = User
+/// // 1 = Settings
+/// // 2 = Product
+///
+/// @HiveType(typeId: 0)
+/// class User extends HiveObject { ... }
+///
+/// @HiveType(typeId: 1)
+/// class Settings extends HiveObject { ... }
+/// ```
+class RequireHiveTypeIdManagementRule extends SaropaLintRule {
+  const RequireHiveTypeIdManagementRule() : super(code: _code);
+
+  // INFO severity - advisory rule to encourage documentation, not a crash risk
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_type_id_management',
+    problemMessage:
+        '@HiveType found. Ensure typeId is unique and documented in a central registry.',
+    correctionMessage:
+        'Create a hive_type_ids.dart file to track all typeIds and prevent conflicts.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAnnotation((Annotation node) {
+      final String annotationName = node.name.name;
+      if (annotationName != 'HiveType') return;
+
+      // Check if there's a comment above documenting the typeId
+      final AstNode? parent = node.parent;
+      if (parent is ClassDeclaration) {
+        final String? docComment = parent.documentationComment?.toSource();
+        if (docComment != null &&
+            (docComment.contains('typeId') ||
+                docComment.contains('type_id') ||
+                docComment.contains('Hive type'))) {
+          return; // Has documentation
+        }
+      }
+
+      // Check if in a file that looks like a registry
+      final String filePath = resolver.source.fullName.toLowerCase();
+      if (filePath.contains('type_id') ||
+          filePath.contains('hive_type') ||
+          filePath.contains('registry')) {
+        return; // Already in a registry file
+      }
+
+      reporter.atNode(node, code);
     });
   }
 }

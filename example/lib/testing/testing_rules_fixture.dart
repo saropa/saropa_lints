@@ -3,6 +3,7 @@
 /// Test fixture for testing-related lint rules.
 ///
 /// This file demonstrates patterns that trigger the following rules:
+/// - prefer_test_wrapper
 /// - prefer_fake_over_mock
 /// - require_edge_case_tests
 /// - prefer_test_data_builder
@@ -10,6 +11,43 @@
 
 // Note: These rules only run in test files (_test.dart)
 // This fixture demonstrates the patterns they detect.
+
+// =============================================================================
+// prefer_test_wrapper
+// =============================================================================
+// Warns when widget tests don't wrap with MaterialApp/CupertinoApp.
+// Most widgets need MaterialApp ancestor for theming and localization.
+// **Note:** Teardown patterns (SizedBox, Container, Placeholder) are NOT flagged.
+
+// BAD: Widget not wrapped with MaterialApp
+// testWidgets('shows button', (tester) async {
+//   await tester.pumpWidget(MyButton()); // Lint warning!
+// });
+
+// GOOD: Widget wrapped with MaterialApp
+// testWidgets('shows button', (tester) async {
+//   await tester.pumpWidget(
+//     MaterialApp(home: Scaffold(body: MyButton())),
+//   );
+// });
+
+// GOOD: Teardown pattern (NOT flagged - intentional unmount before dispose)
+// testWidgets('with controller', (tester) async {
+//   final controller = ScrollController();
+//   await tester.pumpWidget(
+//     MaterialApp(home: ListView(controller: controller)),
+//   );
+//   // ... test interactions ...
+//   await tester.pumpWidget(const SizedBox()); // Teardown - OK
+//   controller.dispose();
+// });
+
+// Other valid teardown patterns that are NOT flagged:
+// await tester.pumpWidget(const SizedBox.shrink());
+// await tester.pumpWidget(const SizedBox.expand());
+// await tester.pumpWidget(const Container());
+// await tester.pumpWidget(const Placeholder());
+// await tester.pumpWidget(SizedBox(width: 0, height: 0));
 
 // =============================================================================
 // prefer_fake_over_mock

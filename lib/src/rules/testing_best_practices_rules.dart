@@ -15,7 +15,30 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when test has no assertions.
 ///
-/// Tests without assertions don't actually verify anything.
+/// Alias: test_needs_assertion, no_assertion_test
+///
+/// Tests without assertions don't actually verify anything. This rule uses
+/// simple string matching on the test body source code for fast detection.
+///
+/// ## Related Rules
+///
+/// - **`missing_test_assertion`** (Essential tier): A more sophisticated
+///   alternative that uses AST analysis and recognizes user-defined helper
+///   functions containing assertions. Use `missing_test_assertion` if you
+///   have custom assertion helpers like `expectValid()` or `verifyResult()`.
+///
+/// ## Detection Approach
+///
+/// This rule uses string matching to check if the test body contains any
+/// calls to known assertion methods. This is faster but less accurate than
+/// AST-based analysis - it won't recognize custom assertion helpers.
+///
+/// ## When to Use Each Rule
+///
+/// - Use **this rule** (`require_test_assertions`) for simple codebases
+///   without custom assertion helpers, or when you want faster analysis.
+/// - Use **`missing_test_assertion`** when you have helper functions that
+///   wrap assertions, as it will recognize them as valid assertions.
 ///
 /// **BAD:**
 /// ```dart
@@ -530,27 +553,54 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
 
       final String bodySource = bodyArg.toSource();
 
-      // Check for interactions without pumps
-      for (final String interaction in _interactionMethods) {
-        if (bodySource.contains('tester.$interaction')) {
-          // Check if pump follows (simple heuristic)
-          final int interactionIndex =
-              bodySource.indexOf('tester.$interaction');
-          final String afterInteraction =
-              bodySource.substring(interactionIndex);
-
-          // Look for expect before pump
-          final int expectIndex = afterInteraction.indexOf('expect(');
-          final int pumpIndex = afterInteraction.indexOf('pump');
-
-          if (expectIndex != -1 &&
-              (pumpIndex == -1 || pumpIndex > expectIndex)) {
-            reporter.atNode(node.methodName, code);
-            return;
-          }
-        }
+      // Check for interactions without pumps - track ALL occurrences
+      if (_hasInteractionWithoutPump(bodySource)) {
+        reporter.atNode(node.methodName, code);
       }
     });
+  }
+
+  /// Check if any interaction is followed by expect without an intervening pump.
+  /// Tracks all occurrences to avoid false positives from multiple interactions.
+  bool _hasInteractionWithoutPump(String bodySource) {
+    // Find all interaction positions
+    final List<int> interactionPositions = <int>[];
+    for (final String interaction in _interactionMethods) {
+      final String pattern = 'tester.$interaction';
+      int index = 0;
+      while ((index = bodySource.indexOf(pattern, index)) != -1) {
+        interactionPositions.add(index);
+        index += pattern.length;
+      }
+    }
+
+    if (interactionPositions.isEmpty) return false;
+
+    // Sort positions to process in order
+    interactionPositions.sort();
+
+    // For each interaction, check if there's an expect before a pump
+    for (int i = 0; i < interactionPositions.length; i++) {
+      final int interactionPos = interactionPositions[i];
+
+      // Determine end of search range (next interaction or end of string)
+      final int searchEnd = (i + 1 < interactionPositions.length)
+          ? interactionPositions[i + 1]
+          : bodySource.length;
+
+      final String segment = bodySource.substring(interactionPos, searchEnd);
+
+      // Find first expect and first pump in this segment
+      final int expectIndex = segment.indexOf('expect(');
+      final int pumpIndex = segment.indexOf('pump');
+
+      // Problem: expect before pump (or no pump at all before expect)
+      if (expectIndex != -1 && (pumpIndex == -1 || pumpIndex > expectIndex)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
@@ -586,6 +636,7 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // cspell:ignore firebaseio
   /// Production URL patterns. Should be specific enough to avoid false positives
   /// when tests are validating URL formats or rejection logic.
   static const Set<String> _productionPatterns = <String>{
@@ -1396,6 +1447,12 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 ///
 /// Most widgets need MaterialApp ancestor for theming and localization.
 ///
+/// **Note:** This rule ignores teardown patterns where simple widgets like
+/// `SizedBox`, `Container`, or `Placeholder` are pumped to unmount the
+/// widget tree before disposal.
+///
+/// **Quick fix available:** Wraps the widget with `MaterialApp(home: ...)`.
+///
 /// **BAD:**
 /// ```dart
 /// testWidgets('shows button', (tester) async {
@@ -1409,6 +1466,14 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
 ///   await tester.pumpWidget(
 ///     MaterialApp(home: Scaffold(body: MyButton())),
 ///   );
+/// });
+///
+/// // Teardown pattern (OK - not flagged):
+/// testWidgets('with controller', (tester) async {
+///   await tester.pumpWidget(MaterialApp(home: MyWidget()));
+///   // ... test ...
+///   await tester.pumpWidget(const SizedBox()); // Teardown
+///   controller.dispose();
 /// });
 /// ```
 class PreferTestWrapperRule extends SaropaLintRule {
@@ -1425,6 +1490,15 @@ class PreferTestWrapperRule extends SaropaLintRule {
         'Wrap the widget with MaterialApp(home: Scaffold(body: ...)).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
+
+  /// Simple widgets commonly used for teardown/cleanup in tests.
+  static const Set<String> _teardownWidgets = <String>{
+    'SizedBox',
+    'Container',
+    'Placeholder',
+    'SizedBox.shrink',
+    'SizedBox.expand',
+  };
 
   @override
   void runWithReporter(
@@ -1449,12 +1523,91 @@ class PreferTestWrapperRule extends SaropaLintRule {
       final Expression widget = args.arguments.first;
       final String widgetSource = widget.toSource();
 
+      // Skip teardown patterns - simple widgets used to unmount before disposal
+      if (_isTeardownWidget(widget)) return;
+
       // Check if wrapped with MaterialApp or CupertinoApp
       if (!widgetSource.contains('MaterialApp') &&
           !widgetSource.contains('CupertinoApp') &&
           !widgetSource.contains('WidgetsApp')) {
         reporter.atNode(node, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapWithMaterialAppFix()];
+
+  /// Check if this is a simple widget used for teardown/cleanup.
+  bool _isTeardownWidget(Expression widget) {
+    if (widget is InstanceCreationExpression) {
+      final String typeName = widget.constructorName.type.name.lexeme;
+      final String? constructorName = widget.constructorName.name?.name;
+
+      // Check for SizedBox(), Container(), Placeholder()
+      if (_teardownWidgets.contains(typeName)) return true;
+
+      // Check for SizedBox.shrink(), SizedBox.expand()
+      if (constructorName != null) {
+        final String fullName = '$typeName.$constructorName';
+        if (_teardownWidgets.contains(fullName)) return true;
+      }
+
+      // Check if it's an empty/simple widget (no complex children)
+      // A teardown widget typically has no arguments or only simple ones
+      final args = widget.argumentList.arguments;
+      if (args.isEmpty) return true;
+
+      // If only has simple args like width/height, it's likely teardown
+      if (typeName == 'SizedBox' || typeName == 'Container') {
+        final bool hasOnlySimpleArgs = args.every((arg) {
+          if (arg is NamedExpression) {
+            final name = arg.name.label.name;
+            return name == 'width' ||
+                name == 'height' ||
+                name == 'key' ||
+                name == 'color';
+          }
+          return false;
+        });
+        if (hasOnlySimpleArgs) return true;
+      }
+    }
+    return false;
+  }
+}
+
+/// Quick fix that wraps a widget with MaterialApp(home: ...).
+class _WrapWithMaterialAppFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'pumpWidget') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression widget = args.arguments.first;
+      final String widgetSource = widget.toSource();
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Wrap with MaterialApp',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          widget.sourceRange,
+          'MaterialApp(home: $widgetSource)',
+        );
+      });
     });
   }
 }

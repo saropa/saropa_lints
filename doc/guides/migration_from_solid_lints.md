@@ -6,7 +6,7 @@ This guide helps you migrate from `solid_lints` to `saropa_lints`.
 
 | Feature | solid_lints | saropa_lints |
 |---------|-------------|--------------|
-| **Custom rules** | 16 rules | 821+ custom rules |
+| **Custom rules** | 16 rules | 1184+ custom rules |
 | **Framework** | custom_lint | custom_lint |
 | **Focus** | Clean code principles | Flutter-specific analysis |
 | **Configuration** | Single config | 5 progressive tiers |
@@ -72,7 +72,7 @@ solid_lints has one configuration. saropa_lints offers progressive tiers:
 | Full config | **Recommended** (~280 rules) | Balanced coverage |
 | + strict mode | **Professional** (~560 rules) | Enterprise-grade |
 | Maximum | **Comprehensive** (~700 rules) | Quality obsessed |
-| Everything | **Insanity** (821+ rules) | Every single rule |
+| Everything | **Insanity** (1184+ rules) | Every single rule |
 
 **Start with `recommended`** - it provides similar coverage to solid_lints plus Flutter-specific rules.
 
