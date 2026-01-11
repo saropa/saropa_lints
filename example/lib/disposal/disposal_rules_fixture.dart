@@ -2,6 +2,8 @@
 // ignore_for_file: unused_field, require_dispose, avoid_undisposed_instances
 // Test fixture for disposal rules
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 // =========================================================================
@@ -297,4 +299,296 @@ class _GoodPageViewWidgetState extends State<GoodPageViewWidget> {
       ],
     );
   }
+}
+
+// =========================================================================
+// require_stream_subscription_cancel
+// =========================================================================
+// Warns when StreamSubscription is not cancelled in dispose().
+// Supports both single subscriptions and collections of subscriptions.
+
+// BAD: Single StreamSubscription not cancelled
+class BadSingleSubscriptionWidget extends StatefulWidget {
+  const BadSingleSubscriptionWidget({super.key});
+
+  @override
+  State<BadSingleSubscriptionWidget> createState() =>
+      _BadSingleSubscriptionWidgetState();
+}
+
+// expect_lint: require_stream_subscription_cancel
+class _BadSingleSubscriptionWidgetState
+    extends State<BadSingleSubscriptionWidget> {
+  StreamSubscription<int>? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Stream.periodic(
+      const Duration(seconds: 1),
+      (i) => i,
+    ).listen((data) => setState(() {}));
+  }
+
+  // Missing cancel!
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Single StreamSubscription cancelled with ?.cancel()
+class GoodSingleSubscriptionWidget extends StatefulWidget {
+  const GoodSingleSubscriptionWidget({super.key});
+
+  @override
+  State<GoodSingleSubscriptionWidget> createState() =>
+      _GoodSingleSubscriptionWidgetState();
+}
+
+class _GoodSingleSubscriptionWidgetState
+    extends State<GoodSingleSubscriptionWidget> {
+  StreamSubscription<int>? _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Stream.periodic(
+      const Duration(seconds: 1),
+      (i) => i,
+    ).listen((data) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Single StreamSubscription cancelled with .cancel()
+class GoodSingleSubscriptionNonNullWidget extends StatefulWidget {
+  const GoodSingleSubscriptionNonNullWidget({super.key});
+
+  @override
+  State<GoodSingleSubscriptionNonNullWidget> createState() =>
+      _GoodSingleSubscriptionNonNullWidgetState();
+}
+
+class _GoodSingleSubscriptionNonNullWidgetState
+    extends State<GoodSingleSubscriptionNonNullWidget> {
+  late StreamSubscription<int> _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _subscription = Stream.periodic(
+      const Duration(seconds: 1),
+      (i) => i,
+    ).listen((data) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// BAD: Collection of StreamSubscriptions not cancelled
+class BadCollectionSubscriptionWidget extends StatefulWidget {
+  const BadCollectionSubscriptionWidget({super.key});
+
+  @override
+  State<BadCollectionSubscriptionWidget> createState() =>
+      _BadCollectionSubscriptionWidgetState();
+}
+
+// expect_lint: require_stream_subscription_cancel
+class _BadCollectionSubscriptionWidgetState
+    extends State<BadCollectionSubscriptionWidget> {
+  final List<StreamSubscription<void>> _subscriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _subscriptions.add(
+      Stream.periodic(const Duration(seconds: 1)).listen((_) {}),
+    );
+  }
+
+  // Missing cancel!
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Collection cancelled with for-in loop
+class GoodCollectionForInWidget extends StatefulWidget {
+  const GoodCollectionForInWidget({super.key});
+
+  @override
+  State<GoodCollectionForInWidget> createState() =>
+      _GoodCollectionForInWidgetState();
+}
+
+class _GoodCollectionForInWidgetState extends State<GoodCollectionForInWidget> {
+  final List<StreamSubscription<void>> _subscriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _subscriptions.add(
+      Stream.periodic(const Duration(seconds: 1)).listen((_) {}),
+    );
+  }
+
+  @override
+  void dispose() {
+    for (final sub in _subscriptions) {
+      sub.cancel();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Collection cancelled with for-in loop (typed)
+class GoodCollectionForInTypedWidget extends StatefulWidget {
+  const GoodCollectionForInTypedWidget({super.key});
+
+  @override
+  State<GoodCollectionForInTypedWidget> createState() =>
+      _GoodCollectionForInTypedWidgetState();
+}
+
+class _GoodCollectionForInTypedWidgetState
+    extends State<GoodCollectionForInTypedWidget> {
+  final List<StreamSubscription<void>> _activeSubscriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _activeSubscriptions.add(
+      Stream.periodic(const Duration(seconds: 1)).listen((_) {}),
+    );
+  }
+
+  @override
+  void dispose() {
+    for (final StreamSubscription<void> subscription in _activeSubscriptions) {
+      subscription.cancel();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Collection cancelled with forEach
+class GoodCollectionForEachWidget extends StatefulWidget {
+  const GoodCollectionForEachWidget({super.key});
+
+  @override
+  State<GoodCollectionForEachWidget> createState() =>
+      _GoodCollectionForEachWidgetState();
+}
+
+class _GoodCollectionForEachWidgetState
+    extends State<GoodCollectionForEachWidget> {
+  final List<StreamSubscription<void>> _subscriptions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _subscriptions.add(
+      Stream.periodic(const Duration(seconds: 1)).listen((_) {}),
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscriptions.forEach((s) => s.cancel());
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Set of StreamSubscriptions cancelled
+class GoodSetSubscriptionWidget extends StatefulWidget {
+  const GoodSetSubscriptionWidget({super.key});
+
+  @override
+  State<GoodSetSubscriptionWidget> createState() =>
+      _GoodSetSubscriptionWidgetState();
+}
+
+class _GoodSetSubscriptionWidgetState extends State<GoodSetSubscriptionWidget> {
+  final Set<StreamSubscription<void>> _subscriptions = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _subscriptions.add(
+      Stream.periodic(const Duration(seconds: 1)).listen((_) {}),
+    );
+  }
+
+  @override
+  void dispose() {
+    for (final sub in _subscriptions) {
+      sub.cancel();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Mixed single + collection subscriptions
+class GoodMixedSubscriptionWidget extends StatefulWidget {
+  const GoodMixedSubscriptionWidget({super.key});
+
+  @override
+  State<GoodMixedSubscriptionWidget> createState() =>
+      _GoodMixedSubscriptionWidgetState();
+}
+
+class _GoodMixedSubscriptionWidgetState
+    extends State<GoodMixedSubscriptionWidget> {
+  StreamSubscription<int>? _singleSub;
+  final List<StreamSubscription<void>> _multiSubs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _singleSub = Stream.periodic(const Duration(seconds: 1), (i) => i)
+        .listen((data) => setState(() {}));
+    _multiSubs.add(
+      Stream.periodic(const Duration(seconds: 2)).listen((_) {}),
+    );
+  }
+
+  @override
+  void dispose() {
+    _singleSub?.cancel();
+    for (final sub in _multiSubs) {
+      sub.cancel();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
 }

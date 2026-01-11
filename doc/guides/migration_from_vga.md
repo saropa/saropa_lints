@@ -6,7 +6,7 @@ This guide helps you migrate from `very_good_analysis` to Saropa Lints.
 
 | Feature | very_good_analysis | Saropa Lints |
 |---------|-------------------|--------------|
-| **Rule count** | 174 standard rules | 821+ custom rules |
+| **Rule count** | 174 standard rules | 1184+ custom rules |
 | **Rule types** | Dart linter rules | Deep custom analysis |
 | **Configuration** | Single file | 5 progressive tiers |
 | **Specialization** | General best practices | Flutter-specific (accessibility, state management, security) |
@@ -77,7 +77,7 @@ dev_dependencies:
 
 This gives you:
 - 174 standard Dart linter rules from VGA
-- 821+ custom rules from saropa_lints
+- 1184+ custom rules from saropa_lints
 
 ## Choosing a Tier
 
@@ -89,7 +89,7 @@ VGA has one configuration. Saropa Lints has five tiers to match your team's need
 | Full VGA | **Recommended** (~280 rules) | Similar coverage + Flutter-specific |
 | Stricter | **Professional** (~560 rules) | Enterprise-grade |
 | Maximum | **Comprehensive** (~700 rules) | Quality obsessed |
-| Everything | **Insanity** (821+ rules) | Every single rule |
+| Everything | **Insanity** (1184+ rules) | Every single rule |
 
 **Start with `recommended`** - it's the closest to VGA's philosophy.
 
@@ -103,7 +103,7 @@ Many VGA rules have Saropa Lints equivalents that go deeper:
 | `close_sinks` | `require_dispose`, `dispose_fields` | Full disposal tracking |
 | `avoid_print` | `avoid_print_in_production`, `avoid_debug_print` | Context-aware |
 | `use_key_in_widget_constructors` | `avoid_duplicate_widget_keys`, `require_keys_in_animated_lists` | More specific cases |
-| `unawaited_futures` | `require_future_error_handling`, `avoid_async_call_in_sync_function` | Error handling focus |
+| `unawaited_futures` | `avoid_uncaught_future_errors`, `avoid_async_call_in_sync_function` | Error handling focus |
 
 ## What You Gain
 

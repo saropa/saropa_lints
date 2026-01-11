@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use, unused_element
 
 /// Navigation lint rules for Flutter applications.
 ///
@@ -12,7 +12,12 @@ import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../import_utils.dart';
 import '../saropa_lint_rule.dart';
+
+// =============================================================================
+// Flutter Navigation Rules
+// =============================================================================
 
 /// Warns when MaterialApp/CupertinoApp lacks onUnknownRoute.
 ///
@@ -1225,6 +1230,9 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
 
+      // Only apply to files that import go_router
+      if (!fileImportsPackage(node, PackageImports.goRouter)) return;
+
       // Check if inside build method
       AstNode? current = node.parent;
       while (current != null) {
@@ -1279,6 +1287,9 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
+
+      // Only apply to files that import go_router
+      if (!fileImportsPackage(node, PackageImports.goRouter)) return;
 
       // Check for error handler
       bool hasErrorHandler = false;
@@ -1346,6 +1357,9 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GoRouter') return;
+
+      // Only apply to files that import go_router
+      if (!fileImportsPackage(node, PackageImports.goRouter)) return;
 
       bool hasRedirect = false;
       bool hasRefreshListenable = false;
@@ -1417,12 +1431,14 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_navigationMethods.contains(methodName)) return;
 
-      // Check if target is context
+      // Only apply to files that import go_router
+      if (!fileImportsPackage(node, PackageImports.goRouter)) return;
+
+      // Check if target is context (go_router extension methods)
       final Expression? target = node.target;
       if (target == null) return;
-
-      final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('context')) return;
+      // Use type-based check for BuildContext
+      if (target is! SimpleIdentifier || target.name != 'context') return;
 
       // Check first argument for string literal
       final NodeList<Expression> args = node.argumentList.arguments;
@@ -1502,6 +1518,9 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'GoRoute') return;
 
+      // Only apply to files that import go_router
+      if (!fileImportsPackage(node, PackageImports.goRouter)) return;
+
       // Find builder argument
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'builder') {
@@ -1575,6 +1594,9 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addIndexExpression((IndexExpression node) {
+      // Only apply to files that import go_router
+      if (!fileImportsPackage(node, PackageImports.goRouter)) return;
+
       // Check if accessing pathParameters
       final Expression? target = node.target;
       if (target is! PrefixedIdentifier) return;
