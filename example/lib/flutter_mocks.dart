@@ -79,7 +79,8 @@ class Center extends Widget {
 }
 
 class ConstrainedBox extends Widget {
-  const ConstrainedBox({super.key, required dynamic constraints, Widget? child});
+  const ConstrainedBox(
+      {super.key, required dynamic constraints, Widget? child});
 }
 
 class Column extends Widget {
@@ -128,7 +129,11 @@ class Badge extends Widget {
 // ============================================================================
 
 class TextField extends Widget {
-  const TextField({super.key, TextEditingController? controller, FocusNode? focusNode, bool autofocus = false});
+  const TextField(
+      {super.key,
+      TextEditingController? controller,
+      FocusNode? focusNode,
+      bool autofocus = false});
 }
 
 class TextFormField extends Widget {
@@ -140,7 +145,11 @@ class TextFormField extends Widget {
 // ============================================================================
 
 class ListView extends Widget {
-  const ListView({super.key, List<Widget>? children, dynamic physics, bool shrinkWrap = false});
+  const ListView(
+      {super.key,
+      List<Widget>? children,
+      dynamic physics,
+      bool shrinkWrap = false});
   const ListView.builder({
     super.key,
     int? itemCount,
@@ -197,7 +206,8 @@ Future<T?> showDialog<T>({
 }
 
 class AlertDialog extends Widget {
-  const AlertDialog({super.key, Widget? title, Widget? content, List<Widget>? actions});
+  const AlertDialog(
+      {super.key, Widget? title, Widget? content, List<Widget>? actions});
 }
 
 // ============================================================================
@@ -362,7 +372,8 @@ class Tab extends Widget {
 // ============================================================================
 
 class PageView extends Widget {
-  const PageView({super.key, PageController? controller, List<Widget>? children});
+  const PageView(
+      {super.key, PageController? controller, List<Widget>? children});
 }
 
 // ============================================================================
@@ -405,7 +416,8 @@ class Autocomplete<T extends Object> extends Widget {
   const Autocomplete({
     super.key,
     required Iterable<T> Function(TextEditingValue) optionsBuilder,
-    Widget Function(BuildContext, TextEditingController, FocusNode, VoidCallback)?
+    Widget Function(
+            BuildContext, TextEditingController, FocusNode, VoidCallback)?
         fieldViewBuilder,
   });
 }
