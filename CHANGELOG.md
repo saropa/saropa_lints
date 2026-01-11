@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.3.5] - 2026-01-11
+
+### Fixed
+
+- **use_setstate_synchronously**: Fixed false positive for nested mounted checks (e.g., `if (mounted) { setState(...) }` inside callbacks or try blocks). Now properly traverses the AST to find protecting mounted checks in ancestor chain. Also handles `if (!mounted) return;` guard pattern correctly.
+- **avoid_redirect_injection**: Fixed false positive for non-URL types. Now only flags `String`, `Uri`, or `dynamic` arguments, skipping object types like `AppGridMenuItem` that happen to have "destination" in their name.
+- **avoid_keyboard_overlap**: Fixed false positive for dialogs and `Scrollable.ensureVisible`. Added checks for: class names containing "Dialog", file paths containing "dialog", files containing `showDialog`/`showDialogCommon` calls, and files using `ensureVisible`.
+- **avoid_hardcoded_encryption_keys**: Added support for named constructors (e.g., `Key.fromUtf8(...)`, `Key.fromBase64(...)`) in addition to static method calls. The `encrypt` package uses named constructors.
+- **Documentation**: Fixed unresolved doc references (`[...]` in scroll_rules.dart and `[Ticker]` in animation_rules.dart) by wrapping in backticks
+- **Test fixtures**: Fixed 45 `unfulfilled_expect_lint` errors in example fixtures:
+  - Fixed `// expect_lint` comment placement (must be directly before flagged line)
+  - Enabled rules from higher tiers in example/analysis_options.yaml for testing
+  - Removed expect_lint from commented-out code blocks
+
+### Changed
+
+- **example/pubspec.yaml**: Converted to Flutter project with required dependencies (flutter_bloc, provider, equatable, encrypt) for proper rule testing
+- **example/analysis_options.yaml**: Explicitly enabled all tested rules regardless of tier
+
+### Added
+
+- **Quick fixes for 4 rules:**
+  - `use_setstate_synchronously`: Wraps setState in `if (mounted) { ... }` check
+  - `avoid_redirect_injection`: Adds comment for manual domain validation
+  - `avoid_keyboard_overlap`: Adds comment for manual keyboard handling
+  - `avoid_hardcoded_encryption_keys`: Adds comment for secure key loading
+
 ## [2.3.4] - 2026-01-11
 
 ### Fixed

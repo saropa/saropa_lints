@@ -3344,6 +3344,8 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
 
 /// Warns when setState is called after an async gap without mounted check.
 ///
+/// **Quick fix available:** Wraps the setState call in `if (mounted) { ... }`.
+///
 /// Example of **bad** code:
 /// ```dart
 /// Future<void> loadData() async {
@@ -3389,19 +3391,74 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 
       // Track if we've seen an await
       bool seenAwait = false;
+      // Track if we've seen a guard like `if (!mounted) return;`
+      // Once we see this, subsequent code in the same block is protected
+      bool hasGuard = false;
 
       for (final Statement stmt in body.block.statements) {
         // Check for await expressions
         if (_containsAwait(stmt)) {
           seenAwait = true;
+          // Reset guard after each await - need a new guard after async gap
+          hasGuard = false;
         }
 
-        // After await, check for setState without mounted check
-        if (seenAwait && _containsSetStateWithoutMountedCheck(stmt)) {
-          _reportSetStateInStatement(stmt, reporter);
+        // Check if this statement is an early return guard: if (!mounted) return;
+        if (seenAwait && _isNegatedMountedGuard(stmt)) {
+          hasGuard = true;
+          continue; // The guard itself is fine, check subsequent statements
+        }
+
+        // After await and no guard, report any setState calls not protected
+        if (seenAwait && !hasGuard) {
+          _reportUnprotectedSetState(stmt, reporter);
         }
       }
     });
+  }
+
+  /// Checks if statement is `if (!mounted) return;` or `if (!mounted) throw;`
+  bool _isNegatedMountedGuard(Statement stmt) {
+    if (stmt is! IfStatement) return false;
+    final IfStatement ifStmt = stmt;
+
+    // Check for negated mounted expression: !mounted or !this.mounted
+    if (!_checksNotMounted(ifStmt.expression)) return false;
+
+    // Check if then branch contains early exit (return or throw)
+    final Statement thenStmt = ifStmt.thenStatement;
+    if (thenStmt is ReturnStatement) return true;
+    if (thenStmt is ExpressionStatement &&
+        thenStmt.expression is ThrowExpression) {
+      return true;
+    }
+    // Handle block with single return/throw
+    if (thenStmt is Block && thenStmt.statements.length == 1) {
+      final Statement single = thenStmt.statements.first;
+      if (single is ReturnStatement) return true;
+      if (single is ExpressionStatement &&
+          single.expression is ThrowExpression) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Checks if expression is `!mounted` or `!this.mounted`.
+  static bool _checksNotMounted(Expression expr) {
+    if (expr is PrefixExpression && expr.operator.type == TokenType.BANG) {
+      return _checksMounted(expr.operand);
+    }
+    return false;
+  }
+
+  /// Checks if expression is `mounted`, `this.mounted`, or `context.mounted`.
+  static bool _checksMounted(Expression expr) {
+    if (expr is SimpleIdentifier && expr.name == 'mounted') return true;
+    if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
+      return true;
+    }
+    return false;
   }
 
   bool _containsAwait(AstNode node) {
@@ -3414,45 +3471,147 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
     return found;
   }
 
-  bool _containsSetStateWithoutMountedCheck(Statement stmt) {
-    // If it's an if statement checking mounted, it's fine
-    if (stmt is IfStatement) {
-      if (_checksMounted(stmt.expression)) {
-        return false;
-      }
-    }
-
-    // Check for setState calls
-    return _containsSetState(stmt);
+  void _reportUnprotectedSetState(
+      Statement stmt, SaropaDiagnosticReporter reporter) {
+    // Find all setState calls and check if each is protected by a mounted check
+    stmt.visitChildren(
+      _SetStateWithMountedCheckFinder((MethodInvocation node) {
+        reporter.atNode(node, code);
+      }),
+    );
   }
 
-  bool _checksMounted(Expression expr) {
-    if (expr is SimpleIdentifier && expr.name == 'mounted') {
-      return true;
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapSetStateInMountedCheckFix()];
+}
+
+class _WrapSetStateInMountedCheckFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'setState') return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the statement containing this setState call
+      final AstNode? statement = _findContainingStatement(node);
+      if (statement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Wrap in if (mounted) check',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final String originalCode = statement.toSource();
+        // Get indentation from the original statement
+        final int lineStart = resolver.lineInfo.getOffsetOfLine(
+          resolver.lineInfo.getLocation(statement.offset).lineNumber - 1,
+        );
+        final String leadingText =
+            resolver.source.contents.data.substring(lineStart, statement.offset);
+        final String indent =
+            leadingText.replaceAll(RegExp(r'[^\s]'), ''); // Keep only whitespace
+
+        builder.addSimpleReplacement(
+          SourceRange(statement.offset, statement.length),
+          'if (mounted) {\n$indent  $originalCode\n$indent}',
+        );
+      });
+    });
+  }
+
+  AstNode? _findContainingStatement(AstNode node) {
+    AstNode? current = node;
+    while (current != null) {
+      if (current is ExpressionStatement) {
+        return current;
+      }
+      current = current.parent;
     }
-    if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
-      return true;
+    return null;
+  }
+}
+
+/// Visitor that finds setState calls that are NOT protected by a mounted check.
+/// It traverses the AST and tracks whether we're inside an if (mounted) block.
+class _SetStateWithMountedCheckFinder extends RecursiveAstVisitor<void> {
+  _SetStateWithMountedCheckFinder(this.onUnprotectedSetState);
+
+  final void Function(MethodInvocation) onUnprotectedSetState;
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    // Check if this if statement checks mounted
+    if (UseSetStateSynchronouslyRule._checksMounted(node.expression)) {
+      // Don't visit the then branch - setState inside is protected
+      // But still visit the else branch if it exists
+      node.elseStatement?.accept(this);
+      return;
+    }
+
+    // Check for negated mounted check: if (!mounted) return;
+    // In this case, code AFTER this if statement is protected
+    if (UseSetStateSynchronouslyRule._checksNotMounted(node.expression)) {
+      // The then branch likely contains a return, so code after is protected
+      // Still need to visit the then branch in case there's a setState there
+      super.visitIfStatement(node);
+      return;
+    }
+
+    super.visitIfStatement(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState') {
+      // Check if this setState has a mounted check in its ancestor chain
+      if (!_hasAncestorMountedCheck(node)) {
+        onUnprotectedSetState(node);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  /// Checks if the given node has an ancestor if statement that checks mounted.
+  bool _hasAncestorMountedCheck(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        if (UseSetStateSynchronouslyRule._checksMounted(current.expression)) {
+          // Verify the node is in the THEN branch (protected), not ELSE branch
+          if (_isInThenBranch(node, current)) {
+            return true;
+          }
+        }
+      }
+      // Stop at function boundaries - mounted check must be in same function scope
+      if (current is FunctionExpression || current is MethodDeclaration) {
+        break;
+      }
+      current = current.parent;
     }
     return false;
   }
 
-  bool _containsSetState(AstNode node) {
-    bool found = false;
-    node.visitChildren(
-      _SetStateFinderBatch11((MethodInvocation _) {
-        found = true;
-      }),
-    );
-    return found;
-  }
-
-  void _reportSetStateInStatement(
-      Statement stmt, SaropaDiagnosticReporter reporter) {
-    stmt.visitChildren(
-      _SetStateFinderBatch11((MethodInvocation node) {
-        reporter.atNode(node, code);
-      }),
-    );
+  /// Checks if the node is in the then branch of the if statement.
+  bool _isInThenBranch(AstNode node, IfStatement ifStmt) {
+    AstNode? current = node;
+    while (current != null && current != ifStmt) {
+      if (current == ifStmt.thenStatement) {
+        return true;
+      }
+      if (current == ifStmt.elseStatement) {
+        return false;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 
@@ -3465,19 +3624,6 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
   void visitAwaitExpression(AwaitExpression node) {
     onFound(node);
     super.visitAwaitExpression(node);
-  }
-}
-
-class _SetStateFinderBatch11 extends RecursiveAstVisitor<void> {
-  _SetStateFinderBatch11(this.onFound);
-  final void Function(MethodInvocation) onFound;
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'setState') {
-      onFound(node);
-    }
-    super.visitMethodInvocation(node);
   }
 }
 
@@ -14836,7 +14982,7 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Container') return;
 
       final ArgumentList args = node.argumentList;
@@ -14914,7 +15060,7 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name2.lexeme;
+      final String typeName = node.constructorName.type.name.lexeme;
       if (!_buttonTypes.contains(typeName)) return;
 
       final ArgumentList args = node.argumentList;
@@ -15158,7 +15304,7 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
 
       if (typeName != 'MaterialApp' && typeName != 'CupertinoApp') {
         return;
@@ -15655,7 +15801,7 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextFormField') return;
 
       // Check if the TextFormField has a validator parameter (indicates form usage)
@@ -15677,7 +15823,7 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
 
       while (current != null && depth < maxDepth) {
         if (current is InstanceCreationExpression) {
-          final parentType = current.constructorName.type.name2.lexeme;
+          final parentType = current.constructorName.type.name.lexeme;
           if (parentType == 'Form') {
             foundForm = true;
             break;
@@ -15750,7 +15896,7 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (!_webViewTypes.contains(typeName)) return;
 
       // Check for navigationDelegate or onNavigationRequest parameter
@@ -15840,7 +15986,7 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (!_scrollableTypes.contains(typeName)) return;
 
       // Check if has physics parameter
@@ -15861,7 +16007,7 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 
       while (current != null && depth < maxDepth) {
         if (current is InstanceCreationExpression) {
-          final parentType = current.constructorName.type.name2.lexeme;
+          final parentType = current.constructorName.type.name.lexeme;
           if (_scrollableTypes.contains(parentType)) {
             reporter.atNode(node.constructorName, code);
             return;
@@ -15926,7 +16072,7 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   ) {
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final typeName = node.constructorName.type.name2.lexeme;
+      final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AnimatedBuilder') return;
 
       // Check if child parameter is present
