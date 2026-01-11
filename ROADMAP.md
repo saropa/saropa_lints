@@ -4,6 +4,18 @@
 
 See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 1000 rules.
 
+## Maintenance Rules
+
+**IMPORTANT: When a rule is implemented:**
+
+1. **REMOVE the rule from this ROADMAP entirely** - do NOT mark it with ✅ or "DONE"
+2. **Document aliases in the rule's doc header** - not here in ROADMAP
+   - Example: `/// Alias: require_props_consistency` in the rule's Dart file
+3. **Add to CHANGELOG.md** under the appropriate version
+4. **Register in saropa_lints.dart** and **tiers.dart**
+
+This ROADMAP is for **planned/unimplemented rules only**.
+
 ## Deferred: Pubspec Rules (6 rules)
 
 > **Note**: saropa_lints currently only analyzes `.dart` files using the Dart AST. These pubspec rules require YAML parsing which is not yet supported.
@@ -1189,7 +1201,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `avoid_sqflite_reserved_words` | Essential | WARNING | Avoid SQLite reserved words as column names. Detect reserved word usage. |
 | ⭐ `prefer_sqflite_singleton` | Professional | INFO | Use singleton database instance. Detect multiple openDatabase calls. |
 | `avoid_sqflite_type_mismatch` | Essential | ERROR | SQLite types must match Dart types. Detect type conversion issues. |
 | ⭐ `prefer_sqflite_column_constants` | Recommended | INFO | Use constants for column names. Detect string literal column names. |
@@ -1401,17 +1412,13 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `require_intl_currency_format` | Essential | WARNING | Use NumberFormat.currency for money. Detect manual currency concatenation. |
-| ⭐ `require_intl_date_format_locale` | Essential | WARNING | DateFormat needs locale. Detect DateFormat without explicit locale. |
 | `avoid_string_concatenation_l10n` | Essential | WARNING | String concatenation breaks word order. Detect string + in l10n context. |
 | ⭐ `require_intl_plural_rules` | Essential | WARNING | Use Intl.plural for pluralization. Detect manual count-based string selection. |
 | `prefer_intl_message_description` | Professional | INFO | Provide description for translators. Detect Intl.message without desc. |
 | ⭐ `require_intl_args_match` | Essential | ERROR | Intl.message args must match placeholders. Detect mismatched args. |
 | `prefer_l10n_yaml_config` | Recommended | INFO | Use l10n.yaml for configuration. Detect missing configuration file. |
-| ⭐ `require_number_format_locale` | Essential | WARNING | NumberFormat varies by locale. Detect NumberFormat without locale. |
 | `avoid_hardcoded_locale_strings` | Recommended | WARNING | User-visible strings need l10n. Detect string literals in Text widgets. |
 | `require_rtl_support` | Professional | INFO | Support RTL layouts. Detect hardcoded left/right in layouts. |
-| ⭐ `avoid_manual_date_formatting` | Essential | WARNING | Manual date format breaks across locales. Detect string formatting dates. |
 
 ### 5.29 Firebase Advanced Rules
 
@@ -1487,7 +1494,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `avoid_assert_in_production` | Essential | WARNING | Assert doesn't run in release mode. Detect assert for required checks. |
 | ⭐ `require_finally_cleanup` | Professional | INFO | Use finally for guaranteed cleanup. Detect cleanup in catch block only. |
 | `prefer_zone_error_handler` | Comprehensive | INFO | Use Zone for unhandled async errors. Detect async without zone handling. |
-| ⭐ `avoid_print_error` | Essential | WARNING | Use proper error reporting, not print. Detect print(e) in catch block. |
 
 ### 5.35 Platform-Specific Rules
 
@@ -1617,8 +1623,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | ⭐ `avoid_equatable_datetime` | Professional | WARNING | DateTime equality is problematic. Detect DateTime in Equatable without special handling. |
 | ⭐ `prefer_unmodifiable_collections` | Professional | INFO | Make collection fields unmodifiable. Detect List without List.unmodifiable. |
 | ⭐ `require_copy_with_null_handling` | Essential | WARNING | copyWith should support setting null. Detect copyWith without Nullable pattern. |
-| ⭐ `avoid_mutable_field_in_equatable` | Essential | ERROR | All Equatable fields must be final. Detect non-final field in Equatable. |
-| ⭐ `require_props_consistency` | Essential | ERROR | props must include all fields for correct equality. Detect missing field in props. |
 
 ### 5.45 Auto-Dispose Pattern Rules
 
@@ -1658,7 +1662,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `prefer_extract_widget` | Professional | INFO | `[HEURISTIC]` Large build methods should be split. Detect build >100 lines. |
 | `avoid_repeated_widget_creation` | Professional | WARNING | Cache widget references when possible. Detect identical widgets created in loop. |
 | `prefer_builder_pattern` | Professional | INFO | Use Builder for context-dependent children. Detect context issues. |
-| ⭐ `require_key_for_collection` | Essential | WARNING | Collection items need keys for efficient updates. Detect list items without keys. |
 | `prefer_sliver_for_mixed_scroll` | Professional | INFO | Use slivers for mixed scrollable content. Detect nested scrollables. |
 | `prefer_flex_for_complex_layout` | Professional | INFO | Use Flex over Row/Column for dynamic axis. Detect conditional Row/Column. |
 | ⭐ `avoid_stack_without_positioned` | Professional | WARNING | Stack children should be Positioned for overlay. Detect non-Positioned in Stack. |
@@ -1690,7 +1693,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `avoid_hive_field_index_reuse` | Essential | ERROR | Reusing deleted @HiveField indices corrupts existing data. Always use new indices, never recycle. |
 | ⭐ `require_hive_adapter_registration_order` | Essential | ERROR | Register adapters before openBox. Detect box.open before Hive.registerAdapter for that type. |
 | `prefer_hive_compact_periodically` | Professional | INFO | Hive files grow without compaction. Call box.compact() after bulk deletes to reclaim space. |
 | ⭐ `require_hive_nested_object_adapter` | Essential | ERROR | Nested objects need separate TypeAdapters. Detect class with @HiveType containing non-primitive without adapter. |
