@@ -380,7 +380,7 @@ Stylistic rules require extra documentation since they're not in any tier:
 
 1. Add the rule to `lib/src/rules/stylistic_rules.dart`
 2. Add to `lib/saropa_lints.dart` rule list
-3. **Update [STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/STYLISTIC.md)**:
+3. **Update [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)**:
    - Add to the Quick Reference table
    - Add full documentation section with Pros/Cons and examples
 4. Update rule count in README.md and ROADMAP.md if needed
@@ -390,7 +390,7 @@ Stylistic rules require extra documentation since they're not in any tier:
 | File | Purpose | Update when... |
 |------|---------|----------------|
 | README.md | Central hub, must reference all docs | Adding any new documentation |
-| STYLISTIC.md | Stylistic rule details | Adding/changing stylistic rules |
+| README_STYLISTIC.md | Stylistic rule details | Adding/changing stylistic rules |
 | ROADMAP.md | Planned features | Implementing planned rules (remove from roadmap) |
 | CHANGELOG.md | Version history | Any release |
 | CONTRIBUTING.md | This file | Changing contribution process |
@@ -404,7 +404,7 @@ Stylistic rules require extra documentation since they're not in any tier:
 - [ ] Tests pass
 - [ ] Documentation updated (see Documentation Requirements above)
 - [ ] CHANGELOG.md updated
-- [ ] If stylistic rule: STYLISTIC.md updated
+- [ ] If stylistic rule: README_STYLISTIC.md updated
 
 ## Questions?
 
