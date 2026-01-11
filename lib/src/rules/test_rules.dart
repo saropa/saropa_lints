@@ -2415,13 +2415,15 @@ class RequireTestCleanupRule extends SaropaLintRule {
 
     // Database operations - require specific target patterns
     // e.g., db.insert(, collection.insert(, table.insert(
-    final dbInsertPattern = RegExp(r'\b(db|database|collection|table)\w*\.insert\(');
+    final dbInsertPattern =
+        RegExp(r'\b(db|database|collection|table)\w*\.insert\(');
     if (dbInsertPattern.hasMatch(bodySource.toLowerCase())) {
       return true;
     }
 
     // Hive/SharedPrefs operations - require box. or prefs. prefix
-    final storagePattern = RegExp(r'\b(box|prefs|preferences|storage)\w*\.put\(');
+    final storagePattern =
+        RegExp(r'\b(box|prefs|preferences|storage)\w*\.put\(');
     if (storagePattern.hasMatch(bodySource.toLowerCase())) {
       return true;
     }

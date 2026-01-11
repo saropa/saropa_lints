@@ -2147,8 +2147,10 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
       final target = node.target;
       if (target == null) return;
       // Use property access check instead of string contains
-      if (target is! PropertyAccess || target.propertyName.name != 'interceptors') {
-        if (target is! SimpleIdentifier || !target.name.endsWith('interceptors')) {
+      if (target is! PropertyAccess ||
+          target.propertyName.name != 'interceptors') {
+        if (target is! SimpleIdentifier ||
+            !target.name.endsWith('interceptors')) {
           return;
         }
       }
@@ -2915,7 +2917,8 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
       // Use type-based check: should be PropertyAccess on Permission class
       if (target is PropertyAccess) {
         final targetExpr = target.target;
-        if (targetExpr is! SimpleIdentifier || targetExpr.name != 'Permission') {
+        if (targetExpr is! SimpleIdentifier ||
+            targetExpr.name != 'Permission') {
           return;
         }
       } else if (target is PrefixedIdentifier) {

@@ -15257,7 +15257,7 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
 ///
 /// Alias: missing_super_dispose, super_dispose_required
 ///
-/// In State<T> subclasses, dispose() must call super.dispose() to ensure
+/// In `State<T>` subclasses, dispose() must call super.dispose() to ensure
 /// proper cleanup of framework resources.
 ///
 /// **BAD:**
@@ -15323,7 +15323,7 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
 ///
 /// Alias: missing_super_init_state, super_init_state_required
 ///
-/// In State<T> subclasses, initState() must call super.initState() first
+/// In `State<T>` subclasses, initState() must call super.initState() first
 /// to ensure proper framework initialization.
 ///
 /// **BAD:**

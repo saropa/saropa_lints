@@ -414,7 +414,6 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
-
   /// Flutter notifier types that should NOT trigger this rule.
   static const Set<String> _flutterNotifierTypes = <String>{
     'ValueNotifier',
