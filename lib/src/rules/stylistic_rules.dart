@@ -3180,7 +3180,8 @@ class _SortArgumentsFix extends DartFix {
       // Check if already sorted
       bool alreadySorted = true;
       for (int i = 0; i < namedArgs.length; i++) {
-        if (namedArgs[i].name.label.name != sortedNamedArgs[i].name.label.name) {
+        if (namedArgs[i].name.label.name !=
+            sortedNamedArgs[i].name.label.name) {
           alreadySorted = false;
           break;
         }

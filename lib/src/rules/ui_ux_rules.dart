@@ -1296,8 +1296,7 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
       AstNode? parent = node.parent;
       while (parent != null) {
         if (parent is InstanceCreationExpression) {
-          final String parentType =
-              parent.constructorName.type.name.lexeme;
+          final String parentType = parent.constructorName.type.name.lexeme;
           if (parentType == 'Stack') {
             // Assume Stack contains loading indicator
             hasProgressIndicator = true;
