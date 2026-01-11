@@ -758,6 +758,247 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
   }
 }
 
+/// Warns when SQLite reserved words are used as column names.
+///
+/// Alias: sqflite_reserved_word, sql_reserved_column
+///
+/// SQLite reserved words like ORDER, GROUP, SELECT, etc. cannot be used
+/// as column names without escaping. This causes cryptic SQL syntax errors.
+///
+/// **BAD:**
+/// ```dart
+/// await db.execute('''
+///   CREATE TABLE items (
+///     id INTEGER PRIMARY KEY,
+///     order INTEGER  // 'order' is reserved!
+///   )
+/// ''');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await db.execute('''
+///   CREATE TABLE items (
+///     id INTEGER PRIMARY KEY,
+///     "order" INTEGER  // Escaped with double quotes
+///   )
+/// ''');
+/// // Or better: rename the column
+/// await db.execute('''
+///   CREATE TABLE items (
+///     id INTEGER PRIMARY KEY,
+///     sort_order INTEGER
+///   )
+/// ''');
+/// ```
+class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
+  const AvoidSqfliteReservedWordsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_sqflite_reserved_words',
+    problemMessage:
+        'SQL statement may contain SQLite reserved word as column name.',
+    correctionMessage:
+        'Escape reserved words with double quotes or rename the column.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// SQLite reserved words that commonly cause issues when used as column names
+  static const Set<String> _reservedWords = <String>{
+    'abort',
+    'action',
+    'add',
+    'after',
+    'all',
+    'alter',
+    'analyze',
+    'and',
+    'as',
+    'asc',
+    'attach',
+    'autoincrement',
+    'before',
+    'begin',
+    'between',
+    'by',
+    'cascade',
+    'case',
+    'cast',
+    'check',
+    'collate',
+    'column',
+    'commit',
+    'conflict',
+    'constraint',
+    'create',
+    'cross',
+    'current',
+    'current_date',
+    'current_time',
+    'current_timestamp',
+    'database',
+    'default',
+    'deferrable',
+    'deferred',
+    'delete',
+    'desc',
+    'detach',
+    'distinct',
+    'drop',
+    'each',
+    'else',
+    'end',
+    'escape',
+    'except',
+    'exclusive',
+    'exists',
+    'explain',
+    'fail',
+    'for',
+    'foreign',
+    'from',
+    'full',
+    'glob',
+    'group',
+    'having',
+    'if',
+    'ignore',
+    'immediate',
+    'in',
+    'index',
+    'indexed',
+    'initially',
+    'inner',
+    'insert',
+    'instead',
+    'intersect',
+    'into',
+    'is',
+    'isnull',
+    'join',
+    'key',
+    'left',
+    'like',
+    'limit',
+    'match',
+    'natural',
+    'no',
+    'not',
+    'notnull',
+    'null',
+    'of',
+    'offset',
+    'on',
+    'or',
+    'order',
+    'outer',
+    'plan',
+    'pragma',
+    'primary',
+    'query',
+    'raise',
+    'recursive',
+    'references',
+    'regexp',
+    'reindex',
+    'release',
+    'rename',
+    'replace',
+    'restrict',
+    'right',
+    'rollback',
+    'row',
+    'savepoint',
+    'select',
+    'set',
+    'table',
+    'temp',
+    'temporary',
+    'then',
+    'to',
+    'transaction',
+    'trigger',
+    'union',
+    'unique',
+    'update',
+    'using',
+    'vacuum',
+    'values',
+    'view',
+    'virtual',
+    'when',
+    'where',
+    'with',
+    'without',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for SQL execution methods
+      if (methodName != 'execute' &&
+          methodName != 'rawQuery' &&
+          methodName != 'rawInsert' &&
+          methodName != 'rawUpdate' &&
+          methodName != 'rawDelete') {
+        return;
+      }
+
+      // Check if target looks like a database
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('db') && !targetSource.contains('database')) {
+        return;
+      }
+
+      // Get the SQL string
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression sqlArg = args.first;
+      final String sqlSource = sqlArg.toSource().toLowerCase();
+
+      // Check for CREATE TABLE or column definition patterns
+      if (sqlSource.contains('create table') ||
+          sqlSource.contains('insert into') ||
+          sqlSource.contains('alter table')) {
+        // Look for reserved words used as identifiers
+        for (final String reserved in _reservedWords) {
+          // Match patterns like "reserved INTEGER" or "reserved TEXT"
+          // But not if it's escaped with quotes
+          final RegExp unescapedPattern = RegExp(
+            '\\b$reserved\\s+(integer|text|real|blob|numeric|varchar|boolean)',
+            caseSensitive: false,
+          );
+
+          if (unescapedPattern.hasMatch(sqlSource)) {
+            // Check if it's properly escaped
+            final RegExp escapedPattern = RegExp(
+              '["\'`]$reserved["\'`]',
+              caseSensitive: false,
+            );
+            if (!escapedPattern.hasMatch(sqlSource)) {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
 // =============================================================================
 // Part 5 Rules: Hive Database Rules
 // =============================================================================

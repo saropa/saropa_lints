@@ -200,6 +200,7 @@ const List<LintRule> _allRules = <LintRule>[
   ExtendEquatableRule(),
   ListAllEquatableFieldsRule(),
   PreferEquatableMixinRule(),
+  AvoidMutableFieldInEquatableRule(),
   AvoidCollectionEqualityChecksRule(),
   AvoidDuplicateSwitchCaseConditionsRule(),
   AvoidMixingNamedAndPositionalFieldsRule(),
@@ -567,6 +568,7 @@ const List<LintRule> _allRules = <LintRule>[
   // Error handling rules (NEW)
   AvoidSwallowingExceptionsRule(),
   AvoidLosingStackTraceRule(),
+  AvoidPrintErrorRule(),
   // RequireFutureErrorHandlingRule merged into AvoidUncaughtFutureErrorsRule
   AvoidGenericExceptionsRule(),
   RequireErrorContextRule(),
@@ -611,6 +613,10 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidStringConcatenationInUiRule(),
   AvoidTextInImagesRule(),
   AvoidHardcodedAppNameRule(),
+  RequireIntlDateFormatLocaleRule(),
+  RequireNumberFormatLocaleRule(),
+  AvoidManualDateFormattingRule(),
+  RequireIntlCurrencyFormatRule(),
 
   // API & Network rules (NEW)
   RequireHttpStatusCheckRule(),
@@ -1065,6 +1071,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferItemExtentRule(),
   PreferPrototypeItemRule(),
   RequireKeyForReorderableRule(),
+  RequireKeyForCollectionRule(),
   RequireAddAutomaticKeepAlivesOffRule(),
 
   // Cryptography rules (NEW)
@@ -1280,6 +1287,7 @@ const List<LintRule> _allRules = <LintRule>[
   RequireSqfliteErrorHandlingRule(),
   PreferSqfliteBatchRule(),
   RequireSqfliteCloseRule(),
+  AvoidSqfliteReservedWordsRule(),
 
   // Part 5 - Hive Database rules
   RequireHiveInitializationRule(),
@@ -1287,6 +1295,7 @@ const List<LintRule> _allRules = <LintRule>[
   RequireHiveBoxCloseRule(),
   PreferHiveEncryptionRule(),
   RequireHiveEncryptionKeySecureRule(),
+  AvoidHiveFieldIndexReuseRule(),
 
   // Part 5 - Dio HTTP Client rules
   RequireDioTimeoutRule(),
