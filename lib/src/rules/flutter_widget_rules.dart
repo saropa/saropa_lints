@@ -16826,8 +16826,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 
       while (current != null && depth < 20) {
         if (current is InstanceCreationExpression) {
-          final String parentType =
-              current.constructorName.type.name.lexeme;
+          final String parentType = current.constructorName.type.name.lexeme;
           if (_flexTypes.contains(parentType)) {
             foundFlexParent = true;
             break;
@@ -16922,8 +16921,8 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check if body accesses array with index
-      final bool hasIndexAccess = bodySource.contains('[index]') ||
-          bodySource.contains('[i]');
+      final bool hasIndexAccess =
+          bodySource.contains('[index]') || bodySource.contains('[i]');
 
       if (!hasIndexAccess) return;
 

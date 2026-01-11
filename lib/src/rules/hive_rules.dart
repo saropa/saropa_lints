@@ -946,12 +946,11 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
       // Check if field has @HiveField annotation
-      final Annotation? hiveFieldAnnotation = node.metadata
-          .cast<Annotation?>()
-          .firstWhere(
-            (Annotation? a) => a?.name.name == 'HiveField',
-            orElse: () => null,
-          );
+      final Annotation? hiveFieldAnnotation =
+          node.metadata.cast<Annotation?>().firstWhere(
+                (Annotation? a) => a?.name.name == 'HiveField',
+                orElse: () => null,
+              );
 
       if (hiveFieldAnnotation == null) return;
 

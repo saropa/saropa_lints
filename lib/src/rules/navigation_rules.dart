@@ -1952,7 +1952,8 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_url_launcher_uri_over_string',
-    problemMessage: 'launchUrl with Uri.parse. Prefer constructing Uri directly.',
+    problemMessage:
+        'launchUrl with Uri.parse. Prefer constructing Uri directly.',
     correctionMessage:
         'Use Uri.https() or Uri.http() for compile-time validation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2143,8 +2144,7 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
       final Expression firstArg = args.arguments.first;
 
       // Check for Uri.parse('...$var...')
-      if (firstArg is MethodInvocation &&
-          firstArg.methodName.name == 'parse') {
+      if (firstArg is MethodInvocation && firstArg.methodName.name == 'parse') {
         final ArgumentList parseArgs = firstArg.argumentList;
         if (parseArgs.arguments.isEmpty) return;
 

@@ -3653,8 +3653,7 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_blocking_database_ui',
-    problemMessage:
-        'Database operation in build method may block UI thread.',
+    problemMessage: 'Database operation in build method may block UI thread.',
     correctionMessage:
         'Load data in initState or use FutureBuilder/StreamBuilder.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3831,8 +3830,7 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
     name: 'avoid_rebuild_on_scroll',
     problemMessage:
         'Scroll listener in build method. Will be added multiple times.',
-    correctionMessage:
-        'Add listener in initState and remove in dispose.',
+    correctionMessage: 'Add listener in initState and remove in dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
