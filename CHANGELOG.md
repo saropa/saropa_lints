@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.3.6] - 2026-01-11
+
+### Fixed
+
+- **CI/CD**: Reverted example project to pure Dart (no Flutter SDK dependency) to fix CI failures caused by `dart pub get` requiring Flutter SDK
+
+### Added
+
+- **flutter_mocks.dart**: Created comprehensive mock Flutter types (~490 lines) for lint rule testing without Flutter SDK:
+  - Core types: `Widget`, `StatelessWidget`, `StatefulWidget`, `State`, `BuildContext`
+  - Layout widgets: `Container`, `SizedBox`, `Padding`, `Align`, `Center`, `Column`, `Row`
+  - Material widgets: `Scaffold`, `ElevatedButton`, `TextField`, `TabBar`, `AlertDialog`, `SnackBar`
+  - Controllers: `TextEditingController`, `TabController`, `PageController`, `FocusNode`
+  - Provider mocks: `Provider`, `MultiProvider`, `ChangeNotifierProvider`
+  - BLoC mocks: `Bloc`, `BlocProvider`, `MultiBlocProvider`
+
+### Changed
+
+- Updated 12 fixture files to import `flutter_mocks.dart` instead of Flutter/external packages
+
 ## [2.3.5] - 2026-01-11
 
 ### Fixed
@@ -23,7 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **example/pubspec.yaml**: Converted to Flutter project with required dependencies (flutter_bloc, provider, equatable, encrypt) for proper rule testing
 - **example/analysis_options.yaml**: Explicitly enabled all tested rules regardless of tier
 
 ### Added

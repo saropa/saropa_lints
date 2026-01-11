@@ -1754,9 +1754,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 ### 5.51 Isar Database Rules
 
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `avoid_isar_enum_index_change` | Essential | ERROR | (alias: `avoid_isar_enum_field`) Isar stores enum index, not name. Reordering enums corrupts existing data. |
+<!-- Placeholder - Isar Database Rules is complete -->
 
 ### 5.52 Hive Advanced Rules
 
