@@ -278,7 +278,7 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when ListView uses children property with many items.
 ///
-/// ListView(children: [...]) builds all children immediately.
+/// `ListView(children: [...])` builds all children immediately.
 /// For lists with more than 20 items, use ListView.builder for
 /// better performance through virtualization.
 ///

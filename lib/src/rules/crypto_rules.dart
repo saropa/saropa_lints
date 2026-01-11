@@ -21,6 +21,8 @@ import '../saropa_lint_rule.dart';
 /// compiled applications (APK, IPA). Keys should be stored securely
 /// or derived at runtime.
 ///
+/// **Quick fix available:** Adds a comment for manual secure key loading.
+///
 /// ## Detection approach
 ///
 /// This rule ONLY detects calls to encryption library Key constructors with
@@ -99,6 +101,8 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
     // Only flag encryption library Key constructors with string literals.
     // This approach is reliable because it requires a specific class + method
     // + literal combination that unambiguously indicates a hardcoded key.
+
+    // Handle static method calls like SomeKey.fromUtf8(...)
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
@@ -118,6 +122,68 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
           reporter.atNode(firstArg, code);
         }
       }
+    });
+
+    // Handle named constructors like Key.fromUtf8(...), Key.fromBase64(...)
+    // The encrypt package uses named constructors, not static methods.
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+
+      // Check if it's a Key-like class
+      if (!_keyClasses.contains(typeName)) return;
+
+      // Check if it's a named constructor we care about
+      final SimpleIdentifier? name = constructorName.name;
+      if (name == null) return;
+      if (!_keyMethods.contains(name.name)) return;
+
+      // Check if argument is a string literal (hardcoded key)
+      if (node.argumentList.arguments.isNotEmpty) {
+        final Expression firstArg = node.argumentList.arguments.first;
+        if (firstArg is StringLiteral) {
+          reporter.atNode(firstArg, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddSecureKeyLoadingCommentFix()];
+}
+
+class _AddSecureKeyLoadingCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Handle both method invocations and instance creation expressions
+    context.registry.addStringLiteral((StringLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the containing statement
+      AstNode? current = node;
+      while (current != null && current is! ExpressionStatement) {
+        current = current.parent;
+      }
+      if (current == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add secure key loading comment',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          current!.offset,
+          '// HACK: Load key from secure storage or environment, not hardcoded\n    ',
+        );
+      });
     });
   }
 }

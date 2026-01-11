@@ -75,10 +75,10 @@ class BadBadgeCountWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // expect_lint: require_badge_count_limit
     return Semantics(
       label: '150 notifications',
       child: Badge(
+        // expect_lint: require_badge_count_limit
         label: Text('150'),
         child: Icon(Icons.mail),
       ),

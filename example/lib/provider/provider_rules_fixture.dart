@@ -37,8 +37,8 @@ void testPreferMultiProvider() {
 
 void testAvoidInstantiatingInValueProvider() {
   // BAD: Creating new instance in Provider.value
-  // expect_lint: avoid_instantiating_in_value_provider
   final bad1 = Provider.value(
+    // expect_lint: avoid_instantiating_in_value_provider
     value: AuthService(), // New instance - not managed!
     child: Container(),
   );
