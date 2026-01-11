@@ -467,3 +467,123 @@ at:
 [custom_lint] 2026-01-09T10:38:36.971653 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
 [custom_lint] 2026-01-09T10:38:36.971653 <asynchronous suspension>
 [custom_lint] 2026-01-09T10:38:36.971653
+[custom_lint] 2026-01-11T17:45:17.236868 ../../runtime/vm/zone.cc: 96: error: Out of memory.
+[custom_lint] 2026-01-11T17:45:17.236868
+[custom_lint] 2026-01-11T17:45:17.236868
+[custom_lint] 2026-01-11T17:45:17.241389 version=3.10.4 (stable) (Tue Dec 9 00:01:55 2025 -0800) on "windows_x64"
+[custom_lint] 2026-01-11T17:45:17.241389
+[custom_lint] 2026-01-11T17:45:17.241389
+The request analysis.setContextRoots failed with the following error:
+RequestErrorCode.PLUGIN_ERROR
+Bad state: No response for request CustomLintRequest.analyzerPluginRequest(request: Instance of 'Request', id: 8ccfc072-da4b-40fa-aced-fe59ab089ca4)
+at:
+#0      SocketCustomLintServerToClientChannel.sendCustomLintRequest.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:256:21)
+#1      _runUserCode (dart:async/stream_pipe.dart:14:23)
+#2      Stream.firstWhere.<anonymous closure> (dart:async/stream.dart:1782:11)
+#3      _rootRun (dart:async/zone.dart:1517:47)
+#4      _CustomZone.run (dart:async/zone.dart:1422:19)
+#5      _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#6      _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#7      _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#8      _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)
+#9      _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)
+#10     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)
+#11     _rootRun (dart:async/zone.dart:1517:47)
+#12     _CustomZone.run (dart:async/zone.dart:1422:19)
+#13     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#14     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#15     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#16     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)
+#17     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)
+#18     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)
+#19     _rootRun (dart:async/zone.dart:1517:47)
+#20     _CustomZone.run (dart:async/zone.dart:1422:19)
+#21     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#22     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#23     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#24     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)
+#25     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)
+#26     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)
+#27     _rootRun (dart:async/zone.dart:1517:47)
+#28     _CustomZone.run (dart:async/zone.dart:1422:19)
+#29     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#30     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#31     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#32     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)
+#33     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)
+#34     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)
+#35     _rootRun (dart:async/zone.dart:1517:47)
+#36     _CustomZone.run (dart:async/zone.dart:1422:19)
+#37     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#38     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#39     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#40     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)
+#41     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)
+#42     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)
+#43     _rootRun (dart:async/zone.dart:1517:47)
+#44     _CustomZone.run (dart:async/zone.dart:1422:19)
+#45     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#46     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#47     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#48     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)
+#49     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)
+#50     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)
+#51     _rootRun (dart:async/zone.dart:1517:47)
+#52     _CustomZone.run (dart:async/zone.dart:1422:19)
+#53     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#54     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#55     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#56     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)
+#57     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)
+#58     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)
+#59     _rootRun (dart:async/zone.dart:1517:47)
+#60     _CustomZone.run (dart:async/zone.dart:1422:19)
+#61     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#62     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)
+#63     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)
+#64     _DelayedDone.perform (dart:async/stream_impl.dart:592:14)
+#65     _PendingEvents.handleNext (dart:async/stream_impl.dart:678:11)
+#66     _PendingEvents.schedule.<anonymous closure> (dart:async/stream_impl.dart:649:7)
+#67     _rootRun (dart:async/zone.dart:1517:47)
+#68     _CustomZone.run (dart:async/zone.dart:1422:19)
+#69     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#70     _CustomZone.bindCallbackGuarded.<anonymous closure> (dart:async/zone.dart:1362:23)
+#71     _rootRun (dart:async/zone.dart:1525:13)
+#72     _CustomZone.run (dart:async/zone.dart:1422:19)
+#73     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)
+#74     _CustomZone.bindCallbackGuarded.<anonymous closure> (dart:async/zone.dart:1362:23)
+#75     _microtaskLoop (dart:async/schedule_microtask.dart:40:35)
+#76     _startMicrotaskLoop (dart:async/schedule_microtask.dart:49:5)
+#77     _runPendingImmediateCallback (dart:isolate-patch/isolate_patch.dart:127:13)
+#78     _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:194:5)
+
+[custom_lint] 2026-01-11T17:45:17.251921 pid=345060, thread=313152, isolate_group=main(0000020309691090), isolate=(nil)(0000000000000000)
+[custom_lint] 2026-01-11T17:45:17.251921 os=windows, arch=x64, comp=no, sim=no
+[custom_lint] 2026-01-11T17:45:17.251921 isolate_instructions=7ff65b478060, vm_instructions=7ff65b478080
+[custom_lint] 2026-01-11T17:45:17.251921 fp=fef66fd890, sp=fef66fd848, pc=7ff65b75dc73
+[custom_lint] 2026-01-11T17:45:17.251921   pc 0x00007ff65b75dc73 fp 0x000000fef66fd890 Dart_DetectNullSafety+0x2dd563
+[custom_lint] 2026-01-11T17:45:17.251921 -- End of DumpStackTrace
+[custom_lint] 2026-01-11T17:45:17.251921 ../../runtime/vm/zone.cc: 96: error: Out of memory.
+[custom_lint] 2026-01-11T17:45:17.251921 Aborting reentrant request for stack trace.
+[custom_lint] 2026-01-11T17:45:17.251921
+[custom_lint] 2026-01-11T17:45:17.251921
+[custom_lint] 2026-01-11T17:45:17.256956 _PrettyRequestFailure: {"code":"PLUGIN_ERROR","message":"Bad state: No response for request CustomLintRequest.analyzerPluginRequest(request: Instance of 'Request', id: 8ccfc072-da4b-40fa-aced-fe59ab089ca4)","stackTrace":"#0      SocketCustomLintServerToClientChannel.sendCustomLintRequest.<anonymous closure> (package:custom_lint/src/v2/server_to_client_channel.dart:256:21)\n#1      _runUserCode (dart:async/stream_pipe.dart:14:23)\n#2      Stream.firstWhere.<anonymous closure> (dart:async/stream.dart:1782:11)\n#3      _rootRun (dart:async/zone.dart:1517:47)\n#4      _CustomZone.run (dart:async/zone.dart:1422:19)\n#5      _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#6      _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#7      _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#8      _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)\n#9      _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)\n#10     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)\n#11     _rootRun (dart:async/zone.dart:1517:47)\n#12     _CustomZone.run (dart:async/zone.dart:1422:19)\n#13     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#14     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#15     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#16     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)\n#17     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)\n#18     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)\n#19     _rootRun (dart:async/zone.dart:1517:47)\n#20     _CustomZone.run (dart:async/zone.dart:1422:19)\n#21     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#22     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#23     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#24     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)\n#25     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)\n#26     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)\n#27     _rootRun (dart:async/zone.dart:1517:47)\n#28     _CustomZone.run (dart:async/zone.dart:1422:19)\n#29     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#30     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#31     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#32     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)\n#33     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)\n#34     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)\n#35     _rootRun (dart:async/zone.dart:1517:47)\n#36     _CustomZone.run (dart:async/zone.dart:1422:19)\n#37     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#38     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#39     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#40     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)\n#41     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)\n#42     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)\n#43     _rootRun (dart:async/zone.dart:1517:47)\n#44     _CustomZone.run (dart:async/zone.dart:1422:19)\n#45     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#46     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#47     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#48     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)\n#49     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)\n#50     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)\n#51     _rootRun (dart:async/zone.dart:1517:47)\n#52     _CustomZone.run (dart:async/zone.dart:1422:19)\n#53     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#54     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#55     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#56     _BufferingStreamSubscription._close (dart:async/stream_impl.dart:333:7)\n#57     _ForwardingStream._handleDone (dart:async/stream_pipe.dart:123:10)\n#58     _ForwardingStreamSubscription._handleDone (dart:async/stream_pipe.dart:192:13)\n#59     _rootRun (dart:async/zone.dart:1517:47)\n#60     _CustomZone.run (dart:async/zone.dart:1422:19)\n#61     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#62     _BufferingStreamSubscription._sendDone.sendDone (dart:async/stream_impl.dart:434:13)\n#63     _BufferingStreamSubscription._sendDone (dart:async/stream_impl.dart:444:7)\n#64     _DelayedDone.perform (dart:async/stream_impl.dart:592:14)\n#65     _PendingEvents.handleNext (dart:async/stream_impl.dart:678:11)\n#66     _PendingEvents.schedule.<anonymous closure> (dart:async/stream_impl.dart:649:7)\n#67     _rootRun (dart:async/zone.dart:1517:47)\n#68     _CustomZone.run (dart:async/zone.dart:1422:19)\n#69     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#70     _CustomZone.bindCallbackGuarded.<anonymous closure> (dart:async/zone.dart:1362:23)\n#71     _rootRun (dart:async/zone.dart:1525:13)\n#72     _CustomZone.run (dart:async/zone.dart:1422:19)\n#73     _CustomZone.runGuarded (dart:async/zone.dart:1321:7)\n#74     _CustomZone.bindCallbackGuarded.<anonymous closure> (dart:async/zone.dart:1362:23)\n#75     _microtaskLoop (dart:async/schedule_microtask.dart:40:35)\n#76     _startMicrotaskLoop (dart:async/schedule_microtask.dart:49:5)\n#77     _runPendingImmediateCallback (dart:isolate-patch/isolate_patch.dart:127:13)\n#78     _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:194:5)\n"}
+[custom_lint] 2026-01-11T17:45:17.256956 #0      ChannelBase.sendRequest (package:custom_lint/src/server_isolate_channel.dart:82:7)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #1      CustomLintRunner.initialize.<anonymous closure> (package:custom_lint/src/runner.dart:41:5)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #2      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:96:7)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #3      _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #4      _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #5      _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #6      customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #7      entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-11T17:45:17.256956 <asynchronous suspension>
+[custom_lint] 2026-01-11T17:45:17.256956
