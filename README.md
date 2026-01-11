@@ -500,16 +500,16 @@ Not sure if something is a bug or a design decision? Open a discussion issue. We
 
 ## Professional Services
 
-Optional paid services for teams that want hands-on help. See [ENTERPRISE.md](https://github.com/saropa/saropa_lints/blob/main/ENTERPRISE.md) for details.
+Optional paid services for teams that want hands-on help. See [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md) for details.
 
 | Service | Description |
 |---------|-------------|
-| **Codebase Assessment** | We analyze your codebase, prioritize findings, create a remediation roadmap |
-| **Remediation** | We fix the issues — you stay focused on features |
+| **New Projects** | Development scoped to your stage — MVP, Production, or Enterprise |
+| **Upgrade** | Move existing projects to higher tiers as they grow |
+| **Audit** | Assess codebases you inherited; remediation quoted separately |
 | **Custom Rules** | Rules specific to your architecture and compliance requirements |
-| **Training** | Team workshops on Flutter best practices |
 
-Contact: [saropa.com](https://saropa.com) | [lints@saropa.com](mailto:lints@saropa.com)
+Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:services@saropa.com)
 
 ## Documentation
 
@@ -520,7 +520,7 @@ Contact: [saropa.com](https://saropa.com) | [lints@saropa.com](mailto:lints@saro
 | [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) | How to contribute rules and report issues |
 | [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) | Version history and release notes |
 | [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md) | Security policy and reporting vulnerabilities |
-| [ENTERPRISE.md](https://github.com/saropa/saropa_lints/blob/main/ENTERPRISE.md) | Professional services and custom rules |
+| [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md) | Professional services and custom rules |
 
 ### Package Integration Guides
 

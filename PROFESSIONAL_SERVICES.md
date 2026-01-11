@@ -1,6 +1,6 @@
-# Saropa Lints for Enterprise
+# Saropa Lints — Professional Services
 
-**[saropa.com](https://saropa.com)** | **[enterprise@saropa.com](mailto:enterprise@saropa.com)**
+**[saropa.com](https://saropa.com)** | **[services@saropa.com](mailto:services@saropa.com)**
 
 ---
 
@@ -43,33 +43,51 @@ Static analysis catches bugs **before they reach production**. Industry data sho
 
 ---
 
-## Adoption for Existing Projects
+## Professional Services from Saropa
 
-When enabling comprehensive linting on a legacy codebase, expect thousands of warnings initially. This is normal.
+Different projects have different needs. We offer three core services:
 
-| Project Size | Initial Warnings |
-|--------------|------------------|
-| Small (10K lines) | 500-2,000 |
-| Medium (50K lines) | 2,000-10,000 |
-| Large (200K+ lines) | 10,000-50,000+ |
+### New Projects
 
-### Recommended Approach
+Scoped to your stage:
 
-**Phase 1 (Week 1)**: Enable critical rules only — memory leaks, null safety, security
-**Phase 2 (Weeks 2-4)**: Add performance and error handling rules
-**Phase 3 (Months 2-3)**: Enable documentation, testing, accessibility rules
-**Phase 4 (Month 3+)**: Full enablement with team-specific exclusions
+| Stage | What's included | Best for |
+|-------|-----------------|----------|
+| **MVP** | Core stability — crashes, security, null safety | Early-stage, validating fast |
+| **Production** | Above + performance, error handling, edge cases | Scaling, real users |
+| **Enterprise** | Above + accessibility, compliance, documentation | Regulated markets, enterprise sales |
+
+Each is a complete product. You're not buying quality levels — you're matching the scope to the project's needs.
+
+### Upgrade
+
+Existing projects you've built, moving to a higher tier.
+
+Your project succeeded. Now it's growing. We help you upgrade from MVP-tier to Production-tier or Enterprise-tier practices. This is progression, not remediation.
+
+Typical phased approach:
+- **Phase 1**: Enable critical rules — memory leaks, null safety, security
+- **Phase 2**: Add performance and error handling rules
+- **Phase 3**: Enable documentation, testing, accessibility rules
+- **Phase 4**: Full enablement with team-specific exclusions
+
+### Audit
+
+Existing code you didn't build — or inherited from previous contractors.
+
+We assess the codebase, produce a prioritized report, and quote remediation separately. The report is the deliverable:
+
+- **Current state analysis** — How many issues, what categories, severity distribution
+- **Risk prioritization** — Which issues pose the greatest risk to stability, security, and maintainability
+- **Remediation roadmap** — Phased plan to resolve issues without disrupting feature development
+- **Estimated effort** — Scope of work if you want us to handle remediation
 
 ---
 
-## Professional Services from Saropa
-
-The open source package is free. For teams that want hands-on help:
+### Additional Services
 
 | Service | Description |
 |---------|-------------|
-| **Codebase Assessment** | We analyze your codebase, prioritize findings, and create a remediation roadmap |
-| **Remediation** | We fix the issues — you stay focused on features |
 | **Custom Rules** | Rules specific to your architecture, patterns, or compliance requirements |
 | **Training** | Team workshops on Flutter best practices and lint-driven development |
 | **Ongoing Support** | We manage your lint configuration as your codebase evolves |
@@ -78,17 +96,6 @@ The open source package is free. For teams that want hands-on help:
 | **Custom Builds** | Private fork of Saropa Lints tailored to your organization's standards |
 | **Tailored Lint Sets** | We create a curated lint configuration specific to your tech stack, compliance requirements, and team preferences |
 | **Sponsored Rules** | Fund development of new rules that get added to the public package — your organization gets recognition while the community benefits |
-
-### Project Assessments
-
-Not sure where to start? We assess your codebase and deliver a detailed report:
-
-- **Current state analysis** — How many issues, what categories, severity distribution
-- **Risk prioritization** — Which issues pose the greatest risk to stability, security, and maintainability
-- **Remediation roadmap** — Phased plan to resolve issues without disrupting feature development
-- **Estimated effort** — Scope of work if you want us to handle remediation
-
-Assessments are available as a standalone service or as the first step in a larger engagement.
 
 ### Sponsor Rules for the Public Package
 
@@ -117,7 +124,7 @@ Tailored lint sets can be delivered as a configuration file for the public packa
 ## Contact
 
 **Website**: [saropa.com](https://saropa.com)
-**Email**: [enterprise@saropa.com](mailto:enterprise@saropa.com)
+**Email**: [services@saropa.com](mailto:services@saropa.com)
 
 ---
 
