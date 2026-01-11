@@ -5,7 +5,7 @@
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
-[![rules](https://img.shields.io/badge/rules-1248%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+[![rules](https://img.shields.io/badge/rules-1257%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -79,7 +79,7 @@ These aren't edge cases. They're compliance requirements and security basics tha
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1248+ when you're ready.
+The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1257+ when you're ready.
 
 ---
 

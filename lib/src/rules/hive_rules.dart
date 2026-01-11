@@ -851,8 +851,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
       if (!isHiveType) return;
 
       // Collect all @HiveField indices and their annotations
-      final Map<int, List<Annotation>> fieldIndices =
-          <int, List<Annotation>>{};
+      final Map<int, List<Annotation>> fieldIndices = <int, List<Annotation>>{};
 
       for (final member in node.members) {
         if (member is FieldDeclaration) {

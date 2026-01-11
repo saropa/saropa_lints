@@ -1261,9 +1261,9 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_manual_date_formatting',
-    problemMessage:
-        'Manual date formatting is error-prone and ignores locale.',
-    correctionMessage: 'Use DateFormat from intl: DateFormat.yMd(locale).format(date)',
+    problemMessage: 'Manual date formatting is error-prone and ignores locale.',
+    correctionMessage:
+        'Use DateFormat from intl: DateFormat.yMd(locale).format(date)',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
