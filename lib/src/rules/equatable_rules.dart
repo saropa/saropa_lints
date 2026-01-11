@@ -1089,3 +1089,93 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
     return true;
   }
 }
+
+/// Warns when Equatable class has non-final (mutable) fields.
+///
+/// Alias: no_mutable_equatable_field, equatable_final_fields
+///
+/// All fields in Equatable classes should be final to ensure correct
+/// equality behavior. Mutable fields can change after comparison,
+/// leading to bugs where equal objects become unequal.
+///
+/// **BAD:**
+/// ```dart
+/// class Person extends Equatable {
+///   String name; // Non-final field - can change after comparison!
+///   final int age;
+///
+///   @override
+///   List<Object?> get props => [name, age];
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class Person extends Equatable {
+///   final String name;
+///   final int age;
+///
+///   @override
+///   List<Object?> get props => [name, age];
+/// }
+/// ```
+class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
+  const AvoidMutableFieldInEquatableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_mutable_field_in_equatable',
+    problemMessage:
+        'Equatable class has non-final field. Equality may change unexpectedly.',
+    correctionMessage:
+        'Make all fields final. Use copyWith pattern for updates.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class extends Equatable or mixes in EquatableMixin
+      if (!_isEquatable(node)) return;
+
+      // Find non-final instance fields
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration && !member.isStatic) {
+          // Check if fields are final
+          if (!member.fields.isFinal && !member.fields.isConst) {
+            // Report each non-final field
+            for (final VariableDeclaration variable in member.fields.variables) {
+              reporter.atNode(variable, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  bool _isEquatable(ClassDeclaration node) {
+    // Check extends Equatable
+    final ExtendsClause? extendsClause = node.extendsClause;
+    if (extendsClause != null) {
+      final String superclassName = extendsClause.superclass.name2.lexeme;
+      if (superclassName == 'Equatable') return true;
+    }
+
+    // Check mixes in EquatableMixin
+    final WithClause? withClause = node.withClause;
+    if (withClause != null) {
+      for (final NamedType mixin in withClause.mixinTypes) {
+        if (mixin.name2.lexeme == 'EquatableMixin') return true;
+      }
+    }
+
+    return false;
+  }
+}
+
