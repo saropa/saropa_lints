@@ -592,3 +592,111 @@ class _GoodMixedSubscriptionWidgetState
   @override
   Widget build(BuildContext context) => Container();
 }
+
+// =========================================================================
+// require_sse_subscription_cancel
+// =========================================================================
+
+// Mock SSE types for testing
+class EventSource {
+  void close() {}
+}
+
+class SseClient {
+  void close() {}
+}
+
+// BAD: EventSource not closed in dispose
+class BadSseWidget extends StatefulWidget {
+  const BadSseWidget({super.key});
+
+  @override
+  State<BadSseWidget> createState() => _BadSseWidgetState();
+}
+
+class _BadSseWidgetState extends State<BadSseWidget> {
+  // expect_lint: require_sse_subscription_cancel
+  EventSource? _eventSource;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventSource = EventSource();
+  }
+
+  // Missing close in dispose!
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// BAD: SSE field name pattern without close
+class BadSseFieldNameWidget extends StatefulWidget {
+  const BadSseFieldNameWidget({super.key});
+
+  @override
+  State<BadSseFieldNameWidget> createState() => _BadSseFieldNameWidgetState();
+}
+
+class _BadSseFieldNameWidgetState extends State<BadSseFieldNameWidget> {
+  // expect_lint: require_sse_subscription_cancel
+  dynamic _sseConnection;
+
+  @override
+  void initState() {
+    super.initState();
+    _sseConnection = Object();
+  }
+
+  // Missing close in dispose!
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: EventSource properly closed
+class GoodSseWidget extends StatefulWidget {
+  const GoodSseWidget({super.key});
+
+  @override
+  State<GoodSseWidget> createState() => _GoodSseWidgetState();
+}
+
+class _GoodSseWidgetState extends State<GoodSseWidget> {
+  EventSource? _eventSource;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventSource = EventSource();
+  }
+
+  @override
+  void dispose() {
+    _eventSource?.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Field names that should NOT trigger false positives
+class GoodNoFalsePositivesWidget extends StatefulWidget {
+  const GoodNoFalsePositivesWidget({super.key});
+
+  @override
+  State<GoodNoFalsePositivesWidget> createState() =>
+      _GoodNoFalsePositivesWidgetState();
+}
+
+class _GoodNoFalsePositivesWidgetState
+    extends State<GoodNoFalsePositivesWidget> {
+  // These should NOT trigger the rule (false positive check)
+  String? addressesFuture; // Contains 'sse' but not SSE-related
+  bool? hasSearched; // Contains 'sse' but not SSE-related
+  int? processedCount; // Contains 'sse' but not SSE-related
+
+  @override
+  Widget build(BuildContext context) => Container();
+}

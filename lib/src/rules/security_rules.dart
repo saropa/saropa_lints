@@ -3727,20 +3727,46 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
         final Expression actualArg =
             arg is NamedExpression ? arg.expression : arg;
 
-        // Only flag String or Uri types - not object types like AppGridMenuItem
-        final argType = actualArg.staticType;
-        if (argType == null) continue;
-
-        final typeName = argType.getDisplayString();
-        final isUrlType = typeName == 'String' ||
-            typeName == 'String?' ||
-            typeName == 'Uri' ||
-            typeName == 'Uri?' ||
-            typeName == 'dynamic';
-
-        if (!isUrlType) {
+        // Skip property access on typed objects (e.g., item.destination)
+        // Even though item.destination has type String, the source is a typed
+        // object property which is less likely to be user-controlled injection
+        if (actualArg is PropertyAccess || actualArg is PrefixedIdentifier) {
           continue;
         }
+
+        // Only flag String or Uri types - not object types like AppGridMenuItem
+        final argType = actualArg.staticType;
+
+        // If type is resolved, check if it's a URL-like type
+        if (argType != null) {
+          final typeName = argType.getDisplayString();
+
+          // Skip custom object types (start with uppercase, not String/Uri/dynamic)
+          final isCustomType = typeName.isNotEmpty &&
+              typeName[0].toUpperCase() == typeName[0] &&
+              !typeName.startsWith('String') &&
+              !typeName.startsWith('Uri') &&
+              typeName != 'dynamic' &&
+              typeName != 'Object' &&
+              typeName != 'Object?';
+
+          if (isCustomType) {
+            continue;
+          }
+
+          // Also skip obvious non-URL primitive types
+          final isUrlType = typeName == 'String' ||
+              typeName == 'String?' ||
+              typeName == 'Uri' ||
+              typeName == 'Uri?' ||
+              typeName == 'dynamic';
+
+          if (!isUrlType) {
+            continue;
+          }
+        }
+        // If type is null (unresolved) and not property access, continue checking
+        // The property access case is already handled above
 
         final argSource = arg.toSource().toLowerCase();
 

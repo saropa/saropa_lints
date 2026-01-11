@@ -2198,3 +2198,149 @@ class PreferIterableOperationsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when widgets in lists lack a Key for efficient updates.
+///
+/// Alias: list_item_key, require_widget_key, no_keyless_list_items
+///
+/// Flutter uses keys to identify widgets in lists. Without keys, Flutter
+/// may inefficiently rebuild widgets or lose widget state during reordering.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => ListTile(title: Text(items[index])),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) => ListTile(
+///     key: ValueKey(items[index].id),
+///     title: Text(items[index].name),
+///   ),
+/// )
+/// ```
+class RequireKeyForCollectionRule extends SaropaLintRule {
+  const RequireKeyForCollectionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_key_for_collection',
+    problemMessage:
+        'Widget in list lacks a key. May cause inefficient rebuilds or state loss.',
+    correctionMessage: 'Add a Key (e.g., ValueKey, ObjectKey) to list items.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// List builder widgets that need keyed children.
+  static const Set<String> _listBuilderWidgets = <String>{
+    'ListView',
+    'GridView',
+    'CustomScrollView',
+    'SliverList',
+    'SliverGrid',
+    'ReorderableListView',
+    'AnimatedList',
+  };
+
+  /// Builder methods that indicate dynamic list building.
+  static const Set<String> _builderMethods = <String>{
+    'builder',
+    'separated',
+    'custom',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+
+      final String widgetName = target.name;
+      final String methodName = node.methodName.name;
+
+      // Check for ListView.builder, GridView.builder, etc.
+      if (!_listBuilderWidgets.contains(widgetName)) return;
+      if (!_builderMethods.contains(methodName)) return;
+
+      // Find the itemBuilder argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
+          final Expression builderExpr = arg.expression;
+          if (builderExpr is FunctionExpression) {
+            _checkBuilderForKey(builderExpr, reporter);
+          }
+        }
+      }
+    });
+
+    // Also check for ReorderableListView and AnimatedList constructors
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? typeName = node.constructorName.type.element?.name;
+      if (typeName == null) return;
+
+      if (typeName == 'ReorderableListView' ||
+          typeName == 'AnimatedList' ||
+          typeName == 'SliverAnimatedList') {
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
+            final Expression builderExpr = arg.expression;
+            if (builderExpr is FunctionExpression) {
+              _checkBuilderForKey(builderExpr, reporter);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  void _checkBuilderForKey(
+    FunctionExpression builder,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final FunctionBody body = builder.body;
+
+    // Get the returned widget expression
+    Expression? returnedWidget;
+
+    if (body is ExpressionFunctionBody) {
+      returnedWidget = body.expression;
+    } else if (body is BlockFunctionBody) {
+      // Find return statement
+      for (final Statement stmt in body.block.statements) {
+        if (stmt is ReturnStatement && stmt.expression != null) {
+          returnedWidget = stmt.expression;
+          break;
+        }
+      }
+    }
+
+    if (returnedWidget == null) return;
+
+    // Check if the returned widget has a key
+    if (returnedWidget is InstanceCreationExpression) {
+      if (!_hasKeyArgument(returnedWidget)) {
+        reporter.atNode(returnedWidget.constructorName, code);
+      }
+    }
+  }
+
+  bool _hasKeyArgument(InstanceCreationExpression widget) {
+    for (final Expression arg in widget.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'key') {
+        return true;
+      }
+    }
+    return false;
+  }
+}
