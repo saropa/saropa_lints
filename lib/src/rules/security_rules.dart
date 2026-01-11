@@ -186,14 +186,14 @@ class _AddTodoForSensitiveLoggingFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for sensitive data logging',
+        message: 'Add HACK comment for sensitive data logging',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: remove sensitive data from this log statement\n',
+          '// HACK: remove sensitive data from this log statement\n',
         );
       });
     });
@@ -204,14 +204,14 @@ class _AddTodoForSensitiveLoggingFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for sensitive data logging',
+        message: 'Add HACK comment for sensitive data logging',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: remove sensitive data from this log statement\n',
+          '// HACK: remove sensitive data from this log statement\n',
         );
       });
     });
@@ -422,14 +422,14 @@ class _AddTodoForHardcodedCredentialsFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for hardcoded credential',
+        message: 'Add HACK comment for hardcoded credential',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: use environment variable or secure storage instead\n',
+          '// HACK: use environment variable or secure storage instead\n',
         );
       });
     });
@@ -438,14 +438,14 @@ class _AddTodoForHardcodedCredentialsFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for hardcoded credential',
+        message: 'Add HACK comment for hardcoded credential',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: use environment variable or secure storage instead\n',
+          '// HACK: use environment variable or secure storage instead\n',
         );
       });
     });
@@ -772,14 +772,14 @@ class _AddTodoForEvalPatternFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for dynamic code execution',
+        message: 'Add HACK comment for dynamic code execution',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: replace with static dispatch or explicit mapping\n',
+          '// HACK: replace with static dispatch or explicit mapping\n',
         );
       });
     });
@@ -788,14 +788,14 @@ class _AddTodoForEvalPatternFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO comment for dart:mirrors import',
+        message: 'Add HACK comment for dart:mirrors import',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: remove dart:mirrors usage for security\n',
+          '// HACK: remove dart:mirrors usage for security\n',
         );
       });
     });
@@ -1178,14 +1178,14 @@ class _AddTodoForDynamicSqlFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Use parameterized query',
+        message: 'Add HACK: Use parameterized query',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Use parameterized query with ? placeholders\n',
+          '// HACK: Use parameterized query with ? placeholders\n',
         );
       });
     });
@@ -2071,14 +2071,14 @@ class _AddSecureStorageTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Use flutter_secure_storage instead',
+        message: 'Add HACK: Use flutter_secure_storage instead',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Use flutter_secure_storage for auth tokens\n',
+          '// HACK: Use flutter_secure_storage for auth tokens\n',
         );
       });
     });
@@ -2191,14 +2191,14 @@ class _AddEncryptedPrefsTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Use encrypted storage',
+        message: 'Add HACK: Use encrypted storage',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Use flutter_secure_storage or encrypted_shared_preferences\n',
+          '// HACK: Use flutter_secure_storage or encrypted_shared_preferences\n',
         );
       });
     });
@@ -2366,14 +2366,14 @@ class _AddDeepLinkValidationFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Validate deep link parameter',
+        message: 'Add HACK: Validate deep link parameter',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Validate this deep link parameter before use\n',
+          '// HACK: Validate this deep link parameter before use\n',
         );
       });
     });
@@ -3305,14 +3305,14 @@ class _UseSecureStorageFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Use flutter_secure_storage',
+        message: 'Add HACK: Use flutter_secure_storage',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Replace with FlutterSecureStorage().write()\n',
+          '// HACK: Replace with FlutterSecureStorage().write()\n',
         );
       });
     });

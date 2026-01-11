@@ -142,7 +142,7 @@ class _AddOnCloseFix extends DartFix {
 
         builder.addSimpleInsertion(
           insertOffset,
-          '\n\n  @override\n  void onClose() {\n    // TODO: Dispose resources here\n    super.onClose();\n  }\n',
+          '\n\n  @override\n  void onClose() {\n    // HACK: Dispose resources here\n    super.onClose();\n  }\n',
         );
       });
     });

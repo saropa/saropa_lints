@@ -94,8 +94,8 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
 }
 
 class _AddTryCatchTodoFix extends DartFix {
-  _AddTryCatchTodoFix(this._code);
-  final LintCode _code;
+  // ignore: avoid_unused_constructor_parameters
+  _AddTryCatchTodoFix(LintCode _);
 
   @override
   void run(
@@ -108,15 +108,37 @@ class _AddTryCatchTodoFix extends DartFix {
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
+      // Find the statement containing this method invocation
+      AstNode? statementNode = node.parent;
+      while (statementNode != null && statementNode is! Statement) {
+        statementNode = statementNode.parent;
+      }
+
+      if (statementNode == null) return;
+
+      // Get the indentation of the current statement
+      final int statementOffset = statementNode.offset;
+      final String sourceCode = resolver.source.contents.data;
+      int lineStart = statementOffset;
+      while (lineStart > 0 && sourceCode[lineStart - 1] != '\n') {
+        lineStart--;
+      }
+      final String leadingWhitespace =
+          sourceCode.substring(lineStart, statementOffset);
+      final String indent =
+          leadingWhitespace.isEmpty ? '  ' : leadingWhitespace;
+
+      final String statementSource = statementNode.toSource();
+
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Wrap in try-catch',
+        message: 'Wrap in try-catch',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Wrap this ${_code.name.contains('google') ? 'Google Sign-In' : _code.name.contains('supabase') ? 'Supabase' : 'API'} call in try-catch\n',
+        builder.addSimpleReplacement(
+          SourceRange(statementNode!.offset, statementNode.length),
+          'try {\n$indent  $statementSource\n$indent} catch (e) {\n$indent  // Handle error\n$indent  rethrow;\n$indent}',
         );
       });
     });
@@ -228,14 +250,14 @@ class _AddNonceParameterFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add nonce parameter',
+        message: 'Add HACK: Add nonce parameter',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add nonce parameter to prevent replay attacks\n',
+          '// HACK: Add nonce parameter to prevent replay attacks\n',
         );
       });
     });
@@ -401,14 +423,14 @@ class _AddEnvVarTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Use environment variable',
+        message: 'Add HACK: Use environment variable',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Use environment variable or secure storage instead\n',
+          '// HACK: Use environment variable or secure storage instead\n',
         );
       });
     });
@@ -549,15 +571,24 @@ class _AddDisposeTodoFix extends DartFix {
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
+      // Find the full field declaration (including semicolon)
+      AstNode? fieldDecl = node.parent?.parent;
+      if (fieldDecl is! FieldDeclaration) return;
+
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add $_methodCall in dispose()',
+        message: 'Add FIXME reminder for $_methodCall',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
+        // Find where the semicolon is and insert comment before it
+        final String fieldSource = fieldDecl.toSource();
+        final int semicolonIndex = fieldSource.lastIndexOf(';');
+        if (semicolonIndex == -1) return;
+
         builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Add $_methodCall in dispose() to prevent memory leaks\n',
+          fieldDecl.offset + semicolonIndex,
+          ' // FIXME: Add $_methodCall in dispose()',
         );
       });
     });
@@ -688,14 +719,14 @@ class _AddSslHandlerTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add onSslAuthError handler',
+        message: 'Add HACK: Add onSslAuthError handler',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add onSslAuthError callback to handle SSL certificate issues\n',
+          '// HACK: Add onSslAuthError callback to handle SSL certificate issues\n',
         );
       });
     });
@@ -799,14 +830,14 @@ class _RemoveFileAccessFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Remove file access',
+        message: 'Add HACK: Remove file access',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Remove file access for security\n',
+          '// HACK: Remove file access for security\n',
         );
       });
     });
@@ -815,14 +846,14 @@ class _RemoveFileAccessFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Remove file access',
+        message: 'Add HACK: Remove file access',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Remove file access for security\n',
+          '// HACK: Remove file access for security\n',
         );
       });
     });
@@ -928,14 +959,14 @@ class _AddConstraintsTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add constraints parameter',
+        message: 'Add HACK: Add constraints parameter',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add constraints parameter to specify network/battery requirements\n',
+          '// HACK: Add constraints parameter to specify network/battery requirements\n',
         );
       });
     });
@@ -1036,14 +1067,14 @@ class _AddReturnTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Return true/false from callback',
+        message: 'Add HACK: Return true/false from callback',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Ensure this callback returns true (success) or false (failure)\n',
+          '// HACK: Ensure this callback returns true (success) or false (failure)\n',
         );
       });
     });
@@ -1159,14 +1190,14 @@ class _AddTimezoneParameterFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add timeZone parameter',
+        message: 'Add HACK: Add timeZone parameter',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add timeZone parameter for cross-timezone support\n',
+          '// HACK: Add timeZone parameter for cross-timezone support\n',
         );
       });
     });
@@ -1506,14 +1537,14 @@ class _AddSensitiveUrlTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Use one-time code instead',
+        message: 'Add HACK: Use one-time code instead',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Use one-time codes instead of sensitive tokens in deep links\n',
+          '// HACK: Use one-time codes instead of sensitive tokens in deep links\n',
         );
       });
     });
@@ -1522,14 +1553,14 @@ class _AddSensitiveUrlTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Use one-time code instead',
+        message: 'Add HACK: Use one-time code instead',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Use one-time codes instead of sensitive tokens in deep links\n',
+          '// HACK: Use one-time codes instead of sensitive tokens in deep links\n',
         );
       });
     });
@@ -1626,14 +1657,14 @@ class _AddObfuscateTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add obfuscate: true',
+        message: 'Add HACK: Add obfuscate: true',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add obfuscate: true to prevent key extraction from binaries\n',
+          '// HACK: Add obfuscate: true to prevent key extraction from binaries\n',
         );
       });
     });
@@ -1877,14 +1908,14 @@ class _AddErrorBuilderTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add errorBuilder',
+        message: 'Add HACK: Add errorBuilder',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add errorBuilder callback to handle loading failures\n',
+          '// HACK: Add errorBuilder callback to handle loading failures\n',
         );
       });
     });
@@ -1974,14 +2005,14 @@ class _AddFontFallbackTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Add fontFamilyFallback',
+        message: 'Add HACK: Add fontFamilyFallback',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add fontFamilyFallback for offline/slow network fallback\n',
+          '// HACK: Add fontFamilyFallback for offline/slow network fallback\n',
         );
       });
     });
@@ -2189,14 +2220,14 @@ class _AddImagePickerSizeTodoFix extends DartFix {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO: Set maxWidth/maxHeight',
+        message: 'Add HACK: Set maxWidth/maxHeight',
         priority: 1,
       );
 
       changeBuilder.addDartFileEdit((builder) {
         builder.addSimpleInsertion(
           node.offset,
-          '// TODO: Add maxWidth/maxHeight to prevent OOM on high-res cameras\n',
+          '// HACK: Add maxWidth/maxHeight to prevent OOM on high-res cameras\n',
         );
       });
     });
