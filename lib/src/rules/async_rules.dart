@@ -2896,8 +2896,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unawaited_future',
-    problemMessage:
-        'Future not awaited. Errors may be silently lost.',
+    problemMessage: 'Future not awaited. Errors may be silently lost.',
     correctionMessage:
         'Use await or unawaited() to explicitly handle the Future.',
     errorSeverity: DiagnosticSeverity.WARNING,

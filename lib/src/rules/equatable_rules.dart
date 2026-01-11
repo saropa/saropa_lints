@@ -1157,8 +1157,7 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_equatable_copy_with',
     problemMessage: 'Equatable class should have a copyWith method.',
-    correctionMessage:
-        'Add copyWith method to easily create modified copies.',
+    correctionMessage: 'Add copyWith method to easily create modified copies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1266,7 +1265,9 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
         }
 
         // Check if type is nullable (ends with ?)
-        if (paramName != null && typeSource != null && typeSource.endsWith('?')) {
+        if (paramName != null &&
+            typeSource != null &&
+            typeSource.endsWith('?')) {
           nullableParams.add(paramName);
         }
       }

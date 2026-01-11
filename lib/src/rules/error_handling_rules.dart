@@ -1373,8 +1373,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_permission_permanent_denial_handling',
-    problemMessage:
-        'Permission request without permanent denial handling.',
+    problemMessage: 'Permission request without permanent denial handling.',
     correctionMessage:
         'Check isPermanentlyDenied and call openAppSettings() to guide users.',
     errorSeverity: DiagnosticSeverity.WARNING,

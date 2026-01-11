@@ -1552,8 +1552,7 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
 
       // Must have multiple return statements with strings (different plurals)
       final RegExp returnStringPattern = RegExp(r'''return\s*['"]''');
-      final int returnCount =
-          returnStringPattern.allMatches(bodySource).length;
+      final int returnCount = returnStringPattern.allMatches(bodySource).length;
 
       // Need at least 2 different string returns (singular/plural)
       if (returnCount < 2) return;
@@ -1727,8 +1726,7 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is InstanceCreationExpression) {
-          final String typeName =
-              current.constructorName.type.name2.lexeme;
+          final String typeName = current.constructorName.type.name2.lexeme;
           if (typeName == 'Text' ||
               typeName == 'RichText' ||
               typeName == 'SelectableText') {

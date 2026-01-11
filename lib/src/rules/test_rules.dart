@@ -2936,8 +2936,7 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
         MethodInvocation? interaction;
 
         // Handle await tester.tap(...) pattern
-        if (expr is AwaitExpression &&
-            expr.expression is MethodInvocation) {
+        if (expr is AwaitExpression && expr.expression is MethodInvocation) {
           interaction = expr.expression as MethodInvocation;
         } else if (expr is MethodInvocation) {
           interaction = expr;
