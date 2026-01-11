@@ -576,3 +576,556 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Detects casts between unrelated types that will always fail at runtime.
+///
+/// When casting between types that have no inheritance relationship,
+/// the cast will always throw a TypeError at runtime.
+///
+/// **BAD:**
+/// ```dart
+/// final str = 'hello';
+/// final num = str as int; // String and int are unrelated!
+///
+/// final widget = myButton as TextField; // Always fails if unrelated
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final obj = getValue();
+/// if (obj is int) {
+///   // Use obj safely as int
+/// }
+/// // Or check relationship first
+/// if (widget is TextField) {
+///   // Use widget as TextField
+/// }
+/// ```
+class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
+  const AvoidUnrelatedTypeCastsRule() : super(code: _code);
+
+  /// Critical issue - always-failing cast causes runtime crash.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unrelated_type_casts',
+    problemMessage:
+        'Cast between unrelated types will always fail at runtime.',
+    correctionMessage: 'Use "is" check or verify type hierarchy.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Types that are clearly unrelated to each other (leaf types).
+  /// Casting between these types will always fail.
+  static const Set<String> _leafTypes = <String>{
+    'String',
+    'int',
+    'double',
+    'bool',
+    'Symbol',
+    'Type',
+    'Null',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAsExpression((AsExpression node) {
+      final Expression expression = node.expression;
+      final TypeAnnotation targetType = node.type;
+
+      // Get the source type from the expression
+      final String? sourceTypeName = _getTypeName(expression);
+      final String targetTypeName = targetType.toSource().replaceAll('?', '');
+
+      if (sourceTypeName == null) return;
+
+      // Check if both are leaf types and different
+      if (_leafTypes.contains(sourceTypeName) &&
+          _leafTypes.contains(targetTypeName) &&
+          sourceTypeName != targetTypeName) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  String? _getTypeName(Expression expression) {
+    // Handle simple literals
+    if (expression is StringLiteral) return 'String';
+    if (expression is IntegerLiteral) return 'int';
+    if (expression is DoubleLiteral) return 'double';
+    if (expression is BooleanLiteral) return 'bool';
+    if (expression is NullLiteral) return 'Null';
+
+    // Try to get static type from the expression
+    final staticType = expression.staticType;
+    if (staticType != null) {
+      final String typeName = staticType.getDisplayString();
+      for (final String leafType in _leafTypes) {
+        if (typeName == leafType || typeName == '$leafType?') {
+          return leafType;
+        }
+      }
+    }
+
+    return null;
+  }
+}
+
+/// Detects chained JSON access without null checks.
+///
+/// Accessing nested JSON with chained bracket notation like
+/// json['key']['nested'] without null checks can cause
+/// null pointer exceptions when intermediate keys don't exist.
+///
+/// **BAD:**
+/// ```dart
+/// final name = json['user']['profile']['name']; // Throws if any key missing
+/// final data = response['data']['items'][0]; // Unsafe chain
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final user = json['user'] as Map<String, dynamic>?;
+/// final profile = user?['profile'] as Map<String, dynamic>?;
+/// final name = profile?['name'];
+///
+/// // Or use extension methods
+/// final name = json.optionalString(['user', 'profile', 'name']);
+/// ```
+class AvoidDynamicJsonAccessRule extends SaropaLintRule {
+  const AvoidDynamicJsonAccessRule() : super(code: _code);
+
+  /// High impact - null access causes runtime crash.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dynamic_json_access',
+    problemMessage: 'Chained JSON access without null checks may throw.',
+    correctionMessage: 'Use null-aware operators or validate each level.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      // Check if target is also an index expression (chained access)
+      final Expression? targetExpr = node.target;
+      if (targetExpr is! IndexExpression) return;
+      final IndexExpression target = targetExpr;
+
+      // Check if the index is a string literal (JSON key access pattern)
+      if (node.index is! SimpleStringLiteral) return;
+      if (target.index is! SimpleStringLiteral) return;
+
+      // Check if parent is NOT a null-aware access
+      final AstNode? parent = node.parent;
+
+      // Skip if using null-aware index (?[])
+      if (node.question != null) return;
+      if (target.question != null) return;
+
+      // Skip if inside null check pattern
+      if (parent is BinaryExpression) {
+        if (parent.operator.lexeme == '??' ||
+            parent.operator.lexeme == '?.') {
+          return;
+        }
+      }
+
+      // Skip if wrapped in try-catch
+      if (_isInsideTryCatch(node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _isInsideTryCatch(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is TryStatement) return true;
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Detects JSON map access without null safety handling.
+///
+/// Accessing a JSON map with bracket notation json['key'] returns
+/// dynamic and can be null. Directly using this value without
+/// null check causes runtime errors.
+///
+/// **BAD:**
+/// ```dart
+/// final name = json['name'] as String; // Throws if null
+/// final age = json['age'] as int; // Throws if key missing
+/// widget.text = json['text']; // Assigns potentially null
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final name = json['name'] as String? ?? 'default';
+/// final age = json['age'] as int?;
+/// if (age != null) { ... }
+///
+/// // Or with type check
+/// final nameValue = json['name'];
+/// if (nameValue is String) { ... }
+/// ```
+class RequireNullSafeJsonAccessRule extends SaropaLintRule {
+  const RequireNullSafeJsonAccessRule() : super(code: _code);
+
+  /// Critical issue - null access causes crash.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_null_safe_json_access',
+    problemMessage: 'JSON map access without null handling may throw.',
+    correctionMessage: 'Use "as Type?" with null coalescing or null check.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAsExpression((AsExpression node) {
+      final Expression expression = node.expression;
+
+      // Check if expression is an index expression (map access)
+      if (expression is! IndexExpression) return;
+
+      // Check if index is a string literal (JSON key pattern)
+      if (expression.index is! SimpleStringLiteral) return;
+
+      // Check if type is non-nullable (doesn't end with ?)
+      final TypeAnnotation targetType = node.type;
+      if (targetType.question != null) return; // Has ? so it's nullable
+
+      // Check if there's null coalescing after
+      final AstNode? parent = node.parent;
+      if (parent is BinaryExpression && parent.operator.lexeme == '??') {
+        return; // Has null coalescing
+      }
+
+      // Check if inside null check conditional
+      if (_hasNullCheckGuard(node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _hasNullCheckGuard(AstNode node) {
+    AstNode? current = node.parent;
+    int depth = 0;
+    while (current != null && depth < 5) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (condition.contains('!= null') ||
+            condition.contains('is ') ||
+            condition.contains('case ')) {
+          return true;
+        }
+      }
+      current = current.parent;
+      depth++;
+    }
+    return false;
+  }
+}
+
+/// Detects deeply chained JSON access patterns.
+///
+/// Accessing JSON with deeply chained bracket notation like
+/// json['a']['b']['c'] is error-prone and difficult to maintain.
+/// Prefer flattening or using helper methods.
+///
+/// **BAD:**
+/// ```dart
+/// final value = json['data']['user']['address']['city'];
+/// final item = response['results']['items']['first']['name'];
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final data = json['data'] as Map<String, dynamic>?;
+/// final user = data?['user'] as Map<String, dynamic>?;
+/// final address = user?['address'] as Map<String, dynamic>?;
+/// final city = address?['city'] as String?;
+///
+/// // Or create a typed model
+/// final user = User.fromJson(json);
+/// final city = user.address?.city;
+/// ```
+class AvoidDynamicJsonChainsRule extends SaropaLintRule {
+  const AvoidDynamicJsonChainsRule() : super(code: _code);
+
+  /// Critical issue - deep chains are fragile and crash on missing keys.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_dynamic_json_chains',
+    problemMessage: 'Deep JSON chain is fragile. Use typed models or helpers.',
+    correctionMessage: 'Break into separate accesses with null checks.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      // Count chain depth
+      int depth = _getChainDepth(node);
+
+      // Report if chain is 3 or more levels deep
+      if (depth >= 3) {
+        // Only report on the outermost expression to avoid duplicates
+        final AstNode? parent = node.parent;
+        if (parent is IndexExpression) return; // Not outermost
+
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  int _getChainDepth(IndexExpression node) {
+    int depth = 1;
+    Expression? target = node.target;
+
+    while (target is IndexExpression) {
+      // Only count if index is a string literal (JSON key pattern)
+      if (target.index is SimpleStringLiteral) {
+        depth++;
+      }
+      target = target.target;
+    }
+
+    return depth;
+  }
+}
+
+/// Detects enum parsing from API without fallback for unknown values.
+///
+/// When parsing enums from external data (API responses, JSON), new
+/// values may be added that the app doesn't know about. Without a
+/// fallback, this crashes the app.
+///
+/// **BAD:**
+/// ```dart
+/// final status = Status.values.byName(json['status']); // Throws on unknown
+/// final type = MyEnum.values.firstWhere((e) => e.name == data); // Throws
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final status = Status.values.asNameMap()[json['status']] ?? Status.unknown;
+///
+/// // Or with tryByName extension
+/// final type = MyEnum.values.tryByName(data) ?? MyEnum.fallback;
+///
+/// // Or exhaustive switch with default
+/// Status parseStatus(String value) {
+///   return switch (value) {
+///     'active' => Status.active,
+///     'inactive' => Status.inactive,
+///     _ => Status.unknown,
+///   };
+/// }
+/// ```
+class RequireEnumUnknownValueRule extends SaropaLintRule {
+  const RequireEnumUnknownValueRule() : super(code: _code);
+
+  /// High impact - crashes on new API values.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_enum_unknown_value',
+    problemMessage: 'Enum parsing without fallback crashes on unknown values.',
+    correctionMessage: 'Add fallback value or use tryByName pattern.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for .byName() calls on enum.values
+      if (methodName == 'byName') {
+        final Expression? target = node.target;
+        if (target != null && target.toSource().contains('.values')) {
+          // Check if result has fallback
+          if (!_hasFallback(node)) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+
+      // Check for .firstWhere() on enum.values without orElse
+      if (methodName == 'firstWhere') {
+        final Expression? target = node.target;
+        if (target != null && target.toSource().contains('.values')) {
+          // Check if has orElse parameter
+          bool hasOrElse = false;
+          for (final Expression arg in node.argumentList.arguments) {
+            if (arg is NamedExpression && arg.name.label.name == 'orElse') {
+              hasOrElse = true;
+              break;
+            }
+          }
+          if (!hasOrElse && !_hasFallback(node)) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+
+  bool _hasFallback(AstNode node) {
+    final AstNode? parent = node.parent;
+
+    // Check for null coalescing
+    if (parent is BinaryExpression && parent.operator.lexeme == '??') {
+      return true;
+    }
+
+    // Check for conditional expression
+    if (parent is ConditionalExpression) {
+      return true;
+    }
+
+    // Check if assigned to nullable variable
+    if (parent is VariableDeclaration) {
+      final String source = parent.toSource();
+      if (source.contains('?')) return true;
+    }
+
+    return false;
+  }
+}
+
+/// Detects form validators that don't return null for valid input.
+///
+/// Form validators in Flutter must return null when input is valid.
+/// Returning a string always shows an error message. Forgetting to
+/// return null for the valid case breaks form validation.
+///
+/// **BAD:**
+/// ```dart
+/// validator: (value) {
+///   if (value == null || value.isEmpty) {
+///     return 'Required field';
+///   }
+///   // Forgot to return null! Always shows error
+/// }
+///
+/// validator: (value) {
+///   return value!.isEmpty ? 'Required' : 'Valid'; // Never valid!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// validator: (value) {
+///   if (value == null || value.isEmpty) {
+///     return 'Required field';
+///   }
+///   return null; // Valid input
+/// }
+///
+/// validator: (value) {
+///   return value!.isEmpty ? 'Required' : null;
+/// }
+/// ```
+class RequireValidatorReturnNullRule extends SaropaLintRule {
+  const RequireValidatorReturnNullRule() : super(code: _code);
+
+  /// Critical issue - forms never validate successfully.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_validator_return_null',
+    problemMessage: 'Form validator must return null for valid input.',
+    correctionMessage: 'Add "return null;" for the valid case.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'TextFormField') return;
+
+      // Find validator argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'validator') {
+          final Expression validatorExpr = arg.expression;
+
+          // Check function expression validators
+          if (validatorExpr is FunctionExpression) {
+            final FunctionBody body = validatorExpr.body;
+            if (!_hasNullReturn(body)) {
+              reporter.atNode(arg.name, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  bool _hasNullReturn(FunctionBody body) {
+    final String source = body.toSource();
+
+    // Check for explicit return null
+    if (source.contains('return null')) return true;
+
+    // Check for conditional with null
+    // Pattern: condition ? 'error' : null
+    final ternaryWithNullPattern = RegExp(r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null");
+    if (ternaryWithNullPattern.hasMatch(source)) {
+      return true;
+    }
+
+    // Pattern: condition ? null : 'error'
+    final nullThenStringPattern = RegExp(r"\?\s*null\s*:\s*['" + r'"' + r"]");
+    if (nullThenStringPattern.hasMatch(source)) {
+      return true;
+    }
+
+    // Check for switch expression with null case
+    if (source.contains('=> null') || source.contains('_ => null')) {
+      return true;
+    }
+
+    return false;
+  }
+}

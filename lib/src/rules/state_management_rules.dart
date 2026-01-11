@@ -8740,3 +8740,783 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
     return name.codeUnitAt(2) >= 65 && name.codeUnitAt(2) <= 90; // A-Z
   }
 }
+
+// =============================================================================
+// Bloc Disposal Rules
+// =============================================================================
+
+/// Warns when Bloc/Cubit has controllers or streams without close() cleanup.
+///
+/// Alias: bloc_dispose, bloc_close, cubit_dispose
+///
+/// Bloc and Cubit subclasses that create StreamControllers, TextEditingControllers,
+/// or other disposable resources must override close() to dispose of them.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   final _controller = StreamController<int>();
+///   final _textController = TextEditingController();
+///
+///   MyBloc() : super(MyInitial());
+///   // Missing close() - resources leak!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   final _controller = StreamController<int>();
+///   final _textController = TextEditingController();
+///
+///   MyBloc() : super(MyInitial());
+///
+///   @override
+///   Future<void> close() {
+///     _controller.close();
+///     _textController.dispose();
+///     return super.close();
+///   }
+/// }
+/// ```
+class RequireBlocManualDisposeRule extends SaropaLintRule {
+  const RequireBlocManualDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_manual_dispose',
+    problemMessage:
+        'Bloc/Cubit has disposable resources but no close() override.',
+    correctionMessage:
+        'Override close() to dispose controllers and close streams.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Types that require disposal in Bloc/Cubit close() method
+  static const Set<String> _disposableTypes = <String>{
+    'StreamController',
+    'TextEditingController',
+    'ScrollController',
+    'PageController',
+    'TabController',
+    'AnimationController',
+    'FocusNode',
+    'Timer',
+    'StreamSubscription',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Bloc or Cubit
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (!superName.contains('Bloc') && !superName.contains('Cubit')) {
+        return;
+      }
+
+      // Find disposable fields
+      final List<String> disposableFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null) {
+            for (final String disposableType in _disposableTypes) {
+              if (typeName.contains(disposableType)) {
+                for (final VariableDeclaration variable
+                    in member.fields.variables) {
+                  disposableFields.add(variable.name.lexeme);
+                }
+                break;
+              }
+            }
+          }
+          // Also check initializers
+          for (final VariableDeclaration variable in member.fields.variables) {
+            final Expression? initializer = variable.initializer;
+            if (initializer is InstanceCreationExpression) {
+              final String initType =
+                  initializer.constructorName.type.name.lexeme;
+              if (_disposableTypes.contains(initType)) {
+                if (!disposableFields.contains(variable.name.lexeme)) {
+                  disposableFields.add(variable.name.lexeme);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      if (disposableFields.isEmpty) return;
+
+      // Check for close() method
+      bool hasCloseMethod = false;
+      String? closeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'close') {
+          hasCloseMethod = true;
+          closeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      if (!hasCloseMethod) {
+        // No close() method at all
+        reporter.atToken(node.name, code);
+        return;
+      }
+
+      // Check if all disposable fields are cleaned up
+      for (final String fieldName in disposableFields) {
+        final bool isCleaned = closeBody != null &&
+            (closeBody.contains('$fieldName.close()') ||
+                closeBody.contains('$fieldName?.close()') ||
+                closeBody.contains('$fieldName.dispose()') ||
+                closeBody.contains('$fieldName?.dispose()') ||
+                closeBody.contains('$fieldName.cancel()') ||
+                closeBody.contains('$fieldName?.cancel()'));
+
+        if (!isCleaned) {
+          // Report the specific field that's not cleaned up
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == fieldName) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Provider Dependency Rules
+// =============================================================================
+
+/// Warns when Provider depends on another provider but doesn't use ProxyProvider.
+///
+/// When a Provider needs to depend on another provider's value, using a plain
+/// Provider with context.read() or context.watch() is fragile and error-prone.
+/// ProxyProvider ensures proper dependency tracking and rebuild behavior.
+///
+/// **BAD:**
+/// ```dart
+/// Provider<MyService>(
+///   create: (context) {
+///     final auth = context.read<AuthService>(); // Dependency hidden in create
+///     return MyService(auth);
+///   },
+///   child: ...
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ProxyProvider<AuthService, MyService>(
+///   update: (context, auth, previous) => MyService(auth),
+///   child: ...
+/// )
+/// ```
+class PreferProxyProviderRule extends SaropaLintRule {
+  const PreferProxyProviderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_proxy_provider',
+    problemMessage:
+        'Provider.create() accesses other providers. Use ProxyProvider instead.',
+    correctionMessage:
+        'Use ProxyProvider, ProxyProvider2, etc. to properly declare provider dependencies.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Provider widget types that should use ProxyProvider for dependencies
+  static const Set<String> _providerTypes = <String>{
+    'Provider',
+    'ChangeNotifierProvider',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Only check Provider and ChangeNotifierProvider
+      if (!_providerTypes.contains(typeName)) return;
+
+      // Skip if this is already a ProxyProvider or MultiProvider
+      if (typeName.contains('Proxy') || typeName.contains('Multi')) return;
+
+      // Find the create callback argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final Expression createExpr = arg.expression;
+
+          // Check if the create callback accesses other providers
+          final _ProxyProviderAccessVisitor visitor =
+              _ProxyProviderAccessVisitor();
+          createExpr.visitChildren(visitor);
+
+          if (visitor.accessesProviders) {
+            reporter.atNode(node.constructorName, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Visitor that checks if code accesses other providers via context.read/watch.
+class _ProxyProviderAccessVisitor extends RecursiveAstVisitor<void> {
+  bool accessesProviders = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    // Check for context.read<T>() or context.watch<T>() or Provider.of<T>()
+    if (methodName == 'read' || methodName == 'watch') {
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource();
+        if (targetSource.contains('context')) {
+          accessesProviders = true;
+        }
+      }
+    }
+
+    // Check for Provider.of<T>(context)
+    if (methodName == 'of') {
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'Provider') {
+        accessesProviders = true;
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when ProxyProvider doesn't properly handle the update callback.
+///
+/// ProxyProvider.update is called whenever a dependency changes. If the
+/// callback doesn't properly handle the `previous` parameter, it may
+/// cause memory leaks or miss important cleanup logic.
+///
+/// **BAD:**
+/// ```dart
+/// ProxyProvider<AuthService, MyService>(
+///   update: (context, auth, _) => MyService(auth), // Ignores previous!
+///   child: ...
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ProxyProvider<AuthService, MyService>(
+///   update: (context, auth, previous) {
+///     // Dispose previous if needed, or reuse it
+///     previous?.dispose();
+///     return MyService(auth);
+///   },
+///   dispose: (context, service) => service.dispose(),
+///   child: ...
+/// )
+/// ```
+///
+/// **ALSO GOOD (when previous doesn't need disposal):**
+/// ```dart
+/// ProxyProvider<AuthService, MyService>(
+///   update: (context, auth, previous) => previous ?? MyService(auth),
+///   child: ...
+/// )
+/// ```
+class RequireUpdateCallbackRule extends SaropaLintRule {
+  const RequireUpdateCallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_update_callback',
+    problemMessage:
+        'ProxyProvider.update ignores the previous value. This may cause resource leaks.',
+    correctionMessage:
+        'Handle the previous parameter to dispose resources or reuse the existing instance.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// ProxyProvider variants that have an update callback
+  static const Set<String> _proxyProviderTypes = <String>{
+    'ProxyProvider',
+    'ProxyProvider0',
+    'ProxyProvider2',
+    'ProxyProvider3',
+    'ProxyProvider4',
+    'ProxyProvider5',
+    'ProxyProvider6',
+    'ChangeNotifierProxyProvider',
+    'ChangeNotifierProxyProvider0',
+    'ChangeNotifierProxyProvider2',
+    'ChangeNotifierProxyProvider3',
+    'ChangeNotifierProxyProvider4',
+    'ChangeNotifierProxyProvider5',
+    'ChangeNotifierProxyProvider6',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Only check ProxyProvider variants
+      if (!_proxyProviderTypes.contains(typeName)) return;
+
+      // Find the update callback argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'update') {
+          final Expression updateExpr = arg.expression;
+
+          // Check if it's a function expression
+          if (updateExpr is FunctionExpression) {
+            _checkUpdateCallback(updateExpr, node, reporter);
+          }
+        }
+      }
+    });
+  }
+
+  void _checkUpdateCallback(
+    FunctionExpression updateFunc,
+    InstanceCreationExpression providerNode,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final FormalParameterList? params = updateFunc.parameters;
+    if (params == null) return;
+
+    // The last parameter should be 'previous'
+    final List<FormalParameter> paramList = params.parameters.toList();
+    if (paramList.isEmpty) return;
+
+    final FormalParameter lastParam = paramList.last;
+    final String lastParamName = lastParam.name?.lexeme ?? '';
+
+    // Check if the previous parameter is unused (named _ or starts with _)
+    if (lastParamName == '_' || lastParamName.startsWith('_')) {
+      // Previous is explicitly ignored, which is suspicious
+      reporter.atNode(providerNode.constructorName, code);
+      return;
+    }
+
+    // Check if the previous parameter is actually used in the body
+    final FunctionBody body = updateFunc.body;
+    final _UpdateCallbackParameterUsageVisitor usageVisitor =
+        _UpdateCallbackParameterUsageVisitor(lastParamName);
+    body.visitChildren(usageVisitor);
+
+    if (!usageVisitor.isUsed) {
+      reporter.atNode(providerNode.constructorName, code);
+    }
+  }
+}
+
+/// Visitor that checks if a parameter name is used in the code.
+class _UpdateCallbackParameterUsageVisitor extends RecursiveAstVisitor<void> {
+  _UpdateCallbackParameterUsageVisitor(this.paramName);
+
+  final String paramName;
+  bool isUsed = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == paramName) {
+      isUsed = true;
+    }
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+// =============================================================================
+// Widget/API Replacement Suggestions
+// =============================================================================
+
+/// Suggests using Selector instead of Consumer for granular rebuilds.
+///
+/// Consumer rebuilds on any change to the provider. Selector only rebuilds
+/// when the selected value changes, providing more granular control.
+///
+/// **BAD:**
+/// ```dart
+/// Consumer(
+///   builder: (context, ref, child) {
+///     final user = ref.watch(userProvider);
+///     return Text(user.name); // Rebuilds on ANY user change
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Selector<UserNotifier, String>(
+///   selector: (_, notifier) => notifier.user.name,
+///   builder: (_, name, __) => Text(name), // Only rebuilds when name changes
+/// )
+/// // Or with Riverpod:
+/// Consumer(
+///   builder: (context, ref, child) {
+///     final name = ref.watch(userProvider.select((u) => u.name));
+///     return Text(name);
+///   },
+/// )
+/// ```
+class PreferSelectorOverConsumerRule extends SaropaLintRule {
+  const PreferSelectorOverConsumerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_selector_over_consumer',
+    problemMessage:
+        'Consumer accessing single property. Use Selector for granular rebuilds.',
+    correctionMessage:
+        'Use Selector widget or ref.watch(provider.select(...)) for efficiency.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Consumer') return;
+
+      // Find the builder argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final Expression builderExpr = arg.expression;
+          if (builderExpr is FunctionExpression) {
+            // Analyze the builder body for property access patterns
+            final String bodySource = builderExpr.body.toSource();
+
+            // Check for patterns like ref.watch(provider).property or
+            // ref.watch(provider).field
+            // This suggests the Consumer is only using one property
+            final RegExp singlePropertyPattern = RegExp(
+              r'ref\.watch\([^)]+\)\.(\w+)[^.\w]',
+            );
+
+            final Iterable<RegExpMatch> matches =
+                singlePropertyPattern.allMatches(bodySource);
+
+            // If we only see one property being accessed from the watched
+            // provider, suggest using Selector
+            if (matches.length == 1) {
+              // Also check that there's no .select() already being used
+              if (!bodySource.contains('.select(')) {
+                reporter.atNode(node.constructorName, code);
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Suggests using Cubit instead of Bloc when only one event type exists.
+///
+/// Bloc is designed for complex state management with multiple events.
+/// When a Bloc only has one event type, a Cubit is simpler and more direct.
+///
+/// **BAD:**
+/// ```dart
+/// // Events
+/// abstract class CounterEvent {}
+/// class IncrementEvent extends CounterEvent {}
+///
+/// // Bloc with only one event type
+/// class CounterBloc extends Bloc<CounterEvent, int> {
+///   CounterBloc() : super(0) {
+///     on<IncrementEvent>((event, emit) => emit(state + 1));
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class CounterCubit extends Cubit<int> {
+///   CounterCubit() : super(0);
+///
+///   void increment() => emit(state + 1);
+/// }
+/// ```
+class PreferCubitForSimpleStateRule extends SaropaLintRule {
+  const PreferCubitForSimpleStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_cubit_for_simple_state',
+    problemMessage:
+        'Bloc with single event type. Consider using Cubit for simpler code.',
+    correctionMessage:
+        'Replace with Cubit when only one event/action is needed.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Bloc<Event, State>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc') return;
+
+      // Count the number of on<EventType> handlers
+      int eventHandlerCount = 0;
+      final Set<String> eventTypes = <String>{};
+
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration) {
+          final String bodySource = member.body.toSource();
+
+          // Find all on<EventType> patterns
+          final RegExp onEventPattern = RegExp(r'on<(\w+)>');
+          final Iterable<RegExpMatch> matches =
+              onEventPattern.allMatches(bodySource);
+
+          for (final RegExpMatch match in matches) {
+            eventHandlerCount++;
+            eventTypes.add(match.group(1)!);
+          }
+        }
+      }
+
+      // If only one event type is handled, suggest Cubit
+      if (eventHandlerCount == 1 && eventTypes.length == 1) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when side effects (navigation, snackbar) are performed in BlocBuilder.
+///
+/// BlocBuilder is for building UI based on state. Side effects should be
+/// handled in BlocListener to ensure they only execute once per state change.
+///
+/// **BAD:**
+/// ```dart
+/// BlocBuilder<AuthBloc, AuthState>(
+///   builder: (context, state) {
+///     if (state is AuthSuccess) {
+///       Navigator.pushNamed(context, '/home'); // Called on every rebuild!
+///     }
+///     return Container();
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// BlocListener<AuthBloc, AuthState>(
+///   listener: (context, state) {
+///     if (state is AuthSuccess) {
+///       Navigator.pushNamed(context, '/home'); // Called once per state
+///     }
+///   },
+///   child: BlocBuilder<AuthBloc, AuthState>(
+///     builder: (context, state) => Container(),
+///   ),
+/// )
+/// // Or use BlocConsumer for both
+/// ```
+class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
+  const PreferBlocListenerForSideEffectsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_bloc_listener_for_side_effects',
+    problemMessage:
+        'Side effect in BlocBuilder. Use BlocListener for navigation/snackbars.',
+    correctionMessage:
+        'Move side effects to BlocListener or use BlocConsumer.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Patterns that indicate side effects
+  static const Set<String> _sideEffectPatterns = <String>{
+    'Navigator.',
+    'Navigator.of(',
+    '.pushNamed(',
+    '.push(',
+    '.pop(',
+    '.pushReplacement',
+    'context.go(',
+    'context.push(',
+    'GoRouter.of(',
+    'showDialog(',
+    'showModalBottomSheet(',
+    'showSnackBar(',
+    'ScaffoldMessenger.',
+    'Scaffold.of(',
+    '.showSnackBar(',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'BlocBuilder') return;
+
+      // Find the builder argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
+
+          // Check for side effect patterns
+          for (final String pattern in _sideEffectPatterns) {
+            if (builderSource.contains(pattern)) {
+              reporter.atNode(node.constructorName, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Suggests using BlocConsumer when both BlocListener and BlocBuilder are nested.
+///
+/// When you need both listener (for side effects) and builder (for UI),
+/// BlocConsumer provides a cleaner single-widget solution.
+///
+/// **BAD:**
+/// ```dart
+/// BlocListener<AuthBloc, AuthState>(
+///   listener: (context, state) {
+///     if (state is AuthError) showSnackBar(...);
+///   },
+///   child: BlocBuilder<AuthBloc, AuthState>(
+///     builder: (context, state) {
+///       return Text(state.toString());
+///     },
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// BlocConsumer<AuthBloc, AuthState>(
+///   listener: (context, state) {
+///     if (state is AuthError) showSnackBar(...);
+///   },
+///   builder: (context, state) {
+///     return Text(state.toString());
+///   },
+/// )
+/// ```
+class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
+  const RequireBlocConsumerWhenBothRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_consumer_when_both',
+    problemMessage:
+        'Nested BlocListener + BlocBuilder. Use BlocConsumer instead.',
+    correctionMessage:
+        'Replace with BlocConsumer which combines listener and builder.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'BlocListener') return;
+
+      // Check if the child is a BlocBuilder
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression childExpr = arg.expression;
+
+          if (childExpr is InstanceCreationExpression) {
+            final String childTypeName =
+                childExpr.constructorName.type.name.lexeme;
+            if (childTypeName == 'BlocBuilder') {
+              // Check if they're for the same Bloc type
+              final TypeArgumentList? listenerTypeArgs =
+                  node.constructorName.type.typeArguments;
+              final TypeArgumentList? builderTypeArgs =
+                  childExpr.constructorName.type.typeArguments;
+
+              if (listenerTypeArgs != null && builderTypeArgs != null) {
+                final String listenerType = listenerTypeArgs.toSource();
+                final String builderType = builderTypeArgs.toSource();
+
+                // If same Bloc type, suggest BlocConsumer
+                if (listenerType == builderType) {
+                  reporter.atNode(node.constructorName, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}

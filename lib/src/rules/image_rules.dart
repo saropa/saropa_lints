@@ -1073,3 +1073,329 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// ImageStream Disposal Rules
+// =============================================================================
+
+/// Warns when ImageStream is used without removeListener cleanup.
+///
+/// Alias: image_stream_dispose, image_stream_listener, image_listener_leak
+///
+/// ImageStream listeners must be removed when the widget is disposed to
+/// prevent memory leaks. This is particularly important when using
+/// ImageProvider.resolve() directly for advanced image handling.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   ImageStream? _imageStream;
+///   late ImageStreamListener _listener;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _listener = ImageStreamListener((image, sync) {
+///       // Handle image
+///     });
+///     _imageStream = ImageProvider.resolve(configuration);
+///     _imageStream?.addListener(_listener);
+///   }
+///   // Missing removeListener in dispose!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   ImageStream? _imageStream;
+///   late ImageStreamListener _listener;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _listener = ImageStreamListener((image, sync) {
+///       // Handle image
+///     });
+///     _imageStream = ImageProvider.resolve(configuration);
+///     _imageStream?.addListener(_listener);
+///   }
+///
+///   @override
+///   void dispose() {
+///     _imageStream?.removeListener(_listener);
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireImageStreamDisposeRule extends SaropaLintRule {
+  const RequireImageStreamDisposeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_image_stream_dispose',
+    problemMessage:
+        'ImageStream listener must be removed in dispose() to prevent memory leaks.',
+    correctionMessage:
+        'Add _imageStream?.removeListener(_listener) in dispose() method.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Find ImageStream fields
+      final List<String> imageStreamFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null &&
+              (typeName == 'ImageStream' || typeName == 'ImageStream?')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              imageStreamFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (imageStreamFields.isEmpty) return;
+
+      // Check if addListener is called (to confirm ImageStream is actively used)
+      final String classSource = node.toSource();
+      final bool hasAddListener = classSource.contains('.addListener(');
+
+      if (!hasAddListener) return;
+
+      // Find dispose method and check for removeListener calls
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Report ImageStreams without removeListener in dispose
+      for (final String fieldName in imageStreamFields) {
+        final bool hasRemoveListener = disposeBody != null &&
+            (disposeBody.contains('$fieldName.removeListener(') ||
+                disposeBody.contains('$fieldName?.removeListener('));
+
+        if (!hasRemoveListener) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == fieldName) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// image_picker Package Rules
+// =============================================================================
+
+/// Warns when pickImage is called without requestFullMetadata: false.
+///
+/// By default, image_picker includes full EXIF metadata (GPS location, camera
+/// info, timestamps). If your app doesn't need this metadata, set
+/// requestFullMetadata: false to improve privacy and reduce permissions needed.
+///
+/// **BAD:**
+/// ```dart
+/// final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+/// // Includes GPS, camera info, timestamps - may not be needed
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // When EXIF metadata is not needed:
+/// final image = await ImagePicker().pickImage(
+///   source: ImageSource.gallery,
+///   requestFullMetadata: false, // Skip EXIF for privacy
+/// );
+///
+/// // When EXIF is needed, be explicit:
+/// final image = await ImagePicker().pickImage(
+///   source: ImageSource.gallery,
+///   requestFullMetadata: true, // Need GPS for geotagging feature
+/// );
+/// ```
+class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
+  const PreferImagePickerRequestFullMetadataRule() : super(code: _code);
+
+  /// Privacy consideration - unnecessary metadata collection.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_image_picker_request_full_metadata',
+    problemMessage:
+        'pickImage without requestFullMetadata. Consider setting false for privacy.',
+    correctionMessage:
+        'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for pickImage, pickVideo, pickMultiImage
+      if (methodName != 'pickImage' &&
+          methodName != 'pickVideo' &&
+          methodName != 'pickMultiImage') {
+        return;
+      }
+
+      // Check if called on ImagePicker
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource();
+        if (!targetSource.contains('ImagePicker') &&
+            !targetSource.contains('picker') &&
+            !targetSource.contains('imagePicker')) {
+          return;
+        }
+      }
+
+      // Check for requestFullMetadata parameter
+      bool hasRequestFullMetadata = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'requestFullMetadata') {
+            hasRequestFullMetadata = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasRequestFullMetadata) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when pickImage is called without imageQuality for compression.
+///
+/// Photos from modern cameras can be 5-20+ MB. Without compression, apps waste
+/// bandwidth, storage, and memory. Use imageQuality to reduce file size for
+/// typical use cases like profile pictures, thumbnails, or uploads.
+///
+/// **BAD:**
+/// ```dart
+/// final image = await ImagePicker().pickImage(source: ImageSource.camera);
+/// // May be 10+ MB raw from camera!
+///
+/// await uploadProfilePicture(image); // Wastes bandwidth
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // For profile pictures (80-85% quality is usually indistinguishable):
+/// final image = await ImagePicker().pickImage(
+///   source: ImageSource.camera,
+///   imageQuality: 85,
+/// );
+///
+/// // For thumbnails or previews:
+/// final thumbnail = await ImagePicker().pickImage(
+///   source: ImageSource.gallery,
+///   imageQuality: 50, // Smaller for previews
+///   maxWidth: 300,
+///   maxHeight: 300,
+/// );
+/// ```
+class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
+  const AvoidImagePickerLargeFilesRule() : super(code: _code);
+
+  /// Performance issue - large files waste bandwidth and memory.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_image_picker_large_files',
+    problemMessage:
+        'pickImage without imageQuality. Raw photos can be 10+ MB.',
+    correctionMessage:
+        'Add imageQuality (e.g., 85) to compress images and reduce file size.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for pickImage (not pickVideo - video has different compression)
+      if (methodName != 'pickImage' && methodName != 'pickMultiImage') {
+        return;
+      }
+
+      // Check if called on ImagePicker
+      final Expression? target = node.target;
+      if (target != null) {
+        final String targetSource = target.toSource();
+        if (!targetSource.contains('ImagePicker') &&
+            !targetSource.contains('picker') &&
+            !targetSource.contains('imagePicker')) {
+          return;
+        }
+      }
+
+      // Check for imageQuality or size constraint parameters
+      bool hasCompression = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
+          if (paramName == 'imageQuality' ||
+              paramName == 'maxWidth' ||
+              paramName == 'maxHeight') {
+            hasCompression = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasCompression) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}

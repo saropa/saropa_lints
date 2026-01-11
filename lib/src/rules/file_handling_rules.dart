@@ -1248,3 +1248,125 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when PDF files are loaded entirely into memory without streaming.
+///
+/// Loading entire PDF documents into memory can cause out-of-memory errors
+/// for large files, especially on mobile devices with limited RAM. Use
+/// streaming or page-by-page loading for better memory efficiency.
+///
+/// **BAD:**
+/// ```dart
+/// // Loads entire PDF into memory at once
+/// final doc = await PdfDocument.fromAsset('large_report.pdf');
+/// final bytes = await rootBundle.load('assets/document.pdf');
+/// final pdfBytes = await file.readAsBytes();
+/// final doc = PdfDocument.openData(pdfBytes);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use streaming or page-by-page loading
+/// final doc = await PdfDocument.openFile(file.path);
+/// // Only render pages as needed
+/// final page = await doc.getPage(pageNumber);
+///
+/// // Or use a PDF viewer that handles pagination
+/// PDFView(
+///   filePath: file.path,
+///   pageSnap: true,
+///   swipeHorizontal: false,
+/// )
+/// ```
+class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
+  const AvoidLoadingFullPdfInMemoryRule() : super(code: _code);
+
+  /// High impact - can cause OOM crashes on mobile devices.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_loading_full_pdf_in_memory',
+    problemMessage:
+        'Loading entire PDF into memory may cause out-of-memory errors.',
+    correctionMessage:
+        'Use file path-based loading or streaming instead of loading bytes into memory.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// PDF loading methods that load entire document into memory.
+  static const Set<String> _memoryLoadMethods = <String>{
+    'fromAsset',
+    'openData',
+    'fromData',
+    'fromBytes',
+    'openAsset',
+  };
+
+  /// PDF type names from common PDF packages.
+  static const Set<String> _pdfTypes = <String>{
+    'PdfDocument',
+    'PDFDocument',
+    'Document',
+    'PdfController',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_memoryLoadMethods.contains(methodName)) return;
+
+      // Check if target is a PDF-related type
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      bool isPdfOperation = false;
+      for (final String pdfType in _pdfTypes) {
+        if (targetSource.contains(pdfType)) {
+          isPdfOperation = true;
+          break;
+        }
+      }
+
+      if (!isPdfOperation) return;
+
+      reporter.atNode(node, code);
+    });
+
+    // Also check for patterns like PdfDocument.openData(await file.readAsBytes())
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_pdfTypes.contains(typeName)) return;
+
+      // Check for data/bytes parameters
+      for (final Expression arg in node.argumentList.arguments) {
+        String argSource = '';
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
+          if (paramName == 'data' || paramName == 'bytes') {
+            argSource = arg.expression.toSource();
+          }
+        } else {
+          argSource = arg.toSource();
+        }
+
+        // Check if the argument loads bytes into memory
+        if (argSource.contains('readAsBytes') ||
+            argSource.contains('readAsBytesSync') ||
+            argSource.contains('rootBundle.load') ||
+            argSource.contains('ByteData')) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}

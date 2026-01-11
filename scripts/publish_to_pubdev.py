@@ -68,7 +68,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.10"
+SCRIPT_VERSION = "3.11"
 
 
 # =============================================================================
@@ -599,9 +599,26 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
     if result.returncode == 0 and result.stdout.strip():
         behind_count = int(result.stdout.strip())
         if behind_count > 0:
-            print_error(f"Local branch is behind remote by {behind_count} commit(s).")
-            print_info(f"Pull changes first with: git pull origin {branch}")
-            return False
+            print_warning(f"Local branch is behind remote by {behind_count} commit(s).")
+            print_info(f"Pulling changes from origin/{branch}...")
+
+            # Auto-pull the changes
+            pull_result = subprocess.run(
+                ["git", "pull", "origin", branch],
+                cwd=project_dir,
+                capture_output=True,
+                text=True,
+                shell=use_shell
+            )
+
+            if pull_result.returncode != 0:
+                print_error("Failed to pull changes from remote.")
+                if pull_result.stderr:
+                    print_colored(pull_result.stderr, Color.RED)
+                print_info("Resolve conflicts manually and try again.")
+                return False
+
+            print_success(f"Pulled {behind_count} commit(s) from remote")
 
     # Check if ahead (unpushed commits) - warn but don't block
     result = subprocess.run(

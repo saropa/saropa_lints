@@ -3517,3 +3517,176 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// Server-Sent Events (SSE) Subscription Rules
+// =============================================================================
+
+/// Warns when EventSource/SSE connection is created without close() cleanup.
+///
+/// Alias: sse_subscription_cancel, event_source_close, sse_close
+///
+/// Server-Sent Events (SSE) connections via EventSource or similar packages
+/// must be closed when the widget is disposed to prevent resource leaks and
+/// orphaned network connections.
+///
+/// This rule checks for:
+/// - html.EventSource (dart:html)
+/// - EventSource from sse_client package
+/// - SseClient from flutter_client_sse package
+/// - Any field with "sse" or "eventSource" in the name
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   EventSource? _eventSource;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _eventSource = EventSource('https://api.example.com/stream');
+///     _eventSource?.onMessage.listen((event) {
+///       // Handle SSE event
+///     });
+///   }
+///   // Missing close() in dispose - connection stays open!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   EventSource? _eventSource;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _eventSource = EventSource('https://api.example.com/stream');
+///     _eventSource?.onMessage.listen((event) {
+///       // Handle SSE event
+///     });
+///   }
+///
+///   @override
+///   void dispose() {
+///     _eventSource?.close();
+///     super.dispose();
+///   }
+/// }
+/// ```
+class RequireSseSubscriptionCancelRule extends SaropaLintRule {
+  const RequireSseSubscriptionCancelRule() : super(code: _code);
+
+  /// SSE connections are long-lived and must be properly closed.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_sse_subscription_cancel',
+    problemMessage:
+        'EventSource/SSE connection must be closed in dispose() to prevent resource leaks.',
+    correctionMessage:
+        'Add _eventSource?.close() in dispose() method before super.dispose().',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Types that represent SSE connections
+  static const Set<String> _sseTypes = <String>{
+    'EventSource',
+    'SseClient',
+    'SSEClient',
+    'ServerSentEvent',
+    'SseConnection',
+    'SSEConnection',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends State<T>
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final NamedType superclass = extendsClause.superclass;
+      final String superName = superclass.name.lexeme;
+
+      if (superName != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Find SSE-related fields
+      final List<String> sseFields = <String>[];
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toSource();
+
+          for (final VariableDeclaration variable in member.fields.variables) {
+            final String fieldName = variable.name.lexeme.toLowerCase();
+            bool isSseField = false;
+
+            // Check by type name
+            if (typeName != null) {
+              for (final String sseType in _sseTypes) {
+                if (typeName.contains(sseType)) {
+                  isSseField = true;
+                  break;
+                }
+              }
+            }
+
+            // Also check by field name patterns
+            if (!isSseField &&
+                (fieldName.contains('eventsource') ||
+                    fieldName.contains('event_source') ||
+                    fieldName.contains('sse') ||
+                    fieldName.contains('serversentevent'))) {
+              isSseField = true;
+            }
+
+            if (isSseField) {
+              sseFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (sseFields.isEmpty) return;
+
+      // Find dispose method and check for close calls
+      String? disposeBody;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeBody = member.body.toSource();
+          break;
+        }
+      }
+
+      // Report SSE fields not closed in dispose
+      for (final String fieldName in sseFields) {
+        final bool isClosed = disposeBody != null &&
+            (disposeBody.contains('$fieldName.close()') ||
+                disposeBody.contains('$fieldName?.close()') ||
+                disposeBody.contains('$fieldName.dispose()') ||
+                disposeBody.contains('$fieldName?.dispose()') ||
+                disposeBody.contains('$fieldName.cancel()') ||
+                disposeBody.contains('$fieldName?.cancel()'));
+
+        if (!isClosed) {
+          for (final ClassMember member in node.members) {
+            if (member is FieldDeclaration) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
+                if (variable.name.lexeme == fieldName) {
+                  reporter.atNode(variable, code);
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}

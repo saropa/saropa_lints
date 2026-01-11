@@ -144,3 +144,93 @@ class BadMultipleAutofocusWidget extends StatelessWidget {
     );
   }
 }
+
+// =========================================================================
+// avoid_shrink_wrap_expensive (new in 2.3.7)
+// =========================================================================
+
+class BadShrinkWrapExpensiveWidget extends StatelessWidget {
+  const BadShrinkWrapExpensiveWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // BAD: shrinkWrap is expensive for large lists
+    return ListView.builder(
+      // expect_lint: avoid_shrink_wrap_expensive
+      shrinkWrap: true,
+      itemCount: 100,
+      itemBuilder: (_, i) => Text('Item $i'),
+    );
+  }
+}
+
+// =========================================================================
+// prefer_item_extent (new in 2.3.7)
+// =========================================================================
+
+class BadNoItemExtentWidget extends StatelessWidget {
+  const BadNoItemExtentWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // BAD: itemExtent missing for uniform items
+    // expect_lint: prefer_item_extent
+    return ListView.builder(
+      itemCount: 100,
+      itemBuilder: (_, i) => SizedBox(height: 50, child: Text('Item $i')),
+    );
+  }
+}
+
+// GOOD: Using itemExtent for uniform items
+class GoodItemExtentWidget extends StatelessWidget {
+  const GoodItemExtentWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: 100,
+      itemExtent: 50.0,
+      itemBuilder: (_, i) => Text('Item $i'),
+    );
+  }
+}
+
+// =========================================================================
+// require_key_for_reorderable (new in 2.3.7)
+// =========================================================================
+
+class BadReorderableWidget extends StatelessWidget {
+  const BadReorderableWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // BAD: ReorderableListView children without keys
+    return ReorderableListView(
+      onReorder: (oldIndex, newIndex) {},
+      // expect_lint: require_key_for_reorderable
+      children: [
+        Text('Item 1'),
+        Text('Item 2'),
+        Text('Item 3'),
+      ],
+    );
+  }
+}
+
+// GOOD: ReorderableListView with keys
+class GoodReorderableWidget extends StatelessWidget {
+  const GoodReorderableWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ReorderableListView(
+      onReorder: (oldIndex, newIndex) {},
+      children: [
+        Text('Item 1', key: ValueKey('1')),
+        Text('Item 2', key: ValueKey('2')),
+        Text('Item 3', key: ValueKey('3')),
+      ],
+    );
+  }
+}

@@ -78,6 +78,7 @@ const Set<String> essentialRules = <String>{
   'dispose_providers', // Resource cleanup
   'proper_getx_super_calls', // Broken lifecycle
   'always_remove_getx_listener', // Memory leak
+  'avoid_getx_context_outside_widget', // Unsafe context access outside widgets
   'avoid_hooks_outside_build', // Runtime error
   'avoid_conditional_hooks', // Runtime error
 
@@ -132,6 +133,10 @@ const Set<String> essentialRules = <String>{
   'avoid_dialog_in_build',
   'require_tab_controller_length_sync',
 
+  // Scroll/List (Essential - prevent runtime errors and performance issues)
+  'require_key_for_reorderable', // ERROR - reordering fails without keys
+  'avoid_shrink_wrap_expensive', // WARNING - disables virtualization
+
   // Type Safety (Critical - throws runtime exceptions)
   'prefer_try_parse_for_dynamic_data',
   'avoid_double_for_money',
@@ -139,9 +144,17 @@ const Set<String> essentialRules = <String>{
   // Animation (Essential - prevent crashes)
   'require_vsync_mixin',
   'require_animation_controller_dispose',
+  'require_animation_ticker_disposal', // Ticker must be stopped to prevent memory leaks
 
   // Resource Management (Essential - prevent hardware lock)
   'require_camera_dispose',
+
+  // Disposal Pattern Detection (Essential - memory leaks)
+  'require_bloc_manual_dispose', // Bloc/Cubit with disposable resources
+  'require_getx_worker_dispose', // GetX Workers must be disposed in onClose
+  'require_getx_permanent_cleanup', // Get.put(permanent: true) needs cleanup
+  'require_image_stream_dispose', // ImageStream listeners must be removed
+  'require_sse_subscription_cancel', // SSE connections must be closed
 
   // Accessibility (Essential - critical errors)
   'avoid_hidden_interactive',
@@ -195,6 +208,10 @@ const Set<String> essentialRules = <String>{
 
   // QR/Camera (Essential - app store compliance)
   'require_qr_permission_check',
+  'require_qr_content_validation', // Security - validate scanned content
+
+  // PDF (Essential - memory safety)
+  'avoid_loading_full_pdf_in_memory', // OOM prevention
 
   // Lifecycle (Essential - battery/stability)
   'require_lifecycle_observer',
@@ -384,6 +401,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_image_semantics',
   'prefer_scalable_text',
   'require_safe_area_handling',
+  'require_semantic_label_icons',
+  'require_accessible_images',
+  'avoid_auto_play_media',
 
   // Theming
   'prefer_system_theme_default',
@@ -472,6 +492,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_unnecessary_conditionals',
   'avoid_constant_conditions',
   'avoid_conditions_with_boolean_literals',
+  'prefer_simpler_boolean_expressions',
   'no_empty_string',
   'avoid_misnamed_padding',
 
@@ -564,6 +585,9 @@ const Set<String> recommendedOnlyRules = <String>{
   // Form & Input (Plan Group E)
   'require_keyboard_action_type',
   'require_keyboard_dismiss_on_scroll',
+  'require_form_auto_validate_mode',
+  'require_autofill_hints',
+  'prefer_on_field_submitted',
 
   // Duration & DateTime (Plan Group F)
   'prefer_duration_constants',
@@ -685,6 +709,16 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Cached Image Rules (Recommended - UX)
   'prefer_cached_image_fade_animation', // INFO - smooth image loading
+
+  // Late Keyword Rules (Recommended - code quality)
+  'prefer_late_final', // INFO - prefer late final for one-time init
+  'avoid_late_for_nullable', // INFO - prefer nullable over late for optional
+
+  // go_router Type Safety (Recommended - type safety)
+  'prefer_go_router_extra_typed', // INFO - typed classes over Map/dynamic
+
+  // Firebase Auth (Recommended - UX on web)
+  'prefer_firebase_auth_persistence', // INFO - remember me on web
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -753,6 +787,11 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_global_key_misuse',
   'require_repaint_boundary',
   'avoid_unconstrained_images',
+
+  // Scroll/List Performance (Professional - optimization hints)
+  'prefer_item_extent', // INFO - better scroll performance
+  'prefer_prototype_item', // INFO - consistent sizing optimization
+  'require_add_automatic_keep_alives_off', // INFO - memory efficiency
 
   // Forms/UX
   'prefer_autovalidate_on_interaction',
@@ -1025,9 +1064,13 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Hardware (Plan Group H)
   'require_audio_focus_handling',
+  'prefer_ble_mtu_negotiation', // Performance - BLE data transfer efficiency
 
   // QR Scanner (Plan Group I)
   'avoid_qr_scanner_always_active',
+
+  // GraphQL (Plan Group K)
+  'avoid_graphql_string_queries', // Type safety - use codegen
 
   // Image (Plan Group A)
   'prefer_image_size_constraints',
@@ -1098,6 +1141,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_geolocator_service_enabled',
   'require_geolocator_stream_cancel',
   'require_geolocator_error_handling',
+  'prefer_geolocator_distance_filter', // INFO - battery optimization
 
   // Part 6 - State Management Rules (Professional)
   'avoid_bloc_public_methods',
@@ -1193,6 +1237,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Architecture
   'avoid_singleton_pattern',
   'avoid_service_locator_overuse',
+
+  // State Management - Provider Dependencies (Comprehensive)
+  'prefer_proxy_provider', // INFO - proper provider dependency declaration
+  'require_update_callback', // INFO - handle ProxyProvider previous value
 
   // Theming & Styling (Comprehensive - design consistency)
   'avoid_fixed_dimensions',

@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -1641,6 +1642,283 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
       }
 
       reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when go_router extra parameter is Map or dynamic instead of typed.
+///
+/// Using untyped extra parameters leads to runtime errors and makes code
+/// harder to maintain. Use a typed class for type safety.
+///
+/// **BAD:**
+/// ```dart
+/// context.go('/profile', extra: {'userId': 123, 'name': 'John'});
+///
+/// // In route builder:
+/// final extra = state.extra as Map<String, dynamic>; // Unsafe cast
+/// final userId = extra['userId'] as int; // Another unsafe cast
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class ProfileParams {
+///   final int userId;
+///   final String name;
+///   ProfileParams({required this.userId, required this.name});
+/// }
+///
+/// context.go('/profile', extra: ProfileParams(userId: 123, name: 'John'));
+///
+/// // In route builder:
+/// final params = state.extra as ProfileParams; // Single typed cast
+/// ```
+class PreferGoRouterExtraTypedRule extends SaropaLintRule {
+  const PreferGoRouterExtraTypedRule() : super(code: _code);
+
+  /// Code quality issue - type safety for navigation.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_go_router_extra_typed',
+    problemMessage:
+        'go_router extra parameter should use a typed class instead of Map or dynamic.',
+    correctionMessage:
+        'Create a typed class for extra parameters to ensure type safety.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _goRouterMethods = <String>{
+    'go',
+    'goNamed',
+    'push',
+    'pushNamed',
+    'pushReplacement',
+    'pushReplacementNamed',
+    'replace',
+    'replaceNamed',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_goRouterMethods.contains(methodName)) return;
+
+      // Look for extra parameter
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        if (arg.name.label.name != 'extra') continue;
+
+        final Expression extraValue = arg.expression;
+
+        // Check if extra is a Map literal
+        if (extraValue is SetOrMapLiteral && extraValue.isMap) {
+          reporter.atNode(arg, code);
+          return;
+        }
+
+        // Check for explicit Map type cast or construction
+        if (extraValue is AsExpression) {
+          final String typeStr = extraValue.type.toSource();
+          if (typeStr.startsWith('Map<') || typeStr == 'dynamic') {
+            reporter.atNode(arg, code);
+            return;
+          }
+        }
+
+        // Check if extra is a variable with Map type
+        if (extraValue is SimpleIdentifier) {
+          final DartType? type = extraValue.staticType;
+          if (type != null) {
+            final String typeStr = type.getDisplayString();
+            if (typeStr.startsWith('Map<') ||
+                typeStr == 'dynamic' ||
+                typeStr == 'Object?' ||
+                typeStr == 'Object') {
+              reporter.atNode(arg, code);
+              return;
+            }
+          }
+        }
+
+        // Check for Map constructor
+        if (extraValue is InstanceCreationExpression) {
+          final String typeName = extraValue.constructorName.type.name2.lexeme;
+          if (typeName == 'Map' || typeName == 'HashMap') {
+            reporter.atNode(arg, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// Navigation Safety Rules
+// =============================================================================
+
+/// Warns when Navigator.pop() is used without checking if it can pop.
+///
+/// Using Navigator.pop() directly can crash the app if there's no route to pop.
+/// Use Navigator.maybePop() which safely checks before popping.
+///
+/// **BAD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: () {
+///     Navigator.pop(context); // Crashes if no route to pop!
+///   },
+///   child: Text('Back'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: () {
+///     Navigator.maybePop(context); // Safely checks before popping
+///   },
+///   child: Text('Back'),
+/// )
+/// // Or check explicitly:
+/// ElevatedButton(
+///   onPressed: () {
+///     if (Navigator.canPop(context)) {
+///       Navigator.pop(context);
+///     }
+///   },
+///   child: Text('Back'),
+/// )
+/// ```
+class PreferMaybePopRule extends SaropaLintRule {
+  const PreferMaybePopRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_maybe_pop',
+    problemMessage:
+        'Navigator.pop() without route check. Use maybePop() for safety.',
+    correctionMessage:
+        'Replace with Navigator.maybePop(context) or check canPop() first.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for Navigator.pop or Navigator.of(context).pop
+      if (methodName != 'pop') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      // Check if target is Navigator or Navigator.of(...)
+      bool isNavigatorPop = false;
+
+      if (target is SimpleIdentifier && target.name == 'Navigator') {
+        isNavigatorPop = true;
+      } else if (target is MethodInvocation) {
+        // Navigator.of(context).pop()
+        final Expression? nestedTarget = target.target;
+        if (nestedTarget is SimpleIdentifier &&
+            nestedTarget.name == 'Navigator' &&
+            target.methodName.name == 'of') {
+          isNavigatorPop = true;
+        }
+      } else if (target is PrefixedIdentifier) {
+        // Could be navigator.pop where navigator is a NavigatorState
+        final String prefix = target.prefix.name;
+        if (prefix == 'Navigator') {
+          isNavigatorPop = true;
+        }
+      }
+
+      if (!isNavigatorPop) return;
+
+      // Check if there's a canPop check before this pop
+      // Look for if (Navigator.canPop(context)) or similar patterns
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is IfStatement) {
+          final String condition = current.expression.toSource();
+          if (condition.contains('canPop') ||
+              condition.contains('Navigator.canPop') ||
+              condition.contains('navigator.canPop')) {
+            // There's a canPop check, this is safe
+            return;
+          }
+        }
+        // Don't traverse too far up
+        if (current is FunctionBody || current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      // Check if this pop is inside a WillPopScope or PopScope callback
+      // where the framework already handles the logic
+      current = node.parent;
+      while (current != null) {
+        if (current is NamedExpression) {
+          final String paramName = current.name.label.name;
+          if (paramName == 'onPopInvoked' ||
+              paramName == 'onWillPop' ||
+              paramName == 'onPopInvokedWithResult') {
+            // Inside pop handling callback, this is intentional
+            return;
+          }
+        }
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceWithMaybePopFix()];
+}
+
+class _ReplaceWithMaybePopFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'pop') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Replace with maybePop',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'maybePop',
+        );
+      });
     });
   }
 }

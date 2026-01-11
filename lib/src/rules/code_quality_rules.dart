@@ -6632,6 +6632,240 @@ class _HookCallVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
+/// Warns when a late mutable variable could be late final.
+///
+/// When a late variable is only assigned once, it should be declared as
+/// `late final` to prevent accidental reassignment and signal intent.
+///
+/// **BAD:**
+/// ```dart
+/// class MyService {
+///   late Database _db; // Mutable, but only set once
+///
+///   void init() {
+///     _db = Database.open();
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyService {
+///   late final Database _db;
+///
+///   void init() {
+///     _db = Database.open();
+///   }
+/// }
+/// ```
+class PreferLateFinalRule extends SaropaLintRule {
+  const PreferLateFinalRule() : super(code: _code);
+
+  /// Code quality improvement - prevents accidental mutation.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_late_final',
+    problemMessage:
+        'Late variable is never reassigned. Consider using late final.',
+    correctionMessage:
+        'Use late final for variables that are only assigned once.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Find late non-final fields
+      final List<_LateFinalFieldInfo> lateFields = <_LateFinalFieldInfo>[];
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final VariableDeclarationList fields = member.fields;
+          if (fields.lateKeyword != null && !fields.isFinal) {
+            for (final VariableDeclaration variable in fields.variables) {
+              lateFields.add(_LateFinalFieldInfo(
+                name: variable.name.lexeme,
+                declaration: variable,
+                field: member,
+              ));
+            }
+          }
+        }
+      }
+
+      if (lateFields.isEmpty) return;
+
+      // Count assignments to each late field
+      // Include inline initializers as the first assignment
+      final Map<String, int> assignmentCounts = <String, int>{};
+      for (final _LateFinalFieldInfo field in lateFields) {
+        // If field has inline initializer, count starts at 1
+        final bool hasInitializer = field.declaration.initializer != null;
+        assignmentCounts[field.name] = hasInitializer ? 1 : 0;
+      }
+
+      // Visit all methods to count assignments
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration) {
+          member.body.visitChildren(
+            _LateFinalAssignmentCounterVisitor(assignmentCounts),
+          );
+        }
+        if (member is ConstructorDeclaration) {
+          if (member.body is BlockFunctionBody) {
+            member.body.visitChildren(
+              _LateFinalAssignmentCounterVisitor(assignmentCounts),
+            );
+          }
+          // Count initializer list assignments
+          for (final ConstructorInitializer initializer
+              in member.initializers) {
+            if (initializer is ConstructorFieldInitializer) {
+              final String fieldName = initializer.fieldName.name;
+              if (assignmentCounts.containsKey(fieldName)) {
+                assignmentCounts[fieldName] = assignmentCounts[fieldName]! + 1;
+              }
+            }
+          }
+        }
+      }
+
+      // Report fields that are assigned exactly once
+      // Skip never-assigned fields (count == 0) - those are bugs, not candidates
+      for (final _LateFinalFieldInfo field in lateFields) {
+        final int count = assignmentCounts[field.name]!;
+        if (count == 1) {
+          reporter.atNode(field.declaration, code);
+        }
+      }
+    });
+  }
+}
+
+class _LateFinalFieldInfo {
+  const _LateFinalFieldInfo({
+    required this.name,
+    required this.declaration,
+    required this.field,
+  });
+
+  final String name;
+  final VariableDeclaration declaration;
+  final FieldDeclaration field;
+}
+
+class _LateFinalAssignmentCounterVisitor extends RecursiveAstVisitor<void> {
+  _LateFinalAssignmentCounterVisitor(this.counts);
+
+  final Map<String, int> counts;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression left = node.leftHandSide;
+    String? fieldName;
+
+    if (left is SimpleIdentifier) {
+      fieldName = left.name;
+    } else if (left is PrefixedIdentifier) {
+      // this._field or _prefix._field
+      if (left.prefix.name == 'this') {
+        fieldName = left.identifier.name;
+      }
+    } else if (left is PropertyAccess) {
+      final Expression? target = left.target;
+      if (target is ThisExpression) {
+        fieldName = left.propertyName.name;
+      }
+    }
+
+    if (fieldName != null && counts.containsKey(fieldName)) {
+      counts[fieldName] = counts[fieldName]! + 1;
+    }
+
+    super.visitAssignmentExpression(node);
+  }
+}
+
+/// Warns when late is used for a value that could simply be nullable.
+///
+/// Using `late` for optional values that might not be initialized is risky.
+/// A nullable type with null checks is safer and more explicit.
+///
+/// **BAD:**
+/// ```dart
+/// class UserProfile {
+///   late String? avatarUrl; // late for nullable is redundant
+///   late User user; // Might never be set - crash risk
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserProfile {
+///   String? avatarUrl; // Simply nullable
+///   User? user; // Null-safe access
+/// }
+/// ```
+class AvoidLateForNullableRule extends SaropaLintRule {
+  const AvoidLateForNullableRule() : super(code: _code);
+
+  /// Code quality issue - late with nullable is often a code smell.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_late_for_nullable',
+    problemMessage:
+        'Avoid using late for nullable types. Use nullable without late instead.',
+    correctionMessage:
+        'Remove late keyword and use null checks, or ensure value is always initialized.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      final VariableDeclarationList fields = node.fields;
+      if (fields.lateKeyword == null) return;
+
+      // Check if type is nullable
+      final TypeAnnotation? typeAnnotation = fields.type;
+      if (typeAnnotation == null) return;
+
+      // Check for nullable type annotation (ends with ?)
+      final String typeStr = typeAnnotation.toSource();
+      if (typeStr.endsWith('?')) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addVariableDeclarationStatement((node) {
+      final VariableDeclarationList variables = node.variables;
+      if (variables.lateKeyword == null) return;
+
+      final TypeAnnotation? typeAnnotation = variables.type;
+      if (typeAnnotation == null) return;
+
+      final String typeStr = typeAnnotation.toSource();
+      if (typeStr.endsWith('?')) {
+        for (final VariableDeclaration variable in variables.variables) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+  }
+}
+
 /// Checks if a method name follows the Flutter hooks naming convention.
 ///
 /// Flutter hooks use the pattern `use` + PascalCase identifier:

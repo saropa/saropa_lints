@@ -3052,3 +3052,185 @@ class _ReplaceStraightApostropheFix extends DartFix {
     });
   }
 }
+
+/// Warns when named arguments in function calls are not in alphabetical order.
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// Consistent argument ordering at call sites improves readability and makes
+/// it easier to scan for specific arguments, especially in constructors with
+/// many parameters (common in Flutter widgets).
+///
+/// **Pros of alphabetical argument ordering:**
+/// - Easy to find specific arguments in long argument lists
+/// - Consistent ordering across the codebase
+/// - Cleaner diffs when adding/removing arguments
+///
+/// **Cons (why some teams prefer other orderings):**
+/// - Logical grouping may be more intuitive than alphabetical
+/// - Required parameters first may be preferred
+/// - May conflict with auto-generated code
+///
+/// Note: This rule only checks named arguments. Positional arguments are
+/// not checked since their order is determined by the function signature.
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// Container(
+///   width: 100,
+///   height: 50,      // 'height' should come before 'width'
+///   color: Colors.blue,  // 'color' should come before 'height'
+///   child: Text('Hello'),  // 'child' should come before 'color'
+/// );
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// Container(
+///   child: Text('Hello'),
+///   color: Colors.blue,
+///   height: 50,
+///   width: 100,
+/// );
+/// ```
+class ArgumentsOrderingRule extends SaropaLintRule {
+  const ArgumentsOrderingRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  static const LintCode _code = LintCode(
+    name: 'arguments_ordering',
+    problemMessage: 'Named arguments should be in alphabetical order.',
+    correctionMessage: 'Reorder named arguments alphabetically.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addArgumentList((ArgumentList node) {
+      // Extract only named arguments
+      final List<NamedExpression> namedArgs = <NamedExpression>[];
+      for (final Expression arg in node.arguments) {
+        if (arg is NamedExpression) {
+          namedArgs.add(arg);
+        }
+      }
+
+      // Need at least 2 named arguments to check ordering
+      if (namedArgs.length < 2) return;
+
+      // Check if named arguments are in alphabetical order
+      for (int i = 1; i < namedArgs.length; i++) {
+        final String currentName = namedArgs[i].name.label.name;
+        final String previousName = namedArgs[i - 1].name.label.name;
+
+        if (currentName.compareTo(previousName) < 0) {
+          // Found an argument that should come before the previous one
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_SortArgumentsFix()];
+}
+
+class _SortArgumentsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addArgumentList((ArgumentList node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      // Separate positional and named arguments
+      final List<Expression> positionalArgs = <Expression>[];
+      final List<NamedExpression> namedArgs = <NamedExpression>[];
+
+      for (final Expression arg in node.arguments) {
+        if (arg is NamedExpression) {
+          namedArgs.add(arg);
+        } else {
+          positionalArgs.add(arg);
+        }
+      }
+
+      if (namedArgs.length < 2) return;
+
+      // Sort named arguments alphabetically
+      final List<NamedExpression> sortedNamedArgs =
+          List<NamedExpression>.from(namedArgs)
+            ..sort((NamedExpression a, NamedExpression b) =>
+                a.name.label.name.compareTo(b.name.label.name));
+
+      // Check if already sorted
+      bool alreadySorted = true;
+      for (int i = 0; i < namedArgs.length; i++) {
+        if (namedArgs[i].name.label.name != sortedNamedArgs[i].name.label.name) {
+          alreadySorted = false;
+          break;
+        }
+      }
+
+      if (alreadySorted) return;
+
+      // Build the new argument list string
+      final StringBuffer newArgs = StringBuffer();
+
+      // Add positional arguments first (with their original formatting)
+      for (int i = 0; i < positionalArgs.length; i++) {
+        if (i > 0) {
+          newArgs.write(', ');
+        }
+        newArgs.write(positionalArgs[i].toSource());
+      }
+
+      // Add sorted named arguments
+      for (int i = 0; i < sortedNamedArgs.length; i++) {
+        if (positionalArgs.isNotEmpty || i > 0) {
+          newArgs.write(', ');
+        }
+        newArgs.write(sortedNamedArgs[i].toSource());
+      }
+
+      // Check for trailing comma in original
+      final Token lastToken = node.arguments.last.endToken;
+      final Token? nextToken = lastToken.next;
+      final bool hasTrailingComma = nextToken?.type == TokenType.COMMA;
+      if (hasTrailingComma) {
+        newArgs.write(',');
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Sort arguments alphabetically',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Replace just the arguments (not the parentheses)
+        final int startOffset = node.arguments.first.offset;
+        final int endOffset =
+            hasTrailingComma ? nextToken!.end : node.arguments.last.end;
+
+        builder.addSimpleReplacement(
+          SourceRange(startOffset, endOffset - startOffset),
+          newArgs.toString(),
+        );
+      });
+    });
+  }
+}
