@@ -6,11 +6,17 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: '3.10.4'
@@ -18,8 +24,13 @@ jobs:
         run: dart pub get
       - name: Analyze
         run: dart analyze --fatal-infos
-      - name: Format check
-        run: dart format --set-exit-if-changed .
+      - name: Format
+        run: dart format .
+      - name: Commit formatting changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet || (git add -A && git commit -m "Format Dart files" && git push)
 
   test:
     runs-on: ubuntu-latest
