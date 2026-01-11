@@ -1,6 +1,6 @@
 // ignore_for_file: unused_field, unused_element, prefer_typing_uninitialized_variables
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 /// Test fixture for prefer_async_callback rule.
 ///
