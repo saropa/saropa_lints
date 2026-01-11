@@ -195,7 +195,6 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
     return false;
   }
-
 }
 
 /// Warns when dynamic type is used.
@@ -1782,7 +1781,6 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
       'bool',
     }.contains(typeName);
   }
-
 }
 
 /// Warns when type names don't follow Dart conventions.
@@ -2002,7 +2000,6 @@ class _AddHackForExtensionTypeCastFix extends DartFix {
   }
 }
 
-
 class _AddHackForImplicitlyNullableExtensionFix extends DartFix {
   @override
   void run(
@@ -2058,8 +2055,7 @@ class _AddHackForNullableInterpolationFix extends DartFix {
         final Expression expr = node.expression;
 
         // Check if simple form ($name) or complex form (${expr})
-        final bool isSimpleForm =
-            node.leftBracket.offset == expr.offset - 1;
+        final bool isSimpleForm = node.leftBracket.offset == expr.offset - 1;
 
         if (isSimpleForm) {
           // Simple form: $name -> ${name ?? ''}
@@ -2115,7 +2111,6 @@ class _AddHackForNullableParamWithDefaultFix extends DartFix {
     });
   }
 }
-
 
 class _AddHackForIncorrectTypeNameFix extends DartFix {
   @override
