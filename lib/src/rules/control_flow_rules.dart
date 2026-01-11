@@ -2135,8 +2135,7 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
         final Expression inner = operand.expression;
         if (inner is BinaryExpression) {
           final TokenType op = inner.operator.type;
-          if (op == TokenType.AMPERSAND_AMPERSAND ||
-              op == TokenType.BAR_BAR) {
+          if (op == TokenType.AMPERSAND_AMPERSAND || op == TokenType.BAR_BAR) {
             // Check if both operands are simple enough that De Morgan's
             // would actually improve readability
             if (_isSimpleExpression(inner.leftOperand) &&
@@ -2195,8 +2194,7 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
     name: 'prefer_simpler_boolean_expressions',
     problemMessage:
         'Negated compound expression can be simplified using De Morgan\'s law.',
-    correctionMessage:
-        'Use !(a && b) → !a || !b, or !(a || b) → !a && !b.',
+    correctionMessage: 'Use !(a && b) → !a || !b, or !(a || b) → !a && !b.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
