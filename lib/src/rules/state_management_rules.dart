@@ -5442,9 +5442,8 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check if it's a hook function (starts with 'use')
-      if (!methodName.startsWith('use')) return;
-      if (methodName.length < 4) return; // 'use' alone is not a hook
+      // Check if it's a hook function (use + PascalCase, e.g., useState, useEffect)
+      if (!_isHookFunction(methodName)) return;
 
       // Check if we're inside a build method
       if (!_isInsideBuildMethod(node)) {
@@ -5463,6 +5462,23 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
     }
     return false;
   }
+}
+
+/// Checks if a method name follows the Flutter hooks naming convention.
+///
+/// Flutter hooks use the pattern `use` + PascalCase identifier:
+/// - `useState`, `useEffect`, `useCallback` ✓
+/// - `userDOB`, `usefulHelper`, `username` ✗
+bool _isHookFunction(String methodName) {
+  // Must start with 'use' and have at least one more character
+  if (!methodName.startsWith('use')) return false;
+  if (methodName.length < 4) return false;
+
+  // The character after 'use' must be uppercase (PascalCase convention)
+  // This distinguishes useState from userDOB
+  final charAfterUse = methodName[3];
+  return charAfterUse == charAfterUse.toUpperCase() &&
+      charAfterUse != charAfterUse.toLowerCase();
 }
 
 /// Warns when Flutter Hooks are called inside conditionals.
@@ -5516,9 +5532,8 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check if it's a hook function (starts with 'use')
-      if (!methodName.startsWith('use')) return;
-      if (methodName.length < 4) return;
+      // Check if it's a hook function (use + PascalCase, e.g., useState, useEffect)
+      if (!_isHookFunction(methodName)) return;
 
       // Check if inside build method first
       if (!_isInsideBuildMethod(node)) return;
@@ -5654,7 +5669,8 @@ class _HookCallVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String methodName = node.methodName.name;
-    if (methodName.startsWith('use') && methodName.length > 3) {
+    // Use the proper hook detection (use + PascalCase)
+    if (_isHookFunction(methodName)) {
       hasHookCall = true;
     }
     super.visitMethodInvocation(node);
@@ -7949,6 +7965,8 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
         if (name == 'freezed') {
           hasFreezed = true;
         }
+
+        // cspell:ignore jsonserializable
         if (name == 'jsonserializable') {
           jsonSerializableAnnotation = annotation;
         }
@@ -7961,6 +7979,7 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   }
 }
 
+// cspell:ignore freezed_fromjson_syntax
 /// Warns when Freezed fromJson has block body instead of arrow syntax.
 ///
 /// Alias: freezed_fromjson_syntax, freezed_arrow_required
@@ -8389,6 +8408,8 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
       if (awaitIndex == -1) return;
 
       final beforeAwait = methodSource.substring(0, awaitIndex);
+
+      // cspell:ignore inprogress
       final hasLoadingEmit = beforeAwait.contains('emit(') &&
           (beforeAwait.toLowerCase().contains('loading') ||
               beforeAwait.toLowerCase().contains('inprogress'));
@@ -8463,6 +8484,7 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
   }
 }
 
+// cspell:ignore antipattern
 /// Warns when static mutable state is used.
 ///
 /// Alias: global_mutable_state, static_state_antipattern
@@ -8542,5 +8564,179 @@ class AvoidStaticStateRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+}
+
+// =============================================================================
+// ROADMAP_NEXT Part 7 Rules - Provider
+// =============================================================================
+
+/// Warns when Provider.of or context.read/watch is used in initState.
+///
+/// Alias: provider_in_init_state, read_in_init_state
+///
+/// Using Provider.of in initState can cause issues because the widget
+/// tree may not be fully built yet. Use didChangeDependencies instead.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState();
+///   final user = Provider.of<User>(context); // May fail!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// void didChangeDependencies() {
+///   super.didChangeDependencies();
+///   final user = Provider.of<User>(context);
+/// }
+/// ```
+class AvoidProviderInInitStateRule extends SaropaLintRule {
+  const AvoidProviderInInitStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_provider_in_init_state',
+    problemMessage:
+        'Provider.of or context.read/watch should not be used in initState.',
+    correctionMessage: 'Move to didChangeDependencies() instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for Provider.of, context.read, context.watch
+      bool isProviderCall = false;
+
+      final Expression? target = node.target;
+      if (target is SimpleIdentifier && target.name == 'Provider') {
+        if (methodName == 'of') isProviderCall = true;
+      } else if (target != null) {
+        final String targetSource = target.toSource().toLowerCase();
+        if (targetSource.contains('context') &&
+            (methodName == 'read' || methodName == 'watch')) {
+          isProviderCall = true;
+        }
+      }
+
+      if (!isProviderCall) return;
+
+      // Check if inside initState
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration) {
+          if (current.name.lexeme == 'initState') {
+            reporter.atNode(node, code);
+          }
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Suggests using context.read instead of context.watch in callbacks.
+///
+/// Alias: watch_in_callbacks, read_for_callbacks
+///
+/// Using context.watch in button callbacks or event handlers will cause
+/// unnecessary rebuilds. Use context.read for one-time access in callbacks.
+///
+/// **BAD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: () {
+///     context.watch<Counter>().increment(); // Causes rebuild!
+///   },
+///   child: Text('Increment'),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ElevatedButton(
+///   onPressed: () {
+///     context.read<Counter>().increment(); // One-time access
+///   },
+///   child: Text('Increment'),
+/// )
+/// ```
+class PreferContextReadInCallbacksRule extends SaropaLintRule {
+  const PreferContextReadInCallbacksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_context_read_in_callbacks',
+    problemMessage: 'context.watch should not be used in callbacks.',
+    correctionMessage: 'Use context.read instead for one-time access.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'watch') return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('context')) return;
+
+      // Check if inside a callback (FunctionExpression)
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionExpression) {
+          // Check if this is an event callback
+          final AstNode? funcParent = current.parent;
+          if (funcParent is NamedExpression) {
+            final String paramName = funcParent.name.label.name;
+            // Check for Flutter callback convention: onX where X is uppercase
+            // This avoids false positives on 'once', 'only', etc.
+            if (_isFlutterCallbackName(paramName) ||
+                paramName == 'builder' ||
+                paramName == 'callback') {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+        if (current is MethodDeclaration) {
+          // Check if inside build method - watch is OK there
+          if (current.name.lexeme == 'build') return;
+          break;
+        }
+        current = current.parent;
+      }
+    });
+  }
+
+  /// Check if parameter name follows Flutter callback convention: onX where X is uppercase.
+  /// This avoids false positives on words like 'once', 'only', 'ongoing'.
+  bool _isFlutterCallbackName(String name) {
+    if (!name.startsWith('on')) return false;
+    if (name.length < 3) return false;
+    // The character after 'on' must be uppercase (e.g., onPressed, onTap)
+    return name.codeUnitAt(2) >= 65 && name.codeUnitAt(2) <= 90; // A-Z
   }
 }

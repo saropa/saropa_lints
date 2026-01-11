@@ -6596,8 +6596,8 @@ class PreferUsePrefixRule extends SaropaLintRule {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
       final String name = node.name.lexeme;
 
-      // Skip if already has use prefix
-      if (name.startsWith('use')) return;
+      // Skip if already has hook prefix (use + PascalCase)
+      if (_isHookFunction(name)) return;
 
       // Check if body calls hook methods
       bool usesHooks = false;
@@ -6622,11 +6622,29 @@ class _HookCallVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String methodName = node.methodName.name;
-    if (hookMethods.contains(methodName) || methodName.startsWith('use')) {
+    // Check known hooks or any use + PascalCase pattern
+    if (hookMethods.contains(methodName) || _isHookFunction(methodName)) {
       onHookFound();
     }
     super.visitMethodInvocation(node);
   }
+}
+
+/// Checks if a method name follows the Flutter hooks naming convention.
+///
+/// Flutter hooks use the pattern `use` + PascalCase identifier:
+/// - `useState`, `useEffect`, `useCallback` ✓
+/// - `userDOB`, `usefulHelper`, `username` ✗
+bool _isHookFunction(String name) {
+  // Must start with 'use' and have at least one more character
+  if (!name.startsWith('use')) return false;
+  if (name.length < 4) return false;
+
+  // The character after 'use' must be uppercase (PascalCase convention)
+  // This distinguishes useState from userDOB
+  final charAfterUse = name[3];
+  return charAfterUse == charAfterUse.toUpperCase() &&
+      charAfterUse != charAfterUse.toLowerCase();
 }
 
 /// Warns when enum value could use Dart 3 dot shorthand.

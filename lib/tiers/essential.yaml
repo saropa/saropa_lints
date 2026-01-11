@@ -58,7 +58,7 @@ custom_lint:
     # ASYNC - Unhandled errors
     # =========================================================================
     avoid_throw_in_finally: true
-    require_future_error_handling: true
+    avoid_uncaught_future_errors: true  # Alias: require_future_error_handling
 
     # =========================================================================
     # COLLECTIONS - Runtime errors

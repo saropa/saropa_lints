@@ -85,8 +85,7 @@ const Set<String> essentialRules = <String>{
 
   // Async
   'avoid_throw_in_finally',
-  'require_future_error_handling',
-  'avoid_uncaught_future_errors',
+  'avoid_uncaught_future_errors', // Alias: require_future_error_handling
 
   // Collections
   'avoid_duplicate_map_keys',
@@ -221,6 +220,7 @@ const Set<String> essentialRules = <String>{
   'require_hive_initialization',
   'require_hive_type_adapter',
   'require_hive_encryption_key_secure',
+  'require_type_adapter_registration', // ERROR - adapter not registered before openBox
 
   // Part 5 - HTTP/Dio Rules (Essential)
   'require_dio_timeout',
@@ -482,12 +482,12 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_test_assertions',
   'avoid_real_network_calls_in_tests',
   'avoid_hardcoded_test_delays',
-  'missing_test_assertion',
   'avoid_duplicate_test_assertions',
   'avoid_test_coupling',
   'require_test_isolation',
   'avoid_real_dependencies_in_tests',
   'require_error_case_tests',
+  'prefer_test_wrapper',
 
   // State Management (Batch 10)
   'prefer_copy_with_for_state',
@@ -504,7 +504,7 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // API & Network
   'require_http_status_check',
-  'require_api_timeout',
+  'require_request_timeout', // (alias: require_api_timeout)
   'avoid_hardcoded_api_urls',
 
   // Documentation
@@ -816,6 +816,10 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_single_assertion',
   'avoid_find_all',
   'require_integration_test_setup',
+  'prefer_descriptive_test_name',
+  'prefer_fake_over_mock',
+  'require_edge_case_tests',
+  'avoid_test_implementation_details',
 
   // Flutter Widgets - Pointer handling
   'avoid_absorb_pointer_misuse',
@@ -928,6 +932,10 @@ const Set<String> professionalOnlyRules = <String>{
   'require_api_error_mapping',
   'require_connectivity_check',
   'require_offline_indicator',
+  'prefer_http_connection_reuse', // INFO - performance
+  'avoid_redundant_requests', // INFO - resource efficiency
+  'prefer_pagination', // INFO - memory efficiency
+  'require_cancel_token', // WARNING - cancel requests on dispose
 
   // Resource Management
   'require_http_client_close',
@@ -1046,6 +1054,9 @@ const Set<String> professionalOnlyRules = <String>{
   // Test rules (roadmap_up_next)
   'require_test_cleanup',
   'require_accessibility_tests',
+  'prefer_test_data_builder',
+  'prefer_test_variant',
+  'require_animation_tests',
 
   // Part 5 - Database Rules (Professional)
   'require_sqflite_transaction',
@@ -1054,6 +1065,8 @@ const Set<String> professionalOnlyRules = <String>{
   'require_sqflite_close',
   'require_hive_box_close',
   'prefer_hive_encryption',
+  'require_hive_database_close', // WARNING - database opened without close method
+  'prefer_lazy_box_for_large', // INFO - large collections should use openLazyBox
 
   // Part 5 - Dio Rules (Professional)
   'require_dio_interceptor_error_handler',
@@ -1136,6 +1149,27 @@ const Set<String> professionalOnlyRules = <String>{
   // Part 7 - GoRouter Rules (Professional - best practice)
   'prefer_go_router_redirect_auth', // INFO - separation of concerns
   'require_go_router_typed_params', // INFO - type safety
+
+  // Part 7 - Provider Rules (Professional - best practice)
+  'avoid_provider_in_init_state', // WARNING - initState timing issue
+  'prefer_context_read_in_callbacks', // WARNING - unnecessary rebuilds
+
+  // Part 7 - Hive Rules (Professional - data integrity)
+  'require_hive_type_id_management', // INFO - typeId documentation advisory
+
+  // Part 7 - Image Picker Rules (Professional - error handling)
+  'require_image_picker_result_handling', // WARNING - null result crash
+
+  // Part 7 - Cached Image Rules (Professional - performance)
+  'avoid_cached_image_in_build', // WARNING - cache key instability
+
+  // Part 7 - SQLite Rules (Professional - migration safety)
+  'require_sqflite_migration', // WARNING - migration version check
+
+  // Part 7 - Permission Rules (Professional - UX/compliance)
+  'require_permission_rationale', // INFO - Android best practice
+  'require_permission_status_check', // WARNING - crash prevention
+  'require_notification_permission_android13', // WARNING - Android 13+
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
@@ -1179,6 +1213,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // Network Performance
   'prefer_streaming_response',
+  'require_response_caching', // Opinionated - depends on data freshness needs
+  'avoid_over_fetching', // Opinionated - may require backend changes
 
   // Async
   'avoid_nullable_tostring',

@@ -565,7 +565,7 @@ const List<LintRule> _allRules = <LintRule>[
   // Error handling rules (NEW)
   AvoidSwallowingExceptionsRule(),
   AvoidLosingStackTraceRule(),
-  RequireFutureErrorHandlingRule(),
+  // RequireFutureErrorHandlingRule merged into AvoidUncaughtFutureErrorsRule
   AvoidGenericExceptionsRule(),
   RequireErrorContextRule(),
   PreferResultPatternRule(),
@@ -612,7 +612,7 @@ const List<LintRule> _allRules = <LintRule>[
 
   // API & Network rules (NEW)
   RequireHttpStatusCheckRule(),
-  RequireApiTimeoutRule(),
+  // RequireApiTimeoutRule merged into RequireRequestTimeoutRule
   AvoidHardcodedApiUrlsRule(),
   RequireRetryLogicRule(),
   RequireTypedApiResponseRule(),

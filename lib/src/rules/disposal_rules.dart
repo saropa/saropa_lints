@@ -7,7 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -843,6 +843,17 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 /// and will continue to receive events after the widget is disposed,
 /// potentially causing setState on unmounted widgets.
 ///
+/// This rule detects both single subscriptions and collections of
+/// subscriptions (List, Set, LinkedHashSet, HashSet, Iterable, Queue).
+///
+/// **Supported cancellation patterns:**
+/// - Single: `_subscription?.cancel()` or `_subscription.cancel()`
+/// - Collection for-in: `for (final sub in _subs) { sub.cancel(); }`
+/// - Collection forEach: `_subs.forEach((s) => s.cancel())`
+///
+/// **Quick fix available:** Adds cancel() calls for uncancelled subscriptions.
+/// Creates dispose() method if missing.
+///
 /// **BAD:**
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
@@ -857,7 +868,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 /// }
 /// ```
 ///
-/// **GOOD:**
+/// **GOOD (single subscription):**
 /// ```dart
 /// class _MyWidgetState extends State<MyWidget> {
 ///   StreamSubscription? _subscription;
@@ -875,6 +886,21 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
+///
+/// **GOOD (collection of subscriptions):**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   final List<StreamSubscription<void>> _subscriptions = [];
+///
+///   @override
+///   void dispose() {
+///     for (final sub in _subscriptions) {
+///       sub.cancel();
+///     }
+///     super.dispose();
+///   }
+/// }
+/// ```
 class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
   const RequireStreamSubscriptionCancelRule() : super(code: _code);
 
@@ -884,7 +910,9 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_subscription_cancel',
     problemMessage: 'StreamSubscription must be cancelled in dispose().',
-    correctionMessage: 'Add _subscription?.cancel() to dispose method.',
+    correctionMessage:
+        'Add _subscription?.cancel() for single subscriptions, or iterate '
+        'with for-in/forEach for collections.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -897,39 +925,67 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       if (!_extendsState(node)) return;
 
-      // Find StreamSubscription fields
-      final List<String> subscriptionFields = <String>[];
+      // Track single subscriptions and collection subscriptions separately
+      final List<String> singleSubscriptionFields = <String>[];
+      final List<String> collectionSubscriptionFields = <String>[];
+
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName != null && typeName.contains('StreamSubscription')) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
-              subscriptionFields.add(variable.name.lexeme);
+              final String fieldName = variable.name.lexeme;
+              // Check if it's a collection type (List, Set, Iterable, etc.)
+              if (_isCollectionType(typeName)) {
+                collectionSubscriptionFields.add(fieldName);
+              } else {
+                singleSubscriptionFields.add(fieldName);
+              }
             }
           }
         }
       }
 
-      if (subscriptionFields.isEmpty) return;
+      // If no subscription fields found, nothing to check
+      if (singleSubscriptionFields.isEmpty &&
+          collectionSubscriptionFields.isEmpty) {
+        return;
+      }
 
       // Check dispose method for cancel calls
       final Set<String> cancelledFields = <String>{};
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.toSource();
-          for (final String field in subscriptionFields) {
-            // Check for various cancel patterns
+
+          // Check single subscription fields for direct cancel patterns
+          for (final String field in singleSubscriptionFields) {
             if (disposeSource.contains('$field.cancel()') ||
                 disposeSource.contains('$field?.cancel()')) {
+              cancelledFields.add(field);
+            }
+          }
+
+          // Check collection subscription fields for iteration-based cancel
+          for (final String field in collectionSubscriptionFields) {
+            if (_hasCollectionCancellation(disposeSource, field)) {
               cancelledFields.add(field);
             }
           }
         }
       }
 
-      // Report uncancelled subscriptions
-      for (final String field in subscriptionFields) {
+      // Report uncancelled single subscriptions
+      for (final String field in singleSubscriptionFields) {
+        if (!cancelledFields.contains(field)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+
+      // Report uncancelled collection subscriptions
+      for (final String field in collectionSubscriptionFields) {
         if (!cancelledFields.contains(field)) {
           reporter.atNode(node, code);
           return;
@@ -937,6 +993,236 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
       }
     });
   }
+
+  /// Checks if a type string represents a collection type.
+  bool _isCollectionType(String typeName) {
+    return typeName.startsWith('List<') ||
+        typeName.startsWith('Set<') ||
+        typeName.startsWith('LinkedHashSet<') ||
+        typeName.startsWith('HashSet<') ||
+        typeName.startsWith('Iterable<') ||
+        typeName.startsWith('Queue<');
+  }
+
+  /// Checks if the dispose method contains proper cancellation for a
+  /// collection of subscriptions.
+  ///
+  /// Recognized patterns:
+  /// - `for (final x in field) { x.cancel(); }`
+  /// - `field.forEach((x) => x.cancel())`
+  /// - `field.forEach((x) { x.cancel(); })`
+  bool _hasCollectionCancellation(String disposeSource, String field) {
+    // Pattern 1: for-in loop iterating over the field with cancel on loop var
+    // Captures the loop variable name and verifies .cancel() is called on it.
+    //
+    // Regex captures: `for (final/var Type? loopVar in field)`
+    // Group 1 = loop variable name (word before " in field")
+    final RegExp forInPattern = RegExp(
+      r'for\s*\([^)]*?(\w+)\s+in\s+' + RegExp.escape(field) + r'\s*\)',
+    );
+    final RegExpMatch? forInMatch = forInPattern.firstMatch(disposeSource);
+    if (forInMatch != null) {
+      final String loopVar = forInMatch.group(1)!;
+      // Verify the loop variable has .cancel() called on it
+      if (disposeSource.contains('$loopVar.cancel()')) {
+        return true;
+      }
+    }
+
+    // Pattern 2: forEach with cancel on parameter
+    // Captures: `field.forEach((param) => param.cancel())` or block body
+    final RegExp forEachPattern = RegExp(
+      RegExp.escape(field) + r'\.forEach\s*\(\s*\((\w+)\)',
+    );
+    final RegExpMatch? forEachMatch = forEachPattern.firstMatch(disposeSource);
+    if (forEachMatch != null) {
+      final String param = forEachMatch.group(1)!;
+      // Verify the parameter has .cancel() called on it
+      if (disposeSource.contains('$param.cancel()')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddStreamSubscriptionCancelFix()];
+}
+
+/// Quick fix that adds cancel() calls for StreamSubscription fields.
+class _AddStreamSubscriptionCancelFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Collect uncancelled subscription fields
+      final List<_SubscriptionField> uncancelledFields = <_SubscriptionField>[];
+
+      // Find all subscription fields
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeName = member.fields.type?.toString();
+          if (typeName != null && typeName.contains('StreamSubscription')) {
+            final bool isNullable = typeName.endsWith('?');
+            final bool isCollection = _isCollectionType(typeName);
+
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
+              uncancelledFields.add(_SubscriptionField(
+                name: variable.name.lexeme,
+                isNullable: isNullable,
+                isCollection: isCollection,
+              ));
+            }
+          }
+        }
+      }
+
+      if (uncancelledFields.isEmpty) return;
+
+      // Find existing dispose method
+      MethodDeclaration? disposeMethod;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+          disposeMethod = member;
+          break;
+        }
+      }
+
+      // Check which fields are already cancelled
+      if (disposeMethod != null) {
+        final String disposeSource = disposeMethod.body.toSource();
+        uncancelledFields.removeWhere((field) {
+          if (field.isCollection) {
+            return _hasCollectionCancellationInSource(disposeSource, field.name);
+          } else {
+            return disposeSource.contains('${field.name}.cancel()') ||
+                disposeSource.contains('${field.name}?.cancel()');
+          }
+        });
+      }
+
+      if (uncancelledFields.isEmpty) return;
+
+      // Generate cancel code
+      final StringBuffer cancelCode = StringBuffer();
+      for (final _SubscriptionField field in uncancelledFields) {
+        if (field.isCollection) {
+          cancelCode.writeln(
+              '    for (final sub in ${field.name}) {\n      sub.cancel();\n    }');
+        } else if (field.isNullable) {
+          cancelCode.writeln('    ${field.name}?.cancel();');
+        } else {
+          cancelCode.writeln('    ${field.name}.cancel();');
+        }
+      }
+
+      if (disposeMethod != null) {
+        // Insert cancel calls before super.dispose()
+        final String bodySource = disposeMethod.body.toSource();
+        final int superDisposeIndex = bodySource.indexOf('super.dispose()');
+
+        if (superDisposeIndex != -1) {
+          final int bodyOffset = disposeMethod.body.offset;
+          final int insertOffset = bodyOffset + superDisposeIndex;
+
+          final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+            message: 'Add cancel() for StreamSubscription fields',
+            priority: 1,
+          );
+
+          changeBuilder.addDartFileEdit((builder) {
+            builder.addSimpleInsertion(
+              insertOffset,
+              '${cancelCode.toString().trimRight()}\n    ',
+            );
+          });
+        }
+      } else {
+        // Create new dispose method
+        int insertOffset = node.rightBracket.offset;
+
+        // Find a good insertion point (after fields/constructors)
+        for (final ClassMember member in node.members) {
+          if (member is FieldDeclaration || member is ConstructorDeclaration) {
+            insertOffset = member.end;
+          }
+        }
+
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Add dispose() method with cancel()',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleInsertion(
+            insertOffset,
+            '\n\n  @override\n  void dispose() {\n${cancelCode}    super.dispose();\n  }',
+          );
+        });
+      }
+    });
+  }
+
+  /// Checks if a type string represents a collection type.
+  bool _isCollectionType(String typeName) {
+    return typeName.startsWith('List<') ||
+        typeName.startsWith('Set<') ||
+        typeName.startsWith('LinkedHashSet<') ||
+        typeName.startsWith('HashSet<') ||
+        typeName.startsWith('Iterable<') ||
+        typeName.startsWith('Queue<');
+  }
+
+  /// Checks if dispose source has collection cancellation for a field.
+  bool _hasCollectionCancellationInSource(String disposeSource, String field) {
+    // Check for-in pattern
+    final RegExp forInPattern = RegExp(
+      r'for\s*\([^)]*?(\w+)\s+in\s+' + RegExp.escape(field) + r'\s*\)',
+    );
+    final RegExpMatch? forInMatch = forInPattern.firstMatch(disposeSource);
+    if (forInMatch != null) {
+      final String loopVar = forInMatch.group(1)!;
+      if (disposeSource.contains('$loopVar.cancel()')) {
+        return true;
+      }
+    }
+
+    // Check forEach pattern
+    final RegExp forEachPattern = RegExp(
+      RegExp.escape(field) + r'\.forEach\s*\(\s*\((\w+)\)',
+    );
+    final RegExpMatch? forEachMatch = forEachPattern.firstMatch(disposeSource);
+    if (forEachMatch != null) {
+      final String param = forEachMatch.group(1)!;
+      if (disposeSource.contains('$param.cancel()')) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+}
+
+/// Helper class to track subscription field metadata.
+class _SubscriptionField {
+  const _SubscriptionField({
+    required this.name,
+    required this.isNullable,
+    required this.isCollection,
+  });
+
+  final String name;
+  final bool isNullable;
+  final bool isCollection;
 }
 
 // =============================================================================

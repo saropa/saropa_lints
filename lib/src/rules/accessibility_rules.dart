@@ -1766,11 +1766,14 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
         return;
       }
 
-      // Check if using error colors
-      if (!thenSource.contains('red') &&
-          !thenSource.contains('error') &&
-          !elseSource.contains('red') &&
-          !elseSource.contains('error')) {
+      // Check if using error colors - use patterns to avoid false positives
+      // like 'thread', 'spread', 'shredded' matching 'red'
+      final errorColorPattern = RegExp(
+        r'colors\.red|\.red\b|\.error\b|errorcolor|redaccent',
+        caseSensitive: false,
+      );
+      if (!errorColorPattern.hasMatch(thenSource) &&
+          !errorColorPattern.hasMatch(elseSource)) {
         return;
       }
 
