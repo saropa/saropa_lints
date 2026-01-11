@@ -4447,3 +4447,235 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when API keys appear to be hardcoded in source code.
+///
+/// Alias: hardcoded_api_key, api_key_in_source, secret_in_code
+///
+/// HEURISTIC: Detects string patterns that look like API keys.
+/// May have false positives for non-sensitive keys.
+///
+/// **BAD:**
+/// ```dart
+/// const apiKey = 'sk_live_abc123xyz789';
+/// final headers = {'X-API-Key': 'AIzaSyAbc123...'};
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final apiKey = dotenv.get('API_KEY');
+/// final headers = {'X-API-Key': Config.apiKey};
+/// ```
+class AvoidApiKeyInCodeRule extends SaropaLintRule {
+  const AvoidApiKeyInCodeRule() : super(code: _code);
+
+  /// Hardcoded API keys can be extracted from builds.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_api_key_in_code',
+    problemMessage:
+        'Hardcoded API key detected. Keys in source code can be extracted from builds.',
+    correctionMessage:
+        'Use environment variables, secure storage, or build config to inject keys.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Patterns that indicate API key prefixes.
+  static const List<String> _apiKeyPrefixes = <String>[
+    'sk_live_',
+    'sk_test_',
+    'pk_live_',
+    'pk_test_',
+    'AIzaSy',
+    'AKIA',
+    'ghp_',
+    'gho_',
+    'glpat-',
+    'xoxb-',
+    'xoxp-',
+    'sk-',
+    'rk_live_',
+    'rk_test_',
+  ];
+
+  /// Variable name patterns that suggest API keys.
+  static const Set<String> _apiKeyNamePatterns = <String>{
+    'apikey',
+    'api_key',
+    'apiKey',
+    'secretkey',
+    'secret_key',
+    'secretKey',
+    'accesskey',
+    'access_key',
+    'accessKey',
+    'privatekey',
+    'private_key',
+    'privateKey',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      final String varName = node.name.lexeme.toLowerCase();
+
+      // Check if variable name suggests an API key
+      final bool nameMatchesApiKey = _apiKeyNamePatterns.any(
+        (pattern) => varName.contains(pattern),
+      );
+
+      if (!nameMatchesApiKey) return;
+
+      // Check if value is a hardcoded string
+      final Expression? initializer = node.initializer;
+      if (initializer == null) return;
+
+      if (initializer is SimpleStringLiteral) {
+        final String value = initializer.value;
+        // Check length to avoid false positives on short placeholder strings
+        if (value.length >= 16) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+
+    // Also check string literals with API key patterns
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String value = node.value;
+      for (final String prefix in _apiKeyPrefixes) {
+        if (value.startsWith(prefix) && value.length > prefix.length + 10) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
+  }
+}
+
+/// Warns when sensitive data is stored in unencrypted storage.
+///
+/// Alias: encrypt_sensitive_storage, secure_storage_required
+///
+/// Hive and SharedPreferences store data in plain files. Use encrypted
+/// storage for tokens, passwords, and personal data.
+///
+/// **BAD:**
+/// ```dart
+/// await prefs.setString('auth_token', token);
+/// await box.put('password', password);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await secureStorage.write(key: 'auth_token', value: token);
+/// await encryptedBox.put('password', password);
+/// ```
+class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
+  const AvoidStoringSensitiveUnencryptedRule() : super(code: _code);
+
+  /// Unencrypted sensitive data is readable on rooted/jailbroken devices.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_storing_sensitive_unencrypted',
+    problemMessage:
+        'Sensitive data stored without encryption. Data can be read on rooted devices.',
+    correctionMessage:
+        'Use flutter_secure_storage or an encrypted Hive box for sensitive data.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  /// Keys that indicate sensitive data.
+  static const Set<String> _sensitiveKeys = <String>{
+    'token',
+    'password',
+    'secret',
+    'credential',
+    'auth',
+    'session',
+    'jwt',
+    'refresh',
+    'access_token',
+    'api_key',
+    'private_key',
+    'pin',
+    'biometric',
+  };
+
+  /// Storage methods that are not secure.
+  static const Set<String> _unsecureMethods = <String>{
+    'setString',
+    'setInt',
+    'setBool',
+    'setDouble',
+    'setStringList',
+    'put',
+    'add',
+    'write',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_unsecureMethods.contains(methodName)) return;
+
+      // Check target for SharedPreferences or Hive box
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      // Skip if using secure storage
+      if (targetSource.contains('secure') ||
+          targetSource.contains('encrypted')) {
+        return;
+      }
+
+      // Check if it's SharedPreferences or Hive
+      final bool isStorage = targetSource.contains('pref') ||
+          targetSource.contains('box') ||
+          targetSource.contains('storage');
+
+      if (!isStorage) return;
+
+      // Check the key argument for sensitive names
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final Expression firstArg = args.arguments.first;
+      String? keyValue;
+
+      if (firstArg is SimpleStringLiteral) {
+        keyValue = firstArg.value.toLowerCase();
+      } else if (firstArg is NamedExpression &&
+          firstArg.expression is SimpleStringLiteral) {
+        keyValue =
+            (firstArg.expression as SimpleStringLiteral).value.toLowerCase();
+      }
+
+      if (keyValue != null) {
+        for (final String sensitiveKey in _sensitiveKeys) {
+          if (keyValue.contains(sensitiveKey)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}

@@ -8,6 +8,34 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
+// =============================================================================
+// Shared Utilities
+// =============================================================================
+
+/// Checks if a class declaration extends Equatable or uses EquatableMixin.
+bool isEquatable(ClassDeclaration node) {
+  // Check extends Equatable
+  final ExtendsClause? extendsClause = node.extendsClause;
+  if (extendsClause != null) {
+    final String superclassName = extendsClause.superclass.name2.lexeme;
+    if (superclassName == 'Equatable') return true;
+  }
+
+  // Check mixes in EquatableMixin
+  final WithClause? withClause = node.withClause;
+  if (withClause != null) {
+    for (final NamedType mixin in withClause.mixinTypes) {
+      if (mixin.name2.lexeme == 'EquatableMixin') return true;
+    }
+  }
+
+  return false;
+}
+
+// =============================================================================
+// Equatable Rules
+// =============================================================================
+
 /// Warns when a class overrides operator == but doesn't extend Equatable.
 ///
 /// Alias: prefer_equatable, use_equatable_for_equality
@@ -166,7 +194,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
-      if (!_isEquatable(node)) return;
+      if (!isEquatable(node)) return;
 
       // Collect all instance fields
       final Set<String> instanceFields = <String>{};
@@ -217,25 +245,6 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
         reporter.atNode(propsGetter, code);
       }
     });
-  }
-
-  bool _isEquatable(ClassDeclaration node) {
-    // Check extends Equatable
-    final ExtendsClause? extendsClause = node.extendsClause;
-    if (extendsClause != null) {
-      final String superclassName = extendsClause.superclass.name2.lexeme;
-      if (superclassName == 'Equatable') return true;
-    }
-
-    // Check mixes in EquatableMixin
-    final WithClause? withClause = node.withClause;
-    if (withClause != null) {
-      for (final NamedType mixin in withClause.mixinTypes) {
-        if (mixin.name2.lexeme == 'EquatableMixin') return true;
-      }
-    }
-
-    return false;
   }
 
   void _extractIdentifiers(Expression expr, Set<String> identifiers) {
@@ -480,7 +489,7 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
-      if (!_isEquatable(node)) return;
+      if (!isEquatable(node)) return;
 
       // Check if class already overrides stringify
       bool hasStringifyOverride = false;
@@ -497,25 +506,6 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
-  }
-
-  bool _isEquatable(ClassDeclaration node) {
-    // Check extends Equatable
-    final ExtendsClause? extendsClause = node.extendsClause;
-    if (extendsClause != null) {
-      final String superclassName = extendsClause.superclass.name2.lexeme;
-      if (superclassName == 'Equatable') return true;
-    }
-
-    // Check mixes in EquatableMixin
-    final WithClause? withClause = node.withClause;
-    if (withClause != null) {
-      for (final NamedType mixin in withClause.mixinTypes) {
-        if (mixin.name2.lexeme == 'EquatableMixin') return true;
-      }
-    }
-
-    return false;
   }
 
   @override
@@ -616,7 +606,7 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
-      if (!_isEquatable(node)) return;
+      if (!isEquatable(node)) return;
 
       // Check if class has @immutable annotation
       bool hasImmutableAnnotation = false;
@@ -632,25 +622,6 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
-  }
-
-  bool _isEquatable(ClassDeclaration node) {
-    // Check extends Equatable
-    final ExtendsClause? extendsClause = node.extendsClause;
-    if (extendsClause != null) {
-      final String superclassName = extendsClause.superclass.name2.lexeme;
-      if (superclassName == 'Equatable') return true;
-    }
-
-    // Check mixes in EquatableMixin
-    final WithClause? withClause = node.withClause;
-    if (withClause != null) {
-      for (final NamedType mixin in withClause.mixinTypes) {
-        if (mixin.name2.lexeme == 'EquatableMixin') return true;
-      }
-    }
-
-    return false;
   }
 
   @override
@@ -1010,32 +981,13 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
-      if (!_isEquatable(node)) return;
+      if (!isEquatable(node)) return;
 
       // Check if class is a simple data class suitable for record
       if (_isSimpleDataClass(node)) {
         reporter.atNode(node, code);
       }
     });
-  }
-
-  bool _isEquatable(ClassDeclaration node) {
-    // Check extends Equatable
-    final ExtendsClause? extendsClause = node.extendsClause;
-    if (extendsClause != null) {
-      final String superclassName = extendsClause.superclass.name2.lexeme;
-      if (superclassName == 'Equatable') return true;
-    }
-
-    // Check mixes in EquatableMixin
-    final WithClause? withClause = node.withClause;
-    if (withClause != null) {
-      for (final NamedType mixin in withClause.mixinTypes) {
-        if (mixin.name2.lexeme == 'EquatableMixin') return true;
-      }
-    }
-
-    return false;
   }
 
   bool _isSimpleDataClass(ClassDeclaration node) {
@@ -1144,7 +1096,7 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
       // Check if class extends Equatable or mixes in EquatableMixin
-      if (!_isEquatable(node)) return;
+      if (!isEquatable(node)) return;
 
       // Find non-final instance fields
       for (final ClassMember member in node.members) {
@@ -1161,23 +1113,176 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
       }
     });
   }
+}
 
-  bool _isEquatable(ClassDeclaration node) {
-    // Check extends Equatable
-    final ExtendsClause? extendsClause = node.extendsClause;
-    if (extendsClause != null) {
-      final String superclassName = extendsClause.superclass.name2.lexeme;
-      if (superclassName == 'Equatable') return true;
-    }
+/// Warns when Equatable class doesn't have a copyWith method.
+///
+/// Alias: copy_with_for_equatable, add_copy_with
+///
+/// Equatable classes are typically immutable. A copyWith method makes it
+/// easy to create modified copies without mutating the original.
+///
+/// **BAD:**
+/// ```dart
+/// class Person extends Equatable {
+///   final String name;
+///   final int age;
+///
+///   @override
+///   List<Object?> get props => [name, age];
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class Person extends Equatable {
+///   final String name;
+///   final int age;
+///
+///   Person copyWith({String? name, int? age}) {
+///     return Person(name: name ?? this.name, age: age ?? this.age);
+///   }
+///
+///   @override
+///   List<Object?> get props => [name, age];
+/// }
+/// ```
+class RequireEquatableCopyWithRule extends SaropaLintRule {
+  const RequireEquatableCopyWithRule() : super(code: _code);
 
-    // Check mixes in EquatableMixin
-    final WithClause? withClause = node.withClause;
-    if (withClause != null) {
-      for (final NamedType mixin in withClause.mixinTypes) {
-        if (mixin.name2.lexeme == 'EquatableMixin') return true;
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_equatable_copy_with',
+    problemMessage: 'Equatable class should have a copyWith method.',
+    correctionMessage:
+        'Add copyWith method to easily create modified copies.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class extends Equatable or mixes in EquatableMixin
+      if (!isEquatable(node)) return;
+
+      // Check if class has copyWith method
+      bool hasCopyWith = false;
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'copyWith') {
+          hasCopyWith = true;
+          break;
+        }
       }
-    }
 
-    return false;
+      if (!hasCopyWith) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when copyWith methods can't set nullable fields to null.
+///
+/// Alias: copy_with_nullable, nullable_copy_with
+///
+/// Standard copyWith pattern can't distinguish between "not provided" and
+/// "explicitly null". Use a sentinel value or wrapper class to support
+/// setting nullable fields back to null.
+///
+/// **BAD:**
+/// ```dart
+/// User copyWith({String? name}) {
+///   return User(name: name ?? this.name); // Can't set name to null!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// User copyWith({Optional<String>? name}) {
+///   return User(name: name != null ? name.value : this.name);
+/// }
+/// // Or using freezed with @Default
+/// ```
+class RequireCopyWithNullHandlingRule extends SaropaLintRule {
+  const RequireCopyWithNullHandlingRule() : super(code: _code);
+
+  /// copyWith that can't set null makes state management difficult.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_copy_with_null_handling',
+    problemMessage:
+        'copyWith with ?? operator cannot set nullable fields to null.',
+    correctionMessage:
+        'Use a wrapper type like Optional<T> or generated copyWith from freezed.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'copyWith') return;
+
+      // Check method body for ?? operator on nullable parameters
+      final FunctionBody body = node.body;
+      if (body is! BlockFunctionBody && body is! ExpressionFunctionBody) {
+        return;
+      }
+
+      // Get nullable parameters
+      final FormalParameterList? params = node.parameters;
+      if (params == null) return;
+
+      final Set<String> nullableParams = <String>{};
+      for (final FormalParameter param in params.parameters) {
+        String? paramName;
+        String? typeSource;
+
+        if (param is DefaultFormalParameter) {
+          final NormalFormalParameter inner = param.parameter;
+          if (inner is SimpleFormalParameter) {
+            paramName = inner.name?.lexeme;
+            typeSource = inner.type?.toSource();
+          }
+        } else if (param is SimpleFormalParameter) {
+          paramName = param.name?.lexeme;
+          typeSource = param.type?.toSource();
+        }
+
+        // Check if type is nullable (ends with ?)
+        if (paramName != null && typeSource != null && typeSource.endsWith('?')) {
+          nullableParams.add(paramName);
+        }
+      }
+
+      if (nullableParams.isEmpty) return;
+
+      // Check if body uses ?? with nullable params
+      final String bodySource = body.toSource();
+      for (final String paramName in nullableParams) {
+        // Pattern: paramName ?? this.paramName
+        if (bodySource.contains('$paramName ??') ||
+            bodySource.contains('$paramName??')) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    });
   }
 }

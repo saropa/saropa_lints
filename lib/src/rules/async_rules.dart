@@ -2790,3 +2790,154 @@ class _AddStreamSubscriptionStorageFix extends DartFix {
     });
   }
 }
+
+/// Warns when .then() is used inside an async function.
+///
+/// Alias: then_in_async, prefer_await_over_then
+///
+/// Using .then() inside an async function mixes two async patterns.
+/// Prefer await for cleaner, more readable code.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   fetchData().then((data) {
+///     processData(data);
+///   });
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final data = await fetchData();
+///   processData(data);
+/// }
+/// ```
+class AvoidFutureThenInAsyncRule extends SaropaLintRule {
+  const AvoidFutureThenInAsyncRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_future_then_in_async',
+    problemMessage:
+        'Using .then() inside async function. Prefer await for consistency.',
+    correctionMessage: 'Use await instead of .then() for cleaner async code.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'then') return;
+
+      // Check if we're inside an async function
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionExpression) {
+          if (current.body.isAsynchronous) {
+            reporter.atNode(node.methodName, code);
+          }
+          return;
+        }
+        if (current is MethodDeclaration) {
+          if (current.body is BlockFunctionBody) {
+            final BlockFunctionBody body = current.body as BlockFunctionBody;
+            if (body.isAsynchronous) {
+              reporter.atNode(node.methodName, code);
+            }
+          }
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when a Future is not awaited and not explicitly marked.
+///
+/// Alias: unawaited_future, missing_await, fire_and_forget
+///
+/// Unawaited Futures lose their errors and can cause unexpected behavior.
+/// Either await the Future or use unawaited() to explicitly mark it.
+///
+/// **BAD:**
+/// ```dart
+/// void doSomething() {
+///   saveData(); // Future returned but not awaited
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> doSomething() async {
+///   await saveData();
+/// }
+///
+/// // Or if intentionally fire-and-forget:
+/// void doSomething() {
+///   unawaited(saveData());
+/// }
+/// ```
+class AvoidUnawaitedFutureRule extends SaropaLintRule {
+  const AvoidUnawaitedFutureRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_unawaited_future',
+    problemMessage:
+        'Future not awaited. Errors may be silently lost.',
+    correctionMessage:
+        'Use await or unawaited() to explicitly handle the Future.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addExpressionStatement((ExpressionStatement node) {
+      final Expression expr = node.expression;
+
+      // Check if this is a method invocation that returns a Future
+      if (expr is MethodInvocation) {
+        final DartType? returnType = expr.staticType;
+        if (returnType != null) {
+          final String typeName = returnType.getDisplayString();
+          if (typeName.startsWith('Future<') || typeName == 'Future') {
+            // Check it's not wrapped in unawaited()
+            final AstNode? parent = node.parent;
+            if (parent is! MethodInvocation ||
+                parent.methodName.name != 'unawaited') {
+              reporter.atNode(expr, code);
+            }
+          }
+        }
+      }
+
+      // Also check function invocations
+      if (expr is FunctionExpressionInvocation) {
+        final DartType? returnType = expr.staticType;
+        if (returnType != null) {
+          final String typeName = returnType.getDisplayString();
+          if (typeName.startsWith('Future<') || typeName == 'Future') {
+            reporter.atNode(expr, code);
+          }
+        }
+      }
+    });
+  }
+}

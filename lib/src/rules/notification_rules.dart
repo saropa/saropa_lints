@@ -687,3 +687,79 @@ class _AddTimezoneAwarenessFix extends DartFix {
     });
   }
 }
+
+/// Warns when notifications use the same ID for different notifications.
+///
+/// Alias: notification_id, duplicate_notification_id
+///
+/// Using the same notification ID for different notifications causes
+/// them to overwrite each other. Use unique IDs for each notification.
+///
+/// **BAD:**
+/// ```dart
+/// const notificationId = 0;
+/// await showNotification(id: notificationId, title: 'Message 1');
+/// await showNotification(id: notificationId, title: 'Message 2'); // Overwrites!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// int _notificationCounter = 0;
+/// Future<void> showNotification(String title) async {
+///   final id = _notificationCounter++;
+///   await notify(id: id, title: title);
+/// }
+/// ```
+class AvoidNotificationSameIdRule extends SaropaLintRule {
+  const AvoidNotificationSameIdRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_notification_same_id',
+    problemMessage:
+        'Static notification ID. Different notifications will overwrite each other.',
+    correctionMessage:
+        'Use unique IDs for each notification (e.g., incrementing counter).',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!methodName.contains('show') && !methodName.contains('notify')) {
+        return;
+      }
+
+      // Check for notification-related method names
+      if (!methodName.toLowerCase().contains('notification') &&
+          !methodName.toLowerCase().contains('notify')) {
+        return;
+      }
+
+      // Check for id parameter with literal value
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'id') {
+          final Expression idExpr = arg.expression;
+          if (idExpr is IntegerLiteral ||
+              (idExpr is SimpleIdentifier &&
+                  (idExpr.name.startsWith('_') ||
+                      idExpr.name.contains('Id') ||
+                      idExpr.name.contains('ID')))) {
+            // Check if it's a constant
+            if (idExpr is IntegerLiteral) {
+              reporter.atNode(idExpr, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}

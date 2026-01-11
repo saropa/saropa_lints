@@ -908,69 +908,6 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when Image.network is called without cacheWidth/cacheHeight.
-///
-/// Without cache dimensions, images are decoded at full resolution
-/// even if displayed smaller, wasting memory.
-///
-/// **BAD:**
-/// ```dart
-/// Image.network(url)
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// Image.network(
-///   url,
-///   cacheWidth: 200,
-///   cacheHeight: 200,
-/// )
-/// ```
-class RequireImageCacheDimensionsRule extends SaropaLintRule {
-  const RequireImageCacheDimensionsRule() : super(code: _code);
-
-  /// Significant issue. Address when count exceeds 10.
-  @override
-  LintImpact get impact => LintImpact.high;
-
-  static const LintCode _code = LintCode(
-    name: 'require_image_cache_dimensions',
-    problemMessage: 'Network image should specify cache dimensions.',
-    correctionMessage: 'Add cacheWidth/cacheHeight to reduce memory usage.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addInstanceCreationExpression((
-      InstanceCreationExpression node,
-    ) {
-      final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'Image') return;
-
-      final String? namedConstructor = node.constructorName.name?.name;
-      if (namedConstructor != 'network') return;
-
-      final bool hasCacheDimensions =
-          node.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          return name == 'cacheWidth' || name == 'cacheHeight';
-        }
-        return false;
-      });
-
-      if (!hasCacheDimensions) {
-        reporter.atNode(node.constructorName, code);
-      }
-    });
-  }
-}
-
 /// Warns when images should be precached for smooth display.
 ///
 /// Large images displayed immediately after navigation can cause
@@ -3671,6 +3608,261 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
 
       if (inItemBuilder) {
         reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when database operations are performed on the main UI thread.
+///
+/// Alias: db_ui_thread, blocking_database, database_main_thread
+///
+/// Database operations like Hive, sqflite, or Isar can block the UI thread
+/// causing jank. Use isolates or async properly for large operations.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final users = box.values.toList(); // Blocking in build!
+///   return ListView.builder(...);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> initState() {
+///   super.initState();
+///   _loadUsers();
+/// }
+///
+/// Future<void> _loadUsers() async {
+///   final users = await compute(loadUsersFromBox, null);
+///   setState(() => _users = users);
+/// }
+/// ```
+class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
+  const AvoidBlockingDatabaseUiRule() : super(code: _code);
+
+  /// Database ops in build cause UI jank.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_blocking_database_ui',
+    problemMessage:
+        'Database operation in build method may block UI thread.',
+    correctionMessage:
+        'Load data in initState or use FutureBuilder/StreamBuilder.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Database access patterns to detect.
+  static const Set<String> _databaseMethods = <String>{
+    'values',
+    'keys',
+    'toList',
+    'toMap',
+    'query',
+    'rawQuery',
+    'getAll',
+    'getSync',
+    'getAllSync',
+    'findSync',
+    'findAllSync',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_databaseMethods.contains(methodName)) return;
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when arithmetic operations are performed on double for money.
+///
+/// Alias: money_double, decimal_money, float_currency
+///
+/// HEURISTIC: Floating point arithmetic causes rounding errors in money
+/// calculations. Use int (cents) or a Decimal/Money package.
+///
+/// **BAD:**
+/// ```dart
+/// double total = price * quantity; // 0.1 + 0.2 != 0.3
+/// double discount = amount * 0.15; // Rounding errors compound
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// int totalCents = priceCents * quantity;
+/// Decimal total = Decimal.parse('10.00') * quantity;
+/// ```
+class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
+  const AvoidMoneyArithmeticOnDoubleRule() : super(code: _code);
+
+  /// Money rounding errors can cause accounting discrepancies.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_money_arithmetic_on_double',
+    problemMessage:
+        'Arithmetic on money-like double. Floating point has precision issues.',
+    correctionMessage:
+        'Use int for cents, Decimal package, or money package for financial calculations.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Variable names that suggest money values.
+  static const Set<String> _moneyPatterns = <String>{
+    'price',
+    'cost',
+    'amount',
+    'total',
+    'subtotal',
+    'tax',
+    'discount',
+    'balance',
+    'payment',
+    'fee',
+    'rate',
+    'salary',
+    'wage',
+    'revenue',
+    'profit',
+    'expense',
+    'budget',
+    'invoice',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      final String op = node.operator.lexeme;
+      // Check arithmetic operators
+      if (op != '+' && op != '-' && op != '*' && op != '/') return;
+
+      // Check if either operand looks like money
+      bool isMoney = false;
+
+      if (node.leftOperand is SimpleIdentifier) {
+        final String name =
+            (node.leftOperand as SimpleIdentifier).name.toLowerCase();
+        isMoney = _moneyPatterns.any((pattern) => name.contains(pattern));
+      }
+
+      if (!isMoney && node.rightOperand is SimpleIdentifier) {
+        final String name =
+            (node.rightOperand as SimpleIdentifier).name.toLowerCase();
+        isMoney = _moneyPatterns.any((pattern) => name.contains(pattern));
+      }
+
+      if (!isMoney) return;
+
+      // Check if any operand is a double
+      final String? leftType = node.leftOperand.staticType?.element?.name;
+      final String? rightType = node.rightOperand.staticType?.element?.name;
+
+      if (leftType == 'double' || rightType == 'double') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when scroll listeners are registered in build method.
+///
+/// Alias: scroll_listener_build, scroll_handler_build
+///
+/// Adding scroll listeners in build() causes them to be added multiple
+/// times, leading to duplicate callbacks and memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   _scrollController.addListener(() => print('scrolling'));
+///   return ListView(controller: _scrollController);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void initState() {
+///   super.initState();
+///   _scrollController.addListener(_onScroll);
+/// }
+///
+/// void dispose() {
+///   _scrollController.removeListener(_onScroll);
+///   super.dispose();
+/// }
+/// ```
+class AvoidRebuildOnScrollRule extends SaropaLintRule {
+  const AvoidRebuildOnScrollRule() : super(code: _code);
+
+  /// Listeners added in build leak and duplicate on every rebuild.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_rebuild_on_scroll',
+    problemMessage:
+        'Scroll listener in build method. Will be added multiple times.',
+    correctionMessage:
+        'Add listener in initState and remove in dispose.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'addListener') return;
+
+      // Check if target is a scroll-related controller
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('scroll') &&
+          !targetSource.contains('controller')) {
+        return;
+      }
+
+      // Check if inside build method
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is MethodDeclaration && current.name.lexeme == 'build') {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
       }
     });
   }

@@ -14,6 +14,16 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
+// =============================================================================
+// Shared Constants
+// =============================================================================
+
+/// Common text field widget types.
+const Set<String> _textFieldTypes = <String>{
+  'TextField',
+  'TextFormField',
+};
+
 /// Warns when AutovalidateMode.always is used.
 ///
 /// AutovalidateMode.always validates on every keystroke, which shows
@@ -1743,6 +1753,179 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
 
       if (!hasOnSubmitted) {
         reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when TextField is missing keyboardType.
+///
+/// Alias: keyboard_type, text_input_type
+///
+/// Setting the appropriate keyboardType improves user experience by showing
+/// the right keyboard layout for the expected input.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   controller: _emailController,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   controller: _emailController,
+///   keyboardType: TextInputType.emailAddress,
+/// )
+/// ```
+class RequireTextInputTypeRule extends SaropaLintRule {
+  const RequireTextInputTypeRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_text_input_type',
+    problemMessage:
+        'TextField without keyboardType. Users may see wrong keyboard.',
+    correctionMessage:
+        'Add keyboardType parameter for appropriate keyboard layout.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!_textFieldTypes.contains(node.typeName)) return;
+
+      if (!node.hasNamedParameter('keyboardType')) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when TextField is missing textInputAction.
+///
+/// Alias: input_action, keyboard_action
+///
+/// Setting textInputAction helps users navigate forms efficiently with
+/// the keyboard action button (Done, Next, Search, etc.).
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   controller: _nameController,
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   controller: _nameController,
+///   textInputAction: TextInputAction.next,
+/// )
+/// ```
+class PreferTextInputActionRule extends SaropaLintRule {
+  const PreferTextInputActionRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_text_input_action',
+    problemMessage:
+        'TextField without textInputAction. Keyboard action button unclear.',
+    correctionMessage:
+        'Add textInputAction (e.g., TextInputAction.next or .done).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!_textFieldTypes.contains(node.typeName)) return;
+
+      if (!node.hasNamedParameter('textInputAction')) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+/// Warns when GlobalKey<FormState> is created inside build().
+///
+/// Alias: form_key_in_build, global_key_in_build
+///
+/// Creating a GlobalKey inside build() causes a new key on every rebuild,
+/// losing form state. GlobalKeys should be created in State fields.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final formKey = GlobalKey<FormState>(); // New key every build!
+///   return Form(key: formKey, ...);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   final _formKey = GlobalKey<FormState>();
+///
+///   Widget build(BuildContext context) {
+///     return Form(key: _formKey, ...);
+///   }
+/// }
+/// ```
+class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
+  const RequireFormKeyInStatefulWidgetRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_form_key_in_stateful_widget',
+    problemMessage:
+        'GlobalKey created in build(). Key changes every rebuild, losing state.',
+    correctionMessage:
+        'Move GlobalKey to a State class field to preserve form state.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only check build methods
+      if (node.name.lexeme != 'build') return;
+
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Check for GlobalKey creation in build
+      if (bodySource.contains('GlobalKey<FormState>()') ||
+          bodySource.contains('GlobalKey<FormState>(')) {
+        reporter.atNode(node, code);
       }
     });
   }
