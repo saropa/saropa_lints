@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../import_utils.dart';
@@ -47,7 +48,8 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
     name: 'require_http_status_check',
     problemMessage:
         'HTTP response body used without checking status. Errors may be silently ignored.',
-    correctionMessage: 'Check if (response.statusCode == 200) before parsing response.body.',
+    correctionMessage:
+        'Check if (response.statusCode == 200) before parsing response.body.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -72,7 +74,8 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
       }
 
       // Check if statusCode is checked
-      if (!bodySource.contains('statusCode') && !bodySource.contains('isSuccessful')) {
+      if (!bodySource.contains('statusCode') &&
+          !bodySource.contains('isSuccessful')) {
         reporter.atNode(node, code);
       }
     });
@@ -103,8 +106,10 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_api_urls',
-    problemMessage: 'Hardcoded API URL. Cannot switch between dev/staging/prod environments.',
-    correctionMessage: "Extract to a config constant: Uri.parse('\${ApiConfig.baseUrl}/endpoint').",
+    problemMessage:
+        'Hardcoded API URL. Cannot switch between dev/staging/prod environments.',
+    correctionMessage:
+        "Extract to a config constant: Uri.parse('\${ApiConfig.baseUrl}/endpoint').",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -166,7 +171,8 @@ class RequireRetryLogicRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
-    problemMessage: 'Network call has no retry logic. Transient failures will not recover.',
+    problemMessage:
+        'Network call has no retry logic. Transient failures will not recover.',
     correctionMessage:
         'Wrap with retry() or implement exponential backoff for SocketException/TimeoutException.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -270,7 +276,8 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
           if (methodBody != null) {
             final String bodySource = methodBody.toSource();
             // Check for dynamic access like data['key']
-            if (bodySource.contains("$variableName['") || bodySource.contains('$variableName["')) {
+            if (bodySource.contains("$variableName['") ||
+                bodySource.contains('$variableName["')) {
               reporter.atNode(node, code);
             }
           }
@@ -522,8 +529,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
       // Check if this is an HTTP-related call
       // Be specific to avoid false positives (e.g., apiResponse.get() is not HTTP)
       // Look for actual HTTP client patterns, not just 'api' which matches too broadly
-      final bool isHttpCall =
-          targetSource.contains('http') ||
+      final bool isHttpCall = targetSource.contains('http') ||
           targetSource == 'dio' ||
           targetSource.endsWith('.dio') ||
           targetSource.contains('httpclient') ||
@@ -543,7 +549,8 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
       // Check if in await expression with timeout
       if (parent is AwaitExpression) {
         final AstNode? awaitParent = parent.parent;
-        if (awaitParent is MethodInvocation && awaitParent.methodName.name == 'timeout') {
+        if (awaitParent is MethodInvocation &&
+            awaitParent.methodName.name == 'timeout') {
           return; // await http.get(...).timeout(...)
         }
       }
@@ -614,8 +621,10 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_offline_indicator',
-    problemMessage: 'Connectivity check without offline indicator. Users should see when offline.',
-    correctionMessage: 'Show a banner, snackbar, or icon when connectivity is lost.',
+    problemMessage:
+        'Connectivity check without offline indicator. Users should see when offline.',
+    correctionMessage:
+        'Show a banner, snackbar, or icon when connectivity is lost.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -647,8 +656,7 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
       final String callbackSource = callback.toSource();
 
       // Look for common UI feedback patterns
-      final bool hasUiFeedback =
-          callbackSource.contains('showSnackBar') ||
+      final bool hasUiFeedback = callbackSource.contains('showSnackBar') ||
           callbackSource.contains('showDialog') ||
           callbackSource.contains('Banner') ||
           callbackSource.contains('Overlay') ||
@@ -693,8 +701,10 @@ class PreferStreamingResponseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_streaming_response',
-    problemMessage: 'Large download uses bodyBytes. Consider streaming for large files.',
-    correctionMessage: 'Use client.send() with StreamedResponse and pipe to file.',
+    problemMessage:
+        'Large download uses bodyBytes. Consider streaming for large files.',
+    correctionMessage:
+        'Use client.send() with StreamedResponse and pipe to file.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -842,8 +852,10 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_http_connection_reuse',
-    problemMessage: 'HTTP client created inside method. Connection overhead on every call.',
-    correctionMessage: 'Create HTTP client as a class field and reuse across requests.',
+    problemMessage:
+        'HTTP client created inside method. Connection overhead on every call.',
+    correctionMessage:
+        'Create HTTP client as a class field and reuse across requests.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -878,7 +890,8 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
 
     // Also check for inline Client() usage that isn't assigned to local variable
     // (The MethodDeclaration check above handles local variable + close pattern)
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'Client' && typeName != 'Dio') return;
@@ -898,7 +911,8 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
           reporter.atNode(node, code);
           return;
         }
-        if (current is FieldDeclaration || current is TopLevelVariableDeclaration) {
+        if (current is FieldDeclaration ||
+            current is TopLevelVariableDeclaration) {
           // Field declaration - good pattern
           return;
         }
@@ -945,7 +959,8 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_requests',
-    problemMessage: 'API call in build() or similar may cause redundant requests.',
+    problemMessage:
+        'API call in build() or similar may cause redundant requests.',
     correctionMessage: 'Cache results or use request deduplication pattern.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -972,8 +987,7 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
 
       // Check for HTTP API calls without caching
       // Note: Avoid matching generic .get() which could be Map.get() or Box.get()
-      final bool hasApiCall =
-          bodySource.contains('http.get(') ||
+      final bool hasApiCall = bodySource.contains('http.get(') ||
           bodySource.contains('client.get(') ||
           bodySource.contains('dio.get(') ||
           bodySource.contains('.post(') ||
@@ -984,8 +998,7 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
       if (!hasApiCall) return;
 
       // Check for caching patterns
-      final bool hasCaching =
-          bodySource.contains('cache') ||
+      final bool hasCaching = bodySource.contains('cache') ||
           bodySource.contains('Cache') ||
           bodySource.contains('_pending') ||
           bodySource.contains('putIfAbsent') ||
@@ -1034,8 +1047,10 @@ class RequireResponseCachingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_response_caching',
-    problemMessage: 'GET request without caching. Consider caching static data.',
-    correctionMessage: 'Add response caching with TTL for data that changes infrequently.',
+    problemMessage:
+        'GET request without caching. Consider caching static data.',
+    correctionMessage:
+        'Add response caching with TTL for data that changes infrequently.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1066,8 +1081,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
       }
 
       // Check for caching patterns
-      final bool hasCaching =
-          bodySource.contains('cache') ||
+      final bool hasCaching = bodySource.contains('cache') ||
           bodySource.contains('Cache') ||
           bodySource.contains('_cached') ||
           bodySource.contains('cached') ||
@@ -1122,8 +1136,10 @@ class PreferPaginationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_pagination',
-    problemMessage: 'API fetches all items without pagination. May cause memory issues.',
-    correctionMessage: 'Add pagination parameters: limit, offset, page, or cursor.',
+    problemMessage:
+        'API fetches all items without pagination. May cause memory issues.',
+    correctionMessage:
+        'Add pagination parameters: limit, offset, page, or cursor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1149,7 +1165,8 @@ class PreferPaginationRule extends SaropaLintRule {
       final TypeAnnotation? returnType = node.returnType;
       if (returnType == null) return;
       final String returnTypeStr = returnType.toSource();
-      if (!returnTypeStr.contains('List<') && !returnTypeStr.contains('Iterable<')) {
+      if (!returnTypeStr.contains('List<') &&
+          !returnTypeStr.contains('Iterable<')) {
         return;
       }
 
@@ -1164,8 +1181,7 @@ class PreferPaginationRule extends SaropaLintRule {
       }
 
       // Check for pagination patterns
-      final bool hasPagination =
-          bodySource.contains('limit') ||
+      final bool hasPagination = bodySource.contains('limit') ||
           bodySource.contains('offset') ||
           bodySource.contains('page') ||
           bodySource.contains('cursor') ||
@@ -1209,8 +1225,10 @@ class AvoidOverFetchingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_over_fetching',
-    problemMessage: 'Fetching full object but only using few fields. Consider optimizing.',
-    correctionMessage: 'Use field selection, sparse fieldsets, or dedicated endpoints.',
+    problemMessage:
+        'Fetching full object but only using few fields. Consider optimizing.',
+    correctionMessage:
+        'Use field selection, sparse fieldsets, or dedicated endpoints.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1227,15 +1245,18 @@ class AvoidOverFetchingRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Look for API fetch followed by single property access
-      final RegExp fetchPattern = RegExp(r'await\s+\w+\.(get|fetch|query)\([^)]+\)');
+      final RegExp fetchPattern =
+          RegExp(r'await\s+\w+\.(get|fetch|query)\([^)]+\)');
 
       if (!fetchPattern.hasMatch(bodySource)) return;
 
       // Count property accesses on result vs fields available
       // This is a heuristic - if method is short and only accesses
       // one or two properties after fetch, might be over-fetching
-      final int propertyAccesses = RegExp(r'\.\w+(?!\()').allMatches(bodySource).length;
-      final int apiCalls = RegExp(r'\.(get|fetch|post|query)\(').allMatches(bodySource).length;
+      final int propertyAccesses =
+          RegExp(r'\.\w+(?!\()').allMatches(bodySource).length;
+      final int apiCalls =
+          RegExp(r'\.(get|fetch|post|query)\(').allMatches(bodySource).length;
 
       // If we have an API call and very few property accesses relative
       // to typical object size, might be over-fetching
@@ -1297,8 +1318,10 @@ class RequireCancelTokenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cancel_token',
-    problemMessage: 'Async request in StatefulWidget without cancellation support.',
-    correctionMessage: 'Use CancelToken (Dio) or implement request cancellation on dispose.',
+    problemMessage:
+        'Async request in StatefulWidget without cancellation support.',
+    correctionMessage:
+        'Use CancelToken (Dio) or implement request cancellation on dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1319,8 +1342,7 @@ class RequireCancelTokenRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Check for HTTP calls
-      final bool hasHttpCalls =
-          classSource.contains('.get(') ||
+      final bool hasHttpCalls = classSource.contains('.get(') ||
           classSource.contains('.post(') ||
           classSource.contains('.fetch(') ||
           classSource.contains('http.') ||
@@ -1329,16 +1351,15 @@ class RequireCancelTokenRule extends SaropaLintRule {
       if (!hasHttpCalls) return;
 
       // Check for cancellation patterns
-      final bool hasCancellation =
-          classSource.contains('CancelToken') ||
+      final bool hasCancellation = classSource.contains('CancelToken') ||
           classSource.contains('cancelToken') ||
           classSource.contains('_cancelled') ||
           classSource.contains('isCancelled') ||
           classSource.contains('cancel()');
 
       // Check for mounted check (partial mitigation)
-      final bool hasMountedCheck =
-          classSource.contains('if (mounted)') || classSource.contains('if (!mounted)');
+      final bool hasMountedCheck = classSource.contains('if (mounted)') ||
+          classSource.contains('if (!mounted)');
 
       if (!hasCancellation && !hasMountedCheck) {
         reporter.atNode(node, code);
@@ -1447,7 +1468,8 @@ class _AddOnErrorHandlerFix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         // Insert before closing parenthesis
         final int insertOffset = args.rightParenthesis.offset;
-        builder.addSimpleInsertion(insertOffset, ', onError: (error) { /* HACK: Handle error */ }');
+        builder.addSimpleInsertion(
+            insertOffset, ', onError: (error) { /* HACK: Handle error */ }');
       });
     });
   }
@@ -1483,8 +1505,10 @@ class RequireDioTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dio_timeout',
-    problemMessage: 'Dio instance without timeout configuration. Requests may hang indefinitely.',
-    correctionMessage: 'Configure connectTimeout and receiveTimeout in BaseOptions.',
+    problemMessage:
+        'Dio instance without timeout configuration. Requests may hang indefinitely.',
+    correctionMessage:
+        'Configure connectTimeout and receiveTimeout in BaseOptions.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1494,7 +1518,8 @@ class RequireDioTimeoutRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Dio') return;
 
@@ -1549,7 +1574,8 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dio_error_handling',
-    problemMessage: 'Dio request without error handling. DioException will crash the app.',
+    problemMessage:
+        'Dio request without error handling. DioException will crash the app.',
     correctionMessage: 'Wrap in try-catch to handle DioException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1622,8 +1648,10 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dio_interceptor_error_handler',
-    problemMessage: 'InterceptorsWrapper without onError handler. Errors may be unhandled.',
-    correctionMessage: 'Add onError callback to handle request errors in interceptor.',
+    problemMessage:
+        'InterceptorsWrapper without onError handler. Errors may be unhandled.',
+    correctionMessage:
+        'Add onError callback to handle request errors in interceptor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1633,7 +1661,8 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'InterceptorsWrapper') return;
 
@@ -1678,7 +1707,8 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dio_cancel_token',
-    problemMessage: 'Long-running Dio request without CancelToken. Cannot be cancelled.',
+    problemMessage:
+        'Long-running Dio request without CancelToken. Cannot be cancelled.',
     correctionMessage: 'Add cancelToken parameter for cancellable requests.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1747,8 +1777,10 @@ class RequireDioSslPinningRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dio_ssl_pinning',
-    problemMessage: 'Auth endpoint without SSL pinning. Vulnerable to MITM attacks.',
-    correctionMessage: 'Configure httpClientAdapter with certificate validation.',
+    problemMessage:
+        'Auth endpoint without SSL pinning. Vulnerable to MITM attacks.',
+    correctionMessage:
+        'Configure httpClientAdapter with certificate validation.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1824,8 +1856,10 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dio_form_data_leak',
-    problemMessage: 'FormData with file. Ensure proper cleanup of file resources.',
-    correctionMessage: 'Consider cleanup or using try-finally for file uploads.',
+    problemMessage:
+        'FormData with file. Ensure proper cleanup of file resources.',
+    correctionMessage:
+        'Consider cleanup or using try-finally for file uploads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1894,8 +1928,10 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_content_type_check',
-    problemMessage: 'Parsing response without Content-Type check. May fail on error responses.',
-    correctionMessage: 'Check response.headers[\'content-type\'] before parsing.',
+    problemMessage:
+        'Parsing response without Content-Type check. May fail on error responses.',
+    correctionMessage:
+        'Check response.headers[\'content-type\'] before parsing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1944,7 +1980,8 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
 
       // cspell:ignore contenttype
       // Check for Content-Type check
-      if (methodSource.contains('content-type') || methodSource.contains('contenttype')) {
+      if (methodSource.contains('content-type') ||
+          methodSource.contains('contenttype')) {
         return;
       }
 
@@ -1981,8 +2018,10 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_without_heartbeat',
-    problemMessage: 'WebSocket without heartbeat/ping. Dead connections won\'t be detected.',
-    correctionMessage: 'Add periodic ping messages to detect connection failures.',
+    problemMessage:
+        'WebSocket without heartbeat/ping. Dead connections won\'t be detected.',
+    correctionMessage:
+        'Add periodic ping messages to detect connection failures.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2029,7 +2068,8 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
       if (classSource.contains('ping') ||
           classSource.contains('heartbeat') ||
           classSource.contains('keepalive') ||
-          (classSource.contains('timer.periodic') && classSource.contains('sink.add'))) {
+          (classSource.contains('timer.periodic') &&
+              classSource.contains('sink.add'))) {
         return;
       }
 
@@ -2098,8 +2138,10 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
       final target = node.target;
       if (target == null) return;
       // Use property access check instead of string contains
-      if (target is! PropertyAccess || target.propertyName.name != 'interceptors') {
-        if (target is! SimpleIdentifier || !target.name.endsWith('interceptors')) {
+      if (target is! PropertyAccess ||
+          target.propertyName.name != 'interceptors') {
+        if (target is! SimpleIdentifier ||
+            !target.name.endsWith('interceptors')) {
           return;
         }
       }
@@ -2158,7 +2200,8 @@ class RequireDioSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_singleton',
     problemMessage: 'Consider using a singleton Dio instance.',
-    correctionMessage: 'Create a shared Dio instance with consistent configuration.',
+    correctionMessage:
+        'Create a shared Dio instance with consistent configuration.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2168,7 +2211,8 @@ class RequireDioSingletonRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'Dio') return;
 
@@ -2179,7 +2223,9 @@ class RequireDioSingletonRule extends SaropaLintRule {
           final parent = current.parent;
           if (parent is VariableDeclarationList) {
             final grandParent = parent.parent;
-            if (grandParent is FieldDeclaration && grandParent.isStatic && parent.isFinal) {
+            if (grandParent is FieldDeclaration &&
+                grandParent.isStatic &&
+                parent.isFinal) {
               return; // Singleton pattern - OK
             }
           }
@@ -2223,8 +2269,10 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dio_base_options',
-    problemMessage: 'Repeated options in Dio requests. Consider using BaseOptions.',
-    correctionMessage: 'Move common headers/timeouts to BaseOptions in Dio constructor.',
+    problemMessage:
+        'Repeated options in Dio requests. Consider using BaseOptions.',
+    correctionMessage:
+        'Move common headers/timeouts to BaseOptions in Dio constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2292,7 +2340,8 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dio_without_base_url',
     problemMessage: 'Dio request with full URL. Consider setting baseUrl.',
-    correctionMessage: 'Set baseUrl in BaseOptions and use relative paths in requests.',
+    correctionMessage:
+        'Set baseUrl in BaseOptions and use relative paths in requests.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2374,7 +2423,8 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'launchUrl' && node.methodName.name != 'launch') {
+      if (node.methodName.name != 'launchUrl' &&
+          node.methodName.name != 'launch') {
         return;
       }
 
@@ -2390,7 +2440,8 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
         }
         if (current is IfStatement) {
           final condition = current.expression.toSource();
-          if (condition.contains('canLaunchUrl') || condition.contains('canLaunch')) {
+          if (condition.contains('canLaunchUrl') ||
+              condition.contains('canLaunch')) {
             hasCanLaunchCheck = true;
             break;
           }
@@ -2522,7 +2573,8 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
       for (final arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'source') {
           final sourceValue = arg.expression.toSource();
-          if (sourceValue == 'ImageSource.camera' || sourceValue == 'ImageSource.gallery') {
+          if (sourceValue == 'ImageSource.camera' ||
+              sourceValue == 'ImageSource.gallery') {
             // Hardcoded source - check if in a method that handles both
             AstNode? current = node.parent;
             MethodDeclaration? enclosingMethod;
@@ -2664,7 +2716,8 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_connectivity_subscription_cancel',
-    problemMessage: 'Connectivity subscription without cancel causes memory leak.',
+    problemMessage:
+        'Connectivity subscription without cancel causes memory leak.',
     correctionMessage: 'Store subscription and cancel in dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -2703,7 +2756,8 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
       // Check if we're in initState without storing result
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is MethodDeclaration && current.name.lexeme == 'initState') {
+        if (current is MethodDeclaration &&
+            current.name.lexeme == 'initState') {
           reporter.atNode(node.methodName, code);
           return;
         }
@@ -2746,8 +2800,10 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_notification_handler_top_level',
-    problemMessage: 'Background message handler must be top-level or static function.',
-    correctionMessage: 'Move handler to top-level function with @pragma("vm:entry-point").',
+    problemMessage:
+        'Background message handler must be top-level or static function.',
+    correctionMessage:
+        'Move handler to top-level function with @pragma("vm:entry-point").',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2771,7 +2827,8 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
         // Also check for property access like FirebaseMessaging.instance
         if (target is! PropertyAccess) return;
         final targetExpr = target.target;
-        if (targetExpr is! SimpleIdentifier || targetExpr.name != 'FirebaseMessaging') {
+        if (targetExpr is! SimpleIdentifier ||
+            targetExpr.name != 'FirebaseMessaging') {
           return;
         }
       }
@@ -2828,7 +2885,8 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_denied_handling',
     problemMessage: 'Permission request without denied state handling.',
-    correctionMessage: 'Check and handle isDenied and isPermanentlyDenied states.',
+    correctionMessage:
+        'Check and handle isDenied and isPermanentlyDenied states.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2850,7 +2908,8 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
       // Use type-based check: should be PropertyAccess on Permission class
       if (target is PropertyAccess) {
         final targetExpr = target.target;
-        if (targetExpr is! SimpleIdentifier || targetExpr.name != 'Permission') {
+        if (targetExpr is! SimpleIdentifier ||
+            targetExpr.name != 'Permission') {
           return;
         }
       } else if (target is PrefixedIdentifier) {
@@ -2978,7 +3037,9 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
             parent is IfStatement ||
             parent is BinaryExpression) {
           final source = parent.toSource();
-          if (source.contains('== null') || source.contains('!= null') || source.contains('?')) {
+          if (source.contains('== null') ||
+              source.contains('!= null') ||
+              source.contains('?')) {
             return; // Has null check
           }
         }
@@ -3054,7 +3115,8 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'CachedNetworkImage') return;
 
@@ -3123,7 +3185,8 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_migration',
     problemMessage: 'Database onUpgrade should check oldVersion.',
-    correctionMessage: 'Add version checks: if (oldVersion < 2) { ... migrations ... }',
+    correctionMessage:
+        'Add version checks: if (oldVersion < 2) { ... migrations ... }',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3138,7 +3201,8 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
       final params = node.parameters;
       if (params == null) return;
 
-      final paramNames = params.parameters.map((p) => p.name?.lexeme ?? '').toList();
+      final paramNames =
+          params.parameters.map((p) => p.name?.lexeme ?? '').toList();
       if (!paramNames.contains('oldVersion') &&
           !paramNames.contains('old') &&
           !paramNames.any((p) => p.toLowerCase().contains('version'))) {
@@ -3161,7 +3225,8 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
       while (current != null) {
         if (current is AssignmentExpression) {
           final leftSource = current.leftHandSide.toSource().toLowerCase();
-          if (leftSource.contains('onupgrade') || leftSource.contains('on_upgrade')) {
+          if (leftSource.contains('onupgrade') ||
+              leftSource.contains('on_upgrade')) {
             reporter.atNode(node, code);
             return;
           }
@@ -3210,8 +3275,10 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_permission_rationale',
-    problemMessage: 'Permission request without checking shouldShowRequestRationale.',
-    correctionMessage: 'Check shouldShowRequestRationale() before requesting permission.',
+    problemMessage:
+        'Permission request without checking shouldShowRequestRationale.',
+    correctionMessage:
+        'Check shouldShowRequestRationale() before requesting permission.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3235,7 +3302,8 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
 
       final targetType = target.staticType?.toString() ?? '';
       final targetSource = target.toSource().toLowerCase();
-      if (!targetType.contains('Permission') && !targetSource.contains('permission')) {
+      if (!targetType.contains('Permission') &&
+          !targetSource.contains('permission')) {
         return;
       }
 
@@ -3282,7 +3350,8 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_permission_status_check',
-    problemMessage: 'Using permission-gated feature without checking permission status.',
+    problemMessage:
+        'Using permission-gated feature without checking permission status.',
     correctionMessage: 'Check permission.status.isGranted before use.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3365,8 +3434,10 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_notification_permission_android13',
-    problemMessage: 'Notification shown without POST_NOTIFICATIONS permission check.',
-    correctionMessage: 'Request Permission.notification before showing notifications.',
+    problemMessage:
+        'Notification shown without POST_NOTIFICATIONS permission check.',
+    correctionMessage:
+        'Request Permission.notification before showing notifications.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3505,7 +3576,8 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
     name: 'require_sse_subscription_cancel',
     problemMessage:
         'EventSource/SSE connection must be closed in dispose() to prevent resource leaks.',
-    correctionMessage: 'Add _eventSource?.close() in dispose() method before super.dispose().',
+    correctionMessage:
+        'Add _eventSource?.close() in dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3594,8 +3666,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
       // Report SSE fields not closed in dispose
       for (final String fieldName in sseFields) {
-        final bool isClosed =
-            disposeBody != null &&
+        final bool isClosed = disposeBody != null &&
             (disposeBody.contains('$fieldName.close()') ||
                 disposeBody.contains('$fieldName?.close()') ||
                 disposeBody.contains('$fieldName.dispose()') ||
@@ -3606,7 +3677,8 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
         if (!isClosed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }

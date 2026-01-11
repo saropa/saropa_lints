@@ -249,6 +249,7 @@ custom_lint:
     - prefer_public_exception_classes: false
     - avoid_swallowing_exceptions: false
     - avoid_losing_stack_trace: false
+    - avoid_print_error: false                # WARNING - print() for error logging (v2.3.9)
     - avoid_generic_exceptions: false
     - require_error_context: false
     - prefer_result_pattern: false
@@ -297,6 +298,8 @@ custom_lint:
     - require_hive_database_close: false
     - require_type_adapter_registration: false
     - prefer_lazy_box_for_large: false
+    - avoid_hive_field_index_reuse: false     # ERROR - duplicate indices (v2.3.9)
+    - avoid_sqflite_reserved_words: false     # WARNING - SQL reserved words (v2.3.9)
 
     # =========================================================================
     # FLUTTER DISPOSAL (CRITICAL)
@@ -412,6 +415,7 @@ custom_lint:
     - require_tab_controller_length_sync: false
     - avoid_refresh_without_await: false
     - avoid_multiple_autofocus: false
+    - require_key_for_collection: false       # WARNING - list items need keys (v2.3.9)
 
     # =========================================================================
     # FLUTTER WIDGETS
@@ -743,6 +747,11 @@ custom_lint:
     - avoid_sensitive_data_in_logs: false
 
     # =========================================================================
+    # EQUATABLE (v2.3.9)
+    # =========================================================================
+    - avoid_mutable_field_in_equatable: false # ERROR - mutable fields break equality
+
+    # =========================================================================
     # STATE MANAGEMENT
     # =========================================================================
     - avoid_ref_in_dispose: false
@@ -838,6 +847,14 @@ custom_lint:
     - avoid_autoplay_audio: false
     - prefer_duration_constants: false
     - avoid_datetime_now_in_tests: false
+
+    # =========================================================================
+    # INTERNATIONALIZATION DATE/NUMBER FORMATTING (v2.3.9)
+    # =========================================================================
+    - require_intl_date_format_locale: false  # WARNING - DateFormat without locale
+    - require_number_format_locale: false     # WARNING - NumberFormat without locale
+    - avoid_manual_date_formatting: false     # WARNING - Manual date formatting
+    - require_intl_currency_format: false     # WARNING - Manual currency formatting
 
     # =========================================================================
     # VARIABLES & ASSIGNMENTS

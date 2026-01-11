@@ -364,3 +364,53 @@ class MutableEquatable extends Equatable {
   @override
   List<Object?> get props => [mutableField];
 }
+
+// === avoid_mutable_field_in_equatable ===
+
+// BAD: Equatable class with non-final field
+// ignore: must_be_immutable
+class PersonWithMutableField extends Equatable {
+  // expect_lint: avoid_mutable_field_in_equatable
+  String name; // Non-final field - breaks equality contract!
+  final int age;
+
+  PersonWithMutableField(this.name, this.age);
+
+  @override
+  List<Object?> get props => [name, age];
+}
+
+// BAD: EquatableMixin with non-final field
+// ignore: must_be_immutable
+class MixinWithMutableField with EquatableMixin {
+  // expect_lint: avoid_mutable_field_in_equatable
+  int count; // Non-final field
+  final String id;
+
+  MixinWithMutableField(this.count, this.id);
+
+  @override
+  List<Object?> get props => [count, id];
+}
+
+// GOOD: Equatable with all final fields
+class ImmutablePerson extends Equatable {
+  final String name;
+  final int age;
+
+  const ImmutablePerson(this.name, this.age);
+
+  @override
+  List<Object?> get props => [name, age];
+}
+
+// GOOD: EquatableMixin with all final fields
+class ImmutableMixinClass with EquatableMixin {
+  final String id;
+  final int version;
+
+  const ImmutableMixinClass(this.id, this.version);
+
+  @override
+  List<Object?> get props => [id, version];
+}
