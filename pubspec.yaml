@@ -3,7 +3,7 @@ name: saropa_lints
 description: >-
   1189+ custom lint rules for Flutter and Dart. Static analysis for security,
   accessibility, and performance. Free and open source. 5 tiers plus optional stylistic rules.
-version: 2.3.3
+version: 2.3.4
 license: MIT
 
 # Project links for pub.dev

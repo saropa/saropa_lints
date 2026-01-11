@@ -1537,6 +1537,17 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
     final String bodySource = body.toSource();
     final int targetOffset = target.offset - body.offset;
 
+    // Ensure we don't exceed the string bounds - toSource() may produce
+    // a different length string than the original source
+    if (targetOffset <= 0 || targetOffset > bodySource.length) {
+      // Search the entire body if offset is out of bounds
+      return bodySource.contains('.mounted') ||
+          bodySource.contains('context.mounted') ||
+          bodySource.contains('!mounted') ||
+          bodySource.contains('if (mounted)') ||
+          bodySource.contains('if (!mounted)');
+    }
+
     // Check for mounted check patterns before the target
     final String beforeTarget = bodySource.substring(0, targetOffset);
     return beforeTarget.contains('.mounted') ||
@@ -1650,6 +1661,13 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
   bool _hasAwaitBefore(FunctionBody body, AstNode target) {
     final String bodySource = body.toSource();
     final int targetOffset = target.offset - body.offset;
+
+    // Ensure we don't exceed the string bounds - toSource() may produce
+    // a different length string than the original source
+    if (targetOffset <= 0 || targetOffset > bodySource.length) {
+      return bodySource.contains('await ');
+    }
+
     final String beforeTarget = bodySource.substring(0, targetOffset);
     return beforeTarget.contains('await ');
   }

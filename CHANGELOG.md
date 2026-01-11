@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.3.4] - 2026-01-11
+
+### Fixed
+
+- **avoid_dialog_context_after_async**: Fixed `RangeError` crash when analyzing files where `toSource()` produces a different length string than the original source
+- **avoid_set_state_after_async**: Fixed the same `RangeError` in `_hasAwaitBefore` method
+
 ## [2.3.3] - 2026-01-11
 
 ### Changed
