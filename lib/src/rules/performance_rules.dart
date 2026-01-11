@@ -1135,6 +1135,8 @@ class _ControllerCreationVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when setState is called during build.
 ///
+/// Alias: avoid_set_state_in_build, setstate_in_build, no_setstate_in_build
+///
 /// Calling setState during build causes infinite rebuild loops.
 ///
 /// **BAD:**

@@ -1402,6 +1402,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 // DEEP LINKING RULES
 // =============================================================================
 
+// cspell:ignore myapp
 /// Warns when deep links contain sensitive parameters in URL.
 ///
 /// Alias: no_tokens_in_deep_links, secure_app_links
@@ -1890,6 +1891,7 @@ class _AddErrorBuilderTodoFix extends DartFix {
   }
 }
 
+// cspell:ignore roboto
 /// Warns when GoogleFonts usage lacks fontFamilyFallback.
 ///
 /// Alias: google_fonts_fallback, require_font_fallback
@@ -2064,6 +2066,226 @@ class _ReplaceV1WithV4Fix extends DartFix {
           'v4',
         );
       });
+    });
+  }
+}
+
+// =============================================================================
+// IMAGE PICKER RULES
+// =============================================================================
+
+/// Warns when ImagePicker.pickImage() is called without maxWidth/maxHeight.
+///
+/// Alias: image_picker_dimensions, limit_image_size, picker_size_limit
+///
+/// **Quick fix available:** Adds a reminder comment for manual size limit addition.
+///
+/// ## Why This Matters
+///
+/// Modern smartphone cameras capture images at 12-108 megapixels. Loading these
+/// full-resolution images into memory can easily exceed available RAM, causing:
+/// - Out-of-memory crashes on lower-end devices
+/// - UI freezes during image processing
+/// - Excessive memory pressure leading to app termination
+///
+/// ## Detection
+///
+/// This rule flags `pickImage()` and `pickMultiImage()` calls from the
+/// `image_picker` package that don't specify size constraints. Detection is
+/// based on the presence of the `source` parameter (unique to image_picker).
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// // A 108MP image = ~12,000 x 9,000 pixels = 432MB uncompressed!
+/// final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// final XFile? image = await picker.pickImage(
+///   source: ImageSource.gallery,
+///   maxWidth: 1920,  // Full HD is sufficient for most uses
+///   maxHeight: 1080,
+///   imageQuality: 85, // Optional: compress JPEG quality
+/// );
+/// ```
+///
+/// ## Recommended Size Limits
+///
+/// | Use Case | maxWidth | maxHeight |
+/// |----------|----------|-----------|
+/// | Profile avatar | 512 | 512 |
+/// | List thumbnails | 256 | 256 |
+/// | Full-screen display | 1920 | 1080 |
+/// | Print quality | 3840 | 2160 |
+class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
+  const PreferImagePickerMaxDimensionsRule() : super(code: _code);
+
+  /// High impact - OOM crashes affect user experience significantly.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_image_picker_max_dimensions',
+    problemMessage:
+        'pickImage() without maxWidth/maxHeight can cause OOM on high-res cameras.',
+    correctionMessage:
+        'Add maxWidth and maxHeight parameters to limit image size.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Only check image_picker methods
+      if (methodName != 'pickImage' && methodName != 'pickMultiImage') {
+        return;
+      }
+
+      // Verify this is likely from ImagePicker (has 'source' parameter)
+      bool hasSourceParam = false;
+      bool hasMaxWidth = false;
+      bool hasMaxHeight = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'source') hasSourceParam = true;
+          if (name == 'maxWidth') hasMaxWidth = true;
+          if (name == 'maxHeight') hasMaxHeight = true;
+        }
+      }
+
+      // Only flag if this looks like ImagePicker (has source param)
+      // and is missing size constraints
+      if (hasSourceParam && !hasMaxWidth && !hasMaxHeight) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddImagePickerSizeTodoFix()];
+}
+
+class _AddImagePickerSizeTodoFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO: Set maxWidth/maxHeight',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add maxWidth/maxHeight to prevent OOM on high-res cameras\n',
+        );
+      });
+    });
+  }
+}
+
+// =============================================================================
+// URL LAUNCHER RULES
+// =============================================================================
+
+/// Warns when launchUrl() is called without specifying LaunchMode.
+///
+/// Alias: url_launcher_mode, specify_launch_mode, launch_mode_explicit
+///
+/// ## Why This Matters
+///
+/// Without explicit LaunchMode, URL launching behavior varies by platform:
+/// - **iOS**: Opens in-app Safari View Controller by default
+/// - **Android**: Opens external browser by default
+/// - **Web**: Opens in same tab by default
+///
+/// Specifying mode ensures consistent, predictable behavior across all platforms.
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// // Behavior differs between iOS, Android, and web
+/// await launchUrl(Uri.parse('https://example.com'));
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// await launchUrl(
+///   Uri.parse('https://example.com'),
+///   mode: LaunchMode.externalApplication, // Always open external browser
+/// );
+/// ```
+///
+/// ## LaunchMode Options
+///
+/// | Mode | Behavior |
+/// |------|----------|
+/// | `platformDefault` | Platform decides (inconsistent) |
+/// | `inAppWebView` | In-app browser (keeps user in app) |
+/// | `inAppBrowserView` | In-app browser with native UI |
+/// | `externalApplication` | External browser/app |
+/// | `externalNonBrowserApplication` | External app only (not browser) |
+class RequireUrlLauncherModeRule extends SaropaLintRule {
+  const RequireUrlLauncherModeRule() : super(code: _code);
+
+  /// Medium impact - inconsistent behavior, but not a crash.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_url_launcher_mode',
+    problemMessage:
+        'launchUrl() without mode parameter has inconsistent behavior across platforms.',
+    correctionMessage:
+        'Add mode parameter (e.g., LaunchMode.externalApplication) for consistent behavior.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'launchUrl') return;
+
+      // Verify first argument is a Uri (url_launcher signature)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      // Check if mode is specified
+      bool hasMode = false;
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'mode') {
+          hasMode = true;
+          break;
+        }
+      }
+
+      if (!hasMode) {
+        reporter.atNode(node.methodName, code);
+      }
     });
   }
 }

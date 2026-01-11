@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.3.2] - 2026-01-11
+
+### Added
+
+#### Image & Package-Specific Rules (5 rules)
+
+**Image Picker Rules**
+- **`prefer_image_picker_max_dimensions`**: Warns when `pickImage()` is called without `maxWidth`/`maxHeight` parameters - prevents OOM on high-resolution cameras (12-108MP). Quick fix available.
+
+**Cached Network Image Rules**
+- **`prefer_cached_image_fade_animation`**: Suggests explicitly setting `fadeInDuration` on CachedNetworkImage for intentional UX design (default is 500ms).
+
+**URL Launcher Rules**
+- **`require_url_launcher_mode`**: Warns when `launchUrl()` is called without `mode` parameter - behavior varies by platform without explicit mode.
+
+**SQLite Database Rules**
+- **`avoid_sqflite_read_all_columns`**: Warns when `SELECT *` is used in `rawQuery()` - wastes memory and bandwidth by fetching unnecessary columns.
+
+**Notification Rules**
+- **`require_notification_initialize_per_platform`**: Warns when `InitializationSettings` is missing `android:` or `iOS:` parameters - notifications fail silently on missing platforms. Quick fix available.
+
+### Changed
+
+- **Added aliases** to pre-existing rules:
+  - `require_await_in_async` → alias for `avoid_redundant_async`
+  - `avoid_riverpod_ref_in_dispose` → alias for `avoid_ref_inside_state_dispose`
+  - `avoid_set_state_in_build` → alias for `avoid_setstate_in_build`
+
+## [2.3.1] - 2026-01-11
+
+### Changed
+
+- **`pass_existing_future_to_future_builder`**: Merged `avoid_future_builder_rebuild` into this rule
+  - Now detects inline futures anywhere (not just in build method)
+  - Added `InstanceCreationExpression` detection (e.g., `Future.value()`)
+  - Added alias note in documentation
+
+- **`avoid_uncaught_future_errors`**: Improved false positive handling
+  - Now skips functions that have internal try-catch error handling
+
+- **`avoid_keyboard_overlap`**: Improved detection accuracy
+  - Skips Dialog and BottomSheet widgets (Flutter handles keyboard overlap for these)
+  - Changed to file-level viewInsets check (handles nested widget composition)
+
+- **`require_webview_ssl_error_handling`**: Fixed callback name
+  - Changed from `onSslError` to `onSslAuthError` (correct API for webview_flutter 4.0+)
+  - Removed `onHttpAuthRequest` from check (different purpose: HTTP 401 auth, not SSL)
+
+- **`require_apple_signin_nonce`**: Improved documentation with Supabase example
+
+### Removed
+
+- **`avoid_future_builder_rebuild`**: Merged into `pass_existing_future_to_future_builder`
+
 ## [2.3.0] - 2026-01-10
 
 ### Added

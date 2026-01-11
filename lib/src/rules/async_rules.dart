@@ -299,7 +299,7 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
 
 /// Warns when async is used but no await is present in the function body.
 ///
-/// Alias: unnecessary_async, async_without_await, remove_async
+/// Alias: unnecessary_async, async_without_await, remove_async, require_await_in_async
 ///
 /// Example of **bad** code:
 /// ```dart

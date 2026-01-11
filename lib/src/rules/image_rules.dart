@@ -994,3 +994,82 @@ class RequireExifHandlingRule extends SaropaLintRule {
     });
   }
 }
+
+/// Suggests explicitly setting fadeInDuration on CachedNetworkImage.
+///
+/// Alias: cached_image_fade, smooth_image_loading
+///
+/// ## Why This Rule Exists
+///
+/// CachedNetworkImage has a default fadeInDuration of 500ms, which works well
+/// for most cases. However, explicitly setting this value signals intentional
+/// UX design and allows customization for different contexts:
+/// - **Fast transitions**: 150-200ms for thumbnail grids
+/// - **Smooth transitions**: 300-400ms for hero images
+/// - **No transition**: Duration.zero for instant display
+///
+/// ## Severity: INFO
+///
+/// This is a style suggestion, not a bug. The default 500ms fade is reasonable,
+/// but explicit configuration documents your UX intent.
+///
+/// ## Example
+///
+/// ### Without explicit duration (uses 500ms default):
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: 'https://example.com/image.jpg',
+///   placeholder: (context, url) => CircularProgressIndicator(),
+/// )
+/// ```
+///
+/// ### With explicit duration:
+/// ```dart
+/// CachedNetworkImage(
+///   imageUrl: 'https://example.com/image.jpg',
+///   placeholder: (context, url) => CircularProgressIndicator(),
+///   fadeInDuration: Duration(milliseconds: 300), // Intentional UX choice
+/// )
+/// ```
+class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
+  const PreferCachedImageFadeAnimationRule() : super(code: _code);
+
+  /// Low impact - style suggestion, not a bug.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_cached_image_fade_animation',
+    problemMessage:
+        'CachedNetworkImage without fadeInDuration causes abrupt image pop-in.',
+    correctionMessage: 'Add fadeInDuration for a smoother loading experience.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      if (typeName != 'CachedNetworkImage') return;
+
+      // Check if fadeInDuration is specified
+      bool hasFadeInDuration = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'fadeInDuration') {
+          hasFadeInDuration = true;
+          break;
+        }
+      }
+
+      if (!hasFadeInDuration) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

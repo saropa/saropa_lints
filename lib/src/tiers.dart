@@ -323,6 +323,12 @@ const Set<String> essentialRules = <String>{
   'require_connectivity_subscription_cancel', // ERROR - leak
   'require_notification_handler_top_level', // ERROR - crash
   'require_permission_denied_handling', // WARNING - crash
+
+  // Image Picker Rules (Essential - OOM prevention)
+  'prefer_image_picker_max_dimensions', // WARNING - OOM on high-res cameras
+
+  // Notification Rules (Essential - silent failure prevention)
+  'require_notification_initialize_per_platform', // WARNING - missing platform settings
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -676,6 +682,9 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Part 7 - Image Picker Rules (Recommended - UX)
   'require_image_picker_source_choice', // INFO - flexibility
+
+  // Cached Image Rules (Recommended - UX)
+  'prefer_cached_image_fade_animation', // INFO - smooth image loading
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1171,6 +1180,12 @@ const Set<String> professionalOnlyRules = <String>{
   'require_permission_rationale', // INFO - Android best practice
   'require_permission_status_check', // WARNING - crash prevention
   'require_notification_permission_android13', // WARNING - Android 13+
+
+  // URL Launcher Rules (Professional - consistency)
+  'require_url_launcher_mode', // INFO - cross-platform consistency
+
+  // SQLite Rules (Professional - performance)
+  'avoid_sqflite_read_all_columns', // INFO - memory/bandwidth efficiency
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
