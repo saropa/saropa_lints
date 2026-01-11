@@ -64,6 +64,9 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidUnguardedDebugRule(),
   PreferConstStringListRule(),
   AvoidContextInInitStateDisposeRule(),
+  AvoidStoringContextRule(),
+  AvoidContextAcrossAsyncRule(),
+  AvoidContextInStaticMethodsRule(),
   AvoidIsarEnumFieldRule(),
   AvoidAdjacentStringsRule(),
   AvoidContinueRule(),
@@ -1453,6 +1456,109 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Image picker OOM prevention (NEW)
   PreferImagePickerMaxDimensionsRule(),
+
+  // =========================================================================
+  // NEW RULES v2.3.10
+  // =========================================================================
+
+  // Test rules
+  AvoidTestPrintStatementsRule(),
+  RequireMockHttpClientRule(),
+
+  // Async rules
+  AvoidFutureThenInAsyncRule(),
+  AvoidUnawaitedFutureRule(),
+
+  // Forms rules
+  RequireTextInputTypeRule(),
+  PreferTextInputActionRule(),
+  RequireFormKeyInStatefulWidgetRule(),
+
+  // Network rules
+  PreferTimeoutOnRequestsRule(),
+  PreferDioOverHttpRule(),
+
+  // Error handling rules
+  AvoidCatchAllRule(),
+
+  // State management rules
+  AvoidBlocContextDependencyRule(),
+  AvoidProviderValueRebuildRule(),
+
+  // Lifecycle rules
+  RequireDidUpdateWidgetCheckRule(),
+
+  // Equatable rules
+  RequireEquatableCopyWithRule(),
+
+  // Notification rules
+  AvoidNotificationSameIdRule(),
+
+  // Internationalization rules
+  RequireIntlPluralRulesRule(),
+
+  // Image rules
+  PreferCachedImageCacheManagerRule(),
+  RequireImageCacheDimensionsRule(),
+
+  // Navigation rules
+  PreferUrlLauncherUriOverStringRule(),
+  AvoidGoRouterPushReplacementConfusionRule(),
+
+  // Widget rules
+  AvoidStackWithoutPositionedRule(),
+  AvoidExpandedOutsideFlexRule(),
+
+  // =========================================================================
+  // NEW RULES v2.3.11
+  // =========================================================================
+
+  // Test rules
+  RequireTestWidgetPumpRule(),
+  RequireIntegrationTestTimeoutRule(),
+
+  // Hive rules
+  RequireHiveFieldDefaultValueRule(),
+  RequireHiveAdapterRegistrationOrderRule(),
+  RequireHiveNestedObjectAdapterRule(),
+  AvoidHiveBoxNameCollisionRule(),
+
+  // Security rules
+  AvoidApiKeyInCodeRule(),
+  AvoidStoringSensitiveUnencryptedRule(),
+
+  // State management rules
+  AvoidRiverpodNotifierInBuildRule(),
+  RequireRiverpodAsyncValueGuardRule(),
+  AvoidBlocBusinessLogicInUiRule(),
+
+  // Navigation rules
+  RequireUrlLauncherEncodingRule(),
+  AvoidNestedRoutesWithoutParentRule(),
+
+  // Equatable rules
+  RequireCopyWithNullHandlingRule(),
+
+  // Internationalization rules
+  RequireIntlArgsMatchRule(),
+  AvoidStringConcatenationForL10nRule(),
+
+  // Performance rules
+  AvoidBlockingDatabaseUiRule(),
+  AvoidMoneyArithmeticOnDoubleRule(),
+  AvoidRebuildOnScrollRule(),
+
+  // Error handling rules
+  AvoidExceptionInConstructorRule(),
+  RequireCacheKeyDeterminismRule(),
+  RequirePermissionPermanentDenialHandlingRule(),
+
+  // Dependency injection rules
+  RequireGetItRegistrationOrderRule(),
+  RequireDefaultConfigRule(),
+
+  // Widget rules
+  AvoidBuilderIndexOutOfBoundsRule(),
 ];
 
 class _SaropaLints extends PluginBase {

@@ -1,4 +1,5 @@
 // ignore_for_file: unused_element, avoid_unused_constructor_parameters
+// ignore_for_file: avoid_context_in_static_methods
 // Mock Flutter types for lint rule testing
 // These mocks allow testing lint rules without requiring the Flutter SDK
 

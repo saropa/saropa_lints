@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.9)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.11)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1257+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~1290+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -88,7 +88,7 @@ custom_lint:
     #   - recommended    : ~150 rules (default) ← START HERE
     #   - professional   : ~350 rules (strict)
     #   - comprehensive  : ~700 rules (very strict)
-    #   - insanity       : ~1248+ rules (everything)
+    #   - insanity       : ~1290+ rules (everything)
     tier: recommended
 
   # ===========================================================================
@@ -134,6 +134,8 @@ custom_lint:
     - avoid_uncaught_future_errors: false
     - avoid_unassigned_stream_subscriptions: false
     - require_stream_controller_dispose: false
+    - avoid_future_then_in_async: false          # WARNING - use await instead (v2.3.10)
+    - avoid_unawaited_future: false              # ERROR - unawaited futures lose errors (v2.3.10)
 
     # =========================================================================
     # ACCESSIBILITY
@@ -255,6 +257,10 @@ custom_lint:
     - prefer_result_pattern: false
     - require_async_error_documentation: false
     - require_error_boundary: false
+    - avoid_catch_all: false                     # ERROR - catch specific exceptions (v2.3.10)
+    - avoid_exception_in_constructor: false      # WARNING - error handling (v2.3.11)
+    - require_cache_key_determinism: false       # ERROR - memory bloat (v2.3.11)
+    - require_permission_permanent_denial_handling: false # WARNING - UX (v2.3.11)
 
     # =========================================================================
     # EXTENSION TYPES
@@ -336,11 +342,17 @@ custom_lint:
     - require_secure_keyboard: false
     - require_keyboard_action_type: false
     - require_keyboard_dismiss_on_scroll: false
+    - require_text_input_type: false             # INFO - set keyboardType for UX (v2.3.10)
+    - prefer_text_input_action: false            # INFO - set textInputAction for UX (v2.3.10)
+    - require_form_key_in_stateful_widget: false # ERROR - create GlobalKey in class (v2.3.10)
 
     # =========================================================================
     # FLUTTER LIFECYCLE (CRITICAL)
     # =========================================================================
     - avoid_context_in_initstate_dispose: false
+    - avoid_storing_context: false              # ERROR - context in fields (v2.3.10)
+    - avoid_context_across_async: false         # ERROR - context after await (v2.3.10)
+    - avoid_context_in_static_methods: false    # ERROR - context in static methods (v2.3.10)
     - avoid_inherited_widget_in_initstate: false
     - avoid_build_context_in_providers: false
     - avoid_late_context: false
@@ -364,6 +376,7 @@ custom_lint:
     - avoid_stateful_without_state: false
     - avoid_global_riverpod_providers: false
     - avoid_ref_in_build_body: false
+    - require_did_update_widget_check: false     # WARNING - check oldWidget changes (v2.3.10)
 
     # =========================================================================
     # FLUTTER NAVIGATION
@@ -373,6 +386,10 @@ custom_lint:
     - prefer_scaffold_messenger_maybeof: false
     - require_unknown_route_handler: false
     - avoid_context_after_navigation: false
+    - prefer_url_launcher_uri_over_string: false # INFO - use Uri type safety (v2.3.10)
+    - avoid_go_router_push_replacement_confusion: false # WARNING - clear routing intent (v2.3.10)
+    - require_url_launcher_encoding: false       # WARNING - URL failure (v2.3.11)
+    - avoid_nested_routes_without_parent: false  # WARNING - navigation issues (v2.3.11)
 
     # =========================================================================
     # FLUTTER PERFORMANCE
@@ -416,6 +433,9 @@ custom_lint:
     - avoid_refresh_without_await: false
     - avoid_multiple_autofocus: false
     - require_key_for_collection: false       # WARNING - list items need keys (v2.3.9)
+    - avoid_blocking_database_ui: false       # WARNING - UI jank (v2.3.11)
+    - avoid_money_arithmetic_on_double: false # WARNING - precision issues (v2.3.11)
+    - avoid_rebuild_on_scroll: false          # WARNING - memory leak (v2.3.11)
 
     # =========================================================================
     # FLUTTER WIDGETS
@@ -427,6 +447,9 @@ custom_lint:
     - avoid_single_child_column_row: false
     - avoid_expanded_as_spacer: false
     - avoid_flexible_outside_flex: false
+    - avoid_expanded_outside_flex: false         # ERROR - Expanded needs Flex parent (v2.3.10)
+    - avoid_stack_without_positioned: false      # WARNING - Stack needs Positioned (v2.3.10)
+    - avoid_builder_index_out_of_bounds: false   # WARNING - runtime crash (v2.3.11)
     - avoid_duplicate_widget_keys: false
     - avoid_stateful_widget_in_list: false
     - avoid_uncontrolled_text_field: false
@@ -594,8 +617,9 @@ custom_lint:
     - require_websocket_close: false
     - require_platform_channel_cleanup: false
     - require_isolate_kill: false
-    - require_image_cache_dimensions: false
+    - require_image_cache_dimensions: false      # WARNING - set memCacheWidth/Height (v2.3.10)
     - prefer_image_precache: false
+    - prefer_cached_image_cache_manager: false   # INFO - custom CacheManager (v2.3.10)
 
     # =========================================================================
     # NAMING & STYLE
@@ -661,6 +685,8 @@ custom_lint:
     - prefer_pagination: false
     - avoid_over_fetching: false
     - require_cancel_token: false
+    - prefer_timeout_on_requests: false          # WARNING - add timeout (v2.3.10)
+    - prefer_dio_over_http: false                # INFO - Dio has better features (v2.3.10)
 
     # =========================================================================
     # NUMBERS & STRINGS
@@ -745,11 +771,15 @@ custom_lint:
     - avoid_deprecated_crypto_algorithms: false
     - require_unique_iv_per_encryption: false
     - avoid_sensitive_data_in_logs: false
+    - avoid_api_key_in_code: false               # ERROR - security critical (v2.3.11)
+    - avoid_storing_sensitive_unencrypted: false # ERROR - security critical (v2.3.11)
 
     # =========================================================================
     # EQUATABLE (v2.3.9)
     # =========================================================================
     - avoid_mutable_field_in_equatable: false # ERROR - mutable fields break equality
+    - require_equatable_copy_with: false         # INFO - add copyWith method (v2.3.10)
+    - require_copy_with_null_handling: false     # WARNING - state management (v2.3.11)
 
     # =========================================================================
     # STATE MANAGEMENT
@@ -786,6 +816,11 @@ custom_lint:
     - require_riverpod_lint: false
     - require_multi_provider: false
     - avoid_nested_providers: false
+    - avoid_bloc_context_dependency: false       # ERROR - Bloc shouldn't use context (v2.3.10)
+    - avoid_provider_value_rebuild: false        # WARNING - inline creation (v2.3.10)
+    - avoid_riverpod_notifier_in_build: false    # WARNING - state loss (v2.3.11)
+    - require_riverpod_async_value_guard: false  # WARNING - error handling (v2.3.11)
+    - avoid_bloc_business_logic_in_ui: false     # WARNING - testability (v2.3.11)
 
     # =========================================================================
     # TESTING
@@ -835,6 +870,10 @@ custom_lint:
     - prefer_test_variant: false
     - require_animation_tests: false
     - require_getit_reset_in_tests: false
+    - avoid_test_print_statements: false         # WARNING - use expect() (v2.3.10)
+    - require_mock_http_client: false            # ERROR - mock HTTP in tests (v2.3.10)
+    - require_test_widget_pump: false            # ERROR - pump after interaction (v2.3.11)
+    - require_integration_test_timeout: false    # WARNING - prevent CI hangs (v2.3.11)
 
     # =========================================================================
     # JSON & DATETIME
@@ -849,12 +888,21 @@ custom_lint:
     - avoid_datetime_now_in_tests: false
 
     # =========================================================================
+    # DEPENDENCY INJECTION (v2.3.11)
+    # =========================================================================
+    - require_getit_registration_order: false    # WARNING - startup crash (v2.3.11)
+    - require_default_config: false              # WARNING - startup crash (v2.3.11)
+
+    # =========================================================================
     # INTERNATIONALIZATION DATE/NUMBER FORMATTING (v2.3.9)
     # =========================================================================
     - require_intl_date_format_locale: false  # WARNING - DateFormat without locale
     - require_number_format_locale: false     # WARNING - NumberFormat without locale
     - avoid_manual_date_formatting: false     # WARNING - Manual date formatting
     - require_intl_currency_format: false     # WARNING - Manual currency formatting
+    - require_intl_plural_rules: false       # ERROR - Intl.plural needs forms (v2.3.10)
+    - require_intl_args_match: false         # ERROR - runtime crash (v2.3.11)
+    - avoid_string_concatenation_for_l10n: false # WARNING - i18n correctness (v2.3.11)
 
     # =========================================================================
     # VARIABLES & ASSIGNMENTS
@@ -924,6 +972,10 @@ custom_lint:
     - prefer_context_read_in_callbacks: false    # WARNING - avoid rebuilds
     # Hive
     - require_hive_type_id_management: false     # INFO - typeId registry
+    - require_hive_field_default_value: false    # WARNING - migration safety (v2.3.11)
+    - require_hive_adapter_registration_order: false # ERROR - runtime crash (v2.3.11)
+    - require_hive_nested_object_adapter: false  # ERROR - runtime crash (v2.3.11)
+    - avoid_hive_box_name_collision: false       # WARNING - data corruption (v2.3.11)
     # Image Picker
     - require_image_picker_result_handling: false # WARNING - null handling
     # Cached Network Image
@@ -948,6 +1000,7 @@ custom_lint:
     - avoid_sqflite_read_all_columns: false      # INFO - avoid SELECT *
     # Notifications
     - require_notification_initialize_per_platform: false # WARNING - platform settings
+    - avoid_notification_same_id: false          # WARNING - use unique IDs (v2.3.10)
 
     # =========================================================================
     # OPINIONATED RULES (Not in any tier - enable individually)

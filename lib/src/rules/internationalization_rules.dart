@@ -1452,3 +1452,292 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when manual count-based string selection is used instead of Intl.plural.
+///
+/// Alias: use_intl_plural, manual_plural
+///
+/// Different languages have different plural rules. Using Intl.plural ensures
+/// correct pluralization across all supported languages.
+///
+/// **BAD:**
+/// ```dart
+/// String getMessage(int count) {
+///   if (count == 0) return 'No items';
+///   if (count == 1) return '1 item';
+///   return '$count items';
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// String getMessage(int count) {
+///   return Intl.plural(
+///     count,
+///     zero: 'No items',
+///     one: 'One item',
+///     other: '$count items',
+///   );
+/// }
+/// ```
+class RequireIntlPluralRulesRule extends SaropaLintRule {
+  const RequireIntlPluralRulesRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_intl_plural_rules',
+    problemMessage:
+        'Manual pluralization. Different languages have different plural rules.',
+    correctionMessage:
+        'Use Intl.plural() for proper pluralization across all languages.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Method must return String
+      final TypeAnnotation? returnType = node.returnType;
+      if (returnType == null) return;
+      if (returnType.toSource() != 'String') return;
+
+      // Method must have an int parameter (the count)
+      final FormalParameterList? paramList = node.parameters;
+      if (paramList == null) return;
+
+      String? countParamName;
+      for (final FormalParameter param in paramList.parameters) {
+        String? typeName;
+        String? paramName;
+
+        if (param is SimpleFormalParameter) {
+          typeName = param.type?.toSource();
+          paramName = param.name?.lexeme;
+        } else if (param is DefaultFormalParameter) {
+          final NormalFormalParameter normalParam = param.parameter;
+          if (normalParam is SimpleFormalParameter) {
+            typeName = normalParam.type?.toSource();
+            paramName = normalParam.name?.lexeme;
+          }
+        }
+
+        if (typeName == 'int' && paramName != null) {
+          countParamName = paramName;
+          break;
+        }
+      }
+
+      if (countParamName == null) return;
+
+      final FunctionBody body = node.body;
+      final String bodySource = body.toSource();
+
+      // Already using Intl.plural - good!
+      if (bodySource.contains('Intl.plural')) return;
+
+      // Check that the int parameter is used in comparisons
+      final RegExp countComparisonPattern = RegExp(
+        '${RegExp.escape(countParamName)}\\s*[=!<>]=?\\s*[012]|'
+        '[012]\\s*[=!<>]=?\\s*${RegExp.escape(countParamName)}',
+      );
+
+      if (!countComparisonPattern.hasMatch(bodySource)) return;
+
+      // Must have multiple return statements with strings (different plurals)
+      final RegExp returnStringPattern = RegExp(r'''return\s*['"]''');
+      final int returnCount =
+          returnStringPattern.allMatches(bodySource).length;
+
+      // Need at least 2 different string returns (singular/plural)
+      if (returnCount < 2) return;
+
+      // Look for explicit plural patterns in strings:
+      // - Words ending in 's' that likely represent plurals
+      // - Explicit singular/plural word pairs
+      final RegExp pluralWordPattern = RegExp(
+        r'''['"][^'"]*\b(items?|files?|messages?|users?|days?|hours?|minutes?|'''
+        r'''seconds?|photos?|videos?|comments?|posts?|results?|records?|'''
+        r'''entries?|elements?|objects?|things?)\b[^'"]*['"]''',
+        caseSensitive: false,
+      );
+
+      if (pluralWordPattern.hasMatch(bodySource)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// NEW RULES v2.3.11
+// =============================================================================
+
+/// Warns when Intl.message args don't match placeholders in the message.
+///
+/// Alias: intl_args_placeholders, intl_message_args
+///
+/// Intl.message placeholders must have matching args. Mismatched args cause
+/// runtime errors or missing translations.
+///
+/// **BAD:**
+/// ```dart
+/// Intl.message(
+///   'Hello $name, you have $count items',
+///   args: [name], // Missing count!
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Intl.message(
+///   'Hello $name, you have $count items',
+///   args: [name, count],
+/// );
+/// ```
+class RequireIntlArgsMatchRule extends SaropaLintRule {
+  const RequireIntlArgsMatchRule() : super(code: _code);
+
+  /// Mismatched args cause runtime errors in translations.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'require_intl_args_match',
+    problemMessage:
+        'Intl.message args may not match placeholders in the message.',
+    correctionMessage:
+        'Ensure args list contains all variables used in the message string.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'message') return;
+
+      // Check if it's Intl.message
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Intl') return;
+
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      // Get the message string
+      final Expression messageArg = args.arguments.first;
+      String? messageText;
+
+      if (messageArg is SimpleStringLiteral) {
+        messageText = messageArg.value;
+      } else if (messageArg is StringInterpolation) {
+        // For interpolated strings, get the full source
+        messageText = messageArg.toSource();
+      }
+
+      if (messageText == null) return;
+
+      // Count placeholders in message ($ followed by word characters)
+      final RegExp placeholderPattern = RegExp(r'\$(\w+)');
+      final Iterable<RegExpMatch> placeholders =
+          placeholderPattern.allMatches(messageText);
+      final int placeholderCount = placeholders.length;
+
+      if (placeholderCount == 0) return;
+
+      // Find args parameter
+      int argsCount = 0;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'args') {
+          final Expression argsValue = arg.expression;
+          if (argsValue is ListLiteral) {
+            argsCount = argsValue.elements.length;
+          }
+          break;
+        }
+      }
+
+      // Warn if counts don't match
+      if (argsCount != placeholderCount) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when string concatenation is used for localized text.
+///
+/// Alias: no_concat_l10n, string_plus_l10n, l10n_concatenation
+///
+/// HEURISTIC: String concatenation breaks word order in RTL languages
+/// and languages with different grammatical structures.
+///
+/// **BAD:**
+/// ```dart
+/// Text('Hello, ' + userName + '!'); // Word order varies by language
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(l10n.greeting(userName)); // Translation handles word order
+/// ```
+class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
+  const AvoidStringConcatenationForL10nRule() : super(code: _code);
+
+  /// Concatenation breaks translations in RTL and complex languages.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_string_concatenation_for_l10n',
+    problemMessage:
+        'String concatenation may break word order in other languages.',
+    correctionMessage:
+        'Use parameterized translations: l10n.greeting(name) instead of concatenation.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      // Check for string + variable pattern
+      if (node.operator.lexeme != '+') return;
+
+      // Check if either side is a string literal
+      final bool hasStringLiteral = node.leftOperand is SimpleStringLiteral ||
+          node.rightOperand is SimpleStringLiteral;
+
+      if (!hasStringLiteral) return;
+
+      // Check if inside a Text widget or similar UI context
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String typeName =
+              current.constructorName.type.name2.lexeme;
+          if (typeName == 'Text' ||
+              typeName == 'RichText' ||
+              typeName == 'SelectableText') {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+        current = current.parent;
+      }
+    });
+  }
+}

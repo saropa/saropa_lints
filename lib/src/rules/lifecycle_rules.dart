@@ -220,3 +220,98 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when didUpdateWidget doesn't compare oldWidget.
+///
+/// Alias: did_update_widget_compare, compare_old_widget
+///
+/// didUpdateWidget receives the old widget for comparison. Without comparing
+/// oldWidget to widget, you might trigger unnecessary updates.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// void didUpdateWidget(MyWidget oldWidget) {
+///   super.didUpdateWidget(oldWidget);
+///   _updateState(); // Always updates, even if nothing changed
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// void didUpdateWidget(MyWidget oldWidget) {
+///   super.didUpdateWidget(oldWidget);
+///   if (oldWidget.value != widget.value) {
+///     _updateState(); // Only updates when value changed
+///   }
+/// }
+/// ```
+class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
+  const RequireDidUpdateWidgetCheckRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_did_update_widget_check',
+    problemMessage:
+        'didUpdateWidget should compare oldWidget properties before updating.',
+    correctionMessage:
+        'Compare oldWidget.property != widget.property before state updates.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'didUpdateWidget') return;
+
+      final FunctionBody body = node.body;
+      if (body is EmptyFunctionBody) return;
+
+      // Get the actual parameter name (usually 'oldWidget' but could vary)
+      final NodeList<FormalParameter>? params = node.parameters?.parameters;
+      if (params == null || params.isEmpty) return;
+
+      String paramName = 'oldWidget';
+      final FormalParameter firstParam = params.first;
+      if (firstParam is SimpleFormalParameter) {
+        paramName = firstParam.name?.lexeme ?? 'oldWidget';
+      } else if (firstParam is DefaultFormalParameter) {
+        final NormalFormalParameter normalParam = firstParam.parameter;
+        if (normalParam is SimpleFormalParameter) {
+          paramName = normalParam.name?.lexeme ?? 'oldWidget';
+        }
+      }
+
+      final String bodySource = body.toSource();
+
+      // Check if it only calls super.didUpdateWidget
+      final String trimmed = bodySource
+          .replaceAll(RegExp(r'\s+'), '')
+          .replaceAll('{', '')
+          .replaceAll('}', '');
+
+      // If body only contains super call, no need to warn
+      if (trimmed == 'super.didUpdateWidget($paramName);') return;
+
+      // Check if the parameter is accessed for comparison
+      // Look for: paramName.property, paramName != , paramName == , paramName.hashCode
+      final RegExp comparisonPattern = RegExp(
+        '${RegExp.escape(paramName)}\\s*\\.\\w+\\s*[!=]=|'
+        '${RegExp.escape(paramName)}\\s*[!=]=|'
+        '[!=]=\\s*${RegExp.escape(paramName)}',
+      );
+
+      if (!comparisonPattern.hasMatch(bodySource)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

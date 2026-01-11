@@ -21,6 +21,7 @@ Bloc enforces strict separation of concerns, but has subtle patterns that cause 
 | Public Bloc fields | Bypasses event pattern | `avoid_bloc_public_fields` |
 | Public Bloc methods | Bypasses event pattern | `avoid_bloc_public_methods` |
 | BlocBuilder over-rebuild | Performance | `require_bloc_selector` |
+| BuildContext in Bloc | Lifecycle coupling | `avoid_bloc_context_dependency` |
 
 ## What saropa_lints Catches
 
