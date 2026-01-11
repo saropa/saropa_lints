@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 // =========================================================================
 // require_media_player_dispose

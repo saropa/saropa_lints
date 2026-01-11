@@ -2,8 +2,7 @@
 // ignore_for_file: unused_element, avoid_print
 // Test fixture for BlocProvider rules
 
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../flutter_mocks.dart';
 
 // Mock Bloc classes for testing
 class AuthBloc extends Bloc<Object, Object> {

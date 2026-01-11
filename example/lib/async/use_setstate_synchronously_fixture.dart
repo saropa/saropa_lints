@@ -2,7 +2,7 @@
 // ignore_for_file: unused_field
 // Test fixture for use_setstate_synchronously rule
 
-import 'package:flutter/material.dart';
+import '../flutter_mocks.dart';
 
 // =========================================================================
 // use_setstate_synchronously
