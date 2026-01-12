@@ -30,6 +30,9 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_image_rebuild_on_scroll',
     problemMessage: 'Image.network in ListView.builder will rebuild on scroll.',
@@ -132,6 +135,9 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_avatar_fallback',
     problemMessage:
@@ -216,6 +222,9 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_video_loading_placeholder',
     problemMessage: 'Video player should have a loading placeholder.',
@@ -293,6 +302,9 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_image_size_constraints',
     problemMessage:
@@ -369,6 +381,9 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_image_error_fallback',
     problemMessage:
@@ -439,6 +454,9 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_image_loading_placeholder',
     problemMessage:
@@ -507,6 +525,9 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_media_loading_state',
@@ -598,6 +619,9 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_pdf_loading_indicator',
     problemMessage: 'PDF viewer should provide loading feedback.',
@@ -678,6 +702,9 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_clipboard_feedback',
     problemMessage: 'Clipboard.setData should provide user feedback.',
@@ -757,6 +784,9 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_cached_image_dimensions',
     problemMessage:
@@ -826,6 +856,9 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_cached_image_placeholder',
     problemMessage:
@@ -885,6 +918,12 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_cached_image_error_widget',
@@ -953,6 +992,9 @@ class RequireExifHandlingRule extends SaropaLintRule {
   /// Visual issue - images may display rotated.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_exif_handling',
@@ -1037,6 +1079,9 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
   /// Low impact - style suggestion, not a bug.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_fade_animation',
@@ -1133,6 +1178,12 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_image_stream_dispose',
@@ -1252,6 +1303,9 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_request_full_metadata',
     problemMessage:
@@ -1344,6 +1398,9 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_large_files',
     problemMessage: 'pickImage without imageQuality. Raw photos can be 10+ MB.',
@@ -1433,6 +1490,9 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_cache_manager',
     problemMessage:
@@ -1496,6 +1556,9 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_image_cache_dimensions',

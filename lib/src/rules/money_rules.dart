@@ -42,6 +42,9 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_double_for_money',
     problemMessage:

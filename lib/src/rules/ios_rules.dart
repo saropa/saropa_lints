@@ -102,6 +102,9 @@ class PreferIosSafeAreaRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_ios_safe_area',
     problemMessage:
@@ -245,6 +248,9 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
   /// Hardcoded values cause UI bugs on specific devices.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_status_bar',
@@ -430,6 +436,9 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_ios_haptic_feedback',
     problemMessage:
@@ -576,6 +585,9 @@ class RequireIosPlatformCheckRule extends SaropaLintRule {
   /// Missing platform checks can cause crashes.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_platform_check',
@@ -762,6 +774,9 @@ class AvoidIosBackgroundFetchAbuseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_background_fetch_abuse',
     problemMessage:
@@ -897,6 +912,9 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_macos_menu_bar_integration',
     problemMessage:
@@ -994,6 +1012,9 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_macos_keyboard_shortcuts',
     problemMessage: 'macOS apps should implement standard keyboard shortcuts.',
@@ -1083,6 +1104,9 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
   /// Missing constraints affects UX but isn't critical.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_macos_window_size_constraints',
@@ -1176,6 +1200,9 @@ class RequireMethodChannelErrorHandlingRule extends SaropaLintRule {
   /// Unhandled platform errors cause crashes.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_method_channel_error_handling',
@@ -1347,6 +1374,9 @@ class RequireUniversalLinkValidationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_universal_link_validation',
     problemMessage:
@@ -1433,6 +1463,9 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
   /// Using non-native widgets is a UX preference.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_cupertino_for_ios',
@@ -1545,6 +1578,9 @@ class RequireHttpsForIosRule extends SaropaLintRule {
   /// HTTP requests fail without configuration.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_https_for_ios',
@@ -1701,6 +1737,9 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   /// Missing permission descriptions cause App Store rejection.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_permission_description',
@@ -1892,6 +1931,9 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_privacy_manifest',
     problemMessage: 'API requires iOS Privacy Manifest entry (iOS 17+).',
@@ -1998,6 +2040,9 @@ class RequireAppleSignInRule extends SaropaLintRule {
   /// App Store rejection is critical.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_apple_sign_in',
@@ -2142,6 +2187,9 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_background_mode',
     problemMessage:
@@ -2234,6 +2282,9 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
   /// Deprecated APIs cause App Store warnings and eventual rejection.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_13_deprecations',
@@ -2330,6 +2381,9 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_simulator_only_code',
     problemMessage:
@@ -2423,6 +2477,9 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
   /// Missing version checks cause crashes on older iOS.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_minimum_version_check',
@@ -2529,6 +2586,9 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_deprecated_uikit',
     problemMessage:
@@ -2620,6 +2680,9 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
   /// ATT is required for App Store approval.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_app_tracking_transparency',
@@ -2743,6 +2806,9 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_face_id_usage_description',
     problemMessage: 'Biometric authentication detected. iOS requires '
@@ -2843,6 +2909,9 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_photo_library_add_usage',
     problemMessage:
@@ -2933,6 +3002,9 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
   /// OAuth via WebView is blocked by identity providers.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_in_app_browser_for_auth',
@@ -3060,6 +3132,9 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_app_review_prompt_timing',
     problemMessage: 'App review request detected in initialization context. '
@@ -3176,6 +3251,9 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_keychain_accessibility',
     problemMessage:
@@ -3263,6 +3341,9 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
   /// Hardcoded bundle IDs cause deployment issues.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_bundle_id',
@@ -3357,6 +3438,9 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
   /// Missing push configuration causes silent failures.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_push_notification_capability',
@@ -3462,6 +3546,9 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_macos_file_access_intent',
     problemMessage:
@@ -3539,6 +3626,9 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
   /// Deprecated APIs may cause notarization issues.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_macos_deprecated_security_apis',
@@ -3629,6 +3719,9 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
   /// HTTP without ATS documentation causes confusion and potential issues.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_ats_exception_documentation',
@@ -3722,6 +3815,9 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_local_notification_permission',
     problemMessage:
@@ -3811,6 +3907,9 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_device_model',
     problemMessage:
@@ -3880,6 +3979,9 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
   /// Missing App Groups causes silent data sharing failures.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_app_group_capability',
@@ -3981,6 +4083,9 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_healthkit_authorization',
     problemMessage:
@@ -4063,6 +4168,9 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
   /// Hardened Runtime issues block notarization.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_macos_hardened_runtime',
@@ -4166,6 +4274,9 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_macos_catalyst_unsupported_apis',
     problemMessage: 'API detected that is not available on Mac Catalyst. '
@@ -4265,6 +4376,9 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_siri_intent_definition',
     problemMessage:
@@ -4359,6 +4473,12 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
   /// Missing widget extension setup causes silent failures.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_ios_widget_extension_capability',
@@ -4462,6 +4582,9 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_receipt_validation',
     problemMessage:
@@ -4540,6 +4663,9 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_database_conflict_resolution',
@@ -4627,6 +4753,9 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_continuous_location_tracking',
     problemMessage: 'Continuous location tracking detected with high accuracy. '
@@ -4678,6 +4807,9 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_background_audio_capability',
@@ -4748,6 +4880,9 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_ios_storekit2',
     problemMessage:
@@ -4802,6 +4937,9 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_app_clip_size_limit',
@@ -4885,6 +5023,9 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_keychain_sync_awareness',
     problemMessage:
@@ -4961,6 +5102,9 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_share_sheet_uti_declaration',
     problemMessage:
@@ -5011,6 +5155,9 @@ class RequireIosLifecycleHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_lifecycle_handling',
@@ -5076,6 +5223,9 @@ class RequireIosIcloudKvstoreLimitationsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_icloud_kvstore_limitations',
     problemMessage:
@@ -5119,6 +5269,9 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_accessibility_labels',
@@ -5180,6 +5333,9 @@ class RequireIosOrientationHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_orientation_handling',
     problemMessage:
@@ -5217,6 +5373,9 @@ class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_universal_links_domain_matching',
@@ -5265,6 +5424,9 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_nfc_capability_check',
@@ -5323,6 +5485,9 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_callkit_integration',
@@ -5393,6 +5558,9 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_carplay_setup',
     problemMessage:
@@ -5447,6 +5615,9 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_live_activities_setup',
@@ -5514,6 +5685,9 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_promotion_display_support',
     problemMessage:
@@ -5556,6 +5730,9 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_photo_library_limited_access',
@@ -5632,6 +5809,9 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_pasteboard_privacy_handling',
     problemMessage:
@@ -5677,6 +5857,9 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_background_refresh_declaration',
@@ -5739,6 +5922,9 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_scene_delegate_awareness',
@@ -5808,6 +5994,9 @@ class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_method_channel_cleanup',
     problemMessage:
@@ -5868,6 +6057,9 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_force_unwrap_in_callbacks',
     problemMessage:
@@ -5921,6 +6113,9 @@ class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_review_prompt_frequency',
     problemMessage:
@@ -5965,6 +6160,9 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_macos_window_restoration',
@@ -6022,6 +6220,9 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_deployment_target_consistency',
@@ -6086,6 +6287,9 @@ class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_dynamic_island_safe_zones',
     problemMessage:
@@ -6135,6 +6339,9 @@ class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_ios_app_intents_framework',
@@ -6188,6 +6395,9 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_macos_full_disk_access',
     problemMessage:
@@ -6237,6 +6447,9 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_age_rating_consideration',
@@ -6293,6 +6506,9 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_certificate_pinning',
@@ -6352,6 +6568,9 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_keychain_for_credentials',
@@ -6414,6 +6633,9 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_debug_code_in_release',
     problemMessage:
@@ -6465,6 +6687,9 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_biometric_fallback',
@@ -6519,6 +6744,9 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_macos_sandbox_entitlements',
     problemMessage: 'Feature requiring macOS sandbox entitlement detected. '
@@ -6567,6 +6795,9 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_misleading_push_notifications',
@@ -6657,6 +6888,9 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_running_isolates',
@@ -6750,6 +6984,9 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_workmanager_for_background',
     problemMessage:
@@ -6825,6 +7062,9 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_notification_for_long_tasks',
@@ -6935,6 +7175,9 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_delayed_permission_prompt',
     problemMessage: 'Permission request detected in main() or initState(). '
@@ -7021,6 +7264,9 @@ class AvoidNotificationSpamRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_notification_spam',
@@ -7112,6 +7358,9 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_purchase_verification',
@@ -7212,6 +7461,9 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_purchase_restoration',
     problemMessage: 'In-app purchase detected without restore functionality. '
@@ -7294,6 +7546,9 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_background_sync',
@@ -7386,6 +7641,9 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_sync_error_recovery',
@@ -7503,6 +7761,9 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_wifi_only_assumption',
     problemMessage: 'Large download without connectivity check. Users may have '
@@ -7575,6 +7836,9 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_low_power_mode_handling',
@@ -7657,6 +7921,9 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_accessibility_large_text',
@@ -7756,6 +8023,9 @@ class PreferIosContextMenuRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_ios_context_menu',
     problemMessage:
@@ -7836,6 +8106,9 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_quick_note_awareness',
     problemMessage:
@@ -7914,6 +8187,9 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_keyboard_height',
@@ -8008,6 +8284,9 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_multitasking_support',
     problemMessage:
@@ -8090,6 +8369,9 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_ios_spotlight_indexing',
     problemMessage:
@@ -8169,6 +8451,9 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_data_protection',
@@ -8268,6 +8553,9 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_ios_battery_drain_patterns',
     problemMessage: 'Pattern detected that may cause excessive battery drain. '
@@ -8359,6 +8647,9 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_macos_sandbox_exceptions',
     problemMessage: 'Feature requiring macOS sandbox entitlement detected. '
@@ -8442,6 +8733,9 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_macos_hardened_runtime_violations',
     problemMessage: 'Pattern detected that may violate macOS Hardened Runtime. '
@@ -8509,6 +8803,9 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_macos_app_transport_security',
@@ -8578,6 +8875,9 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_macos_notarization_ready',
@@ -8655,6 +8955,9 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_macos_entitlements',
     problemMessage: 'Feature detected that requires macOS entitlement. '
@@ -8730,6 +9033,9 @@ class RequireIosEntitlementsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_entitlements',
     problemMessage:
@@ -8794,6 +9100,9 @@ class RequireIosLaunchStoryboardRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_launch_storyboard',
@@ -8879,6 +9188,9 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_version_check',
     problemMessage:
@@ -8957,6 +9269,9 @@ class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_ios_focus_mode_awareness',
     problemMessage:
@@ -9027,6 +9342,9 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_ios_handoff_support',
@@ -9105,6 +9423,9 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_ios_voiceover_gesture_compatibility',

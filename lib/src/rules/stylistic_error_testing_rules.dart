@@ -49,6 +49,9 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_specific_exceptions',
     problemMessage: 'Throw specific exception types instead of generic Exception.',
@@ -102,6 +105,9 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_generic_exception',
@@ -164,6 +170,9 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_exception_suffix',
@@ -228,6 +237,9 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_error_suffix',
@@ -304,6 +316,9 @@ class PreferOnOverCatchRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_on_over_catch',
     problemMessage: 'Use "on ExceptionType" instead of bare "catch".',
@@ -363,6 +378,9 @@ class PreferCatchOverOnRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_catch_over_on',
@@ -432,6 +450,9 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_given_when_then_comments',
@@ -521,6 +542,9 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_self_documenting_tests',
     problemMessage: 'Avoid Arrange/Act/Assert comments - prefer self-documenting code.',
@@ -601,6 +625,12 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'prefer_expect_over_assert_in_tests',
     problemMessage: 'Use expect() instead of assert() in tests.',
@@ -664,6 +694,12 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_expectation_per_test',
@@ -759,6 +795,12 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_expectations',
     problemMessage: 'Consider grouping related assertions in one test.',
@@ -845,6 +887,9 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_should_when',
     problemMessage: 'Test names should follow "should X when Y" pattern.',
@@ -908,6 +953,9 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_descriptive',

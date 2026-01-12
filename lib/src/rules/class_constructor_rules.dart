@@ -30,6 +30,9 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_declaring_call_method',
     problemMessage:
@@ -74,6 +77,9 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_generics_shadowing',
@@ -163,6 +169,9 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_incomplete_copy_with',
     problemMessage:
@@ -248,6 +257,9 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_non_empty_constructor_bodies',
     problemMessage:
@@ -324,6 +336,9 @@ class AvoidShadowingRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_shadowing',
@@ -443,6 +458,9 @@ class PreferConstStringListRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_const_string_list',
     problemMessage: 'This <String>[...] list contains only string literals '
@@ -554,6 +572,9 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_declaring_const_constructor',
     problemMessage: 'Class could have a const constructor.',
@@ -640,6 +661,9 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_private_extension_type_field',
     problemMessage: 'Extension type representation field should be private.',
@@ -705,6 +729,9 @@ class ProperSuperCallsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'proper_super_calls',
@@ -796,6 +823,9 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unmarked_public_class',
     problemMessage: 'Public class lacks an explicit class modifier.',
@@ -858,6 +888,9 @@ class PreferFinalClassRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_final_class',
@@ -947,6 +980,9 @@ class PreferInterfaceClassRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_interface_class',
@@ -1046,6 +1082,9 @@ class PreferBaseClassRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_base_class',

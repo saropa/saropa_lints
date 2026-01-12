@@ -42,6 +42,9 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_unbounded_query',
     problemMessage:
@@ -134,6 +137,9 @@ class AvoidDatabaseInBuildRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_database_in_build',
@@ -244,6 +250,9 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_prefs_key_constants',
     problemMessage:
@@ -330,6 +339,9 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_secure_storage_on_web',
     problemMessage:
@@ -414,6 +426,9 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_prefs_for_large_data',
@@ -511,6 +526,9 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
   /// Each occurrence is a serious issue that should be fixed immediately.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_firebase_init_before_use',
@@ -636,6 +654,9 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_database_migration',
     problemMessage:
@@ -738,6 +759,9 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_database_index',
     problemMessage:
@@ -832,6 +856,9 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_transaction_for_batch',
@@ -933,6 +960,9 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_database_close',
     problemMessage:
@@ -1000,6 +1030,9 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_type_adapter_registration',
@@ -1090,6 +1123,9 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_box_for_large',
@@ -1195,6 +1231,9 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_event_name',
     problemMessage:
@@ -1291,6 +1330,9 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
   /// Critical issue. Invalid parameter names are silently dropped.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_parameter_name',
@@ -1391,6 +1433,9 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_firestore_batch_write',
     problemMessage: 'Multiple individual Firestore writes should be batched.',
@@ -1470,6 +1515,12 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_in_widget_build',
@@ -1560,6 +1611,9 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_remote_config_defaults',
     problemMessage: 'RemoteConfig should have defaults set before use.',
@@ -1634,6 +1688,9 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_fcm_token_refresh_handler',
@@ -1711,6 +1768,9 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_background_message_handler',
@@ -1791,6 +1851,9 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_map_markers_in_build',
     problemMessage: 'Creating map markers in build() causes flickering.',
@@ -1860,6 +1923,9 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_map_idle_callback',
     problemMessage: 'Data fetching should use onCameraIdle, not onCameraMove.',
@@ -1927,6 +1993,9 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_marker_clustering',
     problemMessage: 'Consider using marker clustering for better performance.',
@@ -1984,6 +2053,9 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
   /// Debugging improvement - not critical but helpful.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_crashlytics_user_id',
@@ -2074,6 +2146,9 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_firebase_app_check',
     problemMessage: 'Firebase initialization without App Check activation.',
@@ -2163,6 +2238,9 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
   /// Architectural issue - misuse of custom claims.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_storing_user_data_in_auth',
@@ -2258,6 +2336,9 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
   /// Medium impact - affects user experience on web.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_auth_persistence',

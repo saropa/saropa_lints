@@ -47,6 +47,9 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_notification_channel_android',
     problemMessage:
@@ -169,6 +172,9 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   /// Privacy/security issue that can expose passwords, tokens, PII.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_notification_payload_sensitive',
@@ -382,6 +388,9 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_notification_initialize_per_platform',
     problemMessage:
@@ -526,6 +535,9 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
   /// Medium impact - notifications may fire at wrong time, but not a crash.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_notification_timezone_awareness',
@@ -716,6 +728,9 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_notification_same_id',

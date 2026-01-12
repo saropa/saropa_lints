@@ -42,6 +42,9 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_public_api_documentation',
     problemMessage: 'Public API should be documented.',
@@ -108,6 +111,9 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_misleading_documentation',
     problemMessage: 'Documentation may not match the method name.',
@@ -169,6 +175,9 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_deprecation_message',
@@ -244,6 +253,9 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_complex_logic_comments',
     problemMessage: 'Complex method lacks explanatory comments.',
@@ -314,6 +326,9 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_parameter_documentation',
@@ -395,6 +410,9 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_return_documentation',
     problemMessage: 'Return value should be documented.',
@@ -464,6 +482,9 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_exception_documentation',
     problemMessage: 'Thrown exceptions should be documented.',
@@ -531,6 +552,9 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_example_in_documentation',

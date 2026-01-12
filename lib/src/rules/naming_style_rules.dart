@@ -18,6 +18,9 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_getter_prefix',
     problemMessage: "Getter name should not start with 'get'.",
@@ -71,6 +74,9 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_non_ascii_symbols',
     problemMessage: 'String contains non-ASCII characters.',
@@ -123,6 +129,9 @@ class FormatCommentRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'capitalize_comment',
@@ -198,6 +207,9 @@ class MatchClassNamePatternRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'match_class_name_pattern',
@@ -287,6 +299,9 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'match_getter_setter_field_names',
     problemMessage: 'Getter/setter name should match the backing field.',
@@ -365,6 +380,9 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'match_lib_folder_structure',
     problemMessage: 'Test file location should mirror lib folder structure.',
@@ -408,6 +426,9 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'match_positional_field_names_on_assignment',
@@ -491,6 +512,9 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes',
@@ -686,6 +710,9 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_locals',
     problemMessage:
@@ -854,6 +881,9 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_params',
@@ -1059,6 +1089,9 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_correct_callback_field_name',
     problemMessage: "Callback field should be named with 'on' prefix.",
@@ -1182,6 +1215,9 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_error_name',
@@ -1311,6 +1347,9 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_correct_identifier_length',
     problemMessage: 'Identifier name length is not ideal.',
@@ -1407,6 +1446,9 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_correct_setter_parameter_name',
     problemMessage: 'Setter parameter should be named "value".',
@@ -1467,6 +1509,9 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_parameter_names',
     problemMessage: 'Function type parameters should have names.',
@@ -1505,6 +1550,9 @@ class PreferMatchFileNameRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_match_file_name',
@@ -1569,6 +1617,9 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_prefixed_global_constants',
     problemMessage: 'Global constant should have a descriptive prefix.',
@@ -1632,6 +1683,9 @@ class TagNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_kebab_tag_name',
     problemMessage: 'Tag name should follow naming conventions.',
@@ -1694,6 +1748,9 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_named_extensions',
     problemMessage: 'Anonymous extension should be named.',
@@ -1739,6 +1796,9 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_typedef_for_callbacks',
@@ -1808,6 +1868,9 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_enhanced_enums',

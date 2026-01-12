@@ -461,6 +461,7 @@ PACKAGE_TO_RELEVANT_RULES: dict[str, list[RelevantRule]] = {
 # Packages that ALREADY have rules in saropa_lints
 # =============================================================================
 
+# cspell:ignore require_sqflite_whereargs
 SAROPA_LINTS_COVERAGE: dict[str, RuleCoverage] = {
     # Database
     "isar": RuleCoverage(
@@ -881,7 +882,7 @@ DEFAULT_RULES_BY_CATEGORY: dict[str, list[SuggestedRule]] = {
 # =============================================================================
 # CATEGORIES
 # =============================================================================
-
+# cspell:ignore beamer
 CATEGORIES: dict[str, list[str]] = {
     "Database": ["isar", "hive", "sqflite", "drift", "objectbox"],
     "Firebase": ["firebase_core", "firebase_analytics", "firebase_crashlytics", "firebase_messaging",

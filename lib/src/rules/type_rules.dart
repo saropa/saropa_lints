@@ -38,6 +38,9 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_casting_to_extension_type',
     problemMessage: 'Avoid casting to extension types.',
@@ -94,6 +97,9 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_collection_methods_with_unrelated_types',
@@ -208,6 +214,9 @@ class AvoidDynamicRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic',
     problemMessage: "Avoid using 'dynamic' type.",
@@ -254,6 +263,9 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_implicitly_nullable_extension_types',
@@ -302,6 +314,9 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_interpolation',
@@ -354,6 +369,9 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_parameters_with_default_values',
@@ -415,6 +433,9 @@ class AvoidNullableToStringRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_tostring',
@@ -490,6 +511,9 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_null_assertion',
@@ -1599,6 +1623,9 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_type_assertions',
     problemMessage: 'Unnecessary type assertion. '
@@ -1662,6 +1689,9 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_type_casts',
     problemMessage: 'Unnecessary type cast. '
@@ -1724,6 +1754,9 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_assertions',
@@ -1808,6 +1841,9 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_type_name',
@@ -1904,6 +1940,9 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_function_type',

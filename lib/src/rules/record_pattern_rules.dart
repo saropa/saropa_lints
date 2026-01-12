@@ -31,6 +31,9 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_patterns',
     problemMessage:
@@ -84,6 +87,9 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_records',
@@ -153,6 +159,9 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_explicit_pattern_field_name',
@@ -254,6 +263,9 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_extensions_on_records',
     problemMessage:
@@ -302,6 +314,9 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_function_type_in_records',
@@ -357,6 +372,9 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_keywords_in_wildcard_pattern',
@@ -464,6 +482,9 @@ class AvoidLongRecordsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const int _maxFields = 5;
 
   static const LintCode _code = LintCode(
@@ -521,6 +542,9 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_mixing_named_and_positional_fields',
@@ -584,6 +608,9 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_records',
     problemMessage: 'Avoid nested record types.',
@@ -638,6 +665,9 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_one_field_records',
@@ -725,6 +755,9 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_positional_field_name',
     problemMessage: 'Positional record field uses redundant default name.',
@@ -778,6 +811,9 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_single_field_destructuring',
@@ -836,6 +872,9 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const int _maxInlineFields = 3;
 
@@ -950,6 +989,9 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_patterns_null_check',
     problemMessage: 'Consider simpler null check pattern.',
@@ -1000,6 +1042,9 @@ class PreferWildcardPatternRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_pattern',
@@ -1054,6 +1099,9 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_record_fields',

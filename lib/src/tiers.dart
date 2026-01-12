@@ -433,6 +433,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_analytics_in_build',
   'avoid_json_encode_in_build',
   'avoid_canvas_operations_in_build',
+  'prefer_expanded_at_call_site', // WARNING - Expanded in build() couples to Flex parent
 
   // Scroll and List Performance
   'avoid_shrinkwrap_in_scrollview',

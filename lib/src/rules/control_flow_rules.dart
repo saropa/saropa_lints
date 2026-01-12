@@ -29,6 +29,9 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_assignments_as_conditions',
     problemMessage:
@@ -118,6 +121,9 @@ class AvoidCollapsibleIfRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_collapsible_if',
@@ -214,6 +220,9 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditions_with_boolean_literals',
@@ -335,6 +344,9 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_constant_assert_conditions',
     problemMessage: 'Assert has a constant condition that is always {0}.',
@@ -410,6 +422,9 @@ class AvoidConstantSwitchesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_constant_switches',
     problemMessage: 'Switch expression is a constant value.',
@@ -471,6 +486,9 @@ class AvoidContinueRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_continue',
     problemMessage: 'Avoid using the continue statement.',
@@ -511,6 +529,9 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_switch_case_conditions',
@@ -581,6 +602,9 @@ class AvoidIfWithManyBranchesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_if_with_many_branches',
     problemMessage: 'If statement has too many branches (max 4).',
@@ -639,6 +663,9 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_inverted_boolean_checks',
@@ -749,6 +776,9 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_negated_conditions',
@@ -875,6 +905,9 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_assignments',
     problemMessage: 'Avoid using assignment inside another expression.',
@@ -917,6 +950,9 @@ class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_conditional_expressions',
@@ -971,6 +1007,9 @@ class AvoidNestedSwitchesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switches',
@@ -1039,6 +1078,9 @@ class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switch_expressions',
     problemMessage: 'Avoid nested switch expressions.',
@@ -1088,6 +1130,9 @@ class AvoidNestedTryRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try',
@@ -1214,6 +1259,9 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unconditional_break',
     problemMessage:
@@ -1289,6 +1337,9 @@ class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_conditionals',
@@ -1427,6 +1478,9 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_if',
     problemMessage: 'Unnecessary if statement.',
@@ -1510,6 +1564,9 @@ class NoEqualConditionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'no_equal_conditions',
     problemMessage: 'Duplicate condition in if-else chain.',
@@ -1576,6 +1633,9 @@ class NoEqualThenElseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'no_equal_then_else',
     problemMessage: 'If and else branches have identical code.',
@@ -1624,6 +1684,9 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_conditional_expressions',
@@ -1704,6 +1767,9 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const int _minCases = 2;
 
   static const LintCode _code = LintCode(
@@ -1758,6 +1824,9 @@ class PreferEarlyReturnRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
@@ -1833,6 +1902,9 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditionals',
@@ -1926,6 +1998,9 @@ class PreferReturningConditionRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_condition',
@@ -2103,6 +2178,9 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_boolean_expressions',

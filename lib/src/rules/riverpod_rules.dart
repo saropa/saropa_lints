@@ -51,6 +51,12 @@ class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.high;
 
   @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -115,6 +121,12 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   @override
   void runWithReporter(
@@ -190,6 +202,12 @@ class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.critical;
 
   @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -254,6 +272,12 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   @override
   void runWithReporter(
@@ -331,6 +355,12 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   @override
   void runWithReporter(
@@ -413,6 +443,12 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   /// Flutter notifier types that should NOT trigger this rule.
   static const Set<String> _flutterNotifierTypes = <String>{
@@ -584,6 +620,12 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   /// Known Riverpod Notifier base class names.
   static const Set<String> _notifierBaseClasses = <String>{
     'Notifier',
@@ -664,6 +706,12 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -713,6 +761,12 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_consumer_widgets',
@@ -795,6 +849,12 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_async_value_pattern',
     problemMessage: 'Avoid nullable access on AsyncValue.',
@@ -867,6 +927,12 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'require_riverpod_error_handling',
     problemMessage:
@@ -927,6 +993,12 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_state_mutation',
@@ -1007,6 +1079,12 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_select',
     problemMessage:
@@ -1071,6 +1149,12 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'require_flutter_riverpod_package',
     problemMessage: 'Use flutter_riverpod instead of riverpod in Flutter apps.',
@@ -1123,6 +1207,12 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   /// Memory leaks from retained providers.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_auto_dispose',
@@ -1205,6 +1295,12 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
   /// Improves type safety and cache behavior.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_family_for_params',

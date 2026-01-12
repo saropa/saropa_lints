@@ -58,6 +58,9 @@ class AvoidStoringContextRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_storing_context',
     problemMessage:
@@ -200,6 +203,9 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   /// Context after await can crash when widget is disposed.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_across_async',
@@ -411,6 +417,9 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_await_in_static',
     problemMessage:
@@ -547,6 +556,9 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
   /// Risky pattern that can lead to crashes.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_async_static',
@@ -688,6 +700,9 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
   /// Discouraged pattern but generally safe for sync methods.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_static_methods',

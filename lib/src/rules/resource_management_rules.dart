@@ -50,6 +50,9 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_file_close_in_finally',
     problemMessage: 'File handle should be closed in finally block.',
@@ -159,6 +162,9 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_database_close',
     problemMessage: 'Database connection should be closed.',
@@ -236,6 +242,9 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_http_client_close',
     problemMessage: 'HttpClient should be closed when done.',
@@ -297,6 +306,9 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
   /// Each occurrence is a memory leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_native_resource_cleanup',
@@ -386,6 +398,9 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
   /// Each occurrence is a resource leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_close',
@@ -481,6 +496,9 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_platform_channel_cleanup',
     problemMessage: 'Platform channel handler should be removed in dispose.',
@@ -573,6 +591,9 @@ class RequireIsolateKillRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_isolate_kill',
     problemMessage: 'Spawned Isolate should be killed when done.',
@@ -649,6 +670,12 @@ class RequireCameraDisposeRule extends SaropaLintRule {
   /// Each occurrence is a critical resource leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_camera_dispose',
@@ -832,6 +859,9 @@ class RequireImageCompressionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_image_compression',
     problemMessage:
@@ -945,6 +975,9 @@ class PreferCoarseLocationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_coarse_location_when_sufficient',
     problemMessage:
@@ -1010,6 +1043,9 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
   /// UX bug that affects user experience.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_without_source',
@@ -1126,6 +1162,9 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_accuracy_appropriate',
     problemMessage:
@@ -1191,6 +1230,9 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
   /// Battery optimization opportunity.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_last_known',
@@ -1265,6 +1307,9 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
   /// Poor UX from repeated picker dialogs.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_multi_selection',

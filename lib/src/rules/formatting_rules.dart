@@ -41,6 +41,9 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_case',
     problemMessage: 'Add a newline before case clause for readability.',
@@ -110,6 +113,9 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_constructor',
@@ -191,6 +197,9 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_method',
     problemMessage: 'Add a blank line before method declaration.',
@@ -255,6 +264,9 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_return',
@@ -351,6 +363,9 @@ class PreferTrailingCommaRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma',
@@ -507,6 +522,9 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'unnecessary_trailing_comma',
     problemMessage: 'Unnecessary trailing comma for single-element collection.',
@@ -624,6 +642,9 @@ class FormatCommentFormattingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'format_comment',
     problemMessage: 'Comment does not follow formatting conventions.',
@@ -723,6 +744,9 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'member_ordering',
     problemMessage: 'Class members are not in conventional order.',
@@ -790,6 +814,9 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'parameters_ordering',
@@ -874,6 +901,9 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'enum_constants_ordering',

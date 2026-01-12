@@ -35,6 +35,9 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_bitwise_operators_with_booleans',
     problemMessage:
@@ -98,6 +101,9 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_cascade_after_if_null',
     problemMessage: 'Cascade after ?? may have unexpected precedence.',
@@ -150,6 +156,9 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const int _maxOperators = 4;
 
@@ -226,6 +235,9 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const int _maxOperators = 3;
 
@@ -310,6 +322,9 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_cascades',
     problemMessage: 'Duplicate cascade operation detected.',
@@ -365,6 +380,9 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const int _maxOperators = 5;
 
@@ -437,6 +455,9 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_immediately_invoked_functions',
     problemMessage: 'Function is immediately invoked after definition.',
@@ -477,6 +498,9 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_shorthands',
@@ -544,6 +568,9 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_multi_assignment',
     problemMessage: 'Multiple chained assignments detected.',
@@ -609,6 +636,9 @@ class PreferMovingToVariableRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_moving_to_variable',
@@ -688,6 +718,9 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_parentheses_with_if_null',

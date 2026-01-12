@@ -79,6 +79,9 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_initialization',
     problemMessage:
@@ -143,6 +146,9 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_hive_type_adapter',
@@ -235,6 +241,9 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
     problemMessage: 'Hive box opened but not closed in dispose. Resource leak.',
@@ -316,6 +325,9 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
     problemMessage: 'Sensitive data stored in unencrypted Hive box.',
@@ -390,6 +402,9 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_hive_encryption_key_secure',
@@ -473,6 +488,9 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_database_close',
     problemMessage:
@@ -540,6 +558,9 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_type_adapter_registration',
@@ -630,6 +651,9 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_box_for_large',
@@ -744,6 +768,9 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_type_id_management',
     problemMessage:
@@ -823,6 +850,9 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hive_field_index_reuse',
@@ -929,6 +959,9 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_field_default_value',
     problemMessage:
@@ -1012,6 +1045,9 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
   /// Wrong order causes runtime crash.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_hive_adapter_registration_order',
@@ -1125,6 +1161,9 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_nested_object_adapter',
     problemMessage:
@@ -1214,6 +1253,9 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_hive_box_name_collision',
     problemMessage:
@@ -1301,6 +1343,9 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
   /// UI may not update after Hive changes.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_value_listenable',

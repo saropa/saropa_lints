@@ -57,6 +57,9 @@ class PreferBlankLineBeforeReturnRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_return',
     problemMessage: 'Add a blank line before the return statement.',
@@ -127,6 +130,9 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_no_blank_line_before_return',
@@ -200,6 +206,9 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_after_declarations',
     problemMessage: 'Add a blank line after variable declarations.',
@@ -271,6 +280,9 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_compact_declarations',
@@ -345,6 +357,9 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_blank_lines_between_members',
     problemMessage: 'Add a blank line between class members.',
@@ -416,6 +431,9 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_compact_class_members',
     problemMessage: 'Remove blank lines between class members.',
@@ -482,6 +500,12 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'prefer_no_blank_line_inside_blocks',
@@ -555,6 +579,9 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_single_blank_line_max',
     problemMessage: 'Use at most one consecutive blank line.',
@@ -626,6 +653,9 @@ class PreferSuperParametersRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_super_parameters',
@@ -702,6 +732,9 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_initializing_formals',
     problemMessage: 'Use this.field syntax instead of initializer list.',
@@ -771,6 +804,9 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_body_assignment',
     problemMessage: 'Use explicit initializer instead of this.field syntax.',
@@ -836,6 +872,9 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_factory_for_validation',
@@ -920,6 +959,9 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_assertion',
     problemMessage: 'Consider using constructor assertion instead of factory.',
@@ -990,6 +1032,9 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_required_before_optional',
     problemMessage: 'Put required parameters before optional parameters.',
@@ -1048,6 +1093,9 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_by_purpose',
@@ -1125,6 +1173,9 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_rethrow_over_throw_e',

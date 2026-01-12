@@ -56,6 +56,12 @@ class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_initstate_dispose',
     problemMessage: "Avoid using 'context' in initState or dispose. "
@@ -216,6 +222,12 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_empty_setstate',
     problemMessage: 'Empty setState callback has no effect.',
@@ -277,6 +289,12 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_as_spacer',
@@ -351,6 +369,12 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_flexible_outside_flex',
     problemMessage: 'Flexible/Expanded used outside of Row, Column, or Flex.',
@@ -422,6 +446,12 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_image_opacity',
@@ -504,6 +534,12 @@ class AvoidLateContextRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_late_context',
@@ -615,6 +651,12 @@ class AvoidMisnamedPaddingRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_misnamed_padding',
@@ -746,6 +788,12 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_missing_image_alt',
     problemMessage: 'Image is missing semanticLabel for accessibility.',
@@ -833,6 +881,12 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_mounted_in_setstate',
     problemMessage: 'Avoid checking mounted inside setState callback.',
@@ -887,6 +941,12 @@ class AvoidReturningWidgetsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_widgets',
@@ -995,6 +1055,12 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_single_child_column_row',
     problemMessage: 'Column/Row with single child is unnecessary.',
@@ -1069,6 +1135,12 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_state_constructors',
     problemMessage: 'State class should not have constructor body.',
@@ -1125,6 +1197,12 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateless_widget_initialized_fields',
@@ -1187,6 +1265,12 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_gesture_detector',
@@ -1312,6 +1396,12 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_setstate',
     problemMessage: 'setState called in lifecycle method where not needed.',
@@ -1398,6 +1488,12 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_stateful_widgets',
     problemMessage: 'StatefulWidget may be unnecessary.',
@@ -1468,6 +1564,12 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_unremovable_callbacks_in_listeners',
@@ -1543,6 +1645,12 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_setstate',
@@ -1721,6 +1829,12 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_wrapping_in_padding',
@@ -1941,6 +2055,12 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'consistent_update_render_object',
     problemMessage:
@@ -2060,6 +2180,12 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_border_radius',
@@ -2238,6 +2364,12 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_define_hero_tag',
     problemMessage: 'Hero widget should have an explicit tag.',
@@ -2317,6 +2449,12 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_single_widget_per_file',
     problemMessage: 'File contains multiple public widget classes.',
@@ -2382,6 +2520,12 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_prefix',
@@ -2476,6 +2620,12 @@ class PreferTextRichRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich',
@@ -2720,6 +2870,12 @@ class RequireDisposeRule extends SaropaLintRule {
   /// Each occurrence is a serious issue that should be fixed immediately.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_dispose',
@@ -2996,6 +3152,12 @@ class RequireTimerCancellationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_timer_cancellation',
     problemMessage:
@@ -3207,6 +3369,12 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'nullify_after_dispose',
     problemMessage:
@@ -3371,6 +3539,12 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'use_setstate_synchronously',
     problemMessage: 'setState called after async gap without mounted check.',
@@ -3524,6 +3698,12 @@ class AlwaysRemoveListenerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'always_remove_listener',
     problemMessage: 'Listener added but may not be removed.',
@@ -3664,6 +3844,12 @@ class AvoidBorderAllRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_border_all',
     problemMessage: 'Prefer Border.fromBorderSide for const borders.',
@@ -3728,6 +3914,12 @@ class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_deeply_nested_widgets',
@@ -3842,6 +4034,12 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_animation_disposal',
@@ -3970,6 +4168,12 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_uncontrolled_text_field',
@@ -4105,6 +4309,12 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_print_in_production',
     problemMessage: 'Avoid using print() in production code.',
@@ -4209,6 +4419,12 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_catching_generic_exception',
     problemMessage: 'Avoid catching generic exceptions.',
@@ -4272,6 +4488,12 @@ class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_overuse',
@@ -4343,6 +4565,12 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_utc_datetimes',
     problemMessage: 'Consider using UTC DateTime for storage/transmission.',
@@ -4404,6 +4632,12 @@ class AvoidRegexInLoopRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_regex_in_loop',
@@ -4479,6 +4713,12 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_getter_over_method',
@@ -4564,6 +4804,12 @@ class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_callback_parameters',
@@ -4724,6 +4970,12 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_scaffold_messenger_after_await',
     problemMessage:
@@ -4810,6 +5062,12 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_build_context_in_providers',
     problemMessage: 'Storing BuildContext in providers can cause memory leaks.',
@@ -4882,6 +5140,12 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_semantic_widget_names',
     problemMessage: 'Consider using a more semantic widget.',
@@ -4951,6 +5215,12 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor',
@@ -5084,6 +5354,12 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_image_without_cache',
     problemMessage:
@@ -5149,6 +5425,12 @@ class PreferSplitWidgetConstRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_split_widget_const',
@@ -5220,6 +5502,12 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_without_route_name',
     problemMessage: 'Prefer named routes for better navigation management.',
@@ -5271,6 +5559,12 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_widget_keys',
@@ -5354,6 +5648,12 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_consumer',
     problemMessage:
@@ -5413,6 +5713,12 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_unrestricted_text_field_length',
     problemMessage:
@@ -5468,6 +5774,12 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_scaffold_messenger_maybeof',
     problemMessage:
@@ -5517,6 +5829,12 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_key',
@@ -5637,6 +5955,12 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_mediaquery_in_build',
     problemMessage: 'Use specific MediaQuery methods instead of MediaQuery.of.',
@@ -5687,6 +6011,12 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list_delegate',
@@ -5749,6 +6079,12 @@ class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_misuse',
@@ -5830,6 +6166,12 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_repaint_boundary_misuse',
     problemMessage:
@@ -5892,6 +6234,12 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   // cspell:ignore singlechildscrollview
   static const LintCode _code = LintCode(
@@ -5971,6 +6319,12 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_cached_network_image',
     problemMessage: 'Consider using CachedNetworkImage for better caching.',
@@ -6021,6 +6375,12 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_detector_in_scrollview',
@@ -6089,6 +6449,12 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_widget_in_list',
@@ -6173,6 +6539,12 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_opacity_widget',
@@ -6392,6 +6764,12 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_undisposed_instances',
     problemMessage: 'Disposable instance may not be properly disposed.',
@@ -6588,6 +6966,12 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides_in_state',
     problemMessage: 'Override only calls super with no additional logic.',
@@ -6661,6 +7045,12 @@ class DisposeFieldsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'dispose_fields',
@@ -6771,6 +7161,12 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'pass_existing_future_to_future_builder',
     problemMessage:
@@ -6841,6 +7237,12 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'pass_existing_stream_to_stream_builder',
@@ -7001,6 +7403,12 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_font_weight_as_number',
     problemMessage: 'Use named FontWeight constants instead of numeric values.',
@@ -7096,6 +7504,12 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_for_whitespace',
@@ -7263,6 +7677,12 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scaffolds',
     problemMessage: 'Avoid nesting Scaffold widgets inside other Scaffolds.',
@@ -7404,6 +7824,12 @@ class AvoidRawKeyboardListenerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_raw_keyboard_listener',
     problemMessage:
@@ -7486,6 +7912,12 @@ class AvoidImageRepeatRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_repeat',
@@ -7584,6 +8016,12 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_inkwell_over_gesture',
@@ -7699,6 +8137,12 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_fitted_box_for_text',
     problemMessage: 'Avoid using FittedBox to scale Text widgets.',
@@ -7759,6 +8203,12 @@ class PreferListViewBuilderRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_listview_builder',
@@ -7825,6 +8275,12 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_animation',
@@ -7960,6 +8416,12 @@ class PreferSelectableTextRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_selectable_text',
     problemMessage: 'Consider using SelectableText for long content.',
@@ -8044,6 +8506,12 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_spacing_over_sizedbox',
@@ -8165,6 +8633,12 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_material2_fallback',
     problemMessage: 'Avoid explicitly disabling Material 3.',
@@ -8280,6 +8754,12 @@ class PreferOverlayPortalRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_overlay_portal',
@@ -8429,6 +8909,12 @@ class PreferSearchAnchorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_search_anchor',
     problemMessage:
@@ -8497,6 +8983,12 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_tap_region_for_dismiss',
@@ -8601,6 +9093,12 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_handling',
@@ -8732,6 +9230,12 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_image_error_builder',
@@ -8938,6 +9442,12 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_placeholder_for_network',
@@ -9238,6 +9748,12 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_focus_node_dispose',
     problemMessage: 'FocusNode is not disposed. This causes memory leaks.',
@@ -9451,6 +9967,12 @@ class PreferTextThemeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_text_theme',
     problemMessage:
@@ -9526,6 +10048,12 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables',
@@ -9627,6 +10155,12 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_layout_values',
@@ -9754,6 +10288,12 @@ class PreferIgnorePointerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_ignore_pointer',
     problemMessage:
@@ -9807,6 +10347,12 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_without_behavior',
@@ -9974,6 +10520,12 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_cursor_for_buttons',
     problemMessage: 'Interactive widget should specify mouse cursor for web.',
@@ -10048,6 +10600,12 @@ class RequireHoverStatesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_hover_states',
@@ -10125,6 +10683,12 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_button_loading_state',
@@ -10226,6 +10790,12 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_text_styles',
     problemMessage: 'Avoid inline TextStyle with hardcoded values.',
@@ -10310,6 +10880,12 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_page_storage_key',
     problemMessage:
@@ -10388,6 +10964,12 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator',
@@ -10478,6 +11060,12 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_scroll_physics',
     problemMessage: 'Scrollable widget should specify scroll physics.',
@@ -10552,6 +11140,12 @@ class PreferSliverListRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list',
     problemMessage:
@@ -10623,6 +11217,12 @@ class PreferKeepAliveRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_keep_alive',
@@ -10701,6 +11301,12 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_default_text_style',
     problemMessage:
@@ -10771,6 +11377,12 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_wrap_over_overflow',
@@ -10845,6 +11457,12 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_asset_image_for_local',
     problemMessage: 'Use AssetImage for bundled assets, not FileImage.',
@@ -10905,6 +11523,12 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_fit_cover_for_background',
@@ -10972,6 +11596,12 @@ class RequireDisabledStateRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_disabled_state',
@@ -11056,6 +11686,12 @@ class RequireDragFeedbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_drag_feedback',
     problemMessage: 'Draggable should have feedback widget.',
@@ -11119,6 +11755,12 @@ class AvoidGestureConflictRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_conflict',
@@ -11255,6 +11897,12 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_in_scrollable',
     problemMessage:
@@ -11327,6 +11975,12 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_intrinsic_dimensions',
@@ -11409,6 +12063,12 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_actions_and_shortcuts',
@@ -11535,6 +12195,12 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_find_child_in_build',
     problemMessage: 'findChildIndexCallback should not be created in build.',
@@ -11604,6 +12270,12 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_constraints',
@@ -11692,6 +12364,12 @@ class PreferFractionalSizingRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_fractional_sizing',
@@ -11836,6 +12514,12 @@ class RequireErrorWidgetRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_error_widget',
     problemMessage: 'FutureBuilder/StreamBuilder should handle error state.',
@@ -11902,6 +12586,12 @@ class PreferSliverAppBarRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_app_bar',
     problemMessage: 'Use SliverAppBar inside CustomScrollView, not AppBar.',
@@ -11965,6 +12655,12 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_misuse',
     problemMessage: 'Use AnimatedOpacity for opacity animations.',
@@ -12026,6 +12722,12 @@ class PreferClipBehaviorRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_clip_behavior',
@@ -12157,6 +12859,12 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_positioned_directional',
     problemMessage: 'Use PositionedDirectional for RTL support.',
@@ -12224,6 +12932,12 @@ class AvoidStackOverflowRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_stack_overflow',
@@ -12398,6 +13112,12 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_in_scroll',
     problemMessage:
@@ -12484,6 +13204,12 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_deep_widget_nesting',
     problemMessage: 'Widget tree exceeds 15 levels of nesting.',
@@ -12564,6 +13290,12 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_aware',
@@ -12674,6 +13406,12 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_fixed_dimensions',
     problemMessage: 'Fixed pixel dimensions may not work on all screen sizes.',
@@ -12755,6 +13493,12 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_theme_color_from_scheme',
@@ -12852,6 +13596,12 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_color_scheme_from_seed',
     problemMessage:
@@ -12938,6 +13688,12 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_rich_text_for_complex',
     problemMessage:
@@ -13017,6 +13773,12 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_system_theme_default',
@@ -13106,6 +13868,12 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_absorb_pointer_misuse',
@@ -13331,6 +14099,12 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_cupertino_for_ios_feel',
     problemMessage:
@@ -13400,6 +14174,12 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_url_strategy_for_web',
     problemMessage:
@@ -13468,6 +14248,12 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
   /// Users may accidentally make window too small to use.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_window_size_constraints',
@@ -13555,6 +14341,12 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
   /// App works but power users may find it less productive.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_keyboard_shortcuts',
@@ -13656,6 +14448,12 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_widget_methods',
     problemMessage: 'Avoid methods that return nullable Widget? types.',
@@ -13733,6 +14531,12 @@ class RequireOverflowBoxRationaleRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_overflow_box_rationale',
@@ -13847,6 +14651,12 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
   /// Layout shifts affect user experience and CLS scores.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_unconstrained_images',
@@ -14006,6 +14816,12 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   /// Style preference. Large counts acceptable.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_square',
@@ -14170,6 +14986,12 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_center_over_align',
     problemMessage:
@@ -14327,6 +15149,12 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
   /// Style preference. Large counts acceptable.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_align_over_container',
@@ -14493,6 +15321,12 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_padding_over_container',
     problemMessage:
@@ -14657,6 +15491,12 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
   /// Style preference. Large counts acceptable.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_box_over_container',
@@ -14823,6 +15663,12 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_transform_over_container',
     problemMessage: 'Container with only transform should be a Transform.',
@@ -14895,6 +15741,12 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_action_button_tooltip',
     problemMessage: 'IconButton should have a tooltip for accessibility.',
@@ -14959,6 +15811,12 @@ class PreferVoidCallbackRule extends SaropaLintRule {
   /// Style improvement.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_void_callback',
@@ -15059,6 +15917,12 @@ class RequireShouldRebuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_should_rebuild',
     problemMessage:
@@ -15144,6 +16008,12 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_orientation_handling',
     problemMessage:
@@ -15220,6 +16090,12 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
   /// Platform compatibility issue.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_web_renderer_awareness',
@@ -15313,6 +16189,12 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_super_dispose_call',
     problemMessage: 'dispose() must call super.dispose().',
@@ -15380,6 +16262,12 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_super_init_state_call',
     problemMessage: 'initState() must call super.initState().',
@@ -15446,6 +16334,12 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_set_state_in_dispose',
@@ -15531,6 +16425,12 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_navigation_in_build',
@@ -15640,6 +16540,12 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_text_form_field_in_form',
     problemMessage:
@@ -15729,6 +16635,12 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_webview_navigation_delegate',
     problemMessage:
@@ -15816,6 +16728,12 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_physics_for_nested_scroll',
@@ -15911,6 +16829,12 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_animated_builder_child',
     problemMessage:
@@ -15978,6 +16902,12 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_rethrow_preserve_stack',
     problemMessage: 'throw e loses stack trace. Use rethrow instead.',
@@ -16041,6 +16971,12 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_https_over_http',
     problemMessage: 'HTTP is insecure. Use HTTPS instead.',
@@ -16087,6 +17023,12 @@ class RequireWssOverWsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_wss_over_ws',
@@ -16152,6 +17094,12 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_late_without_guarantee',
@@ -16236,6 +17184,12 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_image_picker_permission_ios',
     problemMessage:
@@ -16281,6 +17235,12 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_image_picker_permission_android',
@@ -16329,6 +17289,12 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_permission_manifest_android',
     problemMessage:
@@ -16374,6 +17340,12 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_permission_plist_ios',
@@ -16425,6 +17397,12 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_queries_android',
     problemMessage:
@@ -16474,6 +17452,12 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_schemes_ios',
@@ -16537,6 +17521,12 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_stack_without_positioned',
@@ -16619,7 +17609,7 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 /// Expanded and Flexible only work inside Flex widgets (Row, Column, Flex).
 /// Using them elsewhere causes runtime errors.
 ///
-/// **BAD:**
+/// **BAD - Inside non-Flex container:**
 /// ```dart
 /// Stack(
 ///   children: [
@@ -16628,7 +17618,16 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 /// )
 /// ```
 ///
-/// **GOOD:**
+/// **BAD - Wrapped by RenderObject widgets:**
+/// ```dart
+/// class _MyWidget extends StatelessWidget {
+///   Widget build(BuildContext context) => Expanded(child: Text('Hi'));
+/// }
+/// // Usage: Row(children: [Padding(child: _MyWidget())]) // CRASH!
+/// // The Padding breaks the Flex→Expanded parent chain.
+/// ```
+///
+/// **GOOD - Direct child of Flex:**
 /// ```dart
 /// Column(
 ///   children: [
@@ -16636,12 +17635,36 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 ///   ],
 /// )
 /// ```
+///
+/// **GOOD - Assigned to variable, used in Flex:**
+/// ```dart
+/// final content = Expanded(child: Text('Hi'));
+/// return Column(children: [content]); // OK - lint trusts variable usage
+/// ```
+///
+/// ## False Positives
+///
+/// This rule may flag widgets that return Expanded from `build()` when the
+/// widget is always used inside a Flex. Use `// ignore: avoid_expanded_outside_flex`
+/// if you're certain the widget is only used as a direct Flex child.
+///
+/// ## Design Guidance
+///
+/// Prefer adding Expanded at the **call site** rather than inside widget
+/// definitions. This makes the flex behavior explicit and avoids crashes
+/// when the widget is wrapped with Padding, GestureDetector, etc.
 class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   const AvoidExpandedOutsideFlexRule() : super(code: _code);
 
   /// Expanded/Flexible outside Flex causes runtime crash.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_outside_flex',
@@ -16724,6 +17747,193 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   }
 }
 
+/// Warns when a widget's build() method returns Expanded/Flexible directly.
+///
+/// Alias: expanded_in_build, flexible_in_build
+///
+/// Returning Expanded/Flexible from build() couples the widget to Flex parents.
+/// If the widget is later wrapped (e.g., with Padding), it will crash.
+/// Better design: let the caller add Expanded where needed.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyWidget extends StatelessWidget {
+///   Widget build(BuildContext context) => Expanded(
+///     child: Column(children: [...]),
+///   );
+/// }
+/// // Risk: Row(children: [_MyWidget().withPadding(...)]) crashes!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidget extends StatelessWidget {
+///   Widget build(BuildContext context) => Column(
+///     mainAxisSize: MainAxisSize.min,
+///     children: [...],
+///   );
+/// }
+/// // Caller controls: Row(children: [Expanded(child: _MyWidget())])
+/// ```
+///
+/// **Quick fix available:** Adds a `HACK` comment to mark for manual refactoring.
+///
+/// ## When to Ignore
+///
+/// Use `// ignore: prefer_expanded_at_call_site` if the widget is intentionally
+/// designed to always be a direct Flex child and will never be wrapped.
+class PreferExpandedAtCallSiteRule extends SaropaLintRule {
+  const PreferExpandedAtCallSiteRule() : super(code: _code);
+
+  /// Design guidance - not a crash, but risky pattern.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => <FileType>{FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_expanded_at_call_site',
+    problemMessage:
+        'Avoid returning Expanded/Flexible from build(). Add it at the call site instead.',
+    correctionMessage:
+        'Return the child widget directly and let the caller wrap with Expanded if needed.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _flexChildTypes = <String>{
+    'Expanded',
+    'Flexible',
+  };
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferExpandedAtCallSiteFix()];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only check build() methods
+      if (node.name.lexeme != 'build') return;
+
+      // Check all return expressions in the method
+      _checkReturnExpressions(node, reporter);
+    });
+  }
+
+  /// Checks all return expressions in a method for Expanded/Flexible.
+  void _checkReturnExpressions(
+    MethodDeclaration node,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final FunctionBody body = node.body;
+
+    // Expression body: Widget build(context) => Expanded(...);
+    if (body is ExpressionFunctionBody) {
+      _checkExpression(body.expression, reporter);
+      return;
+    }
+
+    // Block body: check ALL return statements
+    if (body is BlockFunctionBody) {
+      _visitStatements(body.block.statements, reporter);
+    }
+  }
+
+  /// Recursively visits statements to find all return statements.
+  void _visitStatements(
+    NodeList<Statement> statements,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final Statement statement in statements) {
+      if (statement is ReturnStatement && statement.expression != null) {
+        _checkExpression(statement.expression!, reporter);
+      } else if (statement is IfStatement) {
+        // Check both branches of if statements
+        final thenStmt = statement.thenStatement;
+        final elseStmt = statement.elseStatement;
+        if (thenStmt is Block) {
+          _visitStatements(thenStmt.statements, reporter);
+        } else if (thenStmt is ReturnStatement && thenStmt.expression != null) {
+          _checkExpression(thenStmt.expression!, reporter);
+        }
+        if (elseStmt is Block) {
+          _visitStatements(elseStmt.statements, reporter);
+        } else if (elseStmt is ReturnStatement && elseStmt.expression != null) {
+          _checkExpression(elseStmt.expression!, reporter);
+        }
+      }
+    }
+  }
+
+  /// Checks an expression for direct Expanded/Flexible usage.
+  void _checkExpression(Expression expr, SaropaDiagnosticReporter reporter) {
+    // Direct Expanded/Flexible construction
+    if (expr is InstanceCreationExpression) {
+      final String typeName = expr.constructorName.type.name.lexeme;
+      if (_flexChildTypes.contains(typeName)) {
+        reporter.atNode(expr.constructorName, code);
+      }
+    }
+    // Conditional: return cond ? Expanded(...) : Other(...)
+    else if (expr is ConditionalExpression) {
+      _checkExpression(expr.thenExpression, reporter);
+      _checkExpression(expr.elseExpression, reporter);
+    }
+  }
+}
+
+/// Quick fix for prefer_expanded_at_call_site.
+///
+/// Adds a `HACK` comment to mark the code for manual refactoring.
+class _PreferExpandedAtCallSiteFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for manual refactoring',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the line start to insert the comment
+        final lineInfo = resolver.lineInfo;
+        final location = lineInfo.getLocation(analysisError.offset);
+        final lineStart = lineInfo.getOffsetOfLine(location.lineNumber - 1);
+
+        // Get indentation from the current line
+        final source = resolver.source.contents.data;
+        var indent = '';
+        var i = lineStart;
+        while (i < source.length && (source[i] == ' ' || source[i] == '\t')) {
+          indent += source[i];
+          i++;
+        }
+
+        builder.addSimpleInsertion(
+          lineStart,
+          '$indent// HACK: Returning Expanded from build() couples to Flex parent. '
+          'Consider returning the child directly.\n',
+        );
+      });
+    });
+  }
+}
+
 // =============================================================================
 // NEW RULES v2.3.11
 // =============================================================================
@@ -16763,6 +17973,12 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   /// Index out of bounds crashes the app.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_builder_index_out_of_bounds',

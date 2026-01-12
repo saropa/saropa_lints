@@ -20,6 +20,9 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_non_final_exception_class_fields',
     problemMessage: 'Exception class fields should be final.',
@@ -89,6 +92,9 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_only_rethrow',
     problemMessage: 'Catch clause only contains rethrow.',
@@ -145,6 +151,12 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_catch_block',
@@ -209,6 +221,9 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_objects_without_tostring',
@@ -280,6 +295,9 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_public_exception_classes',
