@@ -35,6 +35,9 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_strings_in_ui',
     problemMessage:
@@ -135,6 +138,9 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_locale_aware_formatting',
     problemMessage:
@@ -204,6 +210,12 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_directional_widgets',
@@ -285,6 +297,9 @@ class RequirePluralHandlingRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_plural_handling',
@@ -384,6 +399,9 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale',
     problemMessage: "Hardcoded locale ignores user's device settings.",
@@ -432,6 +450,9 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_in_ui',
@@ -500,6 +521,9 @@ class AvoidTextInImagesRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_in_images',
@@ -574,6 +598,9 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_app_name',
     problemMessage: 'App name should not be hardcoded in UI.',
@@ -639,6 +666,9 @@ class PreferDateFormatRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_date_format',
@@ -712,6 +742,9 @@ class PreferIntlNameRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_intl_name',
     problemMessage: 'Intl.message without name parameter.',
@@ -778,6 +811,9 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_description',
@@ -851,6 +887,9 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_examples',
@@ -942,6 +981,9 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
   /// Medium impact - affects formatting but not crashes.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_intl_locale_initialization',
@@ -1058,6 +1100,9 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_intl_date_format_locale',
     problemMessage:
@@ -1156,6 +1201,9 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_number_format_locale',
@@ -1260,6 +1308,9 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_manual_date_formatting',
     problemMessage: 'Manual date formatting is error-prone and ignores locale.',
@@ -1349,6 +1400,9 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_intl_currency_format',
@@ -1488,6 +1542,9 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_intl_plural_rules',
     problemMessage:
@@ -1608,6 +1665,9 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_intl_args_match',
     problemMessage:
@@ -1697,6 +1757,9 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
   /// Concatenation breaks translations in RTL and complex languages.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_for_l10n',

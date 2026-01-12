@@ -39,6 +39,9 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_collection_equality_checks',
     problemMessage: 'Comparing collections with == uses reference equality.',
@@ -142,6 +145,9 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_map_keys',
     problemMessage: 'Duplicate key in map literal.',
@@ -194,6 +200,9 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_map_keys_contains',
@@ -289,6 +298,9 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_collections',
     problemMessage: 'Unnecessary collection wrapper.',
@@ -363,6 +375,9 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_collection_methods',
@@ -872,6 +887,9 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_reduce',
     problemMessage: 'reduce() throws on empty collections.',
@@ -966,6 +984,9 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_where_methods',
@@ -1085,6 +1106,9 @@ class PreferWhereOrNullRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'prefer_where_or_null',
@@ -1245,6 +1269,9 @@ class MapKeysOrderingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'map_keys_ordering',
     problemMessage: 'Map keys should be in alphabetical order.',
@@ -1305,6 +1332,9 @@ class PreferContainsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_contains',
@@ -1411,6 +1441,9 @@ class PreferFirstRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_first',
     problemMessage: 'Use .first instead of [0].',
@@ -1493,6 +1526,9 @@ class PreferIterableOfRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_of',
@@ -1644,6 +1680,9 @@ class PreferAddAllRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_add_all',
     problemMessage: 'Use addAll() instead of forEach/for with add().',
@@ -1738,6 +1777,9 @@ class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_collection_elements',
     problemMessage: 'Duplicate element in collection literal.',
@@ -1807,6 +1849,9 @@ class PreferSetForLookupRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   static const LintCode _code = LintCode(
     name: 'prefer_set_for_lookup',
     problemMessage:
@@ -1861,6 +1906,9 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_for_loop_increment',
@@ -1937,6 +1985,9 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unreachable_for_loop',
@@ -2068,6 +2119,9 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_elements',
     problemMessage:
@@ -2152,6 +2206,9 @@ class PreferIterableOperationsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_operations',
     problemMessage:
@@ -2227,6 +2284,9 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_key_for_collection',

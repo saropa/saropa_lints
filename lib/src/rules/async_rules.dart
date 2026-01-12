@@ -22,6 +22,9 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   static const LintCode _code = LintCode(
     name: 'avoid_future_ignore',
     problemMessage:
@@ -70,6 +73,9 @@ class AvoidFutureToStringRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_tostring',
@@ -139,6 +145,9 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_futures',
     problemMessage: 'Avoid nested Future types (Future<Future<T>>).',
@@ -190,6 +199,9 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_streams_and_futures',
@@ -244,6 +256,12 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'avoid_passing_async_when_sync_expected',
@@ -325,6 +343,9 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_async',
     problemMessage: 'Async function does not use await.',
@@ -399,6 +420,9 @@ class AvoidStreamToStringRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.high;
+
   // cspell:ignore tostring
   static const LintCode _code = LintCode(
     name: 'avoid_stream_tostring',
@@ -446,6 +470,9 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_stream_subscriptions',
@@ -506,6 +533,9 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_async_await',
     problemMessage: "Prefer 'async/await' over '.then()' in async functions.",
@@ -550,6 +580,9 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_assigning_await_expressions',
@@ -621,6 +654,9 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_future_delayed',
@@ -718,6 +754,9 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_correct_stream_return_type',
     problemMessage:
@@ -774,6 +813,9 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_specifying_future_value_type',
@@ -835,6 +877,9 @@ class PreferReturnAwaitRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'prefer_return_await',
@@ -1185,6 +1230,9 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_async_callback',
     problemMessage:
@@ -1380,6 +1428,9 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_future_void_function_over_async_callback',
     problemMessage:
@@ -1466,6 +1517,9 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_dialog_context_after_async',
@@ -1608,6 +1662,9 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'check_mounted_after_async',
     problemMessage:
@@ -1720,6 +1777,9 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_websocket_message_validation',
     problemMessage: 'WebSocket message should be validated before processing.',
@@ -1802,6 +1862,9 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_feature_flag_default',
     problemMessage: 'Feature flag should have a default/fallback value.',
@@ -1871,6 +1934,9 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'prefer_utc_for_storage',
@@ -1952,6 +2018,9 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_location_timeout',
@@ -2040,6 +2109,9 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_stream_in_build',
     problemMessage:
@@ -2097,6 +2169,9 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_close',
@@ -2173,6 +2248,9 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_stream_listeners',
@@ -2251,6 +2329,9 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_stream_error_handling',
     problemMessage:
@@ -2317,6 +2398,9 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_future_timeout',
@@ -2418,6 +2502,9 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_future_wait_error_handling',
     problemMessage:
@@ -2481,6 +2568,9 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
   /// Resource cleanup and UX issue.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'require_stream_on_done',
@@ -2558,6 +2648,9 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
   /// Bug - futures may hang indefinitely.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_completer_error_handling',
@@ -2650,6 +2743,9 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
   /// Critical - memory leaks and callbacks after disposal.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_stream_subscription_in_field',
@@ -2821,6 +2917,9 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_future_then_in_async',
     problemMessage:
@@ -2911,6 +3010,9 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unawaited_future',
@@ -3071,6 +3173,9 @@ class PreferFutureWaitRule extends SaropaLintRule {
   /// Performance improvement. Can significantly speed up data loading.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_future_wait',

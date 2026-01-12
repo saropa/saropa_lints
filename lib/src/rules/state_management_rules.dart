@@ -46,6 +46,9 @@ class RequireNotifyListenersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_notify_listeners',
     problemMessage:
@@ -156,6 +159,12 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
@@ -338,6 +347,12 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_value_notifier_dispose',
@@ -621,6 +636,9 @@ class RequireMountedCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
     problemMessage: 'setState called after await without mounted check.',
@@ -778,6 +796,9 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_watch_in_callbacks',
     problemMessage: 'Avoid using watch inside callbacks.',
@@ -836,6 +857,12 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
@@ -912,6 +939,9 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
     problemMessage: 'InheritedWidget should override updateShouldNotify.',
@@ -979,6 +1009,12 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_riverpod_providers',
@@ -1059,6 +1095,12 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_without_state',
@@ -1144,6 +1186,9 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_in_build',
@@ -1249,6 +1294,12 @@ class RequireBlocCloseRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_close',
@@ -1468,6 +1519,12 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_widget',
     problemMessage:
@@ -1544,6 +1601,12 @@ class RequireAutoDisposeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_auto_dispose',
@@ -1651,6 +1714,9 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ref_in_build_body',
@@ -1804,6 +1870,12 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'require_immutable_bloc_state',
     problemMessage: 'BLoC state classes should be immutable.',
@@ -1926,6 +1998,12 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'avoid_provider_of_in_build',
     problemMessage:
@@ -2021,6 +2099,9 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_get_find_in_build',
     problemMessage:
@@ -2101,6 +2182,12 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_provider_recreate',
@@ -2195,6 +2282,12 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple',
@@ -2345,6 +2438,12 @@ class RequireProviderScopeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'require_provider_scope',
     problemMessage:
@@ -2419,6 +2518,9 @@ class PreferSelectForPartialRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_select_for_partial',
@@ -2555,6 +2657,12 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_widget',
     problemMessage:
@@ -2636,6 +2744,9 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_family_for_params',
@@ -2724,6 +2835,12 @@ class RequireBlocObserverRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'require_bloc_observer',
     problemMessage:
@@ -2793,6 +2910,12 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_mutation',
     problemMessage:
@@ -2844,6 +2967,9 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
@@ -2899,6 +3025,12 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_listen_in_build',
@@ -2978,6 +3110,9 @@ class RequireInitialStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
     problemMessage: 'BLoC constructor must pass initial state to super().',
@@ -3047,6 +3182,9 @@ class RequireErrorStateRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_error_state',
@@ -3128,6 +3266,12 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_in_bloc',
@@ -3219,6 +3363,9 @@ class PreferSealedEventsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_events',
     problemMessage:
@@ -3277,6 +3424,9 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
   /// UI will show stale data until something else triggers a rebuild.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_ref_watch_over_read',
@@ -3382,6 +3532,12 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_change_notifier_in_widget',
     problemMessage:
@@ -3459,6 +3615,12 @@ class RequireProviderDisposeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_provider_dispose',
@@ -3576,6 +3738,12 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_setstate_in_large_state_class',
     problemMessage:
@@ -3682,6 +3850,12 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_provider_deps',
@@ -3826,6 +4000,9 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_error_handling_in_async',
     problemMessage:
@@ -3915,6 +4092,9 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_notifier_over_state',
@@ -4018,6 +4198,12 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_getx_controller_dispose',
@@ -4154,6 +4340,9 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_obs_outside_controller',
     problemMessage:
@@ -4244,6 +4433,12 @@ class RequireBlocTransformerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_transformer',
@@ -4346,6 +4541,9 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_long_event_handlers',
     problemMessage:
@@ -4410,6 +4608,12 @@ class RequireRiverpodLintRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'require_riverpod_lint',
@@ -4505,6 +4709,12 @@ class RequireMultiProviderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'require_multi_provider',
     problemMessage:
@@ -4597,6 +4807,12 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_providers',
@@ -4722,6 +4938,12 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'prefer_multi_bloc_provider',
     problemMessage:
@@ -4791,6 +5013,12 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
   /// Critical - memory leak potential.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_bloc_value_provider',
@@ -4866,6 +5094,12 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
   /// Critical - unexpected bloc closure.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_existing_instances_in_bloc_provider',
@@ -4946,6 +5180,12 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_bloc_provider',
@@ -5028,6 +5268,12 @@ class PreferMultiProviderRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'prefer_multi_provider',
@@ -5112,6 +5358,12 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_value_provider',
     problemMessage: 'Provider.value should not create a new instance. '
@@ -5188,6 +5440,12 @@ class DisposeProvidersRule extends SaropaLintRule {
   /// High impact - memory leak prevention.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'dispose_providers',
@@ -5279,6 +5537,9 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
   /// Critical - broken lifecycle management.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
@@ -5386,6 +5647,9 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'always_remove_getx_listener',
     problemMessage: 'GetX worker is not assigned to a variable for cleanup. '
@@ -5454,6 +5718,9 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
   /// Critical - runtime error.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hooks_outside_build',
@@ -5543,6 +5810,9 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
   /// Critical - runtime error.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditional_hooks',
@@ -5646,6 +5916,12 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_hook_widgets',
     problemMessage:
@@ -5737,6 +6013,9 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
   /// Critical bug. Emit after close causes crash.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'check_is_not_closed_after_async_gap',
@@ -5858,6 +6137,12 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_bloc_event_handlers',
     problemMessage: 'Duplicate event handler registration detected.',
@@ -5962,6 +6247,12 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_events',
     problemMessage: 'Bloc event class has mutable fields.',
@@ -6021,6 +6312,12 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
   /// Bug risk. Mutable state breaks bloc pattern.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_state',
@@ -6085,6 +6382,12 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_events',
     problemMessage: 'Bloc event base class should be sealed.',
@@ -6146,6 +6449,12 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_state',
     problemMessage: 'Bloc state base class should be sealed.',
@@ -6205,6 +6514,12 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_event_suffix',
     problemMessage: 'Bloc event class should end with "Event" suffix.',
@@ -6257,6 +6572,12 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_state_suffix',
@@ -6314,6 +6635,9 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_selector_value',
@@ -6382,6 +6706,12 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'prefer_provider_extensions',
     problemMessage: 'Long provider access chain is hard to read.',
@@ -6445,6 +6775,9 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
@@ -6510,6 +6843,9 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
@@ -6581,6 +6917,12 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'dispose_provided_instances',
@@ -6694,6 +7036,12 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'dispose_getx_fields',
     problemMessage:
@@ -6806,6 +7154,12 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_provider_types',
     problemMessage: 'Provider type is non-nullable but create may return null.',
@@ -6900,6 +7254,9 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_yield_in_on_event',
     problemMessage: 'yield in Bloc event handler. Use emit() instead.',
@@ -6960,6 +7317,12 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_over_provider_of',
     problemMessage: 'Provider.of in build. Use Consumer for granular rebuilds.',
@@ -7019,6 +7382,9 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
   /// watch() in async callbacks causes subscription leaks.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_listen_in_async',
@@ -7090,6 +7456,9 @@ class PreferGetxBuilderRule extends SaropaLintRule {
   /// Accessing .obs without Obx won't trigger UI rebuilds.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
@@ -7175,6 +7544,12 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'emit_new_bloc_state_instances',
     problemMessage: 'State mutated with cascade. Emit new instance instead.',
@@ -7233,6 +7608,12 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
   /// Public fields expose Bloc internals and break encapsulation.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_fields',
@@ -7298,6 +7679,12 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
   /// Public methods bypass Bloc's event-driven architecture.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_methods',
@@ -7380,6 +7767,9 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_async_value_order',
     problemMessage: 'AsyncValue.when() has non-standard parameter order.',
@@ -7449,6 +7839,12 @@ class RequireBlocSelectorRule extends SaropaLintRule {
   /// BlocSelector provides more targeted rebuilds.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_selector',
@@ -7539,6 +7935,9 @@ class PreferSelectorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_selector',
     problemMessage:
@@ -7606,6 +8005,9 @@ class RequireGetxBindingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_getx_binding',
     problemMessage:
@@ -7667,6 +8069,12 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'require_provider_generic_type',
@@ -7730,6 +8138,12 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_emit_after_close',
@@ -7825,6 +8239,12 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_state_mutation',
     problemMessage: 'Bloc state must not be mutated directly.',
@@ -7895,6 +8315,12 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_initial_state',
@@ -7971,6 +8397,9 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_freezed_json_serializable_conflict',
     problemMessage:
@@ -8038,6 +8467,9 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_freezed_arrow_syntax',
@@ -8109,6 +8541,9 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_freezed_private_constructor',
@@ -8199,6 +8634,9 @@ class RequireEquatableImmutableRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_equatable_immutable',
     problemMessage: 'Equatable fields must be final for correct equality.',
@@ -8257,6 +8695,9 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_props_override',
@@ -8325,6 +8766,9 @@ class AvoidEquatableMutableCollectionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_equatable_mutable_collections',
     problemMessage:
@@ -8392,6 +8836,12 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_loading_state',
@@ -8478,6 +8928,12 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'require_bloc_error_state',
     problemMessage: 'Bloc state sealed class should have an error case.',
@@ -8544,6 +9000,9 @@ class AvoidStaticStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_static_state',
@@ -8631,6 +9090,12 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_init_state',
     problemMessage:
@@ -8710,6 +9175,9 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_context_read_in_callbacks',
@@ -8814,6 +9282,12 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_manual_dispose',
@@ -8966,6 +9440,12 @@ class PreferProxyProviderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'prefer_proxy_provider',
     problemMessage:
@@ -9087,6 +9567,9 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_update_callback',
@@ -9232,6 +9715,12 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'prefer_selector_over_consumer',
     problemMessage:
@@ -9317,6 +9806,12 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple_state',
@@ -9405,6 +9900,12 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_listener_for_side_effects',
@@ -9498,6 +9999,12 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'require_bloc_consumer_when_both',
     problemMessage:
@@ -9580,6 +10087,12 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_context_dependency',
@@ -9667,6 +10180,12 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'avoid_provider_value_rebuild',
     problemMessage:
@@ -9749,6 +10268,12 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
   /// State is lost on every rebuild.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_notifier_in_build',
@@ -9836,6 +10361,12 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.provider};
+
   static const LintCode _code = LintCode(
     name: 'require_riverpod_async_value_guard',
     problemMessage:
@@ -9921,6 +10452,12 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
   /// Blocs with UI code are hard to test and violate separation.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_business_logic_in_ui',
@@ -10010,6 +10547,9 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
   /// Performance issue. Causes unnecessary rebuilds.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_change_notifier_proxy',
@@ -10144,6 +10684,12 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_selector_widget',
     problemMessage:
@@ -10241,6 +10787,12 @@ class RequireBlocEventSealedRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'require_bloc_event_sealed',
     problemMessage:
@@ -10310,6 +10862,12 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
   /// Architecture improvement.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_repository_abstraction',
@@ -10411,6 +10969,9 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_getx_global_state',
     problemMessage:
@@ -10487,6 +11048,12 @@ class PreferBlocTransformRule extends SaropaLintRule {
   /// Performance suggestion.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_transform',

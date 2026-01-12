@@ -47,6 +47,9 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_logging_sensitive_data',
     problemMessage:
@@ -249,6 +252,9 @@ class RequireSecureStorageRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_secure_storage',
     problemMessage:
@@ -339,6 +345,9 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   /// Each occurrence is a security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_credentials',
@@ -487,6 +496,9 @@ class RequireInputSanitizationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_input_sanitization',
     problemMessage: 'User input should be validated or sanitized before use.',
@@ -571,6 +583,9 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_webview_javascript_enabled',
     problemMessage:
@@ -648,6 +663,9 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_biometric_fallback',
     problemMessage:
@@ -720,6 +738,9 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
   /// Each occurrence is a serious security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_eval_like_patterns',
@@ -834,6 +855,9 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
     problemMessage: 'HttpClient should implement certificate pinning.',
@@ -899,6 +923,9 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_token_in_url',
     problemMessage: 'Avoid putting tokens or API keys in URLs.',
@@ -961,6 +988,9 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
   /// Each occurrence risks credential exposure.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_clipboard_sensitive',
@@ -1033,6 +1063,9 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_storing_passwords',
     problemMessage: 'Never store passwords in SharedPreferences.',
@@ -1098,6 +1131,9 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
   /// Each occurrence is a critical security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_sql',
@@ -1217,6 +1253,9 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_generic_key_in_url',
     problemMessage:
@@ -1279,6 +1318,9 @@ class PreferSecureRandomRule extends SaropaLintRule {
   /// Use Random.secure() for tokens and crypto operations.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random',
@@ -1367,6 +1409,9 @@ class PreferTypedDataRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_typed_data',
     problemMessage:
@@ -1438,6 +1483,9 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
   /// Performance optimization, not a bug.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_to_list',
@@ -1533,6 +1581,9 @@ class RequireAuthCheckRule extends SaropaLintRule {
   /// Each occurrence is an unauthorized access risk.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_auth_check',
@@ -1645,6 +1696,9 @@ class RequireTokenRefreshRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_token_refresh',
     problemMessage:
@@ -1743,6 +1797,9 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
     problemMessage: 'Decoding JWT on client for authorization is insecure.',
@@ -1835,6 +1892,9 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
     problemMessage: 'Logout may not clear all sensitive data.',
@@ -1905,6 +1965,9 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
   /// Each occurrence exposes credentials.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_auth_in_query_params',
@@ -1994,6 +2057,9 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
   /// Each occurrence exposes credentials on rooted devices.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_auth_state_in_prefs',
@@ -2116,6 +2182,9 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
   /// Each occurrence exposes personal data.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_encrypted_prefs',
@@ -2248,6 +2317,9 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
   /// Deep links without validation enable injection attacks.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_deep_link_validation',
@@ -2410,6 +2482,9 @@ class RequireDataEncryptionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_data_encryption',
     problemMessage:
@@ -2506,6 +2581,9 @@ class PreferDataMaskingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_data_masking',
@@ -2605,6 +2683,9 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_screenshot_sensitive',
     problemMessage:
@@ -2702,6 +2783,9 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_secure_password_field',
@@ -2836,6 +2920,9 @@ class AvoidPathTraversalRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_path_traversal',
     problemMessage: 'File path may be vulnerable to path traversal attack.',
@@ -2932,6 +3019,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_html_escape',
     problemMessage:
@@ -3027,6 +3117,9 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_logs',
@@ -3224,6 +3317,9 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_shared_prefs_sensitive_data',
     problemMessage:
@@ -3349,6 +3445,9 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_secure_storage_for_auth',
     problemMessage:
@@ -3434,6 +3533,9 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_null_handling',
     problemMessage:
@@ -3502,6 +3604,9 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_key_constants',
@@ -3584,6 +3689,9 @@ class RequireUrlValidationRule extends SaropaLintRule {
   /// Security vulnerability - unvalidated URLs can be exploited.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_url_validation',
@@ -3682,6 +3790,9 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
   /// Security vulnerability - open redirects enable phishing.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_redirect_injection',
@@ -3874,6 +3985,9 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_external_storage_sensitive',
     problemMessage:
@@ -3985,6 +4099,9 @@ class PreferLocalAuthRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_local_auth',
     problemMessage:
@@ -4067,6 +4184,9 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_secure_storage_auth_data',
@@ -4182,6 +4302,9 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_webview_javascript_disabled',
     problemMessage:
@@ -4280,6 +4403,9 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
   /// Critical security vulnerability.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_webview_insecure_content',
@@ -4387,6 +4513,9 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_webview_error_handling',
     problemMessage:
@@ -4476,6 +4605,9 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
   /// Hardcoded API keys can be extracted from builds.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_api_key_in_code',
@@ -4586,6 +4718,9 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
   /// Unencrypted sensitive data is readable on rooted/jailbroken devices.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_storing_sensitive_unencrypted',

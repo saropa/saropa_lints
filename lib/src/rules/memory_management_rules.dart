@@ -42,6 +42,9 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_large_objects_in_state',
     problemMessage: 'Large data structures in State may cause memory issues.',
@@ -131,6 +134,9 @@ class RequireImageDisposalRule extends SaropaLintRule {
   /// Each occurrence is a memory leak.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_image_disposal',
@@ -231,6 +237,9 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_capturing_this_in_callbacks',
     problemMessage:
@@ -320,6 +329,9 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_cache_eviction_policy',
     problemMessage: 'Cache lacks eviction policy and may grow unbounded.',
@@ -390,6 +402,9 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   /// Consider for memory-sensitive applications.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_weak_references_for_cache',
@@ -464,6 +479,9 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_expando_circular_references',
     problemMessage: 'Expando value may reference its key, causing memory leak.',
@@ -535,6 +553,9 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
   /// Performance issue, not a memory leak.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_isolate_communication',

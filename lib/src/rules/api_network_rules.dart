@@ -44,6 +44,9 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_http_status_check',
     problemMessage:
@@ -103,6 +106,9 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_api_urls',
@@ -168,6 +174,9 @@ class RequireRetryLogicRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
@@ -237,6 +246,9 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_typed_api_response',
@@ -331,6 +343,9 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_connectivity_check',
     problemMessage: 'Consider checking connectivity before network operations.',
@@ -406,6 +421,9 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_api_error_mapping',
@@ -485,6 +503,9 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_request_timeout',
@@ -619,6 +640,9 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_offline_indicator',
     problemMessage:
@@ -698,6 +722,9 @@ class PreferStreamingResponseRule extends SaropaLintRule {
   /// Large file downloads without streaming can cause OOM crashes.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_streaming_response',
@@ -850,6 +877,9 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_http_connection_reuse',
     problemMessage:
@@ -957,6 +987,9 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_requests',
     problemMessage:
@@ -1044,6 +1077,9 @@ class RequireResponseCachingRule extends SaropaLintRule {
   /// Caching depends on data freshness requirements - may not be appropriate.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_response_caching',
@@ -1134,6 +1170,9 @@ class PreferPaginationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_pagination',
     problemMessage:
@@ -1222,6 +1261,9 @@ class AvoidOverFetchingRule extends SaropaLintRule {
   /// Optimization depends on API design - may require backend changes.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_over_fetching',
@@ -1316,6 +1358,9 @@ class RequireCancelTokenRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_cancel_token',
     problemMessage:
@@ -1395,6 +1440,9 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_error_handling',
@@ -1503,6 +1551,9 @@ class RequireDioTimeoutRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_dio_timeout',
     problemMessage:
@@ -1571,6 +1622,9 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_dio_error_handling',
@@ -1646,6 +1700,9 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_dio_interceptor_error_handler',
     problemMessage:
@@ -1704,6 +1761,9 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_dio_cancel_token',
@@ -1774,6 +1834,9 @@ class RequireDioSslPinningRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_dio_ssl_pinning',
@@ -1854,6 +1917,9 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_dio_form_data_leak',
     problemMessage:
@@ -1925,6 +1991,9 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
   /// Reliability issue - parsing may fail unexpectedly.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_content_type_check',
@@ -2016,6 +2085,9 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_without_heartbeat',
     problemMessage:
@@ -2104,6 +2176,9 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_dio_debug_print_production',
@@ -2197,6 +2272,9 @@ class RequireDioSingletonRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_dio_singleton',
     problemMessage: 'Consider using a singleton Dio instance.',
@@ -2267,6 +2345,9 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_dio_base_options',
     problemMessage:
@@ -2336,6 +2417,9 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_dio_without_base_url',
@@ -2408,6 +2492,9 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_error_handling',
@@ -2488,6 +2575,9 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_image_picker_error_handling',
     problemMessage: 'pickImage without null check or error handling.',
@@ -2552,6 +2642,9 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_image_picker_source_choice',
@@ -2627,6 +2720,9 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_geolocator_timeout',
@@ -2714,6 +2810,9 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_connectivity_subscription_cancel',
     problemMessage:
@@ -2798,6 +2897,9 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_notification_handler_top_level',
     problemMessage:
@@ -2881,6 +2983,9 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_permission_denied_handling',
@@ -3007,6 +3112,9 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_image_picker_result_handling',
     problemMessage: 'pickImage result should be checked for null.',
@@ -3102,6 +3210,9 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_cached_image_in_build',
     problemMessage: 'Variable cacheKey in build method defeats caching.',
@@ -3181,6 +3292,9 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_migration',
@@ -3273,6 +3387,9 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_permission_rationale',
     problemMessage:
@@ -3347,6 +3464,9 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_permission_status_check',
@@ -3431,6 +3551,9 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_notification_permission_android13',
@@ -3571,6 +3694,9 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
   /// SSE connections are long-lived and must be properly closed.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_sse_subscription_cancel',
@@ -3714,6 +3840,9 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_timeout_on_requests',
@@ -3868,6 +3997,9 @@ class PreferDioOverHttpRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_dio_over_http',
     problemMessage:
@@ -3919,6 +4051,9 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
   /// Binary data corruption if wrong response type used.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_dio_response_type',
@@ -3998,6 +4133,9 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_dio_retry_interceptor',
     problemMessage: 'Dio instance without retry interceptor.',
@@ -4060,6 +4198,9 @@ class PreferDioTransformerRule extends SaropaLintRule {
   /// UI jank from main thread JSON parsing.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_dio_transformer',

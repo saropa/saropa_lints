@@ -116,7 +116,86 @@ LintImpact get impact => LintImpact.critical; // Memory leak - each one matters
 
 **DO NOT default to `medium` without thought.** Consider the real-world consequence of 1000 violations of your rule.
 
-### 3. Register the rule
+### 3. Set performance optimizations (optional but recommended)
+
+With 1400+ rules, performance matters. Two getters help the framework optimize rule execution:
+
+#### Rule Cost Classification
+
+Declare how expensive your rule is to execute. Rules are sorted by cost so fast rules run first:
+
+```dart
+@override
+RuleCost get cost => RuleCost.low; // Single node inspection
+```
+
+| Cost | Use when... | Examples |
+|------|-------------|----------|
+| `trivial` | Simple pattern matching | Check for specific method name |
+| `low` | Single AST node inspection | Check constructor parameters |
+| `medium` | Traverse part of AST (default) | Check method body |
+| `high` | Full AST traversal or type resolution | Complex type analysis |
+| `extreme` | Cross-file analysis simulation | Dependency graph analysis |
+
+#### File Type Filtering
+
+Restrict your rule to specific file types for early exit. Files not matching are skipped entirely:
+
+```dart
+@override
+Set<FileType>? get applicableFileTypes => {FileType.widget};
+```
+
+| FileType | Matches |
+|----------|---------|
+| `widget` | Files with `StatelessWidget`, `StatefulWidget`, `State<>` |
+| `test` | `*_test.dart`, files in `test/`, `integration_test/` |
+| `bloc` | Files with `Bloc<>`, `Cubit<>` |
+| `provider` | Files with `Provider`, `Riverpod`, `ref.watch/read` |
+| `model` | Data classes, entities |
+| `service` | Service/repository files |
+| `general` | Default for unclassified files |
+
+**Example: A complete widget-specific rule**
+
+```dart
+class AvoidWidgetAntiPatternRule extends SaropaLintRule {
+  const AvoidWidgetAntiPatternRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  // Only run on widget files - skip everything else
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  // This rule is fast - single node inspection
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const _code = LintCode(
+    name: 'avoid_widget_anti_pattern',
+    problemMessage: 'Widget anti-pattern detected.',
+    errorSeverity: ErrorSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((node) {
+      // Only called for widget files due to applicableFileTypes
+      if (isAntiPattern(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+```
+
+### 4. Register the rule
 
 Add to `lib/src/rules/all_rules.dart`:
 
@@ -124,7 +203,7 @@ Add to `lib/src/rules/all_rules.dart`:
 AvoidMyAntiPatternRule(),
 ```
 
-### 4. Add to appropriate tier(s)
+### 5. Add to appropriate tier(s)
 
 Edit `lib/tiers/*.yaml`:
 
@@ -133,7 +212,7 @@ rules:
   avoid_my_anti_pattern: true
 ```
 
-### 5. Add quick fixes (optional but recommended)
+### 6. Add quick fixes (optional but recommended)
 
 Quick fixes provide IDE code actions that help developers resolve lint issues.
 
@@ -193,7 +272,7 @@ All rules should have quick fixes when feasible:
    - **Complex issues**: Add `// HACK:` comment for manual attention
 3. **All WARNING/ERROR severity rules must have at least a HACK comment fix**
 
-### 6. Add tests
+### 7. Add tests
 
 Create a fixture file in `example/lib/<category>/`:
 
@@ -220,6 +299,67 @@ dart run custom_lint
 ```
 
 The `expect_lint` comments assert that a lint fires on the next line. If the lint doesn't fire, the test fails. If a lint fires without an `expect_lint` comment, that also fails.
+
+## Audit New Rules Checklist
+
+Before submitting a PR with new or modified lint rules, review **only the files you changed** against this checklist. This ensures consistency, performance, and completeness.
+
+### Code Quality
+
+- [ ] **Correct file placement** — Is each rule in the appropriate `lib/src/rules/<category>_rules.dart` file?
+- [ ] **Logic correctness** — Does the detection logic handle all edge cases correctly?
+- [ ] **Heuristics safety** — If using name-based detection, have you avoided false positives? (See "Avoiding False Positives" section below)
+- [ ] **No recursion risks** — Does the visitor avoid infinite loops or excessive tree traversal?
+- [ ] **No duplication** — Check for duplicate logic or lint coverage; extract shared utilities if applicable
+- [ ] **Clear code comments** — Concise inline comments explaining non-obvious logic
+
+### Rule Configuration
+
+- [ ] **`LintImpact` correctly set** — Impact reflects real-world severity (critical/high/medium/low), not defaulted to medium
+- [ ] **`cost` override set** — Rule cost classification matches actual complexity (trivial/low/medium/high/extreme)
+- [ ] **`applicableFileTypes` override set** — Restrict to specific file types when possible (widget/test/bloc/etc.) for performance
+- [ ] **Error severity appropriate** — `ErrorSeverity` matches the rule's impact (ERROR/WARNING/INFO)
+
+### Documentation
+
+- [ ] **Doc header complete** — Verbose doc comment with: summary, why it matters, **BAD:** example, **GOOD:** example
+- [ ] **Quick fix documented** — If quick fix exists, add `**Quick fix available:**` to doc header
+- [ ] **Guide compatibility** — Review `doc/guides/` documents if your changes affect documented patterns
+
+### Quick Fixes
+
+- [ ] **Quick fix implemented** — Add quick fixes where feasible (all WARNING/ERROR rules should have at least a HACK comment fix)
+- [ ] **Fix preserves intent** — Comment out code rather than deleting when removing debug statements
+- [ ] **Fix is safe** — The fix doesn't introduce new issues or change behavior unexpectedly
+
+### Registration & Configuration
+
+- [ ] **Rule registered** — Added to `lib/saropa_lints.dart` rule list
+- [ ] **Tier assignment** — Updated `lib/src/tiers.dart` with correct tier membership
+- [ ] **Template updated** — Added to `example/analysis_options_template.yaml` with impact level and tier documented
+
+### Testing
+
+- [ ] **Test fixtures added** — Created test fixtures in `example/lib/<category>/`
+- [ ] **BAD cases marked** — All expected violations have `// expect_lint: rule_name` comments
+- [ ] **GOOD cases included** — Include passing cases without expect_lint to verify no false positives
+- [ ] **Tests pass** — Run `cd example && dart run custom_lint` to verify
+
+### Project Updates
+
+- [ ] **CHANGELOG.md updated** — Added entry under appropriate version (bump version if current is deployed)
+- [ ] **README.md counts updated** — Update rule counts in README if total changed
+- [ ] **pubspec.yaml updated** — Update version and rule count if applicable
+- [ ] **ROADMAP.md cleaned** — Remove implemented rules completely (don't just mark as complete)
+
+### Quick Reference
+
+```bash
+# Run these before submitting:
+dart analyze                           # Check for analyzer issues
+cd example && dart run custom_lint     # Verify test fixtures
+dart test                              # Run unit tests
+```
 
 ## Avoiding False Positives (Critical)
 
@@ -399,6 +539,7 @@ Stylistic rules require extra documentation since they're not in any tier:
 
 - [ ] Rule extends `SaropaLintRule` (not `DartLintRule`)
 - [ ] **Impact classification set** (not just defaulting to `medium`)
+- [ ] **Performance optimizations considered** (set `cost` and/or `applicableFileTypes` if appropriate)
 - [ ] Rule follows naming conventions
 - [ ] Added to appropriate tier(s)
 - [ ] Tests pass

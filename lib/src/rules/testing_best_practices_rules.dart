@@ -65,6 +65,12 @@ class RequireTestAssertionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'require_test_assertions',
     problemMessage: 'Test has no assertions.',
@@ -154,6 +160,12 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'avoid_vague_test_descriptions',
@@ -255,6 +267,12 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'avoid_real_network_calls_in_tests',
     problemMessage: 'Test may be making real network calls.',
@@ -352,6 +370,12 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_test_delays',
     problemMessage:
@@ -431,6 +455,12 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'require_test_setup_teardown',
     problemMessage: 'Test file lacks setUp/tearDown for shared resources.',
@@ -506,6 +536,12 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'require_pump_after_interaction',
@@ -630,6 +666,12 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'avoid_production_config_in_tests',
     problemMessage: 'Test may be using production configuration.',
@@ -713,6 +755,12 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'prefer_pump_and_settle',
@@ -820,6 +868,12 @@ class AvoidTestSleepRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'avoid_test_sleep',
     problemMessage: 'Avoid using sleep() or real delays in tests.',
@@ -900,6 +954,12 @@ class AvoidFindByTextRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'avoid_find_by_text',
@@ -989,6 +1049,12 @@ class RequireTestKeysRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'require_test_keys',
@@ -1088,6 +1154,12 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'require_arrange_act_assert',
     problemMessage: 'Test should follow Arrange-Act-Assert pattern.',
@@ -1172,6 +1244,12 @@ class PreferMockNavigatorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'prefer_mock_navigator',
     problemMessage:
@@ -1243,6 +1321,12 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_timer_in_widget_test',
@@ -1317,6 +1401,12 @@ class RequireMockVerificationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'require_mock_verification',
     problemMessage: 'Mock is stubbed but never verified.',
@@ -1388,6 +1478,12 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'prefer_matcher_over_equals',
@@ -1483,6 +1579,12 @@ class PreferTestWrapperRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_wrapper',
@@ -1644,6 +1746,12 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'require_screen_size_tests',
     problemMessage: 'Consider testing at multiple screen sizes.',
@@ -1721,6 +1829,12 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_test_setup',
     problemMessage: 'setUp should not mutate shared state.',
@@ -1788,6 +1902,12 @@ class PreferMockHttpRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'prefer_mock_http',
@@ -1938,6 +2058,12 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'avoid_flaky_tests',
@@ -2091,6 +2217,12 @@ class PreferSingleAssertionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'prefer_single_assertion',
     problemMessage:
@@ -2161,6 +2293,12 @@ class AvoidFindAllRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'avoid_find_all',
@@ -2261,6 +2399,12 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'require_integration_test_setup',
@@ -2363,6 +2507,12 @@ class AvoidHardcodedDelaysRule extends SaropaLintRule {
   /// Tests may fail intermittently in CI environments.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_delays',
@@ -2473,6 +2623,12 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
   /// Tests without error cases miss important edge cases.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'require_error_case_tests',
@@ -2595,6 +2751,12 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'prefer_test_find_by_key',
     problemMessage:
@@ -2678,6 +2840,12 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   /// Test quality improvement.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'prefer_setup_teardown',
@@ -2817,6 +2985,12 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'require_test_description_convention',
     problemMessage:
@@ -2918,6 +3092,12 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_test_package',
     problemMessage:
@@ -2998,6 +3178,12 @@ class PreferMockVerifyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
   static const LintCode _code = LintCode(
     name: 'prefer_mock_verify',
     problemMessage:
@@ -3073,6 +3259,12 @@ class RequireErrorLoggingRule extends SaropaLintRule {
   /// Error handling improvement.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
 
   static const LintCode _code = LintCode(
     name: 'require_error_logging',

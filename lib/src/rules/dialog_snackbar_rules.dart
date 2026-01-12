@@ -32,6 +32,9 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_snackbar_duration',
     problemMessage: 'SnackBar should have explicit duration.',
@@ -95,6 +98,9 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
   /// Minor improvement. Track for later review.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_dialog_barrier_dismissible',
@@ -168,6 +174,9 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_dialog_result_handling',
     problemMessage: 'showDialog result should be awaited or handled.',
@@ -235,6 +244,9 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
   /// Minor improvement. Track for later review.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_queue_buildup',
@@ -330,6 +342,9 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_adaptive_dialog',
     problemMessage:
@@ -411,6 +426,9 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
   /// UX improvement - allows recovery from accidents.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_snackbar_action_for_undo',

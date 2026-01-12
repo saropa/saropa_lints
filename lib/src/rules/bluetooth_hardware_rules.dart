@@ -25,6 +25,9 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_bluetooth_scan_without_timeout',
     problemMessage:
@@ -95,6 +98,9 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
   /// Critical for robust Bluetooth apps.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_bluetooth_state_check',
@@ -202,6 +208,9 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_ble_disconnect_handling',
     problemMessage: 'BLE connection should handle disconnect state.',
@@ -291,6 +300,9 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
   /// Important for proper audio behavior.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_audio_focus_handling',
@@ -391,6 +403,9 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_qr_permission_check',
     problemMessage: 'QR scanner requires camera permission check.',
@@ -479,6 +494,9 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_geolocator_permission_check',
     problemMessage: 'Location access without permission check. Crashes on iOS.',
@@ -551,6 +569,9 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_geolocator_service_enabled',
@@ -625,6 +646,9 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_geolocator_stream_cancel',
     problemMessage:
@@ -685,6 +709,9 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_geolocator_error_handling',
@@ -754,6 +781,9 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
   /// Important for BLE performance.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_ble_mtu_negotiation',
