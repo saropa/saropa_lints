@@ -193,7 +193,8 @@ class GoodContextMountedCheck extends StatefulWidget {
   const GoodContextMountedCheck({super.key});
 
   @override
-  State<GoodContextMountedCheck> createState() => _GoodContextMountedCheckState();
+  State<GoodContextMountedCheck> createState() =>
+      _GoodContextMountedCheckState();
 }
 
 class _GoodContextMountedCheckState extends State<GoodContextMountedCheck> {

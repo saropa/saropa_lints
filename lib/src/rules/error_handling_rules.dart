@@ -1783,7 +1783,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
+  List<Fix> getFixes() =>
+      <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
 }
 
 class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
