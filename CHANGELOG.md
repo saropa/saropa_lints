@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.3.13] - 2026-01-11
+
+### Added
+
+#### Additional iOS Platform Rules (6 rules)
+- **`require_apple_sign_in`**: Warns when apps use third-party login (Google, Facebook) without Sign in with Apple. App Store rejection per Guidelines 4.8. (ERROR)
+- **`require_ios_background_mode`**: Reminds to add iOS background capabilities when using background task APIs. (INFO)
+- **`avoid_ios_13_deprecations`**: Warns when deprecated iOS 13+ APIs (UIWebView, UIAlertView) are detected in platform channel code. (WARNING)
+- **`avoid_ios_simulator_only_code`**: Warns when iOS Simulator-only patterns (/Users/, localhost:) are detected in production code. (WARNING)
+- **`require_ios_minimum_version_check`**: Warns when iOS version-specific APIs (LiveActivity, SharePlay) are used without version checks. (INFO)
+- **`avoid_ios_deprecated_uikit`**: Warns when deprecated UIKit APIs (keyWindow, statusBarOrientation) are used in platform channel code. (WARNING)
+
+## [2.3.12] - 2026-01-11
+
+### Fixed
+
+- **pubspec.yaml**: Shortened package description to comply with pub.dev 180-character limit
+- **`require_rethrow_preserve_stack`**: Fixed type comparison error where `Token` was compared to `String`. Now correctly uses `.lexeme` to extract the exception parameter name
+- **`avoid_yield_in_on_event`**: Fixed doc comment where `on<Event>` angle brackets were being interpreted as HTML. Wrapped in backticks for proper escaping
+
+### Added
+
+#### iOS Platform Rules (5 rules)
+- **`prefer_ios_safe_area`**: Warns when Scaffold body doesn't use SafeArea. Content may be hidden by iOS notch or Dynamic Island. (INFO)
+- **`avoid_ios_hardcoded_status_bar`**: Warns when hardcoded status bar heights (20, 44, 47, 59) are used. Use MediaQuery.padding.top instead. (WARNING)
+- **`prefer_ios_haptic_feedback`**: Suggests adding haptic feedback for important button interactions on iOS devices. (INFO)
+- **`require_ios_platform_check`**: Warns when iOS-specific MethodChannel calls lack Platform.isIOS guard. (WARNING)
+- **`avoid_ios_background_fetch_abuse`**: Warns when Future.delayed exceeds iOS 30-second background limit. (WARNING)
+
+#### macOS Platform Rules (3 rules)
+- **`prefer_macos_menu_bar_integration`**: Suggests using PlatformMenuBar for native macOS menu integration. (INFO)
+- **`prefer_macos_keyboard_shortcuts`**: Suggests implementing standard macOS keyboard shortcuts (Cmd+S, Cmd+Z). (INFO)
+- **`require_macos_window_size_constraints`**: Warns when macOS apps lack minimum/maximum window size constraints. (INFO)
+
+#### Cross-Platform Apple Rules (6 rules)
+- **`require_method_channel_error_handling`**: Warns when MethodChannel.invokeMethod lacks try-catch for PlatformException. (WARNING)
+- **`require_universal_link_validation`**: Reminds to validate iOS Universal Links server configuration for deep link routes. (INFO)
+- **`prefer_cupertino_for_ios`**: Suggests Cupertino widgets over Material widgets in Platform.isIOS blocks. (INFO)
+- **`require_https_for_ios`**: Warns when HTTP URLs are used that will be blocked by iOS App Transport Security. (WARNING)
+- **`require_ios_permission_description`**: Warns when permission-requiring APIs are used without Info.plist usage descriptions. (WARNING)
+- **`require_ios_privacy_manifest`**: Warns when APIs requiring iOS 17+ Privacy Manifest entries are used. (WARNING)
+
 ## [2.3.11] - 2026-01-11
 
 ### Changed

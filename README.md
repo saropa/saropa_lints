@@ -535,6 +535,7 @@ We provide specialized lint rules for popular Flutter packages. These catch libr
 | **Databases** | Isar | [Using with Isar](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_isar.md) |
 | | Hive | [Using with Hive](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_hive.md) |
 | **Backend Services** | Firebase | [Using with Firebase](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_firebase.md) |
+| **Platform** | iOS/macOS | [Apple Platform Rules](https://github.com/saropa/saropa_lints/blob/main/doc/guides/apple_platform_rules.md) |
 
 #### For Package Authors
 

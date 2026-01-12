@@ -6875,7 +6875,7 @@ class _NullReturnVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when yield is used inside Bloc event handler.
 ///
-/// In Bloc 8.0+, yield was replaced with emit(). Using yield in on<Event>
+/// In Bloc 8.0+, yield was replaced with emit(). Using yield in `on<Event>`
 /// handlers is deprecated and won't work correctly.
 ///
 /// **BAD:**
