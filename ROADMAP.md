@@ -240,7 +240,6 @@ This ROADMAP is for **planned/unimplemented rules only**.
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_universal_link_validation` | Essential | WARNING | iOS Universal Links and Android App Links need server-side apple-app-site-association and assetlinks.json. Test on real devices. |
 | `prefer_branch_io_or_firebase_links` | Professional | INFO | Raw deep links break when app not installed. Branch.io or Firebase Dynamic Links provide install-then-open flow. |
 
 ### 1.9 Forms & Validation Rules
@@ -270,11 +269,34 @@ This ROADMAP is for **planned/unimplemented rules only**.
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_ios_permission_description` | Essential | ERROR | iOS rejects apps without Info.plist usage descriptions for camera, location, etc. Add NSCameraUsageDescription etc. |
-| `avoid_http_without_ats_exception` | Essential | ERROR | iOS blocks non-HTTPS by default (App Transport Security). Add exception in Info.plist only if absolutely necessary. |
-| `require_ios_background_mode` | Professional | INFO | Background tasks need specific capabilities in Xcode: background fetch, remote notifications, audio, location. |
-| `avoid_ios_13_deprecations` | Recommended | WARNING | iOS 13+ deprecates UIWebView, UIAlertView, and others. Use WKWebView and modern APIs to avoid App Store rejection. |
-| `require_apple_sign_in` | Essential | ERROR | Apps with third-party login (Google, Facebook) must also offer Sign in with Apple per App Store guidelines. |
+| `require_ios_entitlements` | Professional | ERROR | `[CROSS-FILE]` Features like Push Notifications, Keychain Sharing, App Groups require matching entitlements in Xcode. Detect feature usage without entitlement. |
+| `require_ios_launch_storyboard` | Essential | ERROR | `[CROSS-FILE]` iOS apps without LaunchScreen.storyboard are rejected. Detect Flutter apps missing launch screen configuration. |
+
+#### macOS-Specific
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `require_macos_entitlements` | Essential | ERROR | `[CROSS-FILE]` macOS sandboxed apps require entitlements for network, file access, camera, etc. Detect usage without entitlement. |
+| `require_macos_sandbox_exceptions` | Professional | INFO | macOS App Store apps must be sandboxed. Document any required temporary exceptions for file/network access. |
+| `avoid_macos_hardened_runtime_violations` | Essential | ERROR | macOS Notarization requires Hardened Runtime. Code injection, unsigned libraries, and missing entitlements cause rejection. |
+| `require_macos_app_transport_security` | Essential | WARNING | Like iOS, macOS enforces ATS. HTTP connections need explicit exceptions in Info.plist. |
+| `avoid_macos_full_disk_access` | Professional | WARNING | Full Disk Access is a sensitive permission. Prefer scoped file access with NSOpenPanel or specific entitlements. |
+| `require_macos_notarization_ready` | Essential | ERROR | Apps must be notarized for macOS 10.15+. Ensure code signing and hardened runtime are properly configured. |
+
+#### FFI/Native Interop (iOS/macOS)
+
+> **Note**: These are built-in Dart analyzer diagnostics, not custom lint rules. They are automatically enabled when using `dart:ffi` for iOS/macOS native code integration. Listed here for documentation purposes.
+
+| Diagnostic | Type | Description |
+|------------|------|-------------|
+| `ffi_native_must_be_external` | Built-in | Functions with `@Native` annotation must be declared `external` to bind to native iOS/macOS code. |
+| `ffi_native_invalid_multiple_annotations` | Built-in | Native functions must have exactly one `@Native` annotation. |
+| `native_function_missing_type` | Built-in | Type hints required on `@Native` annotations to infer native function types. |
+| `native_field_invalid_type` | Built-in | Native fields must use valid FFI types: pointers, arrays, numeric types, or structs/unions. |
+| `native_field_not_static` | Built-in | Native fields binding to iOS/macOS symbols must be static. |
+| `leaf_call_must_not_return_handle` | Built-in | FFI leaf calls (for performance) cannot return Handle types. |
+| `leaf_call_must_not_take_handle` | Built-in | FFI leaf calls cannot accept Handle arguments. |
+| `packed_annotation_alignment` | Built-in | Struct packing (for C interop) only supports 1, 2, 4, 8, and 16 byte alignment. |
 
 #### Android-Specific
 
@@ -1470,7 +1492,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_desktop_window_setup` | Professional | INFO | `[CROSS-FILE]` Desktop apps need window configuration. Detect desktop target without setup. |
 | `avoid_web_only_dependencies` | Essential | ERROR | Don't use web-only packages in mobile. Detect dart:html in mobile code. |
 | `prefer_foundation_platform_check` | Recommended | INFO | Use foundation's defaultTargetPlatform. Detect Platform in widget context. |
-| `require_method_channel_error_handling` | Essential | WARNING | Platform channels can fail. Detect MethodChannel without error handling. |
 
 ### 5.36 API Response Handling Rules
 
