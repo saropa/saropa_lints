@@ -1281,3 +1281,148 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// avoid_getx_global_navigation
+// =============================================================================
+
+/// Get.to() uses global context, hurting testability.
+///
+/// GetX navigation methods bypass the widget tree's context, making
+/// testing and navigation state management difficult.
+///
+/// **BAD:**
+/// ```dart
+/// Get.to(NextPage());
+/// Get.off(HomePage());
+/// Get.toNamed('/details');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Navigator.of(context).push(...);
+/// // Or use GoRouter, AutoRoute, etc.
+/// ```
+class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
+  const AvoidGetxGlobalNavigationRule() : super(code: _code);
+
+  /// Testability and navigation predictability issues.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_getx_global_navigation',
+    problemMessage:
+        'GetX global navigation (Get.to, Get.off) bypasses widget context.',
+    correctionMessage:
+        'Use Navigator.of(context) or a typed routing solution like GoRouter.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Navigation methods that use global context.
+  static const Set<String> _globalNavMethods = <String>{
+    'to',
+    'toNamed',
+    'off',
+    'offNamed',
+    'offAll',
+    'offAllNamed',
+    'offAndToNamed',
+    'offUntil',
+    'offNamedUntil',
+    'back',
+    'close',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_globalNavMethods.contains(methodName)) return;
+
+      // Check if target is Get
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Get') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// require_getx_binding_routes
+// =============================================================================
+
+/// GetX routes should use Bindings for dependency injection.
+///
+/// GetPage without a binding forces manual controller creation and
+/// lifecycle management in widgets.
+///
+/// **BAD:**
+/// ```dart
+/// GetPage(
+///   name: '/home',
+///   page: () => HomePage(),
+///   // Missing binding!
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GetPage(
+///   name: '/home',
+///   page: () => HomePage(),
+///   binding: HomeBinding(),
+/// )
+/// ```
+class RequireGetxBindingRoutesRule extends SaropaLintRule {
+  const RequireGetxBindingRoutesRule() : super(code: _code);
+
+  /// DI and lifecycle management consistency.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_getx_binding_routes',
+    problemMessage: 'GetPage without binding parameter.',
+    correctionMessage: 'Add binding: YourBinding() for proper DI lifecycle.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GetPage') return;
+
+      // Check for binding parameter
+      final ArgumentList args = node.argumentList;
+      bool hasBinding = false;
+
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'binding' ||
+              arg.name.label.name == 'bindings') {
+            hasBinding = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasBinding) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

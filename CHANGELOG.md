@@ -7,6 +7,189 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.7.0] - 2026-01-12
+
+### Added
+
+#### Stylistic/Opinionated Lint Rules (92 rules)
+
+**IMPORTANT**: These rules are **not included in any tier by default**. They express team style preferences where valid arguments exist for opposing approaches. Enable them individually based on your team's style guide.
+
+**Widget Style Rules (11 rules)** - `stylistic_widget_rules.dart`
+- **`prefer_sized_box_over_container`**: Prefer SizedBox over Container when only setting dimensions. (INFO)
+- **`prefer_container_over_sized_box`**: Opposite - prefer Container for consistency. (INFO)
+- **`prefer_text_rich_over_richtext`**: Prefer Text.rich over RichText widget. (INFO)
+- **`prefer_richtext_over_text_rich`**: Opposite - prefer RichText for complex spans. (INFO)
+- **`prefer_edge_insets_symmetric`**: Prefer EdgeInsets.symmetric over LTRB when applicable. (INFO)
+- **`prefer_edge_insets_only`**: Prefer EdgeInsets.only for explicit padding. (INFO)
+- **`prefer_const_widgets`**: Prefer const constructors for widgets. (INFO)
+- **`prefer_builder_over_closure`**: Prefer Builder widgets over inline closures in build. (INFO)
+- **`prefer_closure_over_builder`**: Opposite - prefer closures for simplicity. (INFO)
+- **`prefer_fractionally_sized_box`**: Prefer FractionallySizedBox over MediaQuery calculations. (INFO)
+- **`prefer_media_query_over_fractional`**: Opposite - prefer explicit MediaQuery. (INFO)
+
+**Null & Collection Style Rules (14 rules)** - `stylistic_null_collection_rules.dart`
+- **`prefer_if_null_operator`**: Prefer `??` over ternary null checks. (INFO)
+- **`prefer_ternary_over_if_null`**: Opposite - prefer ternary for explicitness. (INFO)
+- **`prefer_null_aware_assignment`**: Prefer `??=` over if-null assignment patterns. (INFO)
+- **`prefer_explicit_null_assignment`**: Opposite - prefer explicit null checks. (INFO)
+- **`prefer_spread_operator`**: Prefer spread operator `...` over addAll. (INFO)
+- **`prefer_add_all_over_spread`**: Opposite - prefer addAll for clarity. (INFO)
+- **`prefer_collection_literals`**: Prefer `[]`, `{}` over `List()`, `Map()`. (INFO)
+- **`prefer_constructor_over_literal`**: Opposite - prefer constructors. (INFO)
+- **`prefer_where_over_for_if`**: Prefer where/map over for-if loops. (INFO)
+- **`prefer_for_loop_over_functional`**: Opposite - prefer imperative loops. (INFO)
+- **`prefer_cascade_notation`**: Prefer cascade `..` for multiple operations on same object. (INFO)
+- **`prefer_separate_calls_over_cascade`**: Opposite - prefer separate method calls. (INFO)
+- **`prefer_final_in_for_each`**: Prefer final in for-each loops. (INFO)
+- **`prefer_var_in_for_each`**: Opposite - prefer var for mutability. (INFO)
+
+**Control Flow & Async Rules (14 rules)** - `stylistic_control_flow_rules.dart`
+- **`prefer_early_return`**: Prefer early return over nested if-else. (INFO)
+- **`prefer_single_exit_point`**: Opposite - prefer structured single exit. (INFO)
+- **`prefer_switch_expression`**: Prefer switch expressions over statements. (INFO)
+- **`prefer_switch_statement_over_expression`**: Opposite - prefer statements. (INFO)
+- **`prefer_pattern_matching`**: Prefer pattern matching over manual type checks. (INFO)
+- **`prefer_manual_type_checks`**: Opposite - prefer explicit is/as checks. (INFO)
+- **`prefer_ternary_over_if_else`**: Prefer ternary for simple conditionals. (INFO)
+- **`prefer_if_else_over_ternary`**: Opposite - prefer if-else for readability. (INFO)
+- **`prefer_guard_clauses`**: Prefer guard clauses at start of methods. (INFO)
+- **`prefer_positive_conditions`**: Opposite - prefer positive condition flow. (INFO)
+- **`prefer_async_only_when_awaiting`**: Warn when async function doesn't contain await. (INFO)
+- **`prefer_await_over_then`**: Prefer await over .then() chains. (INFO)
+- **`prefer_then_over_await`**: Opposite - prefer functional .then() style. (INFO)
+- **`prefer_sync_over_async_where_possible`**: Prefer sync when no await needed. (INFO)
+
+**Whitespace & Constructor Rules (18 rules)** - `stylistic_whitespace_constructor_rules.dart`
+- **`prefer_blank_line_before_return`**: Prefer blank line before return statements. (INFO)
+- **`prefer_no_blank_line_before_return`**: Opposite - prefer compact returns. (INFO)
+- **`prefer_blank_line_after_declarations`**: Prefer blank line after variable declarations. (INFO)
+- **`prefer_compact_declarations`**: Opposite - prefer compact variable sections. (INFO)
+- **`prefer_blank_line_between_members`**: Prefer blank line between class members. (INFO)
+- **`prefer_compact_class_body`**: Opposite - prefer compact class bodies. (INFO)
+- **`prefer_trailing_commas`**: Prefer trailing commas in multi-line. (INFO)
+- **`prefer_no_trailing_commas`**: Opposite - prefer no trailing commas. (INFO)
+- **`prefer_super_parameters`**: Prefer super parameters over super.x in constructor body. (INFO)
+- **`prefer_explicit_super_calls`**: Opposite - prefer explicit super. calls. (INFO)
+- **`prefer_initializing_formals`**: Prefer this.x parameters over assignment. (INFO)
+- **`prefer_explicit_field_assignment`**: Opposite - prefer explicit assignments. (INFO)
+- **`prefer_factory_constructors`**: Prefer factory for conditional construction. (INFO)
+- **`prefer_assertion_constructors`**: Opposite - prefer assertions in regular constructors. (INFO)
+- **`prefer_named_constructors`**: Prefer named constructors over positional parameters. (INFO)
+- **`prefer_unnamed_constructors`**: Opposite - prefer simple unnamed constructors. (INFO)
+- **`prefer_const_constructors_in_immutables`**: Prefer const in immutable classes. (INFO)
+- **`prefer_mutable_constructors`**: Opposite - allow mutable patterns. (INFO)
+
+**Error Handling & Testing Style Rules (13 rules)** - `stylistic_error_testing_rules.dart`
+- **`prefer_specific_exceptions`**: Prefer specific exception types over Exception/Error. (INFO)
+- **`prefer_generic_exceptions`**: Opposite - prefer generic for catch-all. (INFO)
+- **`prefer_rethrow`**: Prefer rethrow over throw e. (INFO)
+- **`prefer_throw_over_rethrow`**: Opposite - prefer explicit throw for modification. (INFO)
+- **`prefer_on_clause`**: Prefer on TypeError catch over generic catch. (INFO)
+- **`prefer_catch_over_on`**: Opposite - prefer catch for simplicity. (INFO)
+- **`prefer_aaa_test_structure`**: Prefer Arrange-Act-Assert comments in tests. (INFO)
+- **`prefer_gwt_test_structure`**: Opposite - prefer Given-When-Then comments. (INFO)
+- **`prefer_expect_over_assert`**: Prefer expect() matchers over assert in tests. (INFO)
+- **`prefer_assert_over_expect`**: Opposite - prefer assert for simplicity. (INFO)
+- **`prefer_test_description_prefix`**: Prefer should/when/it prefixes in test names. (INFO)
+- **`prefer_descriptive_test_names`**: Opposite - prefer full sentence descriptions. (INFO)
+- **`prefer_single_expectation_per_test`**: Prefer one expect per test. (INFO)
+
+**Additional Style Rules (22 rules)** - `stylistic_additional_rules.dart`
+- **`prefer_string_interpolation`**: Prefer interpolation over concatenation. (INFO)
+- **`prefer_string_concatenation`**: Opposite - prefer explicit concatenation. (INFO)
+- **`prefer_single_quotes`**: Prefer single quotes for strings. (INFO)
+- **`prefer_double_quotes`**: Opposite - prefer double quotes. (INFO)
+- **`prefer_grouped_imports`**: Prefer imports grouped by type (dart/package/relative). (INFO)
+- **`prefer_flat_imports`**: Opposite - prefer flat import list. (INFO)
+- **`prefer_fields_before_methods`**: Prefer fields declared before methods. (INFO)
+- **`prefer_methods_before_fields`**: Opposite - prefer methods first. (INFO)
+- **`prefer_static_members_first`**: Prefer static members before instance members. (INFO)
+- **`prefer_instance_members_first`**: Opposite - prefer instance first. (INFO)
+- **`prefer_public_members_first`**: Prefer public members before private. (INFO)
+- **`prefer_private_members_first`**: Opposite - prefer private first. (INFO)
+- **`prefer_explicit_types`**: Prefer explicit type annotations over var. (INFO)
+- **`prefer_var_keyword`**: Opposite - prefer var for inferred types. (INFO)
+- **`prefer_dynamic_over_object`**: Prefer dynamic over Object? for unknown types. (INFO)
+- **`prefer_object_over_dynamic`**: Opposite - prefer Object? for type safety. (INFO)
+- **`prefer_lower_camel_case_constants`**: Prefer lowerCamelCase for constants. (INFO)
+- **`prefer_screaming_case_constants`**: Opposite - prefer SCREAMING_CASE. (INFO)
+- **`prefer_short_variable_names`**: Prefer short names for short-lived variables. (INFO)
+- **`prefer_descriptive_variable_names`**: Opposite - prefer descriptive names. (INFO)
+- **`prefer_explicit_this`**: Prefer explicit this. for field access. (INFO)
+- **`prefer_implicit_boolean_comparison`**: Prefer `if (isValid)` over `if (isValid == true)`. (INFO)
+- **`prefer_explicit_boolean_comparison`**: Opposite - prefer explicit comparisons for nullable. (INFO)
+
+### Changed
+
+- Updated rule counts in README.md (1360+ → 1450+)
+- Updated pubspec.yaml version to 2.7.0
+- Updated analysis_options_template.yaml with all 92 stylistic rules
+
+## [2.6.0] - 2026-01-12
+
+### Added
+
+#### New Lint Rules (23 rules from ROADMAP_NEXT)
+
+**Code Quality Rules (1 rule)**
+- **`prefer_returning_conditional_expressions`**: Warns when if/else blocks only contain return statements. Use ternary expression or direct return. **Quick fix available.** (INFO)
+
+**Riverpod Rules (2 rules)**
+- **`prefer_riverpod_auto_dispose`**: Warns when providers don't use `.autoDispose` modifier. Prevents memory leaks from retained providers. (INFO)
+- **`prefer_riverpod_family_for_params`**: Warns when `StateProvider<T?>` with `=> null` initializer is used for parameterized data. Use `.family` modifier instead. (INFO)
+
+**GetX Rules (2 rules)**
+- **`avoid_getx_global_navigation`**: Warns when `Get.to()`, `Get.off()`, etc. are used outside widgets. Hurts testability. (WARNING)
+- **`require_getx_binding_routes`**: Warns when `GetPage` is created without `binding:` parameter. (INFO)
+
+**Dio HTTP Rules (3 rules)**
+- **`require_dio_response_type`**: Warns when Dio `download()` is called without explicit `responseType`. (INFO)
+- **`require_dio_retry_interceptor`**: Warns when `Dio()` is created without retry interceptor. (INFO)
+- **`prefer_dio_transformer`**: Warns when `Dio()` is created without custom transformer for background parsing. (INFO)
+
+**GoRouter Rules (3 rules)**
+- **`prefer_shell_route_shared_layout`**: Warns when `GoRoute` builder includes `Scaffold` with `AppBar`. Use `ShellRoute` instead. (INFO)
+- **`require_stateful_shell_route_tabs`**: Warns when `ShellRoute` with tab-like navigation should use `StatefulShellRoute`. (INFO)
+- **`require_go_router_fallback_route`**: Warns when `GoRouter` is created without `errorBuilder` or `errorPageBuilder`. (INFO)
+
+**SQLite Rules (2 rules)**
+- **`prefer_sqflite_singleton`**: Warns when `openDatabase()` is called outside a singleton pattern. (INFO)
+- **`prefer_sqflite_column_constants`**: Warns when string literals are used for column names in database queries. (INFO)
+
+**Freezed Rules (2 rules)**
+- **`require_freezed_json_converter`**: Warns when Freezed classes with DateTime/Color fields lack `JsonConverter`. (INFO)
+- **`require_freezed_lint_package`**: Warns when project uses Freezed but doesn't import `freezed_lint`. (INFO)
+
+**Geolocation Rules (2 rules)**
+- **`prefer_geolocator_accuracy_appropriate`**: Warns when `LocationAccuracy.high` is used. Consider lower accuracy to save battery. (INFO)
+- **`prefer_geolocator_last_known`**: Warns when `getCurrentPosition` with low accuracy could use `getLastKnownPosition`. (INFO)
+
+**Resource Management Rules (1 rule)**
+- **`prefer_image_picker_multi_selection`**: Warns when `pickImage()` is called inside a loop. Use `pickMultiImage()`. (INFO)
+
+**Notification Rules (1 rule)**
+- **`require_notification_action_handling`**: Warns when notification actions are defined without handler setup. (INFO)
+
+**Error Handling Rules (1 rule)**
+- **`require_finally_cleanup`**: Warns when cleanup code (close/dispose) is in catch block instead of finally. (INFO)
+
+**DI Rules (1 rule)**
+- **`require_di_scope_awareness`**: Warns about potential scope mismatches in GetIt registration (stateful as singleton, expensive as factory). (INFO)
+
+**Equatable Rules (3 rules)**
+- **`require_deep_equality_collections`**: Warns when List/Set/Map fields in Equatable props are compared by reference. (WARNING)
+- **`avoid_equatable_datetime`**: Warns when DateTime fields in Equatable props may cause flaky equality. (WARNING)
+- **`prefer_unmodifiable_collections`**: Warns when collection fields in Equatable/State classes could be mutated externally. (INFO)
+
+**Hive Rules (1 rule)**
+- **`prefer_hive_value_listenable`**: Warns when `setState()` is called after Hive operations. Use `box.listenable()`. (INFO)
+
+### Changed
+
+- Updated rule counts in README.md (1340+ → 1360+)
+- Updated pubspec.yaml version to 2.6.0
+
 ## [2.5.0] - 2026-01-12
 
 ### Changed
@@ -14,8 +197,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`avoid_context_across_async`**: Improved detection logic using proper AST type checking instead of string matching. Now correctly reports context usage in else-branch of `if (mounted)` blocks. Added quick fix to insert `if (!mounted) return;` guard.
 - **`use_setstate_synchronously`**: Refactored to use shared mounted-check utilities for consistency
 - **`avoid_scaffold_messenger_after_await`**: Refactored to use shared await detection utilities
+- **`require_ios_permission_description`**: Now **actually reads Info.plist** to verify if required permission keys are present. Only reports warnings when keys are genuinely missing, eliminating false positives. Reports specific missing key names in the error message. **Smart ImagePicker detection**: analyzes the `source:` parameter to determine if `ImageSource.gallery` or `ImageSource.camera` is used, requiring only the relevant permission (`NSPhotoLibraryUsageDescription` or `NSCameraUsageDescription`) instead of both.
 
 ### Added
+
+#### New Lint Rules (17 rules)
+
+**Code Quality Rules (1 rule)**
+- **`no_boolean_literal_compare`**: Warns when comparing boolean expressions to `true` or `false` literals (e.g., `if (x == true)`). Use the expression directly or negate it. **Quick fix available.** (INFO)
+
+**JSON Serialization Rules (1 rule)**
+- **`avoid_not_encodable_in_to_json`**: Warns when `toJson()` methods return non-JSON-encodable types (DateTime, Function, Widget, etc.). **Quick fix available** for DateTime → `.toIso8601String()`. (WARNING)
+
+**Dependency Injection Rules (1 rule)**
+- **`prefer_constructor_injection`**: Warns when setter/method injection is used instead of constructor injection. Flags `late` fields for service types, setter methods for dependencies, and `init()`/`configure()` methods. (INFO)
+
+**Async Performance Rules (1 rule)**
+- **`prefer_future_wait`**: Warns when sequential independent awaits could run in parallel with `Future.wait()`. Detects dependency chains to avoid false positives. (INFO)
+
+**Testing Best Practices Rules (6 rules)**
+- **`prefer_test_find_by_key`**: Warns when `find.byType` is used instead of `find.byKey` in widget tests. Keys are more reliable. (INFO)
+- **`prefer_setup_teardown`**: Warns when test setup code is duplicated 3+ times. Use `setUp()`/`tearDown()` instead. (INFO)
+- **`require_test_description_convention`**: Warns when test descriptions don't follow conventions (should explain what is tested and expected behavior). (INFO)
+- **`prefer_bloc_test_package`**: Suggests using `blocTest()` from `bloc_test` package for Bloc testing. (INFO)
+- **`prefer_mock_verify`**: Warns when `when()` mock setup is used without `verify()` to check method was called. (INFO)
+- **`require_error_logging`**: Warns when catch blocks don't log errors. Silent failures are hard to debug. (INFO)
+
+**State Management Rules (7 rules)**
+- **`prefer_change_notifier_proxy`**: Warns when `Provider.of` is used without `listen: false` in callbacks. Use `context.read()` instead. (INFO)
+- **`prefer_selector_widget`**: Warns when `Consumer` rebuilds entire subtree. Consider `Selector` for targeted rebuilds. (INFO)
+- **`require_bloc_event_sealed`**: Warns when Bloc event hierarchy uses `abstract class` instead of `sealed class` for Dart 3+ exhaustive pattern matching. (INFO)
+- **`require_bloc_repository_abstraction`**: Warns when Bloc depends on concrete repository implementations (e.g., `FirebaseUserRepository`) instead of abstract interfaces. (INFO)
+- **`avoid_getx_global_state`**: Warns when `Get.put()`/`Get.find()` is used for global state. Use `GetBuilder` with `init:` parameter instead. (INFO)
+- **`prefer_bloc_transform`**: Warns when search/input Bloc events lack debounce/throttle transformer. (INFO)
+
+#### Other Additions
+
+- **`info_plist_utils.dart`**: New utility for smart Info.plist checking - finds project root, caches parsed content per project, checks for specific permission keys
 
 - **`require_cache_key_determinism`**: Added quick fix that inserts HACK comment for manual cache key review
 - **`avoid_exception_in_constructor`**: Added quick fix that inserts HACK comment suggesting factory constructor conversion
@@ -26,6 +244,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`require_ios_face_id_usage_description`**: Fixed false positives from overly broad method name matching. Previously flagged any `authenticate()` call (e.g., Google Sign-In). Now uses proper AST type resolution via `staticType?.element?.name` to verify the receiver is `LocalAuthentication` from the `local_auth` package.
 - **`require_cache_key_determinism`**: Fixed false positives from substring matching. Now uses regex with word boundaries to avoid matching variable names like `myHashCode`, `userUuid`. Removed overly generic `generateId(` pattern.
 - **`avoid_builder_index_out_of_bounds`**: Improved detection to verify bounds check is on the SAME list being accessed. Previously would miss cases where `otherList.length` was checked but `items[index]` was accessed.
 - **Shared utilities**: Created `async_context_utils.dart` with reusable mounted-check and await detection logic

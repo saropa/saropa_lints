@@ -6,9 +6,9 @@ This guide helps you migrate from `very_good_analysis` to Saropa Lints.
 
 | Feature | very_good_analysis | Saropa Lints |
 |---------|-------------------|--------------|
-| **Rule count** | 174 standard rules | 1184+ custom rules |
+| **Rule count** | 174 standard rules | 1450+ custom rules |
 | **Rule types** | Dart linter rules | Deep custom analysis |
-| **Configuration** | Single file | 5 progressive tiers |
+| **Configuration** | Single file | 5 progressive tiers + optional stylistic rules |
 | **Specialization** | General best practices | Flutter-specific (accessibility, state management, security) |
 
 **Note**: You can also use both packages together. They're complementary, not competing.
@@ -25,7 +25,7 @@ dev_dependencies:
 # After
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
 ```
 
 ### Step 2: Update analysis_options.yaml
@@ -72,12 +72,12 @@ custom_lint:
 dev_dependencies:
   very_good_analysis: ^6.0.0
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
 ```
 
 This gives you:
 - 174 standard Dart linter rules from VGA
-- 1184+ custom rules from saropa_lints
+- 1450+ custom rules from saropa_lints
 
 ## Choosing a Tier
 
@@ -85,13 +85,15 @@ VGA has one configuration. Saropa Lints has five tiers to match your team's need
 
 | VGA Equivalent | Saropa Lints Tier | Description |
 |----------------|-------------------|-------------|
-| Basic usage | **Essential** (~100 rules) | Critical bugs, memory leaks, security |
-| Full VGA | **Recommended** (~280 rules) | Similar coverage + Flutter-specific |
-| Stricter | **Professional** (~560 rules) | Enterprise-grade |
-| Maximum | **Comprehensive** (~700 rules) | Quality obsessed |
-| Everything | **Insanity** (1184+ rules) | Every single rule |
+| Basic usage | **Essential** (~256 rules) | Critical bugs, memory leaks, security |
+| Full VGA | **Recommended** (~573 rules) | Similar coverage + Flutter-specific |
+| Stricter | **Professional** (~979 rules) | Enterprise-grade |
+| Maximum | **Comprehensive** (~1202 rules) | Quality obsessed |
+| Everything | **Insanity** (1450+ rules) | Every single rule |
 
 **Start with `recommended`** - it's the closest to VGA's philosophy.
+
+**Plus 114 optional stylistic rules** for team preferences (trailing commas, sorting, etc.) - see [stylistic rules](../../README_STYLISTIC.md).
 
 ## Rule Mapping
 

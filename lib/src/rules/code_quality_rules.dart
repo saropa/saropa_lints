@@ -6,7 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 
 import '../saropa_lint_rule.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -6955,5 +6955,313 @@ class PreferDotShorthandRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+}
+
+// =============================================================================
+// ROADMAP_NEXT: Phase 2 - Core Code Quality Rules
+// =============================================================================
+
+/// Warns when comparing boolean expressions to boolean literals.
+///
+/// Alias: boolean_literal_compare, unnecessary_bool_compare, redundant_bool_literal
+///
+/// Comparing a boolean expression to `true` or `false` is redundant and
+/// makes code harder to read. Use the expression directly or negate it.
+///
+/// **BAD:**
+/// ```dart
+/// if (isEnabled == true) { }
+/// if (isEnabled == false) { }
+/// if (true == isEnabled) { }
+/// if (isEnabled != false) { }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// if (isEnabled) { }
+/// if (!isEnabled) { }
+/// ```
+///
+/// **Quick fix available:** Simplifies to direct boolean expression.
+class NoBooleanLiteralCompareRule extends SaropaLintRule {
+  const NoBooleanLiteralCompareRule() : super(code: _code);
+
+  /// Code style improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'no_boolean_literal_compare',
+    problemMessage: 'Unnecessary comparison to boolean literal.',
+    correctionMessage:
+        'Use the boolean expression directly: x instead of x == true, '
+        '!x instead of x == false.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      // Only check == and != operators
+      final operatorType = node.operator.type;
+      if (operatorType != TokenType.EQ_EQ && operatorType != TokenType.BANG_EQ) {
+        return;
+      }
+
+      final left = node.leftOperand;
+      final right = node.rightOperand;
+
+      // Check if either operand is a boolean literal
+      final leftIsBoolLiteral = left is BooleanLiteral;
+      final rightIsBoolLiteral = right is BooleanLiteral;
+
+      if (!leftIsBoolLiteral && !rightIsBoolLiteral) {
+        return;
+      }
+
+      // Check if the other operand is a boolean type (to avoid false positives
+      // on nullable booleans where == true is intentional)
+      final Expression otherOperand = leftIsBoolLiteral ? right : left;
+      final otherType = otherOperand.staticType;
+
+      // Only flag if the other operand is non-nullable bool
+      if (otherType != null && otherType.isDartCoreBool) {
+        // Check nullability - allow == true/false for nullable bools
+        if (otherType.nullabilitySuffix == NullabilitySuffix.none) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_SimplifyBooleanComparisonFix()];
+}
+
+/// Quick fix: Simplifies boolean literal comparisons.
+class _SimplifyBooleanComparisonFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addBinaryExpression((BinaryExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final operatorType = node.operator.type;
+      final left = node.leftOperand;
+      final right = node.rightOperand;
+
+      final leftIsBoolLiteral = left is BooleanLiteral;
+      final rightIsBoolLiteral = right is BooleanLiteral;
+
+      if (!leftIsBoolLiteral && !rightIsBoolLiteral) return;
+
+      final BooleanLiteral boolLiteral =
+          leftIsBoolLiteral ? left : right as BooleanLiteral;
+      final Expression otherExpr = leftIsBoolLiteral ? right : left;
+
+      // Determine the replacement
+      String replacement;
+      final bool comparingToTrue = boolLiteral.value;
+      final bool isEquality = operatorType == TokenType.EQ_EQ;
+
+      // Truth table:
+      // x == true  -> x
+      // x == false -> !x
+      // x != true  -> !x
+      // x != false -> x
+      final bool needsNegation = comparingToTrue != isEquality;
+
+      if (needsNegation) {
+        // Check if we need parentheses
+        final exprSource = otherExpr.toSource();
+        if (_needsParentheses(otherExpr)) {
+          replacement = '!($exprSource)';
+        } else {
+          replacement = '!$exprSource';
+        }
+      } else {
+        replacement = otherExpr.toSource();
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Simplify to: $replacement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(node.sourceRange, replacement);
+      });
+    });
+  }
+
+  /// Check if expression needs parentheses when negated.
+  bool _needsParentheses(Expression expr) {
+    return expr is BinaryExpression ||
+        expr is ConditionalExpression ||
+        expr is AsExpression ||
+        expr is IsExpression;
+  }
+}
+
+// =============================================================================
+// prefer_returning_conditional_expressions
+// =============================================================================
+
+/// Return conditional expressions directly instead of if/else blocks.
+///
+/// When an if/else block simply returns different values, use a ternary
+/// expression or direct return for cleaner, more readable code.
+///
+/// **BAD:**
+/// ```dart
+/// if (condition) {
+///   return true;
+/// } else {
+///   return false;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// return condition;
+/// // or
+/// return condition ? valueA : valueB;
+/// ```
+///
+/// **Quick fix available:** Transforms if/else to ternary expression.
+class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
+  const PreferReturningConditionalExpressionsRule() : super(code: _code);
+
+  /// Code quality improvement. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_returning_conditional_expressions',
+    problemMessage:
+        'If/else with only return statements can be simplified to ternary.',
+    correctionMessage:
+        'Use return condition ? valueA : valueB; or return condition;',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIfStatement((IfStatement node) {
+      // Must have else branch
+      final Statement? elseStatement = node.elseStatement;
+      if (elseStatement == null) return;
+
+      // Check if then branch is single return
+      final Statement thenStatement = node.thenStatement;
+      final ReturnStatement? thenReturn = _getSingleReturn(thenStatement);
+      if (thenReturn == null) return;
+
+      // Check if else branch is single return (not else-if)
+      if (elseStatement is IfStatement) return;
+      final ReturnStatement? elseReturn = _getSingleReturn(elseStatement);
+      if (elseReturn == null) return;
+
+      // Both branches are single returns - report
+      reporter.atNode(node, code);
+    });
+  }
+
+  /// Extract single return statement from a block or bare statement.
+  ReturnStatement? _getSingleReturn(Statement statement) {
+    if (statement is ReturnStatement) return statement;
+    if (statement is Block) {
+      final statements = statement.statements;
+      if (statements.length == 1 && statements.first is ReturnStatement) {
+        return statements.first as ReturnStatement;
+      }
+    }
+    return null;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferReturningConditionalExpressionsFix()];
+}
+
+class _PreferReturningConditionalExpressionsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIfStatement((IfStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Statement? elseStatement = node.elseStatement;
+      if (elseStatement == null) return;
+
+      final ReturnStatement? thenReturn = _getSingleReturn(node.thenStatement);
+      final ReturnStatement? elseReturn = _getSingleReturn(elseStatement);
+      if (thenReturn == null || elseReturn == null) return;
+
+      final Expression? thenValue = thenReturn.expression;
+      final Expression? elseValue = elseReturn.expression;
+      if (thenValue == null || elseValue == null) return;
+
+      final String condition = node.expression.toSource();
+      final String thenSource = thenValue.toSource();
+      final String elseSource = elseValue.toSource();
+
+      String replacement;
+
+      // Check for boolean literal returns
+      if (thenValue is BooleanLiteral && elseValue is BooleanLiteral) {
+        if (thenValue.value && !elseValue.value) {
+          // return true else return false -> return condition
+          replacement = 'return $condition;';
+        } else if (!thenValue.value && elseValue.value) {
+          // return false else return true -> return !condition
+          replacement = 'return !($condition);';
+        } else {
+          // Both same value - just use ternary
+          replacement = 'return $condition ? $thenSource : $elseSource;';
+        }
+      } else {
+        // General case: use ternary
+        replacement = 'return $condition ? $thenSource : $elseSource;';
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Convert to conditional expression',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(node.sourceRange, replacement);
+      });
+    });
+  }
+
+  ReturnStatement? _getSingleReturn(Statement statement) {
+    if (statement is ReturnStatement) return statement;
+    if (statement is Block) {
+      final statements = statement.statements;
+      if (statements.length == 1 && statements.first is ReturnStatement) {
+        return statements.first as ReturnStatement;
+      }
+    }
+    return null;
   }
 }

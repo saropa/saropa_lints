@@ -6,13 +6,30 @@ This guide helps you migrate from `dart_code_metrics` (DCM) to `saropa_lints`.
 
 | Feature | DCM | saropa_lints |
 |---------|-----|--------------|
-| **Rule count** | ~70 rules + metrics | 1184+ custom rules |
+| **Rule count** | ~70 rules + metrics | 1450+ custom rules |
 | **Focus** | Code metrics & complexity | Flutter-specific analysis |
 | **Configuration** | Extensive YAML options | 5 progressive tiers |
 | **Maintenance** | DCM Classic discontinued | Actively maintained |
 | **Cost** | DCM v2+ requires license | Free & open source |
 
 **Note**: If you're using DCM primarily for metrics (cyclomatic complexity, lines of code, etc.), saropa_lints focuses more on Flutter-specific patterns. Consider your primary use case.
+
+## Architecture Differences
+
+DCM and saropa_lints take different approaches to performance:
+
+| Aspect | DCM | saropa_lints |
+|--------|-----|--------------|
+| **Architecture** | Precompiled binary | custom_lint plugin |
+| **IDE integration** | Separate CLI tool | Real-time IDE feedback |
+| **Performance** | Fast CLI, limited IDE | Full IDE support, memory scales with tier |
+| **Installation** | Global binary + project config | Package dependency only |
+
+**DCM's approach**: DCM moved to a precompiled binary to solve performance issues with running many rules in the Dart Analysis Server. This makes CLI analysis fast but limits real-time IDE feedback.
+
+**saropa_lints' approach**: Uses the custom_lint plugin architecture for full IDE integration (squiggles, quick fixes, hover info). The tier system lets you control memory usage - start with `essential` (~256 rules) for lighter resource usage, scale up as needed.
+
+**Recommendation**: For large codebases concerned about IDE performance, start with `essential` or `recommended` tier. Use higher tiers in CI where memory isn't constrained.
 
 ## Quick Migration
 
@@ -26,7 +43,7 @@ dev_dependencies:
 # After
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
 ```
 
 ### Step 2: Update analysis_options.yaml
@@ -90,7 +107,7 @@ custom_lint:
 dev_dependencies:
   dart_code_metrics: ^5.7.0
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
 ```
 
 ## Choosing a Tier
@@ -99,13 +116,15 @@ DCM has granular metric thresholds. saropa_lints uses progressive tiers:
 
 | DCM Usage | saropa_lints Tier | Description |
 |-----------|-------------------|-------------|
-| Minimal rules | **Essential** (~100 rules) | Critical bugs, memory leaks, security |
-| Default config | **Recommended** (~280 rules) | Balanced coverage |
-| Strict metrics | **Professional** (~560 rules) | Enterprise-grade |
-| All rules enabled | **Comprehensive** (~700 rules) | Quality obsessed |
-| Maximum everything | **Insanity** (1184+ rules) | Every single rule |
+| Minimal rules | **Essential** (~256 rules) | Critical bugs, memory leaks, security |
+| Default config | **Recommended** (~573 rules) | Balanced coverage |
+| Strict metrics | **Professional** (~979 rules) | Enterprise-grade |
+| All rules enabled | **Comprehensive** (~1202 rules) | Quality obsessed |
+| Maximum everything | **Insanity** (1450+ rules) | Every single rule |
 
 **Start with `recommended`** - it provides broad coverage without overwhelming noise.
+
+**Plus 114 optional stylistic rules** for team preferences (trailing commas, sorting, etc.) - see [stylistic rules](../../README_STYLISTIC.md).
 
 ## Rule Mapping
 
