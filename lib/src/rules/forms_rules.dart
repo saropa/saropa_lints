@@ -374,7 +374,8 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_secure_keyboard',
-    problemMessage: '[require_secure_keyboard] Password field should use obscureText: true.',
+    problemMessage:
+        '[require_secure_keyboard] Password field should use obscureText: true.',
     correctionMessage: 'Add obscureText: true to hide password input.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -632,7 +633,8 @@ class RequireFormKeyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_form_key',
-    problemMessage: '[require_form_key] Form should have a GlobalKey to access FormState.',
+    problemMessage:
+        '[require_form_key] Form should have a GlobalKey to access FormState.',
     correctionMessage:
         'Add key: _formKey where _formKey = GlobalKey<FormState>()',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1241,7 +1243,8 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_keyboard_action_type',
-    problemMessage: '[require_keyboard_action_type] Text field should have textInputAction for better UX.',
+    problemMessage:
+        '[require_keyboard_action_type] Text field should have textInputAction for better UX.',
     correctionMessage:
         'Add textInputAction: TextInputAction.next or TextInputAction.done.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1592,7 +1595,8 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_form_auto_validate_mode',
-    problemMessage: '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX.',
+    problemMessage:
+        '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX.',
     correctionMessage:
         'Add autovalidateMode: AutovalidateMode.onUserInteraction.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -55,7 +55,8 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_file_close_in_finally',
-    problemMessage: '[require_file_close_in_finally] File handle should be closed in finally block.',
+    problemMessage:
+        '[require_file_close_in_finally] File handle should be closed in finally block.',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -167,7 +168,8 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_database_close',
-    problemMessage: '[require_database_close] Database connection should be closed.',
+    problemMessage:
+        '[require_database_close] Database connection should be closed.',
     correctionMessage:
         'Close database in finally block or use connection pool.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -247,7 +249,8 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_http_client_close',
-    problemMessage: '[require_http_client_close] HttpClient should be closed when done.',
+    problemMessage:
+        '[require_http_client_close] HttpClient should be closed when done.',
     correctionMessage: 'Call client.close() in finally block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -312,7 +315,8 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_native_resource_cleanup',
-    problemMessage: '[require_native_resource_cleanup] Native resource should be freed.',
+    problemMessage:
+        '[require_native_resource_cleanup] Native resource should be freed.',
     correctionMessage: 'Call free() in finally block for native allocations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -404,7 +408,8 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_close',
-    problemMessage: '[require_websocket_close] WebSocket should be closed in dispose.',
+    problemMessage:
+        '[require_websocket_close] WebSocket should be closed in dispose.',
     correctionMessage: 'Add _socket.close() in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -501,7 +506,8 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_platform_channel_cleanup',
-    problemMessage: '[require_platform_channel_cleanup] Platform channel handler should be removed in dispose.',
+    problemMessage:
+        '[require_platform_channel_cleanup] Platform channel handler should be removed in dispose.',
     correctionMessage: 'Set handler to null in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -596,7 +602,8 @@ class RequireIsolateKillRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isolate_kill',
-    problemMessage: '[require_isolate_kill] Spawned Isolate should be killed when done.',
+    problemMessage:
+        '[require_isolate_kill] Spawned Isolate should be killed when done.',
     correctionMessage: 'Call isolate.kill() in cleanup/dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

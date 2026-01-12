@@ -186,7 +186,8 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'list_all_equatable_fields',
-    problemMessage: '[list_all_equatable_fields] Equatable class has fields not included in props.',
+    problemMessage:
+        '[list_all_equatable_fields] Equatable class has fields not included in props.',
     correctionMessage:
         'Add all instance fields to the props getter for correct equality.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -487,7 +488,8 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_stringify',
-    problemMessage: '[prefer_equatable_stringify] Equatable class does not override stringify to true.',
+    problemMessage:
+        '[prefer_equatable_stringify] Equatable class does not override stringify to true.',
     correctionMessage:
         'Add: @override bool get stringify => true; for better debugging.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -607,7 +609,8 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_annotation',
-    problemMessage: '[prefer_immutable_annotation] Equatable class is not annotated with @immutable.',
+    problemMessage:
+        '[prefer_immutable_annotation] Equatable class is not annotated with @immutable.',
     correctionMessage:
         'Add @immutable annotation to document immutability intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1186,7 +1189,8 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_copy_with',
-    problemMessage: '[require_equatable_copy_with] Equatable class should have a copyWith method.',
+    problemMessage:
+        '[require_equatable_copy_with] Equatable class should have a copyWith method.',
     correctionMessage: 'Add copyWith method to easily create modified copies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

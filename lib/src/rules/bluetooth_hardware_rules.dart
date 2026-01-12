@@ -104,7 +104,8 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bluetooth_state_check',
-    problemMessage: '[require_bluetooth_state_check] BLE operations should check adapter state first.',
+    problemMessage:
+        '[require_bluetooth_state_check] BLE operations should check adapter state first.',
     correctionMessage:
         'Check FlutterBluePlus.adapterState before BLE operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -213,7 +214,8 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ble_disconnect_handling',
-    problemMessage: '[require_ble_disconnect_handling] BLE connection should handle disconnect state.',
+    problemMessage:
+        '[require_ble_disconnect_handling] BLE connection should handle disconnect state.',
     correctionMessage:
         'Listen to device.connectionState for disconnect events.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -408,7 +410,8 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_qr_permission_check',
-    problemMessage: '[require_qr_permission_check] QR scanner requires camera permission check.',
+    problemMessage:
+        '[require_qr_permission_check] QR scanner requires camera permission check.',
     correctionMessage: 'Request Permission.camera before showing QR scanner.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -499,7 +502,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_geolocator_permission_check',
-    problemMessage: '[require_geolocator_permission_check] Location access without permission check. Crashes on iOS.',
+    problemMessage:
+        '[require_geolocator_permission_check] Location access without permission check. Crashes on iOS.',
     correctionMessage:
         'Call Geolocator.checkPermission() before getCurrentPosition().',
     errorSeverity: DiagnosticSeverity.ERROR,

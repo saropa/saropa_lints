@@ -287,7 +287,8 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
-    problemMessage: '[proper_getx_super_calls] GetxController lifecycle method must call super. '
+    problemMessage:
+        '[proper_getx_super_calls] GetxController lifecycle method must call super. '
         'Missing super call breaks controller lifecycle.',
     correctionMessage:
         'Add super.onInit() at the start or super.onClose() at the end.',
@@ -398,7 +399,8 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'always_remove_getx_listener',
-    problemMessage: '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
+    problemMessage:
+        '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
         'This will cause a memory leak.',
     correctionMessage:
         'Assign the worker to a variable and call dispose() in onClose().',
@@ -468,7 +470,8 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
-    problemMessage: '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
+    problemMessage:
+        '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
     correctionMessage: 'Move reactive variables to a GetxController.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -538,7 +541,8 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
-    problemMessage: '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
+    problemMessage:
+        '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
     correctionMessage: 'Use .value = or callable syntax to update.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1443,7 +1447,8 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_getx_binding_routes',
-    problemMessage: '[require_getx_binding_routes] GetPage without binding parameter.',
+    problemMessage:
+        '[require_getx_binding_routes] GetPage without binding parameter.',
     correctionMessage: 'Add binding: YourBinding() for proper DI lifecycle.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

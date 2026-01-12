@@ -246,7 +246,8 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
-    problemMessage: '[require_hive_box_close] Hive box opened but not closed in dispose. Resource leak.',
+    problemMessage:
+        '[require_hive_box_close] Hive box opened but not closed in dispose. Resource leak.',
     correctionMessage: 'Call box.close() in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -330,7 +331,8 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
-    problemMessage: '[prefer_hive_encryption] Sensitive data stored in unencrypted Hive box.',
+    problemMessage:
+        '[prefer_hive_encryption] Sensitive data stored in unencrypted Hive box.',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,

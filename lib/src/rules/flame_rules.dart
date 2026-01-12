@@ -46,7 +46,8 @@ class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_creating_vector_in_update',
-    problemMessage: '[avoid_creating_vector_in_update] Creating Vector in update() causes GC churn every frame.',
+    problemMessage:
+        '[avoid_creating_vector_in_update] Creating Vector in update() causes GC churn every frame.',
     correctionMessage: 'Cache vectors as static final or instance fields.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -137,7 +138,8 @@ class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_async_on_load',
-    problemMessage: '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead.',
+    problemMessage:
+        '[avoid_redundant_async_on_load] async onLoad() without await adds unnecessary overhead.',
     correctionMessage: 'Remove async keyword or add await statements.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

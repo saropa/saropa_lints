@@ -25,7 +25,8 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_final_exception_class_fields',
-    problemMessage: '[avoid_non_final_exception_class_fields] Exception class fields should be final.',
+    problemMessage:
+        '[avoid_non_final_exception_class_fields] Exception class fields should be final.',
     correctionMessage: 'Make all fields final in exception classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -160,7 +161,8 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_catch_block',
-    problemMessage: '[avoid_throw_in_catch_block] Throwing in catch block loses the original stack trace.',
+    problemMessage:
+        '[avoid_throw_in_catch_block] Throwing in catch block loses the original stack trace.',
     correctionMessage:
         'Use rethrow or Error.throwWithStackTrace to preserve stack trace.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -227,7 +229,8 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_objects_without_tostring',
-    problemMessage: '[avoid_throw_objects_without_tostring] Thrown object may not have a useful toString() method.',
+    problemMessage:
+        '[avoid_throw_objects_without_tostring] Thrown object may not have a useful toString() method.',
     correctionMessage:
         'Consider throwing an Exception or Error subclass, or implement toString().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -301,7 +304,8 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_public_exception_classes',
-    problemMessage: '[prefer_public_exception_classes] Exception classes should be public.',
+    problemMessage:
+        '[prefer_public_exception_classes] Exception classes should be public.',
     correctionMessage: 'Remove underscore prefix from exception class name.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

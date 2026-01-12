@@ -169,7 +169,8 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_vague_test_descriptions',
-    problemMessage: '[avoid_vague_test_descriptions] Test description is too vague.',
+    problemMessage:
+        '[avoid_vague_test_descriptions] Test description is too vague.',
     correctionMessage:
         'Use descriptive names like "should [action] when [condition]".',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -275,7 +276,8 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_network_calls_in_tests',
-    problemMessage: '[avoid_real_network_calls_in_tests] Test may be making real network calls.',
+    problemMessage:
+        '[avoid_real_network_calls_in_tests] Test may be making real network calls.',
     correctionMessage: 'Mock HTTP clients and other external dependencies.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -463,7 +465,8 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_test_setup_teardown',
-    problemMessage: '[require_test_setup_teardown] Test file lacks setUp/tearDown for shared resources.',
+    problemMessage:
+        '[require_test_setup_teardown] Test file lacks setUp/tearDown for shared resources.',
     correctionMessage:
         'Add setUp() and tearDown() to initialize and clean up test state.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -674,7 +677,8 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_production_config_in_tests',
-    problemMessage: '[avoid_production_config_in_tests] Test may be using production configuration.',
+    problemMessage:
+        '[avoid_production_config_in_tests] Test may be using production configuration.',
     correctionMessage: 'Use test-specific or mocked configuration.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -876,7 +880,8 @@ class AvoidTestSleepRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_test_sleep',
-    problemMessage: '[avoid_test_sleep] Avoid using sleep() or real delays in tests.',
+    problemMessage:
+        '[avoid_test_sleep] Avoid using sleep() or real delays in tests.',
     correctionMessage: 'Use fakeAsync and async.elapse() for time-based tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1058,7 +1063,8 @@ class RequireTestKeysRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_test_keys',
-    problemMessage: '[require_test_keys] Widget in test should have a Key for findability.',
+    problemMessage:
+        '[require_test_keys] Widget in test should have a Key for findability.',
     correctionMessage: 'Add key: Key("descriptive_name") to the widget.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1162,7 +1168,8 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_arrange_act_assert',
-    problemMessage: '[require_arrange_act_assert] Test should follow Arrange-Act-Assert pattern.',
+    problemMessage:
+        '[require_arrange_act_assert] Test should follow Arrange-Act-Assert pattern.',
     correctionMessage:
         'Add // Arrange, // Act, // Assert comments to structure the test.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1330,7 +1337,8 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_timer_in_widget_test',
-    problemMessage: '[avoid_real_timer_in_widget_test] Avoid using Timer in widget tests.',
+    problemMessage:
+        '[avoid_real_timer_in_widget_test] Avoid using Timer in widget tests.',
     correctionMessage:
         'Use fakeAsync or tester.runAsync for timer-based tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1409,7 +1417,8 @@ class RequireMockVerificationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_mock_verification',
-    problemMessage: '[require_mock_verification] Mock is stubbed but never verified.',
+    problemMessage:
+        '[require_mock_verification] Mock is stubbed but never verified.',
     correctionMessage: 'Add verify() call to check mock interactions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1588,7 +1597,8 @@ class PreferTestWrapperRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_wrapper',
-    problemMessage: '[prefer_test_wrapper] Widget test should wrap with MaterialApp/CupertinoApp.',
+    problemMessage:
+        '[prefer_test_wrapper] Widget test should wrap with MaterialApp/CupertinoApp.',
     correctionMessage:
         'Wrap the widget with MaterialApp(home: Scaffold(body: ...)).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1754,7 +1764,8 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_screen_size_tests',
-    problemMessage: '[require_screen_size_tests] Consider testing at multiple screen sizes.',
+    problemMessage:
+        '[require_screen_size_tests] Consider testing at multiple screen sizes.',
     correctionMessage:
         'Use tester.binding.window.physicalSizeTestValue to test responsive layouts.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1837,7 +1848,8 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_test_setup',
-    problemMessage: '[avoid_stateful_test_setup] setUp should not mutate shared state.',
+    problemMessage:
+        '[avoid_stateful_test_setup] setUp should not mutate shared state.',
     correctionMessage: 'Reassign variables instead of mutating them in setUp.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1973,7 +1985,8 @@ class RequireGoldenTestRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_golden_test',
-    problemMessage: '[require_golden_test] Consider adding golden test for visual verification.',
+    problemMessage:
+        '[require_golden_test] Consider adding golden test for visual verification.',
     correctionMessage: 'Add matchesGoldenFile() for visual regression testing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2067,7 +2080,8 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_flaky_tests',
-    problemMessage: '[avoid_flaky_tests] Test contains patterns that may cause flakiness.',
+    problemMessage:
+        '[avoid_flaky_tests] Test contains patterns that may cause flakiness.',
     correctionMessage:
         'Use seeded Random, mock time sources, use tester.pump() instead of '
         'Future.delayed, and mock network/file system access.',

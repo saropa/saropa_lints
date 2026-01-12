@@ -1438,7 +1438,8 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_firestore_batch_write',
-    problemMessage: '[prefer_firestore_batch_write] Multiple individual Firestore writes should be batched.',
+    problemMessage:
+        '[prefer_firestore_batch_write] Multiple individual Firestore writes should be batched.',
     correctionMessage: 'Use WriteBatch for multiple related write operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1524,7 +1525,8 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_in_widget_build',
-    problemMessage: '[avoid_firestore_in_widget_build] Firestore operation in build() causes queries on rebuild.',
+    problemMessage:
+        '[avoid_firestore_in_widget_build] Firestore operation in build() causes queries on rebuild.',
     correctionMessage: 'Use StreamBuilder/FutureBuilder or state management.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1616,7 +1618,8 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_remote_config_defaults',
-    problemMessage: '[prefer_firebase_remote_config_defaults] RemoteConfig should have defaults set before use.',
+    problemMessage:
+        '[prefer_firebase_remote_config_defaults] RemoteConfig should have defaults set before use.',
     correctionMessage: 'Call setDefaults() with fallback values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1694,7 +1697,8 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_fcm_token_refresh_handler',
-    problemMessage: '[require_fcm_token_refresh_handler] FCM token refresh should be handled.',
+    problemMessage:
+        '[require_fcm_token_refresh_handler] FCM token refresh should be handled.',
     correctionMessage:
         'Listen to onTokenRefresh to update server with new tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1774,7 +1778,8 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_background_message_handler',
-    problemMessage: '[require_background_message_handler] FCM should have a background message handler.',
+    problemMessage:
+        '[require_background_message_handler] FCM should have a background message handler.',
     correctionMessage:
         'Add onBackgroundMessage with a top-level handler function.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1856,7 +1861,8 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_map_markers_in_build',
-    problemMessage: '[avoid_map_markers_in_build] Creating map markers in build() causes flickering.',
+    problemMessage:
+        '[avoid_map_markers_in_build] Creating map markers in build() causes flickering.',
     correctionMessage: 'Cache markers in state and only recreate when needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1928,7 +1934,8 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_map_idle_callback',
-    problemMessage: '[require_map_idle_callback] Data fetching should use onCameraIdle, not onCameraMove.',
+    problemMessage:
+        '[require_map_idle_callback] Data fetching should use onCameraIdle, not onCameraMove.',
     correctionMessage: 'Move data fetching to onCameraIdle to prevent spam.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1998,7 +2005,8 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_marker_clustering',
-    problemMessage: '[prefer_marker_clustering] Consider using marker clustering for better performance.',
+    problemMessage:
+        '[prefer_marker_clustering] Consider using marker clustering for better performance.',
     correctionMessage: 'Use marker clustering library for many markers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2151,7 +2159,8 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_firebase_app_check',
-    problemMessage: '[require_firebase_app_check] Firebase initialization without App Check activation.',
+    problemMessage:
+        '[require_firebase_app_check] Firebase initialization without App Check activation.',
     correctionMessage:
         'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp().',
     errorSeverity: DiagnosticSeverity.INFO,

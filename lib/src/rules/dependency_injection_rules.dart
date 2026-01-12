@@ -508,7 +508,8 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_di_dependencies',
-    problemMessage: '[avoid_circular_di_dependencies] Potential circular dependency detected.',
+    problemMessage:
+        '[avoid_circular_di_dependencies] Potential circular dependency detected.',
     correctionMessage:
         'Refactor to break the cycle using interfaces or events.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -688,7 +689,8 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_typed_di_registration',
-    problemMessage: '[require_typed_di_registration] DI registration should have explicit type parameter.',
+    problemMessage:
+        '[require_typed_di_registration] DI registration should have explicit type parameter.',
     correctionMessage:
         'Add type parameter like registerSingleton<Type>(instance).',
     errorSeverity: DiagnosticSeverity.INFO,

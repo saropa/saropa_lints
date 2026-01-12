@@ -143,7 +143,8 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pdf_error_handling',
-    problemMessage: '[require_pdf_error_handling] PDF loading should have error handling.',
+    problemMessage:
+        '[require_pdf_error_handling] PDF loading should have error handling.',
     correctionMessage: 'Wrap PDF loading in try-catch block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -554,7 +555,8 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_error_handling',
-    problemMessage: '[require_sqflite_error_handling] Database operation should have error handling.',
+    problemMessage:
+        '[require_sqflite_error_handling] Database operation should have error handling.',
     correctionMessage: 'Wrap in try-catch to handle DatabaseException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -722,7 +724,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_close',
-    problemMessage: '[require_sqflite_close] Database opened but not closed. Resource leak possible.',
+    problemMessage:
+        '[require_sqflite_close] Database opened but not closed. Resource leak possible.',
     correctionMessage:
         'Ensure db.close() is called, preferably in a finally block or dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1221,7 +1224,8 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
-    problemMessage: '[require_hive_box_close] Hive box opened but not closed in dispose. Resource leak.',
+    problemMessage:
+        '[require_hive_box_close] Hive box opened but not closed in dispose. Resource leak.',
     correctionMessage: 'Call box.close() in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1303,7 +1307,8 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
-    problemMessage: '[prefer_hive_encryption] Sensitive data stored in unencrypted Hive box.',
+    problemMessage:
+        '[prefer_hive_encryption] Sensitive data stored in unencrypted Hive box.',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1774,7 +1779,8 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_column_constants',
-    problemMessage: '[prefer_sqflite_column_constants] String literal column name may contain typos.',
+    problemMessage:
+        '[prefer_sqflite_column_constants] String literal column name may contain typos.',
     correctionMessage: 'Define column names as constants in a table class.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

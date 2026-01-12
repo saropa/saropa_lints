@@ -51,7 +51,8 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shrinkwrap_in_scrollview',
-    problemMessage: '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true in scrollable disables virtualization.',
+    problemMessage:
+        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true in scrollable disables virtualization.',
     correctionMessage:
         'Use CustomScrollView with slivers, or add NeverScrollableScrollPhysics.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -384,7 +385,8 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_bottom_nav_items',
-    problemMessage: '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI.',
+    problemMessage:
+        '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI.',
     correctionMessage:
         'Limit to 5 items or use a navigation drawer for additional options.',
     errorSeverity: DiagnosticSeverity.INFO,
