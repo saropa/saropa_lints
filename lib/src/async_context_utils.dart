@@ -27,6 +27,9 @@ bool containsAwait(AstNode node) {
 ///
 /// Uses proper AST type checking instead of string matching to avoid
 /// false positives on variables like "isMounted" or "mountedCount".
+///
+/// Also handles compound `&&` conditions where any operand checks mounted,
+/// e.g., `mounted && context.mounted` or `someCondition && mounted`.
 bool checksMounted(Expression expr) {
   // Direct `mounted` identifier
   if (expr is SimpleIdentifier && expr.name == 'mounted') return true;
@@ -42,6 +45,13 @@ bool checksMounted(Expression expr) {
     final right = expr.rightOperand;
     if (_isTrueLiteral(left) && checksMounted(right)) return true;
     if (_isTrueLiteral(right) && checksMounted(left)) return true;
+  }
+
+  // Compound `&&` conditions: `mounted && otherCondition` or vice versa
+  // If any part of an && chain checks mounted, the then-branch is protected
+  if (expr is BinaryExpression &&
+      expr.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+    return checksMounted(expr.leftOperand) || checksMounted(expr.rightOperand);
   }
 
   return false;
@@ -195,6 +205,14 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
       // Skip if part of a mounted check (context.mounted is safe to access)
       final parent = node.parent;
       if (parent is PrefixedIdentifier && parent.identifier.name == 'mounted') {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
+      // Skip if inside a mounted guard: if (context.mounted) { ... }
+      // This handles nested guards inside other statements, e.g.:
+      //   if (someCondition) { if (context.mounted) context.doThing(); }
+      if (hasAncestorMountedCheck(node)) {
         super.visitSimpleIdentifier(node);
         return;
       }

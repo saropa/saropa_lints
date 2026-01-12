@@ -795,7 +795,14 @@ class SaropaDiagnosticReporter {
     // Track the violation by impact level
     _trackViolation(code, 0); // Token doesn't have easy line access
 
-    _delegate.atToken(token, _applyOverride(code));
+    // Use atOffset instead of atToken to ensure proper span width.
+    // The built-in atToken has a bug where endColumn equals startColumn
+    // (zero-width highlight). Using atOffset with explicit length fixes this.
+    _delegate.atOffset(
+      offset: token.offset,
+      length: token.length,
+      diagnosticCode: _applyOverride(code),
+    );
   }
 
   /// Reports a diagnostic at the given offset and length.

@@ -349,6 +349,36 @@ class GoodContextBeforeAwait {
   }
 }
 
+// GOOD: Context as argument TO the await call (not after it)
+class GoodContextInAwaitCall {
+  static Future<bool> showMyDialog(BuildContext context) async {
+    // Context is passed as argument to the awaited call - this is SAFE
+    // The context is used during the await, not after it completes
+    return await showDialog(context: context) ?? false;
+  }
+
+  static Future<void> showAndReturn(BuildContext context) async {
+    // Same pattern - context is argument to await, not used after
+    final result = await Navigator.of(context).push(Container());
+  }
+}
+
+// GOOD: Context used with mounted ternary guard
+class GoodContextWithMountedTernary {
+  static Future<void> logError(BuildContext context) async {
+    try {
+      await Future.value('data');
+    } catch (e) {
+      // context.mounted ? context : null is a safe pattern
+      // The ternary ensures context is only used when mounted
+      debugException(e, context: context.mounted ? context : null);
+    }
+  }
+}
+
+// Helper for test
+void debugException(Object e, {BuildContext? context}) {}
+
 // =========================================================================
 // avoid_context_in_async_static (Recommended/WARNING)
 // =========================================================================
