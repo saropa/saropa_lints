@@ -756,7 +756,8 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
     name: 'require_freezed_json_converter',
     problemMessage:
         'Freezed class with DateTime/Color field may need JsonConverter.',
-    correctionMessage: 'Add @JsonSerializable(converters: [...]) for custom types.',
+    correctionMessage:
+        'Add @JsonSerializable(converters: [...]) for custom types.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

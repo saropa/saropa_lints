@@ -1992,8 +1992,7 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_notification_action_handling',
-    problemMessage:
-        'Notification with actions may lack action handler setup.',
+    problemMessage: 'Notification with actions may lack action handler setup.',
     correctionMessage:
         'Ensure onDidReceiveNotificationResponse handles action IDs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2074,7 +2073,8 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_finally_cleanup',
-    problemMessage: 'Cleanup in catch block. Use finally for guaranteed cleanup.',
+    problemMessage:
+        'Cleanup in catch block. Use finally for guaranteed cleanup.',
     correctionMessage: 'Move cleanup code to finally block.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

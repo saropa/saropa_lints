@@ -83,7 +83,8 @@ class PreferBlankLineBeforeReturnRule extends SaropaLintRule {
       final secondLastStmt = statements[statements.length - 2];
 
       // Get line numbers
-      final lastLine = resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
+      final lastLine =
+          resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
       final prevLine =
           resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
 
@@ -156,7 +157,8 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
 
       final secondLastStmt = statements[statements.length - 2];
 
-      final lastLine = resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
+      final lastLine =
+          resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
       final prevLine =
           resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
 
@@ -235,7 +237,8 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
             next is! VariableDeclarationStatement) {
           final currentLine =
               resolver.lineInfo.getLocation(current.end).lineNumber;
-          final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
+          final nextLine =
+              resolver.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine < 2) {
             reporter.atNode(current, code);
@@ -309,7 +312,8 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
             next is! VariableDeclarationStatement) {
           final currentLine =
               resolver.lineInfo.getLocation(current.end).lineNumber;
-          final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
+          final nextLine =
+              resolver.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine >= 2) {
             reporter.atNode(current, code);
@@ -526,8 +530,9 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
       // Check for blank line at start
       final openBraceLine =
           resolver.lineInfo.getLocation(node.leftBracket.offset).lineNumber;
-      final firstStmtLine =
-          resolver.lineInfo.getLocation(node.statements.first.offset).lineNumber;
+      final firstStmtLine = resolver.lineInfo
+          .getLocation(node.statements.first.offset)
+          .lineNumber;
 
       if (firstStmtLine - openBraceLine > 1) {
         reporter.atNode(node.statements.first, code);
@@ -965,7 +970,8 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_assertion',
     problemMessage: 'Consider using constructor assertion instead of factory.',
-    correctionMessage: 'Constructor assertions are simpler for debug validation.',
+    correctionMessage:
+        'Constructor assertions are simpler for debug validation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1099,7 +1105,8 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_by_purpose',
-    problemMessage: 'Group parameters by purpose rather than required/optional.',
+    problemMessage:
+        'Group parameters by purpose rather than required/optional.',
     correctionMessage: 'Consider grouping related parameters together.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

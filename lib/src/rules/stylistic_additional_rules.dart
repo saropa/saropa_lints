@@ -282,8 +282,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_imports',
     problemMessage: 'Group imports by type: dart, package, then relative.',
-    correctionMessage:
-        'Organize imports into groups separated by blank lines.',
+    correctionMessage: 'Organize imports into groups separated by blank lines.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -379,7 +378,8 @@ class PreferFlatImportsRule extends SaropaLintRule {
 
         // Get line numbers for previous and current imports
         final prevEndLine = lineInfo.getLocation(prevImport.end).lineNumber;
-        final currStartLine = lineInfo.getLocation(currImport.offset).lineNumber;
+        final currStartLine =
+            lineInfo.getLocation(currImport.offset).lineNumber;
 
         // If there's more than one line gap (blank line), report
         if (currStartLine - prevEndLine > 1) {
@@ -657,8 +657,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_public_members_first',
-    problemMessage:
-        'Declare public members before private members in classes.',
+    problemMessage: 'Declare public members before private members in classes.',
     correctionMessage: 'Move public declarations above private declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -713,8 +712,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_members_first',
-    problemMessage:
-        'Declare private members before public members in classes.',
+    problemMessage: 'Declare private members before public members in classes.',
     correctionMessage: 'Move private declarations above public declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -837,8 +835,7 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_object_over_dynamic',
     problemMessage: 'Use Object? instead of dynamic for unknown types.',
-    correctionMessage:
-        'Replace dynamic with Object? for better type safety.',
+    correctionMessage: 'Replace dynamic with Object? for better type safety.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1008,8 +1005,7 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_camel_case_method_names',
     problemMessage: 'Use camelCase for method names.',
-    correctionMessage:
-        'Rename method to use camelCase (e.g., fetchUserData).',
+    correctionMessage: 'Rename method to use camelCase (e.g., fetchUserData).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1072,10 +1068,8 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_variable_names',
-    problemMessage:
-        'Use descriptive variable names (at least 3 characters).',
-    correctionMessage:
-        'Rename variable to be more descriptive.',
+    problemMessage: 'Use descriptive variable names (at least 3 characters).',
+    correctionMessage: 'Rename variable to be more descriptive.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1129,8 +1123,7 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_concise_variable_names',
-    problemMessage:
-        'Use concise variable names (30 characters or less).',
+    problemMessage: 'Use concise variable names (30 characters or less).',
     correctionMessage: 'Shorten variable name while keeping it descriptive.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

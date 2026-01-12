@@ -1384,8 +1384,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
       final Set<String> collectionFields = <String>{};
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
-          for (final VariableDeclaration field
-              in member.fields.variables) {
+          for (final VariableDeclaration field in member.fields.variables) {
             final String? typeSource = member.fields.type?.toSource();
             if (typeSource != null &&
                 (typeSource.startsWith('List') ||
@@ -1489,8 +1488,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeSource = member.fields.type?.toSource();
           if (typeSource != null && typeSource.contains('DateTime')) {
-            for (final VariableDeclaration field
-                in member.fields.variables) {
+            for (final VariableDeclaration field in member.fields.variables) {
               final String? fieldName = field.name.lexeme;
               if (fieldName != null) {
                 dateTimeFields.add(fieldName);
@@ -1613,9 +1611,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
             for (final ClassMember constructor in node.members) {
               if (constructor is ConstructorDeclaration) {
-                final String? initSource = constructor.initializers
-                    .map((e) => e.toSource())
-                    .join();
+                final String? initSource =
+                    constructor.initializers.map((e) => e.toSource()).join();
                 if (initSource != null &&
                     (initSource.contains('List.unmodifiable') ||
                         initSource.contains('Map.unmodifiable') ||
