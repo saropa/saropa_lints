@@ -45,7 +45,8 @@ class AvoidDuplicateTestAssertionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_test_assertions',
-    problemMessage: '[avoid_duplicate_test_assertions] Duplicate test assertion detected.',
+    problemMessage:
+        '[avoid_duplicate_test_assertions] Duplicate test assertion detected.',
     correctionMessage:
         'Remove the duplicate assertion or verify different values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -168,7 +169,8 @@ class AvoidTopLevelMembersInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_top_level_members_in_tests',
-    problemMessage: '[avoid_top_level_members_in_tests] Avoid public top-level members in test files.',
+    problemMessage:
+        '[avoid_top_level_members_in_tests] Avoid public top-level members in test files.',
     correctionMessage: 'Make the member private by prefixing with underscore, '
         'or move it to a separate utility file.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -263,7 +265,8 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_test_name',
-    problemMessage: '[prefer_descriptive_test_name] Test name should be descriptive.',
+    problemMessage:
+        '[prefer_descriptive_test_name] Test name should be descriptive.',
     correctionMessage:
         'Use a descriptive test name that explains what is being tested.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -348,7 +351,8 @@ class PreferCorrectTestFileNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_test_file_name',
-    problemMessage: '[prefer_correct_test_file_name] Test file naming convention violation.',
+    problemMessage:
+        '[prefer_correct_test_file_name] Test file naming convention violation.',
     correctionMessage:
         'Test files should end with `_test.dart` and be in test/ directory.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -424,7 +428,8 @@ class PreferExpectLaterRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_expect_later',
-    problemMessage: '[prefer_expect_later] Use expectLater() for Future assertions.',
+    problemMessage:
+        '[prefer_expect_later] Use expectLater() for Future assertions.',
     correctionMessage: 'Replace expect() with expectLater() for Futures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -508,7 +513,8 @@ class PreferTestStructureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_structure',
-    problemMessage: '[prefer_test_structure] Test file should follow proper structure conventions.',
+    problemMessage:
+        '[prefer_test_structure] Test file should follow proper structure conventions.',
     correctionMessage: 'Wrap tests in group() and use descriptive names.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1011,7 +1017,8 @@ class RequireTestIsolationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_test_isolation',
-    problemMessage: '[require_test_isolation] Mutable top-level variable may cause test coupling.',
+    problemMessage:
+        '[require_test_isolation] Mutable top-level variable may cause test coupling.',
     correctionMessage:
         'Use setUp() to initialize shared state before each test, '
         'ensuring tests are isolated.',
@@ -1101,7 +1108,8 @@ class AvoidRealDependenciesInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_real_dependencies_in_tests',
-    problemMessage: '[avoid_real_dependencies_in_tests] Test uses real network/database call. Use mocks instead.',
+    problemMessage:
+        '[avoid_real_dependencies_in_tests] Test uses real network/database call. Use mocks instead.',
     correctionMessage:
         'Replace real HTTP/database calls with mocks for faster, '
         'more reliable tests.',
@@ -1872,7 +1880,8 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
   // cspell:ignore getit
   static const LintCode _code = LintCode(
     name: 'require_getit_reset_in_tests',
-    problemMessage: '[require_getit_reset_in_tests] GetIt singletons persist across tests. Reset in setUp.',
+    problemMessage:
+        '[require_getit_reset_in_tests] GetIt singletons persist across tests. Reset in setUp.',
     correctionMessage: 'Add GetIt.I.reset() in setUp() or setUpAll().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2390,7 +2399,8 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_symbol_over_key',
-    problemMessage: '[prefer_symbol_over_key] Consider using a constant Key instead of string literal.',
+    problemMessage:
+        '[prefer_symbol_over_key] Consider using a constant Key instead of string literal.',
     correctionMessage:
         'Define a constant for the Key to improve maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2475,7 +2485,8 @@ class RequireTestCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_test_cleanup',
-    problemMessage: '[require_test_cleanup] Test creates resources without tearDown cleanup.',
+    problemMessage:
+        '[require_test_cleanup] Test creates resources without tearDown cleanup.',
     correctionMessage: 'Add tearDown to clean up created files or data.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2702,7 +2713,8 @@ class RequireAccessibilityTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_accessibility_tests',
-    problemMessage: '[require_accessibility_tests] Widget tests should include accessibility checks.',
+    problemMessage:
+        '[require_accessibility_tests] Widget tests should include accessibility checks.',
     correctionMessage: 'Add meetsGuideline assertions for accessibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2780,7 +2792,8 @@ class RequireAnimationTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_animation_tests',
-    problemMessage: '[require_animation_tests] Animated widget test should use pump with duration.',
+    problemMessage:
+        '[require_animation_tests] Animated widget test should use pump with duration.',
     correctionMessage: 'Use pump(Duration) or pumpAndSettle for animations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2883,7 +2896,8 @@ class AvoidTestPrintStatementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_test_print_statements',
-    problemMessage: '[avoid_test_print_statements] Print statement in test file clutters output.',
+    problemMessage:
+        '[avoid_test_print_statements] Print statement in test file clutters output.',
     correctionMessage:
         'Remove debug print or use proper logging for test debugging.',
     errorSeverity: DiagnosticSeverity.INFO,

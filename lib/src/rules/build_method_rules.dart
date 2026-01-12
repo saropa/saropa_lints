@@ -159,7 +159,8 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dialog_in_build',
-    problemMessage: '[avoid_dialog_in_build] showDialog in build() causes infinite dialog loop.',
+    problemMessage:
+        '[avoid_dialog_in_build] showDialog in build() causes infinite dialog loop.',
     correctionMessage:
         'Move dialog calls to event handlers or lifecycle methods.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -297,7 +298,8 @@ class AvoidSnackbarInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_in_build',
-    problemMessage: '[avoid_snackbar_in_build] showSnackBar in build() causes repeated snackbars.',
+    problemMessage:
+        '[avoid_snackbar_in_build] showSnackBar in build() causes repeated snackbars.',
     correctionMessage: 'Move snackbar calls to event handlers.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -386,7 +388,8 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_analytics_in_build',
-    problemMessage: '[avoid_analytics_in_build] Analytics calls in build() fire on every rebuild.',
+    problemMessage:
+        '[avoid_analytics_in_build] Analytics calls in build() fire on every rebuild.',
     correctionMessage: 'Move analytics to initState() or event handlers.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -503,7 +506,8 @@ class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_json_encode_in_build',
-    problemMessage: '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank.',
+    problemMessage:
+        '[avoid_json_encode_in_build] jsonEncode in build() is expensive and causes jank.',
     correctionMessage: 'Cache JSON encoding result outside of build().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -589,7 +593,8 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getit_in_build',
-    problemMessage: '[avoid_getit_in_build] GetIt service locator in build() hides dependencies.',
+    problemMessage:
+        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies.',
     correctionMessage:
         'Inject dependencies via constructor or access in initState().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -680,7 +685,8 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_canvas_operations_in_build',
-    problemMessage: '[avoid_canvas_operations_in_build] Canvas operations belong in CustomPainter, not build().',
+    problemMessage:
+        '[avoid_canvas_operations_in_build] Canvas operations belong in CustomPainter, not build().',
     correctionMessage: 'Move canvas operations to CustomPainter.paint().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -840,7 +846,8 @@ class PreferSingleSetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_setstate',
-    problemMessage: '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds.',
+    problemMessage:
+        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds.',
     correctionMessage: 'Combine setState calls into a single call.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -916,7 +923,8 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_compute_over_isolate_run',
-    problemMessage: '[prefer_compute_over_isolate_run] Consider using compute() instead of Isolate.run().',
+    problemMessage:
+        '[prefer_compute_over_isolate_run] Consider using compute() instead of Isolate.run().',
     correctionMessage: 'compute() provides better error handling and typing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -974,7 +982,8 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_for_loop_in_children',
-    problemMessage: '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children.',
+    problemMessage:
+        '[prefer_for_loop_in_children] Prefer collection-for over List.generate in children.',
     correctionMessage: 'Use [for (final item in items) Widget(item)].',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1048,7 +1057,8 @@ class PreferContainerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_container',
-    problemMessage: '[prefer_container] Nested decoration widgets could be a single Container.',
+    problemMessage:
+        '[prefer_container] Nested decoration widgets could be a single Container.',
     correctionMessage: 'Use Container with padding, decoration, and size.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

@@ -39,7 +39,8 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_qr_scan_feedback',
-    problemMessage: '[require_qr_scan_feedback] QR scan callback should provide user feedback.',
+    problemMessage:
+        '[require_qr_scan_feedback] QR scan callback should provide user feedback.',
     correctionMessage:
         'Add HapticFeedback.mediumImpact() or visual feedback on scan.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -130,7 +131,8 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_qr_scanner_always_active',
-    problemMessage: '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded.',
+    problemMessage:
+        '[avoid_qr_scanner_always_active] QR scanner should pause when app is backgrounded.',
     correctionMessage:
         'Add WidgetsBindingObserver and pause camera in didChangeAppLifecycleState.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -242,7 +244,8 @@ class RequireQrContentValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_qr_content_validation',
-    problemMessage: '[require_qr_content_validation] QR scan result used without validation. Security risk.',
+    problemMessage:
+        '[require_qr_content_validation] QR scan result used without validation. Security risk.',
     correctionMessage:
         'Validate URL scheme and optionally domain before using scanned content.',
     errorSeverity: DiagnosticSeverity.WARNING,

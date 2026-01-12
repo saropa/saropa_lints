@@ -168,7 +168,8 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
-    problemMessage: '[require_stream_controller_dispose] StreamController is not closed in dispose.',
+    problemMessage:
+        '[require_stream_controller_dispose] StreamController is not closed in dispose.',
     correctionMessage: 'Add controller.close() in dispose method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -356,7 +357,8 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_value_notifier_dispose',
-    problemMessage: '[require_value_notifier_dispose] ValueNotifier is not disposed.',
+    problemMessage:
+        '[require_value_notifier_dispose] ValueNotifier is not disposed.',
     correctionMessage: 'Add notifier.dispose() in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -641,7 +643,8 @@ class RequireMountedCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
-    problemMessage: '[require_mounted_check] setState called after await without mounted check.',
+    problemMessage:
+        '[require_mounted_check] setState called after await without mounted check.',
     correctionMessage: 'Add "if (!mounted) return;" before setState.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -801,7 +804,8 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_watch_in_callbacks',
-    problemMessage: '[avoid_watch_in_callbacks] Avoid using watch inside callbacks.',
+    problemMessage:
+        '[avoid_watch_in_callbacks] Avoid using watch inside callbacks.',
     correctionMessage: 'Use read instead of watch in event handlers.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -866,7 +870,8 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
-    problemMessage: '[avoid_bloc_event_in_constructor] Avoid adding BLoC events in constructor.',
+    problemMessage:
+        '[avoid_bloc_event_in_constructor] Avoid adding BLoC events in constructor.',
     correctionMessage:
         'Add initial events from the widget that creates the BLoC.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -944,7 +949,8 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
-    problemMessage: '[require_update_should_notify] InheritedWidget should override updateShouldNotify.',
+    problemMessage:
+        '[require_update_should_notify] InheritedWidget should override updateShouldNotify.',
     correctionMessage:
         'Add updateShouldNotify to control when dependents rebuild.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1018,7 +1024,8 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_riverpod_providers',
-    problemMessage: '[avoid_global_riverpod_providers] Consider scoping Riverpod providers appropriately.',
+    problemMessage:
+        '[avoid_global_riverpod_providers] Consider scoping Riverpod providers appropriately.',
     correctionMessage:
         'Document provider scope or use ProviderScope for isolation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1192,7 +1199,8 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_in_build',
-    problemMessage: '[avoid_global_key_in_build] GlobalKey should not be created in build method.',
+    problemMessage:
+        '[avoid_global_key_in_build] GlobalKey should not be created in build method.',
     correctionMessage: 'Create GlobalKey as a class field instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1878,7 +1886,8 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_immutable_bloc_state',
-    problemMessage: '[require_immutable_bloc_state] BLoC state classes should be immutable.',
+    problemMessage:
+        '[require_immutable_bloc_state] BLoC state classes should be immutable.',
     correctionMessage:
         'Add @immutable annotation or extend Equatable to ensure state '
         'immutability and proper equality comparisons.',
@@ -2973,7 +2982,8 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
-    problemMessage: '[prefer_copy_with_for_state] Directly modifying state breaks immutability.',
+    problemMessage:
+        '[prefer_copy_with_for_state] Directly modifying state breaks immutability.',
     correctionMessage: 'Use state.copyWith(field: value) to create new state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3115,7 +3125,8 @@ class RequireInitialStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
-    problemMessage: '[require_initial_state] BLoC constructor must pass initial state to super().',
+    problemMessage:
+        '[require_initial_state] BLoC constructor must pass initial state to super().',
     correctionMessage:
         'Add initial state: super(InitialState()) or super(const State()).',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3188,7 +3199,8 @@ class RequireErrorStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_state',
-    problemMessage: '[require_error_state] BLoC state hierarchy should include an error state.',
+    problemMessage:
+        '[require_error_state] BLoC state hierarchy should include an error state.',
     correctionMessage:
         'Add an Error state class (e.g., UserError) to handle failures.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4816,7 +4828,8 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_providers',
-    problemMessage: '[avoid_nested_providers] Provider created inside Consumer or builder callback.',
+    problemMessage:
+        '[avoid_nested_providers] Provider created inside Consumer or builder callback.',
     correctionMessage:
         'Use ProxyProvider or move provider to MultiProvider at tree root.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5022,7 +5035,8 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_bloc_value_provider',
-    problemMessage: '[avoid_instantiating_in_bloc_value_provider] BlocProvider.value should not create a new bloc instance. '
+    problemMessage:
+        '[avoid_instantiating_in_bloc_value_provider] BlocProvider.value should not create a new bloc instance. '
         'The bloc will not be automatically closed.',
     correctionMessage:
         'Use BlocProvider(create: ...) for new instances, or pass an existing '
@@ -5277,7 +5291,8 @@ class PreferMultiProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_multi_provider',
-    problemMessage: '[prefer_multi_provider] Nested Providers should use MultiProvider instead.',
+    problemMessage:
+        '[prefer_multi_provider] Nested Providers should use MultiProvider instead.',
     correctionMessage:
         'Combine into MultiProvider(providers: [...], child: ...).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5366,7 +5381,8 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_value_provider',
-    problemMessage: '[avoid_instantiating_in_value_provider] Provider.value should not create a new instance. '
+    problemMessage:
+        '[avoid_instantiating_in_value_provider] Provider.value should not create a new instance. '
         'The instance lifecycle will not be properly managed.',
     correctionMessage:
         'Use Provider(create: ...) for new instances, or pass an existing '
@@ -5543,7 +5559,8 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
-    problemMessage: '[proper_getx_super_calls] GetxController lifecycle method must call super. '
+    problemMessage:
+        '[proper_getx_super_calls] GetxController lifecycle method must call super. '
         'Missing super call breaks controller lifecycle.',
     correctionMessage:
         'Add super.onInit() at the start or super.onClose() at the end.',
@@ -5652,7 +5669,8 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'always_remove_getx_listener',
-    problemMessage: '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
+    problemMessage:
+        '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
         'This will cause a memory leak.',
     correctionMessage:
         'Assign the worker to a variable and call dispose() in onClose().',
@@ -5724,7 +5742,8 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hooks_outside_build',
-    problemMessage: '[avoid_hooks_outside_build] Hook function called outside of build method. '
+    problemMessage:
+        '[avoid_hooks_outside_build] Hook function called outside of build method. '
         'Hooks must only be called from build().',
     correctionMessage: 'Move this hook call inside the build() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -5816,7 +5835,8 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditional_hooks',
-    problemMessage: '[avoid_conditional_hooks] Hook function called conditionally. '
+    problemMessage:
+        '[avoid_conditional_hooks] Hook function called conditionally. '
         'Hooks must be called unconditionally in the same order.',
     correctionMessage:
         'Move hook calls outside of conditionals. Use the hook value conditionally instead.',
@@ -6019,7 +6039,8 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'check_is_not_closed_after_async_gap',
-    problemMessage: '[check_is_not_closed_after_async_gap] emit() called after await without checking isClosed.',
+    problemMessage:
+        '[check_is_not_closed_after_async_gap] emit() called after await without checking isClosed.',
     correctionMessage:
         'Add if (!isClosed) check before emit() after async operations.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -6145,7 +6166,8 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_bloc_event_handlers',
-    problemMessage: '[avoid_duplicate_bloc_event_handlers] Duplicate event handler registration detected.',
+    problemMessage:
+        '[avoid_duplicate_bloc_event_handlers] Duplicate event handler registration detected.',
     correctionMessage:
         'Combine handlers into one on<Event> call. Only one handler per event type.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -6255,7 +6277,8 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_events',
-    problemMessage: '[prefer_immutable_bloc_events] Bloc event class has mutable fields.',
+    problemMessage:
+        '[prefer_immutable_bloc_events] Bloc event class has mutable fields.',
     correctionMessage: 'Mark all fields as final for immutable events.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6321,7 +6344,8 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_state',
-    problemMessage: '[prefer_immutable_bloc_state] Bloc state class has mutable fields.',
+    problemMessage:
+        '[prefer_immutable_bloc_state] Bloc state class has mutable fields.',
     correctionMessage: 'Mark all fields as final for immutable state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6390,7 +6414,8 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_events',
-    problemMessage: '[prefer_sealed_bloc_events] Bloc event base class should be sealed.',
+    problemMessage:
+        '[prefer_sealed_bloc_events] Bloc event base class should be sealed.',
     correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6457,7 +6482,8 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_state',
-    problemMessage: '[prefer_sealed_bloc_state] Bloc state base class should be sealed.',
+    problemMessage:
+        '[prefer_sealed_bloc_state] Bloc state base class should be sealed.',
     correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6522,7 +6548,8 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_event_suffix',
-    problemMessage: '[prefer_bloc_event_suffix] Bloc event class should end with "Event" suffix.',
+    problemMessage:
+        '[prefer_bloc_event_suffix] Bloc event class should end with "Event" suffix.',
     correctionMessage:
         'Rename class to include Event suffix (e.g., LoadUserEvent).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6581,7 +6608,8 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_state_suffix',
-    problemMessage: '[prefer_bloc_state_suffix] Bloc state class should end with "State" suffix.',
+    problemMessage:
+        '[prefer_bloc_state_suffix] Bloc state class should end with "State" suffix.',
     correctionMessage:
         'Rename class to include State suffix (e.g., UserLoadingState).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6714,7 +6742,8 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_provider_extensions',
-    problemMessage: '[prefer_provider_extensions] Long provider access chain is hard to read.',
+    problemMessage:
+        '[prefer_provider_extensions] Long provider access chain is hard to read.',
     correctionMessage: 'Consider using an extension method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6781,7 +6810,8 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
-    problemMessage: '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
+    problemMessage:
+        '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
     correctionMessage: 'Move reactive variables to a GetxController.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6849,7 +6879,8 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
-    problemMessage: '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
+    problemMessage:
+        '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
     correctionMessage: 'Use .value = or callable syntax to update.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -7162,7 +7193,8 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_provider_types',
-    problemMessage: '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null.',
+    problemMessage:
+        '[prefer_nullable_provider_types] Provider type is non-nullable but create may return null.',
     correctionMessage: 'Use nullable type parameter: Provider<Type?>.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -7259,7 +7291,8 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_yield_in_on_event',
-    problemMessage: '[avoid_yield_in_on_event] yield in Bloc event handler. Use emit() instead.',
+    problemMessage:
+        '[avoid_yield_in_on_event] yield in Bloc event handler. Use emit() instead.',
     correctionMessage:
         'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7325,7 +7358,8 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_over_provider_of',
-    problemMessage: '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds.',
+    problemMessage:
+        '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds.',
     correctionMessage:
         'Replace with Consumer<T> or context.select() for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7388,7 +7422,8 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_listen_in_async',
-    problemMessage: '[avoid_listen_in_async] context.watch() in async callback. Use read() instead.',
+    problemMessage:
+        '[avoid_listen_in_async] context.watch() in async callback. Use read() instead.',
     correctionMessage: 'Replace watch() with read() in async callbacks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -7552,7 +7587,8 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'emit_new_bloc_state_instances',
-    problemMessage: '[emit_new_bloc_state_instances] State mutated with cascade. Emit new instance instead.',
+    problemMessage:
+        '[emit_new_bloc_state_instances] State mutated with cascade. Emit new instance instead.',
     correctionMessage: 'Use copyWith() or constructor to create new state.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -7617,7 +7653,8 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_fields',
-    problemMessage: '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private.',
+    problemMessage:
+        '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private.',
     correctionMessage: 'Make field private (_fieldName) or final.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -7688,7 +7725,8 @@ class AvoidBlocPublicMethodsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_methods',
-    problemMessage: '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead.',
+    problemMessage:
+        '[avoid_bloc_public_methods] Public method in Bloc. Use events via add() instead.',
     correctionMessage: 'Convert to event class and handle in on<Event>().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -7772,7 +7810,8 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_async_value_order',
-    problemMessage: '[require_async_value_order] AsyncValue.when() has non-standard parameter order.',
+    problemMessage:
+        '[require_async_value_order] AsyncValue.when() has non-standard parameter order.',
     correctionMessage: 'Use order: data, error, loading for consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -8078,7 +8117,8 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_provider_generic_type',
-    problemMessage: '[require_provider_generic_type] Provider.of must specify a generic type parameter.',
+    problemMessage:
+        '[require_provider_generic_type] Provider.of must specify a generic type parameter.',
     correctionMessage: 'Add <Type> to Provider.of<Type>(context).',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -8147,7 +8187,8 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_emit_after_close',
-    problemMessage: '[avoid_bloc_emit_after_close] emit() after await may throw if Bloc is closed.',
+    problemMessage:
+        '[avoid_bloc_emit_after_close] emit() after await may throw if Bloc is closed.',
     correctionMessage: 'Add "if (!isClosed)" check before emit after await.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -8247,7 +8288,8 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_state_mutation',
-    problemMessage: '[avoid_bloc_state_mutation] Bloc state must not be mutated directly.',
+    problemMessage:
+        '[avoid_bloc_state_mutation] Bloc state must not be mutated directly.',
     correctionMessage: 'Use state.copyWith() to create a new state instance.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -8324,7 +8366,8 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_initial_state',
-    problemMessage: '[require_bloc_initial_state] Bloc constructor must call super with initial state.',
+    problemMessage:
+        '[require_bloc_initial_state] Bloc constructor must call super with initial state.',
     correctionMessage: 'Add : super(InitialState()) to the constructor.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -8473,7 +8516,8 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_freezed_arrow_syntax',
-    problemMessage: '[require_freezed_arrow_syntax] Freezed fromJson must use arrow syntax (=>).',
+    problemMessage:
+        '[require_freezed_arrow_syntax] Freezed fromJson must use arrow syntax (=>).',
     correctionMessage:
         'Use: factory User.fromJson(Map<String, dynamic> json) => _\$UserFromJson(json);',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -8547,7 +8591,8 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_freezed_private_constructor',
-    problemMessage: '[require_freezed_private_constructor] Freezed class should have private constructor.',
+    problemMessage:
+        '[require_freezed_private_constructor] Freezed class should have private constructor.',
     correctionMessage: 'Add: const ClassName._();',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -8639,7 +8684,8 @@ class RequireEquatableImmutableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_immutable',
-    problemMessage: '[require_equatable_immutable] Equatable fields must be final for correct equality.',
+    problemMessage:
+        '[require_equatable_immutable] Equatable fields must be final for correct equality.',
     correctionMessage: 'Make all fields final.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -8701,7 +8747,8 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_props_override',
-    problemMessage: '[require_equatable_props_override] Equatable class must override props getter.',
+    problemMessage:
+        '[require_equatable_props_override] Equatable class must override props getter.',
     correctionMessage: 'Add: List<Object?> get props => [field1, field2];',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -8845,7 +8892,8 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_loading_state',
-    problemMessage: '[require_bloc_loading_state] Async Bloc handler should emit loading state.',
+    problemMessage:
+        '[require_bloc_loading_state] Async Bloc handler should emit loading state.',
     correctionMessage: 'Add emit(LoadingState()) before async operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -8936,7 +8984,8 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_error_state',
-    problemMessage: '[require_bloc_error_state] Bloc state sealed class should have an error case.',
+    problemMessage:
+        '[require_bloc_error_state] Bloc state sealed class should have an error case.',
     correctionMessage: 'Add an error state class (e.g., UserError).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -9181,7 +9230,8 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_context_read_in_callbacks',
-    problemMessage: '[prefer_context_read_in_callbacks] context.watch should not be used in callbacks.',
+    problemMessage:
+        '[prefer_context_read_in_callbacks] context.watch should not be used in callbacks.',
     correctionMessage: 'Use context.read instead for one-time access.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

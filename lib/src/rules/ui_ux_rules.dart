@@ -30,7 +30,8 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_responsive_breakpoints',
-    problemMessage: '[require_responsive_breakpoints] Breakpoint value should be a named constant.',
+    problemMessage:
+        '[require_responsive_breakpoints] Breakpoint value should be a named constant.',
     correctionMessage:
         'Extract the magic number to a constant like kTabletBreakpoint.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -126,7 +127,8 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_paint_objects',
-    problemMessage: '[prefer_cached_paint_objects] Paint created in paint() is recreated every frame.',
+    problemMessage:
+        '[prefer_cached_paint_objects] Paint created in paint() is recreated every frame.',
     correctionMessage: 'Move Paint to a class field for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -289,7 +291,8 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_currency_formatting_locale',
-    problemMessage: '[require_currency_formatting_locale] NumberFormat.currency should have explicit locale.',
+    problemMessage:
+        '[require_currency_formatting_locale] NumberFormat.currency should have explicit locale.',
     correctionMessage:
         'Add locale parameter for consistent currency formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -364,7 +367,8 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_number_formatting_locale',
-    problemMessage: '[require_number_formatting_locale] NumberFormat should have explicit locale.',
+    problemMessage:
+        '[require_number_formatting_locale] NumberFormat should have explicit locale.',
     correctionMessage: 'Add locale parameter for consistent number formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -453,7 +457,8 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_graphql_operation_names',
-    problemMessage: '[require_graphql_operation_names] GraphQL operation should have a name.',
+    problemMessage:
+        '[require_graphql_operation_names] GraphQL operation should have a name.',
     correctionMessage: 'Add operation name after query/mutation keyword.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -518,7 +523,8 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_badge_without_meaning',
-    problemMessage: '[avoid_badge_without_meaning] Badge with count 0 should be hidden.',
+    problemMessage:
+        '[avoid_badge_without_meaning] Badge with count 0 should be hidden.',
     correctionMessage: 'Add isLabelVisible: count > 0 to hide when empty.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -591,7 +597,8 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_logger_over_print',
-    problemMessage: '[prefer_logger_over_print] Use log() from dart:developer instead of print().',
+    problemMessage:
+        '[prefer_logger_over_print] Use log() from dart:developer instead of print().',
     correctionMessage: 'Replace print() with log() for better log management.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -647,7 +654,8 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_itemextent_when_known',
-    problemMessage: '[prefer_itemextent_when_known] Consider adding itemExtent for better scroll performance.',
+    problemMessage:
+        '[prefer_itemextent_when_known] Consider adding itemExtent for better scroll performance.',
     correctionMessage:
         'Set itemExtent when all list items have the same height.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -725,7 +733,8 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_tab_state_preservation',
-    problemMessage: '[require_tab_state_preservation] TabBarView children may lose state on tab switch.',
+    problemMessage:
+        '[require_tab_state_preservation] TabBarView children may lose state on tab switch.',
     correctionMessage: 'Use AutomaticKeepAliveClientMixin to preserve state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -872,7 +881,8 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_empty_results_state',
-    problemMessage: '[require_empty_results_state] List with search-related name missing empty state check.',
+    problemMessage:
+        '[require_empty_results_state] List with search-related name missing empty state check.',
     correctionMessage: 'Add isEmpty check with empty state UI for better UX.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -980,7 +990,8 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_search_loading_indicator',
-    problemMessage: '[require_search_loading_indicator] Search callback without loading state management.',
+    problemMessage:
+        '[require_search_loading_indicator] Search callback without loading state management.',
     correctionMessage:
         'Set loading state before search and clear it on completion.',
     errorSeverity: DiagnosticSeverity.INFO,

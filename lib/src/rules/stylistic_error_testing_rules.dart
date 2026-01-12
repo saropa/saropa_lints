@@ -113,7 +113,8 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_generic_exception',
-    problemMessage: '[prefer_generic_exception] Consider using generic Exception for simplicity.',
+    problemMessage:
+        '[prefer_generic_exception] Consider using generic Exception for simplicity.',
     correctionMessage: 'Generic Exception is often sufficient.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -178,7 +179,8 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_exception_suffix',
-    problemMessage: '[prefer_exception_suffix] Exception classes should end with "Exception" suffix.',
+    problemMessage:
+        '[prefer_exception_suffix] Exception classes should end with "Exception" suffix.',
     correctionMessage: 'Rename to end with "Exception" for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -245,7 +247,8 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_error_suffix',
-    problemMessage: '[prefer_error_suffix] Exception classes should end with "Error" suffix.',
+    problemMessage:
+        '[prefer_error_suffix] Exception classes should end with "Error" suffix.',
     correctionMessage: 'Rename to end with "Error" for consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -323,7 +326,8 @@ class PreferOnOverCatchRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_on_over_catch',
-    problemMessage: '[prefer_on_over_catch] Use "on ExceptionType" instead of bare "catch".',
+    problemMessage:
+        '[prefer_on_over_catch] Use "on ExceptionType" instead of bare "catch".',
     correctionMessage: 'Specific exception types make error handling clearer.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -386,7 +390,8 @@ class PreferCatchOverOnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_catch_over_on',
-    problemMessage: '[prefer_catch_over_on] Consider using bare "catch" for simplicity.',
+    problemMessage:
+        '[prefer_catch_over_on] Consider using bare "catch" for simplicity.',
     correctionMessage: 'Bare catch is simpler and catches all exceptions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -637,7 +642,8 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_expect_over_assert_in_tests',
-    problemMessage: '[prefer_expect_over_assert_in_tests] Use expect() instead of assert() in tests.',
+    problemMessage:
+        '[prefer_expect_over_assert_in_tests] Use expect() instead of assert() in tests.',
     correctionMessage: 'expect() provides better error messages and matchers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -707,7 +713,8 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_expectation_per_test',
-    problemMessage: '[prefer_single_expectation_per_test] Tests should have a single logical assertion.',
+    problemMessage:
+        '[prefer_single_expectation_per_test] Tests should have a single logical assertion.',
     correctionMessage: 'Split into multiple tests for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -807,7 +814,8 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_expectations',
-    problemMessage: '[prefer_grouped_expectations] Consider grouping related assertions in one test.',
+    problemMessage:
+        '[prefer_grouped_expectations] Consider grouping related assertions in one test.',
     correctionMessage: 'Group related assertions to reduce test boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -896,7 +904,8 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_should_when',
-    problemMessage: '[prefer_test_name_should_when] Test names should follow "should X when Y" pattern.',
+    problemMessage:
+        '[prefer_test_name_should_when] Test names should follow "should X when Y" pattern.',
     correctionMessage: 'Use: test("should [behavior] when [condition]", ...)',
     errorSeverity: DiagnosticSeverity.INFO,
   );

@@ -35,7 +35,8 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_rebuild_on_scroll',
-    problemMessage: '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll.',
+    problemMessage:
+        '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll.',
     correctionMessage:
         'Use CachedNetworkImage or move image loading outside the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -227,7 +228,8 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_video_loading_placeholder',
-    problemMessage: '[prefer_video_loading_placeholder] Video player should have a loading placeholder.',
+    problemMessage:
+        '[prefer_video_loading_placeholder] Video player should have a loading placeholder.',
     correctionMessage: 'Add placeholder parameter for better UX during load.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -531,7 +533,8 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_media_loading_state',
-    problemMessage: '[require_media_loading_state] VideoPlayer should check isInitialized before displaying.',
+    problemMessage:
+        '[require_media_loading_state] VideoPlayer should check isInitialized before displaying.',
     correctionMessage:
         'Wrap VideoPlayer in a conditional checking controller.value.isInitialized.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -624,7 +627,8 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pdf_loading_indicator',
-    problemMessage: '[require_pdf_loading_indicator] PDF viewer should provide loading feedback.',
+    problemMessage:
+        '[require_pdf_loading_indicator] PDF viewer should provide loading feedback.',
     correctionMessage:
         'Add loading state handling or use onDocumentLoaded callback.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -707,7 +711,8 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_clipboard_feedback',
-    problemMessage: '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback.',
+    problemMessage:
+        '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback.',
     correctionMessage: 'Add SnackBar or Toast to confirm clipboard operation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1403,7 +1408,8 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_large_files',
-    problemMessage: '[avoid_image_picker_large_files] pickImage without imageQuality. Raw photos can be 10+ MB.',
+    problemMessage:
+        '[avoid_image_picker_large_files] pickImage without imageQuality. Raw photos can be 10+ MB.',
     correctionMessage:
         'Add imageQuality (e.g., 85) to compress images and reduce file size.',
     errorSeverity: DiagnosticSeverity.WARNING,

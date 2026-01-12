@@ -131,7 +131,8 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_business_logic_in_ui',
-    problemMessage: '[avoid_business_logic_in_ui] Business logic should not be in UI layer.',
+    problemMessage:
+        '[avoid_business_logic_in_ui] Business logic should not be in UI layer.',
     correctionMessage:
         'Move calculations and business rules to domain/service layer.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -384,7 +385,8 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ui_in_domain_layer',
-    problemMessage: '[avoid_ui_in_domain_layer] Domain layer should not have UI dependencies.',
+    problemMessage:
+        '[avoid_ui_in_domain_layer] Domain layer should not have UI dependencies.',
     correctionMessage:
         'Remove Flutter/UI imports from domain models and services.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -475,7 +477,8 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_cross_feature_dependencies',
-    problemMessage: '[avoid_cross_feature_dependencies] Feature module depends on another feature.',
+    problemMessage:
+        '[avoid_cross_feature_dependencies] Feature module depends on another feature.',
     correctionMessage:
         'Move shared code to core/shared layer or use dependency injection.',
     errorSeverity: DiagnosticSeverity.INFO,

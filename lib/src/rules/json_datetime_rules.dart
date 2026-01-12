@@ -42,7 +42,8 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_json_decode_try_catch',
-    problemMessage: '[require_json_decode_try_catch] jsonDecode throws on malformed JSON. Wrap in try-catch.',
+    problemMessage:
+        '[require_json_decode_try_catch] jsonDecode throws on malformed JSON. Wrap in try-catch.',
     correctionMessage: 'Add try-catch for FormatException around jsonDecode.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -332,7 +333,8 @@ class PreferDurationConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
-    problemMessage: '[prefer_duration_constants] Duration can use a cleaner unit.',
+    problemMessage:
+        '[prefer_duration_constants] Duration can use a cleaner unit.',
     correctionMessage: 'Use a larger unit for cleaner code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -409,7 +411,8 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_now_in_tests',
-    problemMessage: '[avoid_datetime_now_in_tests] DateTime.now() in tests can cause flaky behavior.',
+    problemMessage:
+        '[avoid_datetime_now_in_tests] DateTime.now() in tests can cause flaky behavior.',
     correctionMessage:
         'Use fixed datetime values or a clock abstraction for predictable tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -486,7 +489,8 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_not_encodable_in_to_json',
-    problemMessage: '[avoid_not_encodable_in_to_json] Value is not JSON-encodable and will cause runtime error.',
+    problemMessage:
+        '[avoid_not_encodable_in_to_json] Value is not JSON-encodable and will cause runtime error.',
     correctionMessage:
         'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
         '.toJson() for objects, or remove non-serializable values.',

@@ -53,7 +53,8 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_swallowing_exceptions',
-    problemMessage: '[avoid_swallowing_exceptions] Catch block swallows exception without handling.',
+    problemMessage:
+        '[avoid_swallowing_exceptions] Catch block swallows exception without handling.',
     correctionMessage: 'Log the error, rethrow, or handle it properly.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -175,7 +176,8 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_losing_stack_trace',
-    problemMessage: '[avoid_losing_stack_trace] Stack trace is lost when rethrowing.',
+    problemMessage:
+        '[avoid_losing_stack_trace] Stack trace is lost when rethrowing.',
     correctionMessage:
         'Capture stack trace parameter and pass it to Error.throwWithStackTrace or include in new exception.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -291,7 +293,8 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_generic_exceptions',
-    problemMessage: '[avoid_generic_exceptions] Avoid throwing generic Exception.',
+    problemMessage:
+        '[avoid_generic_exceptions] Avoid throwing generic Exception.',
     correctionMessage: 'Create and throw a specific exception type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -417,7 +420,8 @@ class PreferResultPatternRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_result_pattern',
-    problemMessage: '[prefer_result_pattern] Consider using Result pattern for expected failures.',
+    problemMessage:
+        '[prefer_result_pattern] Consider using Result pattern for expected failures.',
     correctionMessage:
         'Return Result<T, E> instead of throwing for recoverable errors.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -613,7 +617,8 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try_statements',
-    problemMessage: '[avoid_nested_try_statements] Avoid nested try statements.',
+    problemMessage:
+        '[avoid_nested_try_statements] Avoid nested try statements.',
     correctionMessage: 'Extract inner try-catch into a separate function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -674,7 +679,8 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
-    problemMessage: '[require_error_boundary] App should have an error boundary.',
+    problemMessage:
+        '[require_error_boundary] App should have an error boundary.',
     correctionMessage:
         'Wrap app content in an ErrorBoundary widget or use builder with error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -793,7 +799,8 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_uncaught_future_errors',
-    problemMessage: '[avoid_uncaught_future_errors] Future without error handling may crash app.',
+    problemMessage:
+        '[avoid_uncaught_future_errors] Future without error handling may crash app.',
     correctionMessage:
         'Add try-catch to the function, use .ignore(), or add .catchError().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1907,7 +1914,8 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_permission_permanent_denial_handling',
-    problemMessage: '[require_permission_permanent_denial_handling] Permission request without permanent denial handling.',
+    problemMessage:
+        '[require_permission_permanent_denial_handling] Permission request without permanent denial handling.',
     correctionMessage:
         'Check isPermanentlyDenied and call openAppSettings() to guide users.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1992,7 +2000,8 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_notification_action_handling',
-    problemMessage: '[require_notification_action_handling] Notification with actions may lack action handler setup.',
+    problemMessage:
+        '[require_notification_action_handling] Notification with actions may lack action handler setup.',
     correctionMessage:
         'Ensure onDidReceiveNotificationResponse handles action IDs.',
     errorSeverity: DiagnosticSeverity.INFO,

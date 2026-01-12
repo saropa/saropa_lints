@@ -1017,7 +1017,8 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_macos_keyboard_shortcuts',
-    problemMessage: '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts.',
+    problemMessage:
+        '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts.',
     correctionMessage:
         'Use Shortcuts widget with common macOS shortcuts (Cmd+S, Cmd+Z, etc.).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1936,7 +1937,8 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_privacy_manifest',
-    problemMessage: '[require_ios_privacy_manifest] API requires iOS Privacy Manifest entry (iOS 17+).',
+    problemMessage:
+        '[require_ios_privacy_manifest] API requires iOS Privacy Manifest entry (iOS 17+).',
     correctionMessage:
         'Add PrivacyInfo.xcprivacy with required reason API declarations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2046,7 +2048,8 @@ class RequireAppleSignInRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_apple_sign_in',
-    problemMessage: '[require_apple_sign_in] Third-party login detected without Sign in with Apple. '
+    problemMessage:
+        '[require_apple_sign_in] Third-party login detected without Sign in with Apple. '
         'iOS apps with social login must offer Sign in with Apple.',
     correctionMessage:
         'Add Sign in with Apple using the sign_in_with_apple package '
@@ -2811,7 +2814,8 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_face_id_usage_description',
-    problemMessage: '[require_ios_face_id_usage_description] Biometric authentication detected. iOS requires '
+    problemMessage:
+        '[require_ios_face_id_usage_description] Biometric authentication detected. iOS requires '
         'NSFaceIDUsageDescription in Info.plist for Face ID.',
     correctionMessage:
         'Add NSFaceIDUsageDescription to ios/Runner/Info.plist explaining '
@@ -3137,7 +3141,8 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_app_review_prompt_timing',
-    problemMessage: '[require_ios_app_review_prompt_timing] App review request detected in initialization context. '
+    problemMessage:
+        '[require_ios_app_review_prompt_timing] App review request detected in initialization context. '
         'Do not request reviews on first launch or during startup.',
     correctionMessage: 'Move review request after meaningful user engagement. '
         'Apple rejects apps that prompt too early.',
@@ -3347,7 +3352,8 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_bundle_id',
-    problemMessage: '[avoid_ios_hardcoded_bundle_id] Hardcoded bundle ID detected. Bundle IDs should come from '
+    problemMessage:
+        '[avoid_ios_hardcoded_bundle_id] Hardcoded bundle ID detected. Bundle IDs should come from '
         'configuration, not hardcoded strings.',
     correctionMessage:
         'Use PackageInfo.fromPlatform().packageName or build-time configuration.',
@@ -4279,7 +4285,8 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_macos_catalyst_unsupported_apis',
-    problemMessage: '[avoid_macos_catalyst_unsupported_apis] API detected that is not available on Mac Catalyst. '
+    problemMessage:
+        '[avoid_macos_catalyst_unsupported_apis] API detected that is not available on Mac Catalyst. '
         'Add platform check if supporting Mac Catalyst.',
     correctionMessage:
         'Wrap with Platform.isMacOS check or use kIsWeb/defaultTargetPlatform.',
@@ -4758,7 +4765,8 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_continuous_location_tracking',
-    problemMessage: '[avoid_ios_continuous_location_tracking] Continuous location tracking detected with high accuracy. '
+    problemMessage:
+        '[avoid_ios_continuous_location_tracking] Continuous location tracking detected with high accuracy. '
         'Consider using lower accuracy or distance filters to save battery.',
     correctionMessage:
         'Use LocationAccuracy.medium or lower, and set distanceFilter.',
@@ -5430,7 +5438,8 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_nfc_capability_check',
-    problemMessage: '[require_ios_nfc_capability_check] NFC usage detected. Not all iOS devices support NFC. '
+    problemMessage:
+        '[require_ios_nfc_capability_check] NFC usage detected. Not all iOS devices support NFC. '
         'Check capability before use.',
     correctionMessage:
         'Use NFCNDEFReaderSession.readingAvailable before scanning.',
@@ -6453,7 +6462,8 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_age_rating_consideration',
-    problemMessage: '[require_ios_age_rating_consideration] Feature requiring age rating consideration detected. '
+    problemMessage:
+        '[require_ios_age_rating_consideration] Feature requiring age rating consideration detected. '
         'Verify App Store Connect age rating matches app content.',
     correctionMessage:
         'Review App Store Connect age rating for user-generated content, '
@@ -6749,7 +6759,8 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_sandbox_entitlements',
-    problemMessage: '[require_macos_sandbox_entitlements] Feature requiring macOS sandbox entitlement detected. '
+    problemMessage:
+        '[require_macos_sandbox_entitlements] Feature requiring macOS sandbox entitlement detected. '
         'Ensure entitlements file includes required permissions.',
     correctionMessage:
         'Add required entitlements to macOS/Runner/Release.entitlements.',
@@ -6954,7 +6965,8 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
           // for short-lived foreground work
           final int nodeOffset = node.offset;
           final int startOffset = nodeOffset > 200 ? nodeOffset - 200 : 0;
-          final String preceding = fileSource.substring(startOffset, nodeOffset);
+          final String preceding =
+              fileSource.substring(startOffset, nodeOffset);
           final String precedingLower = preceding.toLowerCase();
 
           // Skip if comments indicate intentional short-lived foreground use
@@ -7214,7 +7226,8 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_delayed_permission_prompt',
-    problemMessage: '[prefer_delayed_permission_prompt] Permission request detected in main() or initState(). '
+    problemMessage:
+        '[prefer_delayed_permission_prompt] Permission request detected in main() or initState(). '
         'Asking too early reduces acceptance rates.',
     correctionMessage:
         'Wait until user interaction shows they need the feature, '
@@ -7398,7 +7411,8 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_purchase_verification',
-    problemMessage: '[require_purchase_verification] In-app purchase without server verification detected. '
+    problemMessage:
+        '[require_purchase_verification] In-app purchase without server verification detected. '
         'Client-side verification can be bypassed by attackers.',
     correctionMessage:
         'Verify purchase receipts server-side with Apple/Google. '
@@ -7500,7 +7514,8 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_purchase_restoration',
-    problemMessage: '[require_purchase_restoration] In-app purchase detected without restore functionality. '
+    problemMessage:
+        '[require_purchase_restoration] In-app purchase detected without restore functionality. '
         'App Store requires "Restore Purchases" for non-consumables.',
     correctionMessage: 'Add a "Restore Purchases" button that calls '
         'InAppPurchase.instance.restorePurchases().',
@@ -7586,7 +7601,8 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_background_sync',
-    problemMessage: '[prefer_background_sync] Data sync in initState() only runs when app is open. '
+    problemMessage:
+        '[prefer_background_sync] Data sync in initState() only runs when app is open. '
         'Consider background sync for better user experience.',
     correctionMessage:
         'Use Workmanager for background sync. Data stays fresh even when '
@@ -7681,7 +7697,8 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_sync_error_recovery',
-    problemMessage: '[require_sync_error_recovery] Sync operation without error recovery detected. '
+    problemMessage:
+        '[require_sync_error_recovery] Sync operation without error recovery detected. '
         'Failed syncs should retry and notify user of unrecoverable errors.',
     correctionMessage: 'Implement exponential backoff retry and notify user of '
         'persistent failures.',
@@ -7800,7 +7817,8 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_wifi_only_assumption',
-    problemMessage: '[avoid_ios_wifi_only_assumption] Large download without connectivity check. Users may have '
+    problemMessage:
+        '[avoid_ios_wifi_only_assumption] Large download without connectivity check. Users may have '
         'expensive cellular plans.',
     correctionMessage:
         'Check connectivity type and warn user before large downloads '
@@ -7876,7 +7894,8 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_low_power_mode_handling',
-    problemMessage: '[require_ios_low_power_mode_handling] Heavy animation or background activity detected. Consider '
+    problemMessage:
+        '[require_ios_low_power_mode_handling] Heavy animation or background activity detected. Consider '
         'checking iOS Low Power Mode and adapting behavior.',
     correctionMessage:
         'Check ProcessInfo.isLowPowerModeEnabled and reduce animations '
@@ -7961,7 +7980,8 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_accessibility_large_text',
-    problemMessage: '[require_ios_accessibility_large_text] Hardcoded font size may not respect iOS Dynamic Type. '
+    problemMessage:
+        '[require_ios_accessibility_large_text] Hardcoded font size may not respect iOS Dynamic Type. '
         'Use theme text styles for accessibility.',
     correctionMessage: 'Use Theme.of(context).textTheme styles or apply '
         'MediaQuery.textScaleFactorOf(context).',
@@ -8592,7 +8612,8 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_battery_drain_patterns',
-    problemMessage: '[avoid_ios_battery_drain_patterns] Pattern detected that may cause excessive battery drain. '
+    problemMessage:
+        '[avoid_ios_battery_drain_patterns] Pattern detected that may cause excessive battery drain. '
         'iOS shows high battery usage in Settings.',
     correctionMessage: 'Use push notifications instead of polling. '
         'Reduce location accuracy and frequency.',
@@ -8686,7 +8707,8 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_sandbox_exceptions',
-    problemMessage: '[require_macos_sandbox_exceptions] Feature requiring macOS sandbox entitlement detected. '
+    problemMessage:
+        '[require_macos_sandbox_exceptions] Feature requiring macOS sandbox entitlement detected. '
         'App Store apps must declare entitlements.',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements.',
@@ -8772,7 +8794,8 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_macos_hardened_runtime_violations',
-    problemMessage: '[avoid_macos_hardened_runtime_violations] Pattern detected that may violate macOS Hardened Runtime. '
+    problemMessage:
+        '[avoid_macos_hardened_runtime_violations] Pattern detected that may violate macOS Hardened Runtime. '
         'Apps must pass notarization for distribution.',
     correctionMessage:
         'Avoid loading unsigned dynamic libraries or using JIT compilation '
@@ -8843,7 +8866,8 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_app_transport_security',
-    problemMessage: '[require_macos_app_transport_security] HTTP URL detected. macOS enforces App Transport Security. '
+    problemMessage:
+        '[require_macos_app_transport_security] HTTP URL detected. macOS enforces App Transport Security. '
         'Use HTTPS or declare exception in Info.plist.',
     correctionMessage:
         'Change to HTTPS or add NSAppTransportSecurity exception '
@@ -8994,7 +9018,8 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_entitlements',
-    problemMessage: '[require_macos_entitlements] Feature detected that requires macOS entitlement. '
+    problemMessage:
+        '[require_macos_entitlements] Feature detected that requires macOS entitlement. '
         'Sandboxed apps crash without proper entitlements.',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements '

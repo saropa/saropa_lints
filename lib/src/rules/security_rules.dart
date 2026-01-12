@@ -501,7 +501,8 @@ class RequireInputSanitizationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_input_sanitization',
-    problemMessage: '[require_input_sanitization] User input should be validated or sanitized before use.',
+    problemMessage:
+        '[require_input_sanitization] User input should be validated or sanitized before use.',
     correctionMessage:
         'Validate and sanitize user input to prevent injection attacks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -744,7 +745,8 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_eval_like_patterns',
-    problemMessage: '[avoid_eval_like_patterns] Dynamic code execution pattern detected.',
+    problemMessage:
+        '[avoid_eval_like_patterns] Dynamic code execution pattern detected.',
     correctionMessage:
         'Avoid dynamic code execution. Use static dispatch or explicit mappings.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -860,7 +862,8 @@ class RequireCertificatePinningRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
-    problemMessage: '[require_certificate_pinning] HttpClient should implement certificate pinning.',
+    problemMessage:
+        '[require_certificate_pinning] HttpClient should implement certificate pinning.',
     correctionMessage:
         'Set badCertificateCallback to validate server certificates.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -928,7 +931,8 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_token_in_url',
-    problemMessage: '[avoid_token_in_url] Avoid putting tokens or API keys in URLs.',
+    problemMessage:
+        '[avoid_token_in_url] Avoid putting tokens or API keys in URLs.',
     correctionMessage:
         'Use Authorization header or request body for sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -994,7 +998,8 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_clipboard_sensitive',
-    problemMessage: '[avoid_clipboard_sensitive] Avoid copying sensitive data to clipboard.',
+    problemMessage:
+        '[avoid_clipboard_sensitive] Avoid copying sensitive data to clipboard.',
     correctionMessage:
         'Clipboard can be read by other apps. Never copy passwords or tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1068,7 +1073,8 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_storing_passwords',
-    problemMessage: '[avoid_storing_passwords] Never store passwords in SharedPreferences.',
+    problemMessage:
+        '[avoid_storing_passwords] Never store passwords in SharedPreferences.',
     correctionMessage:
         'Use flutter_secure_storage for passwords and sensitive data.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1587,7 +1593,8 @@ class RequireAuthCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_auth_check',
-    problemMessage: '[require_auth_check] Protected endpoint may be missing authentication check.',
+    problemMessage:
+        '[require_auth_check] Protected endpoint may be missing authentication check.',
     correctionMessage:
         'Add authentication verification before processing protected requests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1802,7 +1809,8 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
-    problemMessage: '[avoid_jwt_decode_client] Decoding JWT on client for authorization is insecure.',
+    problemMessage:
+        '[avoid_jwt_decode_client] Decoding JWT on client for authorization is insecure.',
     correctionMessage:
         'Verify JWT claims on the server. Client-decoded JWTs can be manipulated.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1897,7 +1905,8 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
-    problemMessage: '[require_logout_cleanup] Logout may not clear all sensitive data.',
+    problemMessage:
+        '[require_logout_cleanup] Logout may not clear all sensitive data.',
     correctionMessage:
         'Ensure logout clears tokens, cached user data, and resets auth state.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2789,7 +2798,8 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_secure_password_field',
-    problemMessage: '[require_secure_password_field] Password field missing secure keyboard settings.',
+    problemMessage:
+        '[require_secure_password_field] Password field missing secure keyboard settings.',
     correctionMessage:
         'Add enableSuggestions: false and autocorrect: false for passwords.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2925,7 +2935,8 @@ class AvoidPathTraversalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_path_traversal',
-    problemMessage: '[avoid_path_traversal] File path may be vulnerable to path traversal attack.',
+    problemMessage:
+        '[avoid_path_traversal] File path may be vulnerable to path traversal attack.',
     correctionMessage:
         'Validate paths: check for "..", use basename, verify resolved path.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3123,7 +3134,8 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_logs',
-    problemMessage: '[avoid_sensitive_data_in_logs] Sensitive data in logs creates security risks.',
+    problemMessage:
+        '[avoid_sensitive_data_in_logs] Sensitive data in logs creates security risks.',
     correctionMessage:
         'Remove sensitive data or log only non-sensitive metadata.',
     errorSeverity: DiagnosticSeverity.ERROR,
