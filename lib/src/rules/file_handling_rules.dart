@@ -1665,7 +1665,8 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
 
       // Check if we're inside a non-singleton context
       // Look for common singleton patterns: static field, getter, or factory
-      final FunctionBody? enclosingBody = node.thisOrAncestorOfType<FunctionBody>();
+      final FunctionBody? enclosingBody =
+          node.thisOrAncestorOfType<FunctionBody>();
       if (enclosingBody == null) return;
 
       // Check if enclosing function/method is a static getter or uses null-aware

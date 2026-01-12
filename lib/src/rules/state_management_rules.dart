@@ -10182,7 +10182,8 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
               for (final stmt in body.block.statements) {
                 if (stmt is ReturnStatement) {
                   final returnExpr = stmt.expression;
-                  if (returnExpr != null && _isComplexWidgetReturn(returnExpr)) {
+                  if (returnExpr != null &&
+                      _isComplexWidgetReturn(returnExpr)) {
                     reporter.atNode(node, code);
                     break;
                   }
@@ -10439,8 +10440,7 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
       // Check if this is at top level (main) or in a field initializer
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is FunctionDeclaration &&
-            current.name.lexeme == 'main') {
+        if (current is FunctionDeclaration && current.name.lexeme == 'main') {
           reporter.atNode(node, code);
           return;
         }

@@ -51,12 +51,16 @@ void goodSelector() {
 // BAD - Not exhaustive
 // expect_lint: require_bloc_event_sealed
 abstract class CounterEvent {}
+
 class Increment extends CounterEvent {}
+
 class Decrement extends CounterEvent {}
 
 // GOOD - Exhaustive pattern matching
 sealed class GoodCounterEvent {}
+
 class GoodIncrement extends GoodCounterEvent {}
+
 class GoodDecrement extends GoodCounterEvent {}
 
 // =========================================================================
@@ -80,6 +84,7 @@ class GoodBloc extends Bloc<Object, Object> {
 }
 
 abstract class UserRepository {}
+
 class FirebaseUserRepository implements UserRepository {}
 
 // =========================================================================
@@ -140,16 +145,21 @@ class MyNotifier extends ChangeNotifier {
   MyNotifier(OtherNotifier? other);
   void updateWith(OtherNotifier? other) {}
 }
+
 class OtherNotifier extends ChangeNotifier {}
+
 class UserModel {
   final String name;
   UserModel(this.name);
 }
+
 class MyController {}
+
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container();
 }
+
 class HomeBinding extends Bindings {
   @override
   void dependencies() {}
@@ -157,11 +167,14 @@ class HomeBinding extends Bindings {
 
 // Bloc mocks
 sealed class SearchEvent {}
+
 class SearchQueryChanged extends SearchEvent {
   final String query;
   SearchQueryChanged(this.query);
 }
+
 sealed class SearchState {}
+
 class SearchInitial extends SearchState {}
 
 EventTransformer<T> debounce<T>(Duration duration) {
