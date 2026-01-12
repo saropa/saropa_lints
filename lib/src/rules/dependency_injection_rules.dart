@@ -1020,3 +1020,325 @@ class RequireDefaultConfigRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// ROADMAP_NEXT: Phase 2 - Dependency Injection Rules
+// =============================================================================
+
+/// Warns when setter injection is used instead of constructor injection.
+///
+/// Alias: constructor_injection, di_constructor, setter_injection
+///
+/// Constructor injection makes dependencies explicit and ensures objects are
+/// fully initialized when created. Setter injection allows partially initialized
+/// objects and makes dependencies implicit.
+///
+/// **BAD:**
+/// ```dart
+/// class UserService {
+///   late UserRepository _repo; // Setter injection
+///   late AnalyticsService _analytics;
+///
+///   set repository(UserRepository repo) => _repo = repo;
+///   set analytics(AnalyticsService a) => _analytics = a;
+///
+///   void configure(UserRepository repo) { // Method injection
+///     _repo = repo;
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserService {
+///   const UserService(this._repo, this._analytics);
+///
+///   final UserRepository _repo;
+///   final AnalyticsService _analytics;
+/// }
+/// ```
+///
+/// **Also flags:**
+/// - `late` fields for service types that should be constructor-injected
+/// - Setter methods for dependency types
+/// - `init()` or `configure()` methods that set dependencies
+class PreferConstructorInjectionRule extends SaropaLintRule {
+  const PreferConstructorInjectionRule() : super(code: _code);
+
+  /// Code quality issue. Makes testing harder.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_constructor_injection',
+    problemMessage:
+        'Setter/method injection hides dependencies. Use constructor injection.',
+    correctionMessage:
+        'Make this a final field and add a constructor parameter: '
+        'MyClass(this._service);',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Suffixes that identify dependency types (services, repos, etc.).
+  static const Set<String> _dependencySuffixes = <String>{
+    'Service',
+    'Repository',
+    'Repo',
+    'Client',
+    'Api',
+    'Provider',
+    'Manager',
+    'Handler',
+    'Controller',
+    'UseCase',
+    'Interactor',
+    'Gateway',
+    'Store',
+    'Bloc',
+    'Cubit',
+    'Notifier',
+  };
+
+  /// Methods that suggest setter/method injection patterns.
+  static const Set<String> _injectionMethodNames = <String>{
+    'init',
+    'initialize',
+    'configure',
+    'setup',
+    'inject',
+    'setDependencies',
+    'setServices',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Skip abstract classes and mixins
+      if (node.abstractKeyword != null) return;
+
+      for (final ClassMember member in node.members) {
+        // Check for late fields with dependency types
+        if (member is FieldDeclaration) {
+          _checkLateDependencyField(member, reporter);
+        }
+
+        // Check for setter methods that set dependencies
+        if (member is MethodDeclaration && member.isSetter) {
+          _checkDependencySetter(member, reporter);
+        }
+
+        // Check for init/configure methods that set dependencies
+        if (member is MethodDeclaration && !member.isSetter) {
+          _checkInjectionMethod(member, reporter);
+        }
+      }
+    });
+  }
+
+  void _checkLateDependencyField(
+    FieldDeclaration field,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    // Check if field has late keyword
+    if (field.fields.lateKeyword == null) return;
+
+    // Check if field type is a dependency
+    final TypeAnnotation? type = field.fields.type;
+    if (type == null) return;
+
+    final String typeStr = type.toSource();
+    for (final String suffix in _dependencySuffixes) {
+      if (typeStr.contains(suffix)) {
+        reporter.atNode(field, code);
+        return;
+      }
+    }
+  }
+
+  void _checkDependencySetter(
+    MethodDeclaration setter,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    // Check parameter type
+    final FormalParameterList? params = setter.parameters;
+    if (params == null || params.parameters.isEmpty) return;
+
+    final FormalParameter param = params.parameters.first;
+    String? typeStr;
+
+    if (param is SimpleFormalParameter) {
+      typeStr = param.type?.toSource();
+    } else if (param is DefaultFormalParameter) {
+      final innerParam = param.parameter;
+      if (innerParam is SimpleFormalParameter) {
+        typeStr = innerParam.type?.toSource();
+      }
+    }
+
+    if (typeStr != null) {
+      for (final String suffix in _dependencySuffixes) {
+        if (typeStr.contains(suffix)) {
+          reporter.atNode(setter, code);
+          return;
+        }
+      }
+    }
+  }
+
+  void _checkInjectionMethod(
+    MethodDeclaration method,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final String methodName = method.name.lexeme.toLowerCase();
+
+    // Check if method name suggests dependency injection
+    if (!_injectionMethodNames.any((name) => methodName.contains(name))) {
+      return;
+    }
+
+    // Check if method has dependency-type parameters
+    final FormalParameterList? params = method.parameters;
+    if (params == null) return;
+
+    for (final FormalParameter param in params.parameters) {
+      String? typeStr;
+
+      if (param is SimpleFormalParameter) {
+        typeStr = param.type?.toSource();
+      } else if (param is DefaultFormalParameter) {
+        final innerParam = param.parameter;
+        if (innerParam is SimpleFormalParameter) {
+          typeStr = innerParam.type?.toSource();
+        }
+      }
+
+      if (typeStr != null) {
+        for (final String suffix in _dependencySuffixes) {
+          if (typeStr.contains(suffix)) {
+            reporter.atNode(method, code);
+            return;
+          }
+        }
+      }
+    }
+  }
+}
+
+// =============================================================================
+// require_di_scope_awareness
+// =============================================================================
+
+/// Understand singleton vs factory vs lazySingleton scopes in GetIt.
+///
+/// Misusing DI scopes causes lifecycle bugs:
+/// - singleton: Created once, lives forever
+/// - lazySingleton: Created on first access, lives forever
+/// - factory: Created fresh each time
+///
+/// **Potential issues:**
+/// ```dart
+/// // BAD: Stateful service as singleton
+/// GetIt.I.registerSingleton(UserSessionService());  // Retains old user data!
+///
+/// // BAD: Expensive service as factory
+/// GetIt.I.registerFactory(() => DatabaseConnection());  // Creates connection each time!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GetIt.I.registerLazySingleton(() => DatabaseConnection());
+/// GetIt.I.registerFactory(() => RequestHandler());  // Stateless, OK as factory
+/// ```
+class RequireDiScopeAwarenessRule extends SaropaLintRule {
+  const RequireDiScopeAwarenessRule() : super(code: _code);
+
+  /// Memory leaks or stale data from wrong scope.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_di_scope_awareness',
+    problemMessage:
+        'Review DI scope: singleton retains state, factory creates each time.',
+    correctionMessage:
+        'Use lazySingleton for expensive objects, factory for stateless handlers.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Service types that might have scope issues.
+  static const Set<String> _statefulSuffixes = <String>{
+    'Session',
+    'Cache',
+    'Store',
+    'State',
+    'Manager',
+    'Controller',
+  };
+
+  static const Set<String> _expensiveSuffixes = <String>{
+    'Connection',
+    'Database',
+    'Client',
+    'Service',
+    'Repository',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for GetIt registration methods
+      if (methodName != 'registerSingleton' &&
+          methodName != 'registerFactory' &&
+          methodName != 'registerLazySingleton') {
+        return;
+      }
+
+      // Check if target is GetIt
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('GetIt') &&
+          !targetSource.contains('sl') &&
+          !targetSource.contains('locator') &&
+          !targetSource.contains('getIt')) {
+        return;
+      }
+
+      // Get the registered type
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isEmpty) return;
+
+      final String argSource = args.arguments.first.toSource();
+
+      // Check for potentially misused scopes
+      if (methodName == 'registerSingleton') {
+        // Stateful services as singleton may cause stale data
+        for (final String suffix in _statefulSuffixes) {
+          if (argSource.contains(suffix)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      } else if (methodName == 'registerFactory') {
+        // Expensive services as factory waste resources
+        for (final String suffix in _expensiveSuffixes) {
+          if (argSource.contains(suffix)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}

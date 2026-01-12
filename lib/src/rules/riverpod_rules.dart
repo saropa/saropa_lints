@@ -1097,3 +1097,148 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_riverpod_auto_dispose
+// =============================================================================
+
+/// Providers should use autoDispose to free memory when unused.
+///
+/// Without autoDispose, providers live forever and can cause memory leaks.
+/// Use .autoDispose modifier to automatically dispose providers when
+/// no longer watched.
+///
+/// **BAD:**
+/// ```dart
+/// final myProvider = StateProvider<int>((ref) => 0);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final myProvider = StateProvider.autoDispose<int>((ref) => 0);
+/// ```
+class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
+  const PreferRiverpodAutoDisposeRule() : super(code: _code);
+
+  /// Memory leaks from retained providers.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_riverpod_auto_dispose',
+    problemMessage:
+        'Provider without autoDispose may leak memory when no longer used.',
+    correctionMessage:
+        'Use .autoDispose modifier: StateProvider.autoDispose<T>((ref) => ...).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Provider constructors that have autoDispose variants.
+  static const Set<String> _providerTypes = <String>{
+    'StateProvider',
+    'FutureProvider',
+    'StreamProvider',
+    'NotifierProvider',
+    'AsyncNotifierProvider',
+    'StateNotifierProvider',
+    'ChangeNotifierProvider',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      final Expression? initializer = node.initializer;
+      if (initializer == null) return;
+
+      // Check for direct provider construction
+      if (initializer is MethodInvocation) {
+        final String? typeName = _getProviderTypeName(initializer);
+        if (typeName == null || !_providerTypes.contains(typeName)) return;
+
+        // Check if already using autoDispose
+        final String source = initializer.toSource();
+        if (source.contains('.autoDispose')) return;
+
+        reporter.atNode(initializer, code);
+      }
+    });
+  }
+
+  String? _getProviderTypeName(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier) {
+      return target.name;
+    }
+    return null;
+  }
+}
+
+// =============================================================================
+// prefer_riverpod_family_for_params
+// =============================================================================
+
+/// Providers with parameters should use .family modifier.
+///
+/// Using state to pass parameters to providers is error-prone. The .family
+/// modifier provides type-safe parameter passing.
+///
+/// **BAD:**
+/// ```dart
+/// final userProvider = StateProvider<User?>((ref) => null);
+/// // Then: ref.read(userProvider.notifier).state = fetchUser(userId);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final userProvider = FutureProvider.family<User, String>((ref, userId) {
+///   return fetchUser(userId);
+/// });
+/// // Usage: ref.watch(userProvider(userId));
+/// ```
+class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
+  const PreferRiverpodFamilyForParamsRule() : super(code: _code);
+
+  /// Improves type safety and cache behavior.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_riverpod_family_for_params',
+    problemMessage:
+        'Provider uses nullable state for parameterized data. Use .family instead.',
+    correctionMessage:
+        'Use FutureProvider.family<T, Param>((ref, param) => ...) for parameterized providers.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      final Expression? initializer = node.initializer;
+      if (initializer == null) return;
+
+      // Look for StateProvider<T?> or StateProvider<SomeType?>
+      final String source = initializer.toSource();
+
+      // Check if it's a StateProvider with nullable type (ends with ?>)
+      if (!source.startsWith('StateProvider<')) return;
+
+      // Check for nullable type parameter pattern
+      final RegExp nullablePattern = RegExp(r'StateProvider<\w+\?>');
+      if (!nullablePattern.hasMatch(source)) return;
+
+      // Check if the initializer returns null (pattern: (ref) => null)
+      if (!source.contains('=> null')) return;
+
+      reporter.atNode(initializer, code);
+    });
+  }
+}

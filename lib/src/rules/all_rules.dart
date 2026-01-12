@@ -64,6 +64,14 @@ export 'return_rules.dart';
 export 'scroll_rules.dart';
 export 'security_rules.dart';
 export 'stylistic_rules.dart';
+export 'stylistic_widget_rules.dart';
+export 'stylistic_null_collection_rules.dart'
+    hide PreferUnmodifiableCollectionsRule, PreferMutableCollectionsRule;
+export 'stylistic_control_flow_rules.dart'
+    hide PreferEarlyReturnRule, PreferSwitchExpressionRule;
+export 'stylistic_whitespace_constructor_rules.dart';
+export 'stylistic_error_testing_rules.dart';
+export 'stylistic_additional_rules.dart';
 export 'type_safety_rules.dart';
 export 'ui_ux_rules.dart';
 export 'state_management_rules.dart'

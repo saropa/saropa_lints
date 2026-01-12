@@ -94,7 +94,7 @@ dependencies:
 
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
   isar_generator: ^3.1.0
   build_runner: ^2.4.0
 ```

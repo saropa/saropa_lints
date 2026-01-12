@@ -1,32 +1,19 @@
+<!-- cspell:ignore edgeinsets borderradius ifnull addall wheretype wherecast asmap catcherror richtext sizedbox -->
 # Stylistic Rules
 
 These rules are **not included in any tier**. They represent team preferences where there's no objectively "correct" answer — enable them individually based on your coding conventions.
 
-## Quick Reference
+**114 rules** organized into 7 categories:
 
-| Rule | Description |
-|------|-------------|
-| [`prefer_relative_imports`](#prefer_relative_imports) | Use relative imports instead of absolute `package:` imports |
-| [`prefer_one_widget_per_file`](#prefer_one_widget_per_file) | One widget class per file |
-| [`prefer_arrow_functions`](#prefer_arrow_functions) | Use `=>` arrow syntax for single-return functions |
-| [`prefer_all_named_parameters`](#prefer_all_named_parameters) | Use named parameters when 3+ positional params |
-| [`prefer_trailing_comma_always`](#prefer_trailing_comma_always) | Trailing commas on all multi-line constructs |
-| [`prefer_private_underscore_prefix`](#prefer_private_underscore_prefix) | All instance fields should be private (`_name`) |
-| [`prefer_widget_methods_over_classes`](#prefer_widget_methods_over_classes) | Small widgets as methods instead of classes |
-| [`prefer_explicit_types`](#prefer_explicit_types) | Explicit types instead of `var`/`final` inference |
-| [`prefer_class_over_record_return`](#prefer_class_over_record_return) | Return classes instead of records from methods |
-| [`prefer_inline_callbacks`](#prefer_inline_callbacks) | Inline callbacks instead of method references |
-| [`prefer_single_quotes`](#prefer_single_quotes) | Single quotes `'string'` instead of double quotes |
-| [`prefer_todo_format`](#prefer_todo_format) | TODOs follow `TODO(author): description` format |
-| [`prefer_fixme_format`](#prefer_fixme_format) | FIXMEs follow `FIXME(author): description` format |
-| [`prefer_sentence_case_comments`](#prefer_sentence_case_comments) | Comments start with capital letter |
-| [`prefer_period_after_doc`](#prefer_period_after_doc) | Doc comments end with period |
-| [`prefer_screaming_case_constants`](#prefer_screaming_case_constants) | Constants in `SCREAMING_SNAKE_CASE` |
-| [`prefer_descriptive_bool_names`](#prefer_descriptive_bool_names) | Booleans use `is`/`has`/`can` prefix |
-| [`prefer_snake_case_files`](#prefer_snake_case_files) | File names in `snake_case.dart` |
-| [`avoid_small_text`](#avoid_small_text) | Font size at least 12 for accessibility |
-| [`prefer_doc_comments_over_regular`](#prefer_doc_comments_over_regular) | Use `///` instead of `//` for public API docs |
-| [`prefer_literal_apostrophe`](#prefer_literal_apostrophe) | Use `'` instead of `\'` by switching to double quotes |
+- [General Stylistic Rules](#general-stylistic-rules) (23 rules)
+- [Widget Preferences](#widget-preferences) (11 rules)
+- [Null & Collection Handling](#null--collection-handling) (15 rules)
+- [Control Flow & Async](#control-flow--async) (14 rules)
+- [Whitespace & Constructors](#whitespace--constructors) (16 rules)
+- [Error Handling & Testing](#error-handling--testing) (13 rules)
+- [Additional Style Rules](#additional-style-rules) (22 rules)
+
+---
 
 ## Enabling Stylistic Rules
 
@@ -44,7 +31,347 @@ custom_lint:
 
 ---
 
-## prefer_relative_imports
+## General Stylistic Rules
+
+Core stylistic preferences for imports, functions, formatting, naming, and comments.
+
+| Rule | Description | Quick Fix |
+|------|-------------|:---------:|
+| [`prefer_relative_imports`](#prefer_relative_imports) | Use relative imports instead of absolute `package:` imports | Yes |
+| [`prefer_one_widget_per_file`](#prefer_one_widget_per_file) | One widget class per file | |
+| [`prefer_arrow_functions`](#prefer_arrow_functions) | Use `=>` arrow syntax for single-return functions | Yes |
+| [`prefer_all_named_parameters`](#prefer_all_named_parameters) | Use named parameters when 3+ positional params | |
+| [`prefer_trailing_comma_always`](#prefer_trailing_comma_always) | Trailing commas on all multi-line constructs | Yes |
+| [`prefer_private_underscore_prefix`](#prefer_private_underscore_prefix) | All instance fields should be private (`_name`) | |
+| [`prefer_widget_methods_over_classes`](#prefer_widget_methods_over_classes) | Small widgets as methods instead of classes | |
+| [`prefer_explicit_types`](#prefer_explicit_types) | Explicit types instead of `var`/`final` inference | |
+| [`prefer_class_over_record_return`](#prefer_class_over_record_return) | Return classes instead of records from methods | |
+| [`prefer_inline_callbacks`](#prefer_inline_callbacks) | Inline callbacks instead of method references | |
+| [`prefer_single_quotes`](#prefer_single_quotes) | Single quotes `'string'` instead of double quotes | Yes |
+| [`prefer_todo_format`](#prefer_todo_format) | TODOs follow `TODO(author): description` format | |
+| [`prefer_fixme_format`](#prefer_fixme_format) | FIXMEs follow `FIXME(author): description` format | |
+| [`prefer_sentence_case_comments`](#prefer_sentence_case_comments) | Comments start with capital letter | Yes |
+| [`prefer_period_after_doc`](#prefer_period_after_doc) | Doc comments end with period | Yes |
+| [`prefer_screaming_case_constants`](#prefer_screaming_case_constants) | Constants in `SCREAMING_SNAKE_CASE` | Yes |
+| [`prefer_descriptive_bool_names`](#prefer_descriptive_bool_names) | Booleans use `is`/`has`/`can` prefix | |
+| [`prefer_snake_case_files`](#prefer_snake_case_files) | File names in `snake_case.dart` | |
+| [`avoid_small_text`](#avoid_small_text) | Font size at least 12 for accessibility | Yes |
+| [`prefer_doc_comments_over_regular`](#prefer_doc_comments_over_regular) | Use `///` instead of `//` for public API docs | Yes |
+| [`prefer_literal_apostrophe`](#prefer_literal_apostrophe) | Use `'` instead of `\'` by switching to double quotes | Yes |
+
+---
+
+## Widget Preferences
+
+Preferences for Flutter widget patterns. Many come in opposing pairs — choose the one that fits your team.
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_sizedbox_over_container` | Use SizedBox for simple sizing | `prefer_container_over_sizedbox` |
+| `prefer_container_over_sizedbox` | Prefer Container for consistency | `prefer_sizedbox_over_container` |
+| `prefer_text_rich_over_richtext` | Use Text.rich over RichText widget | `prefer_richtext_over_text_rich` |
+| `prefer_richtext_over_text_rich` | Use RichText over Text.rich | `prefer_text_rich_over_richtext` |
+| `prefer_edgeinsets_symmetric` | Use EdgeInsets.symmetric when applicable | `prefer_edgeinsets_only` |
+| `prefer_edgeinsets_only` | Use EdgeInsets.only for explicit values | `prefer_edgeinsets_symmetric` |
+| `prefer_borderradius_circular` | Use BorderRadius.circular for uniform corners | |
+| `prefer_expanded_over_flexible` | Use Expanded instead of Flexible(flex: 1) | `prefer_flexible_over_expanded` |
+| `prefer_flexible_over_expanded` | Prefer Flexible for explicit control | `prefer_expanded_over_flexible` |
+| `prefer_material_theme_colors` | Use Theme.of(context) colors | `prefer_explicit_colors` |
+| `prefer_explicit_colors` | Use explicit color values | `prefer_material_theme_colors` |
+
+### Example: SizedBox vs Container
+
+```dart
+// prefer_sizedbox_over_container
+SizedBox(width: 100, height: 50)  // Preferred
+
+// prefer_container_over_sizedbox
+Container(width: 100, height: 50)  // Preferred
+```
+
+---
+
+## Null & Collection Handling
+
+Preferences for null-aware operators and collection manipulation patterns.
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_ifnull_over_ternary` | Use `??` instead of ternary for null defaults | `prefer_ternary_over_ifnull` |
+| `prefer_ternary_over_ifnull` | Use explicit ternary for null checks | `prefer_ifnull_over_ternary` |
+| `prefer_cascade_over_multiple_calls` | Use `..` cascade notation | `prefer_multiple_calls_over_cascade` |
+| `prefer_multiple_calls_over_cascade` | Use separate method calls | `prefer_cascade_over_multiple_calls` |
+| `prefer_map_entries_over_foreach` | Use map.entries instead of forEach | `prefer_foreach_over_map_entries` |
+| `prefer_foreach_over_map_entries` | Use forEach for map iteration | `prefer_map_entries_over_foreach` |
+| `prefer_spread_over_addall` | Use `...` spread operator | `prefer_addall_over_spread` |
+| `prefer_addall_over_spread` | Use addAll method | `prefer_spread_over_addall` |
+| `prefer_collection_literals` | Use `[]`, `{}` over constructors | `prefer_constructor_over_literals` |
+| `prefer_constructor_over_literals` | Use `List()`, `Map()` constructors | `prefer_collection_literals` |
+| `prefer_wheretype_over_wherecast` | Use `.whereType<T>()` for filtering | `prefer_wherecast_over_wheretype` |
+| `prefer_wherecast_over_wheretype` | Use `.where().cast<T>()` pattern | `prefer_wheretype_over_wherecast` |
+| `prefer_fold_over_reduce` | Use fold with initial value | `prefer_reduce_over_fold` |
+| `prefer_reduce_over_fold` | Use reduce when no initial value needed | `prefer_fold_over_reduce` |
+| `prefer_asmap_over_indexed_iteration` | Use `.asMap().entries` for indexed access | |
+
+### Example: Cascade vs Multiple Calls
+
+```dart
+// prefer_cascade_over_multiple_calls
+list
+  ..add(1)
+  ..add(2)
+  ..add(3);
+
+// prefer_multiple_calls_over_cascade
+list.add(1);
+list.add(2);
+list.add(3);
+```
+
+---
+
+## Control Flow & Async
+
+Preferences for control flow patterns, guard clauses, and async/await style.
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_early_return` | Return early to reduce nesting | `prefer_single_exit` |
+| `prefer_single_exit` | Single return at end of function | `prefer_early_return` |
+| `prefer_guard_clauses` | Use guard clauses for preconditions | `prefer_if_else_over_guards` |
+| `prefer_if_else_over_guards` | Use if-else for all conditions | `prefer_guard_clauses` |
+| `prefer_switch_expression` | Use switch expressions (Dart 3) | `prefer_switch_statement` |
+| `prefer_switch_statement` | Use switch statements | `prefer_switch_expression` |
+| `prefer_null_aware_method_calls` | Use `?.` for null-safe calls | `prefer_explicit_null_checks` |
+| `prefer_explicit_null_checks` | Use explicit `if (x != null)` | `prefer_null_aware_method_calls` |
+| `prefer_cascade_assignments` | Use cascades for multiple assignments | `prefer_separate_assignments` |
+| `prefer_separate_assignments` | Use separate assignment statements | `prefer_cascade_assignments` |
+| `prefer_async_await` | Use async/await pattern | `prefer_then_catcherror` |
+| `prefer_then_catcherror` | Use .then()/.catchError() pattern | `prefer_async_await` |
+| `prefer_await_completion` | Always await async operations | `prefer_fire_and_forget` |
+| `prefer_fire_and_forget` | Allow unawaited async for side effects | `prefer_await_completion` |
+
+### Example: Early Return vs Single Exit
+
+```dart
+// prefer_early_return
+void process(User? user) {
+  if (user == null) return;
+  if (!user.isActive) return;
+  // main logic here
+}
+
+// prefer_single_exit
+void process(User? user) {
+  if (user != null && user.isActive) {
+    // main logic here
+  }
+}
+```
+
+---
+
+## Whitespace & Constructors
+
+Preferences for blank lines, member ordering, and constructor patterns.
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_blank_line_before_return` | Blank line before return statements | `prefer_no_blank_line_before_return` |
+| `prefer_no_blank_line_before_return` | No blank line before return | `prefer_blank_line_before_return` |
+| `prefer_blank_line_after_declarations` | Blank line after variable declarations | `prefer_compact_declarations` |
+| `prefer_compact_declarations` | No blank lines between declarations | `prefer_blank_line_after_declarations` |
+| `prefer_grouped_related_statements` | Group related code with blank lines | `prefer_ungrouped_statements` |
+| `prefer_ungrouped_statements` | Minimal blank lines in code | `prefer_grouped_related_statements` |
+| `prefer_blank_line_between_members` | Blank lines between class members | `prefer_compact_members` |
+| `prefer_compact_members` | No blank lines between members | `prefer_blank_line_between_members` |
+| `prefer_named_constructor_parameters` | Use named parameters in constructors | `prefer_positional_constructor_parameters` |
+| `prefer_positional_constructor_parameters` | Use positional parameters | `prefer_named_constructor_parameters` |
+| `prefer_initializing_formals` | Use `this.param` shorthand | `prefer_explicit_parameter_assignment` |
+| `prefer_explicit_parameter_assignment` | Explicit `param = param` assignment | `prefer_initializing_formals` |
+| `prefer_const_constructor_declarations` | Mark constructors as const when possible | `prefer_non_const_constructors` |
+| `prefer_non_const_constructors` | Avoid const constructors | `prefer_const_constructor_declarations` |
+| `prefer_factory_constructor` | Use factory for non-trivial construction | `prefer_static_method` |
+| `prefer_static_method` | Use static methods over factories | `prefer_factory_constructor` |
+
+### Example: Initializing Formals
+
+```dart
+// prefer_initializing_formals
+class User {
+  final String name;
+  User(this.name);
+}
+
+// prefer_explicit_parameter_assignment
+class User {
+  final String name;
+  User(String name) : name = name;
+}
+```
+
+---
+
+## Error Handling & Testing
+
+Preferences for exception handling patterns and test organization.
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_specific_exceptions` | Throw specific exception types | `prefer_generic_exception` |
+| `prefer_generic_exception` | Use generic Exception class | `prefer_specific_exceptions` |
+| `prefer_exception_suffix` | Exception classes end with "Exception" | `prefer_error_suffix` |
+| `prefer_error_suffix` | Exception classes end with "Error" | `prefer_exception_suffix` |
+| `prefer_on_over_catch` | Use `on ExceptionType` in try-catch | `prefer_catch_over_on` |
+| `prefer_catch_over_on` | Use bare `catch (e)` | `prefer_on_over_catch` |
+| `prefer_given_when_then_comments` | Use AAA/GWT comments in tests | `prefer_self_documenting_tests` |
+| `prefer_self_documenting_tests` | No structure comments in tests | `prefer_given_when_then_comments` |
+| `prefer_expect_over_assert_in_tests` | Use expect() instead of assert() | |
+| `prefer_single_expectation_per_test` | One assertion per test | `prefer_grouped_expectations` |
+| `prefer_grouped_expectations` | Group related assertions | `prefer_single_expectation_per_test` |
+| `prefer_test_name_should_when` | Test names: "should X when Y" | `prefer_test_name_descriptive` |
+| `prefer_test_name_descriptive` | Descriptive test names | `prefer_test_name_should_when` |
+
+### Example: Test Structure Comments
+
+```dart
+// prefer_given_when_then_comments
+test('user login', () {
+  // Arrange
+  final user = User('test@example.com');
+
+  // Act
+  final result = authService.login(user);
+
+  // Assert
+  expect(result.isSuccess, true);
+});
+
+// prefer_self_documenting_tests
+test('user login', () {
+  final user = User('test@example.com');
+  final result = authService.login(user);
+  expect(result.isSuccess, true);
+});
+```
+
+---
+
+## Additional Style Rules
+
+Additional preferences for strings, imports, class structure, types, naming, and expressions.
+
+### String Handling
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_interpolation_over_concatenation` | Use `'Hello, $name'` | `prefer_concatenation_over_interpolation` |
+| `prefer_concatenation_over_interpolation` | Use `'Hello, ' + name` | `prefer_interpolation_over_concatenation` |
+| `prefer_double_quotes` | Use double quotes for strings | `prefer_single_quotes` |
+
+### Import Organization
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_absolute_imports` | Use `package:` imports | `prefer_relative_imports` |
+| `prefer_grouped_imports` | Group: dart, package, relative | `prefer_flat_imports` |
+| `prefer_flat_imports` | No grouping, flat import list | `prefer_grouped_imports` |
+
+### Class Structure
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_fields_before_methods` | Fields declared before methods | `prefer_methods_before_fields` |
+| `prefer_methods_before_fields` | Methods declared before fields | `prefer_fields_before_methods` |
+| `prefer_static_members_first` | Static members before instance | `prefer_instance_members_first` |
+| `prefer_instance_members_first` | Instance members before static | `prefer_static_members_first` |
+| `prefer_public_members_first` | Public members before private | `prefer_private_members_first` |
+| `prefer_private_members_first` | Private members before public | `prefer_public_members_first` |
+
+### Type Annotations
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_var_over_explicit_type` | Use `var` when type is obvious | `prefer_explicit_types` |
+| `prefer_object_over_dynamic` | Use `Object?` instead of `dynamic` | `prefer_dynamic_over_object` |
+| `prefer_dynamic_over_object` | Use `dynamic` for truly dynamic types | `prefer_object_over_dynamic` |
+
+### Naming Conventions
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_lower_camel_case_constants` | Constants: `maxRetries` | `prefer_screaming_case_constants` |
+| `prefer_camel_case_method_names` | Methods: `fetchUserData` | |
+| `prefer_descriptive_variable_names` | Names at least 3 characters | `prefer_concise_variable_names` |
+| `prefer_concise_variable_names` | Names 30 characters or less | `prefer_descriptive_variable_names` |
+
+### Expression Style
+
+| Rule | Description | Opposing Rule |
+|------|-------------|---------------|
+| `prefer_explicit_this` | Use `this.field` for field access | |
+| `prefer_implicit_boolean_comparison` | Use `if (isValid)` not `if (isValid == true)` | `prefer_explicit_boolean_comparison` |
+| `prefer_explicit_boolean_comparison` | Use `if (isValid == true)` for nullable bools | `prefer_implicit_boolean_comparison` |
+
+---
+
+## Opposing Rules Reference
+
+Many stylistic rules have valid opposites. This table helps you choose which rules to enable based on your team's preferences:
+
+| Preference A | Rule A | vs | Rule B | Preference B |
+|--------------|--------|:--:|--------|--------------|
+| Relative imports | `prefer_relative_imports` | | `prefer_absolute_imports` | Absolute imports |
+| Arrow functions | `prefer_arrow_functions` | | (block bodies) | Block bodies |
+| Inline callbacks | `prefer_inline_callbacks` | | (extracted methods) | Extracted methods |
+| Single quotes | `prefer_single_quotes` | | `prefer_double_quotes` | Double quotes |
+| Readable apostrophes | `prefer_literal_apostrophe` | | `prefer_single_quotes` | Single quotes |
+| SizedBox | `prefer_sizedbox_over_container` | | `prefer_container_over_sizedbox` | Container |
+| Text.rich | `prefer_text_rich_over_richtext` | | `prefer_richtext_over_text_rich` | RichText |
+| EdgeInsets.symmetric | `prefer_edgeinsets_symmetric` | | `prefer_edgeinsets_only` | EdgeInsets.only |
+| Expanded | `prefer_expanded_over_flexible` | | `prefer_flexible_over_expanded` | Flexible |
+| Theme colors | `prefer_material_theme_colors` | | `prefer_explicit_colors` | Explicit colors |
+| `??` operator | `prefer_ifnull_over_ternary` | | `prefer_ternary_over_ifnull` | Ternary |
+| Cascades | `prefer_cascade_over_multiple_calls` | | `prefer_multiple_calls_over_cascade` | Separate calls |
+| Spread operator | `prefer_spread_over_addall` | | `prefer_addall_over_spread` | addAll |
+| Collection literals | `prefer_collection_literals` | | `prefer_constructor_over_literals` | Constructors |
+| whereType | `prefer_wheretype_over_wherecast` | | `prefer_wherecast_over_wheretype` | where+cast |
+| fold | `prefer_fold_over_reduce` | | `prefer_reduce_over_fold` | reduce |
+| Early return | `prefer_early_return` | | `prefer_single_exit` | Single exit |
+| Guard clauses | `prefer_guard_clauses` | | `prefer_if_else_over_guards` | if-else |
+| Switch expressions | `prefer_switch_expression` | | `prefer_switch_statement` | Switch statements |
+| Null-aware `?.` | `prefer_null_aware_method_calls` | | `prefer_explicit_null_checks` | Explicit checks |
+| async/await | `prefer_async_await` | | `prefer_then_catcherror` | .then() |
+| await completion | `prefer_await_completion` | | `prefer_fire_and_forget` | Fire and forget |
+| Blank before return | `prefer_blank_line_before_return` | | `prefer_no_blank_line_before_return` | No blank |
+| Spaced declarations | `prefer_blank_line_after_declarations` | | `prefer_compact_declarations` | Compact |
+| Grouped statements | `prefer_grouped_related_statements` | | `prefer_ungrouped_statements` | Ungrouped |
+| Spaced members | `prefer_blank_line_between_members` | | `prefer_compact_members` | Compact |
+| Named params | `prefer_named_constructor_parameters` | | `prefer_positional_constructor_parameters` | Positional |
+| `this.param` | `prefer_initializing_formals` | | `prefer_explicit_parameter_assignment` | Explicit |
+| const constructors | `prefer_const_constructor_declarations` | | `prefer_non_const_constructors` | Non-const |
+| Factory | `prefer_factory_constructor` | | `prefer_static_method` | Static method |
+| Specific exceptions | `prefer_specific_exceptions` | | `prefer_generic_exception` | Generic |
+| Exception suffix | `prefer_exception_suffix` | | `prefer_error_suffix` | Error suffix |
+| `on Type` catch | `prefer_on_over_catch` | | `prefer_catch_over_on` | Bare catch |
+| AAA comments | `prefer_given_when_then_comments` | | `prefer_self_documenting_tests` | No comments |
+| Single assertion | `prefer_single_expectation_per_test` | | `prefer_grouped_expectations` | Grouped |
+| should/when names | `prefer_test_name_should_when` | | `prefer_test_name_descriptive` | Descriptive |
+| Interpolation | `prefer_interpolation_over_concatenation` | | `prefer_concatenation_over_interpolation` | Concatenation |
+| Grouped imports | `prefer_grouped_imports` | | `prefer_flat_imports` | Flat imports |
+| Fields first | `prefer_fields_before_methods` | | `prefer_methods_before_fields` | Methods first |
+| Static first | `prefer_static_members_first` | | `prefer_instance_members_first` | Instance first |
+| Public first | `prefer_public_members_first` | | `prefer_private_members_first` | Private first |
+| var | `prefer_var_over_explicit_type` | | `prefer_explicit_types` | Explicit types |
+| Object? | `prefer_object_over_dynamic` | | `prefer_dynamic_over_object` | dynamic |
+| lowerCamel constants | `prefer_lower_camel_case_constants` | | `prefer_screaming_case_constants` | SCREAMING_CASE |
+| Implicit bool | `prefer_implicit_boolean_comparison` | | `prefer_explicit_boolean_comparison` | Explicit bool |
+
+---
+
+## Detailed Rule Documentation
+
+### prefer_relative_imports
 
 Use relative imports instead of absolute `package:` imports for files within the same package.
 
@@ -58,8 +385,6 @@ Use relative imports instead of absolute `package:` imports for files within the
 - Easier to understand file location at a glance
 - IDEs may auto-generate absolute imports
 
-### Example
-
 ```dart
 // BAD (with this rule enabled):
 import 'package:my_app/src/utils/helpers.dart';
@@ -72,23 +397,11 @@ import '../utils/helpers.dart';
 
 ---
 
-## prefer_one_widget_per_file
+### prefer_one_widget_per_file
 
 One widget class per file for easier navigation and searchability.
 
-**Pros:**
-- Easier file navigation and searchability
-- Smaller, more focused files
-- Clear file naming conventions
-
-**Cons:**
-- Related widgets can be viewed together
-- Reduces number of files in project
-- Simpler for small, tightly coupled widgets
-
 **Note:** State classes are NOT counted as separate widgets since they must be in the same file as their StatefulWidget.
-
-### Example
 
 ```dart
 // BAD (with this rule enabled):
@@ -106,21 +419,9 @@ class MyCard extends StatelessWidget { ... }
 
 ---
 
-## prefer_arrow_functions
+### prefer_arrow_functions
 
 Use arrow syntax (`=>`) for functions that contain only a return statement.
-
-**Pros:**
-- More concise and readable for simple returns
-- Signals that function is a pure expression
-- Consistent with functional programming style
-
-**Cons:**
-- Block bodies are more explicit
-- Easier to add debug statements later
-- Consistent formatting regardless of complexity
-
-### Example
 
 ```dart
 // BAD (with this rule enabled):
@@ -136,30 +437,16 @@ int double(int x) => x * 2;
 
 ---
 
-## prefer_all_named_parameters
+### prefer_all_named_parameters
 
 Use named parameters when a function has 3 or more positional parameters.
 
-**Pros:**
-- Self-documenting call sites
-- Order-independent arguments
-- Easier to add optional parameters later
-
-**Cons:**
-- More verbose call sites
-- Overkill for simple 2-3 param functions
-- Familiar positional style from other languages
-
 **Note:** Excludes `main()`, operators, and `@override` methods.
-
-### Example
 
 ```dart
 // BAD (with this rule enabled):
 void createUser(String name, String email, int age, bool isAdmin) { ... }
-
-// Call site is unclear:
-createUser('John', 'john@example.com', 30, true);
+createUser('John', 'john@example.com', 30, true);  // Unclear
 
 // GOOD:
 void createUser({
@@ -168,498 +455,84 @@ void createUser({
   required int age,
   required bool isAdmin,
 }) { ... }
-
-// Call site is self-documenting:
 createUser(name: 'John', email: 'john@example.com', age: 30, isAdmin: true);
 ```
 
 ---
 
-## prefer_trailing_comma_always
+### prefer_trailing_comma_always
 
 Trailing commas on all multi-line constructs for cleaner git diffs.
 
-**Pros:**
-- Cleaner git diffs (single line changes)
-- Easier to reorder arguments
-- Consistent formatting with `dart format`
-
-**Cons:**
-- Visual noise at end of lines
-- Different from most other languages
-- May feel redundant
-
-### Example
-
 ```dart
 // BAD (with this rule enabled):
-Widget build() {
-  return Container(
-    child: Column(
-      children: [
-        Text('Hello'),
-        Text('World')  // Missing trailing comma
-      ]  // Missing trailing comma
-    )  // Missing trailing comma
-  );  // Missing trailing comma
-}
+return Container(
+  child: Text('Hello')  // Missing trailing comma
+);
 
 // GOOD:
-Widget build() {
-  return Container(
-    child: Column(
-      children: [
-        Text('Hello'),
-        Text('World'),
-      ],
-    ),
-  );
-}
+return Container(
+  child: Text('Hello'),
+);
 ```
 
 **Quick fix available:** Adds trailing comma automatically.
 
 ---
 
-## prefer_private_underscore_prefix
-
-All instance fields should be private (prefixed with underscore).
-
-**Pros:**
-- Encapsulation by default
-- Clear distinction between public API and internal state
-- Forces explicit getter/setter decisions
-
-**Cons:**
-- More boilerplate for simple data classes
-- Dart already has library privacy without underscore
-- Record types make plain fields common
-
-**Note:** Excludes widget properties, State class fields, and documented fields.
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-class MyClass {
-  String name;  // Public field triggers warning
-}
-
-// GOOD:
-class MyClass {
-  String _name;  // Private field
-
-  String get name => _name;  // Public getter if needed
-}
-```
-
----
-
-## prefer_widget_methods_over_classes
-
-Simple private widgets could be build methods instead of separate classes.
-
-**Pros:**
-- Less boilerplate code
-- Simpler for very small UI pieces
-- Access to parent widget state without passing
-
-**Cons:**
-- Widget classes enable better rebuild optimization
-- Easier to add const constructors
-- Better separation of concerns
-- More testable in isolation
-
-**Note:** Only flags private StatelessWidgets with simple build methods (5 lines or fewer). Complex widgets with fields or multiple methods are not flagged.
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-class _MyIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Icon(Icons.star, color: Colors.yellow);
-  }
-}
-
-// GOOD (as a method in parent widget):
-Widget _buildIcon() {
-  return Icon(Icons.star, color: Colors.yellow);
-}
-```
-
----
-
-## prefer_explicit_types
-
-Use explicit type annotations instead of `var`, `final` (without type), or `dynamic`.
-
-**Pros:**
-- Clear intent and documentation
-- Catches type mismatches at declaration
-- Easier to read in code reviews
-
-**Cons:**
-- More verbose
-- Dart's type inference is excellent
-- Redundant when type is obvious from initializer
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-var name = 'John';
-final count = 42;
-dynamic items = <String>[];
-
-// GOOD:
-String name = 'John';
-final int count = 42;
-List<String> items = <String>[];
-```
-
----
-
-## prefer_class_over_record_return
-
-Return dedicated classes instead of records from methods.
-
-**Pros:**
-- Named fields are self-documenting
-- Can add methods and validation
-- Better IDE support and refactoring
-- Can implement interfaces
-
-**Cons:**
-- Records are more concise
-- Good for simple data transfer
-- No boilerplate needed
-- Pattern matching support
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-(String name, int age) getUser() {
-  return ('John', 30);
-}
-
-({String name, int age}) getUserNamed() {
-  return (name: 'John', age: 30);
-}
-
-// GOOD:
-class User {
-  final String name;
-  final int age;
-  User(this.name, this.age);
-}
-
-User getUser() {
-  return User('John', 30);
-}
-```
-
----
-
-## prefer_inline_callbacks
-
-Inline callbacks instead of referencing extracted methods.
-
-**Pros:**
-- Behavior is visible where it's used
-- No need to search for method definition
-- Simpler for one-off handlers
-
-**Cons:**
-- Reusable across multiple widgets
-- Easier to test in isolation
-- Keeps build methods shorter
-- Can have descriptive method names
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-class MyWidget extends StatelessWidget {
-  void _onPressed() {
-    print('pressed');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: _onPressed,  // Method reference triggers warning
-      child: Text('Press me'),
-    );
-  }
-}
-
-// GOOD:
-class MyWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        print('pressed');
-      },
-      child: Text('Press me'),
-    );
-  }
-}
-```
-
----
-
-## prefer_single_quotes
+### prefer_single_quotes
 
 Use single quotes instead of double quotes for strings.
-
-**Pros:**
-- Dart style guide recommends single quotes
-- Fewer keystrokes (no shift key needed)
-- Consistent with many Dart codebases
-
-**Cons:**
-- Familiar from other languages (Java, JavaScript)
-- Easier to include apostrophes in strings
-- JSON uses double quotes
-
-### Example
 
 ```dart
 // BAD (with this rule enabled):
 String name = "John";
-String message = "Hello, World!";
 
 // GOOD:
 String name = 'John';
-String message = 'Hello, World!';
 ```
 
 **Quick fix available:** Converts to single quotes automatically.
 
 ---
 
-## prefer_todo_format
-
-TODO comments should follow the format: `TODO(author): description`
-
-**Pros:**
-- Easy to track who added the TODO
-- Searchable by author
-- Consistent across codebase
-
-**Cons:**
-- Git blame already shows author
-- Extra typing
-- Author may leave the team
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-// TODO: fix this later
-// TODO fix this
-// todo: implement feature
-
-// GOOD:
-// TODO(john): fix this later
-// TODO(jane): implement feature
-```
-
----
-
-## prefer_fixme_format
-
-FIXME comments should follow the format: `FIXME(author): description`
-
-**Pros:**
-- Easy to track who added the FIXME
-- Searchable by author
-- Consistent with TODO format
-
-**Cons:**
-- Git blame already shows author
-- Extra typing
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-// FIXME: this is broken
-// FIXME fix the bug
-
-// GOOD:
-// FIXME(john): this is broken
-// FIXME(jane): handle edge case
-```
-
----
-
-## prefer_sentence_case_comments
-
-Comments should start with a capital letter.
-
-**Pros:**
-- More professional appearance
-- Consistent with documentation standards
-- Easier to read
-
-**Cons:**
-- Extra effort for quick notes
-- May conflict with code references (e.g., `// userId is required`)
-
-**Note:** Skips special markers (TODO, FIXME, NOTE, etc.) and code references.
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-// calculate the total
-// this is a helper function
-
-// GOOD:
-// Calculate the total
-// This is a helper function
-```
-
-**Quick fix available:** Capitalizes the first letter automatically.
-
----
-
-## prefer_period_after_doc
-
-Doc comments should end with a period.
-
-**Pros:**
-- Complete sentences are easier to read
-- Professional documentation style
-- Consistent with Dart documentation guidelines
-
-**Cons:**
-- Extra typing for simple docs
-- May feel redundant for short descriptions
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-/// Returns the user's name
-String getName() => name;
-
-// GOOD:
-/// Returns the user's name.
-String getName() => name;
-```
-
-**Quick fix available:** Adds period automatically.
-
----
-
-## prefer_screaming_case_constants
+### prefer_screaming_case_constants
 
 Constants should use `SCREAMING_SNAKE_CASE` naming.
-
-**Pros:**
-- Immediately identifiable as constants
-- Traditional style from C/Java
-- Clear distinction from variables
-
-**Cons:**
-- Dart style guide prefers `lowerCamelCase` for constants
-- Less "shouty" in code
-- Consistent with other Dart naming
-
-### Example
 
 ```dart
 // BAD (with this rule enabled):
 const int maxRetries = 3;
-const String apiVersion = 'v1';
 
 // GOOD:
 const int MAX_RETRIES = 3;
-const String API_VERSION = 'v1';
 ```
 
 **Quick fix available:** Converts to SCREAMING_SNAKE_CASE automatically.
 
 ---
 
-## prefer_descriptive_bool_names
+### prefer_descriptive_bool_names
 
 Boolean variables should use descriptive prefixes like `is`, `has`, `can`, `should`.
 
-**Pros:**
-- Self-documenting code
-- Clear intent at usage site
-- Reads naturally in conditions
-
-**Cons:**
-- Can be verbose for obvious cases
-- Some booleans don't fit these patterns naturally
-
 **Note:** Allows common standalone names like `enabled`, `visible`, `loading`, etc.
-
-### Example
 
 ```dart
 // BAD (with this rule enabled):
-bool loading = true;
-bool visible = false;
-void setEnabled(bool enabled) { ... }
+bool admin = true;
 
 // GOOD:
-bool isLoading = true;
-bool isVisible = false;
-void setEnabled(bool isEnabled) { ... }
+bool isAdmin = true;
+bool hasPermission = true;
+bool canEdit = true;
 ```
 
 ---
 
-## prefer_snake_case_files
-
-Dart file names should use `snake_case`.
-
-**Pros:**
-- Dart style guide recommends snake_case
-- Consistent across the Dart ecosystem
-- Case-insensitive file systems handle better
-
-**Cons:**
-- Some prefer PascalCase to match class names
-- Habit from other languages
-
-### Example
-
-```
-BAD (with this rule enabled):
-UserService.dart
-user-service.dart
-userService.dart
-
-GOOD:
-user_service.dart
-```
-
----
-
-## avoid_small_text
+### avoid_small_text
 
 Font size should be at least 12 logical pixels for accessibility.
-
-**Pros:**
-- Better accessibility for all users
-- WCAG compliance
-- Easier reading on all devices
-
-**Cons:**
-- Design requirements may need smaller text
-- Captions and legal text often need smaller sizes
-
-### Example
 
 ```dart
 // BAD (with this rule enabled):
@@ -672,92 +545,10 @@ Text('Readable', style: TextStyle(fontSize: 14));
 **Quick fix available:** Changes font size to 12 automatically.
 
 ---
-
-## prefer_doc_comments_over_regular
-
-Use doc comments (`///`) instead of regular comments (`//`) for public API documentation.
-
-**Pros:**
-- Show up in IDE hover documentation
-- Can be extracted by dartdoc
-- Clearly mark API documentation
-
-**Cons:**
-- Less formal for internal notes
-- Doc comments may feel heavy for simple members
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-// Returns the user's full name.
-String getFullName() => '$firstName $lastName';
-
-// GOOD:
-/// Returns the user's full name.
-String getFullName() => '$firstName $lastName';
-```
-
-**Quick fix available:** Converts `//` to `///` automatically.
-
----
-
-## prefer_literal_apostrophe
-
-Use literal apostrophes in strings by switching to double quotes instead of escaping with `\'`.
-
-**Pros:**
-- Cleaner, more readable strings
-- Less visual noise from escape characters
-- Double-quoted strings handle apostrophes naturally
-
-**Cons:**
-- Consistency with single-quote preference
-- Habit from other languages
-- May prefer single quotes for all strings
-
-### Example
-
-```dart
-// BAD (with this rule enabled):
-String message = 'It\'s a beautiful day';
-String name = 'O\'Brien';
-
-// GOOD:
-String message = "It's a beautiful day";
-String name = "O'Brien";
-```
-
-**Quick fix available:** Converts to double quotes automatically.
-
-**Note:** Only flags strings that don't contain double quotes (which would require escaping after conversion).
-
----
-
-## Opposing Rules
-
-Some stylistic rules have valid opposites. Pick what fits your team:
-
-| If you prefer... | Enable... | Instead of... |
-|------------------|-----------|---------------|
-| Relative imports | `prefer_relative_imports` | Absolute imports |
-| Absolute imports | (no rule yet) | `prefer_relative_imports` |
-| Arrow functions | `prefer_arrow_functions` | Block bodies |
-| Block bodies | (no rule yet) | `prefer_arrow_functions` |
-| Inline callbacks | `prefer_inline_callbacks` | Extracted methods |
-| Extracted methods | (no rule yet) | `prefer_inline_callbacks` |
-| Single quotes everywhere | `prefer_single_quotes` | `prefer_literal_apostrophe` |
-| Readable apostrophes | `prefer_literal_apostrophe` | `prefer_single_quotes` |
-
-See [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) for planned opposing rules.
-
----
 <!-- cspell:ignore Rossum -->
 ## About This Document
 
 > "Code is read more often than it is written." — Guido van Rossum
-
-> "Any fool can write code that a computer can understand. Good programmers write code that humans can understand." — Martin Fowler
 
 **Stylistic rules** enforce team conventions that have no objectively correct answer. Quote styles, trailing commas, import ordering — these are preferences, not bugs. But consistency matters: it reduces cognitive load during code review, speeds up onboarding, and prevents style debates from derailing productive discussions.
 
@@ -788,3 +579,7 @@ Enable these rules based on your team's consensus. Document your choices. Move o
 
 - **Dart Language Tour** — Language features reference
   https://dart.dev/language
+
+---
+
+> "Any fool can write code that a computer can understand. Good programmers write code that humans can understand." — Martin Fowler

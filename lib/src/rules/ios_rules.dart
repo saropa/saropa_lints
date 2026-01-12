@@ -39,6 +39,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../info_plist_utils.dart';
 import '../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -1653,6 +1654,17 @@ class _ReplaceHttpWithHttpsFix extends DartFix {
 /// protected resources (camera, location, microphone, etc.). Apps without
 /// these entries are **rejected by App Store review**.
 ///
+/// ## Smart Detection
+///
+/// This rule **actually reads your Info.plist** file to check if the required
+/// permission keys are present. It only reports warnings when keys are
+/// genuinely missing, avoiding false positives.
+///
+/// - Finds your project's `ios/Runner/Info.plist` automatically
+/// - Caches the result per project for performance
+/// - Reports which specific key(s) are missing
+/// - Silently passes if Info.plist already has the required keys
+///
 /// ## Required Info.plist Keys
 ///
 /// | API | Info.plist Key |
@@ -1665,16 +1677,21 @@ class _ReplaceHttpWithHttpsFix extends DartFix {
 /// | Contacts | NSContactsUsageDescription |
 /// | Calendar | NSCalendarsUsageDescription |
 /// | Bluetooth | NSBluetoothAlwaysUsageDescription |
+/// | Face ID | NSFaceIDUsageDescription |
+/// | Health | NSHealthShareUsageDescription, NSHealthUpdateUsageDescription |
 ///
-/// ## Detection
+/// ## Detected Packages
 ///
 /// This rule detects usage of common Flutter packages that require permissions:
-/// - image_picker
-/// - camera
-/// - geolocator / location
-/// - speech_to_text
-/// - contacts_service
-/// - device_calendar
+/// - image_picker (camera + photo library)
+/// - camera (camera)
+/// - geolocator / location (location)
+/// - speech_to_text (speech recognition + microphone)
+/// - contacts_service / flutter_contacts (contacts)
+/// - device_calendar (calendar)
+/// - flutter_blue_plus / flutter_blue (bluetooth)
+/// - local_authentication (face ID)
+/// - health (health data)
 ///
 /// @see [Info.plist Keys](https://developer.apple.com/documentation/bundleresources/information_property_list)
 class RequireIosPermissionDescriptionRule extends SaropaLintRule {
@@ -1688,27 +1705,32 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_permission_description',
     problemMessage:
-        'Permission-requiring API used. Ensure Info.plist has usage '
-        'description.',
-    correctionMessage:
-        'Add NSCameraUsageDescription, NSLocationWhenInUseUsageDescription, '
-        'etc. to ios/Runner/Info.plist.',
+        'Permission-requiring API used. Missing Info.plist key(s): {0}',
+    correctionMessage: 'Add the missing key(s) to ios/Runner/Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
-  /// Package/class names that require iOS permission descriptions.
-  ///
-  /// Keys are class/type names, values are the required Info.plist keys.
-  static const Map<String, String> _permissionTypes = <String, String>{
-    'ImagePicker': 'NSPhotoLibraryUsageDescription + NSCameraUsageDescription',
-    'CameraPlatform': 'NSCameraUsageDescription',
-    'CameraController': 'NSCameraUsageDescription',
-    'Geolocator': 'NSLocationWhenInUseUsageDescription',
-    'LocationService': 'NSLocationWhenInUseUsageDescription',
-    'SpeechToText':
-        'NSSpeechRecognitionUsageDescription + NSMicrophoneUsageDescription',
-    'FlutterSoundRecorder': 'NSMicrophoneUsageDescription',
+  /// Methods on ImagePicker that access device resources.
+  static const Set<String> _imagePickerMethods = <String>{
+    'pickImage',
+    'pickVideo',
+    'pickMedia',
+    'pickMultiImage',
+    'pickMultipleMedia',
   };
+
+  /// Creates a LintCode with specific missing keys in the message.
+  static LintCode _codeWithMissingKeys(List<String> missingKeys) {
+    return LintCode(
+      name: 'require_ios_permission_description',
+      problemMessage:
+          'Permission-requiring API used. Missing Info.plist key(s): '
+          '${missingKeys.join(", ")}',
+      correctionMessage:
+          'Add ${missingKeys.join(" and ")} to ios/Runner/Info.plist.',
+      errorSeverity: DiagnosticSeverity.WARNING,
+    );
+  }
 
   @override
   void runWithReporter(
@@ -1716,16 +1738,124 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    // Get the Info.plist checker for this file's project.
+    final filePath = resolver.source.fullName;
+    final plistChecker = InfoPlistChecker.forFile(filePath);
+
+    // Check for permission-requiring types (non-ImagePicker).
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.typeName;
 
-      if (_permissionTypes.containsKey(typeName)) {
-        reporter.atNode(node, code);
+      // Get required keys for this type.
+      final requiredKeys = IosPermissionMapping.getRequiredKeys(typeName);
+      if (requiredKeys == null) return;
+
+      // Check if any keys are missing from Info.plist.
+      final missingKeys = plistChecker?.getMissingKeys(requiredKeys) ?? [];
+
+      // Only report if keys are actually missing.
+      if (missingKeys.isNotEmpty) {
+        reporter.atNode(node, _codeWithMissingKeys(missingKeys));
+      }
+    });
+
+    // Smart ImagePicker detection: check the actual source parameter.
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Only check ImagePicker methods.
+      if (!_imagePickerMethods.contains(methodName)) return;
+
+      // Check if this is called on an ImagePicker instance.
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      // Check if target is ImagePicker type.
+      final bool isImagePicker = _isImagePickerTarget(target);
+      if (!isImagePicker) return;
+
+      // Determine which source is being used.
+      final _ImageSource source = _getImageSource(node);
+
+      // Get required keys based on source.
+      final List<String> requiredKeys;
+      switch (source) {
+        case _ImageSource.gallery:
+          requiredKeys = ['NSPhotoLibraryUsageDescription'];
+        case _ImageSource.camera:
+          requiredKeys = ['NSCameraUsageDescription'];
+        case _ImageSource.unknown:
+          requiredKeys = [
+            'NSPhotoLibraryUsageDescription',
+            'NSCameraUsageDescription',
+          ];
+      }
+
+      // Check if any keys are missing from Info.plist.
+      final missingKeys = plistChecker?.getMissingKeys(requiredKeys) ?? [];
+
+      // Only report if keys are actually missing.
+      if (missingKeys.isNotEmpty) {
+        reporter.atNode(node, _codeWithMissingKeys(missingKeys));
       }
     });
   }
+
+  /// Checks if the target expression is an ImagePicker instance.
+  ///
+  /// Uses actual type resolution for reliability rather than heuristics.
+  static bool _isImagePickerTarget(Expression target) {
+    // Direct constructor call: ImagePicker().pickImage(...)
+    if (target is InstanceCreationExpression) {
+      return target.typeName == 'ImagePicker';
+    }
+
+    // Use resolved static type for reliable detection.
+    final String? typeName = target.staticType?.element?.name;
+    return typeName == 'ImagePicker';
+  }
+
+  /// Extracts the ImageSource from a method invocation's source parameter.
+  static _ImageSource _getImageSource(MethodInvocation node) {
+    // Look for the 'source' named parameter.
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'source') {
+        final Expression value = arg.expression;
+
+        // Check for ImageSource.gallery or ImageSource.camera.
+        if (value is PrefixedIdentifier) {
+          final String identifier = value.identifier.name;
+          if (identifier == 'gallery') return _ImageSource.gallery;
+          if (identifier == 'camera') return _ImageSource.camera;
+        }
+
+        // Also check for PropertyAccess (e.g., if using a variable).
+        if (value is PropertyAccess) {
+          final String propertyName = value.propertyName.name;
+          if (propertyName == 'gallery') return _ImageSource.gallery;
+          if (propertyName == 'camera') return _ImageSource.camera;
+        }
+
+        // Check for simple identifier that might be a variable.
+        // Can't determine statically, so return unknown.
+        return _ImageSource.unknown;
+      }
+    }
+
+    // No source parameter found - for pickMultiImage, default is gallery.
+    final String methodName = node.methodName.name;
+    if (methodName == 'pickMultiImage' || methodName == 'pickMultipleMedia') {
+      return _ImageSource.gallery;
+    }
+
+    // For other methods without explicit source, we can't determine.
+    return _ImageSource.unknown;
+  }
 }
+
+/// Internal enum for ImageSource detection.
+enum _ImageSource { gallery, camera, unknown }
 
 /// Warns when APIs requiring iOS 17+ Privacy Manifest are used.
 ///
@@ -2623,14 +2753,19 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
-  /// Biometric authentication patterns.
-  static const Set<String> _biometricPatterns = {
+  /// Type names from the local_auth package.
+  static const Set<String> _localAuthTypeNames = {
     'LocalAuthentication',
+  };
+
+  /// Method names that are unique to LocalAuthentication class.
+  /// These methods only exist on LocalAuthentication, so type checking
+  /// the receiver is sufficient.
+  static const Set<String> _localAuthMethods = {
     'authenticate',
     'canCheckBiometrics',
     'getAvailableBiometrics',
-    'LAContext',
-    'biometricOnly',
+    'isDeviceSupported',
   };
 
   @override
@@ -2642,16 +2777,29 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      if (_biometricPatterns.contains(methodName)) {
+      // Only check methods that could be from local_auth
+      if (!_localAuthMethods.contains(methodName)) {
+        return;
+      }
+
+      // Verify the receiver is LocalAuthentication using type resolution
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      // Use static type resolution - this is the reliable way
+      final String? typeName = target.staticType?.element?.name;
+      if (typeName != null && _localAuthTypeNames.contains(typeName)) {
         reporter.atNode(node, code);
       }
     });
 
     context.registry
         .addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.typeName;
+      // Use element name for reliable type checking
+      final String? typeName = node.constructorName.type.element?.name;
 
-      if (_biometricPatterns.contains(typeName)) {
+      if (typeName == 'LocalAuthentication' ||
+          typeName == 'AuthenticationOptions') {
         reporter.atNode(node, code);
       }
     });

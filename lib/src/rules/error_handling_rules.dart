@@ -1905,34 +1905,161 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
     });
   }
 
-  @override
-  List<Fix> getFixes() => <Fix>[_AddPermanentDenialHandlingFix()];
+  // No quick fix - permanent denial handling requires app-specific UI flow
 }
 
-/// Quick fix: Adds TODO comment for permanent denial handling.
-class _AddPermanentDenialHandlingFix extends DartFix {
+// =============================================================================
+// require_notification_action_handling
+// =============================================================================
+
+/// Notification actions need handlers.
+///
+/// Adding actions to notifications without handling taps leads to
+/// broken user experience.
+///
+/// **BAD:**
+/// ```dart
+/// NotificationDetails(
+///   android: AndroidNotificationDetails(
+///     actions: [AndroidNotificationAction('reply', 'Reply')],
+///     // No action handler!
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Set up action handler
+/// onDidReceiveNotificationResponse: (response) {
+///   if (response.actionId == 'reply') handleReply();
+/// }
+/// ```
+class RequireNotificationActionHandlingRule extends SaropaLintRule {
+  const RequireNotificationActionHandlingRule() : super(code: _code);
+
+  /// Broken notification actions frustrate users.
   @override
-  void run(
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_notification_action_handling',
+    problemMessage:
+        'Notification with actions may lack action handler setup.',
+    correctionMessage:
+        'Ensure onDidReceiveNotificationResponse handles action IDs.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
     CustomLintResolver resolver,
-    ChangeReporter reporter,
+    SaropaDiagnosticReporter reporter,
     CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
   ) {
-    context.registry.addMethodInvocation((MethodInvocation node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'AndroidNotificationDetails' &&
+          typeName != 'DarwinNotificationDetails') {
+        return;
+      }
 
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO for permanent denial handling',
-        priority: 2,
-      );
+      // Check for actions parameter
+      final ArgumentList args = node.argumentList;
+      bool hasActions = false;
 
-      changeBuilder.addDartFileEdit((builder) {
-        builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Add isPermanentlyDenied check and openAppSettings() call\n    ',
-        );
-      });
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'actions') {
+          hasActions = true;
+          break;
+        }
+      }
+
+      if (hasActions) {
+        // Check if there's a handler in the file
+        // This is a simple heuristic - flag to remind developers
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_finally_cleanup
+// =============================================================================
+
+/// Use finally for guaranteed cleanup, not just in catch.
+///
+/// Cleanup code in catch blocks doesn't run for all exception types
+/// or when no exception occurs. Use finally for guaranteed cleanup.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   file = await File(path).open();
+///   await processFile(file);
+/// } catch (e) {
+///   await file?.close();  // May not run!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   file = await File(path).open();
+///   await processFile(file);
+/// } finally {
+///   await file?.close();  // Always runs
+/// }
+/// ```
+class RequireFinallyCleanupRule extends SaropaLintRule {
+  const RequireFinallyCleanupRule() : super(code: _code);
+
+  /// Resource leaks from missed cleanup.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_finally_cleanup',
+    problemMessage: 'Cleanup in catch block. Use finally for guaranteed cleanup.',
+    correctionMessage: 'Move cleanup code to finally block.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Methods that suggest cleanup operations.
+  static const Set<String> _cleanupMethods = <String>{
+    'close',
+    'dispose',
+    'cancel',
+    'release',
+    'unlock',
+    'destroy',
+    'cleanup',
+    'shutdown',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addTryStatement((TryStatement node) {
+      // Skip if already has finally
+      if (node.finallyBlock != null) return;
+
+      // Check catch clauses for cleanup calls
+      for (final CatchClause catchClause in node.catchClauses) {
+        final String catchSource = catchClause.body.toSource();
+        for (final String method in _cleanupMethods) {
+          if (catchSource.contains('.$method(') ||
+              catchSource.contains('.$method;')) {
+            reporter.atNode(catchClause, code);
+            return;
+          }
+        }
+      }
     });
   }
 }

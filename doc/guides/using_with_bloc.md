@@ -393,7 +393,7 @@ dependencies:
 
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
   bloc_test: ^9.1.0
 ```
 

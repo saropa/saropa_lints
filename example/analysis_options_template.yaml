@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.3.11)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 2.7.0)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -21,7 +21,7 @@
 # - recommended    : Essential + common mistakes (~150) - default for most teams
 # - professional   : Recommended + architecture/testing (~350) - enterprise teams
 # - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1290+) - greenfield projects
+# - insanity       : Everything including opinionated rules (~1450+) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -136,6 +136,7 @@ custom_lint:
     - require_stream_controller_dispose: false
     - avoid_future_then_in_async: false          # WARNING - use await instead (v2.3.10)
     - avoid_unawaited_future: false              # ERROR - unawaited futures lose errors (v2.3.10)
+    - prefer_future_wait: false                  # INFO - use Future.wait for independent awaits (v2.5.0)
 
     # =========================================================================
     # ACCESSIBILITY
@@ -190,6 +191,7 @@ custom_lint:
     - avoid_constant_switches: false
     - avoid_contradictory_expressions: false
     - avoid_conditions_with_boolean_literals: false
+    - no_boolean_literal_compare: false          # INFO - use boolean expression directly (v2.5.0)
     - avoid_unnecessary_conditionals: false
     - avoid_inverted_boolean_checks: false
     - avoid_negated_conditions: false
@@ -218,6 +220,7 @@ custom_lint:
     - prefer_early_return: false
     - prefer_returning_condition: false
     - prefer_returning_conditionals: false
+    - prefer_returning_conditional_expressions: false # INFO - ternary over if/else return (v2.6.0)
     - prefer_switch_expression: false
     - prefer_switch_with_enums: false
     - prefer_switch_with_sealed_classes: false
@@ -261,6 +264,7 @@ custom_lint:
     - avoid_exception_in_constructor: false      # WARNING - error handling (v2.3.11)
     - require_cache_key_determinism: false       # ERROR - memory bloat (v2.3.11)
     - require_permission_permanent_denial_handling: false # WARNING - UX (v2.3.11)
+    - require_finally_cleanup: false             # INFO - cleanup in finally not catch (v2.6.0)
 
     # =========================================================================
     # EXTENSION TYPES
@@ -306,6 +310,8 @@ custom_lint:
     - prefer_lazy_box_for_large: false
     - avoid_hive_field_index_reuse: false     # ERROR - duplicate indices (v2.3.9)
     - avoid_sqflite_reserved_words: false     # WARNING - SQL reserved words (v2.3.9)
+    - prefer_sqflite_singleton: false        # INFO - use singleton for database (v2.6.0)
+    - prefer_sqflite_column_constants: false # INFO - constants for column names (v2.6.0)
 
     # =========================================================================
     # FLUTTER DISPOSAL (CRITICAL)
@@ -390,6 +396,10 @@ custom_lint:
     - avoid_go_router_push_replacement_confusion: false # WARNING - clear routing intent (v2.3.10)
     - require_url_launcher_encoding: false       # WARNING - URL failure (v2.3.11)
     - avoid_nested_routes_without_parent: false  # WARNING - navigation issues (v2.3.11)
+    # GoRouter v2.6.0
+    - prefer_shell_route_shared_layout: false    # INFO - ShellRoute for shared layout (v2.6.0)
+    - require_stateful_shell_route_tabs: false   # INFO - StatefulShellRoute for tabs (v2.6.0)
+    - require_go_router_fallback_route: false    # INFO - errorBuilder for unknown paths (v2.6.0)
 
     # =========================================================================
     # FLUTTER PERFORMANCE
@@ -687,6 +697,10 @@ custom_lint:
     - require_cancel_token: false
     - prefer_timeout_on_requests: false          # WARNING - add timeout (v2.3.10)
     - prefer_dio_over_http: false                # INFO - Dio has better features (v2.3.10)
+    # Dio v2.6.0
+    - require_dio_response_type: false           # INFO - explicit responseType for downloads (v2.6.0)
+    - require_dio_retry_interceptor: false       # INFO - retry logic for network failures (v2.6.0)
+    - prefer_dio_transformer: false              # INFO - custom transformer for large JSON (v2.6.0)
 
     # =========================================================================
     # NUMBERS & STRINGS
@@ -780,6 +794,10 @@ custom_lint:
     - avoid_mutable_field_in_equatable: false # ERROR - mutable fields break equality
     - require_equatable_copy_with: false         # INFO - add copyWith method (v2.3.10)
     - require_copy_with_null_handling: false     # WARNING - state management (v2.3.11)
+    # Equatable v2.6.0
+    - require_deep_equality_collections: false   # WARNING - DeepCollectionEquality for lists (v2.6.0)
+    - avoid_equatable_datetime: false            # WARNING - DateTime in props is flaky (v2.6.0)
+    - prefer_unmodifiable_collections: false     # INFO - immutable collections in state (v2.6.0)
 
     # =========================================================================
     # STATE MANAGEMENT
@@ -821,6 +839,18 @@ custom_lint:
     - avoid_riverpod_notifier_in_build: false    # WARNING - state loss (v2.3.11)
     - require_riverpod_async_value_guard: false  # WARNING - error handling (v2.3.11)
     - avoid_bloc_business_logic_in_ui: false     # WARNING - testability (v2.3.11)
+    - prefer_change_notifier_proxy: false        # INFO - Provider.of without listen:false (v2.5.0)
+    - prefer_selector_widget: false              # INFO - targeted rebuilds over Consumer (v2.5.0)
+    - require_bloc_event_sealed: false           # INFO - sealed classes for exhaustive matching (v2.5.0)
+    - require_bloc_repository_abstraction: false # INFO - abstract deps for testability (v2.5.0)
+    - avoid_getx_global_state: false             # INFO - avoid Get.put/Get.find global state (v2.5.0)
+    - prefer_bloc_transform: false               # INFO - debounce/throttle search events (v2.5.0)
+    # Riverpod v2.6.0
+    - prefer_riverpod_auto_dispose: false        # INFO - autoDispose modifier for memory (v2.6.0)
+    - prefer_riverpod_family_for_params: false   # INFO - family modifier for parameters (v2.6.0)
+    # GetX v2.6.0
+    - avoid_getx_global_navigation: false        # WARNING - avoid Get.to/Get.off global nav (v2.6.0)
+    - require_getx_binding_routes: false         # INFO - GetPage needs binding param (v2.6.0)
 
     # =========================================================================
     # TESTING
@@ -874,6 +904,12 @@ custom_lint:
     - require_mock_http_client: false            # ERROR - mock HTTP in tests (v2.3.10)
     - require_test_widget_pump: false            # ERROR - pump after interaction (v2.3.11)
     - require_integration_test_timeout: false    # WARNING - prevent CI hangs (v2.3.11)
+    - prefer_test_find_by_key: false             # INFO - prefer find.byKey over find.byType (v2.5.0)
+    - prefer_setup_teardown: false               # INFO - extract repeated test setup (v2.5.0)
+    - require_test_description_convention: false # INFO - descriptive test names (v2.5.0)
+    - prefer_bloc_test_package: false            # INFO - use blocTest() for Bloc testing (v2.5.0)
+    - prefer_mock_verify: false                  # INFO - verify mock interactions (v2.5.0)
+    - require_error_logging: false               # INFO - log errors in catch blocks (v2.5.0)
 
     # =========================================================================
     # JSON & DATETIME
@@ -886,12 +922,18 @@ custom_lint:
     - avoid_autoplay_audio: false
     - prefer_duration_constants: false
     - avoid_datetime_now_in_tests: false
+    - avoid_not_encodable_in_to_json: false      # WARNING - non-JSON types in toJson() (v2.5.0)
+    # Freezed v2.6.0
+    - require_freezed_json_converter: false      # INFO - JsonConverter for DateTime/Color (v2.6.0)
+    - require_freezed_lint_package: false        # INFO - add freezed_lint package (v2.6.0)
 
     # =========================================================================
     # DEPENDENCY INJECTION (v2.3.11)
     # =========================================================================
     - require_getit_registration_order: false    # WARNING - startup crash (v2.3.11)
     - require_default_config: false              # WARNING - startup crash (v2.3.11)
+    - prefer_constructor_injection: false        # INFO - constructor DI over setter injection (v2.5.0)
+    - require_di_scope_awareness: false          # INFO - singleton vs factory scope (v2.6.0)
 
     # =========================================================================
     # INTERNATIONALIZATION DATE/NUMBER FORMATTING (v2.3.9)
@@ -976,8 +1018,13 @@ custom_lint:
     - require_hive_adapter_registration_order: false # ERROR - runtime crash (v2.3.11)
     - require_hive_nested_object_adapter: false  # ERROR - runtime crash (v2.3.11)
     - avoid_hive_box_name_collision: false       # WARNING - data corruption (v2.3.11)
+    - prefer_hive_value_listenable: false        # INFO - box.listenable() for reactive UI (v2.6.0)
     # Image Picker
     - require_image_picker_result_handling: false # WARNING - null handling
+    - prefer_image_picker_multi_selection: false # INFO - pickMultiImage for batch (v2.6.0)
+    # Geolocator v2.6.0
+    - prefer_geolocator_accuracy_appropriate: false # INFO - battery drain from high accuracy (v2.6.0)
+    - prefer_geolocator_last_known: false        # INFO - cached position for non-critical (v2.6.0)
     # Cached Network Image
     - avoid_cached_image_in_build: false         # WARNING - stable cache key
     # SQLite
@@ -1001,12 +1048,16 @@ custom_lint:
     # Notifications
     - require_notification_initialize_per_platform: false # WARNING - platform settings
     - avoid_notification_same_id: false          # WARNING - use unique IDs (v2.3.10)
+    - require_notification_action_handling: false # INFO - handle notification actions (v2.6.0)
 
     # =========================================================================
     # OPINIONATED RULES (Not in any tier - enable individually)
     # =========================================================================
     # These rules express stylistic preferences. They're not included in
     # any tier by default but available for teams with strong style guides.
+    # Many rules have opposing pairs - choose based on your team's conventions.
+
+    # --- Original Stylistic Rules ---
     - prefer_relative_imports: false
     - prefer_one_widget_per_file: false
     - prefer_arrow_functions: false
@@ -1026,3 +1077,108 @@ custom_lint:
     - prefer_descriptive_bool_names: false
     - prefer_snake_case_files: false
     - prefer_doc_comments_over_regular: false
+
+    # --- Widget Style Rules (v2.7.0) ---
+    - prefer_sized_box_over_container: false     # SizedBox for dimensions only
+    - prefer_container_over_sized_box: false     # Opposite - Container consistency
+    - prefer_text_rich_over_richtext: false      # Text.rich over RichText
+    - prefer_richtext_over_text_rich: false      # Opposite - RichText for complex
+    - prefer_edge_insets_symmetric: false        # EdgeInsets.symmetric when applicable
+    - prefer_edge_insets_only: false             # EdgeInsets.only for explicit
+    - prefer_const_widgets: false                # Const constructors for widgets
+    - prefer_builder_over_closure: false         # Builder over inline closures
+    - prefer_closure_over_builder: false         # Opposite - closures for simplicity
+    - prefer_fractionally_sized_box: false       # FractionallySizedBox over MediaQuery
+    - prefer_media_query_over_fractional: false  # Opposite - explicit MediaQuery
+
+    # --- Null & Collection Style Rules (v2.7.0) ---
+    - prefer_if_null_operator: false             # ?? over ternary null checks
+    - prefer_ternary_over_if_null: false         # Opposite - ternary for explicitness
+    - prefer_null_aware_assignment: false        # ??= over if-null patterns
+    - prefer_explicit_null_assignment: false     # Opposite - explicit null checks
+    - prefer_spread_operator: false              # ... over addAll
+    - prefer_add_all_over_spread: false          # Opposite - addAll for clarity
+    - prefer_collection_literals: false          # [], {} over List(), Map()
+    - prefer_constructor_over_literal: false     # Opposite - constructors
+    - prefer_where_over_for_if: false            # where/map over for-if
+    - prefer_for_loop_over_functional: false     # Opposite - imperative loops
+    - prefer_cascade_notation: false             # Cascade .. for multiple ops
+    - prefer_separate_calls_over_cascade: false  # Opposite - separate calls
+    - prefer_final_in_for_each: false            # final in for-each
+    - prefer_var_in_for_each: false              # Opposite - var for mutability
+
+    # --- Control Flow & Async Rules (v2.7.0) ---
+    - prefer_early_return: false                 # Early return over nested if-else
+    - prefer_single_exit_point: false            # Opposite - single exit
+    - prefer_switch_expression: false            # Switch expressions over statements
+    - prefer_switch_statement_over_expression: false  # Opposite - statements
+    - prefer_pattern_matching: false             # Pattern matching over type checks
+    - prefer_manual_type_checks: false           # Opposite - explicit is/as
+    - prefer_ternary_over_if_else: false         # Ternary for simple conditionals
+    - prefer_if_else_over_ternary: false         # Opposite - if-else for readability
+    - prefer_guard_clauses: false                # Guard clauses at start
+    - prefer_positive_conditions: false          # Opposite - positive condition flow
+    - prefer_async_only_when_awaiting: false     # async only when await is used
+    - prefer_await_over_then: false              # await over .then() chains
+    - prefer_then_over_await: false              # Opposite - functional .then()
+    - prefer_sync_over_async_where_possible: false  # sync when no await needed
+
+    # --- Whitespace & Constructor Rules (v2.7.0) ---
+    - prefer_blank_line_before_return: false     # Blank line before return
+    - prefer_no_blank_line_before_return: false  # Opposite - compact returns
+    - prefer_blank_line_after_declarations: false  # Blank line after declarations
+    - prefer_compact_declarations: false         # Opposite - compact variables
+    - prefer_blank_line_between_members: false   # Blank line between members
+    - prefer_compact_class_body: false           # Opposite - compact class
+    - prefer_trailing_commas: false              # Trailing commas in multi-line
+    - prefer_no_trailing_commas: false           # Opposite - no trailing commas
+    - prefer_super_parameters: false             # super parameters over super.x
+    - prefer_explicit_super_calls: false         # Opposite - explicit super.
+    - prefer_initializing_formals: false         # this.x parameters
+    - prefer_explicit_field_assignment: false    # Opposite - explicit assignments
+    - prefer_factory_constructors: false         # Factory for conditional construction
+    - prefer_assertion_constructors: false       # Opposite - assertions in regular
+    - prefer_named_constructors: false           # Named constructors
+    - prefer_unnamed_constructors: false         # Opposite - unnamed constructors
+    - prefer_const_constructors_in_immutables: false  # Const in immutable classes
+    - prefer_mutable_constructors: false         # Opposite - mutable patterns
+
+    # --- Error Handling & Testing Style Rules (v2.7.0) ---
+    - prefer_specific_exceptions: false          # Specific exception types
+    - prefer_generic_exceptions: false           # Opposite - generic for catch-all
+    - prefer_rethrow: false                      # rethrow over throw e
+    - prefer_throw_over_rethrow: false           # Opposite - explicit throw
+    - prefer_on_clause: false                    # on TypeError over generic catch
+    - prefer_catch_over_on: false                # Opposite - catch for simplicity
+    - prefer_aaa_test_structure: false           # Arrange-Act-Assert comments
+    - prefer_gwt_test_structure: false           # Opposite - Given-When-Then
+    - prefer_expect_over_assert: false           # expect() over assert in tests
+    - prefer_assert_over_expect: false           # Opposite - assert for simplicity
+    - prefer_test_description_prefix: false      # should/when/it prefixes
+    - prefer_descriptive_test_names: false       # Opposite - full sentences
+    - prefer_single_expectation_per_test: false  # One expect per test
+
+    # --- Additional Style Rules (v2.7.0) ---
+    - prefer_string_interpolation: false         # Interpolation over concatenation
+    - prefer_string_concatenation: false         # Opposite - explicit concatenation
+    # prefer_single_quotes already listed above
+    - prefer_double_quotes: false                # Opposite - double quotes
+    - prefer_grouped_imports: false              # Imports grouped by type
+    - prefer_flat_imports: false                 # Opposite - flat import list
+    - prefer_fields_before_methods: false        # Fields declared before methods
+    - prefer_methods_before_fields: false        # Opposite - methods first
+    - prefer_static_members_first: false         # Static before instance
+    - prefer_instance_members_first: false       # Opposite - instance first
+    - prefer_public_members_first: false         # Public before private
+    - prefer_private_members_first: false        # Opposite - private first
+    # prefer_explicit_types already listed above
+    - prefer_var_keyword: false                  # var for inferred types
+    - prefer_dynamic_over_object: false          # dynamic over Object?
+    - prefer_object_over_dynamic: false          # Opposite - Object? for safety
+    - prefer_lower_camel_case_constants: false   # lowerCamelCase for constants
+    # prefer_screaming_case_constants already listed above
+    - prefer_short_variable_names: false         # Short names for short-lived vars
+    - prefer_descriptive_variable_names: false   # Opposite - descriptive names
+    - prefer_explicit_this: false                # explicit this. for fields
+    - prefer_implicit_boolean_comparison: false  # if (isValid) over == true
+    - prefer_explicit_boolean_comparison: false  # Opposite - explicit for nullable

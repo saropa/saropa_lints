@@ -3891,3 +3891,209 @@ class PreferDioOverHttpRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_dio_response_type
+// =============================================================================
+
+/// Explicitly set responseType when processing binary data.
+///
+/// Dio defaults responseType to JSON, which causes issues when downloading
+/// files or handling binary responses.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await dio.get(url);  // Defaults to JSON
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final response = await dio.get(
+///   url,
+///   options: Options(responseType: ResponseType.bytes),
+/// );
+/// ```
+class RequireDioResponseTypeRule extends SaropaLintRule {
+  const RequireDioResponseTypeRule() : super(code: _code);
+
+  /// Binary data corruption if wrong response type used.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dio_response_type',
+    problemMessage:
+        'Dio download without explicit responseType may corrupt binary data.',
+    correctionMessage:
+        'Add options: Options(responseType: ResponseType.bytes) for downloads.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      // Only check download-related methods
+      if (methodName != 'download' && methodName != 'downloadUri') return;
+
+      // Check if target is Dio instance
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('dio') && !targetSource.contains('Dio')) {
+        return;
+      }
+
+      // Check for Options with responseType
+      final ArgumentList args = node.argumentList;
+      bool hasResponseType = false;
+
+      for (final Expression arg in args.arguments) {
+        final String argSource = arg.toSource();
+        if (argSource.contains('responseType') ||
+            argSource.contains('ResponseType')) {
+          hasResponseType = true;
+          break;
+        }
+      }
+
+      if (!hasResponseType) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_dio_retry_interceptor
+// =============================================================================
+
+/// Network requests should have retry logic for resilience.
+///
+/// Network failures are common on mobile. Without retry logic, transient
+/// failures cause unnecessary errors.
+///
+/// **BAD:**
+/// ```dart
+/// final dio = Dio();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final dio = Dio()
+///   ..interceptors.add(RetryInterceptor(
+///     dio: dio,
+///     retries: 3,
+///   ));
+/// ```
+class RequireDioRetryInterceptorRule extends SaropaLintRule {
+  const RequireDioRetryInterceptorRule() : super(code: _code);
+
+  /// User experience degradation from transient failures.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_dio_retry_interceptor',
+    problemMessage: 'Dio instance without retry interceptor.',
+    correctionMessage: 'Add RetryInterceptor for network resilience.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Dio') return;
+
+      // Look for cascade with interceptors.add
+      final AstNode? parent = node.parent;
+      if (parent is CascadeExpression) {
+        final String cascadeSource = parent.toSource();
+        if (cascadeSource.contains('RetryInterceptor') ||
+            cascadeSource.contains('retry') ||
+            cascadeSource.contains('Retry')) {
+          return;
+        }
+      }
+
+      // Check if part of an assignment where interceptors are added later
+      // This is a simple heuristic - just flag bare Dio() calls
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_dio_transformer
+// =============================================================================
+
+/// Large JSON parsing should use custom transformer with isolates.
+///
+/// Parsing large JSON responses on the main thread causes jank.
+/// Use BackgroundTransformer or compute() for heavy parsing.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await dio.get('/large-data');
+/// final data = response.data;  // Parsing on main thread
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// dio.transformer = BackgroundTransformer();
+/// ```
+class PreferDioTransformerRule extends SaropaLintRule {
+  const PreferDioTransformerRule() : super(code: _code);
+
+  /// UI jank from main thread JSON parsing.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_dio_transformer',
+    problemMessage: 'Dio instance without custom transformer for large data.',
+    correctionMessage:
+        'Set dio.transformer = BackgroundTransformer() for off-main-thread parsing.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Dio') return;
+
+      // Look for transformer assignment in cascade
+      final AstNode? parent = node.parent;
+      if (parent is CascadeExpression) {
+        final String cascadeSource = parent.toSource();
+        if (cascadeSource.contains('transformer') ||
+            cascadeSource.contains('BackgroundTransformer') ||
+            cascadeSource.contains('Transformer')) {
+          return;
+        }
+      }
+
+      // Simple heuristic - flag Dio() without transformer configuration
+      reporter.atNode(node, code);
+    });
+  }
+}

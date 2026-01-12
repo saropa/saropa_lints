@@ -1096,3 +1096,205 @@ class _AddImageSourceFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// prefer_geolocator_accuracy_appropriate
+// =============================================================================
+
+/// Use appropriate location accuracy level - high accuracy drains battery.
+///
+/// LocationAccuracy.high uses GPS and significantly drains battery.
+/// For features that don't need precise location, use lower accuracy.
+///
+/// **BAD:**
+/// ```dart
+/// await Geolocator.getCurrentPosition(
+///   desiredAccuracy: LocationAccuracy.high,  // Overkill for city-level!
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// await Geolocator.getCurrentPosition(
+///   desiredAccuracy: LocationAccuracy.low,  // City-level is fine
+/// );
+/// ```
+class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
+  const PreferGeolocatorAccuracyAppropriateRule() : super(code: _code);
+
+  /// Battery drain from excessive GPS usage.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_geolocator_accuracy_appropriate',
+    problemMessage:
+        'LocationAccuracy.high uses GPS and drains battery significantly.',
+    correctionMessage:
+        'Consider LocationAccuracy.low or .medium if precise location not needed.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getPositionStream') {
+        return;
+      }
+
+      // Check if target is Geolocator
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
+
+      // Check for high accuracy
+      final ArgumentList args = node.argumentList;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'desiredAccuracy') {
+          final String valueSource = arg.expression.toSource();
+          if (valueSource.contains('.high') ||
+              valueSource.contains('.best') ||
+              valueSource.contains('.bestForNavigation')) {
+            reporter.atNode(arg, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_geolocator_last_known
+// =============================================================================
+
+/// Use lastKnownPosition for non-critical needs to save battery.
+///
+/// getLastKnownPosition returns cached location without GPS poll.
+/// Use it when fresh location isn't critical.
+///
+/// **Consider using:**
+/// ```dart
+/// final position = await Geolocator.getLastKnownPosition();
+/// if (position != null) {
+///   // Use cached position
+/// }
+/// ```
+class PreferGeolocatorLastKnownRule extends SaropaLintRule {
+  const PreferGeolocatorLastKnownRule() : super(code: _code);
+
+  /// Battery optimization opportunity.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_geolocator_last_known',
+    problemMessage:
+        'getCurrentPosition polls GPS. Consider getLastKnownPosition for cached location.',
+    correctionMessage:
+        'Use Geolocator.getLastKnownPosition() when fresh location not critical.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getCurrentPosition') return;
+
+      // Check if target is Geolocator
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Geolocator') return;
+
+      // Check if it's in a context that suggests non-critical use
+      // (e.g., initialization, splash screens, or low-accuracy requests)
+      final ArgumentList args = node.argumentList;
+      bool hasLowAccuracy = false;
+
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'desiredAccuracy') {
+          final String valueSource = arg.expression.toSource();
+          if (valueSource.contains('.low') ||
+              valueSource.contains('.lowest') ||
+              valueSource.contains('.reduced')) {
+            hasLowAccuracy = true;
+            break;
+          }
+        }
+      }
+
+      // Only suggest for low-accuracy requests where cached might suffice
+      if (hasLowAccuracy) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_image_picker_multi_selection
+// =============================================================================
+
+/// Use pickMultiImage instead of loop calling pickImage.
+///
+/// Calling pickImage in a loop is inefficient. Use pickMultiImage for
+/// batch image selection.
+///
+/// **BAD:**
+/// ```dart
+/// for (int i = 0; i < count; i++) {
+///   final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final images = await ImagePicker().pickMultiImage();
+/// ```
+class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
+  const PreferImagePickerMultiSelectionRule() : super(code: _code);
+
+  /// Poor UX from repeated picker dialogs.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_image_picker_multi_selection',
+    problemMessage:
+        'pickImage in loop. Use pickMultiImage for batch selection.',
+    correctionMessage: 'Replace with ImagePicker().pickMultiImage().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'pickImage') return;
+
+      // Check if inside a loop
+      final ForStatement? forLoop = node.thisOrAncestorOfType<ForStatement>();
+      final WhileStatement? whileLoop = node.thisOrAncestorOfType<WhileStatement>();
+      final DoStatement? doLoop = node.thisOrAncestorOfType<DoStatement>();
+      final ForElement? forElement = node.thisOrAncestorOfType<ForElement>();
+
+      if (forLoop != null ||
+          whileLoop != null ||
+          doLoop != null ||
+          forElement != null) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

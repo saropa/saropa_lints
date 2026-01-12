@@ -7,7 +7,7 @@ This guide explains how saropa_lints enhances your Riverpod development with spe
 | Aspect | riverpod_lint | saropa_lints |
 |--------|--------------|--------------|
 | **Focus** | Riverpod-specific syntax | Cross-cutting concerns |
-| **Rule count** | ~20 rules | 1184+ rules (8+ Riverpod-specific) |
+| **Rule count** | ~20 rules | 1450+ rules (8+ Riverpod-specific) |
 | **Catches** | Provider syntax issues | Memory leaks, lifecycle bugs, architecture |
 
 **Key insight**: These packages are *complementary*. Use both for comprehensive coverage.
@@ -236,7 +236,7 @@ dependencies:
 
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
   riverpod_lint: ^2.3.0      # Official Riverpod lints
   riverpod_generator: ^2.3.0  # If using code generation
 ```
@@ -275,6 +275,8 @@ dart run custom_lint
 | `prefer_selector` | professional | context.watch without select |
 | `avoid_global_riverpod_providers` | comprehensive | Unscoped global providers |
 | `require_riverpod_lint` | comprehensive | Missing riverpod_lint in project |
+| `prefer_riverpod_auto_dispose` | professional | Providers without autoDispose modifier (v2.6.0) |
+| `prefer_riverpod_family_for_params` | professional | StateProvider used for parameterized data (v2.6.0) |
 
 ## Common Patterns
 

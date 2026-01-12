@@ -3016,3 +3016,172 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
     return methodName == 'catchError' || methodName == 'ignore';
   }
 }
+
+// =============================================================================
+// ROADMAP_NEXT: Phase 2 - Async Performance Rules
+// =============================================================================
+
+/// Warns when sequential awaits could use Future.wait for parallelism.
+///
+/// Alias: future_wait, parallel_await, concurrent_futures
+///
+/// When multiple independent async operations are awaited sequentially,
+/// they run one after another. Using `Future.wait` allows them to run
+/// in parallel, improving performance.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final users = await fetchUsers();       // Waits ~100ms
+///   final products = await fetchProducts(); // Waits another ~100ms
+///   final orders = await fetchOrders();     // Waits another ~100ms
+///   // Total: ~300ms
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final results = await Future.wait([
+///     fetchUsers(),
+///     fetchProducts(),
+///     fetchOrders(),
+///   ]);
+///   final users = results[0];
+///   final products = results[1];
+///   final orders = results[2];
+///   // Total: ~100ms (parallel)
+/// }
+///
+/// // Or with records (Dart 3):
+/// Future<void> loadData() async {
+///   final (users, products, orders) = await (
+///     fetchUsers(),
+///     fetchProducts(),
+///     fetchOrders(),
+///   ).wait;
+/// }
+/// ```
+///
+/// **Note:** Only applies when futures are independent. If one depends on
+/// the result of another, sequential awaits are correct.
+class PreferFutureWaitRule extends SaropaLintRule {
+  const PreferFutureWaitRule() : super(code: _code);
+
+  /// Performance improvement. Can significantly speed up data loading.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_future_wait',
+    problemMessage:
+        'Sequential awaits could run in parallel with Future.wait.',
+    correctionMessage:
+        'Use Future.wait([future1, future2]) to run independent futures '
+        'concurrently, or (future1, future2).wait in Dart 3.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Minimum number of sequential awaits to trigger the warning.
+  static const int _minSequentialAwaits = 2;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addBlockFunctionBody((BlockFunctionBody body) {
+      // Check if function is async
+      if (body.keyword?.keyword != Keyword.ASYNC) return;
+
+      final block = body.block;
+      _checkBlockForSequentialAwaits(block, reporter);
+    });
+  }
+
+  void _checkBlockForSequentialAwaits(
+    Block block,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final List<Statement> statements = block.statements;
+    final List<VariableDeclarationStatement> sequentialAwaits = [];
+    final Set<String> usedVariables = <String>{};
+
+    for (int i = 0; i < statements.length; i++) {
+      final statement = statements[i];
+
+      if (statement is VariableDeclarationStatement) {
+        final variables = statement.variables.variables;
+        if (variables.length == 1) {
+          final variable = variables.first;
+          final initializer = variable.initializer;
+
+          if (initializer is AwaitExpression) {
+            // Check if this await uses any previously declared variables
+            final usedVars = _getUsedVariables(initializer);
+            final dependsOnPrevious =
+                usedVars.any((v) => usedVariables.contains(v));
+
+            if (dependsOnPrevious) {
+              // This await depends on a previous result, break the chain
+              _reportIfEnough(sequentialAwaits, reporter);
+              sequentialAwaits.clear();
+            }
+
+            sequentialAwaits.add(statement);
+            usedVariables.add(variable.name.lexeme);
+            continue;
+          }
+        }
+      }
+
+      // Non-await statement encountered, check the chain so far
+      _reportIfEnough(sequentialAwaits, reporter);
+      sequentialAwaits.clear();
+    }
+
+    // Check any remaining awaits at the end
+    _reportIfEnough(sequentialAwaits, reporter);
+  }
+
+  void _reportIfEnough(
+    List<VariableDeclarationStatement> awaits,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (awaits.length >= _minSequentialAwaits) {
+      // Report on the second await (to indicate this is part of a sequence)
+      reporter.atNode(awaits[1], code);
+    }
+  }
+
+  Set<String> _getUsedVariables(Expression expression) {
+    final Set<String> variables = <String>{};
+    expression.accept(_VariableCollector(variables));
+    return variables;
+  }
+}
+
+class _VariableCollector extends RecursiveAstVisitor<void> {
+  _VariableCollector(this.variables);
+
+  final Set<String> variables;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // Only collect identifiers that look like local variables
+    // (not method names, not type names)
+    final parent = node.parent;
+    if (parent is MethodInvocation && parent.methodName == node) {
+      // This is a method name, not a variable
+      return;
+    }
+    if (parent is NamedType) {
+      // This is a type name
+      return;
+    }
+
+    variables.add(node.name);
+    super.visitSimpleIdentifier(node);
+  }
+}

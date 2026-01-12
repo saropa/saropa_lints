@@ -210,6 +210,10 @@ const Set<String> essentialRules = <String>{
   'avoid_datetime_now_in_tests',
   'missing_test_assertion',
   'avoid_async_callback_in_fake_async',
+  'avoid_test_sleep', // WARNING - blocks test runner, use pump() instead
+
+  // JSON Serialization (Essential - runtime crashes)
+  'avoid_not_encodable_in_to_json', // WARNING - non-JSON types cause runtime errors
 
   // QR/Camera (Essential - app store compliance)
   'require_qr_permission_check',
@@ -477,6 +481,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_bloc_event_in_constructor',
   'avoid_provider_recreate',
   'avoid_provider_in_widget',
+  'prefer_change_notifier_proxy', // INFO - use context.read() in callbacks
+  'require_bloc_event_sealed', // INFO - sealed classes for exhaustive matching
+  'avoid_getx_global_state', // INFO - avoid Get.put/Get.find for global state
 
   // Animation
   'avoid_animation_in_build',
@@ -542,6 +549,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_return_await',
   'avoid_future_ignore',
   'avoid_stream_tostring',
+  'prefer_future_wait', // INFO - parallel independent awaits
 
   // Code Quality
   'avoid_self_assignment',
@@ -555,6 +563,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_simpler_boolean_expressions',
   'no_empty_string',
   'avoid_misnamed_padding',
+  'no_boolean_literal_compare', // INFO - use boolean expression directly
 
   // Collections
   'avoid_map_keys_contains',
@@ -788,6 +797,9 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Test Rules (Recommended - test quality)
   'avoid_test_print_statements', // WARNING - use expect() instead
+  'prefer_test_find_by_key', // INFO - prefer find.byKey over find.byType
+  'prefer_setup_teardown', // INFO - extract repeated test setup
+  'require_test_description_convention', // INFO - descriptive test names
 
   // Async Rules (Recommended - readability)
   'avoid_future_then_in_async', // WARNING - use await instead
@@ -885,6 +897,16 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_macos_sandbox_exceptions', // WARNING - sandbox entitlements documentation
   'avoid_macos_hardened_runtime_violations', // WARNING - notarization compliance
   'require_macos_app_transport_security', // WARNING - macOS ATS compliance
+
+  // v2.6.0 rules (ROADMAP_NEXT)
+  'prefer_returning_conditional_expressions', // INFO - cleaner code
+  'prefer_riverpod_family_for_params', // INFO - type-safe parameters
+  'require_dio_response_type', // INFO - explicit response types
+  'require_go_router_fallback_route', // INFO - error handling
+  'prefer_sqflite_column_constants', // INFO - avoid typos
+  'require_freezed_lint_package', // INFO - Freezed best practices
+  'prefer_image_picker_multi_selection', // INFO - better UX
+  'prefer_hive_value_listenable', // INFO - reactive UI
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -987,6 +1009,9 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_immutable_bloc_state',
   'prefer_sealed_bloc_events',
   'prefer_sealed_bloc_state',
+  'require_bloc_repository_abstraction', // INFO - abstract deps for testability
+  'prefer_bloc_transform', // INFO - debounce/throttle for search events
+  'prefer_selector_widget', // INFO - targeted rebuilds vs full Consumer
 
   // State Management (Batch 10)
   'require_error_state',
@@ -1035,6 +1060,13 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_fake_over_mock',
   'require_edge_case_tests',
   'avoid_test_implementation_details',
+  'avoid_find_by_text', // INFO - prefer find.byKey for interactions
+  'require_test_keys', // INFO - widgets in tests should have keys
+  'require_arrange_act_assert', // INFO - AAA pattern for test structure
+  'prefer_mock_navigator', // INFO - mock navigator for verification
+  'prefer_bloc_test_package', // INFO - use blocTest() for Bloc testing
+  'prefer_mock_verify', // INFO - verify mock interactions
+  'require_error_logging', // INFO - log errors in catch blocks
 
   // Flutter Widgets - Pointer handling
   'avoid_absorb_pointer_misuse',
@@ -1060,6 +1092,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_typed_di_registration',
   'avoid_getit_in_build',
   'require_getit_reset_in_tests',
+  'prefer_constructor_injection', // INFO - constructor DI over setter injection
 
   // Memory Management
   'require_image_disposal',
@@ -1451,6 +1484,24 @@ const Set<String> professionalOnlyRules = <String>{
   'require_ios_focus_mode_awareness', // INFO - Focus Mode interruption levels
   'require_ios_quick_note_awareness', // INFO - NSUserActivity for Quick Note
   'require_macos_entitlements', // INFO - macOS entitlement detection
+
+  // v2.6.0 rules (ROADMAP_NEXT)
+  'prefer_riverpod_auto_dispose', // INFO - memory management
+  'avoid_getx_global_navigation', // WARNING - testability
+  'require_getx_binding_routes', // INFO - DI lifecycle
+  'require_dio_retry_interceptor', // INFO - network resilience
+  'prefer_shell_route_shared_layout', // INFO - code reuse
+  'require_stateful_shell_route_tabs', // INFO - state preservation
+  'prefer_sqflite_singleton', // INFO - connection management
+  'require_freezed_json_converter', // INFO - JSON serialization
+  'prefer_geolocator_accuracy_appropriate', // INFO - battery management
+  'prefer_geolocator_last_known', // INFO - battery optimization
+  'require_notification_action_handling', // INFO - notification UX
+  'require_finally_cleanup', // INFO - resource cleanup
+  'require_di_scope_awareness', // INFO - DI lifecycle
+  'require_deep_equality_collections', // WARNING - state comparison
+  'avoid_equatable_datetime', // WARNING - flaky equality
+  'prefer_unmodifiable_collections', // INFO - immutability
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
@@ -1831,6 +1882,9 @@ const Set<String> insanityOnlyRules = <String>{
 
   // Testing
   'tag_name',
+
+  // v2.6.0 rules (ROADMAP_NEXT)
+  'prefer_dio_transformer', // INFO - background JSON parsing
 };
 
 /// Get all rules for a specific tier.

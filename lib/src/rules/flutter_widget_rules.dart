@@ -16839,38 +16839,5 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
     return hasLengthCheck || hasEmptyCheck;
   }
 
-  @override
-  List<Fix> getFixes() => <Fix>[_AddBoundsCheckFix()];
-}
-
-/// Quick fix: Adds TODO comment for bounds check.
-class _AddBoundsCheckFix extends DartFix {
-  @override
-  void run(
-    CustomLintResolver resolver,
-    ChangeReporter reporter,
-    CustomLintContext context,
-    AnalysisError analysisError,
-    List<AnalysisError> others,
-  ) {
-    context.registry.addNamedExpression((NamedExpression node) {
-      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
-
-      final Expression builderExpr = node.expression;
-      if (builderExpr is! FunctionExpression) return;
-
-      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Add TODO for bounds check',
-        priority: 2,
-      );
-
-      changeBuilder.addDartFileEdit((builder) {
-        // Add comment before the itemBuilder parameter
-        builder.addSimpleInsertion(
-          node.offset,
-          '// TODO: Add bounds check: if (index >= list.length) return fallback;\n          ',
-        );
-      });
-    });
-  }
+  // No quick fix - bounds checking requires knowing variable names and fallback widgets
 }
