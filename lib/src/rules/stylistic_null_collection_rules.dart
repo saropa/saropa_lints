@@ -284,8 +284,7 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_if_null',
-    problemMessage:
-        'Use ternary expression instead of ?? for explicit control.',
+    problemMessage: 'Use ternary expression instead of ?? for explicit control.',
     correctionMessage: 'Replace with: value != null ? value : default',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -344,10 +343,8 @@ class PreferLateOverNullableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_late_over_nullable',
-    problemMessage:
-        'Consider using late instead of nullable for lazily initialized fields.',
-    correctionMessage:
-        'late avoids null checks if you guarantee initialization before use.',
+    problemMessage: 'Consider using late instead of nullable for lazily initialized fields.',
+    correctionMessage: 'late avoids null checks if you guarantee initialization before use.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -479,6 +476,7 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // cspell:ignore addall
   static const LintCode _code = LintCode(
     name: 'prefer_spread_over_addall',
     problemMessage: 'Use spread operator [...] instead of addAll().',
@@ -617,10 +615,8 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
       final thenExpr = inner.thenExpression;
       final elseExpr = inner.elseExpression;
 
-      final isEmptyListThen =
-          thenExpr is ListLiteral && thenExpr.elements.isEmpty;
-      final isEmptyListElse =
-          elseExpr is ListLiteral && elseExpr.elements.isEmpty;
+      final isEmptyListThen = thenExpr is ListLiteral && thenExpr.elements.isEmpty;
+      final isEmptyListElse = elseExpr is ListLiteral && elseExpr.elements.isEmpty;
 
       if (isEmptyListThen || isEmptyListElse) {
         reporter.atNode(node, code);
@@ -719,6 +715,7 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // cspell:ignore wheretype
   static const LintCode _code = LintCode(
     name: 'prefer_wheretype_over_where_is',
     problemMessage: 'Use whereType<T>() instead of where((e) => e is T).',
@@ -939,10 +936,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_unmodifiable_collections',
-    problemMessage:
-        'Return UnmodifiableListView from getters to prevent mutation.',
-    correctionMessage:
-        'Wrap with UnmodifiableListView() or List.unmodifiable().',
+    problemMessage: 'Return UnmodifiableListView from getters to prevent mutation.',
+    correctionMessage: 'Wrap with UnmodifiableListView() or List.unmodifiable().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

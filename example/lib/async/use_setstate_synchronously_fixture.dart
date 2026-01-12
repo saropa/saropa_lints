@@ -266,3 +266,103 @@ class _GoodMultipleAwaitsWithGuardsState
         children: [Text(_data1), Text(_data2)],
       );
 }
+
+// =========================================================================
+// Compound && mounted checks (v3.0.2 fix)
+// =========================================================================
+// Short-circuit evaluation guarantees mounted is true in the then-branch.
+
+// GOOD: Compound && with mounted on left side
+class GoodCompoundMountedLeft extends StatefulWidget {
+  const GoodCompoundMountedLeft({super.key});
+
+  @override
+  State<GoodCompoundMountedLeft> createState() =>
+      _GoodCompoundMountedLeftState();
+}
+
+class _GoodCompoundMountedLeftState extends State<GoodCompoundMountedLeft> {
+  String _data = '';
+  bool _shouldUpdate = true;
+
+  Future<void> loadData() async {
+    final data = await Future.value('data');
+    if (mounted && _shouldUpdate) {
+      setState(() => _data = data); // Protected - mounted checked in &&
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: Compound && with mounted on right side
+class GoodCompoundMountedRight extends StatefulWidget {
+  const GoodCompoundMountedRight({super.key});
+
+  @override
+  State<GoodCompoundMountedRight> createState() =>
+      _GoodCompoundMountedRightState();
+}
+
+class _GoodCompoundMountedRightState extends State<GoodCompoundMountedRight> {
+  String _data = '';
+  bool _isActive = true;
+
+  Future<void> loadData() async {
+    final data = await Future.value('data');
+    if (_isActive && mounted) {
+      setState(() => _data = data); // Protected - mounted checked in &&
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: Compound && with context.mounted
+class GoodCompoundContextMounted extends StatefulWidget {
+  const GoodCompoundContextMounted({super.key});
+
+  @override
+  State<GoodCompoundContextMounted> createState() =>
+      _GoodCompoundContextMountedState();
+}
+
+class _GoodCompoundContextMountedState
+    extends State<GoodCompoundContextMounted> {
+  String _data = '';
+  bool _canUpdate = true;
+
+  Future<void> loadData() async {
+    final data = await Future.value('data');
+    if (context.mounted && _canUpdate) {
+      setState(() => _data = data); // Protected - context.mounted in &&
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: Double mounted check in && (redundant but valid)
+class GoodDoubleMountedCheck extends StatefulWidget {
+  const GoodDoubleMountedCheck({super.key});
+
+  @override
+  State<GoodDoubleMountedCheck> createState() => _GoodDoubleMountedCheckState();
+}
+
+class _GoodDoubleMountedCheckState extends State<GoodDoubleMountedCheck> {
+  String _data = '';
+
+  Future<void> loadData() async {
+    final data = await Future.value('data');
+    if (mounted && context.mounted) {
+      setState(() => _data = data); // Protected - both checked
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
