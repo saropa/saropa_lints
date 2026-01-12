@@ -85,7 +85,7 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_initialization',
     problemMessage:
-        'Hive.openBox called. Verify Hive.init() or Hive.initFlutter() is called in main().',
+        '[require_hive_initialization] Hive.openBox called. Verify Hive.init() or Hive.initFlutter() is called in main().',
     correctionMessage:
         'Ensure Hive.initFlutter() is called in main() before opening boxes (cannot verify cross-file).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -153,7 +153,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_type_adapter',
     problemMessage:
-        'Storing object in Hive. Ensure class has @HiveType annotation.',
+        '[require_hive_type_adapter] Storing object in Hive. Ensure class has @HiveType annotation.',
     correctionMessage:
         'Add @HiveType(typeId: X) annotation and generate adapter with build_runner.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -246,7 +246,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
-    problemMessage: 'Hive box opened but not closed in dispose. Resource leak.',
+    problemMessage: '[require_hive_box_close] Hive box opened but not closed in dispose. Resource leak.',
     correctionMessage: 'Call box.close() in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -330,7 +330,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
-    problemMessage: 'Sensitive data stored in unencrypted Hive box.',
+    problemMessage: '[prefer_hive_encryption] Sensitive data stored in unencrypted Hive box.',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -409,7 +409,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_encryption_key_secure',
     problemMessage:
-        'Hardcoded Hive encryption key. Can be extracted from app binary.',
+        '[require_hive_encryption_key_secure] Hardcoded Hive encryption key. Can be extracted from app binary.',
     correctionMessage:
         'Store encryption key in flutter_secure_storage, not in code.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -494,7 +494,7 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_database_close',
     problemMessage:
-        'Database opened but no close() method found. Resource leak risk.',
+        '[require_hive_database_close] Database opened but no close() method found. Resource leak risk.',
     correctionMessage: 'Add dispose() method that calls database.close().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -565,7 +565,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_type_adapter_registration',
     problemMessage:
-        'Hive box opened with custom type but adapter may not be registered.',
+        '[require_type_adapter_registration] Hive box opened with custom type but adapter may not be registered.',
     correctionMessage:
         'Ensure Hive.registerAdapter() is called before opening typed boxes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -658,7 +658,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_box_for_large',
     problemMessage:
-        'Large collection uses regular Hive box. Consider openLazyBox for memory.',
+        '[prefer_lazy_box_for_large] Large collection uses regular Hive box. Consider openLazyBox for memory.',
     correctionMessage:
         'Use Hive.openLazyBox() for collections that may grow large.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -774,7 +774,7 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_type_id_management',
     problemMessage:
-        '@HiveType found. Ensure typeId is unique and documented in a central registry.',
+        '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry.',
     correctionMessage:
         'Create a hive_type_ids.dart file to track all typeIds and prevent conflicts.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -857,7 +857,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hive_field_index_reuse',
     problemMessage:
-        '@HiveField index is duplicated within this class. Data corruption will occur.',
+        '[avoid_hive_field_index_reuse] @HiveField index is duplicated within this class. Data corruption will occur.',
     correctionMessage:
         'Use a unique index for each @HiveField annotation in the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -965,7 +965,7 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_field_default_value',
     problemMessage:
-        '@HiveField on nullable field without defaultValue. Existing data may fail to load.',
+        '[require_hive_field_default_value] @HiveField on nullable field without defaultValue. Existing data may fail to load.',
     correctionMessage:
         'Add defaultValue parameter: @HiveField(0, defaultValue: null)',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1052,7 +1052,7 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_adapter_registration_order',
     problemMessage:
-        'Hive.openBox may be called before registering adapters in this function.',
+        '[require_hive_adapter_registration_order] Hive.openBox may be called before registering adapters in this function.',
     correctionMessage:
         'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1167,7 +1167,7 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_nested_object_adapter',
     problemMessage:
-        '@HiveField contains custom type. Ensure it has @HiveType annotation.',
+        '[require_hive_nested_object_adapter] @HiveField contains custom type. Ensure it has @HiveType annotation.',
     correctionMessage:
         'Add @HiveType annotation to the nested class or use a primitive type.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1259,7 +1259,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hive_box_name_collision',
     problemMessage:
-        'Generic Hive box name may cause collision. Use a specific name.',
+        '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name.',
     correctionMessage:
         'Use a unique, descriptive box name like "users" or "settings".',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1350,7 +1350,7 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_hive_value_listenable',
     problemMessage:
-        'setState after Hive put/delete. Consider using box.listenable().',
+        '[prefer_hive_value_listenable] setState after Hive put/delete. Consider using box.listenable().',
     correctionMessage:
         'Use ValueListenableBuilder with box.listenable() for reactive UI.',
     errorSeverity: DiagnosticSeverity.INFO,

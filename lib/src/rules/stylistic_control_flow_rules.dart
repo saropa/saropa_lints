@@ -82,7 +82,7 @@ class PreferEarlyReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
-    problemMessage: 'Consider using early return instead of nested if blocks.',
+    problemMessage: '[prefer_early_return] Consider using early return instead of nested if blocks.',
     correctionMessage: 'Guard clauses at the top reduce nesting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -174,7 +174,7 @@ class PreferSingleExitPointRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_single_exit_point',
     problemMessage:
-        'Consider using single exit point instead of early returns.',
+        '[prefer_single_exit_point] Consider using single exit point instead of early returns.',
     correctionMessage: 'Single exit makes cleanup and logging easier.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -283,7 +283,7 @@ class PreferGuardClausesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_guard_clauses',
     problemMessage:
-        'Consider using guard clauses at the start of the function.',
+        '[prefer_guard_clauses] Consider using guard clauses at the start of the function.',
     correctionMessage: 'Guard clauses make preconditions explicit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -355,7 +355,7 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_positive_conditions_first',
-    problemMessage: 'Consider using positive conditions with happy path first.',
+    problemMessage: '[prefer_positive_conditions_first] Consider using positive conditions with happy path first.',
     correctionMessage: 'Positive conditions are easier to understand.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -439,7 +439,7 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_switch_expression',
-    problemMessage: 'Consider using switch expression instead of statement.',
+    problemMessage: '[prefer_switch_expression] Consider using switch expression instead of statement.',
     correctionMessage:
         'Switch expressions are more concise for value production.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -524,7 +524,7 @@ class PreferSwitchStatementRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_switch_statement',
-    problemMessage: 'Consider using switch statement instead of expression.',
+    problemMessage: '[prefer_switch_statement] Consider using switch statement instead of expression.',
     correctionMessage: 'Switch statements are more familiar and flexible.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -582,7 +582,7 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_cascade_over_chained',
-    problemMessage: 'Consider using cascade (..) for consecutive mutations.',
+    problemMessage: '[prefer_cascade_over_chained] Consider using cascade (..) for consecutive mutations.',
     correctionMessage: 'Cascades make it clear operations are on same object.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -669,7 +669,7 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_chained_over_cascade',
-    problemMessage: 'Consider using separate statements instead of cascade.',
+    problemMessage: '[prefer_chained_over_cascade] Consider using separate statements instead of cascade.',
     correctionMessage: 'Separate statements are more familiar and explicit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -730,7 +730,7 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_exhaustive_enums',
-    problemMessage: 'Prefer exhaustive enum cases instead of default.',
+    problemMessage: '[prefer_exhaustive_enums] Prefer exhaustive enum cases instead of default.',
     correctionMessage:
         'Exhaustive switches catch missing cases at compile time.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -807,7 +807,7 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_default_enum_case',
-    problemMessage: 'Consider using default case for future-proofing.',
+    problemMessage: '[prefer_default_enum_case] Consider using default case for future-proofing.',
     correctionMessage: 'Default case handles unknown enum values gracefully.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -888,7 +888,7 @@ class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_only_when_awaiting',
-    problemMessage: 'Function is async but does not use await.',
+    problemMessage: '[prefer_async_only_when_awaiting] Function is async but does not use await.',
     correctionMessage: 'Remove async or add await expressions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -993,7 +993,7 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_await_over_then',
-    problemMessage: 'Consider using await instead of .then() chains.',
+    problemMessage: '[prefer_await_over_then] Consider using await instead of .then() chains.',
     correctionMessage: 'await provides better readability and error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1048,7 +1048,7 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_then_over_await',
-    problemMessage: 'Consider using .then() for functional style.',
+    problemMessage: '[prefer_then_over_await] Consider using .then() for functional style.',
     correctionMessage: '.then() provides explicit Future chaining.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1104,7 +1104,7 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sync_over_async_where_possible',
-    problemMessage: 'Consider returning Future.value() for simple sync values.',
+    problemMessage: '[prefer_sync_over_async_where_possible] Consider returning Future.value() for simple sync values.',
     correctionMessage: 'Avoid async overhead when not awaiting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

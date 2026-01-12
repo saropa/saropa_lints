@@ -37,7 +37,7 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_inconsistent_digit_separators',
-    problemMessage: 'Digit separators are not grouped consistently.',
+    problemMessage: '[avoid_inconsistent_digit_separators] Digit separators are not grouped consistently.',
     correctionMessage: 'Use consistent groups of 3 digits.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -128,7 +128,7 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_digit_separators',
-    problemMessage: 'Unnecessary or poorly placed digit separator.',
+    problemMessage: '[avoid_unnecessary_digit_separators] Unnecessary or poorly placed digit separator.',
     correctionMessage:
         'Use digit separators consistently for large numbers only.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -182,7 +182,7 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'double_literal_format',
-    problemMessage: 'Use consistent double literal format.',
+    problemMessage: '[double_literal_format] Use consistent double literal format.',
     correctionMessage: 'Include leading zero before decimal point (e.g., 0.5).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -223,7 +223,7 @@ class NoMagicNumberRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_magic_number',
-    problemMessage: 'Avoid magic numbers.',
+    problemMessage: '[no_magic_number] Avoid magic numbers.',
     correctionMessage: 'Extract the number to a named constant.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -312,7 +312,7 @@ class NoMagicStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_magic_string',
-    problemMessage: 'Avoid using magic string literals.',
+    problemMessage: '[no_magic_string] Avoid using magic string literals.',
     correctionMessage: 'Extract the string to a named constant.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -432,7 +432,7 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_addition_subtraction_assignments',
-    problemMessage: 'Use compound assignment operator.',
+    problemMessage: '[prefer_addition_subtraction_assignments] Use compound assignment operator.',
     correctionMessage: 'Replace with +=, -=, *=, /=, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -511,7 +511,7 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_compound_assignment_operators',
-    problemMessage: 'Use compound assignment operator.',
+    problemMessage: '[prefer_compound_assignment_operators] Use compound assignment operator.',
     correctionMessage: 'Replace with compound assignment (e.g., &=, |=, ^=).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -576,7 +576,7 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_digit_separators',
-    problemMessage: 'Large number should use digit separators.',
+    problemMessage: '[prefer_digit_separators] Large number should use digit separators.',
     correctionMessage: 'Add underscores to group digits (e.g., 1_000_000).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -707,7 +707,7 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_digit_separators',
-    problemMessage: 'Unnecessary digit separator in small number.',
+    problemMessage: '[avoid_digit_separators] Unnecessary digit separator in small number.',
     correctionMessage: 'Remove digit separators from small numbers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

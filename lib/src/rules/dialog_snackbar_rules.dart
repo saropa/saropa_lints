@@ -37,7 +37,7 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_snackbar_duration',
-    problemMessage: 'SnackBar should have explicit duration.',
+    problemMessage: '[require_snackbar_duration] SnackBar should have explicit duration.',
     correctionMessage: 'Add duration parameter for consistent UX timing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -104,7 +104,7 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dialog_barrier_dismissible',
-    problemMessage: 'showDialog should have explicit barrierDismissible.',
+    problemMessage: '[require_dialog_barrier_dismissible] showDialog should have explicit barrierDismissible.',
     correctionMessage:
         'Add barrierDismissible: true or false to make intent clear.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -179,7 +179,7 @@ class RequireDialogResultHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dialog_result_handling',
-    problemMessage: 'showDialog result should be awaited or handled.',
+    problemMessage: '[require_dialog_result_handling] showDialog result should be awaited or handled.',
     correctionMessage:
         'Use await showDialog() or .then() to handle the dialog result.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -250,7 +250,7 @@ class AvoidSnackbarQueueBuildupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_queue_buildup',
-    problemMessage: 'Consider clearing snackbars before showing new ones.',
+    problemMessage: '[avoid_snackbar_queue_buildup] Consider clearing snackbars before showing new ones.',
     correctionMessage:
         'Call clearSnackBars() or hideCurrentSnackBar() before showSnackBar().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -348,7 +348,7 @@ class PreferAdaptiveDialogRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_adaptive_dialog',
     problemMessage:
-        'AlertDialog without adaptive styling. May look non-native on iOS.',
+        '[prefer_adaptive_dialog] AlertDialog without adaptive styling. May look non-native on iOS.',
     correctionMessage:
         'Use AlertDialog.adaptive() or platform-specific dialogs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -433,7 +433,7 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_snackbar_action_for_undo',
     problemMessage:
-        'SnackBar for delete/remove without undo action. Users can\'t recover.',
+        '[require_snackbar_action_for_undo] SnackBar for delete/remove without undo action. Users can\'t recover.',
     correctionMessage:
         'Add action parameter with SnackBarAction for undo functionality.',
     errorSeverity: DiagnosticSeverity.INFO,

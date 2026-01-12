@@ -51,7 +51,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shrinkwrap_in_scrollview',
-    problemMessage: 'shrinkWrap: true in scrollable disables virtualization.',
+    problemMessage: '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true in scrollable disables virtualization.',
     correctionMessage:
         'Use CustomScrollView with slivers, or add NeverScrollableScrollPhysics.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -194,7 +194,7 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables_conflict',
     problemMessage:
-        'Nested scrollable without explicit physics causes gesture conflicts.',
+        '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts.',
     correctionMessage:
         'Add physics: NeverScrollableScrollPhysics() to inner scrollable.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -314,7 +314,7 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_listview_children_for_large_lists',
     problemMessage:
-        'ListView with many children loads all items. Use ListView.builder.',
+        '[avoid_listview_children_for_large_lists] ListView with many children loads all items. Use ListView.builder.',
     correctionMessage:
         'Replace ListView(children: [...]) with ListView.builder for better performance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -384,7 +384,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_bottom_nav_items',
-    problemMessage: 'BottomNavigationBar with more than 5 items crowds the UI.',
+    problemMessage: '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI.',
     correctionMessage:
         'Limit to 5 items or use a navigation drawer for additional options.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -462,7 +462,7 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_length_sync',
     problemMessage:
-        'TabController length must match TabBar/TabBarView children count.',
+        '[require_tab_controller_length_sync] TabController length must match TabBar/TabBarView children count.',
     correctionMessage: 'Ensure TabController length equals the number of tabs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -577,7 +577,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_refresh_without_await',
     problemMessage:
-        'RefreshIndicator onRefresh should return Future for proper timing.',
+        '[avoid_refresh_without_await] RefreshIndicator onRefresh should return Future for proper timing.',
     correctionMessage: 'Make onRefresh async and await async operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -647,7 +647,7 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_autofocus',
     problemMessage:
-        'Multiple widgets with autofocus: true causes unpredictable behavior.',
+        '[avoid_multiple_autofocus] Multiple widgets with autofocus: true causes unpredictable behavior.',
     correctionMessage: 'Only one widget should have autofocus: true.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -731,7 +731,7 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator_on_lists',
     problemMessage:
-        'ListView without RefreshIndicator. Users can\'t pull to refresh.',
+        '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh.',
     correctionMessage:
         'Wrap with RefreshIndicator for pull-to-refresh support.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -818,7 +818,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_expensive',
     problemMessage:
-        'shrinkWrap: true disables virtualization and can cause performance issues.',
+        '[avoid_shrink_wrap_expensive] shrinkWrap: true disables virtualization and can cause performance issues.',
     correctionMessage:
         'Use a fixed-height container, Slivers, or reconsider the layout.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -928,7 +928,7 @@ class PreferItemExtentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_item_extent',
     problemMessage:
-        'ListView with uniform items should specify itemExtent for better performance.',
+        '[prefer_item_extent] ListView with uniform items should specify itemExtent for better performance.',
     correctionMessage:
         'Add itemExtent parameter if all items have the same height.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1004,7 +1004,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_prototype_item',
     problemMessage:
-        'Consider using prototypeItem for ListView with consistent item sizes.',
+        '[prefer_prototype_item] Consider using prototypeItem for ListView with consistent item sizes.',
     correctionMessage:
         'Add prototypeItem parameter if items have consistent dimensions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1083,7 +1083,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_key_for_reorderable',
     problemMessage:
-        'ReorderableListView items must have unique keys for proper reordering.',
+        '[require_key_for_reorderable] ReorderableListView items must have unique keys for proper reordering.',
     correctionMessage: 'Add a key parameter (e.g., ValueKey) to each item.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1243,7 +1243,7 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_add_automatic_keep_alives_off',
     problemMessage:
-        'Long lists with addAutomaticKeepAlives: true (default) can cause memory issues.',
+        '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues.',
     correctionMessage:
         'Add addAutomaticKeepAlives: false for better memory efficiency.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -22,7 +22,7 @@ class AlwaysFailRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'always_fail',
-    problemMessage: 'This custom lint always fails (test hook).',
+    problemMessage: '[always_fail] This custom lint always fails (test hook).',
     correctionMessage: 'Disable the rule or remove the test lint trigger.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -57,7 +57,7 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_commented_out_code',
-    problemMessage: 'Avoid commented-out code.',
+    problemMessage: '[avoid_commented_out_code] Avoid commented-out code.',
     correctionMessage:
         'Remove commented-out code. Use version control to preserve history.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -145,7 +145,7 @@ class AvoidDebugPrintRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_debug_print',
-    problemMessage: 'Avoid using debugPrint. '
+    problemMessage: '[avoid_debug_print] Avoid using debugPrint. '
         'Use a proper logging solution instead.',
     correctionMessage: 'Replace debugPrint with a logger that can be '
         'configured per environment.',
@@ -264,7 +264,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unguarded_debug',
-    problemMessage: 'Debug statement is not guarded by a debug mode check.',
+    problemMessage: '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
     correctionMessage: 'Wrap in if (kDebugMode), if (DebugType.*.isDebug), '
         'or add level: DebugLevels.Warning/Error parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -438,7 +438,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_analyzer_ignores',
     problemMessage:
-        'Analyzer ignore comment should have a preceding explanatory comment.',
+        '[prefer_commenting_analyzer_ignores] Analyzer ignore comment should have a preceding explanatory comment.',
     correctionMessage:
         'Add a comment on the line above explaining why this rule is ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -577,7 +577,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_debugPrint',
     problemMessage:
-        'print() should use debugPrint() for throttled console output.',
+        '[prefer_debugPrint] print() should use debugPrint() for throttled console output.',
     correctionMessage:
         'Replace print() with debugPrint() to prevent console buffer overflow.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -43,7 +43,7 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_direct_data_access_in_ui',
     problemMessage:
-        'Widget directly accesses data layer. This couples UI to data implementation.',
+        '[avoid_direct_data_access_in_ui] Widget directly accesses data layer. This couples UI to data implementation.',
     correctionMessage:
         'Inject a ViewModel, Cubit, or Controller that wraps the data layer.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -131,7 +131,7 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_business_logic_in_ui',
-    problemMessage: 'Business logic should not be in UI layer.',
+    problemMessage: '[avoid_business_logic_in_ui] Business logic should not be in UI layer.',
     correctionMessage:
         'Move calculations and business rules to domain/service layer.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -225,7 +225,7 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_dependencies',
     problemMessage:
-        'Service depends on another service of the same layer. This may cause circular dependencies.',
+        '[avoid_circular_dependencies] Service depends on another service of the same layer. This may cause circular dependencies.',
     correctionMessage:
         'Extract shared logic to a new service, use interfaces, or communicate via events.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -314,7 +314,7 @@ class AvoidGodClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_god_class',
     problemMessage:
-        'Class has too many members (>15 fields or >20 methods). Violates Single Responsibility.',
+        '[avoid_god_class] Class has too many members (>15 fields or >20 methods). Violates Single Responsibility.',
     correctionMessage:
         'Extract related fields and methods into focused helper classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -384,7 +384,7 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ui_in_domain_layer',
-    problemMessage: 'Domain layer should not have UI dependencies.',
+    problemMessage: '[avoid_ui_in_domain_layer] Domain layer should not have UI dependencies.',
     correctionMessage:
         'Remove Flutter/UI imports from domain models and services.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -475,7 +475,7 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_cross_feature_dependencies',
-    problemMessage: 'Feature module depends on another feature.',
+    problemMessage: '[avoid_cross_feature_dependencies] Feature module depends on another feature.',
     correctionMessage:
         'Move shared code to core/shared layer or use dependency injection.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -548,7 +548,7 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_pattern',
     problemMessage:
-        'Singleton pattern detected. Cannot mock in tests or have multiple instances.',
+        '[avoid_singleton_pattern] Singleton pattern detected. Cannot mock in tests or have multiple instances.',
     correctionMessage:
         'Use DI container: getIt.registerSingleton(MyService()) and inject where needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -629,7 +629,7 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_touch_only_gestures',
     problemMessage:
-        'GestureDetector with only onTap. Missing desktop/web interactions.',
+        '[avoid_touch_only_gestures] GestureDetector with only onTap. Missing desktop/web interactions.',
     correctionMessage:
         'Add onSecondaryTap for right-click and consider hover states.',
     errorSeverity: DiagnosticSeverity.INFO,

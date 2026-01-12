@@ -50,7 +50,7 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_http_status_check',
     problemMessage:
-        'HTTP response body used without checking status. Errors may be silently ignored.',
+        '[require_http_status_check] HTTP response body used without checking status. Errors may be silently ignored.',
     correctionMessage:
         'Check if (response.statusCode == 200) before parsing response.body.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -113,7 +113,7 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_api_urls',
     problemMessage:
-        'Hardcoded API URL. Cannot switch between dev/staging/prod environments.',
+        '[avoid_hardcoded_api_urls] Hardcoded API URL. Cannot switch between dev/staging/prod environments.',
     correctionMessage:
         "Extract to a config constant: Uri.parse('\${ApiConfig.baseUrl}/endpoint').",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -181,7 +181,7 @@ class RequireRetryLogicRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_retry_logic',
     problemMessage:
-        'Network call has no retry logic. Transient failures will not recover.',
+        '[require_retry_logic] Network call has no retry logic. Transient failures will not recover.',
     correctionMessage:
         'Wrap with retry() or implement exponential backoff for SocketException/TimeoutException.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -252,7 +252,7 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_typed_api_response',
-    problemMessage: 'API response should be parsed into a typed model.',
+    problemMessage: '[require_typed_api_response] API response should be parsed into a typed model.',
     correctionMessage: 'Create a model class and use fromJson/fromMap.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -348,7 +348,7 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_connectivity_check',
-    problemMessage: 'Consider checking connectivity before network operations.',
+    problemMessage: '[require_connectivity_check] Consider checking connectivity before network operations.',
     correctionMessage: 'Use Connectivity package to check network status.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -427,7 +427,7 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_api_error_mapping',
-    problemMessage: 'API errors should be mapped to domain exceptions.',
+    problemMessage: '[require_api_error_mapping] API errors should be mapped to domain exceptions.',
     correctionMessage: 'Catch specific exceptions and map to domain errors.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -509,7 +509,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_request_timeout',
-    problemMessage: 'HTTP request without timeout may hang indefinitely.',
+    problemMessage: '[require_request_timeout] HTTP request without timeout may hang indefinitely.',
     correctionMessage:
         'Add .timeout(Duration(seconds: 30)) or configure timeout in client options.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -646,7 +646,7 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_offline_indicator',
     problemMessage:
-        'Connectivity check without offline indicator. Users should see when offline.',
+        '[require_offline_indicator] Connectivity check without offline indicator. Users should see when offline.',
     correctionMessage:
         'Show a banner, snackbar, or icon when connectivity is lost.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -729,7 +729,7 @@ class PreferStreamingResponseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_streaming_response',
     problemMessage:
-        'Large download uses bodyBytes. Consider streaming for large files.',
+        '[prefer_streaming_response] Large download uses bodyBytes. Consider streaming for large files.',
     correctionMessage:
         'Use client.send() with StreamedResponse and pipe to file.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -883,7 +883,7 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_http_connection_reuse',
     problemMessage:
-        'HTTP client created inside method. Connection overhead on every call.',
+        '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call.',
     correctionMessage:
         'Create HTTP client as a class field and reuse across requests.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -993,7 +993,7 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_requests',
     problemMessage:
-        'API call in build() or similar may cause redundant requests.',
+        '[avoid_redundant_requests] API call in build() or similar may cause redundant requests.',
     correctionMessage: 'Cache results or use request deduplication pattern.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1084,7 +1084,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_response_caching',
     problemMessage:
-        'GET request without caching. Consider caching static data.',
+        '[require_response_caching] GET request without caching. Consider caching static data.',
     correctionMessage:
         'Add response caching with TTL for data that changes infrequently.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1176,7 +1176,7 @@ class PreferPaginationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_pagination',
     problemMessage:
-        'API fetches all items without pagination. May cause memory issues.',
+        '[prefer_pagination] API fetches all items without pagination. May cause memory issues.',
     correctionMessage:
         'Add pagination parameters: limit, offset, page, or cursor.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1268,7 +1268,7 @@ class AvoidOverFetchingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_over_fetching',
     problemMessage:
-        'Fetching full object but only using few fields. Consider optimizing.',
+        '[avoid_over_fetching] Fetching full object but only using few fields. Consider optimizing.',
     correctionMessage:
         'Use field selection, sparse fieldsets, or dedicated endpoints.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1364,7 +1364,7 @@ class RequireCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cancel_token',
     problemMessage:
-        'Async request in StatefulWidget without cancellation support.',
+        '[require_cancel_token] Async request in StatefulWidget without cancellation support.',
     correctionMessage:
         'Use CancelToken (Dio) or implement request cancellation on dispose.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1446,7 +1446,7 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_error_handling',
-    problemMessage: 'WebSocket listener without onError can crash on errors.',
+    problemMessage: '[require_websocket_error_handling] WebSocket listener without onError can crash on errors.',
     correctionMessage: 'Add onError handler to WebSocket stream.listen().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1557,7 +1557,7 @@ class RequireDioTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_timeout',
     problemMessage:
-        'Dio instance without timeout configuration. Requests may hang indefinitely.',
+        '[require_dio_timeout] Dio instance without timeout configuration. Requests may hang indefinitely.',
     correctionMessage:
         'Configure connectTimeout and receiveTimeout in BaseOptions.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1629,7 +1629,7 @@ class RequireDioErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_error_handling',
     problemMessage:
-        'Dio request without error handling. DioException will crash the app.',
+        '[require_dio_error_handling] Dio request without error handling. DioException will crash the app.',
     correctionMessage: 'Wrap in try-catch to handle DioException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1706,7 +1706,7 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_interceptor_error_handler',
     problemMessage:
-        'InterceptorsWrapper without onError handler. Errors may be unhandled.',
+        '[require_dio_interceptor_error_handler] InterceptorsWrapper without onError handler. Errors may be unhandled.',
     correctionMessage:
         'Add onError callback to handle request errors in interceptor.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1768,7 +1768,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_cancel_token',
     problemMessage:
-        'Long-running Dio request without CancelToken. Cannot be cancelled.',
+        '[prefer_dio_cancel_token] Long-running Dio request without CancelToken. Cannot be cancelled.',
     correctionMessage: 'Add cancelToken parameter for cancellable requests.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1841,7 +1841,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_ssl_pinning',
     problemMessage:
-        'Auth endpoint without SSL pinning. Vulnerable to MITM attacks.',
+        '[require_dio_ssl_pinning] Auth endpoint without SSL pinning. Vulnerable to MITM attacks.',
     correctionMessage:
         'Configure httpClientAdapter with certificate validation.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1923,7 +1923,7 @@ class AvoidDioFormDataLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dio_form_data_leak',
     problemMessage:
-        'FormData with file. Ensure proper cleanup of file resources.',
+        '[avoid_dio_form_data_leak] FormData with file. Ensure proper cleanup of file resources.',
     correctionMessage:
         'Consider cleanup or using try-finally for file uploads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1998,7 +1998,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_content_type_check',
     problemMessage:
-        'Parsing response without Content-Type check. May fail on error responses.',
+        '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses.',
     correctionMessage:
         'Check response.headers[\'content-type\'] before parsing.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2091,7 +2091,7 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_without_heartbeat',
     problemMessage:
-        'WebSocket without heartbeat/ping. Dead connections won\'t be detected.',
+        '[avoid_websocket_without_heartbeat] WebSocket without heartbeat/ping. Dead connections won\'t be detected.',
     correctionMessage:
         'Add periodic ping messages to detect connection failures.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2182,7 +2182,7 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dio_debug_print_production',
-    problemMessage: 'Dio LogInterceptor without kDebugMode check.',
+    problemMessage: '[avoid_dio_debug_print_production] Dio LogInterceptor without kDebugMode check.',
     correctionMessage: 'Wrap with: if (kDebugMode) { dio.interceptors.add... }',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2277,7 +2277,7 @@ class RequireDioSingletonRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dio_singleton',
-    problemMessage: 'Consider using a singleton Dio instance.',
+    problemMessage: '[require_dio_singleton] Consider using a singleton Dio instance.',
     correctionMessage:
         'Create a shared Dio instance with consistent configuration.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2351,7 +2351,7 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_base_options',
     problemMessage:
-        'Repeated options in Dio requests. Consider using BaseOptions.',
+        '[prefer_dio_base_options] Repeated options in Dio requests. Consider using BaseOptions.',
     correctionMessage:
         'Move common headers/timeouts to BaseOptions in Dio constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2423,7 +2423,7 @@ class AvoidDioWithoutBaseUrlRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dio_without_base_url',
-    problemMessage: 'Dio request with full URL. Consider setting baseUrl.',
+    problemMessage: '[avoid_dio_without_base_url] Dio request with full URL. Consider setting baseUrl.',
     correctionMessage:
         'Set baseUrl in BaseOptions and use relative paths in requests.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2498,7 +2498,7 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_error_handling',
-    problemMessage: 'launchUrl without error handling can crash.',
+    problemMessage: '[require_url_launcher_error_handling] launchUrl without error handling can crash.',
     correctionMessage: 'Wrap in try-catch or check with canLaunchUrl first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2580,7 +2580,7 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_picker_error_handling',
-    problemMessage: 'pickImage without null check or error handling.',
+    problemMessage: '[require_image_picker_error_handling] pickImage without null check or error handling.',
     correctionMessage: 'Add null check for cancelled and try-catch for errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2648,7 +2648,7 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_picker_source_choice',
-    problemMessage: 'Hardcoded ImageSource. Consider offering user a choice.',
+    problemMessage: '[require_image_picker_source_choice] Hardcoded ImageSource. Consider offering user a choice.',
     correctionMessage: 'Show dialog letting user choose camera or gallery.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2726,7 +2726,7 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_geolocator_timeout',
-    problemMessage: 'getCurrentPosition without timeLimit can hang.',
+    problemMessage: '[require_geolocator_timeout] getCurrentPosition without timeLimit can hang.',
     correctionMessage: 'Add timeLimit parameter (e.g., Duration(seconds: 10)).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2816,7 +2816,7 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_connectivity_subscription_cancel',
     problemMessage:
-        'Connectivity subscription without cancel causes memory leak.',
+        '[require_connectivity_subscription_cancel] Connectivity subscription without cancel causes memory leak.',
     correctionMessage: 'Store subscription and cancel in dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -2903,7 +2903,7 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_handler_top_level',
     problemMessage:
-        'Background message handler must be top-level or static function.',
+        '[require_notification_handler_top_level] Background message handler must be top-level or static function.',
     correctionMessage:
         'Move handler to top-level function with @pragma("vm:entry-point").',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2989,7 +2989,7 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_permission_denied_handling',
-    problemMessage: 'Permission request without denied state handling.',
+    problemMessage: '[require_permission_denied_handling] Permission request without denied state handling.',
     correctionMessage:
         'Check and handle isDenied and isPermanentlyDenied states.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3117,7 +3117,7 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_picker_result_handling',
-    problemMessage: 'pickImage result should be checked for null.',
+    problemMessage: '[require_image_picker_result_handling] pickImage result should be checked for null.',
     correctionMessage: 'Add null check: if (image == null) return;',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3215,7 +3215,7 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_cached_image_in_build',
-    problemMessage: 'Variable cacheKey in build method defeats caching.',
+    problemMessage: '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching.',
     correctionMessage: 'Use a stable cacheKey that does not change on rebuild.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3298,7 +3298,7 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_migration',
-    problemMessage: 'Database onUpgrade should check oldVersion.',
+    problemMessage: '[require_sqflite_migration] Database onUpgrade should check oldVersion.',
     correctionMessage:
         'Add version checks: if (oldVersion < 2) { ... migrations ... }',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3393,7 +3393,7 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_rationale',
     problemMessage:
-        'Permission request without checking shouldShowRequestRationale.',
+        '[require_permission_rationale] Permission request without checking shouldShowRequestRationale.',
     correctionMessage:
         'Check shouldShowRequestRationale() before requesting permission.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3471,7 +3471,7 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_status_check',
     problemMessage:
-        'Using permission-gated feature without checking permission status.',
+        '[require_permission_status_check] Using permission-gated feature without checking permission status.',
     correctionMessage: 'Check permission.status.isGranted before use.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3558,7 +3558,7 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_permission_android13',
     problemMessage:
-        'Notification shown without POST_NOTIFICATIONS permission check.',
+        '[require_notification_permission_android13] Notification shown without POST_NOTIFICATIONS permission check.',
     correctionMessage:
         'Request Permission.notification before showing notifications.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3701,7 +3701,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sse_subscription_cancel',
     problemMessage:
-        'EventSource/SSE connection must be closed in dispose() to prevent resource leaks.',
+        '[require_sse_subscription_cancel] EventSource/SSE connection must be closed in dispose() to prevent resource leaks.',
     correctionMessage:
         'Add _eventSource?.close() in dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3847,7 +3847,7 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_timeout_on_requests',
     problemMessage:
-        'HTTP request without timeout. Request may hang indefinitely.',
+        '[prefer_timeout_on_requests] HTTP request without timeout. Request may hang indefinitely.',
     correctionMessage:
         'Add .timeout(Duration(seconds: 30)) or configure client timeout.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4003,7 +4003,7 @@ class PreferDioOverHttpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dio_over_http',
     problemMessage:
-        'Using http package. Dio provides better features for production apps.',
+        '[prefer_dio_over_http] Using http package. Dio provides better features for production apps.',
     correctionMessage:
         'Consider using Dio for interceptors, cancellation, and error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4058,7 +4058,7 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dio_response_type',
     problemMessage:
-        'Dio download without explicit responseType may corrupt binary data.',
+        '[require_dio_response_type] Dio download without explicit responseType may corrupt binary data.',
     correctionMessage:
         'Add options: Options(responseType: ResponseType.bytes) for downloads.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4138,7 +4138,7 @@ class RequireDioRetryInterceptorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dio_retry_interceptor',
-    problemMessage: 'Dio instance without retry interceptor.',
+    problemMessage: '[require_dio_retry_interceptor] Dio instance without retry interceptor.',
     correctionMessage: 'Add RetryInterceptor for network resilience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4204,7 +4204,7 @@ class PreferDioTransformerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dio_transformer',
-    problemMessage: 'Dio instance without custom transformer for large data.',
+    problemMessage: '[prefer_dio_transformer] Dio instance without custom transformer for large data.',
     correctionMessage:
         'Set dio.transformer = BackgroundTransformer() for off-main-thread parsing.',
     errorSeverity: DiagnosticSeverity.INFO,

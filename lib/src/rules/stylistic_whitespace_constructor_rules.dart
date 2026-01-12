@@ -62,7 +62,7 @@ class PreferBlankLineBeforeReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_return',
-    problemMessage: 'Add a blank line before the return statement.',
+    problemMessage: '[prefer_blank_line_before_return] Add a blank line before the return statement.',
     correctionMessage: 'A blank line before return improves readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -137,7 +137,7 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_no_blank_line_before_return',
-    problemMessage: 'Remove the blank line before the return statement.',
+    problemMessage: '[prefer_no_blank_line_before_return] Remove the blank line before the return statement.',
     correctionMessage: 'Keep code compact without unnecessary blank lines.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -213,7 +213,7 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_after_declarations',
-    problemMessage: 'Add a blank line after variable declarations.',
+    problemMessage: '[prefer_blank_line_after_declarations] Add a blank line after variable declarations.',
     correctionMessage: 'Separate declarations from logic with a blank line.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -289,7 +289,7 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_compact_declarations',
-    problemMessage: 'Remove blank line after variable declarations.',
+    problemMessage: '[prefer_compact_declarations] Remove blank line after variable declarations.',
     correctionMessage: 'Keep declarations close to their usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -366,7 +366,7 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_lines_between_members',
-    problemMessage: 'Add a blank line between class members.',
+    problemMessage: '[prefer_blank_lines_between_members] Add a blank line between class members.',
     correctionMessage: 'Blank lines between members improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -440,7 +440,7 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_compact_class_members',
-    problemMessage: 'Remove blank lines between class members.',
+    problemMessage: '[prefer_compact_class_members] Remove blank lines between class members.',
     correctionMessage: 'Compact members make classes easier to overview.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -513,7 +513,7 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_no_blank_line_inside_blocks',
-    problemMessage: 'Remove blank line at start/end of block.',
+    problemMessage: '[prefer_no_blank_line_inside_blocks] Remove blank line at start/end of block.',
     correctionMessage: 'Blocks should not have leading/trailing blank lines.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -589,7 +589,7 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_blank_line_max',
-    problemMessage: 'Use at most one consecutive blank line.',
+    problemMessage: '[prefer_single_blank_line_max] Use at most one consecutive blank line.',
     correctionMessage: 'Multiple blank lines waste vertical space.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -664,7 +664,7 @@ class PreferSuperParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_super_parameters',
-    problemMessage: 'Use super.parameter syntax instead of passing to super().',
+    problemMessage: '[prefer_super_parameters] Use super.parameter syntax instead of passing to super().',
     correctionMessage: 'Dart 3 super parameters reduce boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -742,7 +742,7 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_initializing_formals',
-    problemMessage: 'Use this.field syntax instead of initializer list.',
+    problemMessage: '[prefer_initializing_formals] Use this.field syntax instead of initializer list.',
     correctionMessage: 'Initializing formals are more concise.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -814,7 +814,7 @@ class PreferConstructorBodyAssignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_body_assignment',
-    problemMessage: 'Use explicit initializer instead of this.field syntax.',
+    problemMessage: '[prefer_constructor_body_assignment] Use explicit initializer instead of this.field syntax.',
     correctionMessage: 'Explicit initializers allow for validation logic.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -883,7 +883,7 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_factory_for_validation',
-    problemMessage: 'Consider using factory constructor for validation logic.',
+    problemMessage: '[prefer_factory_for_validation] Consider using factory constructor for validation logic.',
     correctionMessage: 'Factory constructors can handle validation failures.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -969,7 +969,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_assertion',
-    problemMessage: 'Consider using constructor assertion instead of factory.',
+    problemMessage: '[prefer_constructor_assertion] Consider using constructor assertion instead of factory.',
     correctionMessage:
         'Constructor assertions are simpler for debug validation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1043,7 +1043,7 @@ class PreferRequiredBeforeOptionalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_required_before_optional',
-    problemMessage: 'Put required parameters before optional parameters.',
+    problemMessage: '[prefer_required_before_optional] Put required parameters before optional parameters.',
     correctionMessage: 'Required parameters should come first.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1106,7 +1106,7 @@ class PreferGroupedByPurposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_by_purpose',
     problemMessage:
-        'Group parameters by purpose rather than required/optional.',
+        '[prefer_grouped_by_purpose] Group parameters by purpose rather than required/optional.',
     correctionMessage: 'Consider grouping related parameters together.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1186,7 +1186,7 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_rethrow_over_throw_e',
-    problemMessage: 'Use rethrow instead of throw e to preserve stack trace.',
+    problemMessage: '[prefer_rethrow_over_throw_e] Use rethrow instead of throw e to preserve stack trace.',
     correctionMessage: 'rethrow preserves the original stack trace.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
