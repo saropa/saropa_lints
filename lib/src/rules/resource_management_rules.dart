@@ -1194,7 +1194,8 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
       // Check for high accuracy
       final ArgumentList args = node.argumentList;
       for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'desiredAccuracy') {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'desiredAccuracy') {
           final String valueSource = arg.expression.toSource();
           if (valueSource.contains('.high') ||
               valueSource.contains('.best') ||
@@ -1262,7 +1263,8 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
       bool hasLowAccuracy = false;
 
       for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'desiredAccuracy') {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'desiredAccuracy') {
           final String valueSource = arg.expression.toSource();
           if (valueSource.contains('.low') ||
               valueSource.contains('.lowest') ||
@@ -1330,7 +1332,8 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
 
       // Check if inside a loop
       final ForStatement? forLoop = node.thisOrAncestorOfType<ForStatement>();
-      final WhileStatement? whileLoop = node.thisOrAncestorOfType<WhileStatement>();
+      final WhileStatement? whileLoop =
+          node.thisOrAncestorOfType<WhileStatement>();
       final DoStatement? doLoop = node.thisOrAncestorOfType<DoStatement>();
       final ForElement? forElement = node.thisOrAncestorOfType<ForElement>();
 

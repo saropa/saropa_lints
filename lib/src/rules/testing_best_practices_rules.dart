@@ -3320,7 +3320,8 @@ class RequireErrorLoggingRule extends SaropaLintRule {
 
       // Check if body is empty or just returns
       final isMinimalBody = body.statements.isEmpty ||
-          (body.statements.length == 1 && body.statements.first is ReturnStatement);
+          (body.statements.length == 1 &&
+              body.statements.first is ReturnStatement);
 
       if (!hasLogging && !hasRethrow && !isIntentionalIgnore && isMinimalBody) {
         reporter.atNode(node, code);
