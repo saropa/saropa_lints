@@ -16154,7 +16154,7 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
       if (catchClause == null) return;
 
       // Check if throwing the caught exception
-      final exceptionParam = catchClause.exceptionParameter?.name;
+      final exceptionParam = catchClause.exceptionParameter?.name.lexeme;
       if (exceptionParam == null) return;
 
       if (thrown.name == exceptionParam) {

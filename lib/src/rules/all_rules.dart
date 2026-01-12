@@ -84,4 +84,5 @@ export 'theming_rules.dart';
 export 'type_rules.dart';
 export 'unnecessary_code_rules.dart';
 export 'lifecycle_rules.dart';
+export 'ios_rules.dart';
 export 'package_specific_rules.dart';

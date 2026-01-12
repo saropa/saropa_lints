@@ -374,6 +374,15 @@ const Set<String> essentialRules = <String>{
   'avoid_storing_sensitive_unencrypted', // ERROR - security critical
   'require_intl_args_match', // ERROR - runtime crash
   'require_cache_key_determinism', // ERROR - memory bloat
+
+  // NEW v2.3.12 - iOS/macOS Platform Rules (Essential)
+  'require_method_channel_error_handling', // WARNING - crash prevention
+  'require_https_for_ios', // WARNING - ATS blocking
+  'require_ios_permission_description', // WARNING - App Store rejection
+  'require_ios_privacy_manifest', // WARNING - iOS 17+ requirement
+
+  // NEW v2.3.13 - Additional iOS Platform Rules (Essential)
+  'require_apple_sign_in', // ERROR - App Store rejection
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -801,6 +810,19 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_getit_registration_order', // WARNING - startup crash
   'require_default_config', // WARNING - startup crash
   'avoid_builder_index_out_of_bounds', // WARNING - runtime crash
+
+  // NEW v2.3.12 - iOS/macOS Platform Rules (Recommended)
+  'prefer_ios_safe_area', // INFO - iOS notch/Dynamic Island handling
+  'avoid_ios_hardcoded_status_bar', // WARNING - device-specific issues
+  'require_ios_platform_check', // WARNING - platform-specific crashes
+  'avoid_ios_background_fetch_abuse', // WARNING - iOS background limits
+  'require_universal_link_validation', // INFO - deep link testing
+  'require_macos_window_size_constraints', // INFO - UX
+
+  // NEW v2.3.13 - Additional iOS Platform Rules (Recommended)
+  'avoid_ios_13_deprecations', // WARNING - App Store warnings
+  'avoid_ios_simulator_only_code', // WARNING - production failures
+  'require_ios_minimum_version_check', // INFO - version compatibility
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1319,6 +1341,10 @@ const Set<String> professionalOnlyRules = <String>{
 
   // API/Network Rules (Professional - architecture)
   'prefer_dio_over_http', // INFO - better features, interceptors
+
+  // NEW v2.3.13 - Additional iOS Platform Rules (Professional)
+  'require_ios_background_mode', // INFO - background capabilities
+  'avoid_ios_deprecated_uikit', // WARNING - deprecated UIKit APIs
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
@@ -1587,6 +1613,12 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // Part 8 - Package-specific rules (Comprehensive - stylistic)
   'prefer_uuid_v4', // Stylistic - prefer v4 over v1 for uniqueness
+
+  // NEW v2.3.12 - iOS/macOS Platform Rules (Comprehensive)
+  'prefer_ios_haptic_feedback', // INFO - tactile feedback for iOS
+  'prefer_macos_menu_bar_integration', // INFO - native macOS menus
+  'prefer_macos_keyboard_shortcuts', // INFO - keyboard shortcuts
+  'prefer_cupertino_for_ios', // INFO - native iOS widgets
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.

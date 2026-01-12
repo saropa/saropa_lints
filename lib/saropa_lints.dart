@@ -1559,6 +1559,41 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Widget rules
   AvoidBuilderIndexOutOfBoundsRule(),
+
+  // =========================================================================
+  // NEW RULES v2.3.12 - iOS/macOS Platform Rules
+  // =========================================================================
+
+  // iOS rules
+  PreferIosSafeAreaRule(),
+  AvoidIosHardcodedStatusBarRule(),
+  PreferIosHapticFeedbackRule(),
+  RequireIosPlatformCheckRule(),
+  AvoidIosBackgroundFetchAbuseRule(),
+
+  // macOS rules
+  PreferMacosMenuBarIntegrationRule(),
+  PreferMacosKeyboardShortcutsRule(),
+  RequireMacosWindowSizeConstraintsRule(),
+
+  // Cross-platform Apple rules (iOS & macOS)
+  RequireMethodChannelErrorHandlingRule(),
+  RequireUniversalLinkValidationRule(),
+  PreferCupertinoForIosRule(),
+  RequireHttpsForIosRule(),
+  RequireIosPermissionDescriptionRule(),
+  RequireIosPrivacyManifestRule(),
+
+  // =========================================================================
+  // NEW RULES v2.3.13 - Additional iOS-Specific Rules
+  // =========================================================================
+
+  RequireAppleSignInRule(),
+  RequireIosBackgroundModeRule(),
+  AvoidIos13DeprecationsRule(),
+  AvoidIosSimulatorOnlyCodeRule(),
+  RequireIosMinimumVersionCheckRule(),
+  AvoidIosDeprecatedUikitRule(),
 ];
 
 class _SaropaLints extends PluginBase {
