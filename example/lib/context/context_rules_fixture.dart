@@ -165,6 +165,48 @@ class _GoodContextAfterAwaitWithMountedBlockState
   Widget build(BuildContext context) => Container();
 }
 
+// BAD: Context in else-branch of if (mounted) is NOT protected
+class BadContextInElseBranch extends StatefulWidget {
+  const BadContextInElseBranch({super.key});
+
+  @override
+  State<BadContextInElseBranch> createState() => _BadContextInElseBranchState();
+}
+
+class _BadContextInElseBranchState extends State<BadContextInElseBranch> {
+  Future<void> loadData() async {
+    final data = await Future.value('data');
+    if (mounted) {
+      Navigator.of(context).push(Container()); // Safe inside then-branch
+    } else {
+      // expect_lint: avoid_context_across_async
+      Navigator.of(context).pop(); // NOT safe in else-branch!
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: context.mounted check (Flutter 3.7+ style)
+class GoodContextMountedCheck extends StatefulWidget {
+  const GoodContextMountedCheck({super.key});
+
+  @override
+  State<GoodContextMountedCheck> createState() => _GoodContextMountedCheckState();
+}
+
+class _GoodContextMountedCheckState extends State<GoodContextMountedCheck> {
+  Future<void> loadData() async {
+    final data = await Future.value('data');
+    if (!context.mounted) return;
+    Navigator.of(context).push(Container()); // Protected by context.mounted
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
 // GOOD: Using context.mounted guard (single-line if statement)
 class GoodContextMountedInlineGuard extends StatefulWidget {
   const GoodContextMountedInlineGuard({super.key});

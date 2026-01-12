@@ -20,6 +20,10 @@ Standard linters see valid Dart code. saropa_lints understands Hive's requiremen
 | Missing adapter registration | Runtime crash | `require_type_adapter_registration` |
 | Large data in regular box | Memory bloat | `prefer_lazy_box_for_large` |
 | Database not closed | Resource leak | `require_hive_database_close` |
+| Missing field default value | Null errors on migration | `require_hive_field_default_value` |
+| Wrong adapter registration order | Runtime crash | `require_hive_adapter_registration_order` |
+| Missing nested object adapter | Runtime crash | `require_hive_nested_object_adapter` |
+| Duplicate box names | Data corruption | `avoid_hive_box_name_collision` |
 
 ## What saropa_lints Catches
 
@@ -165,6 +169,149 @@ final product = await box.get('id123');  // Note: async
 
 **Rule**: `prefer_lazy_box_for_large`
 
+### Missing Field Default Value
+
+```dart
+// BAD - new field without default value breaks existing data
+@HiveType(typeId: 0)
+class User {
+  @HiveField(0)
+  final String name;
+
+  @HiveField(1)
+  final int age;
+
+  @HiveField(2)  // Added later - existing data doesn't have this!
+  final String email;
+
+  User(this.name, this.age, this.email);
+}
+
+// GOOD - provide default value for new fields
+@HiveType(typeId: 0)
+class User {
+  @HiveField(0)
+  final String name;
+
+  @HiveField(1)
+  final int age;
+
+  @HiveField(2, defaultValue: '')  // Safe for existing data
+  final String email;
+
+  User(this.name, this.age, this.email);
+}
+```
+
+**Rule**: `require_hive_field_default_value`
+
+### Wrong Adapter Registration Order
+
+```dart
+// BAD - Address adapter registered after User adapter
+@HiveType(typeId: 0)
+class Address {
+  @HiveField(0)
+  final String street;
+  Address(this.street);
+}
+
+@HiveType(typeId: 1)
+class User {
+  @HiveField(0)
+  final String name;
+
+  @HiveField(1)
+  final Address address;  // Nested type
+
+  User(this.name, this.address);
+}
+
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(UserAdapter());    // Wrong order!
+  Hive.registerAdapter(AddressAdapter()); // Should be first
+}
+
+// GOOD - register nested type adapters first
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(AddressAdapter()); // Nested type first
+  Hive.registerAdapter(UserAdapter());    // Parent type after
+}
+```
+
+**Rule**: `require_hive_adapter_registration_order`
+
+### Missing Nested Object Adapter
+
+```dart
+// BAD - Address is used in User but not marked as @HiveType
+class Address {
+  final String street;
+  final String city;
+  Address(this.street, this.city);
+}
+
+@HiveType(typeId: 0)
+class User {
+  @HiveField(0)
+  final String name;
+
+  @HiveField(1)
+  final Address address;  // Runtime crash - no adapter!
+
+  User(this.name, this.address);
+}
+
+// GOOD - all nested objects have @HiveType
+@HiveType(typeId: 0)
+class Address {
+  @HiveField(0)
+  final String street;
+
+  @HiveField(1)
+  final String city;
+
+  Address(this.street, this.city);
+}
+
+@HiveType(typeId: 1)
+class User {
+  @HiveField(0)
+  final String name;
+
+  @HiveField(1)
+  final Address address;  // Works - Address has adapter
+
+  User(this.name, this.address);
+}
+```
+
+**Rule**: `require_hive_nested_object_adapter`
+
+### Box Name Collision
+
+```dart
+// BAD - same box name for different types
+final userBox = await Hive.openBox<User>('data');
+final settingsBox = await Hive.openBox<Settings>('data');  // Collision!
+
+// BAD - inconsistent generic type for same box name
+final box1 = await Hive.openBox<User>('users');
+final box2 = await Hive.openBox('users');  // Missing generic - returns dynamic
+
+// GOOD - unique box names per type
+final userBox = await Hive.openBox<User>('users');
+final settingsBox = await Hive.openBox<Settings>('settings');
+
+// GOOD - consistent generic types
+final box1 = await Hive.openBox<User>('users');
+final box2 = Hive.box<User>('users');  // Same type
+```
+
+**Rule**: `avoid_hive_box_name_collision`
+
 ## Recommended Setup
 
 ### 1. Update pubspec.yaml
@@ -212,6 +359,10 @@ dart run custom_lint
 | `require_type_adapter_registration` | recommended | Typed box without adapter registration |
 | `prefer_lazy_box_for_large` | recommended | Large collections in regular boxes |
 | `require_hive_database_close` | recommended | Database connections not closed |
+| `require_hive_field_default_value` | recommended | New @HiveField without defaultValue |
+| `require_hive_adapter_registration_order` | essential | Nested adapters registered after parent |
+| `require_hive_nested_object_adapter` | essential | Nested objects missing @HiveType |
+| `avoid_hive_box_name_collision` | essential | Same box name used for different types |
 
 ## Common Patterns
 

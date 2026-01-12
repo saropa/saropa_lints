@@ -4,6 +4,8 @@
 ///
 /// These rules detect common misuses of BuildContext that can lead to
 /// runtime crashes, memory leaks, or unpredictable behavior.
+///
+/// See also: [async_context_utils.dart] for shared mounted-check utilities.
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
@@ -12,6 +14,7 @@ import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../async_context_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when BuildContext is stored in a field.
@@ -131,18 +134,41 @@ class AvoidStoringContextRule extends SaropaLintRule {
   }
 }
 
-/// Warns when BuildContext is used after an await.
+/// Warns when BuildContext is used after an await without a mounted check.
 ///
-/// Alias: context_after_await, async_context, stale_context
+/// Alias: context_after_await, async_context, stale_context,
+///        avoid_using_context_after_dispose
 ///
-/// After an await, the widget may have been disposed. Using context
-/// after an await without checking mounted can cause crashes.
+/// ## Why This Matters
+///
+/// After an `await`, the widget may have been unmounted (disposed). If you use
+/// `context` without checking `mounted`, you risk:
+/// - **Crashes**: `Looking up a deactivated widget's ancestor` exceptions
+/// - **Memory leaks**: Keeping references to disposed widgets
+/// - **Undefined behavior**: Actions on non-existent UI elements
+///
+/// ## Detection Patterns
+///
+/// This rule tracks await expressions and mounted guards at the block level:
+/// - Resets protection after each `await` (new async gap = new risk)
+/// - Recognizes `if (!mounted) return;` as protection for subsequent code
+/// - Recognizes `if (mounted) { ... }` as protection for code inside the block
+/// - Skips nested callbacks (they have their own valid context scope)
+///
+/// ## Recognized Mounted Guards
+///
+/// ```dart
+/// if (!mounted) return;           // Early exit guard
+/// if (!context.mounted) return;   // Flutter 3.7+ style
+/// if (mounted == false) return;   // Explicit comparison
+/// if (mounted) { ... }            // Positive block guard
+/// ```
 ///
 /// **BAD:**
 /// ```dart
 /// Future<void> loadData() async {
 ///   final data = await fetchData();
-///   Navigator.of(context).push(...); // Context may be invalid!
+///   Navigator.of(context).push(...); // LINT: Context may be invalid!
 /// }
 /// ```
 ///
@@ -150,14 +176,28 @@ class AvoidStoringContextRule extends SaropaLintRule {
 /// ```dart
 /// Future<void> loadData() async {
 ///   final data = await fetchData();
-///   if (!mounted) return;
+///   if (!mounted) return;  // Guard against disposed widget
 ///   Navigator.of(context).push(...);
 /// }
 /// ```
+///
+/// **ALSO GOOD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final data = await fetchData();
+///   if (mounted) {
+///     Navigator.of(context).push(...);  // Safe inside mounted block
+///   }
+/// }
+/// ```
+///
+/// See also:
+/// - [use_setstate_synchronously] - Similar rule for setState calls
+/// - [avoid_scaffold_messenger_after_await] - Similar rule for ScaffoldMessenger
 class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   const AvoidContextAcrossAsyncRule() : super(code: _code);
 
-  /// Context after await can crash when widget disposed.
+  /// Context after await can crash when widget is disposed.
   @override
   LintImpact get impact => LintImpact.critical;
 
@@ -175,8 +215,8 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    // Check async method declarations
     context.registry.addMethodDeclaration((node) {
-      // Only check async methods with block body
       if (node.body is! BlockFunctionBody) return;
       final body = node.body as BlockFunctionBody;
       if (!body.isAsynchronous) return;
@@ -184,7 +224,7 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
       _checkAsyncBody(body.block, reporter);
     });
 
-    // Also check function expressions (lambdas)
+    // Check async function expressions (lambdas, callbacks)
     context.registry.addFunctionExpression((node) {
       if (node.body is! BlockFunctionBody) return;
       final body = node.body as BlockFunctionBody;
@@ -194,188 +234,115 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
     });
   }
 
-  /// Check an async function body for context usage after await.
+  /// Analyzes async block for context usage after await without guards.
+  ///
+  /// Algorithm:
+  /// 1. Track when we've seen an await (starts the "danger zone")
+  /// 2. Reset guard flag after each await (need fresh guard per async gap)
+  /// 3. Detect mounted guards that protect subsequent code
+  /// 4. Report unguarded context usage after await
   void _checkAsyncBody(Block block, SaropaDiagnosticReporter reporter) {
     bool seenAwait = false;
     bool hasGuard = false;
 
     for (final statement in block.statements) {
-      // Check for await expressions in this statement
-      final statementHasAwait = _containsAwait(statement);
-      if (statementHasAwait) {
+      // Await found: enter danger zone, reset any previous guard
+      if (containsAwait(statement)) {
         seenAwait = true;
-        hasGuard = false; // Reset guard after each await
-        // Don't report context usage in the SAME statement as the await
-        // (context passed as an argument to the await call is OK)
+        hasGuard = false;
+        // Context in same statement as await is OK (e.g., `await foo(context)`)
         continue;
       }
 
-      // Check if this statement is an early return guard: if (!mounted) return;
-      if (seenAwait && _isNegatedMountedGuard(statement)) {
+      // Early-exit guard: `if (!mounted) return;` protects all code after
+      if (seenAwait && isNegatedMountedGuard(statement)) {
         hasGuard = true;
         continue;
       }
 
-      // Check if this statement is a positive mounted guard: if (mounted) { ... }
-      // In this case, we should NOT report context usage inside the if block
-      if (seenAwait && _isPositiveMountedGuard(statement)) {
-        // Don't report anything inside the if (mounted) block
+      // Positive guard: `if (mounted) { ... }` - code inside is safe
+      // But else-branch and code after are NOT protected
+      if (seenAwait && isPositiveMountedGuard(statement)) {
+        final ifStmt = statement as IfStatement;
+        // Report context in else-branch (not protected)
+        if (ifStmt.elseStatement != null) {
+          _reportContextUsage(ifStmt.elseStatement!, reporter);
+        }
         continue;
       }
 
-      // After await and no guard, report any context usage
+      // In danger zone without guard: report any context usage
       if (seenAwait && !hasGuard) {
         _reportContextUsage(statement, reporter);
       }
     }
   }
 
-  /// Checks if statement contains an await expression.
-  bool _containsAwait(Statement stmt) {
-    bool found = false;
-    stmt.visitChildren(_AwaitFinder(() => found = true));
-    return found;
-  }
-
-  /// Checks if statement is `if (!mounted) return;` or `if (!mounted) throw;`
-  bool _isNegatedMountedGuard(Statement stmt) {
-    if (stmt is! IfStatement) return false;
-
-    final condition = stmt.expression.toSource();
-    // Check for !mounted or mounted == false patterns
-    if (!condition.contains('mounted')) return false;
-
-    final isNegated = condition.contains('!mounted') ||
-        condition.contains('!this.mounted') ||
-        condition.contains('!context.mounted') ||
-        condition.contains('mounted == false') ||
-        condition.contains('mounted==false');
-
-    if (!isNegated) return false;
-
-    // Check if then branch contains early exit (return or throw)
-    final thenStmt = stmt.thenStatement;
-    if (thenStmt is ReturnStatement) return true;
-    if (thenStmt is ExpressionStatement &&
-        thenStmt.expression is ThrowExpression) {
-      return true;
-    }
-    if (thenStmt is Block && thenStmt.statements.length == 1) {
-      final single = thenStmt.statements.first;
-      if (single is ReturnStatement) return true;
-      if (single is ExpressionStatement &&
-          single.expression is ThrowExpression) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /// Checks if statement is `if (mounted) { ... }` (positive check).
-  /// Context usage inside this block is safe.
-  bool _isPositiveMountedGuard(Statement stmt) {
-    if (stmt is! IfStatement) return false;
-
-    final condition = stmt.expression.toSource();
-    // Check for just 'mounted' without negation
-    if (!condition.contains('mounted')) return false;
-
-    // Make sure it's NOT negated
-    final isNegated = condition.contains('!mounted') ||
-        condition.contains('!this.mounted') ||
-        condition.contains('!context.mounted') ||
-        condition.contains('mounted == false') ||
-        condition.contains('mounted==false');
-
-    // It should be a positive check like 'if (mounted)' or 'if (this.mounted)'
-    return !isNegated;
-  }
-
-  /// Report any context usage in a statement (after await without guard).
+  /// Finds and reports all context usages in the given statement.
   void _reportContextUsage(Statement stmt, SaropaDiagnosticReporter reporter) {
-    stmt.visitChildren(_ContextUsageFinder(reporter, code));
+    stmt.visitChildren(
+      ContextUsageFinder(onContextFound: (node) => reporter.atNode(node, code)),
+    );
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddMountedGuardFix()];
 }
 
-/// Visitor to find await expressions.
-class _AwaitFinder extends RecursiveAstVisitor<void> {
-  _AwaitFinder(this.onFound);
-  final void Function() onFound;
-
+/// Quick fix that inserts `if (!mounted) return;` before context usage.
+class _AddMountedGuardFix extends DartFix {
   @override
-  void visitAwaitExpression(AwaitExpression node) {
-    onFound();
-    super.visitAwaitExpression(node);
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleIdentifier((node) {
+      if (node.name != 'context') return;
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the containing statement to insert guard before
+      final statement = _findContainingStatement(node);
+      if (statement == null) return;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Add mounted guard before this statement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Calculate indentation from original statement
+        final lineStart = resolver.lineInfo.getOffsetOfLine(
+          resolver.lineInfo.getLocation(statement.offset).lineNumber - 1,
+        );
+        final leadingText = resolver.source.contents.data.substring(
+          lineStart,
+          statement.offset,
+        );
+        // Extract whitespace only (the indentation)
+        final indent = leadingText.replaceAll(RegExp(r'[^\s]'), '');
+
+        // Insert guard before the statement
+        builder.addSimpleInsertion(
+          statement.offset,
+          'if (!mounted) return;\n$indent',
+        );
+      });
+    });
   }
 
-  @override
-  void visitFunctionExpression(FunctionExpression node) {
-    // Don't descend into nested function expressions
-    return;
-  }
-}
-
-/// Visitor to find context usage and report it.
-class _ContextUsageFinder extends RecursiveAstVisitor<void> {
-  _ContextUsageFinder(this.reporter, this.code);
-
-  final SaropaDiagnosticReporter reporter;
-  final LintCode code;
-
-  @override
-  void visitIfStatement(IfStatement node) {
-    // Check if this is a positive context.mounted guard
-    // If so, skip the entire then-branch (it's guarded)
-    if (_isPositiveMountedGuard(node)) {
-      // Only visit the else branch if it exists (not guarded)
-      node.elseStatement?.accept(this);
-      return;
-    }
-
-    // Check if this is a negated mounted guard with early return
-    // The statements after the if are guarded, but we handle that at the
-    // block level, so just continue normal traversal
-    super.visitIfStatement(node);
-  }
-
-  /// Checks if statement is a positive mounted guard: `if (mounted)` or
-  /// `if (context.mounted)` without negation.
-  bool _isPositiveMountedGuard(IfStatement node) {
-    final condition = node.expression.toSource();
-    if (!condition.contains('mounted')) return false;
-
-    // Make sure it's NOT negated
-    final isNegated = condition.contains('!mounted') ||
-        condition.contains('!this.mounted') ||
-        condition.contains('!context.mounted') ||
-        condition.contains('mounted == false') ||
-        condition.contains('mounted==false');
-
-    return !isNegated;
-  }
-
-  @override
-  void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (node.name == 'context') {
-      // Skip if this is part of a mounted check expression
-      final parent = node.parent;
-      if (parent != null) {
-        final parentSource = parent.toSource();
-        if (parentSource.contains('mounted')) {
-          super.visitSimpleIdentifier(node);
-          return;
-        }
+  /// Walks up the AST to find the statement containing the node.
+  AstNode? _findContainingStatement(AstNode node) {
+    AstNode? current = node;
+    while (current != null) {
+      if (current is ExpressionStatement || current is ReturnStatement) {
+        return current;
       }
-      reporter.atNode(node, code);
+      current = current.parent;
     }
-    super.visitSimpleIdentifier(node);
-  }
-
-  @override
-  void visitFunctionExpression(FunctionExpression node) {
-    // Don't descend into nested function expressions (callbacks)
-    // The context inside a builder callback is valid within that callback
-    return;
+    return null;
   }
 }
 

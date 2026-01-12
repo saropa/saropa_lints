@@ -8,11 +8,12 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../async_context_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when `context` is used inside `initState` or `dispose` methods.
 ///
-/// Alias: avoid_context_in_init_state
+/// Alias: avoid_context_in_init_state, avoid_using_context_after_dispose
 ///
 /// Using `context` in these lifecycle methods is an anti-pattern because
 /// the widget may not be fully mounted (in `initState`) or may already be
@@ -3384,32 +3385,30 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
-      // Only check async methods
+      // Only check async methods with block body
       if (node.body is! BlockFunctionBody) return;
       final BlockFunctionBody body = node.body as BlockFunctionBody;
       if (!body.isAsynchronous) return;
 
-      // Track if we've seen an await
       bool seenAwait = false;
-      // Track if we've seen a guard like `if (!mounted) return;`
-      // Once we see this, subsequent code in the same block is protected
       bool hasGuard = false;
 
       for (final Statement stmt in body.block.statements) {
-        // Check for await expressions
-        if (_containsAwait(stmt)) {
+        // Await found: enter danger zone, reset guard
+        // Uses shared utility from async_context_utils.dart
+        if (containsAwait(stmt)) {
           seenAwait = true;
-          // Reset guard after each await - need a new guard after async gap
           hasGuard = false;
         }
 
-        // Check if this statement is an early return guard: if (!mounted) return;
-        if (seenAwait && _isNegatedMountedGuard(stmt)) {
+        // Early-exit guard protects subsequent code
+        // Uses shared utility from async_context_utils.dart
+        if (seenAwait && isNegatedMountedGuard(stmt)) {
           hasGuard = true;
-          continue; // The guard itself is fine, check subsequent statements
+          continue;
         }
 
-        // After await and no guard, report any setState calls not protected
+        // Report unprotected setState calls after await
         if (seenAwait && !hasGuard) {
           _reportUnprotectedSetState(stmt, reporter);
         }
@@ -3417,65 +3416,11 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
     });
   }
 
-  /// Checks if statement is `if (!mounted) return;` or `if (!mounted) throw;`
-  bool _isNegatedMountedGuard(Statement stmt) {
-    if (stmt is! IfStatement) return false;
-    final IfStatement ifStmt = stmt;
-
-    // Check for negated mounted expression: !mounted or !this.mounted
-    if (!_checksNotMounted(ifStmt.expression)) return false;
-
-    // Check if then branch contains early exit (return or throw)
-    final Statement thenStmt = ifStmt.thenStatement;
-    if (thenStmt is ReturnStatement) return true;
-    if (thenStmt is ExpressionStatement &&
-        thenStmt.expression is ThrowExpression) {
-      return true;
-    }
-    // Handle block with single return/throw
-    if (thenStmt is Block && thenStmt.statements.length == 1) {
-      final Statement single = thenStmt.statements.first;
-      if (single is ReturnStatement) return true;
-      if (single is ExpressionStatement &&
-          single.expression is ThrowExpression) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /// Checks if expression is `!mounted` or `!this.mounted`.
-  static bool _checksNotMounted(Expression expr) {
-    if (expr is PrefixExpression && expr.operator.type == TokenType.BANG) {
-      return _checksMounted(expr.operand);
-    }
-    return false;
-  }
-
-  /// Checks if expression is `mounted`, `this.mounted`, or `context.mounted`.
-  static bool _checksMounted(Expression expr) {
-    if (expr is SimpleIdentifier && expr.name == 'mounted') return true;
-    if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
-      return true;
-    }
-    return false;
-  }
-
-  bool _containsAwait(AstNode node) {
-    bool found = false;
-    node.visitChildren(
-      _AwaitFinder((AwaitExpression _) {
-        found = true;
-      }),
-    );
-    return found;
-  }
-
   void _reportUnprotectedSetState(
       Statement stmt, SaropaDiagnosticReporter reporter) {
-    // Find all setState calls and check if each is protected by a mounted check
+    // Uses shared SetStateWithMountedCheckFinder from async_context_utils.dart
     stmt.visitChildren(
-      _SetStateWithMountedCheckFinder((MethodInvocation node) {
+      SetStateWithMountedCheckFinder((MethodInvocation node) {
         reporter.atNode(node, code);
       }),
     );
@@ -3538,94 +3483,11 @@ class _WrapSetStateInMountedCheckFix extends DartFix {
   }
 }
 
-/// Visitor that finds setState calls that are NOT protected by a mounted check.
-/// It traverses the AST and tracks whether we're inside an if (mounted) block.
-class _SetStateWithMountedCheckFinder extends RecursiveAstVisitor<void> {
-  _SetStateWithMountedCheckFinder(this.onUnprotectedSetState);
-
-  final void Function(MethodInvocation) onUnprotectedSetState;
-
-  @override
-  void visitIfStatement(IfStatement node) {
-    // Check if this if statement checks mounted
-    if (UseSetStateSynchronouslyRule._checksMounted(node.expression)) {
-      // Don't visit the then branch - setState inside is protected
-      // But still visit the else branch if it exists
-      node.elseStatement?.accept(this);
-      return;
-    }
-
-    // Check for negated mounted check: if (!mounted) return;
-    // In this case, code AFTER this if statement is protected
-    if (UseSetStateSynchronouslyRule._checksNotMounted(node.expression)) {
-      // The then branch likely contains a return, so code after is protected
-      // Still need to visit the then branch in case there's a setState there
-      super.visitIfStatement(node);
-      return;
-    }
-
-    super.visitIfStatement(node);
-  }
-
-  @override
-  void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'setState') {
-      // Check if this setState has a mounted check in its ancestor chain
-      if (!_hasAncestorMountedCheck(node)) {
-        onUnprotectedSetState(node);
-      }
-    }
-    super.visitMethodInvocation(node);
-  }
-
-  /// Checks if the given node has an ancestor if statement that checks mounted.
-  bool _hasAncestorMountedCheck(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is IfStatement) {
-        if (UseSetStateSynchronouslyRule._checksMounted(current.expression)) {
-          // Verify the node is in the THEN branch (protected), not ELSE branch
-          if (_isInThenBranch(node, current)) {
-            return true;
-          }
-        }
-      }
-      // Stop at function boundaries - mounted check must be in same function scope
-      if (current is FunctionExpression || current is MethodDeclaration) {
-        break;
-      }
-      current = current.parent;
-    }
-    return false;
-  }
-
-  /// Checks if the node is in the then branch of the if statement.
-  bool _isInThenBranch(AstNode node, IfStatement ifStmt) {
-    AstNode? current = node;
-    while (current != null && current != ifStmt) {
-      if (current == ifStmt.thenStatement) {
-        return true;
-      }
-      if (current == ifStmt.elseStatement) {
-        return false;
-      }
-      current = current.parent;
-    }
-    return false;
-  }
-}
-
-class _AwaitFinder extends RecursiveAstVisitor<void> {
-  _AwaitFinder(this.onFound);
-
-  final void Function(AwaitExpression) onFound;
-
-  @override
-  void visitAwaitExpression(AwaitExpression node) {
-    onFound(node);
-    super.visitAwaitExpression(node);
-  }
-}
+// Note: _SetStateWithMountedCheckFinder and _AwaitFinder removed.
+// Now using shared utilities from async_context_utils.dart:
+// - SetStateWithMountedCheckFinder
+// - AwaitFinder
+// - containsAwait(), isNegatedMountedGuard(), checksMounted(), etc.
 
 /// Warns when a listener is added but never removed.
 ///
@@ -4882,8 +4744,8 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
 
       bool hasAwait = false;
       for (final Statement statement in node.block.statements) {
-        // Check for await expressions
-        if (_containsAwait(statement)) {
+        // Check for await expressions using shared utility
+        if (containsAwait(statement)) {
           hasAwait = true;
         }
 
@@ -4898,12 +4760,6 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
         }
       }
     });
-  }
-
-  bool _containsAwait(AstNode node) {
-    bool found = false;
-    node.visitChildren(_AwaitFinder((_) => found = true));
-    return found;
   }
 
   bool _containsScaffoldMessengerOf(AstNode node) {
@@ -16822,9 +16678,18 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
       // Walk up to find parent widget
       AstNode? current = node.parent;
       bool foundFlexParent = false;
+      bool assignedToVariable = false;
       int depth = 0;
 
       while (current != null && depth < 20) {
+        // If Expanded/Flexible is assigned to a variable, we can't track where
+        // it's used - assume the developer will place it in a Flex widget.
+        // Common pattern: final Widget x = condition ? Expanded(...) : Flexible(...);
+        if (current is VariableDeclaration) {
+          assignedToVariable = true;
+          break;
+        }
+
         if (current is InstanceCreationExpression) {
           final String parentType = current.constructorName.type.name.lexeme;
           if (_flexTypes.contains(parentType)) {
@@ -16844,7 +16709,8 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
         depth++;
       }
 
-      if (!foundFlexParent) {
+      // Only report if not inside a Flex AND not assigned to a variable
+      if (!foundFlexParent && !assignedToVariable) {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -16861,6 +16727,8 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
 // =============================================================================
 // NEW RULES v2.3.11
 // =============================================================================
+
+// cspell:ignore itembuilder
 
 /// Warns when ListView.builder itemBuilder may access index out of bounds.
 ///
@@ -16905,6 +16773,12 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // Matches: items[index], data[i], _list[index], widget.items[index]
+  // Captures the list variable name (group 1)
+  static final RegExp _indexAccessPattern = RegExp(
+    r'(\b[a-zA-Z_][\w.]*)\s*\[\s*(?:index|i)\s*\]',
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -16920,24 +16794,51 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       final FunctionBody body = builderExpr.body;
       final String bodySource = body.toSource();
 
-      // Check if body accesses array with index
-      final bool hasIndexAccess =
-          bodySource.contains('[index]') || bodySource.contains('[i]');
+      // Extract all list variables being accessed with [index] or [i]
+      final Iterable<RegExpMatch> matches =
+          _indexAccessPattern.allMatches(bodySource);
+      if (matches.isEmpty) return;
 
-      if (!hasIndexAccess) return;
+      // Get unique list names being accessed
+      final Set<String> accessedLists = matches
+          .map((m) => m.group(1)!)
+          .map(_extractListName) // Get base name for property access
+          .toSet();
 
-      // Check if body has bounds check
-      final bool hasBoundsCheck = bodySource.contains('.length') &&
-          (bodySource.contains('>=') ||
-              bodySource.contains('>') ||
-              bodySource.contains('<') ||
-              bodySource.contains('<=') ||
-              bodySource.contains('isEmpty') ||
-              bodySource.contains('isNotEmpty'));
-
-      if (!hasBoundsCheck) {
-        reporter.atNode(node, code);
+      // Check if ANY accessed list has a proper bounds check
+      for (final String listName in accessedLists) {
+        if (!_hasBoundsCheckForList(bodySource, listName)) {
+          reporter.atNode(node, code);
+          return; // Report once per itemBuilder
+        }
       }
     });
   }
+
+  /// Extracts the base list name from property access patterns.
+  /// 'widget.items' -> 'items', 'items' -> 'items', '_data' -> '_data'
+  String _extractListName(String fullName) {
+    final int lastDot = fullName.lastIndexOf('.');
+    return lastDot >= 0 ? fullName.substring(lastDot + 1) : fullName;
+  }
+
+  /// Checks if there's a bounds check for the specific list variable.
+  bool _hasBoundsCheckForList(String bodySource, String listName) {
+    // Check for: listName.length with comparison
+    // Patterns: index >= list.length, index < list.length, list.length > index
+    final bool hasLengthCheck = bodySource.contains('$listName.length') &&
+        (bodySource.contains('>=') ||
+            bodySource.contains('>') ||
+            bodySource.contains('<') ||
+            bodySource.contains('<='));
+
+    // Check for: listName.isEmpty or listName.isNotEmpty
+    final bool hasEmptyCheck = bodySource.contains('$listName.isEmpty') ||
+        bodySource.contains('$listName.isNotEmpty');
+
+    return hasLengthCheck || hasEmptyCheck;
+  }
+
+  // No quick fix provided - bounds checking requires context-specific logic
+  // that cannot be safely auto-generated (variable names, fallback widgets, etc.)
 }
