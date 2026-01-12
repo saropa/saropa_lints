@@ -43,7 +43,8 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_autoplay_audio',
-    problemMessage: '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users.',
+    problemMessage:
+        '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users.',
     correctionMessage:
         'Set autoPlay: false and require user interaction to play.',
     errorSeverity: DiagnosticSeverity.INFO,

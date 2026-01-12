@@ -83,7 +83,8 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_generics_shadowing',
-    problemMessage: '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration.',
+    problemMessage:
+        '[avoid_generics_shadowing] Generic type parameter shadows a top-level declaration.',
     correctionMessage: 'Rename the generic parameter to avoid shadowing.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -342,7 +343,8 @@ class AvoidShadowingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shadowing',
-    problemMessage: '[avoid_shadowing] Declaration shadows a declaration from an outer scope.',
+    problemMessage:
+        '[avoid_shadowing] Declaration shadows a declaration from an outer scope.',
     correctionMessage: 'Rename the variable to avoid confusion.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -463,7 +465,8 @@ class PreferConstStringListRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_string_list',
-    problemMessage: '[prefer_const_string_list] This <String>[...] list contains only string literals '
+    problemMessage:
+        '[prefer_const_string_list] This <String>[...] list contains only string literals '
         'and could be const.',
     correctionMessage: 'Add const before the list literal or use a const '
         'variable declaration.',
@@ -577,7 +580,8 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_declaring_const_constructor',
-    problemMessage: '[prefer_declaring_const_constructor] Class could have a const constructor.',
+    problemMessage:
+        '[prefer_declaring_const_constructor] Class could have a const constructor.',
     correctionMessage: 'Add const keyword to constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -666,7 +670,8 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_extension_type_field',
-    problemMessage: '[prefer_private_extension_type_field] Extension type representation field should be private.',
+    problemMessage:
+        '[prefer_private_extension_type_field] Extension type representation field should be private.',
     correctionMessage: 'Use a private field with underscore prefix.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -735,7 +740,8 @@ class ProperSuperCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'proper_super_calls',
-    problemMessage: '[proper_super_calls] Super lifecycle method called in wrong order.',
+    problemMessage:
+        '[proper_super_calls] Super lifecycle method called in wrong order.',
     correctionMessage:
         'super.initState() should be first; super.dispose() should be last.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -828,7 +834,8 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unmarked_public_class',
-    problemMessage: '[avoid_unmarked_public_class] Public class lacks an explicit class modifier.',
+    problemMessage:
+        '[avoid_unmarked_public_class] Public class lacks an explicit class modifier.',
     correctionMessage:
         'Add base, final, interface, or sealed modifier (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -894,7 +901,8 @@ class PreferFinalClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_final_class',
-    problemMessage: '[prefer_final_class] Consider marking this class as final.',
+    problemMessage:
+        '[prefer_final_class] Consider marking this class as final.',
     correctionMessage:
         'Add final modifier if this class is not designed for extension (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1088,7 +1096,8 @@ class PreferBaseClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_base_class',
-    problemMessage: '[prefer_base_class] Abstract class with shared implementation could be base.',
+    problemMessage:
+        '[prefer_base_class] Abstract class with shared implementation could be base.',
     correctionMessage:
         'Use abstract base class to prevent direct implementation (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,

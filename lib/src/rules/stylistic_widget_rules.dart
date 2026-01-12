@@ -133,7 +133,8 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_container_over_sizedbox',
-    problemMessage: '[prefer_container_over_sizedbox] Use Container instead of SizedBox for consistency.',
+    problemMessage:
+        '[prefer_container_over_sizedbox] Use Container instead of SizedBox for consistency.',
     correctionMessage:
         'Container provides a consistent API and is easier to extend.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -201,7 +202,8 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich_over_richtext',
-    problemMessage: '[prefer_text_rich_over_richtext] Use Text.rich() instead of RichText widget.',
+    problemMessage:
+        '[prefer_text_rich_over_richtext] Use Text.rich() instead of RichText widget.',
     correctionMessage:
         'Text.rich() inherits DefaultTextStyle and has a simpler API.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -260,7 +262,8 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_richtext_over_text_rich',
-    problemMessage: '[prefer_richtext_over_text_rich] Use RichText instead of Text.rich() for explicit control.',
+    problemMessage:
+        '[prefer_richtext_over_text_rich] Use RichText instead of Text.rich() for explicit control.',
     correctionMessage:
         'RichText provides explicit control without implicit style inheritance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -406,7 +409,8 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_only',
-    problemMessage: '[prefer_edgeinsets_only] Use EdgeInsets.only() for explicit side values.',
+    problemMessage:
+        '[prefer_edgeinsets_only] Use EdgeInsets.only() for explicit side values.',
     correctionMessage:
         'EdgeInsets.only() is more explicit and easier to modify.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -544,7 +548,8 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_over_flexible',
-    problemMessage: '[prefer_expanded_over_flexible] Use Expanded instead of Flexible(fit: FlexFit.tight).',
+    problemMessage:
+        '[prefer_expanded_over_flexible] Use Expanded instead of Flexible(fit: FlexFit.tight).',
     correctionMessage: 'Expanded is more concise and idiomatic.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -614,7 +619,8 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_flexible_over_expanded',
-    problemMessage: '[prefer_flexible_over_expanded] Use Flexible instead of Expanded for consistency.',
+    problemMessage:
+        '[prefer_flexible_over_expanded] Use Flexible instead of Expanded for consistency.',
     correctionMessage:
         'Flexible provides a consistent API and explicit fit parameter.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -37,7 +37,8 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_equal_expressions',
-    problemMessage: '[avoid_equal_expressions] Both sides of the binary expression are identical.',
+    problemMessage:
+        '[avoid_equal_expressions] Both sides of the binary expression are identical.',
     correctionMessage:
         'This is likely a bug. Use different expressions on each side.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -123,7 +124,8 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_negations_in_equality_checks',
-    problemMessage: '[avoid_negations_in_equality_checks] Use != instead of negating == comparison.',
+    problemMessage:
+        '[avoid_negations_in_equality_checks] Use != instead of negating == comparison.',
     correctionMessage: 'Replace !(a == b) with a != b.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -374,7 +376,8 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_compare_to',
-    problemMessage: '[avoid_unnecessary_compare_to] Use == instead of compareTo() == 0.',
+    problemMessage:
+        '[avoid_unnecessary_compare_to] Use == instead of compareTo() == 0.',
     correctionMessage: 'Replace compareTo(x) == 0 with == x.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

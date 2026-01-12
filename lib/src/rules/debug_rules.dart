@@ -264,7 +264,8 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unguarded_debug',
-    problemMessage: '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
+    problemMessage:
+        '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
     correctionMessage: 'Wrap in if (kDebugMode), if (DebugType.*.isDebug), '
         'or add level: DebugLevels.Warning/Error parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,

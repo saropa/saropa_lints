@@ -59,7 +59,8 @@ class PreferRelativeImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
-    problemMessage: '[prefer_relative_imports] Use relative imports instead of absolute package imports.',
+    problemMessage:
+        '[prefer_relative_imports] Use relative imports instead of absolute package imports.',
     correctionMessage:
         'Consider using a relative import path for files within the same package.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -242,7 +243,8 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
-    problemMessage: '[prefer_one_widget_per_file] Multiple widget classes defined in a single file.',
+    problemMessage:
+        '[prefer_one_widget_per_file] Multiple widget classes defined in a single file.',
     correctionMessage:
         'Consider moving each widget class to its own file for better organization.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -628,7 +630,8 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
-    problemMessage: '[prefer_trailing_comma_always] Multi-line construct should have a trailing comma.',
+    problemMessage:
+        '[prefer_trailing_comma_always] Multi-line construct should have a trailing comma.',
     correctionMessage: 'Add a trailing comma for consistent formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1082,7 +1085,8 @@ class PreferExplicitTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
-    problemMessage: '[prefer_explicit_types] Use explicit type annotation instead of var.',
+    problemMessage:
+        '[prefer_explicit_types] Use explicit type annotation instead of var.',
     correctionMessage: 'Replace var with the explicit type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1363,7 +1367,8 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_quotes',
-    problemMessage: '[prefer_single_quotes] Use single quotes instead of double quotes for strings.',
+    problemMessage:
+        '[prefer_single_quotes] Use single quotes instead of double quotes for strings.',
     correctionMessage: "Replace double quotes with single quotes: 'string'",
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1674,7 +1679,8 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sentence_case_comments',
-    problemMessage: '[prefer_sentence_case_comments] Comment should start with a capital letter.',
+    problemMessage:
+        '[prefer_sentence_case_comments] Comment should start with a capital letter.',
     correctionMessage: 'Capitalize the first letter of the comment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1921,7 +1927,8 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_period_after_doc',
-    problemMessage: '[prefer_period_after_doc] Doc comment should end with a period.',
+    problemMessage:
+        '[prefer_period_after_doc] Doc comment should end with a period.',
     correctionMessage: 'Add a period at the end of the doc comment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2080,7 +2087,8 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
-    problemMessage: '[prefer_screaming_case_constants] Constants should use SCREAMING_SNAKE_CASE.',
+    problemMessage:
+        '[prefer_screaming_case_constants] Constants should use SCREAMING_SNAKE_CASE.',
     correctionMessage:
         'Rename to SCREAMING_SNAKE_CASE: MAX_VALUE instead of maxValue',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2384,7 +2392,8 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
-    problemMessage: '[prefer_snake_case_files] File name should use snake_case.',
+    problemMessage:
+        '[prefer_snake_case_files] File name should use snake_case.',
     correctionMessage:
         'Rename file to snake_case: user_service.dart instead of UserService.dart',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3232,7 +3241,8 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'arguments_ordering',
-    problemMessage: '[arguments_ordering] Named arguments should be in alphabetical order.',
+    problemMessage:
+        '[arguments_ordering] Named arguments should be in alphabetical order.',
     correctionMessage: 'Reorder named arguments alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

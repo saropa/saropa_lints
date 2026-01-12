@@ -837,7 +837,8 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
-    problemMessage: '[require_heading_semantics] Section headers should have Semantics with header: true.',
+    problemMessage:
+        '[require_heading_semantics] Section headers should have Semantics with header: true.',
     correctionMessage:
         'Wrap with Semantics(header: true) for screen reader navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1688,7 +1689,8 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hover_only',
-    problemMessage: '[avoid_hover_only] Hover-only interaction is inaccessible on touch devices.',
+    problemMessage:
+        '[avoid_hover_only] Hover-only interaction is inaccessible on touch devices.',
     correctionMessage:
         'Add GestureDetector with onTap or use widgets like Tooltip that handle both.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2248,7 +2250,8 @@ class RequireImageDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_description',
-    problemMessage: '[require_image_description] Image should have semanticLabel or excludeFromSemantics.',
+    problemMessage:
+        '[require_image_description] Image should have semanticLabel or excludeFromSemantics.',
     correctionMessage:
         'Add semanticLabel for content images or excludeFromSemantics: true '
         'for decorative images.',
@@ -2389,7 +2392,8 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_merge_semantics',
-    problemMessage: '[prefer_merge_semantics] Icon + Text should be wrapped in MergeSemantics.',
+    problemMessage:
+        '[prefer_merge_semantics] Icon + Text should be wrapped in MergeSemantics.',
     correctionMessage:
         'Wrap Row/Column with MergeSemantics for unified screen reader output.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2495,7 +2499,8 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_focus_indicator',
-    problemMessage: '[require_focus_indicator] Interactive widget should have visible focus indicator.',
+    problemMessage:
+        '[require_focus_indicator] Interactive widget should have visible focus indicator.',
     correctionMessage:
         'Wrap in Focus widget and show visual feedback on focus.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2583,7 +2588,8 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_flashing_content',
-    problemMessage: '[avoid_flashing_content] Animation may flash more than 3 times per second.',
+    problemMessage:
+        '[avoid_flashing_content] Animation may flash more than 3 times per second.',
     correctionMessage:
         'Increase duration to at least 333ms to stay under 3 flashes/second.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2665,7 +2671,8 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_adequate_spacing',
-    problemMessage: '[prefer_adequate_spacing] Adjacent touch targets should have spacing between them.',
+    problemMessage:
+        '[prefer_adequate_spacing] Adjacent touch targets should have spacing between them.',
     correctionMessage: 'Add SizedBox(width/height: 8) between touch targets.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2750,7 +2757,8 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_motion_without_reduce',
-    problemMessage: '[avoid_motion_without_reduce] Animation should respect disableAnimations preference.',
+    problemMessage:
+        '[avoid_motion_without_reduce] Animation should respect disableAnimations preference.',
     correctionMessage:
         'Check MediaQuery.disableAnimations and reduce/skip animation if true.',
     errorSeverity: DiagnosticSeverity.INFO,

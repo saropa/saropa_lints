@@ -443,7 +443,8 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',
-    problemMessage: '[require_unique_iv_per_encryption] Static or reused IV breaks encryption security.',
+    problemMessage:
+        '[require_unique_iv_per_encryption] Static or reused IV breaks encryption security.',
     correctionMessage:
         'Generate a new random IV for each encryption operation.',
     errorSeverity: DiagnosticSeverity.ERROR,

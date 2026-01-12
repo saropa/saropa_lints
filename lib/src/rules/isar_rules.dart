@@ -57,7 +57,8 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_enum_field',
-    problemMessage: '[avoid_isar_enum_field] Enum fields in Isar collections can cause data corruption '
+    problemMessage:
+        '[avoid_isar_enum_field] Enum fields in Isar collections can cause data corruption '
         'if the enum is renamed or reordered.',
     correctionMessage: 'Store the enum as a String field and use an @ignore '
         'getter to parse it. See rule documentation for the pattern.',
@@ -397,7 +398,8 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_collection_annotation',
-    problemMessage: '[require_isar_collection_annotation] Class used with Isar must have @collection annotation.',
+    problemMessage:
+        '[require_isar_collection_annotation] Class used with Isar must have @collection annotation.',
     correctionMessage: 'Add @collection annotation to the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -475,7 +477,8 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_id_field',
-    problemMessage: '[require_isar_id_field] Isar @collection class must have an Id? id field.',
+    problemMessage:
+        '[require_isar_id_field] Isar @collection class must have an Id? id field.',
     correctionMessage: 'Add "Id? id;" as the first field in the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -713,7 +716,8 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_transaction_nesting',
-    problemMessage: '[avoid_isar_transaction_nesting] Nested writeTxn calls cause deadlocks.',
+    problemMessage:
+        '[avoid_isar_transaction_nesting] Nested writeTxn calls cause deadlocks.',
     correctionMessage: 'Combine operations into a single writeTxn block.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -913,7 +917,8 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_inspector_debug_only',
-    problemMessage: '[require_isar_inspector_debug_only] Isar Inspector should only be enabled in debug mode.',
+    problemMessage:
+        '[require_isar_inspector_debug_only] Isar Inspector should only be enabled in debug mode.',
     correctionMessage: 'Use inspector: kDebugMode instead of inspector: true.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -976,7 +981,8 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_clear_in_production',
-    problemMessage: '[avoid_isar_clear_in_production] isar.clear() deletes all data. Wrap in kDebugMode check.',
+    problemMessage:
+        '[avoid_isar_clear_in_production] isar.clear() deletes all data. Wrap in kDebugMode check.',
     correctionMessage: 'Add if (kDebugMode) guard before calling clear().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1181,7 +1187,8 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_web_limitations',
-    problemMessage: '[avoid_isar_web_limitations] Isar sync APIs do not work on web. Use async methods.',
+    problemMessage:
+        '[avoid_isar_web_limitations] Isar sync APIs do not work on web. Use async methods.',
     correctionMessage:
         'Replace Sync methods with async equivalents for web compatibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1584,7 +1591,8 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_isar_composite_index',
-    problemMessage: '[prefer_isar_composite_index] Multi-field queries benefit from composite indexes.',
+    problemMessage:
+        '[prefer_isar_composite_index] Multi-field queries benefit from composite indexes.',
     correctionMessage:
         'Add @Index(composite: [...]) for frequently used field combinations.',
     errorSeverity: DiagnosticSeverity.INFO,

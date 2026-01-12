@@ -315,7 +315,8 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_route_transition_consistency',
-    problemMessage: '[require_route_transition_consistency] Mixed route transition types. Use consistent transitions.',
+    problemMessage:
+        '[require_route_transition_consistency] Mixed route transition types. Use consistent transitions.',
     correctionMessage:
         'Define transitions in ThemeData.pageTransitionsTheme for consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -479,7 +480,8 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_route_guards',
-    problemMessage: '[require_route_guards] Protected route without authentication guard.',
+    problemMessage:
+        '[require_route_guards] Protected route without authentication guard.',
     correctionMessage:
         'Add redirect callback to check authentication before accessing this route.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -857,7 +859,8 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_deep_link_fallback',
-    problemMessage: '[require_deep_link_fallback] Deep link handler should handle missing/invalid content.',
+    problemMessage:
+        '[require_deep_link_fallback] Deep link handler should handle missing/invalid content.',
     correctionMessage:
         'Add fallback for when linked content is not found or unavailable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -931,7 +934,8 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
-    problemMessage: '[avoid_deep_link_sensitive_params] Deep link should not contain sensitive parameters.',
+    problemMessage:
+        '[avoid_deep_link_sensitive_params] Deep link should not contain sensitive parameters.',
     correctionMessage:
         'Do not pass passwords, tokens, or secrets via deep link.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1018,7 +1022,8 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_typed_route_params',
-    problemMessage: '[prefer_typed_route_params] Route parameter used without type conversion.',
+    problemMessage:
+        '[prefer_typed_route_params] Route parameter used without type conversion.',
     correctionMessage:
         'Use int.tryParse/double.tryParse for numeric parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1104,7 +1109,8 @@ class RequireStepperValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_stepper_validation',
-    problemMessage: '[require_stepper_validation] Stepper onStepContinue should validate before proceeding.',
+    problemMessage:
+        '[require_stepper_validation] Stepper onStepContinue should validate before proceeding.',
     correctionMessage: 'Add form validation in onStepContinue callback.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1178,7 +1184,8 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_step_count_indicator',
-    problemMessage: '[require_step_count_indicator] Multi-step flow should show progress indicator.',
+    problemMessage:
+        '[require_step_count_indicator] Multi-step flow should show progress indicator.',
     correctionMessage: 'Add step counter or progress indicator.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1255,7 +1262,8 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_inline_creation',
-    problemMessage: '[avoid_go_router_inline_creation] GoRouter created in build(). Causes hot reload issues.',
+    problemMessage:
+        '[avoid_go_router_inline_creation] GoRouter created in build(). Causes hot reload issues.',
     correctionMessage:
         'Create GoRouter as a field or in initState(), not in build().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2402,7 +2410,8 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_shared_layout',
-    problemMessage: '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code.',
+    problemMessage:
+        '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code.',
     correctionMessage:
         'Consider using ShellRoute for shared AppBar/BottomNav layouts.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2551,7 +2560,8 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_go_router_fallback_route',
-    problemMessage: '[require_go_router_fallback_route] GoRouter without errorBuilder or errorPageBuilder.',
+    problemMessage:
+        '[require_go_router_fallback_route] GoRouter without errorBuilder or errorPageBuilder.',
     correctionMessage: 'Add errorBuilder: (context, state) => ErrorPage().',
     errorSeverity: DiagnosticSeverity.INFO,
   );

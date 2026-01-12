@@ -43,7 +43,8 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_casting_to_extension_type',
-    problemMessage: '[avoid_casting_to_extension_type] Avoid casting to extension types.',
+    problemMessage:
+        '[avoid_casting_to_extension_type] Avoid casting to extension types.',
     correctionMessage: 'Use the extension type constructor instead of casting.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -103,7 +104,8 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_collection_methods_with_unrelated_types',
-    problemMessage: '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type.',
+    problemMessage:
+        '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type.',
     correctionMessage:
         'The argument type cannot match any element in the collection.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -269,7 +271,8 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_implicitly_nullable_extension_types',
-    problemMessage: '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable.',
+    problemMessage:
+        '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable.',
     correctionMessage: 'Add "implements Object" to make it non-nullable.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -320,7 +323,8 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_interpolation',
-    problemMessage: '[avoid_nullable_interpolation] Avoid interpolating nullable values.',
+    problemMessage:
+        '[avoid_nullable_interpolation] Avoid interpolating nullable values.',
     correctionMessage: 'Add null check or use ?? to provide default value.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -375,7 +379,8 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_parameters_with_default_values',
-    problemMessage: '[avoid_nullable_parameters_with_default_values] Parameter with default value should not be nullable.',
+    problemMessage:
+        '[avoid_nullable_parameters_with_default_values] Parameter with default value should not be nullable.',
     correctionMessage:
         'Remove the ? from the type since it has a non-null default.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -439,7 +444,8 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_tostring',
-    problemMessage: '[avoid_nullable_tostring] Calling toString() on a nullable value.',
+    problemMessage:
+        '[avoid_nullable_tostring] Calling toString() on a nullable value.',
     correctionMessage: 'Check for null first or provide a default value.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -517,7 +523,8 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_null_assertion',
-    problemMessage: '[avoid_null_assertion] Avoid using the null assertion operator (!). '
+    problemMessage:
+        '[avoid_null_assertion] Avoid using the null assertion operator (!). '
         'It can cause runtime crashes if the value is null.',
     correctionMessage: 'Use null-safe alternatives: ?? for defaults, '
         'if-null checks, or ?. for optional chaining.',
@@ -1628,7 +1635,8 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_type_assertions',
-    problemMessage: '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
+    problemMessage:
+        '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
         'The expression is already known to be of this type.',
     correctionMessage: 'Remove the redundant type check.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1760,7 +1768,8 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_assertions',
-    problemMessage: '[avoid_unrelated_type_assertions] Type assertion can never be true. '
+    problemMessage:
+        '[avoid_unrelated_type_assertions] Type assertion can never be true. '
         'The types are unrelated.',
     correctionMessage: 'Remove the impossible type check or fix the types.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1847,7 +1856,8 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_type_name',
-    problemMessage: '[prefer_correct_type_name] Type name should be UpperCamelCase.',
+    problemMessage:
+        '[prefer_correct_type_name] Type name should be UpperCamelCase.',
     correctionMessage: 'Rename to use UpperCamelCase convention.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1946,7 +1956,8 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_function_type',
-    problemMessage: '[prefer_explicit_function_type] Use explicit function type instead of bare "Function".',
+    problemMessage:
+        '[prefer_explicit_function_type] Use explicit function type instead of bare "Function".',
     correctionMessage:
         'Specify the function signature (e.g., void Function()).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1992,7 +2003,8 @@ class PreferTypeOverVarRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_type_over_var',
-    problemMessage: '[prefer_type_over_var] Prefer explicit type annotation over var.',
+    problemMessage:
+        '[prefer_type_over_var] Prefer explicit type annotation over var.',
     correctionMessage: 'Replace var with the explicit type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
