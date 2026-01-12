@@ -1905,5 +1905,34 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
     });
   }
 
-  // No quick fix - permanent denial handling requires app-specific UI flow
+  @override
+  List<Fix> getFixes() => <Fix>[_AddPermanentDenialHandlingFix()];
+}
+
+/// Quick fix: Adds TODO comment for permanent denial handling.
+class _AddPermanentDenialHandlingFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO for permanent denial handling',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Add isPermanentlyDenied check and openAppSettings() call\n    ',
+        );
+      });
+    });
+  }
 }
