@@ -1268,3 +1268,73 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_hive_value_listenable
+// =============================================================================
+
+/// Use box.listenable() with ValueListenableBuilder for reactive UI.
+///
+/// Manually calling setState after Hive updates is error-prone.
+/// Use ValueListenableBuilder with box.listenable() for reactive updates.
+///
+/// **BAD:**
+/// ```dart
+/// void _saveItem(Item item) async {
+///   await box.put(item.id, item);
+///   setState(() {});  // Manual!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ValueListenableBuilder(
+///   valueListenable: box.listenable(),
+///   builder: (context, Box<Item> box, _) {
+///     return ListView(children: box.values.map(...).toList());
+///   },
+/// )
+/// ```
+class PreferHiveValueListenableRule extends SaropaLintRule {
+  const PreferHiveValueListenableRule() : super(code: _code);
+
+  /// UI may not update after Hive changes.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_hive_value_listenable',
+    problemMessage:
+        'setState after Hive put/delete. Consider using box.listenable().',
+    correctionMessage:
+        'Use ValueListenableBuilder with box.listenable() for reactive UI.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'setState') return;
+
+      // Look for Hive operations in the same function body
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body == null) return;
+
+      final String bodySource = body.toSource();
+
+      // Check for Hive put/delete operations
+      if ((bodySource.contains('.put(') ||
+              bodySource.contains('.delete(') ||
+              bodySource.contains('.add(') ||
+              bodySource.contains('.putAll(') ||
+              bodySource.contains('.deleteAll(')) &&
+          (bodySource.contains('box') || bodySource.contains('Box'))) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

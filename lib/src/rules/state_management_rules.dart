@@ -9972,3 +9972,595 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// ROADMAP_NEXT: Phase 4 - State Management Rules
+// =============================================================================
+
+/// Warns when Provider.of is used without listen: false in non-build contexts.
+///
+/// Alias: provider_of_listen, change_notifier_proxy, provider_proxy
+///
+/// Using Provider.of without listen: false outside build() causes unnecessary
+/// rebuilds. For one-time reads or actions, use `listen: false`.
+///
+/// **BAD:**
+/// ```dart
+/// void onTap() {
+///   final user = Provider.of<UserModel>(context); // Rebuilds on change!
+///   user.updateName('New Name');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void onTap() {
+///   final user = Provider.of<UserModel>(context, listen: false);
+///   user.updateName('New Name');
+/// }
+///
+/// // Or use context.read():
+/// void onTap() {
+///   context.read<UserModel>().updateName('New Name');
+/// }
+/// ```
+class PreferChangeNotifierProxyRule extends SaropaLintRule {
+  const PreferChangeNotifierProxyRule() : super(code: _code);
+
+  /// Performance issue. Causes unnecessary rebuilds.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_change_notifier_proxy',
+    problemMessage:
+        'Provider.of without listen:false in callback. Use context.read() or add listen: false.',
+    correctionMessage:
+        'Add listen: false parameter, or use context.read<T>() for one-time reads.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Provider.of<T>(context)
+      if (node.methodName.name != 'of') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Provider') return;
+
+      // Check if listen: false is provided
+      final args = node.argumentList.arguments;
+      final hasListenFalse = args.any((arg) {
+        if (arg is NamedExpression && arg.name.label.name == 'listen') {
+          final value = arg.expression;
+          return value is BooleanLiteral && !value.value;
+        }
+        return false;
+      });
+
+      if (hasListenFalse) return;
+
+      // Check if inside build() method - that's OK
+      if (_isInsideBuildMethod(node)) return;
+
+      // Check if inside callback (onTap, onPressed, etc.)
+      if (_isInsideCallback(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideBuildMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration && current.name.lexeme == 'build') {
+        // Make sure we're directly in build, not in a callback inside build
+        return _isDirectChildOfMethod(node, current);
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _isDirectChildOfMethod(AstNode node, MethodDeclaration method) {
+    AstNode? current = node.parent;
+    while (current != null && current != method) {
+      // If we hit a FunctionExpression, we're in a callback
+      if (current is FunctionExpression) {
+        return false;
+      }
+      current = current.parent;
+    }
+    return true;
+  }
+
+  bool _isInsideCallback(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        // Check if parent is a callback argument
+        final parent = current.parent;
+        if (parent is NamedExpression) {
+          final name = parent.name.label.name;
+          if (name == 'onTap' ||
+              name == 'onPressed' ||
+              name == 'onChanged' ||
+              name == 'onSubmitted' ||
+              name == 'builder' ||
+              name.startsWith('on')) {
+            return true;
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when Consumer/Selector rebuilds entire subtree unnecessarily.
+///
+/// Alias: selector_widget, consumer_selector, provider_selector
+///
+/// Using Consumer to rebuild an entire widget tree when only part needs
+/// updating is wasteful. Use Selector to rebuild only what changed.
+///
+/// **BAD:**
+/// ```dart
+/// Consumer<CartModel>(
+///   builder: (context, cart, child) {
+///     return Column(
+///       children: [
+///         ExpensiveWidget(), // Rebuilds unnecessarily!
+///         Text('Items: ${cart.itemCount}'),
+///       ],
+///     );
+///   },
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Column(
+///   children: [
+///     ExpensiveWidget(), // Doesn't rebuild
+///     Selector<CartModel, int>(
+///       selector: (_, cart) => cart.itemCount,
+///       builder: (_, count, __) => Text('Items: $count'),
+///     ),
+///   ],
+/// );
+/// ```
+class PreferSelectorWidgetRule extends SaropaLintRule {
+  const PreferSelectorWidgetRule() : super(code: _code);
+
+  /// Performance improvement suggestion.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_selector_widget',
+    problemMessage:
+        'Consumer rebuilds entire subtree. Consider Selector for targeted rebuilds.',
+    correctionMessage:
+        'Use Selector<Model, T> to rebuild only widgets that depend on specific values.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Consumer') return;
+
+      // Check if builder has complex widget tree
+      final args = node.argumentList.arguments;
+      for (final arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final builderExpr = arg.expression;
+          if (builderExpr is FunctionExpression) {
+            final body = builderExpr.body;
+            if (body is ExpressionFunctionBody) {
+              // Check if returning complex widget
+              if (_isComplexWidgetReturn(body.expression)) {
+                reporter.atNode(node, code);
+              }
+            } else if (body is BlockFunctionBody) {
+              // Check return statements
+              for (final stmt in body.block.statements) {
+                if (stmt is ReturnStatement) {
+                  final returnExpr = stmt.expression;
+                  if (returnExpr != null && _isComplexWidgetReturn(returnExpr)) {
+                    reporter.atNode(node, code);
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  bool _isComplexWidgetReturn(Expression expr) {
+    if (expr is! InstanceCreationExpression) return false;
+
+    final typeName = expr.constructorName.type.name.lexeme;
+    // Complex container widgets
+    const complexWidgets = <String>{
+      'Column',
+      'Row',
+      'Stack',
+      'ListView',
+      'GridView',
+      'Wrap',
+      'CustomScrollView',
+    };
+
+    return complexWidgets.contains(typeName);
+  }
+}
+
+/// Warns when Bloc events are not sealed classes.
+///
+/// Alias: bloc_event_sealed, sealed_bloc_event, event_sealed
+///
+/// Using sealed classes for Bloc events enables exhaustive pattern matching
+/// and prevents invalid event subtypes.
+///
+/// **BAD:**
+/// ```dart
+/// abstract class CounterEvent {}
+/// class IncrementEvent extends CounterEvent {}
+/// class DecrementEvent extends CounterEvent {}
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// sealed class CounterEvent {}
+/// final class IncrementEvent extends CounterEvent {}
+/// final class DecrementEvent extends CounterEvent {}
+/// ```
+class RequireBlocEventSealedRule extends SaropaLintRule {
+  const RequireBlocEventSealedRule() : super(code: _code);
+
+  /// Type safety improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_event_sealed',
+    problemMessage:
+        'Bloc event hierarchy should use sealed class for exhaustive matching.',
+    correctionMessage:
+        'Change abstract class XEvent to sealed class XEvent for Dart 3+ pattern matching.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class name ends with Event
+      final name = node.name.lexeme;
+      if (!name.endsWith('Event')) return;
+
+      // Check if it's abstract but not sealed
+      if (node.abstractKeyword != null && node.sealedKeyword == null) {
+        // Make sure it looks like a Bloc event (has subclasses pattern)
+        if (node.members.isEmpty || _looksLikeBlocEvent(node)) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  bool _looksLikeBlocEvent(ClassDeclaration node) {
+    // Empty body is common for event base classes
+    if (node.members.isEmpty) return true;
+
+    // Only has constructors
+    return node.members.every((member) => member is ConstructorDeclaration);
+  }
+}
+
+/// Warns when Bloc directly depends on repository implementations.
+///
+/// Alias: bloc_repository, bloc_abstract_repo, bloc_di
+///
+/// Blocs should depend on abstract repository interfaces, not concrete
+/// implementations. This enables testing and swapping implementations.
+///
+/// **BAD:**
+/// ```dart
+/// class UserBloc extends Bloc<UserEvent, UserState> {
+///   UserBloc() : super(UserInitial()) {
+///     _repo = FirebaseUserRepository(); // Concrete implementation!
+///   }
+///   late final FirebaseUserRepository _repo;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserBloc extends Bloc<UserEvent, UserState> {
+///   UserBloc(this._repo) : super(UserInitial());
+///   final UserRepository _repo; // Abstract interface
+/// }
+/// ```
+class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
+  const RequireBlocRepositoryAbstractionRule() : super(code: _code);
+
+  /// Architecture improvement.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_repository_abstraction',
+    problemMessage:
+        'Bloc depends on concrete repository. Use abstract interface for testability.',
+    correctionMessage:
+        'Inject UserRepository interface instead of FirebaseUserRepository.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Prefixes that indicate concrete implementations.
+  static const Set<String> _concretePrefixes = <String>{
+    'Firebase',
+    'Postgres',
+    'Mysql',
+    'Sqlite',
+    'Http',
+    'Rest',
+    'Grpc',
+    'Mock',
+    'Fake',
+    'Real',
+    'Local',
+    'Remote',
+    'Cached',
+    'Impl',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class is a Bloc
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check fields for concrete repository types
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          final type = member.fields.type;
+          if (type == null) continue;
+
+          final typeName = type.toSource();
+          for (final prefix in _concretePrefixes) {
+            if (typeName.startsWith(prefix) &&
+                (typeName.contains('Repository') ||
+                    typeName.contains('Service') ||
+                    typeName.contains('DataSource'))) {
+              reporter.atNode(member, code);
+              break;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when GetX global state is used instead of reactive state.
+///
+/// Alias: getx_global, getx_reactive, avoid_get_put
+///
+/// Using Get.put() for global state makes testing difficult and
+/// creates implicit dependencies. Prefer reactive state with GetBuilder.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   Get.put(UserController()); // Global state
+///   runApp(MyApp());
+/// }
+///
+/// class MyWidget extends StatelessWidget {
+///   final ctrl = Get.find<UserController>(); // Implicit dependency
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   Widget build(BuildContext context) {
+///     return GetBuilder<UserController>(
+///       init: UserController(),
+///       builder: (controller) => Text(controller.userName),
+///     );
+///   }
+/// }
+/// ```
+class AvoidGetxGlobalStateRule extends SaropaLintRule {
+  const AvoidGetxGlobalStateRule() : super(code: _code);
+
+  /// Testing difficulty.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_getx_global_state',
+    problemMessage:
+        'Global GetX state (Get.put/Get.find) makes testing difficult.',
+    correctionMessage:
+        'Use GetBuilder with init: parameter, or inject controller via constructor.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final methodName = node.methodName.name;
+
+      // Check for Get.put() and Get.find()
+      if (methodName != 'put' && methodName != 'find') return;
+
+      final target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'Get') return;
+
+      // Check if this is at top level (main) or in a field initializer
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is FunctionDeclaration &&
+            current.name.lexeme == 'main') {
+          reporter.atNode(node, code);
+          return;
+        }
+        if (current is FieldDeclaration) {
+          reporter.atNode(node, code);
+          return;
+        }
+        current = current.parent;
+      }
+    });
+  }
+}
+
+/// Warns when Bloc doesn't use transform for event debouncing/throttling.
+///
+/// Alias: bloc_transform, event_transformer, debounce_bloc
+///
+/// For events like search queries, use EventTransformer to debounce or
+/// throttle, preventing excessive API calls.
+///
+/// **BAD:**
+/// ```dart
+/// class SearchBloc extends Bloc<SearchEvent, SearchState> {
+///   SearchBloc() : super(SearchInitial()) {
+///     on<SearchQueryChanged>(_onQueryChanged); // No debounce!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class SearchBloc extends Bloc<SearchEvent, SearchState> {
+///   SearchBloc() : super(SearchInitial()) {
+///     on<SearchQueryChanged>(
+///       _onQueryChanged,
+///       transformer: debounce(Duration(milliseconds: 300)),
+///     );
+///   }
+/// }
+/// ```
+class PreferBlocTransformRule extends SaropaLintRule {
+  const PreferBlocTransformRule() : super(code: _code);
+
+  /// Performance suggestion.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_bloc_transform',
+    problemMessage:
+        'Search/input event without transformer. Consider debounce/throttle.',
+    correctionMessage:
+        'Add transformer: debounce(Duration(milliseconds: 300)) to on<Event>().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Event name patterns that typically need debouncing.
+  static const Set<String> _debounceCandidates = <String>{
+    'SearchQueryChanged',
+    'SearchTextChanged',
+    'QueryChanged',
+    'TextChanged',
+    'InputChanged',
+    'FilterChanged',
+    'TypeaheadChanged',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'on') return;
+
+      // Check if inside a Bloc constructor
+      if (!_isInsideBlocConstructor(node)) return;
+
+      // Check type argument
+      final typeArgs = node.typeArguments;
+      if (typeArgs == null || typeArgs.arguments.isEmpty) return;
+
+      final eventType = typeArgs.arguments.first.toSource();
+
+      // Check if event looks like it needs debouncing
+      final needsDebounce = _debounceCandidates.any(
+        (candidate) => eventType.contains(candidate),
+      );
+
+      if (!needsDebounce) return;
+
+      // Check if transformer is provided
+      final args = node.argumentList.arguments;
+      final hasTransformer = args.any((arg) {
+        return arg is NamedExpression && arg.name.label.name == 'transformer';
+      });
+
+      if (!hasTransformer) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideBlocConstructor(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ConstructorDeclaration) {
+        // Check if constructor belongs to a Bloc
+        final parent = current.parent;
+        if (parent is ClassDeclaration) {
+          final extendsClause = parent.extendsClause;
+          if (extendsClause != null) {
+            final superName = extendsClause.superclass.name.lexeme;
+            return superName == 'Bloc';
+          }
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}

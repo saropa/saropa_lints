@@ -197,7 +197,7 @@ dependencies:
 
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
 ```
 
 ### 2. Update analysis_options.yaml
@@ -231,6 +231,8 @@ dart run custom_lint
 | `dispose_getx_fields` | recommended | Worker fields not disposed in onClose |
 | `prefer_getx_builder` | recommended | .obs property access without Obx wrapper |
 | `require_getx_binding` | professional | Get.put() in widget build method |
+| `avoid_getx_global_navigation` | professional | Get.to/Get.off global navigation (v2.6.0) |
+| `require_getx_binding_routes` | professional | GetPage without binding parameter (v2.6.0) |
 
 ## Common Patterns
 

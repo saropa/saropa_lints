@@ -759,6 +759,109 @@ const List<LintRule> _allRules = <LintRule>[
   PreferStraightApostropheRule(),
   PreferCurlyApostropheRule(),
 
+  // =========================================================================
+  // NEW STYLISTIC RULES v2.5.0 (76+ opinionated rules with opposites)
+  // =========================================================================
+
+  // Widget & UI stylistic rules (stylistic_widget_rules.dart)
+  PreferSizedBoxOverContainerRule(),
+  PreferContainerOverSizedBoxRule(),
+  PreferTextRichOverRichTextRule(),
+  PreferRichTextOverTextRichRule(),
+  PreferEdgeInsetsSymmetricRule(),
+  PreferEdgeInsetsOnlyRule(),
+  PreferBorderRadiusCircularRule(),
+  PreferExpandedOverFlexibleRule(),
+  PreferFlexibleOverExpandedRule(),
+  PreferMaterialThemeColorsRule(),
+  PreferExplicitColorsRule(),
+
+  // Null handling & collection stylistic rules (stylistic_null_collection_rules.dart)
+  PreferNullAwareAssignmentRule(),
+  PreferExplicitNullAssignmentRule(),
+  PreferIfNullOverTernaryRule(),
+  PreferTernaryOverIfNullRule(),
+  PreferLateOverNullableRule(),
+  PreferNullableOverLateRule(),
+  PreferSpreadOverAddAllRule(),
+  PreferAddAllOverSpreadRule(),
+  PreferCollectionIfOverTernaryRule(),
+  PreferTernaryOverCollectionIfRule(),
+  PreferWhereTypeOverWhereIsRule(),
+  PreferMapEntriesIterationRule(),
+  PreferKeysIterationRule(),
+
+  // Control flow stylistic rules (stylistic_control_flow_rules.dart)
+  PreferSingleExitPointRule(),
+  PreferGuardClausesRule(),
+  PreferPositiveConditionsFirstRule(),
+  PreferSwitchStatementRule(),
+  PreferCascadeOverChainedRule(),
+  PreferChainedOverCascadeRule(),
+  PreferExhaustiveEnumsRule(),
+  PreferDefaultEnumCaseRule(),
+  PreferAsyncOnlyWhenAwaitingRule(),
+  PreferAwaitOverThenRule(),
+  PreferThenOverAwaitRule(),
+  PreferSyncOverAsyncWhereSimpleRule(),
+
+  // Whitespace & constructor stylistic rules (stylistic_whitespace_constructor_rules.dart)
+  PreferBlankLineBeforeReturnRule(),
+  PreferNoBlankLineBeforeReturnRule(),
+  PreferBlankLineAfterDeclarationsRule(),
+  PreferCompactDeclarationsRule(),
+  PreferBlankLinesBetweenMembersRule(),
+  PreferCompactClassMembersRule(),
+  PreferNoBlankLineInsideBlocksRule(),
+  PreferSingleBlankLineMaxRule(),
+  PreferSuperParametersRule(),
+  PreferInitializingFormalsRule(),
+  PreferConstructorBodyAssignmentRule(),
+  PreferFactoryForValidationRule(),
+  PreferConstructorAssertionRule(),
+  PreferRequiredBeforeOptionalRule(),
+  PreferGroupedByPurposeRule(),
+  PreferRethrowOverThrowERule(),
+
+  // Error handling & testing stylistic rules (stylistic_error_testing_rules.dart)
+  PreferSpecificExceptionsRule(),
+  PreferGenericExceptionRule(),
+  PreferExceptionSuffixRule(),
+  PreferErrorSuffixRule(),
+  PreferOnOverCatchRule(),
+  PreferCatchOverOnRule(),
+  PreferGivenWhenThenCommentsRule(),
+  PreferSelfDocumentingTestsRule(),
+  PreferExpectOverAssertInTestsRule(),
+  PreferSingleExpectationPerTestRule(),
+  PreferGroupedExpectationsRule(),
+  PreferTestNameShouldWhenRule(),
+  PreferTestNameDescriptiveRule(),
+
+  // Additional stylistic rules (stylistic_additional_rules.dart)
+  PreferInterpolationOverConcatenationRule(),
+  PreferConcatenationOverInterpolationRule(),
+  PreferDoubleQuotesRule(),
+  PreferAbsoluteImportsRule(),
+  PreferGroupedImportsRule(),
+  PreferFlatImportsRule(),
+  PreferFieldsBeforeMethodsRule(),
+  PreferMethodsBeforeFieldsRule(),
+  PreferStaticMembersFirstRule(),
+  PreferInstanceMembersFirstRule(),
+  PreferPublicMembersFirstRule(),
+  PreferPrivateMembersFirstRule(),
+  PreferVarOverExplicitTypeRule(),
+  PreferObjectOverDynamicRule(),
+  PreferDynamicOverObjectRule(),
+  PreferLowerCamelCaseConstantsRule(),
+  PreferCamelCaseMethodNamesRule(),
+  PreferDescriptiveVariableNamesRule(),
+  PreferConciseVariableNamesRule(),
+  PreferExplicitThisRule(),
+  PreferImplicitBooleanComparisonRule(),
+  PreferExplicitBooleanComparisonRule(),
+
   // Testing best practices rules (batch 3)
   RequireArrangeActAssertRule(),
   PreferMockNavigatorRule(),
@@ -1704,6 +1807,60 @@ const List<LintRule> _allRules = <LintRule>[
   RequireMacosAppTransportSecurityRule(),
   RequireMacosNotarizationReadyRule(),
   RequireMacosEntitlementsRule(),
+
+  // v2.6.0 rules (ROADMAP_NEXT implementation)
+  // Code quality
+  PreferReturningConditionalExpressionsRule(),
+
+  // Riverpod rules
+  PreferRiverpodAutoDisposeRule(),
+  PreferRiverpodFamilyForParamsRule(),
+
+  // GetX rules
+  AvoidGetxGlobalNavigationRule(),
+  RequireGetxBindingRoutesRule(),
+
+  // Dio rules
+  RequireDioResponseTypeRule(),
+  RequireDioRetryInterceptorRule(),
+  PreferDioTransformerRule(),
+
+  // GoRouter rules
+  PreferShellRouteSharedLayoutRule(),
+  RequireStatefulShellRouteTabsRule(),
+  RequireGoRouterFallbackRouteRule(),
+
+  // SQLite rules
+  PreferSqfliteSingletonRule(),
+  PreferSqfliteColumnConstantsRule(),
+
+  // Freezed rules
+  RequireFreezedJsonConverterRule(),
+  RequireFreezedLintPackageRule(),
+
+  // Geolocation rules
+  PreferGeolocatorAccuracyAppropriateRule(),
+  PreferGeolocatorLastKnownRule(),
+
+  // Image picker rules
+  PreferImagePickerMultiSelectionRule(),
+
+  // Notification rules
+  RequireNotificationActionHandlingRule(),
+
+  // Error handling rules
+  RequireFinallyCleanupRule(),
+
+  // DI rules
+  RequireDiScopeAwarenessRule(),
+
+  // Equatable rules
+  RequireDeepEqualityCollectionsRule(),
+  AvoidEquatableDatetimeRule(),
+  PreferUnmodifiableCollectionsRule(),
+
+  // Hive rules
+  PreferHiveValueListenableRule(),
 ];
 
 class _SaropaLints extends PluginBase {

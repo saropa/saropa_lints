@@ -1611,3 +1611,167 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_sqflite_singleton
+// =============================================================================
+
+/// Use singleton database instance instead of multiple openDatabase calls.
+///
+/// Calling openDatabase repeatedly creates connection overhead and may
+/// cause locking issues. Use a singleton pattern.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> saveUser(User user) async {
+///   final db = await openDatabase('app.db');  // Opens new connection!
+///   await db.insert('users', user.toMap());
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class DatabaseService {
+///   static Database? _db;
+///   static Future<Database> get database async {
+///     return _db ??= await openDatabase('app.db');
+///   }
+/// }
+/// ```
+class PreferSqfliteSingletonRule extends SaropaLintRule {
+  const PreferSqfliteSingletonRule() : super(code: _code);
+
+  /// Database connection overhead and potential locking.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sqflite_singleton',
+    problemMessage:
+        'openDatabase called directly. May create multiple connections.',
+    correctionMessage: 'Use a singleton pattern for database instance.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'openDatabase') return;
+
+      // Check if we're inside a non-singleton context
+      // Look for common singleton patterns: static field, getter, or factory
+      final FunctionBody? enclosingBody = node.thisOrAncestorOfType<FunctionBody>();
+      if (enclosingBody == null) return;
+
+      // Check if enclosing function/method is a static getter or uses null-aware
+      final MethodDeclaration? method =
+          enclosingBody.parent as MethodDeclaration?;
+      if (method != null) {
+        // If it's a getter returning cached value, it's likely a singleton
+        if (method.isGetter) return;
+        if (method.isStatic) {
+          final String bodySource = enclosingBody.toSource();
+          // Check for caching patterns like ??= or if (_db != null)
+          if (bodySource.contains('??=') || bodySource.contains('_db')) return;
+        }
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_sqflite_column_constants
+// =============================================================================
+
+/// Use constants for column names to avoid typos.
+///
+/// String literals for column names are error-prone. Use constants
+/// for compile-time checking.
+///
+/// **BAD:**
+/// ```dart
+/// await db.query('users', columns: ['id', 'name', 'emial']);  // Typo!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserTable {
+///   static const table = 'users';
+///   static const colId = 'id';
+///   static const colName = 'name';
+///   static const colEmail = 'email';
+/// }
+/// await db.query(UserTable.table, columns: [UserTable.colId, ...]);
+/// ```
+class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
+  const PreferSqfliteColumnConstantsRule() : super(code: _code);
+
+  /// Runtime errors from column name typos.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_sqflite_column_constants',
+    problemMessage: 'String literal column name may contain typos.',
+    correctionMessage: 'Define column names as constants in a table class.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Database methods that take column parameters.
+  static const Set<String> _dbMethods = <String>{
+    'query',
+    'rawQuery',
+    'insert',
+    'update',
+    'delete',
+    'rawInsert',
+    'rawUpdate',
+    'rawDelete',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_dbMethods.contains(methodName)) return;
+
+      // Check if target looks like a database
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('db') &&
+          !targetSource.contains('database') &&
+          !targetSource.contains('Database')) {
+        return;
+      }
+
+      // Check for string literal column names in columns parameter
+      final ArgumentList args = node.argumentList;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'columns') {
+          final Expression value = arg.expression;
+          if (value is ListLiteral) {
+            for (final CollectionElement element in value.elements) {
+              if (element is SimpleStringLiteral) {
+                reporter.atNode(element, code);
+                return;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
