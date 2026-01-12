@@ -47,7 +47,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_objects_in_state',
-    problemMessage: 'Large data structures in State may cause memory issues.',
+    problemMessage: '[avoid_large_objects_in_state] Large data structures in State may cause memory issues.',
     correctionMessage:
         'Consider pagination, streaming, or external state management.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -140,7 +140,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_disposal',
-    problemMessage: 'ui.Image objects must be disposed to free memory.',
+    problemMessage: '[require_image_disposal] ui.Image objects must be disposed to free memory.',
     correctionMessage: 'Call image.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -243,7 +243,7 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_capturing_this_in_callbacks',
     problemMessage:
-        'Callback may capture entire object, preventing garbage collection.',
+        '[avoid_capturing_this_in_callbacks] Callback may capture entire object, preventing garbage collection.',
     correctionMessage: 'Use method reference or extract only needed values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -334,7 +334,7 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cache_eviction_policy',
-    problemMessage: 'Cache lacks eviction policy and may grow unbounded.',
+    problemMessage: '[require_cache_eviction_policy] Cache lacks eviction policy and may grow unbounded.',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -408,7 +408,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_weak_references_for_cache',
-    problemMessage: 'Consider using WeakReference for cache entries.',
+    problemMessage: '[prefer_weak_references_for_cache] Consider using WeakReference for cache entries.',
     correctionMessage:
         'WeakReference allows garbage collection under memory pressure.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -484,7 +484,7 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_expando_circular_references',
-    problemMessage: 'Expando value may reference its key, causing memory leak.',
+    problemMessage: '[avoid_expando_circular_references] Expando value may reference its key, causing memory leak.',
     correctionMessage:
         'Ensure Expando values do not hold references to their keys.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -559,7 +559,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_isolate_communication',
-    problemMessage: 'Sending large objects between isolates is expensive.',
+    problemMessage: '[avoid_large_isolate_communication] Sending large objects between isolates is expensive.',
     correctionMessage: 'Use TransferableTypedData or process data in chunks.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

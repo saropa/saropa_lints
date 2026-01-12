@@ -61,7 +61,7 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_unknown_route_handler',
     problemMessage:
-        'App has routes but no onUnknownRoute. Unknown routes will crash.',
+        '[require_unknown_route_handler] App has routes but no onUnknownRoute. Unknown routes will crash.',
     correctionMessage:
         'Add onUnknownRoute to handle undefined routes gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -145,7 +145,7 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_navigation',
     problemMessage:
-        'Using context after await navigation. Widget may be disposed.',
+        '[avoid_context_after_navigation] Using context after await navigation. Widget may be disposed.',
     correctionMessage: 'Add "if (!mounted) return;" before using context.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -315,7 +315,7 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_route_transition_consistency',
-    problemMessage: 'Mixed route transition types. Use consistent transitions.',
+    problemMessage: '[require_route_transition_consistency] Mixed route transition types. Use consistent transitions.',
     correctionMessage:
         'Define transitions in ThemeData.pageTransitionsTheme for consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -402,7 +402,7 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_unnamed',
     problemMessage:
-        'Navigator.push without named route. Use pushNamed or a router.',
+        '[avoid_navigator_push_unnamed] Navigator.push without named route. Use pushNamed or a router.',
     correctionMessage:
         'Define named routes in MaterialApp.routes or use a router package.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -479,7 +479,7 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_route_guards',
-    problemMessage: 'Protected route without authentication guard.',
+    problemMessage: '[require_route_guards] Protected route without authentication guard.',
     correctionMessage:
         'Add redirect callback to check authentication before accessing this route.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -582,7 +582,7 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_redirects',
     problemMessage:
-        'Redirect may cause infinite loop. Always include conditional return null.',
+        '[avoid_circular_redirects] Redirect may cause infinite loop. Always include conditional return null.',
     correctionMessage:
         'Ensure redirect callback returns null in some cases to break the chain.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -662,7 +662,7 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_pop_without_result',
     problemMessage:
-        'Navigator.push result may be null. Handle the case when user presses back.',
+        '[avoid_pop_without_result] Navigator.push result may be null. Handle the case when user presses back.',
     correctionMessage:
         'Check if result is null before using it, or use type-safe routing.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -771,7 +771,7 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_for_persistent_ui',
     problemMessage:
-        'Multiple routes with same bottomNavigationBar. Use ShellRoute instead.',
+        '[prefer_shell_route_for_persistent_ui] Multiple routes with same bottomNavigationBar. Use ShellRoute instead.',
     correctionMessage:
         'Wrap related routes in ShellRoute to share persistent UI elements.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -857,7 +857,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_deep_link_fallback',
-    problemMessage: 'Deep link handler should handle missing/invalid content.',
+    problemMessage: '[require_deep_link_fallback] Deep link handler should handle missing/invalid content.',
     correctionMessage:
         'Add fallback for when linked content is not found or unavailable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -931,7 +931,7 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
-    problemMessage: 'Deep link should not contain sensitive parameters.',
+    problemMessage: '[avoid_deep_link_sensitive_params] Deep link should not contain sensitive parameters.',
     correctionMessage:
         'Do not pass passwords, tokens, or secrets via deep link.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1018,7 +1018,7 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_typed_route_params',
-    problemMessage: 'Route parameter used without type conversion.',
+    problemMessage: '[prefer_typed_route_params] Route parameter used without type conversion.',
     correctionMessage:
         'Use int.tryParse/double.tryParse for numeric parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1104,7 +1104,7 @@ class RequireStepperValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_stepper_validation',
-    problemMessage: 'Stepper onStepContinue should validate before proceeding.',
+    problemMessage: '[require_stepper_validation] Stepper onStepContinue should validate before proceeding.',
     correctionMessage: 'Add form validation in onStepContinue callback.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1178,7 +1178,7 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_step_count_indicator',
-    problemMessage: 'Multi-step flow should show progress indicator.',
+    problemMessage: '[require_step_count_indicator] Multi-step flow should show progress indicator.',
     correctionMessage: 'Add step counter or progress indicator.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1255,7 +1255,7 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_inline_creation',
-    problemMessage: 'GoRouter created in build(). Causes hot reload issues.',
+    problemMessage: '[avoid_go_router_inline_creation] GoRouter created in build(). Causes hot reload issues.',
     correctionMessage:
         'Create GoRouter as a field or in initState(), not in build().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1317,7 +1317,7 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_error_handler',
     problemMessage:
-        'GoRouter without error handler. Unknown routes show blank screen.',
+        '[require_go_router_error_handler] GoRouter without error handler. Unknown routes show blank screen.',
     correctionMessage: 'Add errorBuilder or errorPageBuilder parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1389,7 +1389,7 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_refresh_listenable',
     problemMessage:
-        'GoRouter with redirect but no refreshListenable. Auth changes won\'t refresh routes.',
+        '[require_go_router_refresh_listenable] GoRouter with redirect but no refreshListenable. Auth changes won\'t refresh routes.',
     correctionMessage:
         'Add refreshListenable parameter to update routes on auth changes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1456,7 +1456,7 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_string_paths',
     problemMessage:
-        'String literal in navigation. Use typed routes for type safety.',
+        '[avoid_go_router_string_paths] String literal in navigation. Use typed routes for type safety.',
     correctionMessage:
         'Consider using go_router_builder for type-safe navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1556,7 +1556,7 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_go_router_redirect_auth',
     problemMessage:
-        'Auth check in page builder. Use redirect callback instead.',
+        '[prefer_go_router_redirect_auth] Auth check in page builder. Use redirect callback instead.',
     correctionMessage:
         'Move authentication logic to GoRouter\'s redirect parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1640,7 +1640,7 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_typed_params',
     problemMessage:
-        'Path parameter used without type conversion. May cause runtime errors.',
+        '[require_go_router_typed_params] Path parameter used without type conversion. May cause runtime errors.',
     correctionMessage:
         'Use int.tryParse(), double.tryParse(), or other type conversion.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1746,7 +1746,7 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_go_router_extra_typed',
     problemMessage:
-        'go_router extra parameter should use a typed class instead of Map or dynamic.',
+        '[prefer_go_router_extra_typed] go_router extra parameter should use a typed class instead of Map or dynamic.',
     correctionMessage:
         'Create a typed class for extra parameters to ensure type safety.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1872,7 +1872,7 @@ class PreferMaybePopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_maybe_pop',
     problemMessage:
-        'Navigator.pop() without route check. Use maybePop() for safety.',
+        '[prefer_maybe_pop] Navigator.pop() without route check. Use maybePop() for safety.',
     correctionMessage:
         'Replace with Navigator.maybePop(context) or check canPop() first.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2019,7 +2019,7 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_url_launcher_uri_over_string',
     problemMessage:
-        'launchUrl with Uri.parse. Prefer constructing Uri directly.',
+        '[prefer_url_launcher_uri_over_string] launchUrl with Uri.parse. Prefer constructing Uri directly.',
     correctionMessage:
         'Use Uri.https() or Uri.http() for compile-time validation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2085,7 +2085,7 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_push_replacement_confusion',
     problemMessage:
-        'Using go() replaces the navigation stack. Did you mean push()?',
+        '[avoid_go_router_push_replacement_confusion] Using go() replaces the navigation stack. Did you mean push()?',
     correctionMessage:
         'Use push() to add to stack (back button works), go() to replace.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2186,7 +2186,7 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_encoding',
     problemMessage:
-        'URL with interpolation may have unencoded characters. Use Uri.encodeComponent or Uri constructor.',
+        '[require_url_launcher_encoding] URL with interpolation may have unencoded characters. Use Uri.encodeComponent or Uri constructor.',
     correctionMessage:
         'Use Uri.encodeComponent() for query params or Uri.https() constructor.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2328,7 +2328,7 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_nested_routes_without_parent',
     problemMessage:
-        'Navigating to deeply nested route. Ensure parent routes are in navigation stack.',
+        '[avoid_nested_routes_without_parent] Navigating to deeply nested route. Ensure parent routes are in navigation stack.',
     correctionMessage:
         'Use push() instead of go(), or verify route hierarchy supports deep linking.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2402,7 +2402,7 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_shared_layout',
-    problemMessage: 'GoRoute with Scaffold builder may duplicate layout code.',
+    problemMessage: '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code.',
     correctionMessage:
         'Consider using ShellRoute for shared AppBar/BottomNav layouts.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2478,7 +2478,7 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stateful_shell_route_tabs',
     problemMessage:
-        'ShellRoute with tab-like navigation may lose state on tab switch.',
+        '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch.',
     correctionMessage:
         'Use StatefulShellRoute.indexedStack for preserving tab state.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2551,7 +2551,7 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_go_router_fallback_route',
-    problemMessage: 'GoRouter without errorBuilder or errorPageBuilder.',
+    problemMessage: '[require_go_router_fallback_route] GoRouter without errorBuilder or errorPageBuilder.',
     correctionMessage: 'Add errorBuilder: (context, state) => ErrorPage().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
