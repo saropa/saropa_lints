@@ -167,7 +167,8 @@ class PreferSingleExitPointRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_exit_point',
-    problemMessage: 'Consider using single exit point instead of early returns.',
+    problemMessage:
+        'Consider using single exit point instead of early returns.',
     correctionMessage: 'Single exit makes cleanup and logging easier.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -272,7 +273,8 @@ class PreferGuardClausesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_guard_clauses',
-    problemMessage: 'Consider using guard clauses at the start of the function.',
+    problemMessage:
+        'Consider using guard clauses at the start of the function.',
     correctionMessage: 'Guard clauses make preconditions explicit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -423,7 +425,8 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_expression',
     problemMessage: 'Consider using switch expression instead of statement.',
-    correctionMessage: 'Switch expressions are more concise for value production.',
+    correctionMessage:
+        'Switch expressions are more concise for value production.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -701,7 +704,8 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_exhaustive_enums',
     problemMessage: 'Prefer exhaustive enum cases instead of default.',
-    correctionMessage: 'Exhaustive switches catch missing cases at compile time.',
+    correctionMessage:
+        'Exhaustive switches catch missing cases at compile time.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -878,7 +882,8 @@ class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
           if (_containsAwaitExpression(stmt.expression!)) hasAwait = true;
         } else if (stmt is VariableDeclarationStatement) {
           for (final v in stmt.variables.variables) {
-            if (v.initializer != null && _containsAwaitExpression(v.initializer!)) {
+            if (v.initializer != null &&
+                _containsAwaitExpression(v.initializer!)) {
               hasAwait = true;
             }
           }

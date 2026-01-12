@@ -51,8 +51,10 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_specific_exceptions',
-    problemMessage: 'Throw specific exception types instead of generic Exception.',
-    correctionMessage: 'Create a custom exception class for better error handling.',
+    problemMessage:
+        'Throw specific exception types instead of generic Exception.',
+    correctionMessage:
+        'Create a custom exception class for better error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -523,8 +525,10 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_self_documenting_tests',
-    problemMessage: 'Avoid Arrange/Act/Assert comments - prefer self-documenting code.',
-    correctionMessage: 'Write clear, self-documenting tests without structure comments.',
+    problemMessage:
+        'Avoid Arrange/Act/Assert comments - prefer self-documenting code.',
+    correctionMessage:
+        'Write clear, self-documenting tests without structure comments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -911,7 +915,8 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_descriptive',
-    problemMessage: 'Use descriptive test names instead of rigid should/when pattern.',
+    problemMessage:
+        'Use descriptive test names instead of rigid should/when pattern.',
     correctionMessage: 'Use natural, descriptive test names.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

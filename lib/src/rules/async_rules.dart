@@ -3074,8 +3074,7 @@ class PreferFutureWaitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_future_wait',
-    problemMessage:
-        'Sequential awaits could run in parallel with Future.wait.',
+    problemMessage: 'Sequential awaits could run in parallel with Future.wait.',
     correctionMessage:
         'Use Future.wait([future1, future2]) to run independent futures '
         'concurrently, or (future1, future2).wait in Dart 3.',
