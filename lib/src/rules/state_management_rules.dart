@@ -6932,7 +6932,7 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
   }
 }
 
-/// Warns when Provider.of<T>(context) is used in build method.
+/// Warns when `Provider.of<T>(context)` sis used in build method.
 ///
 /// Provider.of rebuilds on every change. Use Consumer or context.watch
 /// for more granular rebuilds.
