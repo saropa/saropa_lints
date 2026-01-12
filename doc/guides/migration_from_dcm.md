@@ -198,6 +198,7 @@ saropa_lints includes Flutter-specific rules beyond DCM's scope:
 
 DCM provides some features saropa_lints doesn't focus on:
 
+<!-- cspell:ignore cloc Halstead -->
 | DCM Feature | Alternative |
 |-------------|-------------|
 | Cyclomatic complexity metrics | Use `dart analyze` or IDE plugins |
