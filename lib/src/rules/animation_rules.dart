@@ -54,7 +54,7 @@ class RequireVsyncMixinRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_vsync_mixin',
-    problemMessage: 'AnimationController created without vsync parameter.',
+    problemMessage: '[require_vsync_mixin] AnimationController created without vsync parameter.',
     correctionMessage:
         'Add vsync: this and use SingleTickerProviderStateMixin or TickerProviderStateMixin.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -168,7 +168,7 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_animation_in_build',
     problemMessage:
-        'AnimationController created in build() is recreated on every rebuild.',
+        '[avoid_animation_in_build] AnimationController created in build() is recreated on every rebuild.',
     correctionMessage:
         'Create AnimationController in initState() or as a late final field.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -292,7 +292,7 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_controller_dispose',
     problemMessage:
-        'AnimationController is not disposed. This causes memory leaks.',
+        '[require_animation_controller_dispose] AnimationController is not disposed. This causes memory leaks.',
     correctionMessage:
         'Add _controller.dispose() in dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -500,7 +500,7 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hero_tag_uniqueness',
     problemMessage:
-        'Duplicate Hero tag found. This causes "Multiple heroes" error.',
+        '[require_hero_tag_uniqueness] Duplicate Hero tag found. This causes "Multiple heroes" error.',
     correctionMessage:
         'Use unique tags for each Hero widget, e.g., include IDs or indices.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -597,7 +597,7 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_layout_passes',
     problemMessage:
-        'IntrinsicWidth/Height causes two layout passes. This hurts performance.',
+        '[avoid_layout_passes] IntrinsicWidth/Height causes two layout passes. This hurts performance.',
     correctionMessage:
         'Use CrossAxisAlignment.stretch, Expanded, or fixed dimensions instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -663,7 +663,7 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_duration',
     problemMessage:
-        'Avoid hardcoded Duration values. Use named constants instead.',
+        '[avoid_hardcoded_duration] Avoid hardcoded Duration values. Use named constants instead.',
     correctionMessage:
         'Extract Duration to a named constant for consistency and maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -762,7 +762,7 @@ class RequireAnimationCurveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_curve',
     problemMessage:
-        'Animation uses default linear curve. Specify a curve for natural motion.',
+        '[require_animation_curve] Animation uses default linear curve. Specify a curve for natural motion.',
     correctionMessage:
         'Wrap with CurvedAnimation or use .animate() with a curve parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -854,7 +854,7 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_implicit_animations',
     problemMessage:
-        'Simple animation could use AnimatedOpacity, AnimatedContainer, etc.',
+        '[prefer_implicit_animations] Simple animation could use AnimatedOpacity, AnimatedContainer, etc.',
     correctionMessage:
         'Implicit animations are simpler and auto-dispose. Use for single-property changes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -964,7 +964,7 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_staggered_animation_delays',
     problemMessage:
-        'List item animations should be staggered for smooth cascade effect.',
+        '[require_staggered_animation_delays] List item animations should be staggered for smooth cascade effect.',
     correctionMessage:
         'Use Interval with index-based delays: Interval(index * 0.1, ...).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1058,7 +1058,7 @@ class PreferTweenSequenceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_tween_sequence',
-    problemMessage: 'Multiple chained animations should use TweenSequence.',
+    problemMessage: '[prefer_tween_sequence] Multiple chained animations should use TweenSequence.',
     correctionMessage: 'Use TweenSequence for sequential animations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1126,7 +1126,7 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_status_listener',
     problemMessage:
-        'One-shot animation should have StatusListener for completion.',
+        '[require_animation_status_listener] One-shot animation should have StatusListener for completion.',
     correctionMessage: 'Add addStatusListener to handle animation completion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1211,7 +1211,7 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_overlapping_animations',
-    problemMessage: 'Multiple animations on same property cause conflicts.',
+    problemMessage: '[avoid_overlapping_animations] Multiple animations on same property cause conflicts.',
     correctionMessage:
         'Combine into single animation or use different properties.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1306,7 +1306,7 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_animation_rebuild_waste',
-    problemMessage: 'AnimatedBuilder wraps too much of the widget tree.',
+    problemMessage: '[avoid_animation_rebuild_waste] AnimatedBuilder wraps too much of the widget tree.',
     correctionMessage: 'Move AnimatedBuilder closer to animated widgets only.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1389,7 +1389,7 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_physics_simulation',
     problemMessage:
-        'Drag-release should use physics simulation for natural feel.',
+        '[prefer_physics_simulation] Drag-release should use physics simulation for natural feel.',
     correctionMessage:
         'Use SpringSimulation or FrictionSimulation with animateWith.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1498,7 +1498,7 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_ticker_disposal',
     problemMessage:
-        'Ticker must be stopped in dispose() to prevent memory leaks.',
+        '[require_animation_ticker_disposal] Ticker must be stopped in dispose() to prevent memory leaks.',
     correctionMessage:
         'Add _ticker.stop() in dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,

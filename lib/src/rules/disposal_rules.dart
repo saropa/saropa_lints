@@ -69,7 +69,7 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_media_player_dispose',
     problemMessage:
-        'Media player controller must be disposed to release hardware resources.',
+        '[require_media_player_dispose] Media player controller must be disposed to release hardware resources.',
     correctionMessage:
         'Add controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -209,7 +209,7 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_dispose',
     problemMessage:
-        'TabController must be disposed to free animation resources.',
+        '[require_tab_controller_dispose] TabController must be disposed to free animation resources.',
     correctionMessage:
         'Add _tabController.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -449,7 +449,7 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_editing_controller_dispose',
     problemMessage:
-        'TextEditingController must be disposed to prevent memory leaks.',
+        '[require_text_editing_controller_dispose] TextEditingController must be disposed to prevent memory leaks.',
     correctionMessage: 'Add _textController.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -520,7 +520,7 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_page_controller_dispose',
-    problemMessage: 'PageController must be disposed to prevent memory leaks.',
+    problemMessage: '[require_page_controller_dispose] PageController must be disposed to prevent memory leaks.',
     correctionMessage: 'Add _pageController.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -608,7 +608,7 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_lifecycle_observer',
-    problemMessage: 'Timer.periodic should pause when app is backgrounded.',
+    problemMessage: '[require_lifecycle_observer] Timer.periodic should pause when app is backgrounded.',
     correctionMessage:
         'Add WidgetsBindingObserver and handle didChangeAppLifecycleState.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -707,7 +707,7 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_memory_leak',
-    problemMessage: 'WebSocketChannel must be closed in dispose().',
+    problemMessage: '[avoid_websocket_memory_leak] WebSocketChannel must be closed in dispose().',
     correctionMessage: 'Add channel.sink.close() to dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -818,7 +818,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_video_player_controller_dispose',
-    problemMessage: 'VideoPlayerController must be disposed.',
+    problemMessage: '[require_video_player_controller_dispose] VideoPlayerController must be disposed.',
     correctionMessage: 'Add _controller.dispose() to dispose method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -949,7 +949,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_stream_subscription_cancel',
-    problemMessage: 'StreamSubscription must be cancelled in dispose().',
+    problemMessage: '[require_stream_subscription_cancel] StreamSubscription must be cancelled in dispose().',
     correctionMessage:
         'Add _subscription?.cancel() for single subscriptions, or iterate '
         'with for-in/forEach for collections.',
@@ -1311,7 +1311,7 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_change_notifier_dispose',
-    problemMessage: 'ChangeNotifier must be disposed to clear listeners.',
+    problemMessage: '[require_change_notifier_dispose] ChangeNotifier must be disposed to clear listeners.',
     correctionMessage: 'Add notifier.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1412,7 +1412,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_receive_port_close',
-    problemMessage: 'ReceivePort must be closed to release isolate resources.',
+    problemMessage: '[require_receive_port_close] ReceivePort must be closed to release isolate resources.',
     correctionMessage: 'Add _receivePort.close() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1517,7 +1517,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_socket_close',
-    problemMessage: 'Socket must be closed to release network resources.',
+    problemMessage: '[require_socket_close] Socket must be closed to release network resources.',
     correctionMessage: 'Add _socket?.close() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1634,7 +1634,7 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_debouncer_cancel',
-    problemMessage: 'Debounce timer must be cancelled in dispose().',
+    problemMessage: '[require_debouncer_cancel] Debounce timer must be cancelled in dispose().',
     correctionMessage: 'Add _debounce?.cancel() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1749,7 +1749,7 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_interval_timer_cancel',
-    problemMessage: 'Timer.periodic must be cancelled in dispose().',
+    problemMessage: '[require_interval_timer_cancel] Timer.periodic must be cancelled in dispose().',
     correctionMessage: 'Add _timer?.cancel() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1873,7 +1873,7 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_file_handle_close',
     problemMessage:
-        'RandomAccessFile must be closed to release file descriptors.',
+        '[require_file_handle_close] RandomAccessFile must be closed to release file descriptors.',
     correctionMessage: 'Add _file?.closeSync() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2003,7 +2003,7 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dispose_implementation',
     problemMessage:
-        'StatefulWidget has disposable resources but no dispose() method.',
+        '[require_dispose_implementation] StatefulWidget has disposable resources but no dispose() method.',
     correctionMessage:
         'Add dispose() method to clean up controllers, subscriptions, and timers.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2173,7 +2173,7 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dispose_before_new_instance',
-    problemMessage: 'Disposable field reassigned without disposing old value.',
+    problemMessage: '[prefer_dispose_before_new_instance] Disposable field reassigned without disposing old value.',
     correctionMessage:
         'Call dispose() on the old value before assigning a new instance.',
     errorSeverity: DiagnosticSeverity.WARNING,

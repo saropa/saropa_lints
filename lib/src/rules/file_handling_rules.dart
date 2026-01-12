@@ -38,7 +38,7 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_file_exists_check',
     problemMessage:
-        'File read operation should check exists() or use try-catch.',
+        '[require_file_exists_check] File read operation should check exists() or use try-catch.',
     correctionMessage: 'Wrap in if (await file.exists()) or try-catch block.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -143,7 +143,7 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pdf_error_handling',
-    problemMessage: 'PDF loading should have error handling.',
+    problemMessage: '[require_pdf_error_handling] PDF loading should have error handling.',
     correctionMessage: 'Wrap PDF loading in try-catch block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -243,7 +243,7 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_graphql_error_handling',
     problemMessage:
-        'GraphQL result should check hasException before accessing data.',
+        '[require_graphql_error_handling] GraphQL result should check hasException before accessing data.',
     correctionMessage:
         'Add if (result.hasException) check before result.data access.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -338,7 +338,7 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_whereargs',
     problemMessage:
-        'SQL injection vulnerability. Use whereArgs instead of string interpolation.',
+        '[require_sqflite_whereargs] SQL injection vulnerability. Use whereArgs instead of string interpolation.',
     correctionMessage:
         'Replace string interpolation with ? placeholders and whereArgs parameter.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -448,7 +448,7 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_transaction',
     problemMessage:
-        'Multiple sequential writes should use transaction for atomicity.',
+        '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity.',
     correctionMessage:
         'Wrap writes in db.transaction() for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -554,7 +554,7 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_error_handling',
-    problemMessage: 'Database operation should have error handling.',
+    problemMessage: '[require_sqflite_error_handling] Database operation should have error handling.',
     correctionMessage: 'Wrap in try-catch to handle DatabaseException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -637,7 +637,7 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_batch',
     problemMessage:
-        'Database insert in loop. Use batch operations for better performance.',
+        '[prefer_sqflite_batch] Database insert in loop. Use batch operations for better performance.',
     correctionMessage: 'Use db.batch() with batch.insert() and batch.commit().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -722,7 +722,7 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_close',
-    problemMessage: 'Database opened but not closed. Resource leak possible.',
+    problemMessage: '[require_sqflite_close] Database opened but not closed. Resource leak possible.',
     correctionMessage:
         'Ensure db.close() is called, preferably in a finally block or dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -827,7 +827,7 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sqflite_reserved_words',
     problemMessage:
-        'SQL statement may contain SQLite reserved word as column name.',
+        '[avoid_sqflite_reserved_words] SQL statement may contain SQLite reserved word as column name.',
     correctionMessage:
         'Escape reserved words with double quotes or rename the column.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1060,7 +1060,7 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_initialization',
     problemMessage:
-        'Hive.openBox called. Verify Hive.init() or Hive.initFlutter() is called in main().',
+        '[require_hive_initialization] Hive.openBox called. Verify Hive.init() or Hive.initFlutter() is called in main().',
     correctionMessage:
         'Ensure Hive.initFlutter() is called in main() before opening boxes (cannot verify cross-file).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1126,7 +1126,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_type_adapter',
     problemMessage:
-        'Storing object in Hive. Ensure class has @HiveType annotation.',
+        '[require_hive_type_adapter] Storing object in Hive. Ensure class has @HiveType annotation.',
     correctionMessage:
         'Add @HiveType(typeId: X) annotation and generate adapter with build_runner.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1221,7 +1221,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
-    problemMessage: 'Hive box opened but not closed in dispose. Resource leak.',
+    problemMessage: '[require_hive_box_close] Hive box opened but not closed in dispose. Resource leak.',
     correctionMessage: 'Call box.close() in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1303,7 +1303,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
-    problemMessage: 'Sensitive data stored in unencrypted Hive box.',
+    problemMessage: '[prefer_hive_encryption] Sensitive data stored in unencrypted Hive box.',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1384,7 +1384,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_encryption_key_secure',
     problemMessage:
-        'Hardcoded Hive encryption key. Can be extracted from app binary.',
+        '[require_hive_encryption_key_secure] Hardcoded Hive encryption key. Can be extracted from app binary.',
     correctionMessage:
         'Store encryption key in flutter_secure_storage, not in code.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1475,7 +1475,7 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sqflite_read_all_columns',
     problemMessage:
-        'SELECT * fetches unnecessary columns, wasting memory and bandwidth.',
+        '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth.',
     correctionMessage:
         'Specify only the columns you need: SELECT id, name, email FROM ...',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1577,7 +1577,7 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_loading_full_pdf_in_memory',
     problemMessage:
-        'Loading entire PDF into memory may cause out-of-memory errors.',
+        '[avoid_loading_full_pdf_in_memory] Loading entire PDF into memory may cause out-of-memory errors.',
     correctionMessage:
         'Use file path-based loading or streaming instead of loading bytes into memory.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1699,7 +1699,7 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_singleton',
     problemMessage:
-        'openDatabase called directly. May create multiple connections.',
+        '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections.',
     correctionMessage: 'Use a singleton pattern for database instance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1774,7 +1774,7 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_column_constants',
-    problemMessage: 'String literal column name may contain typos.',
+    problemMessage: '[prefer_sqflite_column_constants] String literal column name may contain typos.',
     correctionMessage: 'Define column names as constants in a table class.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

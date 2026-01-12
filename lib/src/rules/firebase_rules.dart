@@ -48,7 +48,7 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_unbounded_query',
     problemMessage:
-        'Firestore query without limit() could return excessive data.',
+        '[avoid_firestore_unbounded_query] Firestore query without limit() could return excessive data.',
     correctionMessage:
         'Add .limit(n) to prevent unbounded queries and control costs.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -144,7 +144,7 @@ class AvoidDatabaseInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_database_in_build',
     problemMessage:
-        'Database query in build() runs on every rebuild. Cache the query.',
+        '[avoid_database_in_build] Database query in build() runs on every rebuild. Cache the query.',
     correctionMessage:
         'Move database queries to initState() or use cached futures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -256,7 +256,7 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_prefs_key_constants',
     problemMessage:
-        'SharedPreferences key should be a constant, not a string literal.',
+        '[require_prefs_key_constants] SharedPreferences key should be a constant, not a string literal.',
     correctionMessage:
         'Define preference keys as constants to avoid typos and enable refactoring.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -345,7 +345,7 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_secure_storage_on_web',
     problemMessage:
-        'flutter_secure_storage uses localStorage on web (not secure).',
+        '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web (not secure).',
     correctionMessage:
         'Check kIsWeb and use alternative storage for web platform.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -433,7 +433,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_prefs_for_large_data',
     problemMessage:
-        'SharedPreferences is not suitable for large data. Use a database.',
+        '[avoid_prefs_for_large_data] SharedPreferences is not suitable for large data. Use a database.',
     correctionMessage:
         'Use Hive, Isar, or SQLite for collections. SharedPreferences is for small settings only.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -533,7 +533,7 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_firebase_init_before_use',
     problemMessage:
-        'Firebase service used without ensuring Firebase.initializeApp() was called.',
+        '[require_firebase_init_before_use] Firebase service used without ensuring Firebase.initializeApp() was called.',
     correctionMessage:
         'Ensure Firebase.initializeApp() completes in main() before runApp().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -660,7 +660,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_migration',
     problemMessage:
-        'Database model without migration support. Schema changes may break data.',
+        '[require_database_migration] Database model without migration support. Schema changes may break data.',
     correctionMessage:
         'Implement versioned migrations for database schema changes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -765,7 +765,7 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_index',
     problemMessage:
-        'Database query on non-indexed field. Add @Index for better performance.',
+        '[require_database_index] Database query on non-indexed field. Add @Index for better performance.',
     correctionMessage:
         'Add @Index() annotation to fields used in queries and filters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -863,7 +863,7 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_transaction_for_batch',
     problemMessage:
-        'Multiple sequential database writes. Use transaction for atomicity.',
+        '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity.',
     correctionMessage:
         'Wrap related writes in a transaction or use batch operations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -966,7 +966,7 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_database_close',
     problemMessage:
-        'Database opened but no close() method found. Resource leak risk.',
+        '[require_hive_database_close] Database opened but no close() method found. Resource leak risk.',
     correctionMessage: 'Add dispose() method that calls database.close().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1037,7 +1037,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_type_adapter_registration',
     problemMessage:
-        'Hive box opened with custom type but adapter may not be registered.',
+        '[require_type_adapter_registration] Hive box opened with custom type but adapter may not be registered.',
     correctionMessage:
         'Ensure Hive.registerAdapter() is called before opening typed boxes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1130,7 +1130,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_lazy_box_for_large',
     problemMessage:
-        'Large collection uses regular Hive box. Consider openLazyBox for memory.',
+        '[prefer_lazy_box_for_large] Large collection uses regular Hive box. Consider openLazyBox for memory.',
     correctionMessage:
         'Use Hive.openLazyBox() for collections that may grow large.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1237,7 +1237,7 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_event_name',
     problemMessage:
-        'Firebase Analytics event name does not follow conventions.',
+        '[incorrect_firebase_event_name] Firebase Analytics event name does not follow conventions.',
     correctionMessage:
         'Event names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
@@ -1337,7 +1337,7 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_parameter_name',
     problemMessage:
-        'Firebase Analytics parameter name does not follow conventions.',
+        '[incorrect_firebase_parameter_name] Firebase Analytics parameter name does not follow conventions.',
     correctionMessage:
         'Parameter names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
@@ -1438,7 +1438,7 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_firestore_batch_write',
-    problemMessage: 'Multiple individual Firestore writes should be batched.',
+    problemMessage: '[prefer_firestore_batch_write] Multiple individual Firestore writes should be batched.',
     correctionMessage: 'Use WriteBatch for multiple related write operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1524,7 +1524,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_in_widget_build',
-    problemMessage: 'Firestore operation in build() causes queries on rebuild.',
+    problemMessage: '[avoid_firestore_in_widget_build] Firestore operation in build() causes queries on rebuild.',
     correctionMessage: 'Use StreamBuilder/FutureBuilder or state management.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1616,7 +1616,7 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_remote_config_defaults',
-    problemMessage: 'RemoteConfig should have defaults set before use.',
+    problemMessage: '[prefer_firebase_remote_config_defaults] RemoteConfig should have defaults set before use.',
     correctionMessage: 'Call setDefaults() with fallback values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1694,7 +1694,7 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_fcm_token_refresh_handler',
-    problemMessage: 'FCM token refresh should be handled.',
+    problemMessage: '[require_fcm_token_refresh_handler] FCM token refresh should be handled.',
     correctionMessage:
         'Listen to onTokenRefresh to update server with new tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1774,7 +1774,7 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_background_message_handler',
-    problemMessage: 'FCM should have a background message handler.',
+    problemMessage: '[require_background_message_handler] FCM should have a background message handler.',
     correctionMessage:
         'Add onBackgroundMessage with a top-level handler function.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1856,7 +1856,7 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_map_markers_in_build',
-    problemMessage: 'Creating map markers in build() causes flickering.',
+    problemMessage: '[avoid_map_markers_in_build] Creating map markers in build() causes flickering.',
     correctionMessage: 'Cache markers in state and only recreate when needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1928,7 +1928,7 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_map_idle_callback',
-    problemMessage: 'Data fetching should use onCameraIdle, not onCameraMove.',
+    problemMessage: '[require_map_idle_callback] Data fetching should use onCameraIdle, not onCameraMove.',
     correctionMessage: 'Move data fetching to onCameraIdle to prevent spam.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1998,7 +1998,7 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_marker_clustering',
-    problemMessage: 'Consider using marker clustering for better performance.',
+    problemMessage: '[prefer_marker_clustering] Consider using marker clustering for better performance.',
     correctionMessage: 'Use marker clustering library for many markers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2060,7 +2060,7 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_crashlytics_user_id',
     problemMessage:
-        'Crashlytics setup without setUserIdentifier. Crashes will be anonymous.',
+        '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous.',
     correctionMessage:
         'Add FirebaseCrashlytics.instance.setUserIdentifier(userId).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2151,7 +2151,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_firebase_app_check',
-    problemMessage: 'Firebase initialization without App Check activation.',
+    problemMessage: '[require_firebase_app_check] Firebase initialization without App Check activation.',
     correctionMessage:
         'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2245,7 +2245,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_user_data_in_auth',
     problemMessage:
-        'Large object in setCustomClaims. Claims are for roles, not data storage.',
+        '[avoid_storing_user_data_in_auth] Large object in setCustomClaims. Claims are for roles, not data storage.',
     correctionMessage:
         'Store user data in Firestore. Use claims only for access control (roles, permissions).',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2343,7 +2343,7 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_auth_persistence',
     problemMessage:
-        'Firebase Auth on web defaults to session persistence. Consider setting LOCAL persistence.',
+        '[prefer_firebase_auth_persistence] Firebase Auth on web defaults to session persistence. Consider setting LOCAL persistence.',
     correctionMessage:
         'Call FirebaseAuth.instance.setPersistence(Persistence.LOCAL) before sign-in for "remember me".',
     errorSeverity: DiagnosticSeverity.INFO,

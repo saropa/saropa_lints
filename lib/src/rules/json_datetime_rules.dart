@@ -42,7 +42,7 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_json_decode_try_catch',
-    problemMessage: 'jsonDecode throws on malformed JSON. Wrap in try-catch.',
+    problemMessage: '[require_json_decode_try_catch] jsonDecode throws on malformed JSON. Wrap in try-catch.',
     correctionMessage: 'Add try-catch for FormatException around jsonDecode.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -121,7 +121,7 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_parse_unvalidated',
     problemMessage:
-        'DateTime.parse throws on invalid input. Use tryParse or try-catch.',
+        '[avoid_datetime_parse_unvalidated] DateTime.parse throws on invalid input. Use tryParse or try-catch.',
     correctionMessage: 'Replace with DateTime.tryParse() or wrap in try-catch.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -223,7 +223,7 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_try_parse_for_dynamic_data',
     problemMessage:
-        'parse() throws on invalid input. Use tryParse() for dynamic data.',
+        '[prefer_try_parse_for_dynamic_data] parse() throws on invalid input. Use tryParse() for dynamic data.',
     correctionMessage: 'Replace with tryParse() and handle null result.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -332,7 +332,7 @@ class PreferDurationConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
-    problemMessage: 'Duration can use a cleaner unit.',
+    problemMessage: '[prefer_duration_constants] Duration can use a cleaner unit.',
     correctionMessage: 'Use a larger unit for cleaner code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -409,7 +409,7 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_now_in_tests',
-    problemMessage: 'DateTime.now() in tests can cause flaky behavior.',
+    problemMessage: '[avoid_datetime_now_in_tests] DateTime.now() in tests can cause flaky behavior.',
     correctionMessage:
         'Use fixed datetime values or a clock abstraction for predictable tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -486,7 +486,7 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_not_encodable_in_to_json',
-    problemMessage: 'Value is not JSON-encodable and will cause runtime error.',
+    problemMessage: '[avoid_not_encodable_in_to_json] Value is not JSON-encodable and will cause runtime error.',
     correctionMessage:
         'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
         '.toJson() for objects, or remove non-serializable values.',
@@ -755,7 +755,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_json_converter',
     problemMessage:
-        'Freezed class with DateTime/Color field may need JsonConverter.',
+        '[require_freezed_json_converter] Freezed class with DateTime/Color field may need JsonConverter.',
     correctionMessage:
         'Add @JsonSerializable(converters: [...]) for custom types.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -880,7 +880,7 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_lint_package',
     problemMessage:
-        'File uses Freezed. Consider adding freezed_lint package for specialized linting.',
+        '[require_freezed_lint_package] File uses Freezed. Consider adding freezed_lint package for specialized linting.',
     correctionMessage:
         'Add freezed_lint to dev_dependencies. Disable this rule if already installed.',
     errorSeverity: DiagnosticSeverity.INFO,

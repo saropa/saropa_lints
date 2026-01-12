@@ -35,7 +35,7 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_rebuild_on_scroll',
-    problemMessage: 'Image.network in ListView.builder will rebuild on scroll.',
+    problemMessage: '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll.',
     correctionMessage:
         'Use CachedNetworkImage or move image loading outside the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -141,7 +141,7 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_avatar_fallback',
     problemMessage:
-        'CircleAvatar with NetworkImage should have onBackgroundImageError.',
+        '[require_avatar_fallback] CircleAvatar with NetworkImage should have onBackgroundImageError.',
     correctionMessage:
         'Add onBackgroundImageError callback or use Image with ClipOval.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -227,7 +227,7 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_video_loading_placeholder',
-    problemMessage: 'Video player should have a loading placeholder.',
+    problemMessage: '[prefer_video_loading_placeholder] Video player should have a loading placeholder.',
     correctionMessage: 'Add placeholder parameter for better UX during load.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -308,7 +308,7 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_size_constraints',
     problemMessage:
-        'Consider adding cacheWidth/cacheHeight for memory optimization.',
+        '[prefer_image_size_constraints] Consider adding cacheWidth/cacheHeight for memory optimization.',
     correctionMessage:
         'Set cacheWidth/cacheHeight to avoid decoding at full resolution.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -387,7 +387,7 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_error_fallback',
     problemMessage:
-        'Image.network should have an errorBuilder for failed loads.',
+        '[require_image_error_fallback] Image.network should have an errorBuilder for failed loads.',
     correctionMessage: 'Add errorBuilder callback to handle network failures.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -460,7 +460,7 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_loading_placeholder',
     problemMessage:
-        'Image.network should have a loadingBuilder for UX feedback.',
+        '[require_image_loading_placeholder] Image.network should have a loadingBuilder for UX feedback.',
     correctionMessage: 'Add loadingBuilder to show progress while loading.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -531,7 +531,7 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_media_loading_state',
-    problemMessage: 'VideoPlayer should check isInitialized before displaying.',
+    problemMessage: '[require_media_loading_state] VideoPlayer should check isInitialized before displaying.',
     correctionMessage:
         'Wrap VideoPlayer in a conditional checking controller.value.isInitialized.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -624,7 +624,7 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pdf_loading_indicator',
-    problemMessage: 'PDF viewer should provide loading feedback.',
+    problemMessage: '[require_pdf_loading_indicator] PDF viewer should provide loading feedback.',
     correctionMessage:
         'Add loading state handling or use onDocumentLoaded callback.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -707,7 +707,7 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_clipboard_feedback',
-    problemMessage: 'Clipboard.setData should provide user feedback.',
+    problemMessage: '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback.',
     correctionMessage: 'Add SnackBar or Toast to confirm clipboard operation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -790,7 +790,7 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_dimensions',
     problemMessage:
-        'CachedNetworkImage without cache dimensions. Large images cause OOM.',
+        '[require_cached_image_dimensions] CachedNetworkImage without cache dimensions. Large images cause OOM.',
     correctionMessage:
         'Add memCacheWidth/memCacheHeight to limit decoded image size.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -862,7 +862,7 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_placeholder',
     problemMessage:
-        'CachedNetworkImage without placeholder. User sees blank during load.',
+        '[require_cached_image_placeholder] CachedNetworkImage without placeholder. User sees blank during load.',
     correctionMessage: 'Add placeholder parameter for loading state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -928,7 +928,7 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cached_image_error_widget',
     problemMessage:
-        'CachedNetworkImage without errorWidget. Broken images show nothing.',
+        '[require_cached_image_error_widget] CachedNetworkImage without errorWidget. Broken images show nothing.',
     correctionMessage: 'Add errorWidget parameter to handle failed loads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -999,7 +999,7 @@ class RequireExifHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_exif_handling',
     problemMessage:
-        'Image.file may show photos rotated. Consider EXIF handling.',
+        '[require_exif_handling] Image.file may show photos rotated. Consider EXIF handling.',
     correctionMessage:
         'Use flutter_image_compress or similar to auto-rotate camera photos.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1086,7 +1086,7 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_fade_animation',
     problemMessage:
-        'CachedNetworkImage without fadeInDuration causes abrupt image pop-in.',
+        '[prefer_cached_image_fade_animation] CachedNetworkImage without fadeInDuration causes abrupt image pop-in.',
     correctionMessage: 'Add fadeInDuration for a smoother loading experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1188,7 +1188,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_stream_dispose',
     problemMessage:
-        'ImageStream listener must be removed in dispose() to prevent memory leaks.',
+        '[require_image_stream_dispose] ImageStream listener must be removed in dispose() to prevent memory leaks.',
     correctionMessage:
         'Add _imageStream?.removeListener(_listener) in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1309,7 +1309,7 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_request_full_metadata',
     problemMessage:
-        'pickImage without requestFullMetadata. Consider setting false for privacy.',
+        '[prefer_image_picker_request_full_metadata] pickImage without requestFullMetadata. Consider setting false for privacy.',
     correctionMessage:
         'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1403,7 +1403,7 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_large_files',
-    problemMessage: 'pickImage without imageQuality. Raw photos can be 10+ MB.',
+    problemMessage: '[avoid_image_picker_large_files] pickImage without imageQuality. Raw photos can be 10+ MB.',
     correctionMessage:
         'Add imageQuality (e.g., 85) to compress images and reduce file size.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1496,7 +1496,7 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_image_cache_manager',
     problemMessage:
-        'CachedNetworkImage without CacheManager. Cache may grow unbounded.',
+        '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded.',
     correctionMessage:
         'Add cacheManager parameter to limit cache size and stale period.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1563,7 +1563,7 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_cache_dimensions',
     problemMessage:
-        'Image.network without cacheWidth/cacheHeight. High memory usage.',
+        '[require_image_cache_dimensions] Image.network without cacheWidth/cacheHeight. High memory usage.',
     correctionMessage:
         'Add cacheWidth and/or cacheHeight to limit decoded image size.',
     errorSeverity: DiagnosticSeverity.WARNING,

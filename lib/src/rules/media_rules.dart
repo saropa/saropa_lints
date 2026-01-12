@@ -43,7 +43,7 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_autoplay_audio',
-    problemMessage: 'Autoplay is blocked on iOS/web and annoys users.',
+    problemMessage: '[avoid_autoplay_audio] Autoplay is blocked on iOS/web and annoys users.',
     correctionMessage:
         'Set autoPlay: false and require user interaction to play.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -133,7 +133,7 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_camera_resolution_selection',
     problemMessage:
-        'CameraController with max resolution. Consider app-specific needs.',
+        '[prefer_camera_resolution_selection] CameraController with max resolution. Consider app-specific needs.',
     correctionMessage:
         'Use ResolutionPreset.medium for video calls, .high for photos.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -198,7 +198,7 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_audio_session_config',
     problemMessage:
-        'AudioPlayer used without audio session config. May conflict with other audio.',
+        '[prefer_audio_session_config] AudioPlayer used without audio session config. May conflict with other audio.',
     correctionMessage: 'Configure AudioSession.instance before playing audio.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

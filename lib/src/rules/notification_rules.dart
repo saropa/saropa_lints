@@ -53,7 +53,7 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_channel_android',
     problemMessage:
-        'Android notification should specify channel ID and description.',
+        '[require_notification_channel_android] Android notification should specify channel ID and description.',
     correctionMessage:
         'Add channelId and channelDescription for Android 8.0+ compatibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -179,7 +179,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_payload_sensitive',
     problemMessage:
-        'Notification may contain sensitive data visible on lock screen.',
+        '[avoid_notification_payload_sensitive] Notification may contain sensitive data visible on lock screen.',
     correctionMessage:
         'Remove sensitive info from notifications. Use generic messages instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -394,7 +394,7 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_initialize_per_platform',
     problemMessage:
-        'InitializationSettings should include both android and iOS settings.',
+        '[require_notification_initialize_per_platform] InitializationSettings should include both android and iOS settings.',
     correctionMessage:
         'Add both android: and iOS: parameters to ensure notifications work on all platforms.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -542,7 +542,7 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_timezone_awareness',
     problemMessage:
-        'Scheduled notification should use TZDateTime instead of DateTime.',
+        '[require_notification_timezone_awareness] Scheduled notification should use TZDateTime instead of DateTime.',
     correctionMessage:
         'Use tz.TZDateTime.now(tz.local) or tz.TZDateTime.from() for timezone-aware scheduling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -735,7 +735,7 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_same_id',
     problemMessage:
-        'Static notification ID. Different notifications will overwrite each other.',
+        '[avoid_notification_same_id] Static notification ID. Different notifications will overwrite each other.',
     correctionMessage:
         'Use unique IDs for each notification (e.g., incrementing counter).',
     errorSeverity: DiagnosticSeverity.WARNING,

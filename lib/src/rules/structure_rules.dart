@@ -41,7 +41,7 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_barrel_files',
-    problemMessage: 'File contains only export statements (barrel file).',
+    problemMessage: '[avoid_barrel_files] File contains only export statements (barrel file).',
     correctionMessage:
         'Import specific files where needed instead of using barrel files.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -107,7 +107,7 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_slash_imports',
-    problemMessage: 'Import path contains double slashes.',
+    problemMessage: '[avoid_double_slash_imports] Import path contains double slashes.',
     correctionMessage: 'Remove the extra slash from the import path.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -169,7 +169,7 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_exports',
-    problemMessage: 'File is exported multiple times.',
+    problemMessage: '[avoid_duplicate_exports] File is exported multiple times.',
     correctionMessage: 'Remove the duplicate export directive.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -225,7 +225,7 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_mixins',
-    problemMessage: 'Mixin is applied multiple times.',
+    problemMessage: '[avoid_duplicate_mixins] Mixin is applied multiple times.',
     correctionMessage: 'Remove the duplicate mixin application.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -283,7 +283,7 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_named_imports',
     problemMessage:
-        'Import is declared multiple times with different prefixes.',
+        '[avoid_duplicate_named_imports] Import is declared multiple times with different prefixes.',
     correctionMessage: 'Use a single import with one prefix.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -343,7 +343,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_global_state',
-    problemMessage: 'Avoid mutable global state.',
+    problemMessage: '[avoid_global_state] Avoid mutable global state.',
     correctionMessage: 'Use const, final, or encapsulate in a class.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -396,7 +396,7 @@ class AvoidLongFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_files',
-    problemMessage: 'File exceeds $_maxLines lines.',
+    problemMessage: '[avoid_long_files] File exceeds $_maxLines lines.',
     correctionMessage: 'Consider splitting this file into smaller modules.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -439,7 +439,7 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_functions',
-    problemMessage: 'Function body exceeds $_maxLines lines.',
+    problemMessage: '[avoid_long_functions] Function body exceeds $_maxLines lines.',
     correctionMessage: 'Consider extracting parts into smaller functions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -500,7 +500,7 @@ class AvoidLongParameterListRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_parameter_list',
-    problemMessage: 'Function has too many parameters (max 5).',
+    problemMessage: '[avoid_long_parameter_list] Function has too many parameters (max 5).',
     correctionMessage:
         'Consider using a configuration object or named parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -561,7 +561,7 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_local_functions',
-    problemMessage: 'Avoid declaring local functions.',
+    problemMessage: '[avoid_local_functions] Avoid declaring local functions.',
     correctionMessage: 'Extract to a private top-level or class method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -599,7 +599,7 @@ class MaxImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'max_imports',
-    problemMessage: 'File has more than $_maxImports imports.',
+    problemMessage: '[max_imports] File has more than $_maxImports imports.',
     correctionMessage: 'Consider splitting the file or reducing dependencies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -639,7 +639,7 @@ class MemberOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_members',
-    problemMessage: 'Consider reordering class members.',
+    problemMessage: '[prefer_sorted_members] Consider reordering class members.',
     correctionMessage:
         'Order: static fields, instance fields, constructors, static methods, instance methods.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -709,7 +709,7 @@ class PreferSortedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
-    problemMessage: 'Named parameters should be in alphabetical order.',
+    problemMessage: '[prefer_sorted_parameters] Named parameters should be in alphabetical order.',
     correctionMessage: 'Reorder parameters alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -781,7 +781,7 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_boolean_parameters',
-    problemMessage: 'Boolean parameter should be named, not positional.',
+    problemMessage: '[prefer_named_boolean_parameters] Boolean parameter should be named, not positional.',
     correctionMessage: 'Convert to a named parameter for clearer call sites.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -823,7 +823,7 @@ class PreferNamedImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_imports',
-    problemMessage: 'Consider using named imports (show/hide) for clarity.',
+    problemMessage: '[prefer_named_imports] Consider using named imports (show/hide) for clarity.',
     correctionMessage: 'Use "show" to explicitly list imported symbols.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -885,7 +885,7 @@ class PreferNamedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_parameters',
-    problemMessage: 'Function has too many positional parameters.',
+    problemMessage: '[prefer_named_parameters] Function has too many positional parameters.',
     correctionMessage:
         'Consider using named parameters for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -924,7 +924,7 @@ class PreferStaticClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_static_class',
-    problemMessage: 'Class only has static members.',
+    problemMessage: '[prefer_static_class] Class only has static members.',
     correctionMessage:
         'Consider using top-level functions and constants instead.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1005,7 +1005,7 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_local_variable',
-    problemMessage: 'Variable is only used once and returned immediately.',
+    problemMessage: '[avoid_unnecessary_local_variable] Variable is only used once and returned immediately.',
     correctionMessage: 'Return the expression directly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1071,7 +1071,7 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_reassignment',
-    problemMessage: 'Variable is assigned the same value it already has.',
+    problemMessage: '[avoid_unnecessary_reassignment] Variable is assigned the same value it already has.',
     correctionMessage: 'Remove the unnecessary reassignment.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1121,7 +1121,7 @@ class PreferStaticMethodRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_static_method',
-    problemMessage: 'Method does not use instance members and could be static.',
+    problemMessage: '[prefer_static_method] Method does not use instance members and could be static.',
     correctionMessage: 'Make this method static.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1223,7 +1223,7 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_final_static_class',
-    problemMessage: 'Class with only static members should be abstract final.',
+    problemMessage: '[prefer_abstract_final_static_class] Class with only static members should be abstract final.',
     correctionMessage: 'Use "abstract final class" to prevent instantiation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1305,7 +1305,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_colors',
-    problemMessage: 'Avoid hardcoded color values.',
+    problemMessage: '[avoid_hardcoded_colors] Avoid hardcoded color values.',
     correctionMessage:
         'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1369,7 +1369,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_generics',
-    problemMessage: 'Type parameter is declared but never used.',
+    problemMessage: '[avoid_unused_generics] Type parameter is declared but never used.',
     correctionMessage:
         'Remove unused type parameter or use it in the declaration.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1494,7 +1494,7 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_underscore_for_unused',
-    problemMessage: 'Unused parameter should be named with underscore.',
+    problemMessage: '[prefer_trailing_underscore_for_unused] Unused parameter should be named with underscore.',
     correctionMessage: 'Rename to _ or _paramName to indicate it is unused.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1565,7 +1565,7 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
-    problemMessage: 'Async function has no await expressions.',
+    problemMessage: '[avoid_unnecessary_futures] Async function has no await expressions.',
     correctionMessage: 'Remove async keyword or add await expressions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1650,7 +1650,7 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_finally',
-    problemMessage: 'Avoid throw in finally blocks.',
+    problemMessage: '[avoid_throw_in_finally] Avoid throw in finally blocks.',
     correctionMessage: 'Throwing in finally can hide the original exception.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1705,7 +1705,7 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_return_type',
-    problemMessage: 'Return type is nullable but function never returns null.',
+    problemMessage: '[avoid_unnecessary_nullable_return_type] Return type is nullable but function never returns null.',
     correctionMessage: 'Remove the ? from the return type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

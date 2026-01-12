@@ -41,7 +41,7 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_strings_in_ui',
     problemMessage:
-        'Hardcoded user-facing string. Cannot be translated to other languages.',
+        '[avoid_hardcoded_strings_in_ui] Hardcoded user-facing string. Cannot be translated to other languages.',
     correctionMessage:
         'Replace with l10n.yourKey or AppLocalizations.of(context).yourKey.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -144,7 +144,7 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_locale_aware_formatting',
     problemMessage:
-        'Manual date/number formatting ignores locale. Will display wrong format for users.',
+        '[require_locale_aware_formatting] Manual date/number formatting ignores locale. Will display wrong format for users.',
     correctionMessage:
         'Use NumberFormat.currency(locale: locale).format(n) or DateFormat.yMd(locale).format(d).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -220,7 +220,7 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_directional_widgets',
     problemMessage:
-        'Non-directional widget. Layout will be wrong for RTL languages (Arabic, Hebrew).',
+        '[require_directional_widgets] Non-directional widget. Layout will be wrong for RTL languages (Arabic, Hebrew).',
     correctionMessage:
         'Replace left/right with start/end: EdgeInsetsDirectional.only(start: 16).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -304,7 +304,7 @@ class RequirePluralHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_plural_handling',
     problemMessage:
-        'Simple plural logic fails for many languages (Russian, Arabic have complex plural rules).',
+        '[require_plural_handling] Simple plural logic fails for many languages (Russian, Arabic have complex plural rules).',
     correctionMessage:
         "Use Intl.plural(count, zero: '...', one: '...', other: '...').",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -456,7 +456,7 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_in_ui',
-    problemMessage: 'String concatenation breaks internationalization.',
+    problemMessage: '[avoid_string_concatenation_in_ui] String concatenation breaks internationalization.',
     correctionMessage: 'Use localized strings with placeholders.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -528,7 +528,7 @@ class AvoidTextInImagesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_in_images',
     problemMessage:
-        'Image path suggests embedded text that cannot be localized.',
+        '[avoid_text_in_images] Image path suggests embedded text that cannot be localized.',
     correctionMessage: 'Use locale-specific images or text overlays.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -603,7 +603,7 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_app_name',
-    problemMessage: 'App name should not be hardcoded in UI.',
+    problemMessage: '[avoid_hardcoded_app_name] App name should not be hardcoded in UI.',
     correctionMessage: 'Use a configuration constant or localized string.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -672,7 +672,7 @@ class PreferDateFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_date_format',
-    problemMessage: 'Raw DateTime formatting ignores user locale.',
+    problemMessage: '[prefer_date_format] Raw DateTime formatting ignores user locale.',
     correctionMessage:
         'Use DateFormat from intl package for locale-aware formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -747,7 +747,7 @@ class PreferIntlNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_intl_name',
-    problemMessage: 'Intl.message without name parameter.',
+    problemMessage: '[prefer_intl_name] Intl.message without name parameter.',
     correctionMessage: 'Add name parameter for message extraction tools.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -817,7 +817,7 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_description',
-    problemMessage: 'Intl.message without description.',
+    problemMessage: '[prefer_providing_intl_description] Intl.message without description.',
     correctionMessage:
         'Add desc parameter to help translators understand context.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -893,7 +893,7 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_examples',
-    problemMessage: 'Intl.message with args but no examples.',
+    problemMessage: '[prefer_providing_intl_examples] Intl.message with args but no examples.',
     correctionMessage: 'Add examples parameter to help translators.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -988,7 +988,7 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_locale_initialization',
     problemMessage:
-        'Intl package used without Intl.defaultLocale initialization.',
+        '[require_intl_locale_initialization] Intl package used without Intl.defaultLocale initialization.',
     correctionMessage:
         'Initialize Intl.defaultLocale in main() before using DateFormat, NumberFormat, or Intl.message.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1106,7 +1106,7 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_date_format_locale',
     problemMessage:
-        'DateFormat without explicit locale. Format varies by device/platform.',
+        '[require_intl_date_format_locale] DateFormat without explicit locale. Format varies by device/platform.',
     correctionMessage: 'Add locale parameter: DateFormat.yMd(locale).format(d)',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1208,7 +1208,7 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_number_format_locale',
     problemMessage:
-        'NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device.',
+        '[require_number_format_locale] NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device.',
     correctionMessage:
         'Add locale parameter: NumberFormat.decimalPattern(locale)',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1313,7 +1313,7 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_manual_date_formatting',
-    problemMessage: 'Manual date formatting is error-prone and ignores locale.',
+    problemMessage: '[avoid_manual_date_formatting] Manual date formatting is error-prone and ignores locale.',
     correctionMessage:
         'Use DateFormat from intl: DateFormat.yMd(locale).format(date)',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1407,7 +1407,7 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_currency_format',
     problemMessage:
-        'Manual currency formatting. Symbol placement and decimals vary by locale.',
+        '[require_intl_currency_format] Manual currency formatting. Symbol placement and decimals vary by locale.',
     correctionMessage:
         'Use NumberFormat.currency(locale: locale, symbol: s).format(n)',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1548,7 +1548,7 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_plural_rules',
     problemMessage:
-        'Manual pluralization. Different languages have different plural rules.',
+        '[require_intl_plural_rules] Manual pluralization. Different languages have different plural rules.',
     correctionMessage:
         'Use Intl.plural() for proper pluralization across all languages.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1600,10 +1600,12 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
       // Already using Intl.plural - good!
       if (bodySource.contains('Intl.plural')) return;
 
-      // Check that the int parameter is used in comparisons
+      // Check that the int parameter is compared to 1 (typical pluralization)
+      // Only == 1 or != 1 patterns indicate pluralization logic.
+      // Comparisons like <= 0 or > 2 are validation checks, not pluralization.
       final RegExp countComparisonPattern = RegExp(
-        '${RegExp.escape(countParamName)}\\s*[=!<>]=?\\s*[012]|'
-        '[012]\\s*[=!<>]=?\\s*${RegExp.escape(countParamName)}',
+        '${RegExp.escape(countParamName)}\\s*[=!]=\\s*1|'
+        '1\\s*[=!]=\\s*${RegExp.escape(countParamName)}',
       );
 
       if (!countComparisonPattern.hasMatch(bodySource)) return;
@@ -1671,7 +1673,7 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_args_match',
     problemMessage:
-        'Intl.message args may not match placeholders in the message.',
+        '[require_intl_args_match] Intl.message args may not match placeholders in the message.',
     correctionMessage:
         'Ensure args list contains all variables used in the message string.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1764,7 +1766,7 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_for_l10n',
     problemMessage:
-        'String concatenation may break word order in other languages.',
+        '[avoid_string_concatenation_for_l10n] String concatenation may break word order in other languages.',
     correctionMessage:
         'Use parameterized translations: l10n.greeting(name) instead of concatenation.',
     errorSeverity: DiagnosticSeverity.WARNING,

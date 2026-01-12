@@ -54,7 +54,7 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_google_signin_error_handling',
-    problemMessage: 'Google Sign-In calls should be wrapped in try-catch.',
+    problemMessage: '[require_google_signin_error_handling] Google Sign-In calls should be wrapped in try-catch.',
     correctionMessage:
         'Wrap the signIn() call in try-catch to handle failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -209,7 +209,7 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_apple_signin_nonce',
     problemMessage:
-        'Apple Sign-In should include nonce parameter for security.',
+        '[require_apple_signin_nonce] Apple Sign-In should include nonce parameter for security.',
     correctionMessage:
         'Add nonce parameter to getAppleIDCredential() to prevent replay attacks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -309,7 +309,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_supabase_error_handling',
-    problemMessage: 'Supabase calls should be wrapped in try-catch.',
+    problemMessage: '[require_supabase_error_handling] Supabase calls should be wrapped in try-catch.',
     correctionMessage:
         'Wrap Supabase operations in try-catch to handle failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -381,7 +381,7 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_supabase_anon_key_in_code',
-    problemMessage: 'Supabase anon key should not be hardcoded in source code.',
+    problemMessage: '[avoid_supabase_anon_key_in_code] Supabase anon key should not be hardcoded in source code.',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -500,7 +500,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_supabase_realtime_unsubscribe',
     problemMessage:
-        'Supabase realtime channel must be unsubscribed in dispose().',
+        '[require_supabase_realtime_unsubscribe] Supabase realtime channel must be unsubscribed in dispose().',
     correctionMessage:
         'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -666,7 +666,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_webview_ssl_error_handling',
-    problemMessage: 'WebView should handle SSL errors explicitly.',
+    problemMessage: '[require_webview_ssl_error_handling] WebView should handle SSL errors explicitly.',
     correctionMessage:
         'Add onSslAuthError callback to NavigationDelegate to handle certificate errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -783,7 +783,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_webview_file_access',
-    problemMessage: 'WebView file access should be disabled for security.',
+    problemMessage: '[avoid_webview_file_access] WebView file access should be disabled for security.',
     correctionMessage:
         'Remove allowFileAccess: true or set it to false explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -922,7 +922,7 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_workmanager_constraints',
-    problemMessage: 'WorkManager tasks should specify constraints.',
+    problemMessage: '[require_workmanager_constraints] WorkManager tasks should specify constraints.',
     correctionMessage:
         'Add constraints parameter to prevent unwanted battery/data usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1035,7 +1035,7 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_workmanager_result_return',
-    problemMessage: 'WorkManager callback must return a result.',
+    problemMessage: '[require_workmanager_result_return] WorkManager callback must return a result.',
     correctionMessage:
         'Return true/false from the executeTask callback to indicate success.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1155,7 +1155,7 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_calendar_timezone_handling',
     problemMessage:
-        'device_calendar Event should specify time zone explicitly.',
+        '[require_calendar_timezone_handling] device_calendar Event should specify time zone explicitly.',
     correctionMessage: 'Add timeZone parameter to handle cross-timezone usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1295,7 +1295,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_visibility_dispose',
     problemMessage:
-        'KeyboardVisibilityController subscription must be cancelled.',
+        '[require_keyboard_visibility_dispose] KeyboardVisibilityController subscription must be cancelled.',
     correctionMessage: 'Store and cancel the stream subscription in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1400,7 +1400,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_speech_stop_on_dispose',
-    problemMessage: 'SpeechToText must be stopped in dispose() method.',
+    problemMessage: '[require_speech_stop_on_dispose] SpeechToText must be stopped in dispose() method.',
     correctionMessage:
         'Add _speech.stop() in dispose() to release microphone resources.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1505,7 +1505,7 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_app_links_sensitive_params',
-    problemMessage: 'Deep links should not contain sensitive parameters.',
+    problemMessage: '[avoid_app_links_sensitive_params] Deep links should not contain sensitive parameters.',
     correctionMessage:
         'Use one-time codes instead of tokens or passwords in URLs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1651,7 +1651,7 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_envied_obfuscation',
-    problemMessage: 'Envied should use obfuscation for security.',
+    problemMessage: '[require_envied_obfuscation] Envied should use obfuscation for security.',
     correctionMessage: 'Add obfuscate: true to @Envied or @EnviedField.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1750,7 +1750,7 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_openai_key_in_code',
-    problemMessage: 'OpenAI API key should not be hardcoded in source code.',
+    problemMessage: '[avoid_openai_key_in_code] OpenAI API key should not be hardcoded in source code.',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1817,7 +1817,7 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_openai_error_handling',
-    problemMessage: 'OpenAI API calls should be wrapped in try-catch.',
+    problemMessage: '[require_openai_error_handling] OpenAI API calls should be wrapped in try-catch.',
     correctionMessage:
         'Wrap OpenAI calls in try-catch to handle rate limits and failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1909,7 +1909,7 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_svg_error_handler',
-    problemMessage: 'SvgPicture should have an errorBuilder callback.',
+    problemMessage: '[require_svg_error_handler] SvgPicture should have an errorBuilder callback.',
     correctionMessage: 'Add errorBuilder to handle SVG loading failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2016,7 +2016,7 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_google_fonts_fallback',
-    problemMessage: 'GoogleFonts should specify fontFamilyFallback.',
+    problemMessage: '[require_google_fonts_fallback] GoogleFonts should specify fontFamilyFallback.',
     correctionMessage:
         'Add fontFamilyFallback to handle font loading failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2110,7 +2110,7 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_uuid_v4',
-    problemMessage: 'Prefer UUID v4 over v1 for better randomness and privacy.',
+    problemMessage: '[prefer_uuid_v4] Prefer UUID v4 over v1 for better randomness and privacy.',
     correctionMessage: 'Use Uuid().v4() instead of Uuid().v1().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2227,7 +2227,7 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_max_dimensions',
     problemMessage:
-        'pickImage() without maxWidth/maxHeight can cause OOM on high-res cameras.',
+        '[prefer_image_picker_max_dimensions] pickImage() without maxWidth/maxHeight can cause OOM on high-res cameras.',
     correctionMessage:
         'Add maxWidth and maxHeight parameters to limit image size.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2355,7 +2355,7 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_mode',
     problemMessage:
-        'launchUrl() without mode parameter has inconsistent behavior across platforms.',
+        '[require_url_launcher_mode] launchUrl() without mode parameter has inconsistent behavior across platforms.',
     correctionMessage:
         'Add mode parameter (e.g., LaunchMode.externalApplication) for consistent behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2433,7 +2433,7 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_distance_filter',
     problemMessage:
-        'Location stream without distanceFilter causes excessive updates and battery drain.',
+        '[prefer_geolocator_distance_filter] Location stream without distanceFilter causes excessive updates and battery drain.',
     correctionMessage:
         'Add distanceFilter to LocationSettings to reduce unnecessary updates.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -37,7 +37,7 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_equal_expressions',
-    problemMessage: 'Both sides of the binary expression are identical.',
+    problemMessage: '[avoid_equal_expressions] Both sides of the binary expression are identical.',
     correctionMessage:
         'This is likely a bug. Use different expressions on each side.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -123,7 +123,7 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_negations_in_equality_checks',
-    problemMessage: 'Use != instead of negating == comparison.',
+    problemMessage: '[avoid_negations_in_equality_checks] Use != instead of negating == comparison.',
     correctionMessage: 'Replace !(a == b) with a != b.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -216,7 +216,7 @@ class AvoidSelfAssignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_self_assignment',
-    problemMessage: 'Variable is assigned to itself.',
+    problemMessage: '[avoid_self_assignment] Variable is assigned to itself.',
     correctionMessage:
         'Remove the self-assignment or assign a different value.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -297,7 +297,7 @@ class AvoidSelfCompareRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_self_compare',
-    problemMessage: 'Variable is compared to itself.',
+    problemMessage: '[avoid_self_compare] Variable is compared to itself.',
     correctionMessage: 'Use isNaN for NaN checks, or compare different values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -374,7 +374,7 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_compare_to',
-    problemMessage: 'Use == instead of compareTo() == 0.',
+    problemMessage: '[avoid_unnecessary_compare_to] Use == instead of compareTo() == 0.',
     correctionMessage: 'Replace compareTo(x) == 0 with == x.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -494,7 +494,7 @@ class NoEqualArgumentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_arguments',
-    problemMessage: 'Same argument passed multiple times.',
+    problemMessage: '[no_equal_arguments] Same argument passed multiple times.',
     correctionMessage: 'Check if this is intentional or a copy-paste error.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

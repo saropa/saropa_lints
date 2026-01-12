@@ -67,7 +67,7 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_interpolation_over_concatenation',
-    problemMessage: 'Use string interpolation instead of concatenation.',
+    problemMessage: '[prefer_interpolation_over_concatenation] Use string interpolation instead of concatenation.',
     correctionMessage:
         'Replace string concatenation with interpolation for readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -123,7 +123,7 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_concatenation_over_interpolation',
-    problemMessage: 'Use string concatenation instead of interpolation.',
+    problemMessage: '[prefer_concatenation_over_interpolation] Use string concatenation instead of interpolation.',
     correctionMessage:
         'Replace string interpolation with explicit concatenation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -170,7 +170,7 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_double_quotes',
-    problemMessage: 'Use double quotes for string literals.',
+    problemMessage: '[prefer_double_quotes] Use double quotes for string literals.',
     correctionMessage: 'Replace single quotes with double quotes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -223,7 +223,7 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_absolute_imports',
-    problemMessage: 'Use absolute package imports instead of relative imports.',
+    problemMessage: '[prefer_absolute_imports] Use absolute package imports instead of relative imports.',
     correctionMessage: 'Replace relative imports with package imports.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -281,7 +281,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_imports',
-    problemMessage: 'Group imports by type: dart, package, then relative.',
+    problemMessage: '[prefer_grouped_imports] Group imports by type: dart, package, then relative.',
     correctionMessage: 'Organize imports into groups separated by blank lines.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -354,7 +354,7 @@ class PreferFlatImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_flat_imports',
-    problemMessage: 'Keep imports in a flat list without grouping.',
+    problemMessage: '[prefer_flat_imports] Keep imports in a flat list without grouping.',
     correctionMessage: 'Remove blank lines between import groups.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -431,7 +431,7 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_fields_before_methods',
-    problemMessage: 'Declare fields before methods in class declarations.',
+    problemMessage: '[prefer_fields_before_methods] Declare fields before methods in class declarations.',
     correctionMessage: 'Move field declarations above method declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -484,7 +484,7 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_methods_before_fields',
-    problemMessage: 'Declare methods before fields in class declarations.',
+    problemMessage: '[prefer_methods_before_fields] Declare methods before fields in class declarations.',
     correctionMessage: 'Move method declarations above field declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -546,7 +546,7 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_static_members_first',
     problemMessage:
-        'Declare static members before instance members in classes.',
+        '[prefer_static_members_first] Declare static members before instance members in classes.',
     correctionMessage: 'Move static declarations above instance declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -602,7 +602,7 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_instance_members_first',
     problemMessage:
-        'Declare instance members before static members in classes.',
+        '[prefer_instance_members_first] Declare instance members before static members in classes.',
     correctionMessage: 'Move instance declarations above static declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -657,7 +657,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_public_members_first',
-    problemMessage: 'Declare public members before private members in classes.',
+    problemMessage: '[prefer_public_members_first] Declare public members before private members in classes.',
     correctionMessage: 'Move public declarations above private declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -712,7 +712,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_members_first',
-    problemMessage: 'Declare private members before public members in classes.',
+    problemMessage: '[prefer_private_members_first] Declare private members before public members in classes.',
     correctionMessage: 'Move private declarations above public declarations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -772,7 +772,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_var_over_explicit_type',
-    problemMessage: 'Use var instead of explicit type when type is obvious.',
+    problemMessage: '[prefer_var_over_explicit_type] Use var instead of explicit type when type is obvious.',
     correctionMessage:
         'Replace explicit type annotation with var for local variables.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -834,7 +834,7 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_object_over_dynamic',
-    problemMessage: 'Use Object? instead of dynamic for unknown types.',
+    problemMessage: '[prefer_object_over_dynamic] Use Object? instead of dynamic for unknown types.',
     correctionMessage: 'Replace dynamic with Object? for better type safety.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -882,7 +882,7 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dynamic_over_object',
-    problemMessage: 'Use dynamic instead of Object? for truly dynamic types.',
+    problemMessage: '[prefer_dynamic_over_object] Use dynamic instead of Object? for truly dynamic types.',
     correctionMessage:
         'Replace Object? with dynamic when any operation should be allowed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -935,7 +935,7 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_lower_camel_case_constants',
-    problemMessage: 'Use lowerCamelCase for constant names.',
+    problemMessage: '[prefer_lower_camel_case_constants] Use lowerCamelCase for constant names.',
     correctionMessage:
         'Rename constant to use lowerCamelCase (e.g., maxRetries).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1004,7 +1004,7 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_camel_case_method_names',
-    problemMessage: 'Use camelCase for method names.',
+    problemMessage: '[prefer_camel_case_method_names] Use camelCase for method names.',
     correctionMessage: 'Rename method to use camelCase (e.g., fetchUserData).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1068,7 +1068,7 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_variable_names',
-    problemMessage: 'Use descriptive variable names (at least 3 characters).',
+    problemMessage: '[prefer_descriptive_variable_names] Use descriptive variable names (at least 3 characters).',
     correctionMessage: 'Rename variable to be more descriptive.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1123,7 +1123,7 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_concise_variable_names',
-    problemMessage: 'Use concise variable names (30 characters or less).',
+    problemMessage: '[prefer_concise_variable_names] Use concise variable names (30 characters or less).',
     correctionMessage: 'Shorten variable name while keeping it descriptive.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1180,7 +1180,7 @@ class PreferExplicitThisRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_this',
-    problemMessage: 'Use explicit this. prefix for instance field access.',
+    problemMessage: '[prefer_explicit_this] Use explicit this. prefix for instance field access.',
     correctionMessage: 'Add this. prefix to instance field references.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1252,7 +1252,7 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_implicit_boolean_comparison',
-    problemMessage: 'Avoid explicit comparison with boolean literals.',
+    problemMessage: '[prefer_implicit_boolean_comparison] Avoid explicit comparison with boolean literals.',
     correctionMessage: 'Remove == true or == false from boolean expressions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1303,7 +1303,7 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_boolean_comparison',
     problemMessage:
-        'Use explicit == true comparison for nullable boolean expressions.',
+        '[prefer_explicit_boolean_comparison] Use explicit == true comparison for nullable boolean expressions.',
     correctionMessage:
         'Add == true for clarity when dealing with nullable booleans.',
     errorSeverity: DiagnosticSeverity.INFO,

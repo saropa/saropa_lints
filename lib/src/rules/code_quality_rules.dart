@@ -37,7 +37,7 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_adjacent_strings',
-    problemMessage: 'Avoid using adjacent strings.',
+    problemMessage: '[avoid_adjacent_strings] Avoid using adjacent strings.',
     correctionMessage: 'Combine into a single string or use concatenation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -67,7 +67,7 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_enum_values_by_index',
-    problemMessage: 'Avoid accessing enum values by index.',
+    problemMessage: '[avoid_enum_values_by_index] Avoid accessing enum values by index.',
     correctionMessage: 'Use EnumName.byName() or switch on specific values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -131,7 +131,7 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_uri',
-    problemMessage: 'URI string appears to be malformed.',
+    problemMessage: '[avoid_incorrect_uri] URI string appears to be malformed.',
     correctionMessage: 'Check the URI for syntax errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -279,7 +279,7 @@ class AvoidMissedCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_missed_calls',
     problemMessage:
-        'Function reference passed to print. Did you mean to call it?',
+        '[avoid_missed_calls] Function reference passed to print. Did you mean to call it?',
     correctionMessage: 'Add parentheses () to call the function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -378,7 +378,7 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_misused_set_literals',
-    problemMessage: 'Set literal may be misused. '
+    problemMessage: '[avoid_misused_set_literals] Set literal may be misused. '
         'Empty `{}` without type annotation creates a Map, not a Set.',
     correctionMessage: 'Add explicit type annotation: `<Type>{}` for Set '
         'or `<K, V>{}` for Map.',
@@ -435,7 +435,7 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_passing_self_as_argument',
-    problemMessage: 'Object is passed as argument to its own method.',
+    problemMessage: '[avoid_passing_self_as_argument] Object is passed as argument to its own method.',
     correctionMessage: 'Avoid passing an object to its own method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -503,7 +503,7 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_calls',
-    problemMessage: 'Function contains a recursive call to itself.',
+    problemMessage: '[avoid_recursive_calls] Function contains a recursive call to itself.',
     correctionMessage:
         'Ensure proper base case exists or consider using iteration.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -596,7 +596,7 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_tostring',
-    problemMessage: 'toString() method calls itself recursively.',
+    problemMessage: '[avoid_recursive_tostring] toString() method calls itself recursively.',
     correctionMessage:
         'Avoid using \$this or this.toString() inside toString().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -682,7 +682,7 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_referencing_discarded_variables',
-    problemMessage: 'Avoid referencing variables marked as discarded.',
+    problemMessage: '[avoid_referencing_discarded_variables] Avoid referencing variables marked as discarded.',
     correctionMessage:
         'Variables starting with _ should not be used. Rename the variable.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -760,7 +760,7 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_pragma_inline',
-    problemMessage: 'Pragma inline may be redundant for trivial methods.',
+    problemMessage: '[avoid_redundant_pragma_inline] Pragma inline may be redundant for trivial methods.',
     correctionMessage:
         'Remove pragma for simple getters/methods that inline automatically.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -838,7 +838,7 @@ class AvoidSubstringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_substring',
-    problemMessage: 'Avoid using substring() as it can throw if indices '
+    problemMessage: '[avoid_substring] Avoid using substring() as it can throw if indices '
         'are out of bounds.',
     correctionMessage: 'Consider bounds checking or using safer string '
         'manipulation methods.',
@@ -884,7 +884,7 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unknown_pragma',
-    problemMessage: 'Unknown pragma annotation.',
+    problemMessage: '[avoid_unknown_pragma] Unknown pragma annotation.',
     correctionMessage: 'Use a known pragma value or remove the annotation.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -963,7 +963,7 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_parameters',
-    problemMessage: 'Parameter is never used.',
+    problemMessage: '[avoid_unused_parameters] Parameter is never used.',
     correctionMessage:
         'Remove the parameter or prefix with underscore if intentionally unused.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1067,7 +1067,7 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_weak_cryptographic_algorithms',
-    problemMessage: 'Weak cryptographic algorithm detected.',
+    problemMessage: '[avoid_weak_cryptographic_algorithms] Weak cryptographic algorithm detected.',
     correctionMessage:
         'Use stronger algorithms like SHA-256 or SHA-512 instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1101,7 +1101,7 @@ class MissingUseResultAnnotationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'missing_use_result_annotation',
     problemMessage:
-        'Function returns a value that might be ignored. Consider adding @useResult.',
+        '[missing_use_result_annotation] Function returns a value that might be ignored. Consider adding @useResult.',
     correctionMessage:
         'Add @useResult annotation to indicate return value should be used.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1183,7 +1183,7 @@ class NoObjectDeclarationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_object_declaration',
-    problemMessage: 'Avoid declaring members with type Object.',
+    problemMessage: '[no_object_declaration] Avoid declaring members with type Object.',
     correctionMessage: 'Use a more specific type or generics.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1233,7 +1233,7 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_both_inlining_annotations',
-    problemMessage: 'Use both VM and dart2js inlining pragmas.',
+    problemMessage: '[prefer_both_inlining_annotations] Use both VM and dart2js inlining pragmas.',
     correctionMessage: 'Add matching dart2js:tryInline or vm:prefer-inline.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1311,7 +1311,7 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dedicated_media_query_method',
-    problemMessage: 'Prefer dedicated MediaQuery method.',
+    problemMessage: '[prefer_dedicated_media_query_method] Prefer dedicated MediaQuery method.',
     correctionMessage:
         'Use MediaQuery.sizeOf(context), MediaQuery.paddingOf(context), etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1378,7 +1378,7 @@ class PreferEnumsByNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_enums_by_name',
     problemMessage:
-        'Use Enum.values.byName() instead of firstWhere with name comparison.',
+        '[prefer_enums_by_name] Use Enum.values.byName() instead of firstWhere with name comparison.',
     correctionMessage:
         'Replace .firstWhere((e) => e.name == x) with .byName(x).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1445,7 +1445,7 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_extracting_function_callbacks',
-    problemMessage: 'Consider extracting this callback to a named function.',
+    problemMessage: '[prefer_extracting_function_callbacks] Consider extracting this callback to a named function.',
     correctionMessage: 'Extract large inline callbacks to improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1506,7 +1506,7 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_spread',
-    problemMessage: 'Use null-aware spread (...?) for nullable collections.',
+    problemMessage: '[prefer_null_aware_spread] Use null-aware spread (...?) for nullable collections.',
     correctionMessage: 'Replace with ...?nullableCollection.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1587,7 +1587,7 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_visible_for_testing_on_members',
-    problemMessage: 'Test helper members should use @visibleForTesting.',
+    problemMessage: '[prefer_visible_for_testing_on_members] Test helper members should use @visibleForTesting.',
     correctionMessage: 'Add @visibleForTesting annotation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1677,7 +1677,7 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_always_null_parameters',
-    problemMessage: 'Parameter is explicitly passed as null.',
+    problemMessage: '[avoid_always_null_parameters] Parameter is explicitly passed as null.',
     correctionMessage: 'Omit the parameter instead of passing null explicitly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1726,7 +1726,7 @@ class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_assigning_to_static_field',
-    problemMessage: 'Instance method should not modify static field.',
+    problemMessage: '[avoid_assigning_to_static_field] Instance method should not modify static field.',
     correctionMessage: 'Make the method static or use instance field.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1827,7 +1827,7 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_async_call_in_sync_function',
-    problemMessage: 'Async call in sync function without handling the Future.',
+    problemMessage: '[avoid_async_call_in_sync_function] Async call in sync function without handling the Future.',
     correctionMessage: 'Use await, .then(), or unawaited() for the async call.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1905,7 +1905,7 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_complex_loop_conditions',
-    problemMessage: 'Loop condition is too complex.',
+    problemMessage: '[avoid_complex_loop_conditions] Loop condition is too complex.',
     correctionMessage: 'Extract condition to a boolean variable or method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1980,7 +1980,7 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_constant_conditions',
-    problemMessage: 'Condition with constant values can be simplified.',
+    problemMessage: '[avoid_constant_conditions] Condition with constant values can be simplified.',
     correctionMessage: 'Evaluate the constant expression at compile time.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2032,7 +2032,7 @@ class AvoidContradictoryExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_contradictory_expressions',
-    problemMessage: 'Contradictory conditions detected.',
+    problemMessage: '[avoid_contradictory_expressions] Contradictory conditions detected.',
     correctionMessage: 'Review the logic - conditions may never be satisfied.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2166,7 +2166,7 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_identical_exception_handling_blocks',
-    problemMessage: 'Catch blocks have identical code.',
+    problemMessage: '[avoid_identical_exception_handling_blocks] Catch blocks have identical code.',
     correctionMessage:
         'Combine exception types: on FormatException, IOException catch (e).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2221,7 +2221,7 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_late_final_reassignment',
-    problemMessage: 'Late final field may be assigned multiple times.',
+    problemMessage: '[avoid_late_final_reassignment] Late final field may be assigned multiple times.',
     correctionMessage: 'Ensure late final fields are only assigned once.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2316,7 +2316,7 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_missing_completer_stack_trace',
-    problemMessage: 'completeError() called without stack trace.',
+    problemMessage: '[avoid_missing_completer_stack_trace] completeError() called without stack trace.',
     correctionMessage: 'Pass the stack trace as second argument.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2351,7 +2351,7 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_missing_enum_constant_in_map',
-    problemMessage: 'Map may be missing enum constant keys.',
+    problemMessage: '[avoid_missing_enum_constant_in_map] Map may be missing enum constant keys.',
     correctionMessage: 'Ensure all enum values are present in the map.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2415,7 +2415,7 @@ class AvoidMutatingParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutating_parameters',
-    problemMessage: 'Parameter is being reassigned.',
+    problemMessage: '[avoid_mutating_parameters] Parameter is being reassigned.',
     correctionMessage:
         'Create a local variable instead of mutating the parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2521,7 +2521,7 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_similar_names',
-    problemMessage: 'Variable name is too similar to another.',
+    problemMessage: '[avoid_similar_names] Variable name is too similar to another.',
     correctionMessage: 'Use more distinct names to avoid confusion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2636,7 +2636,7 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_parameters',
-    problemMessage: 'Nullable parameter is never passed null.',
+    problemMessage: '[avoid_unnecessary_nullable_parameters] Nullable parameter is never passed null.',
     correctionMessage: 'Consider making the parameter non-nullable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2698,7 +2698,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'function_always_returns_null',
-    problemMessage: 'Function always returns null.',
+    problemMessage: '[function_always_returns_null] Function always returns null.',
     correctionMessage:
         'Consider changing return type to void or returning meaningful values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2785,7 +2785,7 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_accessing_collections_by_constant_index',
-    problemMessage: 'Accessing collection by constant index inside loop.',
+    problemMessage: '[avoid_accessing_collections_by_constant_index] Accessing collection by constant index inside loop.',
     correctionMessage:
         'Use the loop variable or extract the element before the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2849,7 +2849,7 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_default_tostring',
-    problemMessage: 'Class should override toString() for better debugging.',
+    problemMessage: '[avoid_default_tostring] Class should override toString() for better debugging.',
     correctionMessage:
         'Add a toString() method that returns meaningful information.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2895,7 +2895,7 @@ class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_constant_values',
-    problemMessage: 'Duplicate constant value found.',
+    problemMessage: '[avoid_duplicate_constant_values] Duplicate constant value found.',
     correctionMessage: 'Reuse the existing constant instead of duplicating.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2953,7 +2953,7 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_initializers',
-    problemMessage: 'Duplicate initializer expression.',
+    problemMessage: '[avoid_duplicate_initializers] Duplicate initializer expression.',
     correctionMessage: 'Extract the common initialization to a variable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3008,7 +3008,7 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides',
-    problemMessage: 'Override only calls super without additional logic.',
+    problemMessage: '[avoid_unnecessary_overrides] Override only calls super without additional logic.',
     correctionMessage: 'Remove the unnecessary override.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3083,7 +3083,7 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_statements',
-    problemMessage: 'Statement has no effect.',
+    problemMessage: '[avoid_unnecessary_statements] Statement has no effect.',
     correctionMessage: 'Remove the unnecessary statement or use its value.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3134,7 +3134,7 @@ class AvoidUnusedAssignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_assignment',
-    problemMessage: 'Assignment may be unused.',
+    problemMessage: '[avoid_unused_assignment] Assignment may be unused.',
     correctionMessage: 'Remove the unused assignment or use the variable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3209,7 +3209,7 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_instances',
-    problemMessage: 'Instance created but not used.',
+    problemMessage: '[avoid_unused_instances] Instance created but not used.',
     correctionMessage: 'Assign the instance to a variable or remove it.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3242,7 +3242,7 @@ class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_after_null_check',
-    problemMessage: 'Variable is null-checked but not used in the body.',
+    problemMessage: '[avoid_unused_after_null_check] Variable is null-checked but not used in the body.',
     correctionMessage: 'Use the variable or simplify the condition.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3321,7 +3321,7 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_wildcard_cases_with_enums',
-    problemMessage: 'Avoid using default/wildcard case with enums.',
+    problemMessage: '[avoid_wildcard_cases_with_enums] Avoid using default/wildcard case with enums.',
     correctionMessage:
         'Handle all enum values explicitly for exhaustiveness checking.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3385,7 +3385,7 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'function_always_returns_same_value',
-    problemMessage: 'Function always returns the same value.',
+    problemMessage: '[function_always_returns_same_value] Function always returns the same value.',
     correctionMessage:
         'Consider returning a constant or simplifying the function.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3462,7 +3462,7 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_nested_conditions',
-    problemMessage: 'Nested condition is identical to outer condition.',
+    problemMessage: '[no_equal_nested_conditions] Nested condition is identical to outer condition.',
     correctionMessage: 'Remove the redundant nested condition.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3519,7 +3519,7 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_switch_case',
-    problemMessage: 'Switch cases have identical bodies.',
+    problemMessage: '[no_equal_switch_case] Switch cases have identical bodies.',
     correctionMessage: 'Combine cases or extract common code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3577,7 +3577,7 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_any_or_every',
-    problemMessage: 'Use any() or every() instead of where().isEmpty.',
+    problemMessage: '[prefer_any_or_every] Use any() or every() instead of where().isEmpty.',
     correctionMessage:
         'Replace where().isEmpty with !any() or where().isNotEmpty with any().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3628,7 +3628,7 @@ class PreferForInRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_for_in',
-    problemMessage: 'Index-based loop can be replaced with for-in.',
+    problemMessage: '[prefer_for_in] Index-based loop can be replaced with for-in.',
     correctionMessage: 'Use for-in loop for cleaner iteration.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3700,7 +3700,7 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_patterns',
-    problemMessage: 'Duplicate pattern detected.',
+    problemMessage: '[avoid_duplicate_patterns] Duplicate pattern detected.',
     correctionMessage: 'Remove or combine the duplicate patterns.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3751,7 +3751,7 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_extension_types',
-    problemMessage: 'Extension type contains another extension type.',
+    problemMessage: '[avoid_nested_extension_types] Extension type contains another extension type.',
     correctionMessage: 'Consider using the underlying type directly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3800,7 +3800,7 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_slow_collection_methods',
-    problemMessage: 'Using sync* generator for simple collection may be slow.',
+    problemMessage: '[avoid_slow_collection_methods] Using sync* generator for simple collection may be slow.',
     correctionMessage:
         'Consider returning a List directly for small collections.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3874,7 +3874,7 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_fields',
-    problemMessage: 'Field may never be assigned a value.',
+    problemMessage: '[avoid_unassigned_fields] Field may never be assigned a value.',
     correctionMessage: 'Initialize the field or ensure it is assigned.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3985,7 +3985,7 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unassigned_late_fields',
-    problemMessage: 'Late field may never be assigned.',
+    problemMessage: '[avoid_unassigned_late_fields] Late field may never be assigned.',
     correctionMessage: 'Ensure the late field is assigned before use.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -4060,7 +4060,7 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_late_fields',
     problemMessage:
-        'Late keyword is unnecessary when field is assigned in constructor.',
+        '[avoid_unnecessary_late_fields] Late keyword is unnecessary when field is assigned in constructor.',
     correctionMessage: 'Remove the late keyword.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4155,7 +4155,7 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_nullable_fields',
-    problemMessage: 'Nullable field appears to always have a non-null value.',
+    problemMessage: '[avoid_unnecessary_nullable_fields] Nullable field appears to always have a non-null value.',
     correctionMessage: 'Consider making the field non-nullable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4271,7 +4271,7 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_patterns',
-    problemMessage: 'Pattern does not affect type narrowing.',
+    problemMessage: '[avoid_unnecessary_patterns] Pattern does not affect type narrowing.',
     correctionMessage:
         'Remove the unnecessary pattern or use a simple assignment.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4328,7 +4328,7 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_wildcard_cases_with_sealed_classes',
-    problemMessage: 'Avoid using default/wildcard case with sealed classes.',
+    problemMessage: '[avoid_wildcard_cases_with_sealed_classes] Avoid using default/wildcard case with sealed classes.',
     correctionMessage: 'Handle all sealed class subtypes explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -4394,7 +4394,7 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_switch_expression_cases',
-    problemMessage: 'Switch expression cases have identical results.',
+    problemMessage: '[no_equal_switch_expression_cases] Switch expression cases have identical results.',
     correctionMessage: 'Combine patterns or extract common result.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4442,7 +4442,7 @@ class PreferBytesBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_bytes_builder',
-    problemMessage: 'Consider using BytesBuilder for byte list operations.',
+    problemMessage: '[prefer_bytes_builder] Consider using BytesBuilder for byte list operations.',
     correctionMessage:
         'BytesBuilder is more efficient for building byte arrays.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4494,7 +4494,7 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_pushing_conditional_expressions',
-    problemMessage: 'Conditional expression can be pushed into arguments.',
+    problemMessage: '[prefer_pushing_conditional_expressions] Conditional expression can be pushed into arguments.',
     correctionMessage: 'Move the condition into the differing argument.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4563,7 +4563,7 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_constructors',
-    problemMessage: 'Constructor call can use .new shorthand.',
+    problemMessage: '[prefer_shorthands_with_constructors] Constructor call can use .new shorthand.',
     correctionMessage: 'Replace lambda with ClassName.new.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4626,7 +4626,7 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_enums',
-    problemMessage: 'Consider using enum shorthand.',
+    problemMessage: '[prefer_shorthands_with_enums] Consider using enum shorthand.',
     correctionMessage: 'Simplify the enum access pattern.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4682,7 +4682,7 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_shorthands_with_static_fields',
-    problemMessage: 'Consider using static field directly.',
+    problemMessage: '[prefer_shorthands_with_static_fields] Consider using static field directly.',
     correctionMessage: 'Access the static field directly instead of searching.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4736,7 +4736,7 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'pass_correct_accepted_type',
-    problemMessage: 'Parameter type does not match accepted type annotation.',
+    problemMessage: '[pass_correct_accepted_type] Parameter type does not match accepted type annotation.',
     correctionMessage:
         'Ensure the parameter type matches the @Accept annotation.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4801,7 +4801,7 @@ class PassOptionalArgumentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'pass_optional_argument',
-    problemMessage: 'Consider passing the optional argument explicitly.',
+    problemMessage: '[pass_optional_argument] Consider passing the optional argument explicitly.',
     correctionMessage: 'Passing optional arguments can improve code clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4859,7 +4859,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_declaration_per_file',
-    problemMessage: 'File contains multiple top-level declarations.',
+    problemMessage: '[prefer_single_declaration_per_file] File contains multiple top-level declarations.',
     correctionMessage: 'Consider splitting into separate files.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4932,7 +4932,7 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_switch_expression',
-    problemMessage: 'Consider using a switch expression instead.',
+    problemMessage: '[prefer_switch_expression] Consider using a switch expression instead.',
     correctionMessage: 'Switch expressions are more concise for value mapping.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5037,7 +5037,7 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_switch_with_enums',
-    problemMessage: 'Consider using switch statement for enum comparisons.',
+    problemMessage: '[prefer_switch_with_enums] Consider using switch statement for enum comparisons.',
     correctionMessage: 'Switch provides exhaustiveness checking for enums.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5157,7 +5157,7 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_switch_with_sealed_classes',
     problemMessage:
-        'Consider using switch with sealed class for exhaustiveness.',
+        '[prefer_switch_with_sealed_classes] Consider using switch with sealed class for exhaustiveness.',
     correctionMessage:
         'Switch provides exhaustiveness checking for sealed classes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5231,7 +5231,7 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_matchers',
-    problemMessage: 'Use a more specific test matcher.',
+    problemMessage: '[prefer_test_matchers] Use a more specific test matcher.',
     correctionMessage: 'Specific matchers provide better error messages.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5329,7 +5329,7 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_unwrapping_future_or',
-    problemMessage: 'Consider using async/await instead of FutureOr handling.',
+    problemMessage: '[prefer_unwrapping_future_or] Consider using async/await instead of FutureOr handling.',
     correctionMessage: 'Async/await simplifies FutureOr handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5415,7 +5415,7 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_inferrable_type_arguments',
-    problemMessage: 'Generic type matches inference.',
+    problemMessage: '[avoid_inferrable_type_arguments] Generic type matches inference.',
     correctionMessage: 'Remove redundant type arguments that can be inferred.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5496,7 +5496,7 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_passing_default_values',
-    problemMessage: 'Empty collection argument is likely the default value.',
+    problemMessage: '[avoid_passing_default_values] Empty collection argument is likely the default value.',
     correctionMessage: 'Omit the argument to use the default value.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5557,7 +5557,7 @@ class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shadowed_extension_methods',
-    problemMessage: 'Extension method shadows class method.',
+    problemMessage: '[avoid_shadowed_extension_methods] Extension method shadows class method.',
     correctionMessage: 'Rename the extension method to avoid shadowing.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -5626,7 +5626,7 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_local_late',
-    problemMessage: 'Late variable initialized immediately.',
+    problemMessage: '[avoid_unnecessary_local_late] Late variable initialized immediately.',
     correctionMessage:
         'Remove the late keyword for immediately initialized variables.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5684,7 +5684,7 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'match_base_class_default_value',
-    problemMessage: 'Override has non-standard default value.',
+    problemMessage: '[match_base_class_default_value] Override has non-standard default value.',
     correctionMessage: 'Verify this matches the parent class default value.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5783,7 +5783,7 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'move_variable_closer_to_its_usage',
-    problemMessage: 'Scope analysis.',
+    problemMessage: '[move_variable_closer_to_its_usage] Scope analysis.',
     correctionMessage:
         'Consider moving the variable declaration closer to its first use.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5890,7 +5890,7 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'move_variable_outside_iteration',
-    problemMessage: 'Loop invariant code motion.',
+    problemMessage: '[move_variable_outside_iteration] Loop invariant code motion.',
     correctionMessage: 'Move the variable declaration outside the loop.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5988,7 +5988,7 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_overriding_parent_equality',
-    problemMessage: '== implementation consistency.',
+    problemMessage: '[prefer_overriding_parent_equality] == implementation consistency.',
     correctionMessage:
         'Consider calling super.== or checking parent class equality.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6108,7 +6108,7 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_specific_cases_first',
-    problemMessage: 'Switch case specificity.',
+    problemMessage: '[prefer_specific_cases_first] Switch case specificity.',
     correctionMessage: 'Place more specific cases before general ones.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6199,7 +6199,7 @@ class UseExistingDestructuringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'use_existing_destructuring',
-    problemMessage: 'Redundant property access.',
+    problemMessage: '[use_existing_destructuring] Redundant property access.',
     correctionMessage:
         'Use the destructured variable instead of accessing the property.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6313,7 +6313,7 @@ class UseExistingVariableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'use_existing_variable',
-    problemMessage: 'Redundant variable creation.',
+    problemMessage: '[use_existing_variable] Redundant variable creation.',
     correctionMessage:
         'Use the existing variable instead of creating a duplicate.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6400,7 +6400,7 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_string_literals',
     problemMessage:
-        'String literal appears 3+ times in this file. Consider extracting '
+        '[avoid_duplicate_string_literals] String literal appears 3+ times in this file. Consider extracting '
         'to a constant.',
     correctionMessage:
         'Extract this string to a named constant for maintainability.',
@@ -6514,7 +6514,7 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_string_literals_pair',
     problemMessage:
-        'String literal appears 2+ times in this file. Consider extracting '
+        '[avoid_duplicate_string_literals_pair] String literal appears 2+ times in this file. Consider extracting '
         'to a constant.',
     correctionMessage:
         'Extract this string to a named constant for maintainability.',
@@ -6609,7 +6609,7 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_typedefs_for_callbacks',
-    problemMessage: 'Inline function type could be a typedef.',
+    problemMessage: '[prefer_typedefs_for_callbacks] Inline function type could be a typedef.',
     correctionMessage: 'Create a typedef for this callback type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6661,7 +6661,7 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_redirecting_superclass_constructor',
-    problemMessage: 'Consider using super parameters.',
+    problemMessage: '[prefer_redirecting_superclass_constructor] Consider using super parameters.',
     correctionMessage: 'Use super.paramName instead of super(paramName).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6730,7 +6730,7 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_build_when',
-    problemMessage: 'buildWhen always returns true, defeating optimization.',
+    problemMessage: '[avoid_empty_build_when] buildWhen always returns true, defeating optimization.',
     correctionMessage: 'Add meaningful comparison or remove buildWhen.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6802,7 +6802,7 @@ class PreferUsePrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_use_prefix',
-    problemMessage: 'Custom hook should start with "use" prefix.',
+    problemMessage: '[prefer_use_prefix] Custom hook should start with "use" prefix.',
     correctionMessage: 'Rename function to useYourHookName.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6903,7 +6903,7 @@ class PreferLateFinalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_late_final',
     problemMessage:
-        'Late variable is never reassigned. Consider using late final.',
+        '[prefer_late_final] Late variable is never reassigned. Consider using late final.',
     correctionMessage:
         'Use late final for variables that are only assigned once.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7060,7 +7060,7 @@ class AvoidLateForNullableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_for_nullable',
     problemMessage:
-        'Avoid using late for nullable types. Use nullable without late instead.',
+        '[avoid_late_for_nullable] Avoid using late for nullable types. Use nullable without late instead.',
     correctionMessage:
         'Remove late keyword and use null checks, or ensure value is always initialized.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7150,7 +7150,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dot_shorthand',
-    problemMessage: 'Enum value could use dot shorthand (.value) in Dart 3.',
+    problemMessage: '[prefer_dot_shorthand] Enum value could use dot shorthand (.value) in Dart 3.',
     correctionMessage:
         'Replace EnumType.value with .value when type is inferred.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7237,7 +7237,7 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_boolean_literal_compare',
-    problemMessage: 'Unnecessary comparison to boolean literal.',
+    problemMessage: '[no_boolean_literal_compare] Unnecessary comparison to boolean literal.',
     correctionMessage:
         'Use the boolean expression directly: x instead of x == true, '
         '!x instead of x == false.',
@@ -7397,7 +7397,7 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditional_expressions',
     problemMessage:
-        'If/else with only return statements can be simplified to ternary.',
+        '[prefer_returning_conditional_expressions] If/else with only return statements can be simplified to ternary.',
     correctionMessage:
         'Use return condition ? valueA : valueB; or return condition;',
     errorSeverity: DiagnosticSeverity.INFO,

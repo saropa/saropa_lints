@@ -71,7 +71,7 @@ class AvoidMyAntiPatternRule extends SaropaLintRule {
 
   static const _code = LintCode(
     name: 'avoid_my_anti_pattern',
-    problemMessage: 'Avoid using this anti-pattern because...',
+    problemMessage: '[avoid_my_anti_pattern] Avoid using this anti-pattern because...',
     correctionMessage: 'Instead, use the recommended pattern.',
     errorSeverity: ErrorSeverity.WARNING,
   );
@@ -175,7 +175,7 @@ class AvoidWidgetAntiPatternRule extends SaropaLintRule {
 
   static const _code = LintCode(
     name: 'avoid_widget_anti_pattern',
-    problemMessage: 'Widget anti-pattern detected.',
+    problemMessage: '[avoid_widget_anti_pattern] Widget anti-pattern detected.',
     errorSeverity: ErrorSeverity.WARNING,
   );
 
@@ -444,24 +444,25 @@ class MyRule extends SaropaLintRule { ... }
 
 ### Problem Message Format
 
-The `problemMessage` appears in IDEs and tells developers what's wrong:
+The `problemMessage` appears in IDEs and tells developers what's wrong. **All messages must be prefixed with the rule name in brackets** for easy identification in VS Code's Problems panel:
 
 ```dart
-problemMessage: '[What is wrong]. [Why it matters/consequence].',
+problemMessage: '[rule_name] [What is wrong]. [Why it matters/consequence].',
 ```
 
 **Guidelines:**
+- **Always prefix with `[rule_name]`** — This makes the rule name visible in IDE Problems panels
 - Start with the specific issue detected (not "Avoid..." - that's the correction)
 - Include the consequence when not obvious
-- Keep under 80 characters when possible
+- Keep under 100 characters when possible (including the prefix)
 - Use concrete language, not vague warnings
 
 **Examples:**
 | BAD | GOOD |
 |-----|------|
-| `'Avoid using print.'` | `'print() found. Will appear in production logs.'` |
-| `'HTTP status should be checked.'` | `'HTTP response used without status check. Errors may be silently ignored.'` |
-| `'Class has too many responsibilities.'` | `'Class has too many members (>15 fields or >20 methods). Violates Single Responsibility.'` |
+| `'Avoid using print.'` | `'[avoid_print] print() found. Will appear in production logs.'` |
+| `'HTTP status should be checked.'` | `'[require_http_status_check] HTTP response used without status check.'` |
+| `'Class has too many responsibilities.'` | `'[avoid_large_class] Class has >15 fields or >20 methods.'` |
 
 ### Correction Message Format
 
@@ -485,6 +486,7 @@ correctionMessage: '[Specific action to take]. [Optional example].',
 
 ### Message Checklist
 
+- [ ] Problem message starts with `[rule_name]` prefix
 - [ ] Problem message explains WHAT is wrong and WHY it matters
 - [ ] Correction message explains HOW to fix with specific action
 - [ ] Both messages are under 100 characters

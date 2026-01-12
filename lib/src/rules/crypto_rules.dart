@@ -68,7 +68,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_encryption_keys',
     problemMessage:
-        'Hardcoded encryption key can be extracted from compiled app.',
+        '[avoid_hardcoded_encryption_keys] Hardcoded encryption key can be extracted from compiled app.',
     correctionMessage: 'Load key from secure storage or derive at runtime.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -221,7 +221,7 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random_for_crypto',
     problemMessage:
-        'Random() is predictable. Use Random.secure() for security.',
+        '[prefer_secure_random_for_crypto] Random() is predictable. Use Random.secure() for security.',
     correctionMessage:
         'Replace Random() with Random.secure() for cryptographic use.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -352,7 +352,7 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deprecated_crypto_algorithms',
     problemMessage:
-        'Deprecated cryptographic algorithm. Use SHA-256 or stronger.',
+        '[avoid_deprecated_crypto_algorithms] Deprecated cryptographic algorithm. Use SHA-256 or stronger.',
     correctionMessage:
         'Replace MD5/SHA1 with SHA-256+. Replace DES with AES-256.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -443,7 +443,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',
-    problemMessage: 'Static or reused IV breaks encryption security.',
+    problemMessage: '[require_unique_iv_per_encryption] Static or reused IV breaks encryption security.',
     correctionMessage:
         'Generate a new random IV for each encryption operation.',
     errorSeverity: DiagnosticSeverity.ERROR,

@@ -75,6 +75,28 @@ class _GoodUsingContextDirectlyState extends State<GoodUsingContextDirectly> {
   Widget build(BuildContext context) => Container();
 }
 
+// GOOD: Function type with BuildContext parameter is NOT storing context
+// This is a callback signature, not an actual stored context instance
+class GoodFunctionTypeWithContext extends StatelessWidget {
+  const GoodFunctionTypeWithContext({
+    required this.onShowDialog,
+    required this.onAction,
+    super.key,
+  });
+
+  // These should NOT trigger avoid_storing_context - they are function signatures
+  final void Function(BuildContext context, String message) onShowDialog;
+  final void Function(BuildContext ctx) onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onShowDialog(context, 'Hello'),
+      child: Container(),
+    );
+  }
+}
+
 // =========================================================================
 // avoid_context_across_async
 // =========================================================================

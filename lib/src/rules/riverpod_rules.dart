@@ -40,7 +40,7 @@ import '../saropa_lint_rule.dart';
 class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_read_inside_build',
-    problemMessage: 'ref.read() should not be used inside build().',
+    problemMessage: '[avoid_ref_read_inside_build] ref.read() should not be used inside build().',
     correctionMessage: 'Use ref.watch() in build() for reactivity.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -112,7 +112,7 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_watch_outside_build',
-    problemMessage: 'ref.watch() should only be used inside build().',
+    problemMessage: '[avoid_ref_watch_outside_build] ref.watch() should only be used inside build().',
     correctionMessage: 'Move ref.watch() calls into build().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -191,7 +191,7 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
 class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_inside_state_dispose',
-    problemMessage: 'Do not use ref in dispose().',
+    problemMessage: '[avoid_ref_inside_state_dispose] Do not use ref in dispose().',
     correctionMessage: 'Cache values in initState instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -263,7 +263,7 @@ class _RefAccessVisitor extends RecursiveAstVisitor<void> {
 class UseRefReadSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_ref_read_synchronously',
-    problemMessage: 'ref.read() should be called before await.',
+    problemMessage: '[use_ref_read_synchronously] ref.read() should be called before await.',
     correctionMessage: 'Cache ref.read() result before async gap.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -346,7 +346,7 @@ class _RefReadAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_ref_and_state_synchronously',
-    problemMessage: 'ref should be used before async gap.',
+    problemMessage: '[use_ref_and_state_synchronously] ref should be used before async gap.',
     correctionMessage: 'Cache ref before await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -434,7 +434,7 @@ class _RefAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 class AvoidAssigningNotifiersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_assigning_notifiers',
-    problemMessage: 'Do not assign to notifier variables.',
+    problemMessage: '[avoid_assigning_notifiers] Do not assign to notifier variables.',
     correctionMessage: 'Notifiers manage their own state.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -610,7 +610,7 @@ class _CommentOutNotifierAssignmentFix extends DartFix {
 class AvoidNotifierConstructorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notifier_constructors',
-    problemMessage: 'Avoid using constructors for Notifiers.',
+    problemMessage: '[avoid_notifier_constructors] Avoid using constructors for Notifiers.',
     correctionMessage: 'Use build() method for initialization.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -695,7 +695,7 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
 class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_provider_arguments',
-    problemMessage: 'Provider arguments should be immutable.',
+    problemMessage: '[prefer_immutable_provider_arguments] Provider arguments should be immutable.',
     correctionMessage: 'Use final for provider arguments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -770,7 +770,7 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_consumer_widgets',
-    problemMessage: 'ConsumerWidget does not use ref parameter.',
+    problemMessage: '[avoid_unnecessary_consumer_widgets] ConsumerWidget does not use ref parameter.',
     correctionMessage: 'Use StatelessWidget instead if ref is not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -857,7 +857,7 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_async_value_pattern',
-    problemMessage: 'Avoid nullable access on AsyncValue.',
+    problemMessage: '[avoid_nullable_async_value_pattern] Avoid nullable access on AsyncValue.',
     correctionMessage: 'Use when() or map() for safe AsyncValue handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -936,7 +936,7 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_riverpod_error_handling',
     problemMessage:
-        'AsyncValue accessed without error handling. Handle loading/error states.',
+        '[require_riverpod_error_handling] AsyncValue accessed without error handling. Handle loading/error states.',
     correctionMessage:
         'Use .when() or .maybeWhen() to handle all AsyncValue states.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1003,7 +1003,7 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_state_mutation',
     problemMessage:
-        'State mutated directly. Mutations don\'t trigger rebuilds.',
+        '[avoid_riverpod_state_mutation] State mutated directly. Mutations don\'t trigger rebuilds.',
     correctionMessage: 'Use state = state.copyWith(...) to replace state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1088,7 +1088,7 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_select',
     problemMessage:
-        'ref.watch() accessing single field. Use .select() for efficiency.',
+        '[prefer_riverpod_select] ref.watch() accessing single field. Use .select() for efficiency.',
     correctionMessage:
         'Use ref.watch(provider.select((s) => s.field)) for targeted rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1157,7 +1157,7 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_flutter_riverpod_package',
-    problemMessage: 'Use flutter_riverpod instead of riverpod in Flutter apps.',
+    problemMessage: '[require_flutter_riverpod_package] Use flutter_riverpod instead of riverpod in Flutter apps.',
     correctionMessage:
         'Import package:flutter_riverpod/flutter_riverpod.dart instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1217,7 +1217,7 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_auto_dispose',
     problemMessage:
-        'Provider without autoDispose may leak memory when no longer used.',
+        '[prefer_riverpod_auto_dispose] Provider without autoDispose may leak memory when no longer used.',
     correctionMessage:
         'Use .autoDispose modifier: StateProvider.autoDispose<T>((ref) => ...).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1305,7 +1305,7 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_riverpod_family_for_params',
     problemMessage:
-        'Provider uses nullable state for parameterized data. Use .family instead.',
+        '[prefer_riverpod_family_for_params] Provider uses nullable state for parameterized data. Use .family instead.',
     correctionMessage:
         'Use FutureProvider.family<T, Param>((ref, param) => ...) for parameterized providers.',
     errorSeverity: DiagnosticSeverity.INFO,

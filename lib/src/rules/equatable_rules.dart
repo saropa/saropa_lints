@@ -83,7 +83,7 @@ class ExtendEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'extend_equatable',
     problemMessage:
-        'Class overrides operator == but does not extend Equatable.',
+        '[extend_equatable] Class overrides operator == but does not extend Equatable.',
     correctionMessage:
         'Consider extending Equatable for cleaner equality implementation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -186,7 +186,7 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'list_all_equatable_fields',
-    problemMessage: 'Equatable class has fields not included in props.',
+    problemMessage: '[list_all_equatable_fields] Equatable class has fields not included in props.',
     correctionMessage:
         'Add all instance fields to the props getter for correct equality.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -349,7 +349,7 @@ class PreferEquatableMixinRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_mixin',
     problemMessage:
-        'Consider using EquatableMixin instead of extending Equatable.',
+        '[prefer_equatable_mixin] Consider using EquatableMixin instead of extending Equatable.',
     correctionMessage:
         'EquatableMixin allows you to extend other classes while keeping '
         'Equatable functionality. Change to: class X with EquatableMixin',
@@ -487,7 +487,7 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_stringify',
-    problemMessage: 'Equatable class does not override stringify to true.',
+    problemMessage: '[prefer_equatable_stringify] Equatable class does not override stringify to true.',
     correctionMessage:
         'Add: @override bool get stringify => true; for better debugging.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -607,7 +607,7 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_annotation',
-    problemMessage: 'Equatable class is not annotated with @immutable.',
+    problemMessage: '[prefer_immutable_annotation] Equatable class is not annotated with @immutable.',
     correctionMessage:
         'Add @immutable annotation to document immutability intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -714,7 +714,7 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_explicit_json',
     problemMessage:
-        'Freezed class with nested objects may need explicit_to_json in build.yaml.',
+        '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml.',
     correctionMessage:
         'Add explicit_to_json: true to build.yaml under json_serializable options.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -876,7 +876,7 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_freezed_default_values',
     problemMessage:
-        'Freezed nullable field could use @Default annotation instead.',
+        '[prefer_freezed_default_values] Freezed nullable field could use @Default annotation instead.',
     correctionMessage:
         'Consider using @Default(value) instead of nullable type if field has a sensible default.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -989,7 +989,7 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_record_over_equatable',
     problemMessage:
-        'Simple Equatable class could be replaced with a Dart 3 record.',
+        '[prefer_record_over_equatable] Simple Equatable class could be replaced with a Dart 3 record.',
     correctionMessage:
         'Consider using a record type: typedef ClassName = ({Type field, ...});',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1109,7 +1109,7 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_field_in_equatable',
     problemMessage:
-        'Equatable class has non-final field. Equality may change unexpectedly.',
+        '[avoid_mutable_field_in_equatable] Equatable class has non-final field. Equality may change unexpectedly.',
     correctionMessage:
         'Make all fields final. Use copyWith pattern for updates.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1186,7 +1186,7 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_copy_with',
-    problemMessage: 'Equatable class should have a copyWith method.',
+    problemMessage: '[require_equatable_copy_with] Equatable class should have a copyWith method.',
     correctionMessage: 'Add copyWith method to easily create modified copies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1256,7 +1256,7 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_copy_with_null_handling',
     problemMessage:
-        'copyWith with ?? operator cannot set nullable fields to null.',
+        '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null.',
     correctionMessage:
         'Use a wrapper type like Optional<T> or generated copyWith from freezed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1360,7 +1360,7 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deep_equality_collections',
     problemMessage:
-        'Collection in Equatable props compared by reference, not contents.',
+        '[require_deep_equality_collections] Collection in Equatable props compared by reference, not contents.',
     correctionMessage:
         'Use DeepCollectionEquality().hash(collection) or wrap in unmodifiable.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1462,7 +1462,7 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_equatable_datetime',
     problemMessage:
-        'DateTime in Equatable props may cause flaky equality checks.',
+        '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks.',
     correctionMessage:
         'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1562,7 +1562,7 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_unmodifiable_collections',
     problemMessage:
-        'Collection field may be mutated externally. Consider making unmodifiable.',
+        '[prefer_unmodifiable_collections] Collection field may be mutated externally. Consider making unmodifiable.',
     correctionMessage:
         'Use List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView().',
     errorSeverity: DiagnosticSeverity.INFO,

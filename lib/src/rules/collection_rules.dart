@@ -44,7 +44,7 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_collection_equality_checks',
-    problemMessage: 'Comparing collections with == uses reference equality.',
+    problemMessage: '[avoid_collection_equality_checks] Comparing collections with == uses reference equality.',
     correctionMessage:
         'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -150,7 +150,7 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_map_keys',
-    problemMessage: 'Duplicate key in map literal.',
+    problemMessage: '[avoid_duplicate_map_keys] Duplicate key in map literal.',
     correctionMessage: 'Remove or rename the duplicate key.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -206,7 +206,7 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_map_keys_contains',
-    problemMessage: 'Use containsKey() instead of keys.contains().',
+    problemMessage: '[avoid_map_keys_contains] Use containsKey() instead of keys.contains().',
     correctionMessage:
         'Replace map.keys.contains(key) with map.containsKey(key).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -303,7 +303,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_collections',
-    problemMessage: 'Unnecessary collection wrapper.',
+    problemMessage: '[avoid_unnecessary_collections] Unnecessary collection wrapper.',
     correctionMessage: 'Use the collection literal directly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -382,7 +382,7 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_collection_methods',
     problemMessage:
-        'Using .first or .last on a potentially empty collection is unsafe.',
+        '[avoid_unsafe_collection_methods] Using .first or .last on a potentially empty collection is unsafe.',
     correctionMessage: 'Use .firstOrNull/.lastOrNull or check isEmpty first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -892,7 +892,7 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_reduce',
-    problemMessage: 'reduce() throws on empty collections.',
+    problemMessage: '[avoid_unsafe_reduce] reduce() throws on empty collections.',
     correctionMessage:
         'Use fold() with an initial value or check isEmpty first.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -991,7 +991,7 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_where_methods',
     problemMessage:
-        'firstWhere/lastWhere/singleWhere throws if no element matches.',
+        '[avoid_unsafe_where_methods] firstWhere/lastWhere/singleWhere throws if no element matches.',
     correctionMessage:
         'Use firstWhereOrNull/lastWhereOrNull/singleWhereOrNull from '
         'package:collection, or provide an orElse callback.',
@@ -1113,7 +1113,7 @@ class PreferWhereOrNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_where_or_null',
     problemMessage:
-        'Consider using firstWhereOrNull/lastWhereOrNull/singleWhereOrNull '
+        '[prefer_where_or_null] Consider using firstWhereOrNull/lastWhereOrNull/singleWhereOrNull '
         'with ?? instead of orElse callback.',
     correctionMessage: 'Replace .firstWhere(..., orElse: () => x) with '
         '.firstWhereOrNull(...) ?? x for cleaner code.',
@@ -1274,7 +1274,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'map_keys_ordering',
-    problemMessage: 'Map keys should be in alphabetical order.',
+    problemMessage: '[map_keys_ordering] Map keys should be in alphabetical order.',
     correctionMessage: 'Reorder the map entries alphabetically by key.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1338,7 +1338,7 @@ class PreferContainsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_contains',
-    problemMessage: 'Use contains() instead of indexOf() for presence checks.',
+    problemMessage: '[prefer_contains] Use contains() instead of indexOf() for presence checks.',
     correctionMessage: 'Replace indexOf() comparison with contains().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1446,7 +1446,7 @@ class PreferFirstRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_first',
-    problemMessage: 'Use .first instead of [0].',
+    problemMessage: '[prefer_first] Use .first instead of [0].',
     correctionMessage: 'Replace [0] with .first or .firstOrNull.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1532,7 +1532,7 @@ class PreferIterableOfRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_of',
-    problemMessage: 'Prefer using .of() instead of .from() for collections.',
+    problemMessage: '[prefer_iterable_of] Prefer using .of() instead of .from() for collections.',
     correctionMessage: 'Replace .from() with .of() for better type safety.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1583,7 +1583,7 @@ class PreferLastRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_last',
-    problemMessage: 'Use .last instead of [length - 1].',
+    problemMessage: '[prefer_last] Use .last instead of [length - 1].',
     correctionMessage: 'Replace list[list.length - 1] with list.last.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1685,7 +1685,7 @@ class PreferAddAllRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_add_all',
-    problemMessage: 'Use addAll() instead of forEach/for with add().',
+    problemMessage: '[prefer_add_all] Use addAll() instead of forEach/for with add().',
     correctionMessage: 'Replace with list.addAll(items).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1782,7 +1782,7 @@ class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_collection_elements',
-    problemMessage: 'Duplicate element in collection literal.',
+    problemMessage: '[avoid_duplicate_collection_elements] Duplicate element in collection literal.',
     correctionMessage: 'Remove the duplicate element.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1855,7 +1855,7 @@ class PreferSetForLookupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_set_for_lookup',
     problemMessage:
-        'Consider using Set instead of List for contains() lookups.',
+        '[prefer_set_for_lookup] Consider using Set instead of List for contains() lookups.',
     correctionMessage: 'Sets have O(1) lookup vs O(n) for Lists.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1912,7 +1912,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_for_loop_increment',
-    problemMessage: 'For loop uses non-standard increment pattern.',
+    problemMessage: '[prefer_correct_for_loop_increment] For loop uses non-standard increment pattern.',
     correctionMessage: 'Consider using i++ for standard iteration.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1991,7 +1991,7 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unreachable_for_loop',
-    problemMessage: 'For loop has impossible bounds and will never execute.',
+    problemMessage: '[avoid_unreachable_for_loop] For loop has impossible bounds and will never execute.',
     correctionMessage: 'Check the loop condition and increment direction.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2125,7 +2125,7 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_elements',
     problemMessage:
-        'Explicit null check for nullable item. Use ?element syntax.',
+        '[prefer_null_aware_elements] Explicit null check for nullable item. Use ?element syntax.',
     correctionMessage: 'Replace `if (x != null) x` with `?x` for cleaner code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2212,7 +2212,7 @@ class PreferIterableOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_operations',
     problemMessage:
-        '.toList() after iterable chain in for-in. Unnecessary allocation.',
+        '[prefer_iterable_operations] .toList() after iterable chain in for-in. Unnecessary allocation.',
     correctionMessage:
         'Remove .toList() to keep iteration lazy and avoid extra allocation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2291,7 +2291,7 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_key_for_collection',
     problemMessage:
-        'Widget in list lacks a key. May cause inefficient rebuilds or state loss.',
+        '[require_key_for_collection] Widget in list lacks a key. May cause inefficient rebuilds or state loss.',
     correctionMessage: 'Add a Key (e.g., ValueKey, ObjectKey) to list items.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

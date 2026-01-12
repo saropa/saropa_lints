@@ -25,7 +25,7 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_final_exception_class_fields',
-    problemMessage: 'Exception class fields should be final.',
+    problemMessage: '[avoid_non_final_exception_class_fields] Exception class fields should be final.',
     correctionMessage: 'Make all fields final in exception classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -97,7 +97,7 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_only_rethrow',
-    problemMessage: 'Catch clause only contains rethrow.',
+    problemMessage: '[avoid_only_rethrow] Catch clause only contains rethrow.',
     correctionMessage: 'Remove the try-catch or add meaningful error handling.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -160,7 +160,7 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_catch_block',
-    problemMessage: 'Throwing in catch block loses the original stack trace.',
+    problemMessage: '[avoid_throw_in_catch_block] Throwing in catch block loses the original stack trace.',
     correctionMessage:
         'Use rethrow or Error.throwWithStackTrace to preserve stack trace.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -227,7 +227,7 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_objects_without_tostring',
-    problemMessage: 'Thrown object may not have a useful toString() method.',
+    problemMessage: '[avoid_throw_objects_without_tostring] Thrown object may not have a useful toString() method.',
     correctionMessage:
         'Consider throwing an Exception or Error subclass, or implement toString().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -301,7 +301,7 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_public_exception_classes',
-    problemMessage: 'Exception classes should be public.',
+    problemMessage: '[prefer_public_exception_classes] Exception classes should be public.',
     correctionMessage: 'Remove underscore prefix from exception class name.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
