@@ -7,17 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.5.0] - 2026-01-12
+
+### Changed
+
+- **`avoid_context_across_async`**: Improved detection logic using proper AST type checking instead of string matching. Now correctly reports context usage in else-branch of `if (mounted)` blocks. Added quick fix to insert `if (!mounted) return;` guard.
+- **`use_setstate_synchronously`**: Refactored to use shared mounted-check utilities for consistency
+- **`avoid_scaffold_messenger_after_await`**: Refactored to use shared await detection utilities
+
+### Added
+
+- **`require_cache_key_determinism`**: Added quick fix that inserts HACK comment for manual cache key review
+- **`avoid_exception_in_constructor`**: Added quick fix that inserts HACK comment suggesting factory constructor conversion
+- **`require_permission_permanent_denial_handling`**: Added quick fix that inserts TODO comment for permanent denial handling
+- **`avoid_builder_index_out_of_bounds`**: Added quick fix that inserts TODO comment for bounds check
+- **Alias**: Added `avoid_using_context_after_dispose` as alias for `avoid_context_across_async` and `avoid_context_in_initstate_dispose`
+- **Test fixtures**: Added `error_handling_v2311_fixture.dart` with test cases for v2.3.11 error handling rules (`avoid_exception_in_constructor`, `require_cache_key_determinism`, `require_permission_permanent_denial_handling`)
+
+### Fixed
+
+- **`require_cache_key_determinism`**: Fixed false positives from substring matching. Now uses regex with word boundaries to avoid matching variable names like `myHashCode`, `userUuid`. Removed overly generic `generateId(` pattern.
+- **`avoid_builder_index_out_of_bounds`**: Improved detection to verify bounds check is on the SAME list being accessed. Previously would miss cases where `otherList.length` was checked but `items[index]` was accessed.
+- **Shared utilities**: Created `async_context_utils.dart` with reusable mounted-check and await detection logic
+
+### Removed
+
+- **ROADMAP**: Removed `avoid_using_context_after_dispose` (now covered by `avoid_context_across_async` + `avoid_context_in_initstate_dispose`)
+
 ## [2.4.2] - 2026-01-11
 
 ### Changed
 
--- Minor doc header escaping oin ios_rules.dart
+- Minor doc header escaping in ios_rules.dart
 
 ## [2.4.1] - 2026-01-11
 
 ### Changed
 
--- Minor doc header escaping of `Provider.of<T>(context)`
+- Minor doc header escaping of `Provider.of<T>(context)`
 
 ## [2.4.0] - 2026-01-11
 
