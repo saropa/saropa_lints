@@ -1905,6 +1905,5 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
     });
   }
 
-  // No quick fix provided - permanent denial handling requires app-specific
-  // UI flow that cannot be safely auto-generated
+  // No quick fix - permanent denial handling requires app-specific UI flow
 }
