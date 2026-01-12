@@ -382,7 +382,7 @@ class _UseMediaQueryPaddingFix extends DartFix {
 /// Suggests adding haptic feedback for important button interactions on iOS.
 ///
 /// iOS provides rich haptic feedback through the Taptic Engine. Using
-/// [HapticFeedback] improves user experience by providing tactile confirmation
+/// `HapticFeedback` improves user experience by providing tactile confirmation
 /// of actions.
 ///
 /// ## Why This Matters
@@ -839,7 +839,7 @@ class AvoidIosBackgroundFetchAbuseRule extends SaropaLintRule {
 /// Suggests using PlatformMenuBar for native macOS menu integration.
 ///
 /// macOS apps should integrate with the system menu bar for a native
-/// experience. [PlatformMenuBar] provides this integration in Flutter.
+/// experience. `PlatformMenuBar` provides this integration in Flutter.
 ///
 /// ## Why This Matters
 ///
@@ -942,8 +942,8 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
 /// Suggests implementing standard macOS keyboard shortcuts.
 ///
 /// macOS users expect standard keyboard shortcuts like Cmd+S (Save),
-/// Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides [Shortcuts]
-/// and [CallbackShortcuts] widgets to implement these.
+/// Cmd+Z (Undo), Cmd+C/V/X (Copy/Paste/Cut). Flutter provides `Shortcuts`
+/// and `CallbackShortcuts` widgets to implement these.
 ///
 /// ## Why This Matters
 ///
@@ -5458,7 +5458,7 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
 ///
 /// ## iOS 16+ Changes
 ///
-/// - System shows "pasted from [app]" notification
+/// - System shows "pasted from \[app\]" notification
 /// - Users may find unexpected clipboard access intrusive
 /// - Only access clipboard when user explicitly triggers paste
 ///
