@@ -272,7 +272,8 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_if_null',
-    problemMessage: 'Use ternary expression instead of ?? for explicit control.',
+    problemMessage:
+        'Use ternary expression instead of ?? for explicit control.',
     correctionMessage: 'Replace with: value != null ? value : default',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -898,7 +899,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
     name: 'prefer_unmodifiable_collections',
     problemMessage:
         'Return UnmodifiableListView from getters to prevent mutation.',
-    correctionMessage: 'Wrap with UnmodifiableListView() or List.unmodifiable().',
+    correctionMessage:
+        'Wrap with UnmodifiableListView() or List.unmodifiable().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1010,4 +1012,3 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
     });
   }
 }
-

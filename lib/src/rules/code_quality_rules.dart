@@ -6,7 +6,8 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 
 import '../saropa_lint_rule.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -7009,7 +7010,8 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
     context.registry.addBinaryExpression((BinaryExpression node) {
       // Only check == and != operators
       final operatorType = node.operator.type;
-      if (operatorType != TokenType.EQ_EQ && operatorType != TokenType.BANG_EQ) {
+      if (operatorType != TokenType.EQ_EQ &&
+          operatorType != TokenType.BANG_EQ) {
         return;
       }
 

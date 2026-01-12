@@ -143,21 +143,30 @@ void goodWithVerify() {
 // =========================================================================
 
 class MockRepository {}
+
 class MockUserRepository {
   Future<User> create(dynamic data) async => User();
 }
+
 class MyBloc {
   MyBloc([MockRepository? repo]);
   void add(dynamic event) {}
   Stream<dynamic> get stream => Stream.empty();
 }
+
 class MyEvent {}
+
 class MyState {}
+
 class Loading extends MyState {}
+
 class Success extends MyState {}
+
 class User {}
+
 class UseCase {
   Future<void> execute(dynamic data) async {}
 }
+
 final useCase = UseCase();
 final userData = {};

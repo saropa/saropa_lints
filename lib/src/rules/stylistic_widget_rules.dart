@@ -64,8 +64,7 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Container') return;
 
       // Check if Container only has width, height, and/or child
@@ -135,8 +134,7 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'SizedBox') return;
 
       // Skip SizedBox.shrink() and SizedBox.expand()
@@ -198,8 +196,7 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName == 'RichText') {
         reporter.atNode(node, code);
       }
@@ -252,8 +249,7 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
       if (constructorName == 'Text' && namedConstructor == 'rich') {
@@ -311,8 +307,7 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
       if (constructorName != 'EdgeInsets') return;
@@ -332,7 +327,8 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
       final top = args['top'];
       final bottom = args['bottom'];
 
-      final horizontalSymmetric = left != null && right != null && left == right;
+      final horizontalSymmetric =
+          left != null && right != null && left == right;
       final verticalSymmetric = top != null && bottom != null && top == bottom;
 
       if (horizontalSymmetric || verticalSymmetric) {
@@ -387,8 +383,7 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
       if (constructorName == 'EdgeInsets' && namedConstructor == 'symmetric') {
@@ -445,11 +440,11 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
-      if (constructorName != 'BorderRadius' || namedConstructor != 'all') return;
+      if (constructorName != 'BorderRadius' || namedConstructor != 'all')
+        return;
 
       // Check if the argument is Radius.circular()
       final args = node.argumentList.arguments;
@@ -500,8 +495,7 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_over_flexible',
-    problemMessage:
-        'Use Expanded instead of Flexible(fit: FlexFit.tight).',
+    problemMessage: 'Use Expanded instead of Flexible(fit: FlexFit.tight).',
     correctionMessage: 'Expanded is more concise and idiomatic.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -513,8 +507,7 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Flexible') return;
 
       // Check for fit: FlexFit.tight
@@ -579,8 +572,7 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addInstanceCreationExpression((node) {
-      final String? constructorName =
-          node.constructorName.type.element?.name;
+      final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName == 'Expanded') {
         reporter.atNode(node, code);
       }
@@ -701,7 +693,8 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_colors',
-    problemMessage: 'Use explicit Colors instead of Theme.of(context).colorScheme.',
+    problemMessage:
+        'Use explicit Colors instead of Theme.of(context).colorScheme.',
     correctionMessage:
         'Explicit colors are more predictable and have no context dependency.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -722,7 +715,8 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 
       // Check if it's followed by .colorScheme
       final parent = node.parent;
-      if (parent is PropertyAccess && parent.propertyName.name == 'colorScheme') {
+      if (parent is PropertyAccess &&
+          parent.propertyName.name == 'colorScheme') {
         reporter.atNode(parent, code);
       }
     });

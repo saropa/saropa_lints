@@ -149,10 +149,10 @@ class ControlFlowExamples {
 
   // GOOD: Switch expression
   String getDayNameExpression(int day) => switch (day) {
-    1 => 'Monday',
-    2 => 'Tuesday',
-    _ => 'Unknown',
-  };
+        1 => 'Monday',
+        2 => 'Tuesday',
+        _ => 'Unknown',
+      };
 }
 
 // =============================================================================
@@ -182,11 +182,7 @@ int calculateWithBlankLine(int a, int b) {
 class TrailingCommaExample {
   // BAD: No trailing comma (prefer_trailing_commas)
   // expect_lint: prefer_trailing_commas
-  void noTrailingComma(
-    String name,
-    int age,
-    bool isActive
-  ) {}
+  void noTrailingComma(String name, int age, bool isActive) {}
 
   // GOOD: Trailing comma
   void withTrailingComma(
