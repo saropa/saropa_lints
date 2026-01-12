@@ -16839,6 +16839,5 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
     return hasLengthCheck || hasEmptyCheck;
   }
 
-  // No quick fix provided - bounds checking requires context-specific logic
-  // that cannot be safely auto-generated (variable names, fallback widgets, etc.)
+  // No quick fix - bounds checking requires knowing variable names and fallback widgets
 }
