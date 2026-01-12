@@ -74,7 +74,8 @@ class TextRichVsRichTextExamples extends StatelessWidget {
           text: TextSpan(
             text: 'Hello ',
             children: [
-              TextSpan(text: 'World', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text: 'World', style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -84,7 +85,8 @@ class TextRichVsRichTextExamples extends StatelessWidget {
           TextSpan(
             text: 'Hello ',
             children: [
-              TextSpan(text: 'World', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(
+                  text: 'World', style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
         ),
