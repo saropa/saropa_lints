@@ -339,7 +339,8 @@ class GoodAsyncInstanceMethod extends StatefulWidget {
   const GoodAsyncInstanceMethod({super.key});
 
   @override
-  State<GoodAsyncInstanceMethod> createState() => _GoodAsyncInstanceMethodState();
+  State<GoodAsyncInstanceMethod> createState() =>
+      _GoodAsyncInstanceMethodState();
 }
 
 class _GoodAsyncInstanceMethodState extends State<GoodAsyncInstanceMethod> {
