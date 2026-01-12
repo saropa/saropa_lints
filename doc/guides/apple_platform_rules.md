@@ -350,19 +350,33 @@ if (Platform.isIOS) {
 | `prefer_macos_keyboard_shortcuts` | Comprehensive | Enhancement, not required |
 | `prefer_cupertino_for_ios` | Comprehensive | Style preference |
 
-## Planned Rules
+## v2.4.0 Additional Rules
 
-The following iOS/macOS rules are planned for future releases:
+v2.4.0 adds 28 additional iOS/macOS rules covering:
 
-| Rule | Description |
-|------|-------------|
-| `require_apple_sign_in` | Apps with third-party login must offer Sign in with Apple |
-| `require_ios_entitlements` | Detect feature usage without matching Xcode entitlements |
-| `require_macos_entitlements` | macOS sandboxed apps require entitlements for network, file, camera |
-| `avoid_macos_hardened_runtime_violations` | Code injection and unsigned libraries block notarization |
-| `require_ios_launch_storyboard` | iOS apps without LaunchScreen.storyboard are rejected |
+**Background Processing (5 rules)**
+- `avoid_long_running_isolates` - iOS terminates isolates after 30 seconds
+- `require_workmanager_for_background` - Use workmanager for reliable background tasks
+- `require_notification_for_long_tasks` - Show progress for long operations
+- `prefer_background_sync` - Use BGTaskScheduler for sync
+- `require_sync_error_recovery` - Retry failed syncs with backoff
 
-See [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) for the complete list of planned rules.
+**Notification Rules (2 rules)**
+- `prefer_delayed_permission_prompt` - Don't request permissions on launch
+- `avoid_notification_spam` - Batch notifications properly
+
+**In-App Purchase Rules (3 rules)**
+- `require_purchase_verification` - Server-side receipt verification
+- `require_purchase_restoration` - App Store requires restore button
+- `prefer_revenuecat` - RevenueCat for IAP management
+
+**iOS Platform Enhancement (16 rules)**
+- `avoid_ios_wifi_only_assumption`, `require_ios_low_power_mode_handling`, `require_ios_accessibility_large_text`, `prefer_ios_context_menu`, `require_ios_quick_note_awareness`, `avoid_ios_hardcoded_keyboard_height`, `require_ios_multitasking_support`, `prefer_ios_spotlight_indexing`, `require_ios_data_protection`, `avoid_ios_battery_drain_patterns`, `require_ios_entitlements`, `require_ios_launch_storyboard`, `require_ios_version_check`, `require_ios_focus_mode_awareness`, `prefer_ios_handoff_support`, `require_ios_voiceover_gesture_compatibility`
+
+**macOS Platform Enhancement (5 rules)**
+- `require_macos_sandbox_exceptions`, `avoid_macos_hardened_runtime_violations`, `require_macos_app_transport_security`, `require_macos_notarization_ready`, `require_macos_entitlements`
+
+See [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) for additional planned rules.
 
 ## FFI/Native Interop
 
@@ -385,3 +399,92 @@ These are automatically enabled when using `dart:ffi`.
 - [App Transport Security](https://developer.apple.com/documentation/security/preventing_insecure_network_connections)
 - [Privacy Manifest Files](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files)
 - [Flutter Platform Channels](https://docs.flutter.dev/platform-integration/platform-channels)
+
+---
+
+## Appendix: Unimplementable Rules (Static Analysis Limitations)
+
+The following Apple platform requirements **cannot be detected by static Dart analysis** because they involve Xcode project configuration, native code, or runtime behavior that exists outside the Dart codebase. These are documented here for awareness and must be verified manually or through other tooling.
+
+### Info.plist and Entitlements Validation
+
+| Requirement | Why It Can't Be Detected |
+|-------------|-------------------------|
+| **Missing Info.plist keys** | Info.plist is an XML file in the iOS/macOS project folder (`ios/Runner/Info.plist`). Dart analyzers cannot read non-Dart files. We can warn when APIs that *typically* need permissions are used, but cannot verify the actual Info.plist content. |
+| **Incorrect entitlements** | Entitlements files (`.entitlements`) are in the Xcode project. The Dart analyzer has no access to Xcode project structure. |
+| **Provisioning profile mismatches** | Provisioning profiles are binary files managed by Xcode and Apple Developer Portal. Not accessible to static analysis. |
+| **App Store Connect configuration** | App privacy declarations, age ratings, and export compliance are configured in App Store Connect, not in code. |
+
+### Xcode Project Configuration
+
+| Requirement | Why It Can't Be Detected |
+|-------------|-------------------------|
+| **Capability enabling** | Push Notifications, Sign in with Apple, HealthKit, etc. are enabled in Xcode's "Signing & Capabilities" tab. This modifies `.pbxproj` files which are not Dart. |
+| **Build settings** | Minimum deployment target, Swift version, architectures, and other build settings are in Xcode project files. |
+| **Widget Extension targets** | Whether a Widget Extension target exists is determined by Xcode project structure, not Dart code. |
+| **Watch app targets** | WatchOS companion apps are separate Xcode targets with their own Info.plist and entitlements. |
+| **App Extensions** | Share extensions, Today extensions, Notification extensions are Xcode targets, not detectable from Dart. |
+
+### Native Code and Bridging
+
+| Requirement | Why It Can't Be Detected |
+|-------------|-------------------------|
+| **Objective-C/Swift implementation** | Native iOS code implementing MethodChannel handlers is in `.m`, `.swift` files. Dart analyzer only sees Dart. |
+| **CocoaPods/SPM dependencies** | Native dependencies in `Podfile` or `Package.swift` are not visible to Dart analysis. |
+| **Framework linking** | Whether system frameworks (HealthKit.framework, etc.) are linked is in Xcode build phases. |
+| **Bridging headers** | Swift-Objective-C bridging configuration is in Xcode project settings. |
+
+### Runtime and Environment
+
+| Requirement | Why It Can't Be Detected |
+|-------------|-------------------------|
+| **Server-side configuration** | Universal Links require `apple-app-site-association` file on your web server. Not in the app codebase. |
+| **APNs certificate/key** | Push notification credentials are configured in Apple Developer Console and backend servers. |
+| **App Store review guidelines compliance** | Many guidelines (like review prompt frequency) are behavioral and depend on runtime state that can't be statically analyzed. |
+| **Notarization requirements** | Whether an app will pass notarization depends on code signing, entitlements, and runtime behavior that the Dart analyzer cannot evaluate. |
+
+### Cross-File and Multi-Project Analysis
+
+| Requirement | Why It Can't Be Detected |
+|-------------|-------------------------|
+| **Permission request before use** | Verifying that permission is requested *before* using protected APIs requires cross-file control flow analysis across potentially many files. Our rules use heuristics (checking if file contains both patterns) but cannot guarantee ordering. |
+| **Initialization before access** | Rules like "Hive must be initialized before opening box" require understanding execution order across files, which static single-file analysis cannot guarantee. |
+| **Complete App Groups setup** | App Groups require configuration in both the main app AND extensions, across different Xcode targets. |
+
+### What We Do Instead
+
+For issues we cannot detect directly, saropa_lints provides:
+
+1. **Reminder rules**: When we detect usage patterns (e.g., HealthKit APIs), we remind developers about related requirements (e.g., `require_ios_healthkit_authorization`).
+
+2. **Documentation**: Each rule's doc comments explain the full setup required, even if we can only detect part of it.
+
+3. **Best practices**: We catch common mistakes that *can* be detected statically, reducing the debugging surface.
+
+4. **Pattern matching**: We use heuristics to identify likely issues, accepting some false positives in exchange for catching real problems.
+
+### Recommended Complementary Tools
+
+For complete Apple platform compliance, use these tools alongside saropa_lints:
+
+| Tool | What It Checks |
+|------|----------------|
+| **Xcode Analyzer** | Static analysis of Swift/Objective-C code |
+| **fastlane** | Automated certificate, provisioning, and deployment checks |
+| **App Store Connect API** | Validate app metadata before submission |
+| **Firebase App Distribution** | Test on real devices before App Store submission |
+| **Transporter** | Apple's tool for validating app packages |
+| **xcrun altool** | Notarization and validation for macOS apps |
+
+### Manual Checklist
+
+Before submitting to the App Store, manually verify:
+
+- [ ] All required Info.plist keys are present with user-facing descriptions
+- [ ] Entitlements match the capabilities your app uses
+- [ ] Privacy Manifest is complete for iOS 17+
+- [ ] Universal Links server configuration is correct
+- [ ] APNs certificate/key is valid and not expired
+- [ ] Provisioning profiles include all required capabilities
+- [ ] App passes local notarization (macOS)
+- [ ] All third-party SDKs are updated and compliant

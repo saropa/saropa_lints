@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart' show Token;
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
@@ -1123,23 +1124,35 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when catching generic Exception or Object without specific type.
+/// Warns when using bare catch without an on clause.
 ///
-/// Alias: catch_all, generic_catch, broad_exception_catch
+/// Alias: catch_all, generic_catch, broad_exception_catch, no_bare_catch
 ///
-/// Catching Exception or Object catches everything, including errors that
-/// should crash the app. Catch specific exception types instead.
+/// Bare catch blocks (`catch (e)` without `on` clause) catch everything
+/// implicitly, which may be accidental. Use explicit types to show intent.
 ///
-/// **BAD:**
+/// See also: [AvoidCatchExceptionAloneRule] which flags `on Exception catch`
+/// without an `on Object catch` fallback.
+///
+/// Dart's throwable hierarchy:
+/// ```
+/// Object (base of everything - use this to catch all)
+/// ├── Exception (recoverable errors)
+/// │   ├── FormatException, IOException, HttpException, etc.
+/// └── Error (programming bugs - NOT caught by "on Exception"!)
+///     ├── StateError, TypeError, RangeError, AssertionError, etc.
+/// ```
+///
+/// **BAD - Bare catch:**
 /// ```dart
 /// try {
 ///   await fetchData();
 /// } catch (e) {
-///   // Catches everything including programmer errors
+///   // Implicit catch-all - may be accidental
 /// }
 /// ```
 ///
-/// **GOOD:**
+/// **GOOD - Specific handling:**
 /// ```dart
 /// try {
 ///   await fetchData();
@@ -1149,6 +1162,20 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
 ///   // Handle parsing errors
 /// }
 /// ```
+///
+/// **GOOD - Comprehensive handling with on Object:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } on Object catch (e, stack) {
+///   // Catches EVERYTHING including Error types
+///   debugException(e, stack);
+/// }
+/// ```
+///
+/// Note: `on dynamic catch` is a syntax error in Dart - use `on Object catch`.
+///
+/// **Quick fix available:** Adds `on Object` before bare catch.
 class AvoidCatchAllRule extends SaropaLintRule {
   const AvoidCatchAllRule() : super(code: _code);
 
@@ -1159,8 +1186,10 @@ class AvoidCatchAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catch_all',
     problemMessage:
-        'Catching generic exception. This catches everything including bugs.',
-    correctionMessage: 'Catch specific exception types (HttpException, etc.).',
+        'Bare catch without on clause. Use explicit type to show intent.',
+    correctionMessage:
+        'Use "on Object catch" for comprehensive handling, or specific types '
+        'like HttpException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1171,24 +1200,196 @@ class AvoidCatchAllRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addCatchClause((CatchClause node) {
-      // Check if it's a generic catch (no exception type specified)
       final TypeAnnotation? exceptionType = node.exceptionType;
 
       if (exceptionType == null) {
-        // catch (e) without type
-        reporter.atNode(node, code);
-        return;
+        // catch (e) without type - implicit catch-all, may be accidental
+        reporter.atNode(node, _code);
       }
+    });
+  }
 
-      // Check if catching Exception or Object
+  @override
+  List<Fix> getFixes() => <Fix>[_AddOnObjectToBareCatchFix()];
+}
+
+class _AddOnObjectToBareCatchFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.exceptionType != null) return;
+
+      final Token? catchKeyword = node.catchKeyword;
+      if (catchKeyword == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add "on Object" for comprehensive error handling',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(catchKeyword.offset, 'on Object ');
+      });
+    });
+  }
+}
+
+/// Warns when `on Exception catch` is used without `on Object catch` fallback.
+///
+/// Alias: exception_without_fallback, catch_exception_alone,
+/// prefer_object_over_exception
+///
+/// `on Exception catch` only catches `Exception` subclasses, silently missing
+/// all `Error` types (StateError, TypeError, RangeError, AssertionError, etc.).
+/// This is dangerous because programming errors crash without logging!
+///
+/// This rule allows `on Exception catch` if there's also an `on Object catch`
+/// fallback in the same try statement to catch Error types.
+///
+/// See also: [AvoidCatchAllRule] which flags bare `catch (e)` blocks.
+///
+/// Dart's throwable hierarchy:
+/// ```
+/// Object (base of everything - use this to catch all)
+/// ├── Exception (recoverable errors)
+/// │   ├── FormatException, IOException, HttpException, etc.
+/// └── Error (programming bugs - NOT caught by "on Exception"!)
+///     ├── StateError, TypeError, RangeError, AssertionError, etc.
+/// ```
+///
+/// **BAD - on Exception alone (misses Error types!):**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } on Exception catch (e) {
+///   // DANGER: StateError, TypeError, RangeError will crash without logging!
+/// }
+/// ```
+///
+/// **GOOD - on Object catches everything:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } on Object catch (e, stack) {
+///   // Catches EVERYTHING including Error types
+///   debugException(e, stack);
+/// }
+/// ```
+///
+/// **GOOD - on Exception with on Object fallback:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } on Exception catch (e) {
+///   // Handle recoverable exceptions one way
+/// } on Object catch (e, stack) {
+///   // Catch Error types (programming bugs) another way
+///   debugException(e, stack);
+/// }
+/// ```
+///
+/// **Quick fix available:** Changes `Exception` to `Object`.
+class AvoidCatchExceptionAloneRule extends SaropaLintRule {
+  const AvoidCatchExceptionAloneRule() : super(code: _code);
+
+  /// Significant issue. Address when count exceeds 10.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_catch_exception_alone',
+    problemMessage:
+        'on Exception catch misses Error types (StateError, TypeError, etc.).',
+    correctionMessage:
+        'Use "on Object catch" to catch all throwables, or add an '
+        '"on Object catch" fallback to handle Error types.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      final TypeAnnotation? exceptionType = node.exceptionType;
+      if (exceptionType == null) return; // Bare catch handled by AvoidCatchAllRule
+
+      // Check if catching Exception (misses Error types)
       if (exceptionType is NamedType) {
-        final String typeName = exceptionType.name.lexeme;
-        if (typeName == 'Exception' ||
-            typeName == 'Object' ||
-            typeName == 'dynamic') {
-          reporter.atNode(node, code);
+        final String typeName = exceptionType.name2.lexeme;
+        if (typeName == 'Exception') {
+          // Check if there's a fallback catch-all in the same try statement
+          if (!_hasObjectCatchFallback(node)) {
+            reporter.atNode(node, _code);
+          }
         }
       }
+    });
+  }
+
+  /// Checks if the try statement containing this catch clause has an
+  /// `on Object catch` fallback that would catch Error types.
+  bool _hasObjectCatchFallback(CatchClause node) {
+    // Find the parent TryStatement
+    final AstNode? parent = node.parent;
+    if (parent is! TryStatement) return false;
+
+    // Check all catch clauses in this try statement
+    for (final CatchClause clause in parent.catchClauses) {
+      final TypeAnnotation? type = clause.exceptionType;
+
+      // Bare catch (no type) catches everything - but this is bad practice
+      // so we don't count it as a valid fallback
+      // if (type == null) return true;
+
+      // on Object catch catches everything
+      if (type is NamedType && type.name2.lexeme == 'Object') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ChangeExceptionToObjectFix()];
+}
+
+class _ChangeExceptionToObjectFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final TypeAnnotation? exceptionType = node.exceptionType;
+      if (exceptionType is! NamedType) return;
+      if (exceptionType.name2.lexeme != 'Exception') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Change to "on Object" to catch Error types too',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          exceptionType.sourceRange,
+          'Object',
+        );
+      });
     });
   }
 }
