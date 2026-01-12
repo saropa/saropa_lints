@@ -5,35 +5,39 @@
 // =========================================================================
 // avoid_catch_all
 // =========================================================================
-// Warns when catching generic Exception or Object without specific type.
+// Warns when using bare catch without an on clause.
+// Use on Object catch for comprehensive handling, or specific types.
 
-// BAD: Catch without type
+// BAD: Bare catch without type - implicit catch-all, may be accidental
 Future<void> badCatchWithoutType() async {
   try {
     await fetchData();
     // expect_lint: avoid_catch_all
   } catch (e) {
-    // Catches everything including bugs!
+    // Implicit catch-all - use explicit type to show intent
   }
 }
 
-// BAD: Catching Exception (too broad)
-Future<void> badCatchException() async {
+// BAD: Bare catch even with rethrow - still implicit
+Future<void> badCatchWithRethrow() async {
   try {
     await fetchData();
+  } on FormatException catch (e) {
+    // Handle parsing errors
     // expect_lint: avoid_catch_all
-  } on Exception catch (e) {
-    // Still too broad
+  } catch (e) {
+    rethrow; // Bare catch - use "on Object catch" to be explicit
   }
 }
 
-// BAD: Catching Object (catches everything)
-Future<void> badCatchObject() async {
+// GOOD: on Object catch - deliberate comprehensive handling
+Future<void> goodCatchObject() async {
   try {
     await fetchData();
-    // expect_lint: avoid_catch_all
-  } on Object catch (e) {
-    // Catches absolutely everything
+  } on Object catch (e, stack) {
+    // Catches EVERYTHING including Error types
+    // This is the correct pattern for comprehensive error logging
+    print('$e\n$stack');
   }
 }
 
@@ -48,14 +52,44 @@ Future<void> goodCatchSpecific() async {
   }
 }
 
-// GOOD: Catching specific types with fallback that rethrows
-Future<void> goodCatchWithRethrow() async {
+// =========================================================================
+// avoid_catch_exception_alone
+// =========================================================================
+// Warns when on Exception catch is used without on Object catch fallback.
+// on Exception misses Error types (StateError, TypeError, RangeError, etc.)
+
+// BAD: on Exception catch alone - misses Error types!
+Future<void> badCatchExceptionAlone() async {
+  try {
+    await fetchData();
+    // expect_lint: avoid_catch_exception_alone
+  } on Exception catch (e) {
+    // DANGER: StateError, TypeError, RangeError will crash without logging!
+  }
+}
+
+// GOOD: on Exception is OK if there's on Object fallback
+Future<void> goodExceptionWithObjectFallback() async {
+  try {
+    await fetchData();
+  } on Exception catch (e) {
+    // Handle recoverable exceptions one way
+    print('Exception: $e');
+  } on Object catch (e, stack) {
+    // Catch Error types (programming bugs) another way
+    print('Error: $e\n$stack');
+  }
+}
+
+// GOOD: Specific handlers with on Object fallback
+Future<void> goodCatchWithObjectFallback() async {
   try {
     await fetchData();
   } on FormatException catch (e) {
     // Handle parsing errors
-  } catch (e) {
-    rethrow; // Re-throwing is acceptable
+  } on Object catch (e, stack) {
+    // Catch everything else including Error types
+    print('$e\n$stack');
   }
 }
 

@@ -165,26 +165,217 @@ class _GoodContextAfterAwaitWithMountedBlockState
   Widget build(BuildContext context) => Container();
 }
 
-// =========================================================================
-// avoid_context_in_static_methods
-// =========================================================================
-// Warns when BuildContext is used in static methods.
+// GOOD: Using context.mounted guard (single-line if statement)
+class GoodContextMountedInlineGuard extends StatefulWidget {
+  const GoodContextMountedInlineGuard({super.key});
 
-// BAD: BuildContext parameter in static method
-class BadContextInStaticMethod {
+  @override
+  State<GoodContextMountedInlineGuard> createState() =>
+      _GoodContextMountedInlineGuardState();
+}
+
+class _GoodContextMountedInlineGuardState
+    extends State<GoodContextMountedInlineGuard> {
+  Future<void> handleAction() async {
+    await Future.value('data');
+    // This should NOT trigger avoid_context_across_async
+    // because context.mounted IS the recommended guard pattern
+    if (context.mounted) Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Using context.mounted guard (block if statement)
+class GoodContextMountedBlockGuard extends StatefulWidget {
+  const GoodContextMountedBlockGuard({super.key});
+
+  @override
+  State<GoodContextMountedBlockGuard> createState() =>
+      _GoodContextMountedBlockGuardState();
+}
+
+class _GoodContextMountedBlockGuardState
+    extends State<GoodContextMountedBlockGuard> {
+  Future<void> handleAction() async {
+    await Future.value('data');
+    // This should NOT trigger avoid_context_across_async
+    if (context.mounted) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Using negated context.mounted guard with early return
+class GoodContextMountedNegatedGuard extends StatefulWidget {
+  const GoodContextMountedNegatedGuard({super.key});
+
+  @override
+  State<GoodContextMountedNegatedGuard> createState() =>
+      _GoodContextMountedNegatedGuardState();
+}
+
+class _GoodContextMountedNegatedGuardState
+    extends State<GoodContextMountedNegatedGuard> {
+  Future<void> handleAction() async {
+    await Future.value('data');
+    // This should NOT trigger avoid_context_across_async
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Nested if with context.mounted (matches user's reported case)
+class GoodNestedContextMountedCheck extends StatefulWidget {
+  const GoodNestedContextMountedCheck({super.key});
+  final bool isCloseAfterSubmit = true;
+
+  @override
+  State<GoodNestedContextMountedCheck> createState() =>
+      _GoodNestedContextMountedCheckState();
+}
+
+class _GoodNestedContextMountedCheckState
+    extends State<GoodNestedContextMountedCheck> {
+  Future<void> handlePressed() async {
+    await Future.value('showScreenContactDetailView');
+
+    // This nested pattern should NOT trigger avoid_context_across_async
+    if (widget.isCloseAfterSubmit) {
+      if (context.mounted) Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// =========================================================================
+// avoid_context_after_await_in_static (Essential/ERROR)
+// =========================================================================
+// Warns when BuildContext is used AFTER await in async static methods.
+// This is the truly dangerous case - context may be invalid after async gap.
+
+// BAD: Context used after await in async static method - CRASH RISK!
+class BadContextAfterAwaitInStatic {
+  // expect_lint: avoid_context_after_await_in_static
+  static Future<void> fetchAndShow(BuildContext context) async {
+    final data = await Future.value('data');
+    // This is dangerous - widget may be disposed during await
+    ScaffoldMessenger.of(context).showSnackBar();
+  }
+
+  // expect_lint: avoid_context_after_await_in_static
+  static Future<void> multipleAwaits(BuildContext ctx) async {
+    await Future.value('first');
+    await Future.value('second');
+    Navigator.of(ctx).pop(); // Context used after multiple awaits
+  }
+}
+
+// NOTE: Callback-based mounted check pattern.
+// The lint doesn't recognize isMounted() callbacks as valid guards.
+// This is a valid pattern but requires an ignore comment for now.
+class MountedCallbackPattern {
+  static Future<void> fetchAndShow(
+    BuildContext context,
+    bool Function() isMounted,
+  ) async {
+    final data = await Future.value('data');
+    if (!isMounted()) return;
+    // ignore: avoid_context_across_async, avoid_context_after_await_in_static
+    ScaffoldMessenger.of(context).showSnackBar(); // Safe with callback check
+  }
+}
+
+// GOOD: Use context BEFORE await (no lint triggered)
+class GoodContextBeforeAwait {
+  static Future<void> captureTheme(BuildContext context) async {
+    // Using context before await is OK - widget is still mounted
+    final theme = Theme.of(context);
+    await Future.value('data');
+    // Don't use context here!
+  }
+}
+
+// =========================================================================
+// avoid_context_in_async_static (Recommended/WARNING)
+// =========================================================================
+// Warns when ANY async static method has BuildContext parameter.
+// Even if context is used before await, the pattern is risky.
+
+// BAD: Async static method with BuildContext - risky pattern
+class BadAsyncStaticWithContext {
+  // expect_lint: avoid_context_in_async_static
+  static Future<void> showConfirmation(BuildContext context) async {
+    final confirmed = await Future.value(true);
+    // Even if context is used carefully, this pattern is risky
+  }
+
+  // expect_lint: avoid_context_in_async_static
+  static Future<String?> pickOption(BuildContext ctx) async {
+    return await Future.value('option');
+  }
+}
+
+// GOOD: Non-async static method with context (handled by different rule)
+class GoodSyncStaticWithContext {
+  // This triggers avoid_context_in_static_methods (INFO) not the async rule
+  static void showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar();
+  }
+}
+
+// GOOD: Async instance method with context (can check mounted)
+class GoodAsyncInstanceMethod extends StatefulWidget {
+  const GoodAsyncInstanceMethod({super.key});
+
+  @override
+  State<GoodAsyncInstanceMethod> createState() => _GoodAsyncInstanceMethodState();
+}
+
+class _GoodAsyncInstanceMethodState extends State<GoodAsyncInstanceMethod> {
+  Future<void> loadData() async {
+    await Future.value('data');
+    if (!mounted) return;
+    Navigator.of(context).pop(); // Instance method can check mounted
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// =========================================================================
+// avoid_context_in_static_methods (Comprehensive/INFO)
+// =========================================================================
+// Warns when BuildContext is used in SYNC static methods.
+// Sync methods are generally safe but the pattern is discouraged.
+// NOTE: Async static methods are handled by more specific rules above.
+
+// BAD: BuildContext parameter in sync static method (discouraged)
+class BadContextInSyncStaticMethod {
   // expect_lint: avoid_context_in_static_methods
   static void showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar();
   }
 
   // expect_lint: avoid_context_in_static_methods
-  static Future<void> navigate(BuildContext context) async {
-    Navigator.of(context).push(Container());
+  static ThemeData getTheme(BuildContext ctx) {
+    return Theme.of(ctx);
   }
 }
 
-// BAD: Multiple BuildContext parameters in static method
+// BAD: Multiple BuildContext parameters in sync static method
 class BadMultipleContextParams {
+  // expect_lint: avoid_context_in_static_methods
   // expect_lint: avoid_context_in_static_methods
   static void compareContexts(BuildContext ctx1, BuildContext ctx2) {
     // Bad practice - comparing contexts

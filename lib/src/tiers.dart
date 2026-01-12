@@ -48,7 +48,7 @@ const Set<String> essentialRules = <String>{
   'avoid_mounted_in_setstate',
   'avoid_storing_context',
   'avoid_context_across_async',
-  'avoid_context_in_static_methods',
+  'avoid_context_after_await_in_static', // ERROR - context after await in static
 
   // Security
   'avoid_hardcoded_credentials',
@@ -355,7 +355,8 @@ const Set<String> essentialRules = <String>{
 
   // NEW v2.3.10 - Essential Rules
   'avoid_unawaited_future', // WARNING - lost errors
-  'avoid_catch_all', // WARNING - catches too much
+  'avoid_catch_all', // WARNING - bare catch without on clause
+  'avoid_catch_exception_alone', // WARNING - misses Error types
   'require_form_key_in_stateful_widget', // WARNING - form state loss
   'prefer_timeout_on_requests', // WARNING - hang prevention
   'avoid_bloc_context_dependency', // WARNING - testability
@@ -383,10 +384,31 @@ const Set<String> essentialRules = <String>{
 
   // NEW v2.3.13 - Additional iOS Platform Rules (Essential)
   'require_apple_sign_in', // ERROR - App Store rejection
+
+  // NEW v2.3.14 - Additional iOS/macOS Platform Rules (Essential)
+  'require_ios_app_tracking_transparency', // ERROR - App Store rejection without ATT
+  'require_ios_face_id_usage_description', // WARNING - crash without Info.plist entry
+  'avoid_ios_in_app_browser_for_auth', // ERROR - OAuth blocked by Google/Apple
+
+  // NEW v2.3.15 - More iOS/macOS Platform Rules (Essential)
+  'require_ios_local_notification_permission', // WARNING - silent notification failures
+  'require_ios_healthkit_authorization', // WARNING - silent data access failures
+  'avoid_macos_catalyst_unsupported_apis', // WARNING - crashes on Mac Catalyst
+  'require_ios_receipt_validation', // WARNING - IAP fraud prevention
+
+  // NEW v2.4.0 - Additional iOS/macOS Platform Rules (Essential)
+  'avoid_long_running_isolates', // WARNING - iOS kills isolates after 30 seconds
+  'require_purchase_verification', // ERROR - IAP receipt fraud prevention
+  'require_purchase_restoration', // ERROR - App Store requires restore purchases
+  'require_macos_notarization_ready', // INFO - macOS distribution requirement reminder
+  'require_ios_data_protection', // WARNING - file encryption for sensitive data
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 const Set<String> recommendedOnlyRules = <String>{
+  // BuildContext Safety (Recommended)
+  'avoid_context_in_async_static', // WARNING - async static with context
+
   // Memory Management Best Practices
   'nullify_after_dispose',
   'require_auto_dispose',
@@ -823,6 +845,46 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_ios_13_deprecations', // WARNING - App Store warnings
   'avoid_ios_simulator_only_code', // WARNING - production failures
   'require_ios_minimum_version_check', // INFO - version compatibility
+
+  // NEW v2.3.14 - Additional iOS/macOS Platform Rules (Recommended)
+  'require_ios_photo_library_add_usage', // WARNING - crash without permission
+  'require_ios_app_review_prompt_timing', // WARNING - App Store rejection
+  'require_ios_push_notification_capability', // INFO - silent push failures
+
+  // NEW v2.3.15 - More iOS/macOS Platform Rules (Recommended)
+  'avoid_ios_hardcoded_device_model', // WARNING - breaks on new devices
+  'require_ios_app_group_capability', // INFO - extension data sharing
+
+  // NEW v2.3.16 - Even More iOS/macOS Platform Rules (Recommended)
+  'avoid_ios_continuous_location_tracking', // INFO - battery optimization
+  'require_ios_lifecycle_handling', // INFO - proper app lifecycle
+  'require_ios_nfc_capability_check', // WARNING - device compatibility
+  'require_ios_callkit_integration', // WARNING - VoIP requirement
+  'require_ios_photo_library_limited_access', // INFO - iOS 14+ handling
+
+  // NEW v2.3.17 - Additional iOS/macOS Platform Rules (Recommended)
+  'require_ios_method_channel_cleanup', // WARNING - memory leak prevention
+  'avoid_ios_force_unwrap_in_callbacks', // WARNING - crash prevention
+  'require_ios_deployment_target_consistency', // WARNING - API compatibility
+  'require_ios_dynamic_island_safe_zones', // WARNING - device layout
+  'require_ios_keychain_for_credentials', // ERROR - security critical
+  'require_macos_sandbox_entitlements', // WARNING - App Store requirement
+  'avoid_macos_full_disk_access', // WARNING - prefer scoped access
+
+  // NEW v2.4.0 - Additional iOS/macOS Platform Rules (Recommended)
+  'require_workmanager_for_background', // WARNING - Dart isolates die on background
+  'require_notification_for_long_tasks', // WARNING - show progress for long operations
+  'prefer_delayed_permission_prompt', // WARNING - don't request permission on launch
+  'avoid_notification_spam', // WARNING - batch notifications properly
+  'require_ios_low_power_mode_handling', // WARNING - adapt to Low Power Mode
+  'require_ios_accessibility_large_text', // WARNING - support Dynamic Type
+  'avoid_ios_hardcoded_keyboard_height', // WARNING - use viewInsets.bottom
+  'require_ios_multitasking_support', // WARNING - iPad Split View/Slide Over
+  'avoid_ios_battery_drain_patterns', // WARNING - inefficient battery usage
+  'avoid_ios_wifi_only_assumption', // WARNING - check connectivity for downloads
+  'require_macos_sandbox_exceptions', // WARNING - sandbox entitlements documentation
+  'avoid_macos_hardened_runtime_violations', // WARNING - notarization compliance
+  'require_macos_app_transport_security', // WARNING - macOS ATS compliance
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1345,10 +1407,57 @@ const Set<String> professionalOnlyRules = <String>{
   // NEW v2.3.13 - Additional iOS Platform Rules (Professional)
   'require_ios_background_mode', // INFO - background capabilities
   'avoid_ios_deprecated_uikit', // WARNING - deprecated UIKit APIs
+
+  // NEW v2.3.14 - Additional iOS/macOS Platform Rules (Professional)
+  'require_ios_keychain_accessibility', // INFO - security best practice
+  'avoid_ios_hardcoded_bundle_id', // INFO - deployment flexibility
+  'require_macos_file_access_intent', // INFO - sandbox compliance
+  'avoid_macos_deprecated_security_apis', // WARNING - notarization issues
+
+  // NEW v2.3.15 - More iOS/macOS Platform Rules (Professional)
+  'require_ios_ats_exception_documentation', // INFO - ATS documentation
+  'require_macos_hardened_runtime', // INFO - notarization requirements
+  'require_ios_siri_intent_definition', // INFO - SiriKit setup
+  'require_ios_widget_extension_capability', // INFO - WidgetKit setup
+
+  // NEW v2.3.16 - Even More iOS/macOS Platform Rules (Professional)
+  'require_ios_database_conflict_resolution', // INFO - sync conflict handling
+  'require_ios_background_audio_capability', // INFO - background audio setup
+  'require_ios_app_clip_size_limit', // INFO - App Clip bundle size
+  'require_ios_keychain_sync_awareness', // INFO - iCloud Keychain sync
+  'require_ios_share_sheet_uti_declaration', // INFO - UTI for file sharing
+  'require_ios_icloud_kvstore_limitations', // INFO - iCloud KV storage limits
+  'require_ios_orientation_handling', // INFO - orientation configuration
+  'require_ios_universal_links_domain_matching', // INFO - Universal Links paths
+  'require_ios_carplay_setup', // INFO - CarPlay entitlement
+  'require_ios_live_activities_setup', // INFO - ActivityKit configuration
+
+  // NEW v2.3.17 - Additional iOS/macOS Platform Rules (Professional)
+  'require_ios_pasteboard_privacy_handling', // INFO - iOS 16+ clipboard notice
+  'require_ios_background_refresh_declaration', // INFO - background fetch setup
+  'require_ios_scene_delegate_awareness', // INFO - iOS 13+ multi-window
+  'require_ios_review_prompt_frequency', // INFO - StoreKit limits
+  'require_macos_window_restoration', // INFO - window state persistence
+  'require_ios_certificate_pinning', // INFO - security for sensitive APIs
+  'require_ios_biometric_fallback', // INFO - accessibility fallback
+  'avoid_ios_misleading_push_notifications', // INFO - App Store compliance
+
+  // NEW v2.4.0 - Additional iOS/macOS Platform Rules (Professional)
+  'prefer_background_sync', // INFO - use BGTaskScheduler for sync
+  'require_sync_error_recovery', // INFO - retry failed syncs
+  'require_ios_entitlements', // INFO - entitlement detection for features
+  'require_ios_launch_storyboard', // INFO - App Store requirement reminder
+  'require_ios_version_check', // INFO - version-specific API detection
+  'require_ios_focus_mode_awareness', // INFO - Focus Mode interruption levels
+  'require_ios_quick_note_awareness', // INFO - NSUserActivity for Quick Note
+  'require_macos_entitlements', // INFO - macOS entitlement detection
 };
 
 /// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // BuildContext Safety (Comprehensive - sync static methods)
+  'avoid_context_in_static_methods', // INFO - sync static with context discouraged
+
   // Architecture
   'avoid_singleton_pattern',
   'avoid_service_locator_overuse',
@@ -1619,6 +1728,23 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_macos_menu_bar_integration', // INFO - native macOS menus
   'prefer_macos_keyboard_shortcuts', // INFO - keyboard shortcuts
   'prefer_cupertino_for_ios', // INFO - native iOS widgets
+
+  // NEW v2.3.16 - Even More iOS/macOS Platform Rules (Comprehensive)
+  'prefer_ios_storekit2', // INFO - StoreKit 2 recommendation
+  'require_ios_accessibility_labels', // INFO - VoiceOver accessibility
+  'require_ios_promotion_display_support', // INFO - ProMotion 120Hz displays
+
+  // NEW v2.3.17 - Additional iOS/macOS Platform Rules (Comprehensive)
+  'prefer_ios_app_intents_framework', // INFO - modern Siri integration
+  'require_ios_age_rating_consideration', // INFO - App Store age rating
+  'avoid_ios_debug_code_in_release', // INFO - release build hygiene
+
+  // NEW v2.4.0 - Additional iOS/macOS Platform Rules (Comprehensive)
+  'prefer_revenuecat', // INFO - RevenueCat for IAP management
+  'prefer_ios_context_menu', // INFO - CupertinoContextMenu for iOS
+  'prefer_ios_spotlight_indexing', // INFO - Core Spotlight integration
+  'prefer_ios_handoff_support', // INFO - Handoff/Continuity support
+  'require_ios_voiceover_gesture_compatibility', // INFO - VoiceOver accessibility
 };
 
 /// Insanity tier rules - Everything including noisy/opinionated rules.

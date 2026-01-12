@@ -267,21 +267,11 @@ This ROADMAP is for **planned/unimplemented rules only**.
 
 #### iOS-Specific
 
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `require_ios_entitlements` | Professional | ERROR | `[CROSS-FILE]` Features like Push Notifications, Keychain Sharing, App Groups require matching entitlements in Xcode. Detect feature usage without entitlement. |
-| `require_ios_launch_storyboard` | Essential | ERROR | `[CROSS-FILE]` iOS apps without LaunchScreen.storyboard are rejected. Detect Flutter apps missing launch screen configuration. |
+> **Implemented in v2.4.0** - See [Apple Platform Rules Guide](doc/guides/apple_platform_rules.md) for 104 iOS/macOS rules including entitlements, launch storyboard, background processing, in-app purchases, and more.
 
 #### macOS-Specific
 
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| `require_macos_entitlements` | Essential | ERROR | `[CROSS-FILE]` macOS sandboxed apps require entitlements for network, file access, camera, etc. Detect usage without entitlement. |
-| `require_macos_sandbox_exceptions` | Professional | INFO | macOS App Store apps must be sandboxed. Document any required temporary exceptions for file/network access. |
-| `avoid_macos_hardened_runtime_violations` | Essential | ERROR | macOS Notarization requires Hardened Runtime. Code injection, unsigned libraries, and missing entitlements cause rejection. |
-| `require_macos_app_transport_security` | Essential | WARNING | Like iOS, macOS enforces ATS. HTTP connections need explicit exceptions in Info.plist. |
-| `avoid_macos_full_disk_access` | Professional | WARNING | Full Disk Access is a sensitive permission. Prefer scoped file access with NSOpenPanel or specific entitlements. |
-| `require_macos_notarization_ready` | Essential | ERROR | Apps must be notarized for macOS 10.15+. Ensure code signing and hardened runtime are properly configured. |
+> **Implemented in v2.4.0** - See [Apple Platform Rules Guide](doc/guides/apple_platform_rules.md) for macOS-specific rules including entitlements, sandbox exceptions, hardened runtime, ATS, and notarization.
 
 #### FFI/Native Interop (iOS/macOS)
 
@@ -334,34 +324,34 @@ This ROADMAP is for **planned/unimplemented rules only**.
 | `require_conflict_resolution_strategy` | Professional | WARNING | Offline edits that conflict with server need resolution: last-write-wins, merge, or user prompt. Define strategy upfront. |
 | `avoid_sync_on_every_change` | Professional | WARNING | Syncing each keystroke wastes battery and bandwidth. Batch changes and sync on intervals or app background. |
 | `require_pending_changes_indicator` | Recommended | INFO | Users should see when local changes haven't synced. Show "Saving..." or pending count to set expectations. |
-| `prefer_background_sync` | Professional | INFO | Use WorkManager (Android) or BGTaskScheduler (iOS) to sync when app is backgrounded, not just when open. |
-| `require_sync_error_recovery` | Essential | WARNING | Failed syncs must retry with exponential backoff. Unrecoverable errors should notify user, not silently lose data. |
+| ~~`prefer_background_sync`~~ | ~~Professional~~ | ~~INFO~~ | **Implemented in v2.4.0** |
+| ~~`require_sync_error_recovery`~~ | ~~Essential~~ | ~~WARNING~~ | **Implemented in v2.4.0** |
 | `avoid_full_sync_on_every_launch` | Professional | WARNING | Downloading entire dataset on launch is slow and expensive. Use delta sync with timestamps or change feeds. |
 
 ### 1.14 Background Processing Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_workmanager_for_background` | Essential | WARNING | Dart isolates die when app backgrounds. Use workmanager package for reliable background tasks on Android/iOS. |
-| `avoid_long_running_isolates` | Professional | WARNING | iOS kills background tasks after ~30 seconds. Design tasks to be short or use background fetch appropriately. |
-| `require_notification_for_long_tasks` | Recommended | INFO | Long operations (uploads, processing) should show progress notification. Silent background work gets killed by OS. |
+| ~~`require_workmanager_for_background`~~ | ~~Recommended~~ | ~~WARNING~~ | **Implemented in v2.4.0** |
+| ~~`avoid_long_running_isolates`~~ | ~~Essential~~ | ~~ERROR~~ | **Implemented in v2.4.0** |
+| ~~`require_notification_for_long_tasks`~~ | ~~Recommended~~ | ~~WARNING~~ | **Implemented in v2.4.0** |
 | `prefer_foreground_service_android` | Professional | INFO | Android kills background services aggressively. Use foreground service with notification for ongoing work. |
 
 ### 1.15 Push Notification Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_delayed_permission_prompt` | Recommended | INFO | Don't ask for notification permission on first launch. Wait until user sees value, then explain why before asking. |
+| ~~`prefer_delayed_permission_prompt`~~ | ~~Recommended~~ | ~~WARNING~~ | **Implemented in v2.4.0** |
 | `prefer_local_notification_for_immediate` | Recommended | INFO | flutter_local_notifications is better for app-generated notifications. FCM is for server-triggered messages. |
-| `avoid_notification_spam` | Recommended | WARNING | Too many notifications cause users to disable all notifications or uninstall. Batch, dedupe, and respect user preferences. |
+| ~~`avoid_notification_spam`~~ | ~~Recommended~~ | ~~WARNING~~ | **Implemented in v2.4.0** |
 
 ### 1.16 Payment & In-App Purchase Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_purchase_verification` | Essential | ERROR | Verify purchases server-side with Apple/Google receipts. Client-side verification can be bypassed by attackers. |
-| `prefer_revenue_cat` | Professional | INFO | In-app purchases are complex (subscriptions, restores, receipt validation). RevenueCat handles cross-platform edge cases. |
-| `require_purchase_restoration` | Essential | ERROR | App Store requires "Restore Purchases" button for non-consumables and subscriptions. Users switching devices need it. |
+| ~~`require_purchase_verification`~~ | ~~Essential~~ | ~~ERROR~~ | **Implemented in v2.4.0** |
+| ~~`prefer_revenuecat`~~ | ~~Comprehensive~~ | ~~INFO~~ | **Implemented in v2.4.0** |
+| ~~`require_purchase_restoration`~~ | ~~Essential~~ | ~~ERROR~~ | **Implemented in v2.4.0** |
 | `avoid_purchase_in_sandbox_production` | Essential | ERROR | Sandbox purchases in production or vice versa fail validation. Use correct environment configuration. |
 | `require_subscription_status_check` | Essential | WARNING | Subscriptions can be cancelled, refunded, or expired. Check status on app launch, not just after purchase. |
 | `prefer_grace_period_handling` | Professional | INFO | Users with expired cards get billing grace period. Handle "grace period" status to avoid locking out paying customers. |

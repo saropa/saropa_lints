@@ -7,47 +7,177 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
-## [2.3.13] - 2026-01-11
+## [2.4.0] - 2026-01-11
 
 ### Added
 
-#### Additional iOS Platform Rules (6 rules)
-- **`require_apple_sign_in`**: Warns when apps use third-party login (Google, Facebook) without Sign in with Apple. App Store rejection per Guidelines 4.8. (ERROR)
-- **`require_ios_background_mode`**: Reminds to add iOS background capabilities when using background task APIs. (INFO)
-- **`avoid_ios_13_deprecations`**: Warns when deprecated iOS 13+ APIs (UIWebView, UIAlertView) are detected in platform channel code. (WARNING)
-- **`avoid_ios_simulator_only_code`**: Warns when iOS Simulator-only patterns (/Users/, localhost:) are detected in production code. (WARNING)
-- **`require_ios_minimum_version_check`**: Warns when iOS version-specific APIs (LiveActivity, SharePlay) are used without version checks. (INFO)
-- **`avoid_ios_deprecated_uikit`**: Warns when deprecated UIKit APIs (keyWindow, statusBarOrientation) are used in platform channel code. (WARNING)
+#### Apple Platform Rules (104 rules)
 
-## [2.3.12] - 2026-01-11
+This release adds comprehensive iOS and macOS platform rules to help Flutter developers build apps that pass App Store review, handle platform requirements correctly, and provide native user experiences.
+
+See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob/main/doc/guides/apple_platform_rules.md) for detailed documentation.
+
+**iOS Core Rules (14 rules)**
+- **`prefer_ios_safe_area`**: Warns when Scaffold body doesn't use SafeArea. Content may be hidden by iOS notch or Dynamic Island. (INFO)
+- **`avoid_ios_hardcoded_status_bar`**: Warns when hardcoded status bar heights (20, 44, 47, 59) are used. Use MediaQuery.padding.top instead. (WARNING)
+- **`prefer_ios_haptic_feedback`**: Suggests adding haptic feedback for important button interactions on iOS devices. (INFO)
+- **`require_ios_platform_check`**: Warns when iOS-specific MethodChannel calls lack Platform.isIOS guard. (WARNING)
+- **`avoid_ios_background_fetch_abuse`**: Warns when Future.delayed exceeds iOS 30-second background limit. (WARNING)
+- **`require_apple_sign_in`**: Warns when apps use third-party login without Sign in with Apple. App Store rejection per Guidelines 4.8. (ERROR)
+- **`require_ios_background_mode`**: Reminds to add iOS background capabilities when using background task APIs. (INFO)
+- **`avoid_ios_13_deprecations`**: Warns when deprecated iOS 13+ APIs (UIWebView, UIAlertView) are detected. (WARNING)
+- **`avoid_ios_simulator_only_code`**: Warns when iOS Simulator-only patterns are detected in production code. (WARNING)
+- **`require_ios_minimum_version_check`**: Warns when iOS version-specific APIs are used without version checks. (INFO)
+- **`avoid_ios_deprecated_uikit`**: Warns when deprecated UIKit APIs are used in platform channel code. (WARNING)
+- **`require_ios_dynamic_island_safe_zones`**: Warns when fixed top padding doesn't account for Dynamic Island. (WARNING)
+- **`require_ios_deployment_target_consistency`**: Warns when iOS 15+ APIs are used without version checks. (WARNING)
+- **`require_ios_scene_delegate_awareness`**: Suggests using Flutter's unified lifecycle handler for iOS 13+ Scene Delegate. (INFO)
+
+**App Store Review Rules (12 rules)**
+- **`require_ios_app_tracking_transparency`**: Warns when ad SDKs are used without ATT implementation. Required for iOS 14.5+. (ERROR)
+- **`require_ios_face_id_usage_description`**: Warns when biometric auth is used without NSFaceIDUsageDescription. (WARNING)
+- **`require_ios_photo_library_add_usage`**: Warns when photo saving APIs lack NSPhotoLibraryAddUsageDescription. (WARNING)
+- **`avoid_ios_in_app_browser_for_auth`**: Warns when OAuth is loaded in WebView. Google/Apple block this for security. (ERROR)
+- **`require_ios_app_review_prompt_timing`**: Warns when app review is requested too early. (WARNING)
+- **`require_ios_review_prompt_frequency`**: Reminds about Apple's 3x per year limit on StoreKit review prompts. (INFO)
+- **`require_ios_receipt_validation`**: Warns when in-app purchases lack server-side receipt validation. (WARNING)
+- **`require_ios_age_rating_consideration`**: Reminds to verify App Store age rating for WebViews or user-generated content. (INFO)
+- **`avoid_ios_misleading_push_notifications`**: Warns when push notification content may violate Apple's guidelines. (INFO)
+- **`require_ios_permission_description`**: Warns when permission-requiring APIs lack Info.plist usage descriptions. (WARNING)
+- **`require_ios_privacy_manifest`**: Warns when APIs requiring iOS 17+ Privacy Manifest entries are used. (WARNING)
+- **`require_https_for_ios`**: Warns when HTTP URLs are used that will be blocked by App Transport Security. (WARNING)
+
+**Security & Authentication Rules (8 rules)**
+- **`require_ios_keychain_accessibility`**: Suggests specifying iOS Keychain accessibility level for secure storage. (INFO)
+- **`require_ios_keychain_sync_awareness`**: Warns when sensitive keys may sync via iCloud Keychain. (INFO)
+- **`require_ios_keychain_for_credentials`**: Warns when credentials are stored in SharedPreferences instead of Keychain. (ERROR)
+- **`require_ios_certificate_pinning`**: Suggests SSL certificate pinning for sensitive API endpoints. (INFO)
+- **`require_ios_biometric_fallback`**: Reminds to provide fallback authentication for devices without biometrics. (INFO)
+- **`require_ios_healthkit_authorization`**: Warns when HealthKit data is accessed without authorization request. (WARNING)
+- **`avoid_ios_hardcoded_bundle_id`**: Warns when bundle IDs are hardcoded instead of from configuration. (INFO)
+- **`avoid_ios_debug_code_in_release`**: Warns when debug logging may be included in release builds. (INFO)
+
+**Platform Integration Rules (14 rules)**
+- **`require_ios_push_notification_capability`**: Reminds to enable Push Notifications capability in Xcode. (INFO)
+- **`require_ios_background_audio_capability`**: Reminds to enable Background Modes > Audio capability. (INFO)
+- **`require_ios_background_refresh_declaration`**: Reminds about UIBackgroundModes "fetch" in Info.plist. (INFO)
+- **`require_ios_app_group_capability`**: Reminds about App Groups capability for extension data sharing. (INFO)
+- **`require_ios_siri_intent_definition`**: Reminds about Intent Definition file for Siri Shortcuts. (INFO)
+- **`require_ios_widget_extension_capability`**: Reminds about Widget Extension target for Home Screen widgets. (INFO)
+- **`require_ios_live_activities_setup`**: Reminds about ActivityKit and Widget Extension setup. (INFO)
+- **`require_ios_carplay_setup`**: Reminds about CarPlay entitlement requirements. (INFO)
+- **`require_ios_callkit_integration`**: Warns when VoIP call handling lacks CallKit integration. (WARNING)
+- **`require_ios_nfc_capability_check`**: Warns when NFC is used without capability check. (WARNING)
+- **`require_ios_method_channel_cleanup`**: Warns when MethodChannel handler lacks cleanup in dispose(). (WARNING)
+- **`avoid_ios_force_unwrap_in_callbacks`**: Warns when force unwrap is used on MethodChannel results. (WARNING)
+- **`require_method_channel_error_handling`**: Warns when MethodChannel.invokeMethod lacks try-catch. (WARNING)
+- **`prefer_ios_app_intents_framework`**: Suggests migrating from legacy SiriKit to App Intents framework. (INFO)
+
+**Device & Hardware Rules (8 rules)**
+- **`avoid_ios_hardcoded_device_model`**: Warns when device model names are hardcoded. Breaks on new devices. (WARNING)
+- **`require_ios_orientation_handling`**: Reminds to configure UISupportedInterfaceOrientations. (INFO)
+- **`require_ios_photo_library_limited_access`**: Warns when photo library access may not handle iOS 14+ limited access. (INFO)
+- **`avoid_ios_continuous_location_tracking`**: Warns when continuous location tracking uses high accuracy. (INFO)
+- **`require_ios_lifecycle_handling`**: Warns when Timer.periodic or subscriptions lack lifecycle handling. (INFO)
+- **`require_ios_promotion_display_support`**: Warns when manual frame timing may not adapt to ProMotion 120Hz. (INFO)
+- **`require_ios_pasteboard_privacy_handling`**: Warns when clipboard access may trigger iOS 16+ privacy notification. (INFO)
+- **`prefer_ios_storekit2`**: Suggests evaluating StoreKit 2 for new IAP implementations. (INFO)
+
+**Data & Storage Rules (6 rules)**
+- **`require_ios_database_conflict_resolution`**: Reminds to implement conflict resolution for cloud-synced databases. (INFO)
+- **`require_ios_icloud_kvstore_limitations`**: Reminds about iCloud Key-Value Storage 1 MB and 1024 key limits. (INFO)
+- **`require_ios_share_sheet_uti_declaration`**: Reminds about UTI declarations for custom file type sharing. (INFO)
+- **`require_ios_app_clip_size_limit`**: Warns about App Clip 10 MB size limit. (INFO)
+- **`require_ios_ats_exception_documentation`**: Suggests documenting ATS exceptions when HTTP URLs are used. (INFO)
+- **`require_ios_local_notification_permission`**: Warns when local notifications are scheduled without permission request. (WARNING)
+
+**Deep Linking Rules (2 rules)**
+- **`require_universal_link_validation`**: Reminds to validate iOS Universal Links server configuration. (INFO)
+- **`require_ios_universal_links_domain_matching`**: Reminds to verify apple-app-site-association paths match. (INFO)
+
+**macOS Platform Rules (12 rules)**
+- **`prefer_macos_menu_bar_integration`**: Suggests using PlatformMenuBar for native macOS menu integration. (INFO)
+- **`prefer_macos_keyboard_shortcuts`**: Suggests implementing standard macOS keyboard shortcuts. (INFO)
+- **`require_macos_window_size_constraints`**: Warns when macOS apps lack window size constraints. (INFO)
+- **`require_macos_window_restoration`**: Suggests implementing window state restoration for better UX. (INFO)
+- **`require_macos_file_access_intent`**: Warns when direct file paths are used in sandboxed apps. (INFO)
+- **`require_macos_hardened_runtime`**: Warns when operations may require Hardened Runtime entitlements. (INFO)
+- **`require_macos_sandbox_entitlements`**: Warns when features require macOS sandbox entitlements. (WARNING)
+- **`avoid_macos_deprecated_security_apis`**: Warns when deprecated macOS Security framework APIs are used. (WARNING)
+- **`avoid_macos_catalyst_unsupported_apis`**: Warns when APIs unavailable on Mac Catalyst are used. (WARNING)
+- **`avoid_macos_full_disk_access`**: Warns when protected paths are accessed directly. (WARNING)
+- **`prefer_cupertino_for_ios`**: Suggests Cupertino widgets over Material widgets in Platform.isIOS blocks. (INFO)
+- **`require_ios_accessibility_labels`**: Warns when interactive widgets lack Semantics wrapper for VoiceOver. (INFO)
+
+**Background Processing Rules (5 rules)**
+- **`avoid_long_running_isolates`**: Warns when Dart isolates perform long operations. iOS terminates isolates after 30 seconds in background. (WARNING)
+- **`require_workmanager_for_background`**: Warns when Timer.periodic is used without workmanager. Dart isolates die when app backgrounds. (WARNING)
+- **`require_notification_for_long_tasks`**: Warns when long-running tasks may run in background without progress notification. (WARNING)
+- **`prefer_background_sync`**: Suggests using BGTaskScheduler for data synchronization instead of manual polling. (INFO)
+- **`require_sync_error_recovery`**: Warns when data sync operations don't implement retry/recovery for failed syncs. (WARNING)
+
+**Notification Rules (2 rules)**
+- **`prefer_delayed_permission_prompt`**: Warns when permission requests occur in initState. Show context before requesting. (WARNING)
+- **`avoid_notification_spam`**: Warns when notifications may be sent in loops or without proper batching. (WARNING)
+
+**In-App Purchase Rules (3 rules)**
+- **`require_purchase_verification`**: Warns when purchases lack server-side receipt verification. Prevents IAP fraud. (ERROR)
+- **`require_purchase_restoration`**: Warns when IAP implementation lacks restorePurchases. App Store requires restore functionality. (ERROR)
+- **`prefer_revenuecat`**: Suggests RevenueCat for complex IAP implementations over manual StoreKit handling. (INFO)
+
+**iOS Platform Enhancement Rules (16 rules)**
+- **`avoid_ios_wifi_only_assumption`**: Warns when large downloads don't check connectivity. Users may incur cellular charges. (WARNING)
+- **`require_ios_low_power_mode_handling`**: Warns when apps don't adapt behavior for Low Power Mode. (WARNING)
+- **`require_ios_accessibility_large_text`**: Warns when fixed text sizes don't support Dynamic Type. (WARNING)
+- **`prefer_ios_context_menu`**: Suggests CupertinoContextMenu for long-press context menus on iOS. (INFO)
+- **`require_ios_quick_note_awareness`**: Warns when NSUserActivity isn't used. Content may be inaccessible in Quick Note. (INFO)
+- **`avoid_ios_hardcoded_keyboard_height`**: Warns when keyboard heights are hardcoded. Use MediaQuery.viewInsets.bottom. (WARNING)
+- **`require_ios_multitasking_support`**: Warns when iPad apps may not handle Split View or Slide Over correctly. (WARNING)
+- **`prefer_ios_spotlight_indexing`**: Suggests implementing Core Spotlight indexing for searchable content. (INFO)
+- **`require_ios_data_protection`**: Warns when sensitive files don't specify FileProtection attributes. (WARNING)
+- **`avoid_ios_battery_drain_patterns`**: Warns when code patterns may cause excessive battery drain. (WARNING)
+- **`require_ios_entitlements`**: Reminds to add iOS entitlements when using capabilities like Push, iCloud, etc. (INFO)
+- **`require_ios_launch_storyboard`**: Reminds that Launch Storyboard is required for App Store submission. (INFO)
+- **`require_ios_version_check`**: Warns when iOS version-specific APIs are used without @available checks. (INFO)
+- **`require_ios_focus_mode_awareness`**: Suggests setting appropriate interruptionLevel for notifications during Focus Mode. (INFO)
+- **`prefer_ios_handoff_support`**: Suggests implementing NSUserActivity for Handoff and Continuity features. (INFO)
+- **`require_ios_voiceover_gesture_compatibility`**: Warns when custom gestures may conflict with VoiceOver gestures. (INFO)
+
+**macOS Platform Enhancement Rules (5 rules)**
+- **`require_macos_sandbox_exceptions`**: Warns when macOS apps may need sandbox exception entitlements. (WARNING)
+- **`avoid_macos_hardened_runtime_violations`**: Warns when code may violate Hardened Runtime requirements. (WARNING)
+- **`require_macos_app_transport_security`**: Warns when HTTP URLs may be blocked by macOS App Transport Security. (WARNING)
+- **`require_macos_notarization_ready`**: Reminds to verify notarization requirements before distribution. (WARNING)
+- **`require_macos_entitlements`**: Reminds to add macOS entitlements when using capabilities. (INFO)
+
+### Changed
+
+- **`avoid_catch_all`**: Simplified to only flag bare `catch` blocks (without `on` clause). The `on Exception catch` detection has been moved to a new separate rule. **Quick fix available:** Adds `on Object` before bare catch.
+
+#### New Error Handling Rule (1 rule)
+
+- **`avoid_catch_exception_alone`**: Warns when `on Exception catch` is used without an `on Object catch` fallback. `on Exception catch` only catches `Exception` subclasses, silently missing all `Error` types (StateError, TypeError, RangeError, etc.) which crash without logging! Allowed if paired with `on Object catch` in the same try statement. **Quick fix available:** Changes `Exception` to `Object`. (WARNING)
+
+#### BuildContext Safety Rules - Tiered Static Method Rules (2 new rules)
+
+The original `avoid_context_in_static_methods` rule has been refined into a tiered system for different strictness levels:
+
+- **`avoid_context_after_await_in_static`** (Essential/ERROR): Warns when BuildContext is used AFTER an await expression in async static methods. This is the truly dangerous case - the widget may have disposed during the async gap, making the context invalid and causing crashes.
+
+- **`avoid_context_in_async_static`** (Recommended/WARNING): Warns when ANY async static method has a BuildContext parameter. Even if context is used before the first await, this pattern is risky and encourages unsafe additions later. **Quick fix available:** Adds `bool Function() isMounted` parameter.
+
+- **`avoid_context_in_static_methods`** (Comprehensive/INFO): Now only warns for SYNC static methods with BuildContext. Async methods are handled by the more specific rules above. Sync methods are generally safe but the pattern is still discouraged.
+
+**Migration:**
+- Essential tier users get only the critical `avoid_context_after_await_in_static` rule (ERROR)
+- Recommended tier users also get `avoid_context_in_async_static` (WARNING)
+- Comprehensive tier users get all three including the INFO-level sync method rule
 
 ### Fixed
 
 - **pubspec.yaml**: Shortened package description to comply with pub.dev 180-character limit
 - **`require_rethrow_preserve_stack`**: Fixed type comparison error where `Token` was compared to `String`. Now correctly uses `.lexeme` to extract the exception parameter name
 - **`avoid_yield_in_on_event`**: Fixed doc comment where `on<Event>` angle brackets were being interpreted as HTML. Wrapped in backticks for proper escaping
-
-### Added
-
-#### iOS Platform Rules (5 rules)
-- **`prefer_ios_safe_area`**: Warns when Scaffold body doesn't use SafeArea. Content may be hidden by iOS notch or Dynamic Island. (INFO)
-- **`avoid_ios_hardcoded_status_bar`**: Warns when hardcoded status bar heights (20, 44, 47, 59) are used. Use MediaQuery.padding.top instead. (WARNING)
-- **`prefer_ios_haptic_feedback`**: Suggests adding haptic feedback for important button interactions on iOS devices. (INFO)
-- **`require_ios_platform_check`**: Warns when iOS-specific MethodChannel calls lack Platform.isIOS guard. (WARNING)
-- **`avoid_ios_background_fetch_abuse`**: Warns when Future.delayed exceeds iOS 30-second background limit. (WARNING)
-
-#### macOS Platform Rules (3 rules)
-- **`prefer_macos_menu_bar_integration`**: Suggests using PlatformMenuBar for native macOS menu integration. (INFO)
-- **`prefer_macos_keyboard_shortcuts`**: Suggests implementing standard macOS keyboard shortcuts (Cmd+S, Cmd+Z). (INFO)
-- **`require_macos_window_size_constraints`**: Warns when macOS apps lack minimum/maximum window size constraints. (INFO)
-
-#### Cross-Platform Apple Rules (6 rules)
-- **`require_method_channel_error_handling`**: Warns when MethodChannel.invokeMethod lacks try-catch for PlatformException. (WARNING)
-- **`require_universal_link_validation`**: Reminds to validate iOS Universal Links server configuration for deep link routes. (INFO)
-- **`prefer_cupertino_for_ios`**: Suggests Cupertino widgets over Material widgets in Platform.isIOS blocks. (INFO)
-- **`require_https_for_ios`**: Warns when HTTP URLs are used that will be blocked by iOS App Transport Security. (WARNING)
-- **`require_ios_permission_description`**: Warns when permission-requiring APIs are used without Info.plist usage descriptions. (WARNING)
-- **`require_ios_privacy_manifest`**: Warns when APIs requiring iOS 17+ Privacy Manifest entries are used. (WARNING)
 
 ## [2.3.11] - 2026-01-11
 
