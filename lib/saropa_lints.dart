@@ -66,6 +66,8 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidContextInInitStateDisposeRule(),
   AvoidStoringContextRule(),
   AvoidContextAcrossAsyncRule(),
+  AvoidContextAfterAwaitInStaticRule(),
+  AvoidContextInAsyncStaticRule(),
   AvoidContextInStaticMethodsRule(),
   AvoidIsarEnumFieldRule(),
   AvoidAdjacentStringsRule(),
@@ -1480,6 +1482,7 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Error handling rules
   AvoidCatchAllRule(),
+  AvoidCatchExceptionAloneRule(),
 
   // State management rules
   AvoidBlocContextDependencyRule(),
@@ -1561,39 +1564,146 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidBuilderIndexOutOfBoundsRule(),
 
   // =========================================================================
-  // NEW RULES v2.3.12 - iOS/macOS Platform Rules
+  // v2.4.0 - Apple Platform Rules (76 rules)
+  // See doc/guides/apple_platform_rules.md for documentation
   // =========================================================================
 
-  // iOS rules
+  // iOS Core Rules
   PreferIosSafeAreaRule(),
   AvoidIosHardcodedStatusBarRule(),
   PreferIosHapticFeedbackRule(),
   RequireIosPlatformCheckRule(),
   AvoidIosBackgroundFetchAbuseRule(),
-
-  // macOS rules
-  PreferMacosMenuBarIntegrationRule(),
-  PreferMacosKeyboardShortcutsRule(),
-  RequireMacosWindowSizeConstraintsRule(),
-
-  // Cross-platform Apple rules (iOS & macOS)
-  RequireMethodChannelErrorHandlingRule(),
-  RequireUniversalLinkValidationRule(),
-  PreferCupertinoForIosRule(),
-  RequireHttpsForIosRule(),
-  RequireIosPermissionDescriptionRule(),
-  RequireIosPrivacyManifestRule(),
-
-  // =========================================================================
-  // NEW RULES v2.3.13 - Additional iOS-Specific Rules
-  // =========================================================================
-
   RequireAppleSignInRule(),
   RequireIosBackgroundModeRule(),
   AvoidIos13DeprecationsRule(),
   AvoidIosSimulatorOnlyCodeRule(),
   RequireIosMinimumVersionCheckRule(),
   AvoidIosDeprecatedUikitRule(),
+  RequireIosDynamicIslandSafeZonesRule(),
+  RequireIosDeploymentTargetConsistencyRule(),
+  RequireIosSceneDelegateAwarenessRule(),
+
+  // App Store Review Rules
+  RequireIosAppTrackingTransparencyRule(),
+  RequireIosFaceIdUsageDescriptionRule(),
+  RequireIosPhotoLibraryAddUsageRule(),
+  AvoidIosInAppBrowserForAuthRule(),
+  RequireIosAppReviewPromptTimingRule(),
+  RequireIosReviewPromptFrequencyRule(),
+  RequireIosReceiptValidationRule(),
+  RequireIosAgeRatingConsiderationRule(),
+  AvoidIosMisleadingPushNotificationsRule(),
+  RequireIosPermissionDescriptionRule(),
+  RequireIosPrivacyManifestRule(),
+  RequireHttpsForIosRule(),
+
+  // Security & Authentication Rules
+  RequireIosKeychainAccessibilityRule(),
+  RequireIosKeychainSyncAwarenessRule(),
+  RequireIosKeychainForCredentialsRule(),
+  RequireIosCertificatePinningRule(),
+  RequireIosBiometricFallbackRule(),
+  RequireIosHealthKitAuthorizationRule(),
+  AvoidIosHardcodedBundleIdRule(),
+  AvoidIosDebugCodeInReleaseRule(),
+
+  // Platform Integration Rules
+  RequireIosPushNotificationCapabilityRule(),
+  RequireIosBackgroundAudioCapabilityRule(),
+  RequireIosBackgroundRefreshDeclarationRule(),
+  RequireIosAppGroupCapabilityRule(),
+  RequireIosSiriIntentDefinitionRule(),
+  RequireIosWidgetExtensionCapabilityRule(),
+  RequireIosLiveActivitiesSetupRule(),
+  RequireIosCarplaySetupRule(),
+  RequireIosCallkitIntegrationRule(),
+  RequireIosNfcCapabilityCheckRule(),
+  RequireIosMethodChannelCleanupRule(),
+  AvoidIosForceUnwrapInCallbacksRule(),
+  RequireMethodChannelErrorHandlingRule(),
+  PreferIosAppIntentsFrameworkRule(),
+
+  // Device & Hardware Rules
+  AvoidIosHardcodedDeviceModelRule(),
+  RequireIosOrientationHandlingRule(),
+  RequireIosPhotoLibraryLimitedAccessRule(),
+  AvoidIosContinuousLocationTrackingRule(),
+  RequireIosLifecycleHandlingRule(),
+  RequireIosPromotionDisplaySupportRule(),
+  RequireIosPasteboardPrivacyHandlingRule(),
+  PreferIosStoreKit2Rule(),
+
+  // Data & Storage Rules
+  RequireIosDatabaseConflictResolutionRule(),
+  RequireIosIcloudKvstoreLimitationsRule(),
+  RequireIosShareSheetUtiDeclarationRule(),
+  RequireIosAppClipSizeLimitRule(),
+  RequireIosAtsExceptionDocumentationRule(),
+  RequireIosLocalNotificationPermissionRule(),
+
+  // Deep Linking Rules
+  RequireUniversalLinkValidationRule(),
+  RequireIosUniversalLinksDomainMatchingRule(),
+
+  // macOS Platform Rules
+  PreferMacosMenuBarIntegrationRule(),
+  PreferMacosKeyboardShortcutsRule(),
+  RequireMacosWindowSizeConstraintsRule(),
+  RequireMacosWindowRestorationRule(),
+  RequireMacosFileAccessIntentRule(),
+  RequireMacosHardenedRuntimeRule(),
+  RequireMacosSandboxEntitlementsRule(),
+  AvoidMacosDeprecatedSecurityApisRule(),
+  AvoidMacosCatalystUnsupportedApisRule(),
+  AvoidMacosFullDiskAccessRule(),
+  PreferCupertinoForIosRule(),
+  RequireIosAccessibilityLabelsRule(),
+
+  // =========================================================================
+  // v2.4.0 Additional Rules - Background Processing, Notifications, Payments
+  // =========================================================================
+
+  // Background Processing Rules
+  AvoidLongRunningIsolatesRule(),
+  RequireWorkmanagerForBackgroundRule(),
+  RequireNotificationForLongTasksRule(),
+  PreferBackgroundSyncRule(),
+  RequireSyncErrorRecoveryRule(),
+
+  // Notification Rules
+  PreferDelayedPermissionPromptRule(),
+  AvoidNotificationSpamRule(),
+
+  // In-App Purchase Rules
+  RequirePurchaseVerificationRule(),
+  RequirePurchaseRestorationRule(),
+  PreferRevenueCatRule(),
+
+  // iOS Platform Enhancement Rules
+  AvoidIosWifiOnlyAssumptionRule(),
+  RequireIosLowPowerModeHandlingRule(),
+  RequireIosAccessibilityLargeTextRule(),
+  PreferIosContextMenuRule(),
+  RequireIosQuickNoteAwarenessRule(),
+  AvoidIosHardcodedKeyboardHeightRule(),
+  RequireIosMultitaskingSupportRule(),
+  PreferIosSpotlightIndexingRule(),
+  RequireIosDataProtectionRule(),
+  AvoidIosBatteryDrainPatternsRule(),
+  RequireIosEntitlementsRule(),
+  RequireIosLaunchStoryboardRule(),
+  RequireIosVersionCheckRule(),
+  RequireIosFocusModeAwarenessRule(),
+  PreferIosHandoffSupportRule(),
+  RequireIosVoiceoverGestureCompatibilityRule(),
+
+  // macOS Platform Enhancement Rules
+  RequireMacosSandboxExceptionsRule(),
+  AvoidMacosHardenedRuntimeViolationsRule(),
+  RequireMacosAppTransportSecurityRule(),
+  RequireMacosNotarizationReadyRule(),
+  RequireMacosEntitlementsRule(),
 ];
 
 class _SaropaLints extends PluginBase {

@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 /// BuildContext safety rules for Flutter applications.
 ///
@@ -8,7 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -322,6 +322,38 @@ class _ContextUsageFinder extends RecursiveAstVisitor<void> {
   final LintCode code;
 
   @override
+  void visitIfStatement(IfStatement node) {
+    // Check if this is a positive context.mounted guard
+    // If so, skip the entire then-branch (it's guarded)
+    if (_isPositiveMountedGuard(node)) {
+      // Only visit the else branch if it exists (not guarded)
+      node.elseStatement?.accept(this);
+      return;
+    }
+
+    // Check if this is a negated mounted guard with early return
+    // The statements after the if are guarded, but we handle that at the
+    // block level, so just continue normal traversal
+    super.visitIfStatement(node);
+  }
+
+  /// Checks if statement is a positive mounted guard: `if (mounted)` or
+  /// `if (context.mounted)` without negation.
+  bool _isPositiveMountedGuard(IfStatement node) {
+    final condition = node.expression.toSource();
+    if (!condition.contains('mounted')) return false;
+
+    // Make sure it's NOT negated
+    final isNegated = condition.contains('!mounted') ||
+        condition.contains('!this.mounted') ||
+        condition.contains('!context.mounted') ||
+        condition.contains('mounted == false') ||
+        condition.contains('mounted==false');
+
+    return !isNegated;
+  }
+
+  @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
     if (node.name == 'context') {
       // Skip if this is part of a mounted check expression
@@ -346,13 +378,309 @@ class _ContextUsageFinder extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when BuildContext is used in static methods.
+// =============================================================================
+// STATIC METHOD CONTEXT RULES (3 tiers)
+// =============================================================================
+//
+// These rules address BuildContext usage in static methods at different
+// strictness levels:
+//
+// 1. avoid_context_after_await_in_static (Essential/ERROR)
+//    - Flags context used AFTER await in async static method
+//    - This is the truly dangerous case - context may be invalid
+//
+// 2. avoid_context_in_async_static (Recommended/WARNING)
+//    - Flags any async static method with BuildContext parameter
+//    - Even if context is used before await, pattern is risky
+//
+// 3. avoid_context_in_static_methods (Comprehensive/INFO)
+//    - Flags any static method with BuildContext parameter
+//    - Sync methods are generally safe but pattern is discouraged
+
+/// Warns when BuildContext is used after await in async static methods.
+///
+/// Alias: context_after_await_static, async_static_context_danger
+///
+/// This is the most dangerous pattern: after an await, the widget may have
+/// been disposed, making the context invalid. Using it will crash the app.
+///
+/// See also:
+/// - [AvoidContextInAsyncStaticRule] for any async static with context
+/// - [AvoidContextInStaticMethodsRule] for any static with context
+///
+/// **BAD - Context used after await (CRASH RISK!):**
+/// ```dart
+/// class MyHelper {
+///   static Future<void> fetchAndShow(BuildContext context) async {
+///     final data = await fetchData();  // Widget may dispose during await
+///     ScaffoldMessenger.of(context).showSnackBar(...);  // CRASH!
+///   }
+/// }
+/// ```
+///
+/// **GOOD - Check mounted or use callback:**
+/// ```dart
+/// // Option 1: Pass mounted check callback
+/// static Future<void> fetchAndShow(
+///   BuildContext context,
+///   bool Function() isMounted,
+/// ) async {
+///   final data = await fetchData();
+///   if (!isMounted()) return;
+///   ScaffoldMessenger.of(context).showSnackBar(...);
+/// }
+///
+/// // Option 2: Use navigator key (no context needed)
+/// static Future<void> fetchAndShow() async {
+///   final data = await fetchData();
+///   navigatorKey.currentState?.showSnackBar(...);
+/// }
+/// ```
+class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
+  const AvoidContextAfterAwaitInStaticRule() : super(code: _code);
+
+  /// Critical issue - causes crashes.
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_context_after_await_in_static',
+    problemMessage:
+        'BuildContext used after await in static method. Context may be '
+        'invalid after async gap.',
+    correctionMessage:
+        'Pass an isMounted callback, use a navigator key, or restructure '
+        'to avoid context after await.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((node) {
+      // Only check async static methods
+      if (!node.isStatic) return;
+      if (node.body is! BlockFunctionBody) return;
+
+      final body = node.body as BlockFunctionBody;
+      if (!body.isAsynchronous) return;
+
+      // Get BuildContext parameter names
+      final contextParamNames = <String>[];
+      for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
+        final name = _getBuildContextParamName(param);
+        if (name != null) contextParamNames.add(name);
+      }
+      if (contextParamNames.isEmpty) return;
+
+      // Find await expressions and context usages after them
+      final visitor = _ContextAfterAwaitVisitor(contextParamNames);
+      body.block.accept(visitor);
+
+      // Report each context usage after await
+      for (final usage in visitor.contextUsagesAfterAwait) {
+        reporter.atNode(usage, _code);
+      }
+    });
+  }
+
+  String? _getBuildContextParamName(FormalParameter param) {
+    if (param is SimpleFormalParameter) {
+      final typeSource = param.type?.toSource();
+      if (typeSource == null) return null;
+      if (typeSource == 'BuildContext' ||
+          typeSource == 'BuildContext?' ||
+          typeSource.contains('BuildContext')) {
+        return param.name?.lexeme;
+      }
+    }
+    if (param is DefaultFormalParameter) {
+      return _getBuildContextParamName(param.parameter);
+    }
+    return null;
+  }
+}
+
+/// Visitor to find context usages after await expressions.
+class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
+  _ContextAfterAwaitVisitor(this.contextParamNames);
+
+  final List<String> contextParamNames;
+  final List<AstNode> contextUsagesAfterAwait = [];
+  bool _seenAwait = false;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    _seenAwait = true;
+    super.visitAwaitExpression(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_seenAwait && contextParamNames.contains(node.name)) {
+      // Check if this is actually using the context (not just declaring)
+      final parent = node.parent;
+      if (parent is! FormalParameter && parent is! VariableDeclaration) {
+        contextUsagesAfterAwait.add(node);
+      }
+    }
+    super.visitSimpleIdentifier(node);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Don't descend into nested function expressions (callbacks)
+    // They have their own async context
+    return;
+  }
+}
+
+/// Warns when BuildContext parameter is used in async static methods.
+///
+/// Alias: async_static_context, context_in_async_static
+///
+/// Async static methods with BuildContext are risky because the widget
+/// may dispose during any async gap. Even if context is used before the
+/// first await, the pattern encourages unsafe code additions later.
+///
+/// See also:
+/// - [AvoidContextAfterAwaitInStaticRule] for the most dangerous case
+/// - [AvoidContextInStaticMethodsRule] for sync static methods
+///
+/// **BAD - Async static with context:**
+/// ```dart
+/// class MyHelper {
+///   static Future<void> showConfirmation(BuildContext context) async {
+///     final confirmed = await showDialog(...);  // async gap
+///     if (confirmed) Navigator.of(context).pop();  // risky!
+///   }
+/// }
+/// ```
+///
+/// **GOOD - Pass mounted callback:**
+/// ```dart
+/// static Future<void> showConfirmation(
+///   BuildContext context,
+///   bool Function() isMounted,
+/// ) async {
+///   final confirmed = await showDialog(...);
+///   if (!isMounted()) return;
+///   Navigator.of(context).pop();
+/// }
+/// ```
+///
+/// **Quick fix available:** Adds `bool Function() isMounted` parameter.
+class AvoidContextInAsyncStaticRule extends SaropaLintRule {
+  const AvoidContextInAsyncStaticRule() : super(code: _code);
+
+  /// Risky pattern that can lead to crashes.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_context_in_async_static',
+    problemMessage:
+        'BuildContext in async static method may become invalid during '
+        'async operations.',
+    correctionMessage:
+        'Pass an isMounted callback, use a navigator key, or convert to '
+        'instance method.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((node) {
+      // Only check async static methods
+      if (!node.isStatic) return;
+      if (node.body is! BlockFunctionBody) return;
+
+      final body = node.body as BlockFunctionBody;
+      if (!body.isAsynchronous) return;
+
+      // Check parameters for BuildContext
+      for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
+        if (_isBuildContextParam(param)) {
+          reporter.atNode(param, _code);
+        }
+      }
+    });
+  }
+
+  bool _isBuildContextParam(FormalParameter param) {
+    if (param is SimpleFormalParameter) {
+      final typeSource = param.type?.toSource();
+      if (typeSource == null) return false;
+      return typeSource == 'BuildContext' ||
+          typeSource == 'BuildContext?' ||
+          typeSource.contains('BuildContext');
+    }
+    if (param is DefaultFormalParameter) {
+      return _isBuildContextParam(param.parameter);
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddIsMountedCallbackFix()];
+}
+
+/// Quick fix that adds an isMounted callback parameter after BuildContext.
+class _AddIsMountedCallbackFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (!node.isStatic) return;
+
+      // Find the BuildContext parameter
+      final params = node.parameters?.parameters ?? <FormalParameter>[];
+      for (final param in params) {
+        if (!param.sourceRange.intersects(analysisError.sourceRange)) continue;
+
+        final changeBuilder = reporter.createChangeBuilder(
+          message: 'Add isMounted callback parameter',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          // Insert after the BuildContext parameter
+          builder.addSimpleInsertion(
+            param.end,
+            ', bool Function() isMounted',
+          );
+        });
+        return;
+      }
+    });
+  }
+}
+
+/// Warns when BuildContext is used in any static method.
 ///
 /// Alias: static_context, context_in_static
 ///
 /// Static methods don't have access to widget instance state, so they
-/// can't check `mounted`. Context passed to static methods may become
-/// invalid before or during method execution.
+/// can't check `mounted`. While synchronous static methods are generally
+/// safe (context is used immediately), the pattern is discouraged as it
+/// makes code harder to maintain and test.
+///
+/// See also:
+/// - [AvoidContextAfterAwaitInStaticRule] for the most dangerous case
+/// - [AvoidContextInAsyncStaticRule] for async static methods
 ///
 /// **BAD:**
 /// ```dart
@@ -371,10 +699,11 @@ class _ContextUsageFinder extends RecursiveAstVisitor<void> {
 ///   ScaffoldMessenger.of(context).showSnackBar(...);
 /// }
 ///
-/// // Option 2: Pass mounted state along with context
-/// static void showError(BuildContext context, bool mounted, String message) {
-///   if (!mounted) return;
-///   ScaffoldMessenger.of(context).showSnackBar(...);
+/// // Option 2: Use extension method
+/// extension ScaffoldMessengerExt on BuildContext {
+///   void showError(String message) {
+///     ScaffoldMessenger.of(this).showSnackBar(...);
+///   }
 /// }
 ///
 /// // Option 3: Use global navigator key for navigation
@@ -388,17 +717,18 @@ class _ContextUsageFinder extends RecursiveAstVisitor<void> {
 class AvoidContextInStaticMethodsRule extends SaropaLintRule {
   const AvoidContextInStaticMethodsRule() : super(code: _code);
 
-  /// Static methods can't check mounted state.
+  /// Discouraged pattern but generally safe for sync methods.
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_static_methods',
     problemMessage:
-        'BuildContext in static method cannot be validated with mounted check.',
+        'BuildContext in static method. Consider instance method or '
+        'extension instead.',
     correctionMessage:
-        'Use instance methods, pass mounted state, or use a navigator key.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+        'Use instance methods, extension methods, or a navigator key.',
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -411,10 +741,16 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
       // Only check static methods
       if (!node.isStatic) return;
 
+      // Skip async methods - handled by more specific rules
+      if (node.body is BlockFunctionBody) {
+        final body = node.body as BlockFunctionBody;
+        if (body.isAsynchronous) return;
+      }
+
       // Check parameters for BuildContext
       for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
         if (_isBuildContextParam(param)) {
-          reporter.atNode(param, code);
+          reporter.atNode(param, _code);
         }
       }
     });
@@ -424,7 +760,6 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
     if (param is SimpleFormalParameter) {
       final typeSource = param.type?.toSource();
       if (typeSource == null) return false;
-      // Check for BuildContext or BuildContext? (nullable)
       return typeSource == 'BuildContext' ||
           typeSource == 'BuildContext?' ||
           typeSource.contains('BuildContext');
