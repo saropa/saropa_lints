@@ -50,6 +50,9 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_gradient_in_build',
     problemMessage:
@@ -150,6 +153,9 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_dialog_in_build',
@@ -286,6 +292,9 @@ class AvoidSnackbarInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_in_build',
     problemMessage: 'showSnackBar in build() causes repeated snackbars.',
@@ -371,6 +380,9 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_analytics_in_build',
@@ -486,6 +498,9 @@ class AvoidJsonEncodeInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_json_encode_in_build',
     problemMessage: 'jsonEncode in build() is expensive and causes jank.',
@@ -568,6 +583,9 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_getit_in_build',
@@ -657,6 +675,9 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_canvas_operations_in_build',
     problemMessage: 'Canvas operations belong in CustomPainter, not build().',
@@ -719,6 +740,9 @@ class AvoidHardcodedFeatureFlagsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_feature_flags',
@@ -808,6 +832,12 @@ class PreferSingleSetStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_single_setstate',
     problemMessage: 'Multiple setState calls cause unnecessary rebuilds.',
@@ -881,6 +911,9 @@ class PreferComputeOverIsolateRunRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_compute_over_isolate_run',
     problemMessage: 'Consider using compute() instead of Isolate.run().',
@@ -935,6 +968,9 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_for_loop_in_children',
@@ -1003,6 +1039,12 @@ class PreferContainerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_container',

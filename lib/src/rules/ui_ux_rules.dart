@@ -25,6 +25,9 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_responsive_breakpoints',
     problemMessage: 'Breakpoint value should be a named constant.',
@@ -118,6 +121,9 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_cached_paint_objects',
     problemMessage: 'Paint created in paint() is recreated every frame.',
@@ -195,6 +201,9 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_custom_painter_shouldrepaint',
@@ -275,6 +284,9 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_currency_formatting_locale',
     problemMessage: 'NumberFormat.currency should have explicit locale.',
@@ -346,6 +358,9 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
   /// Minor improvement. Track for later review.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_number_formatting_locale',
@@ -433,6 +448,9 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_graphql_operation_names',
     problemMessage: 'GraphQL operation should have a name.',
@@ -494,6 +512,9 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
   /// Minor UX improvement.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_badge_without_meaning',
@@ -565,6 +586,9 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_logger_over_print',
     problemMessage: 'Use log() from dart:developer instead of print().',
@@ -617,6 +641,9 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
   /// Performance optimization suggestion.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_itemextent_when_known',
@@ -693,6 +720,9 @@ class RequireTabStatePreservationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_tab_state_preservation',
     problemMessage: 'TabBarView children may lose state on tab switch.',
@@ -761,6 +791,9 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
   /// UX improvement, not a bug. Track for later.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_skeleton_over_spinner',
@@ -833,6 +866,9 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
   /// UX issue that confuses users.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_empty_results_state',
@@ -939,6 +975,9 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_search_loading_indicator',
     problemMessage: 'Search callback without loading state management.',
@@ -1022,6 +1061,9 @@ class RequireSearchDebounceRule extends SaropaLintRule {
   /// Performance and cost issue from excessive API calls.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_search_debounce',
@@ -1118,6 +1160,9 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
   /// UX issue affecting user experience during loading.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_pagination_loading_state',
@@ -1240,6 +1285,9 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
   /// Missing loading indicator creates poor UX.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_webview_progress_indicator',

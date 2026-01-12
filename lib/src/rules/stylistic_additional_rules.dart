@@ -62,6 +62,9 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_interpolation_over_concatenation',
     problemMessage: 'Use string interpolation instead of concatenation.',
@@ -115,6 +118,9 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_concatenation_over_interpolation',
     problemMessage: 'Use string concatenation instead of interpolation.',
@@ -158,6 +164,9 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_double_quotes',
@@ -208,6 +217,9 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_absolute_imports',
@@ -263,6 +275,9 @@ class PreferGroupedImportsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_imports',
@@ -334,6 +349,9 @@ class PreferFlatImportsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_flat_imports',
@@ -408,6 +426,9 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_fields_before_methods',
     problemMessage: 'Declare fields before methods in class declarations.',
@@ -457,6 +478,9 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_methods_before_fields',
@@ -516,6 +540,9 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_static_members_first',
     problemMessage:
@@ -568,6 +595,9 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_instance_members_first',
@@ -622,6 +652,9 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_public_members_first',
     problemMessage:
@@ -674,6 +707,9 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_private_members_first',
@@ -732,6 +768,9 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_var_over_explicit_type',
@@ -792,6 +831,9 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_object_over_dynamic',
     problemMessage: 'Use Object? instead of dynamic for unknown types.',
@@ -837,6 +879,9 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_dynamic_over_object',
@@ -887,6 +932,9 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_lower_camel_case_constants',
@@ -954,6 +1002,9 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_camel_case_method_names',
     problemMessage: 'Use camelCase for method names.',
@@ -1016,6 +1067,9 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_variable_names',
     problemMessage:
@@ -1069,6 +1123,9 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_concise_variable_names',
@@ -1124,6 +1181,9 @@ class PreferExplicitThisRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_this',
@@ -1194,6 +1254,9 @@ class PreferImplicitBooleanComparisonRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_implicit_boolean_comparison',
     problemMessage: 'Avoid explicit comparison with boolean literals.',
@@ -1240,6 +1303,9 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_boolean_comparison',

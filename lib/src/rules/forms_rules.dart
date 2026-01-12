@@ -54,6 +54,9 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_autovalidate_on_interaction',
     problemMessage:
@@ -142,6 +145,9 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_keyboard_type',
@@ -275,6 +281,9 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_in_row',
     problemMessage:
@@ -359,6 +368,9 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_secure_keyboard',
@@ -516,6 +528,9 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_error_message_context',
     problemMessage:
@@ -612,6 +627,9 @@ class RequireFormKeyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_form_key',
     problemMessage: 'Form should have a GlobalKey to access FormState.',
@@ -685,6 +703,9 @@ class AvoidValidationInBuildRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_validation_in_build',
@@ -768,6 +789,9 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_submit_button_state',
     problemMessage:
@@ -838,6 +862,9 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_unfocus',
     problemMessage:
@@ -904,6 +931,9 @@ class RequireFormRestorationRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_form_restoration',
@@ -995,6 +1025,9 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_clearing_form_on_error',
     problemMessage:
@@ -1061,6 +1094,9 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_form_field_controller',
@@ -1137,6 +1173,9 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_form_in_alert_dialog',
     problemMessage:
@@ -1196,6 +1235,9 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
   /// Minor improvement. Track for later review.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_keyboard_action_type',
@@ -1265,6 +1307,9 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
   /// Minor improvement. Track for later review.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_keyboard_dismiss_on_scroll',
@@ -1360,6 +1405,9 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
   /// UX issue - form fields hidden by keyboard.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_keyboard_overlap',
@@ -1539,6 +1587,9 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_form_auto_validate_mode',
     problemMessage: 'Form should specify autovalidateMode for consistent UX.',
@@ -1645,6 +1696,9 @@ class RequireAutofillHintsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_autofill_hints',
     problemMessage:
@@ -1717,6 +1771,9 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
   /// Minor improvement. Track for later review.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_on_field_submitted',
@@ -1791,6 +1848,9 @@ class RequireTextInputTypeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_text_input_type',
     problemMessage:
@@ -1845,6 +1905,9 @@ class PreferTextInputActionRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_input_action',
@@ -1904,6 +1967,12 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_form_key_in_stateful_widget',

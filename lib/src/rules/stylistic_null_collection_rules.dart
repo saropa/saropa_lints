@@ -50,6 +50,9 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_null_aware_assignment',
     problemMessage: 'Use ??= instead of if-null-then-assign pattern.',
@@ -130,6 +133,9 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_null_assignment',
     problemMessage: 'Use explicit if-null-then-assign instead of ??=.',
@@ -181,6 +187,9 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_if_null_over_ternary',
@@ -270,6 +279,9 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_if_null',
     problemMessage: 'Use ternary expression instead of ?? for explicit control.',
@@ -325,6 +337,9 @@ class PreferLateOverNullableRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_late_over_nullable',
@@ -397,6 +412,9 @@ class PreferNullableOverLateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_over_late',
     problemMessage: 'Use nullable type instead of late for safer code.',
@@ -457,6 +475,9 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_spread_over_addall',
     problemMessage: 'Use spread operator [...] instead of addAll().',
@@ -507,6 +528,9 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_addall_over_spread',
@@ -564,6 +588,9 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_collection_if_over_ternary',
@@ -635,6 +662,9 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_ternary_over_collection_if',
     problemMessage: 'Use ternary spread instead of collection-if.',
@@ -684,6 +714,9 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_wheretype_over_where_is',
@@ -753,6 +786,9 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_map_entries_iteration',
@@ -836,6 +872,9 @@ class PreferKeysIterationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_keys_with_lookup',
     problemMessage: 'Use map.keys with lookup for consistency.',
@@ -893,6 +932,9 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_unmodifiable_collections',
@@ -974,6 +1016,9 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_mutable_collections',

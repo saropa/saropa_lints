@@ -38,6 +38,9 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_autoplay_audio',
     problemMessage: 'Autoplay is blocked on iOS/web and annoys users.',
@@ -124,6 +127,9 @@ class PreferCameraResolutionSelectionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_camera_resolution_selection',
     problemMessage:
@@ -185,6 +191,9 @@ class PreferAudioSessionConfigRule extends SaropaLintRule {
   /// Audio UX issue - unexpected behavior with other apps.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_audio_session_config',

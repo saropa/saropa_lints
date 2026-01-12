@@ -55,6 +55,9 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_unknown_route_handler',
     problemMessage:
@@ -135,6 +138,9 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_navigation',
@@ -304,6 +310,9 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_route_transition_consistency',
     problemMessage: 'Mixed route transition types. Use consistent transitions.',
@@ -387,6 +396,9 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_unnamed',
     problemMessage:
@@ -461,6 +473,9 @@ class RequireRouteGuardsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_route_guards',
@@ -561,6 +576,9 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_circular_redirects',
     problemMessage:
@@ -637,6 +655,9 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_pop_without_result',
@@ -744,6 +765,9 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_for_persistent_ui',
     problemMessage:
@@ -828,6 +852,9 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_deep_link_fallback',
     problemMessage: 'Deep link handler should handle missing/invalid content.',
@@ -898,6 +925,9 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
@@ -983,6 +1013,9 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_typed_route_params',
     problemMessage: 'Route parameter used without type conversion.',
@@ -1066,6 +1099,9 @@ class RequireStepperValidationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_stepper_validation',
     problemMessage: 'Stepper onStepContinue should validate before proceeding.',
@@ -1136,6 +1172,9 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_step_count_indicator',
@@ -1211,6 +1250,9 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_inline_creation',
     problemMessage: 'GoRouter created in build(). Causes hot reload issues.',
@@ -1268,6 +1310,9 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_go_router_error_handler',
@@ -1338,6 +1383,9 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_go_router_refresh_listenable',
     problemMessage:
@@ -1401,6 +1449,9 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_string_paths',
@@ -1499,6 +1550,9 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_go_router_redirect_auth',
     problemMessage:
@@ -1579,6 +1633,9 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_go_router_typed_params',
@@ -1682,6 +1739,9 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
   /// Code quality issue - type safety for navigation.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'prefer_go_router_extra_typed',
@@ -1805,6 +1865,9 @@ class PreferMaybePopRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_maybe_pop',
@@ -1950,6 +2013,9 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_url_launcher_uri_over_string',
     problemMessage:
@@ -2012,6 +2078,9 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_push_replacement_confusion',
@@ -2110,6 +2179,9 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
   /// Unencoded URLs fail or cause injection vulnerabilities.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_encoding',
@@ -2250,6 +2322,9 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_routes_without_parent',
     problemMessage:
@@ -2322,6 +2397,9 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_shell_route_shared_layout',
     problemMessage: 'GoRoute with Scaffold builder may duplicate layout code.',
@@ -2390,6 +2468,12 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
   /// Tab state loss on navigation.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_stateful_shell_route_tabs',
@@ -2461,6 +2545,9 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
   /// User-facing errors on invalid navigation.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_go_router_fallback_route',

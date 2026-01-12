@@ -32,6 +32,9 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_equal_expressions',
     problemMessage: 'Both sides of the binary expression are identical.',
@@ -114,6 +117,9 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_negations_in_equality_checks',
@@ -205,6 +211,9 @@ class AvoidSelfAssignmentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_self_assignment',
     problemMessage: 'Variable is assigned to itself.',
@@ -283,6 +292,9 @@ class AvoidSelfCompareRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_self_compare',
     problemMessage: 'Variable is compared to itself.',
@@ -356,6 +368,9 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_compare_to',
@@ -473,6 +488,9 @@ class NoEqualArgumentsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'no_equal_arguments',

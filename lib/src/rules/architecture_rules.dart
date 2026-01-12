@@ -37,6 +37,9 @@ class AvoidDirectDataAccessInUiRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_direct_data_access_in_ui',
     problemMessage:
@@ -122,6 +125,9 @@ class AvoidBusinessLogicInUiRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_business_logic_in_ui',
@@ -213,6 +219,9 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_circular_dependencies',
     problemMessage:
@@ -299,6 +308,9 @@ class AvoidGodClassRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_god_class',
     problemMessage:
@@ -366,6 +378,9 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_ui_in_domain_layer',
@@ -455,6 +470,9 @@ class AvoidCrossFeatureDependenciesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_cross_feature_dependencies',
     problemMessage: 'Feature module depends on another feature.',
@@ -523,6 +541,9 @@ class AvoidSingletonPatternRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_pattern',
@@ -601,6 +622,9 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
   /// Accessibility issue on desktop/web platforms.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_touch_only_gestures',

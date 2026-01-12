@@ -30,6 +30,9 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_empty_spread',
     problemMessage: 'Empty spread has no effect.',
@@ -113,6 +116,12 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_block',
     problemMessage: 'Unnecessary nested block.',
@@ -163,6 +172,9 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_call',
@@ -253,6 +265,9 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_constructor',
@@ -359,6 +374,9 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_arguments',
     problemMessage: 'Enum argument matches default value and can be omitted.',
@@ -400,6 +418,9 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_prefix',
@@ -538,6 +559,9 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_extends',
     problemMessage: 'Unnecessary extends Object.',
@@ -629,6 +653,9 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_getter',
     problemMessage:
@@ -716,6 +743,9 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_length_check',
@@ -892,6 +922,9 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_negations',
     problemMessage: 'Unnecessary negation can be simplified.',
@@ -961,6 +994,9 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_super',
@@ -1066,6 +1102,12 @@ class NoEmptyBlockRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const String _name = 'no_empty_block';
 
@@ -1223,6 +1265,9 @@ class NoEmptyStringRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'no_empty_string',

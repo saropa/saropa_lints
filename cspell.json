@@ -48,6 +48,7 @@
     "apikey",
     "assetlinks",
     "asynchrony",
+    "audioplayers",
     "authtoken",
     "autoplay",
     "Autoplaying",
@@ -88,12 +89,15 @@
     "jailbroken",
     "jank",
     "keepalive",
+    "kvstore",
+    "latlong",
     "lintable",
     "listview",
     "malloc",
     "maybeof",
     "mediaquery",
     "numberformat",
+    "objectbox",
     "open-source",
     "pbxproj",
     "PKCE",
@@ -116,6 +120,7 @@
     "sizedbox",
     "snackbars",
     "SonarQube",
+    "spinkit",
     "sqflite",
     "strobing",
     "Taptic",
@@ -130,6 +135,7 @@
     "vsync",
     "WCAG",
     "Wiegers",
-    "workmanager"
+    "workmanager",
+    "zxcvbn"
   ]
 }

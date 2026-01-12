@@ -37,6 +37,9 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_json_decode_try_catch',
     problemMessage: 'jsonDecode throws on malformed JSON. Wrap in try-catch.',
@@ -111,6 +114,9 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_parse_unvalidated',
@@ -210,6 +216,9 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_try_parse_for_dynamic_data',
@@ -318,6 +327,9 @@ class PreferDurationConstantsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
     problemMessage: 'Duration can use a cleaner unit.',
@@ -392,6 +404,9 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_datetime_now_in_tests',
     problemMessage: 'DateTime.now() in tests can cause flaky behavior.',
@@ -465,6 +480,9 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
   /// Critical issue - causes runtime crashes when encoding JSON.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_not_encodable_in_to_json',
@@ -731,6 +749,9 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_freezed_json_converter',
     problemMessage:
@@ -851,6 +872,9 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
   /// Missing specialized linting for Freezed patterns.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_freezed_lint_package',

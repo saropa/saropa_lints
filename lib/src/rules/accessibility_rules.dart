@@ -45,6 +45,9 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_icon_buttons_without_tooltip',
     problemMessage:
@@ -110,6 +113,9 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
@@ -241,6 +247,9 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_exclude_semantics_justification',
     problemMessage:
@@ -341,6 +350,9 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
     problemMessage:
@@ -422,6 +434,9 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
@@ -509,6 +524,9 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
@@ -603,6 +621,9 @@ class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
     problemMessage:
@@ -695,6 +716,9 @@ class RequireLiveRegionRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_live_region',
@@ -808,6 +832,9 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
     problemMessage: 'Section headers should have Semantics with header: true.',
@@ -914,6 +941,9 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
@@ -1026,6 +1056,9 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor_ignore',
     problemMessage:
@@ -1113,6 +1146,9 @@ class RequireImageSemanticsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_image_semantics',
@@ -1227,6 +1263,9 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hidden_interactive',
@@ -1358,6 +1397,9 @@ class PreferScalableTextRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_scalable_text',
     problemMessage:
@@ -1435,6 +1477,9 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_button_semantics',
@@ -1538,6 +1583,9 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_semantics',
     problemMessage:
@@ -1634,6 +1682,9 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hover_only',
@@ -1735,6 +1786,9 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
   /// Accessibility issue affecting colorblind users.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_error_identification',
@@ -1840,6 +1894,9 @@ class RequireMinimumContrastRule extends SaropaLintRule {
   /// Accessibility issue affecting users with low vision.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_minimum_contrast',
@@ -1963,6 +2020,9 @@ class RequireAvatarAltTextRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_avatar_alt_text',
     problemMessage:
@@ -2029,6 +2089,9 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_badge_semantics',
@@ -2100,6 +2163,9 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_badge_count_limit',
@@ -2177,6 +2243,9 @@ class RequireImageDescriptionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_image_description',
     problemMessage: 'Image should have semanticLabel or excludeFromSemantics.',
@@ -2242,6 +2311,9 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_semantics_exclusion',
@@ -2311,6 +2383,9 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_merge_semantics',
@@ -2415,6 +2490,9 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_focus_indicator',
     problemMessage: 'Interactive widget should have visible focus indicator.',
@@ -2500,6 +2578,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_flashing_content',
     problemMessage: 'Animation may flash more than 3 times per second.',
@@ -2578,6 +2659,9 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_adequate_spacing',
@@ -2661,6 +2745,9 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_motion_without_reduce',
     problemMessage: 'Animation should respect disableAnimations preference.',
@@ -2739,6 +2826,9 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_semantic_label_icons',
@@ -2848,6 +2938,9 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_accessible_images',
     problemMessage:
@@ -2947,6 +3040,9 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_auto_play_media',

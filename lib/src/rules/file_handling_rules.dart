@@ -32,6 +32,9 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_file_exists_check',
     problemMessage:
@@ -135,6 +138,9 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_pdf_error_handling',
     problemMessage: 'PDF loading should have error handling.',
@@ -231,6 +237,9 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_graphql_error_handling',
     problemMessage:
@@ -322,6 +331,9 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_whereargs',
@@ -430,6 +442,9 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_sqflite_transaction',
     problemMessage:
@@ -534,6 +549,9 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_sqflite_error_handling',
     problemMessage: 'Database operation should have error handling.',
@@ -612,6 +630,9 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_batch',
@@ -695,6 +716,9 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_sqflite_close',
@@ -796,6 +820,9 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_sqflite_reserved_words',
@@ -1027,6 +1054,9 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_initialization',
     problemMessage:
@@ -1089,6 +1119,9 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_hive_type_adapter',
@@ -1183,6 +1216,9 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
     problemMessage: 'Hive box opened but not closed in dispose. Resource leak.',
@@ -1262,6 +1298,9 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
     problemMessage: 'Sensitive data stored in unencrypted Hive box.',
@@ -1338,6 +1377,9 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_hive_encryption_key_secure',
@@ -1426,6 +1468,9 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
   /// Medium impact - performance issue, not a crash.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_sqflite_read_all_columns',
@@ -1525,6 +1570,9 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
   /// High impact - can cause OOM crashes on mobile devices.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_loading_full_pdf_in_memory',
@@ -1645,6 +1693,9 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_singleton',
     problemMessage:
@@ -1716,6 +1767,9 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
   /// Runtime errors from column name typos.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_sqflite_column_constants',

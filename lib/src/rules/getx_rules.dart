@@ -47,6 +47,12 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_getx_controller_dispose',
     problemMessage:
@@ -184,6 +190,9 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_obs_outside_controller',
     problemMessage:
@@ -272,6 +281,9 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
   /// Critical - broken lifecycle management.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
@@ -381,6 +393,9 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'always_remove_getx_listener',
     problemMessage: 'GetX worker is not assigned to a variable for cleanup. '
@@ -448,6 +463,9 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
     problemMessage: 'Creating .obs in build() causes memory leaks.',
@@ -514,6 +532,9 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
@@ -603,6 +624,12 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'dispose_getx_fields',
@@ -717,6 +744,9 @@ class PreferGetxBuilderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
     problemMessage:
@@ -813,6 +843,9 @@ class RequireGetxBindingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_getx_binding',
     problemMessage:
@@ -897,6 +930,12 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_getx_worker_dispose',
@@ -1022,6 +1061,9 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_getx_permanent_cleanup',
@@ -1162,6 +1204,12 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_context_outside_widget',
@@ -1310,6 +1358,9 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_getx_global_navigation',
     problemMessage:
@@ -1386,6 +1437,9 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
   /// DI and lifecycle management consistency.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_getx_binding_routes',

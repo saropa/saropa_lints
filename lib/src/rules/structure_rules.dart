@@ -36,6 +36,9 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_barrel_files',
     problemMessage: 'File contains only export statements (barrel file).',
@@ -99,6 +102,9 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_double_slash_imports',
     problemMessage: 'Import path contains double slashes.',
@@ -158,6 +164,9 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_exports',
     problemMessage: 'File is exported multiple times.',
@@ -210,6 +219,9 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_mixins',
@@ -264,6 +276,9 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_named_imports',
@@ -323,6 +338,9 @@ class AvoidGlobalStateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_global_state',
     problemMessage: 'Avoid mutable global state.',
@@ -371,6 +389,9 @@ class AvoidLongFilesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const int _maxLines = 500;
 
   static const LintCode _code = LintCode(
@@ -410,6 +431,9 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const int _maxLines = 100;
 
@@ -471,6 +495,9 @@ class AvoidLongParameterListRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_long_parameter_list',
     problemMessage: 'Function has too many parameters (max 5).',
@@ -529,6 +556,9 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_local_functions',
     problemMessage: 'Avoid declaring local functions.',
@@ -561,6 +591,9 @@ class MaxImportsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const int _maxImports = 20;
 
@@ -671,6 +704,9 @@ class PreferSortedParametersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
     problemMessage: 'Named parameters should be in alphabetical order.',
@@ -739,6 +775,9 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_boolean_parameters',
@@ -840,6 +879,9 @@ class PreferNamedParametersRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_parameters',
@@ -958,6 +1000,9 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_local_variable',
     problemMessage: 'Variable is only used once and returned immediately.',
@@ -1020,6 +1065,9 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_reassignment',
@@ -1170,6 +1218,9 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_final_static_class',
     problemMessage: 'Class with only static members should be abstract final.',
@@ -1248,6 +1299,9 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_colors',
@@ -1435,6 +1489,9 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_underscore_for_unused',
     problemMessage: 'Unused parameter should be named with underscore.',
@@ -1502,6 +1559,9 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
@@ -1584,6 +1644,9 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_finally',

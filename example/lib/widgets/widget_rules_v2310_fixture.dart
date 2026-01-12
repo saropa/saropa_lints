@@ -122,6 +122,114 @@ class GoodStackSingleChild extends StatelessWidget {
 }
 
 // =========================================================================
+// prefer_expanded_at_call_site
+// =========================================================================
+// Warns when build() returns Expanded/Flexible directly.
+// Better to add Expanded at the call site for flexibility.
+
+// BAD: Returning Expanded from build()
+class BadExpandedInBuild extends StatelessWidget {
+  const BadExpandedInBuild({super.key});
+
+  @override
+  // expect_lint: prefer_expanded_at_call_site
+  Widget build(BuildContext context) => Expanded(
+        child: Column(children: const []),
+      );
+}
+
+// BAD: Returning Flexible from build()
+class BadFlexibleInBuild extends StatelessWidget {
+  const BadFlexibleInBuild({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: prefer_expanded_at_call_site
+    return Flexible(child: Container());
+  }
+}
+
+// GOOD: Return content, let caller add Expanded
+class GoodNoExpandedInBuild extends StatelessWidget {
+  const GoodNoExpandedInBuild({super.key});
+
+  @override
+  Widget build(BuildContext context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [],
+      );
+}
+
+// GOOD: Expanded used inside build but not as return value
+class GoodExpandedAsChild extends StatelessWidget {
+  const GoodExpandedAsChild({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(child: Container()),
+        Container(),
+      ],
+    );
+  }
+}
+
+// BAD: Returning Expanded from conditional expression
+class BadExpandedInTernary extends StatelessWidget {
+  const BadExpandedInTernary({super.key});
+  final bool useExpanded = true;
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: prefer_expanded_at_call_site
+    return useExpanded ? Expanded(child: Container()) : Container();
+  }
+}
+
+// BAD: Returning Expanded from else branch
+class BadExpandedInElseBranch extends StatelessWidget {
+  const BadExpandedInElseBranch({super.key});
+  final bool showLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (showLoading) {
+      return Container();
+    } else {
+      // expect_lint: prefer_expanded_at_call_site
+      return Flexible(child: Container());
+    }
+  }
+}
+
+// BAD: Multiple returns with Expanded in one branch
+class BadExpandedInBranch extends StatelessWidget {
+  const BadExpandedInBranch({super.key});
+  final bool isActive = true;
+
+  @override
+  Widget build(BuildContext context) {
+    if (isActive) {
+      // expect_lint: prefer_expanded_at_call_site
+      return Expanded(child: Container());
+    }
+    return Container();
+  }
+}
+
+// GOOD: Ternary returning non-Expanded widgets
+class GoodTernaryNoExpanded extends StatelessWidget {
+  const GoodTernaryNoExpanded({super.key});
+  final bool showA = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return showA ? Container() : Column(children: const []);
+  }
+}
+
+// =========================================================================
 // Helper mocks
 // =========================================================================
 

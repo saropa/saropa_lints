@@ -32,6 +32,9 @@ class AvoidInconsistentDigitSeparatorsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_inconsistent_digit_separators',
     problemMessage: 'Digit separators are not grouped consistently.',
@@ -120,6 +123,9 @@ class AvoidUnnecessaryDigitSeparatorsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_digit_separators',
     problemMessage: 'Unnecessary or poorly placed digit separator.',
@@ -171,6 +177,9 @@ class DoubleLiteralFormatRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'double_literal_format',
     problemMessage: 'Use consistent double literal format.',
@@ -208,6 +217,9 @@ class NoMagicNumberRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'no_magic_number',
@@ -294,6 +306,9 @@ class NoMagicStringRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'no_magic_string',
@@ -412,6 +427,9 @@ class PreferAdditionSubtractionAssignmentsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_addition_subtraction_assignments',
     problemMessage: 'Use compound assignment operator.',
@@ -488,6 +506,9 @@ class PreferCompoundAssignmentOperatorsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_compound_assignment_operators',
     problemMessage: 'Use compound assignment operator.',
@@ -547,6 +568,9 @@ class PreferDigitSeparatorsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const int _threshold = 10000; // Numbers >= 10000 should use separators
 
@@ -677,6 +701,9 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_digit_separators',

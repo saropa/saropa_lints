@@ -38,6 +38,7 @@ library;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'package:saropa_lints/src/rules/all_rules.dart';
+import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/tiers.dart';
 
 // Export all rule classes for documentation
@@ -51,6 +52,8 @@ export 'package:saropa_lints/src/saropa_lint_rule.dart'
         SaropaLintRule,
         ViolationRecord;
 export 'package:saropa_lints/src/tiers.dart';
+export 'package:saropa_lints/src/project_context.dart'
+    show FileType, FileTypeDetector, ProjectContext, RuleCost;
 
 /// All available Saropa lint rules.
 ///
@@ -1620,6 +1623,7 @@ const List<LintRule> _allRules = <LintRule>[
   // Widget rules
   AvoidStackWithoutPositionedRule(),
   AvoidExpandedOutsideFlexRule(),
+  PreferExpandedAtCallSiteRule(),
 
   // =========================================================================
   // NEW RULES v2.3.11
@@ -1934,6 +1938,18 @@ class _SaropaLints extends PluginBase {
       return tierRules.contains(ruleName);
     }).toList();
 
+    // =========================================================================
+    // RULE PRIORITY ORDERING (Performance Optimization)
+    // =========================================================================
+    // Sort rules by estimated execution cost so fast rules run first.
+    // This improves perceived performance and allows early termination
+    // strategies in the future.
+    filteredRules.sort((a, b) {
+      final costA = _getRuleCost(a);
+      final costB = _getRuleCost(b);
+      return costA.index.compareTo(costB.index);
+    });
+
     // Cache the result for subsequent files
     _cachedFilteredRules = filteredRules;
     _cachedTier = tier;
@@ -1941,4 +1957,16 @@ class _SaropaLints extends PluginBase {
 
     return filteredRules;
   }
+}
+
+/// Get the execution cost of a rule.
+///
+/// If the rule is a [SaropaLintRule], use its declared cost.
+/// Otherwise, default to medium cost.
+RuleCost _getRuleCost(LintRule rule) {
+  if (rule is SaropaLintRule) {
+    return rule.cost;
+  }
+  // Non-Saropa rules default to medium cost
+  return RuleCost.medium;
 }

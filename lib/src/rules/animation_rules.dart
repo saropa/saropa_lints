@@ -49,6 +49,9 @@ class RequireVsyncMixinRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_vsync_mixin',
     problemMessage: 'AnimationController created without vsync parameter.',
@@ -158,6 +161,9 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
   /// Each occurrence is a memory leak bug.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_animation_in_build',
@@ -276,6 +282,12 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   /// and prevents garbage collection. Even 1-2 is serious in production.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_animation_controller_dispose',
@@ -482,6 +494,9 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_hero_tag_uniqueness',
     problemMessage:
@@ -576,6 +591,9 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_layout_passes',
     problemMessage:
@@ -638,6 +656,9 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
   /// 1000+ is fine in legacy code; enforce on new code only.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_duration',
@@ -735,6 +756,9 @@ class RequireAnimationCurveRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_animation_curve',
     problemMessage:
@@ -823,6 +847,9 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
   /// Address during refactoring; not a bug.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_implicit_animations',
@@ -931,6 +958,9 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_staggered_animation_delays',
     problemMessage:
@@ -1023,6 +1053,9 @@ class PreferTweenSequenceRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_tween_sequence',
     problemMessage: 'Multiple chained animations should use TweenSequence.',
@@ -1086,6 +1119,9 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_animation_status_listener',
@@ -1169,6 +1205,9 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_overlapping_animations',
@@ -1262,6 +1301,9 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_animation_rebuild_waste',
     problemMessage: 'AnimatedBuilder wraps too much of the widget tree.',
@@ -1340,6 +1382,9 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_physics_simulation',
@@ -1446,6 +1491,9 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
   /// Ticker leaks cause memory issues and error messages.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_animation_ticker_disposal',

@@ -47,6 +47,12 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_in_widgets',
     problemMessage:
@@ -129,6 +135,9 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_too_many_dependencies',
@@ -235,6 +244,9 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
     problemMessage:
@@ -312,6 +324,9 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_dependencies',
@@ -402,6 +417,9 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_for_scoped_dependencies',
     problemMessage:
@@ -484,6 +502,9 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_di_dependencies',
@@ -594,6 +615,9 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_null_object_pattern',
     problemMessage:
@@ -659,6 +683,9 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_typed_di_registration',
     problemMessage: 'DI registration should have explicit type parameter.',
@@ -721,6 +748,9 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
   /// Potential bug. Wrong method used.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_functions_in_register_singleton',
@@ -791,6 +821,9 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
   /// Wrong registration order crashes at startup.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_getit_registration_order',
@@ -962,6 +995,9 @@ class RequireDefaultConfigRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_default_config',
     problemMessage:
@@ -1068,6 +1104,9 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
   /// Code quality issue. Makes testing harder.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_injection',
@@ -1259,6 +1298,9 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
   /// Memory leaks or stale data from wrong scope.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_di_scope_awareness',

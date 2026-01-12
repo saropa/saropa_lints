@@ -52,6 +52,9 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_isar_enum_field',
     problemMessage: 'Enum fields in Isar collections can cause data corruption '
@@ -389,6 +392,9 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_isar_collection_annotation',
     problemMessage: 'Class used with Isar must have @collection annotation.',
@@ -463,6 +469,9 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_isar_id_field',
@@ -547,6 +556,12 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_isar_close_on_dispose',
     problemMessage:
@@ -629,6 +644,9 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_isar_async_writes',
     problemMessage:
@@ -689,6 +707,9 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_transaction_nesting',
@@ -767,6 +788,9 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_isar_batch_operations',
     problemMessage:
@@ -825,6 +849,9 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_isar_float_equality_queries',
     problemMessage:
@@ -880,6 +907,9 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_isar_inspector_debug_only',
@@ -941,6 +971,9 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_isar_clear_in_production',
     problemMessage: 'isar.clear() deletes all data. Wrap in kDebugMode check.',
@@ -999,6 +1032,9 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_isar_links_load',
@@ -1076,6 +1112,9 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_isar_query_stream',
     problemMessage:
@@ -1136,6 +1175,9 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_web_limitations',
@@ -1201,6 +1243,9 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_isar_index_for_queries',
@@ -1268,6 +1313,9 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_isar_embedded_large_objects',
     problemMessage:
@@ -1333,6 +1381,9 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_isar_lazy_links',
     problemMessage:
@@ -1378,6 +1429,9 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_schema_breaking_changes',
@@ -1445,6 +1499,9 @@ class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_isar_non_nullable_migration',
@@ -1522,6 +1579,9 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_isar_composite_index',
     problemMessage: 'Multi-field queries benefit from composite indexes.',
@@ -1584,6 +1644,9 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_string_contains_without_index',

@@ -54,6 +54,9 @@ class PreferRelativeImportsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
     problemMessage: 'Use relative imports instead of absolute package imports.',
@@ -231,6 +234,12 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
     problemMessage: 'Multiple widget classes defined in a single file.',
@@ -313,6 +322,9 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_arrow_functions',
@@ -490,6 +502,9 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   /// Threshold for number of positional parameters before suggesting named.
   static const int _threshold = 3;
 
@@ -607,6 +622,9 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
@@ -804,6 +822,9 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
     problemMessage:
@@ -934,6 +955,12 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   /// Maximum number of lines in build method to suggest conversion.
   static const int _maxBuildLines = 5;
 
@@ -1050,6 +1077,9 @@ class PreferExplicitTypesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
     problemMessage: 'Use explicit type annotation instead of var/dynamic.',
@@ -1142,6 +1172,9 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
@@ -1236,6 +1269,9 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
     problemMessage:
@@ -1325,6 +1361,9 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_quotes',
@@ -1449,6 +1488,9 @@ class PreferTodoFormatRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
     problemMessage:
@@ -1540,6 +1582,9 @@ class PreferFixmeFormatRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
     problemMessage:
@@ -1627,6 +1672,9 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_sentence_case_comments',
@@ -1872,6 +1920,9 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_period_after_doc',
     problemMessage: 'Doc comment should end with a period.',
@@ -2028,6 +2079,9 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
     problemMessage: 'Constants should use SCREAMING_SNAKE_CASE.',
@@ -2166,6 +2220,9 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
@@ -2326,6 +2383,9 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
     problemMessage: 'File name should use snake_case.',
@@ -2424,6 +2484,9 @@ class AvoidSmallTextRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   /// Minimum font size in logical pixels.
   static const double _minFontSize = 12.0;
@@ -2554,6 +2617,9 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_doc_comments_over_regular',
@@ -2773,6 +2839,9 @@ class PreferStraightApostropheRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_straight_apostrophe',
     problemMessage:
@@ -2900,6 +2969,9 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
   /// Stylistic rule - style/consistency issues are acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_curly_apostrophe',
@@ -3101,6 +3173,9 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   /// Style/consistency. Large counts acceptable in legacy code.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'arguments_ordering',
