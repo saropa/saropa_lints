@@ -56,10 +56,8 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sizedbox_over_container',
-    problemMessage:
-        'Use SizedBox instead of Container for simple width/height spacing.',
-    correctionMessage:
-        'SizedBox is more lightweight and clearer for sizing-only needs.',
+    problemMessage: 'Use SizedBox instead of Container for simple width/height spacing.',
+    correctionMessage: 'SizedBox is more lightweight and clearer for sizing-only needs.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -134,8 +132,7 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_container_over_sizedbox',
     problemMessage: 'Use Container instead of SizedBox for consistency.',
-    correctionMessage:
-        'Container provides a consistent API and is easier to extend.',
+    correctionMessage: 'Container provides a consistent API and is easier to extend.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -202,8 +199,7 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich_over_richtext',
     problemMessage: 'Use Text.rich() instead of RichText widget.',
-    correctionMessage:
-        'Text.rich() inherits DefaultTextStyle and has a simpler API.',
+    correctionMessage: 'Text.rich() inherits DefaultTextStyle and has a simpler API.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -261,8 +257,7 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_richtext_over_text_rich',
     problemMessage: 'Use RichText instead of Text.rich() for explicit control.',
-    correctionMessage:
-        'RichText provides explicit control without implicit style inheritance.',
+    correctionMessage: 'RichText provides explicit control without implicit style inheritance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -323,10 +318,8 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
   //  cspell:ignore edgeinsets
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_symmetric',
-    problemMessage:
-        'Use EdgeInsets.symmetric() when left/right or top/bottom are equal.',
-    correctionMessage:
-        'EdgeInsets.symmetric() is more concise for symmetric padding.',
+    problemMessage: 'Use EdgeInsets.symmetric() when left/right or top/bottom are equal.',
+    correctionMessage: 'EdgeInsets.symmetric() is more concise for symmetric padding.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -357,8 +350,7 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
       final top = args['top'];
       final bottom = args['bottom'];
 
-      final horizontalSymmetric =
-          left != null && right != null && left == right;
+      final horizontalSymmetric = left != null && right != null && left == right;
       final verticalSymmetric = top != null && bottom != null && top == bottom;
 
       if (horizontalSymmetric || verticalSymmetric) {
@@ -407,8 +399,7 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_only',
     problemMessage: 'Use EdgeInsets.only() for explicit side values.',
-    correctionMessage:
-        'EdgeInsets.only() is more explicit and easier to modify.',
+    correctionMessage: 'EdgeInsets.only() is more explicit and easier to modify.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -469,8 +460,7 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
   // cspell:ignore borderradius
   static const LintCode _code = LintCode(
     name: 'prefer_borderradius_circular',
-    problemMessage:
-        'Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()).',
+    problemMessage: 'Use BorderRadius.circular() instead of BorderRadius.all(Radius.circular()).',
     correctionMessage: 'BorderRadius.circular() is more concise.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -485,8 +475,7 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.type.element?.name;
       final String? namedConstructor = node.constructorName.name?.name;
 
-      if (constructorName != 'BorderRadius' || namedConstructor != 'all')
-        return;
+      if (constructorName != 'BorderRadius' || namedConstructor != 'all') return;
 
       // Check if the argument is Radius.circular()
       final args = node.argumentList.arguments;
@@ -563,8 +552,7 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'fit') {
           final expr = arg.expression;
           if (expr is PrefixedIdentifier) {
-            if (expr.prefix.name == 'FlexFit' &&
-                expr.identifier.name == 'tight') {
+            if (expr.prefix.name == 'FlexFit' && expr.identifier.name == 'tight') {
               reporter.atNode(node, code);
               return;
             }
@@ -614,8 +602,7 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_flexible_over_expanded',
     problemMessage: 'Use Flexible instead of Expanded for consistency.',
-    correctionMessage:
-        'Flexible provides a consistent API and explicit fit parameter.',
+    correctionMessage: 'Flexible provides a consistent API and explicit fit parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -675,10 +662,8 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_material_theme_colors',
-    problemMessage:
-        'Use Theme.of(context).colorScheme instead of hardcoded Colors.',
-    correctionMessage:
-        'Theme colors support dark mode and maintain consistency.',
+    problemMessage: 'Use Theme.of(context).colorScheme instead of hardcoded Colors.',
+    correctionMessage: 'Theme colors support dark mode and maintain consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -759,10 +744,8 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_colors',
-    problemMessage:
-        'Use explicit Colors instead of Theme.of(context).colorScheme.',
-    correctionMessage:
-        'Explicit colors are more predictable and have no context dependency.',
+    problemMessage: 'Use explicit Colors instead of Theme.of(context).colorScheme.',
+    correctionMessage: 'Explicit colors are more predictable and have no context dependency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -781,8 +764,7 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 
       // Check if it's followed by .colorScheme
       final parent = node.parent;
-      if (parent is PropertyAccess &&
-          parent.propertyName.name == 'colorScheme') {
+      if (parent is PropertyAccess && parent.propertyName.name == 'colorScheme') {
         reporter.atNode(parent, code);
       }
     });
