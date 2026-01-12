@@ -1321,7 +1321,8 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
   ) {
     context.registry.addCatchClause((CatchClause node) {
       final TypeAnnotation? exceptionType = node.exceptionType;
-      if (exceptionType == null) return; // Bare catch handled by AvoidCatchAllRule
+      if (exceptionType == null)
+        return; // Bare catch handled by AvoidCatchAllRule
 
       // Check if catching Exception (misses Error types)
       if (exceptionType is NamedType) {
