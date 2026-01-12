@@ -491,8 +491,10 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitAwaitExpression(AwaitExpression node) {
-    _seenAwait = true;
+    // Visit children first - context usage within await args is safe
     super.visitAwaitExpression(node);
+    // Then mark await as seen - subsequent statements are dangerous
+    _seenAwait = true;
   }
 
   @override
@@ -500,11 +502,70 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
     if (_seenAwait && contextParamNames.contains(node.name)) {
       // Check if this is actually using the context (not just declaring)
       final parent = node.parent;
-      if (parent is! FormalParameter && parent is! VariableDeclaration) {
-        contextUsagesAfterAwait.add(node);
+      if (parent is FormalParameter || parent is VariableDeclaration) {
+        super.visitSimpleIdentifier(node);
+        return;
       }
+
+      // Safe: context.mounted check (context is receiver of .mounted)
+      if (parent is PrefixedIdentifier && parent.identifier.name == 'mounted') {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
+      // Safe: context in then-branch of `context.mounted ? context : ...`
+      if (_isInMountedGuardedTernary(node)) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
+      contextUsagesAfterAwait.add(node);
     }
     super.visitSimpleIdentifier(node);
+  }
+
+  /// Checks if node is in the then-branch of a mounted-guarded ternary.
+  /// Pattern: `context.mounted ? context : null`
+  bool _isInMountedGuardedTernary(SimpleIdentifier node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ConditionalExpression) {
+        // Check if this node is in the then-expression (not condition or else)
+        if (_isDescendantOf(node, current.thenExpression)) {
+          // Check if condition is a mounted check
+          final condition = current.condition;
+          if (_isMountedCheck(condition)) {
+            return true;
+          }
+        }
+        return false;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if the expression is a mounted check (context.mounted or mounted).
+  bool _isMountedCheck(Expression expr) {
+    // context.mounted
+    if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
+      return true;
+    }
+    // mounted
+    if (expr is SimpleIdentifier && expr.name == 'mounted') {
+      return true;
+    }
+    return false;
+  }
+
+  /// Checks if child is a descendant of parent.
+  bool _isDescendantOf(AstNode child, AstNode parent) {
+    AstNode? current = child;
+    while (current != null) {
+      if (current == parent) return true;
+      current = current.parent;
+    }
+    return false;
   }
 
   @override

@@ -3067,8 +3067,13 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
   /// Returns true for patterns where unawaited futures are intentional and safe.
   bool _isSafeFireAndForget(MethodInvocation expr, ExpressionStatement node) {
-    // dispose() is sync; subscription cleanup doesn't need await
-    if (_isSubscriptionCancelInDispose(expr, node)) {
+    // Lifecycle methods are sync; subscription cleanup doesn't need await
+    if (_isSubscriptionCancelInLifecycle(expr, node)) {
+      return true;
+    }
+
+    // StreamController.close() in onDone callbacks - callback is void Function()
+    if (_isControllerCloseInOnDone(expr, node)) {
       return true;
     }
 
@@ -3080,8 +3085,13 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
     return false;
   }
 
-  /// StreamSubscription.cancel() in dispose() is safe - widget is dying anyway.
-  bool _isSubscriptionCancelInDispose(
+  /// StreamSubscription.cancel() in lifecycle methods is safe.
+  ///
+  /// These methods handle cleanup where awaiting cancel() is unnecessary:
+  /// - `dispose()` - widget is dying anyway
+  /// - `didUpdateWidget()` - canceling old subscription before creating new one
+  /// - `deactivate()` - widget being removed from tree
+  bool _isSubscriptionCancelInLifecycle(
     MethodInvocation expr,
     ExpressionStatement node,
   ) {
@@ -3105,7 +3115,51 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is MethodDeclaration) {
-        return current.name.lexeme == 'dispose';
+        final String name = current.name.lexeme;
+        return name == 'dispose' ||
+            name == 'didUpdateWidget' ||
+            name == 'deactivate';
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// StreamController.close() in onDone/onError callbacks is safe.
+  ///
+  /// The `onDone` parameter of `Stream.listen()` is `void Function()`, so
+  /// you cannot await inside it. Closing the controller here is standard
+  /// cleanup for transformed streams.
+  bool _isControllerCloseInOnDone(
+    MethodInvocation expr,
+    ExpressionStatement node,
+  ) {
+    if (expr.methodName.name != 'close') {
+      return false;
+    }
+
+    // Verify target is a StreamController
+    final Expression? target = expr.target;
+    if (target != null) {
+      final DartType? targetType = target.staticType;
+      if (targetType != null) {
+        final String targetTypeName = targetType.getDisplayString();
+        if (!targetTypeName.contains('StreamController')) {
+          return false;
+        }
+      }
+    }
+
+    // Walk up AST to find if we're in an onDone/onError named parameter
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is NamedExpression) {
+        final String paramName = current.name.label.name;
+        return paramName == 'onDone' || paramName == 'onError';
+      }
+      // Stop searching if we hit a method or function declaration
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        break;
       }
       current = current.parent;
     }

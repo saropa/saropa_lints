@@ -1061,7 +1061,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
 /// ```dart
 /// var name = 'John';
 /// final count = 42;
-/// dynamic items = <String>[];
+/// // dynamic is acceptable when intentional (e.g., JSON)
 /// ```
 ///
 /// #### GOOD:
@@ -1082,8 +1082,8 @@ class PreferExplicitTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
-    problemMessage: 'Use explicit type annotation instead of var/dynamic.',
-    correctionMessage: 'Replace var/dynamic with the explicit type.',
+    problemMessage: 'Use explicit type annotation instead of var.',
+    correctionMessage: 'Replace var with the explicit type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1115,12 +1115,8 @@ class PreferExplicitTypesRule extends SaropaLintRule {
         return;
       }
 
-      // Check for 'dynamic' type
-      if (type is NamedType && type.element?.name == 'dynamic') {
-        for (final VariableDeclaration variable in node.variables) {
-          reporter.atToken(variable.name, code);
-        }
-      }
+      // Note: 'dynamic' is an explicit type choice, not implicit like var/final.
+      // Don't flag it - developers use it intentionally for JSON, etc.
     });
   }
 }
@@ -2394,10 +2390,10 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
-  /// Pattern for valid snake_case file names.
-  static final RegExp _snakeCasePattern = RegExp(r'^[a-z][a-z0-9_]*\.dart$');
+  /// Pattern for valid snake_case base names (without extension).
+  static final RegExp _snakeCasePattern = RegExp(r'^[a-z][a-z0-9_]*$');
 
-  /// Generated file suffixes that should be skipped.
+  /// Generated file suffixes that should be skipped entirely.
   static const List<String> _generatedSuffixes = <String>[
     '.g.dart',
     '.freezed.dart',
@@ -2409,6 +2405,39 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
     '.drift.dart',
     '.mapper.dart',
     '.reflectable.dart',
+  ];
+
+  /// Multi-part extensions that are allowed and should be stripped
+  /// before validating the base name.
+  ///
+  /// Format: base_name.suffix.dart (e.g., contact_star_wars.io.dart)
+  static const List<String> _allowedMultiPartExtensions = <String>[
+    '.io.dart', // Input/output or data transfer files
+    '.dto.dart', // Data transfer objects
+    '.model.dart', // Model files
+    '.entity.dart', // Entity files
+    '.service.dart', // Service files
+    '.repository.dart', // Repository files
+    '.controller.dart', // Controller files
+    '.provider.dart', // Provider files
+    '.bloc.dart', // BLoC files
+    '.cubit.dart', // Cubit files
+    '.state.dart', // State files
+    '.event.dart', // Event files
+    '.notifier.dart', // Notifier files
+    '.view.dart', // View files
+    '.widget.dart', // Widget files
+    '.screen.dart', // Screen files
+    '.page.dart', // Page files
+    '.dialog.dart', // Dialog files
+    '.utils.dart', // Utils files
+    '.helper.dart', // Helper files
+    '.extension.dart', // Extension files
+    '.mixin.dart', // Mixin files
+    '.test.dart', // Test files
+    '.mock.dart', // Mock files
+    '.stub.dart', // Stub files
+    '.fake.dart', // Fake files
   ];
 
   @override
@@ -2434,7 +2463,10 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
         return;
       }
 
-      if (!_snakeCasePattern.hasMatch(fileName)) {
+      // Extract the base name by stripping known extensions
+      final String baseName = _extractBaseName(fileName);
+
+      if (!_snakeCasePattern.hasMatch(baseName)) {
         // Report at the library directive if present, otherwise at the first token
         final LibraryDirective? library =
             unit.directives.whereType<LibraryDirective>().firstOrNull;
@@ -2450,6 +2482,27 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Extracts the base name from a file, stripping known extensions.
+  ///
+  /// For `user_service.dart` returns `user_service`.
+  /// For `contact.io.dart` returns `contact`.
+  /// For `my_bloc.bloc.dart` returns `my_bloc`.
+  static String _extractBaseName(String fileName) {
+    // Check multi-part extensions first (longer suffixes)
+    for (final String ext in _allowedMultiPartExtensions) {
+      if (fileName.endsWith(ext)) {
+        return fileName.substring(0, fileName.length - ext.length);
+      }
+    }
+
+    // Fall back to stripping just .dart
+    if (fileName.endsWith('.dart')) {
+      return fileName.substring(0, fileName.length - 5);
+    }
+
+    return fileName;
   }
 }
 
