@@ -1,5 +1,7 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages
 
+import 'dart:developer' as developer;
+
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
@@ -7,6 +9,113 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'ignore_utils.dart';
+
+// =============================================================================
+// RULE TIMING INSTRUMENTATION (Performance Profiling)
+// =============================================================================
+//
+// Tracks execution time of each rule to identify slow rules that impact
+// analysis performance. Rules taking >10ms are logged for investigation.
+//
+// Enable timing by setting the environment variable:
+//   SAROPA_LINTS_PROFILE=true dart run custom_lint
+//
+// Timing data helps identify:
+// 1. Rules that need optimization
+// 2. Rules that should be moved to higher tiers
+// 3. Patterns that cause slow analysis
+// =============================================================================
+
+/// Controls whether rule timing is enabled.
+///
+/// Set via environment variable: SAROPA_LINTS_PROFILE=true
+final bool _profilingEnabled =
+    const bool.fromEnvironment('SAROPA_LINTS_PROFILE') ||
+        const String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true';
+
+/// Threshold in milliseconds for logging slow rules.
+const int _slowRuleThresholdMs = 10;
+
+/// Tracks cumulative timing for each rule across all files.
+class RuleTimingTracker {
+  RuleTimingTracker._();
+
+  static final Map<String, Duration> _totalTime = {};
+  static final Map<String, int> _callCount = {};
+
+  /// Record a rule execution time.
+  static void record(String ruleName, Duration elapsed) {
+    _totalTime[ruleName] = (_totalTime[ruleName] ?? Duration.zero) + elapsed;
+    _callCount[ruleName] = (_callCount[ruleName] ?? 0) + 1;
+
+    // Log slow rules immediately for debugging
+    if (elapsed.inMilliseconds >= _slowRuleThresholdMs) {
+      developer.log(
+        'SLOW RULE: $ruleName took ${elapsed.inMilliseconds}ms',
+        name: 'saropa_lints',
+      );
+    }
+  }
+
+  /// Get all timing data sorted by total time (slowest first).
+  static List<RuleTimingRecord> get sortedTimings {
+    final entries = _totalTime.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    return entries.map((e) {
+      final count = _callCount[e.key] ?? 1;
+      return RuleTimingRecord(
+        ruleName: e.key,
+        totalTime: e.value,
+        callCount: count,
+        averageTime: Duration(microseconds: e.value.inMicroseconds ~/ count),
+      );
+    }).toList();
+  }
+
+  /// Get a summary of the slowest rules.
+  static String get summary {
+    final timings = sortedTimings.take(20).toList();
+    if (timings.isEmpty) return 'No timing data collected.';
+
+    final buffer = StringBuffer();
+    buffer.writeln('\n=== SAROPA LINTS TIMING REPORT ===');
+    buffer.writeln('Top 20 slowest rules (by total time):');
+    buffer.writeln('');
+
+    for (final timing in timings) {
+      buffer.writeln(
+        '  ${timing.ruleName}: '
+        '${timing.totalTime.inMilliseconds}ms total, '
+        '${timing.callCount} calls, '
+        '${timing.averageTime.inMicroseconds / 1000}ms avg',
+      );
+    }
+
+    return buffer.toString();
+  }
+
+  /// Reset all timing data.
+  static void reset() {
+    _totalTime.clear();
+    _callCount.clear();
+  }
+}
+
+/// A record of timing data for a single rule.
+class RuleTimingRecord {
+  const RuleTimingRecord({
+    required this.ruleName,
+    required this.totalTime,
+    required this.callCount,
+    required this.averageTime,
+  });
+
+  final String ruleName;
+  final Duration totalTime;
+  final int callCount;
+  final Duration averageTime;
+}
 
 // =============================================================================
 // AST Utilities
@@ -450,7 +559,19 @@ abstract class SaropaLintRule extends DartLintRule {
       severityOverride: severityOverrides?[code.name],
     );
 
-    runWithReporter(resolver, wrappedReporter, context);
+    // =========================================================================
+    // TIMING INSTRUMENTATION
+    // =========================================================================
+    // When profiling is enabled (SAROPA_LINTS_PROFILE=true), measure rule
+    // execution time and log slow rules (>10ms) for performance investigation.
+    if (_profilingEnabled) {
+      final stopwatch = Stopwatch()..start();
+      runWithReporter(resolver, wrappedReporter, context);
+      stopwatch.stop();
+      RuleTimingTracker.record(code.name, stopwatch.elapsed);
+    } else {
+      runWithReporter(resolver, wrappedReporter, context);
+    }
   }
 
   /// Override this method instead of [run] to implement your lint rule.

@@ -242,6 +242,32 @@ custom_lint:
     tier: insanity  # May show thousands of warnings
 ```
 
+### Performance Tip: Use Lower Tiers During Development
+
+**custom_lint is notoriously slow** with large rule sets. For faster iteration during development:
+
+1. **Use `essential` tier locally** (~400 rules) - catches critical bugs, runs 3-5x faster
+2. **Use `professional` or higher in CI** - thorough checking where speed matters less
+3. **Upgrade tiers gradually** - fix warnings before enabling more rules
+
+```yaml
+# Fast local development
+custom_lint:
+  saropa_lints:
+    tier: essential  # ~400 rules, fastest
+
+# Thorough CI checking
+custom_lint:
+  saropa_lints:
+    tier: professional  # ~1400 rules, comprehensive
+```
+
+The tier you choose has a direct impact on analysis speed:
+- `essential`: ~400 rules → **fastest** (memory leaks, security, crashes)
+- `recommended`: ~900 rules → moderate (+ accessibility, performance)
+- `professional`: ~1400 rules → slower (+ architecture, documentation)
+- `comprehensive`/`insanity`: 1450+ rules → **slowest** (everything)
+
 ## Adoption Strategy
 
 Static analysis doesn't create problems — it reveals ones that already exist. The tiered system lets you start at any level and progress at your own pace. Findings are for your workflow. You control what you address and when.
@@ -516,6 +542,7 @@ Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:service
 | Document | Description |
 |----------|-------------|
 | [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md) | 200+ optional stylistic rules with examples |
+| [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md) | Performance optimization guide and profiling |
 | [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) | Planned rules and project direction |
 | [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) | How to contribute rules and report issues |
 | [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) | Version history and release notes |

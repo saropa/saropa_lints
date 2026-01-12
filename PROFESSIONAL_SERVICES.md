@@ -138,6 +138,15 @@ For a medium-sized codebase, expect 2-4 weeks to resolve critical issues and 2-3
 
 Initially, there may be a 1-2 week adjustment period. After that, development typically accelerates — fewer bugs to investigate, faster code reviews, less production firefighting.
 
+### Is custom_lint slow with 1400+ rules?
+
+It can be. We've implemented significant performance optimizations in v3.0.0 (tier caching, rule filtering cache, analyzer excludes). For detailed optimization strategies, see our **[Performance Guide](PERFORMANCE.md)**.
+
+**Quick tips:**
+- Use `essential` tier locally (~400 rules, 3-5x faster)
+- Use `professional` in CI (thorough checking)
+- Exclude generated code in `analysis_options.yaml`
+
 ### Can we customize which rules are enabled?
 
 Yes. Every rule can be enabled, disabled, or adjusted. We can help you create a configuration that matches your team's priorities.

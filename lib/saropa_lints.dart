@@ -43,7 +43,13 @@ import 'package:saropa_lints/src/tiers.dart';
 // Export all rule classes for documentation
 export 'package:saropa_lints/src/rules/all_rules.dart';
 export 'package:saropa_lints/src/saropa_lint_rule.dart'
-    show ImpactTracker, LintImpact, SaropaLintRule, ViolationRecord;
+    show
+        ImpactTracker,
+        LintImpact,
+        RuleTimingRecord,
+        RuleTimingTracker,
+        SaropaLintRule,
+        ViolationRecord;
 export 'package:saropa_lints/src/tiers.dart';
 
 /// All available Saropa lint rules.
@@ -1781,7 +1787,6 @@ const List<LintRule> _allRules = <LintRule>[
   // In-App Purchase Rules
   RequirePurchaseVerificationRule(),
   RequirePurchaseRestorationRule(),
-  PreferRevenueCatRule(),
 
   // iOS Platform Enhancement Rules
   AvoidIosWifiOnlyAssumptionRule(),
@@ -1863,6 +1868,28 @@ const List<LintRule> _allRules = <LintRule>[
   PreferHiveValueListenableRule(),
 ];
 
+// =============================================================================
+// RULE FILTERING CACHE (Performance Optimization)
+// =============================================================================
+//
+// Caches the filtered rule list per tier+config combination to avoid
+// re-filtering 1400+ rules on every file analysis. The filter operation
+// itself is O(n) and was being called for EVERY file in the project.
+//
+// Cache invalidation: The cache is keyed by tier name. If the user changes
+// their tier or rule overrides, they need to restart the analysis server.
+// This is acceptable since config changes require a restart anyway.
+// =============================================================================
+
+/// Cached filtered rules to avoid re-filtering on every file.
+List<LintRule>? _cachedFilteredRules;
+
+/// The tier that was used to compute the cached rules.
+String? _cachedTier;
+
+/// Whether enableAllLintRules was set when cache was computed.
+bool? _cachedEnableAll;
+
 class _SaropaLints extends PluginBase {
   @override
   List<LintRule> getLintRules(CustomLintConfigs configs) {
@@ -1872,11 +1899,24 @@ class _SaropaLints extends PluginBase {
     //     tier: recommended
     final LintOptions? saropaConfig = configs.rules['saropa_lints'];
     final String tier = saropaConfig?.json['tier'] as String? ?? 'essential';
+    final bool enableAll = configs.enableAllLintRules == true;
+
+    // =========================================================================
+    // PERFORMANCE: Return cached rules if tier hasn't changed
+    // =========================================================================
+    // This avoids re-filtering 1400+ rules for every single file.
+    // The filter is computed ONCE per analysis session, not per file.
+    if (_cachedFilteredRules != null &&
+        _cachedTier == tier &&
+        _cachedEnableAll == enableAll) {
+      return _cachedFilteredRules!;
+    }
 
     // Get all rules enabled for this tier
     final Set<String> tierRules = getRulesForTier(tier);
 
-    return _allRules.where((LintRule rule) {
+    // Filter rules based on tier and explicit overrides
+    final List<LintRule> filteredRules = _allRules.where((LintRule rule) {
       final String ruleName = rule.code.name;
       final LintOptions? options = configs.rules[ruleName];
 
@@ -1886,12 +1926,19 @@ class _SaropaLints extends PluginBase {
       }
 
       // If enableAllLintRules is true, enable all rules
-      if (configs.enableAllLintRules == true) {
+      if (enableAll) {
         return true;
       }
 
       // Otherwise, use tier-based rules
       return tierRules.contains(ruleName);
     }).toList();
+
+    // Cache the result for subsequent files
+    _cachedFilteredRules = filteredRules;
+    _cachedTier = tier;
+    _cachedEnableAll = enableAll;
+
+    return filteredRules;
   }
 }
