@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 1.8.2.
 
+## [2.4.1] - 2026-01-11
+
+### Changed
+
+-- Minor doc header escaping of `Provider.of<T>(context)`
+
 ## [2.4.0] - 2026-01-11
 
 ### Added
