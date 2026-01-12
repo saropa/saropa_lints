@@ -2887,6 +2887,24 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
 ///   unawaited(saveData());
 /// }
 /// ```
+///
+/// **ALLOWED (safe fire-and-forget patterns):**
+/// ```dart
+/// // StreamSubscription.cancel() in dispose() - can't await in sync method
+/// @override
+/// void dispose() {
+///   _subscription?.cancel(); // OK - disposal cleanup
+///   super.dispose();
+/// }
+///
+/// // Future chains with .catchError() - errors are handled
+/// _scrollController.animateTo(100).catchError((e) {
+///   debugPrint('Animation failed: $e');
+/// }); // OK - error is handled
+///
+/// // Future.ignore() - explicitly ignored
+/// someAsyncOperation().ignore(); // OK - explicitly fire-and-forget
+/// ```
 class AvoidUnawaitedFutureRule extends SaropaLintRule {
   const AvoidUnawaitedFutureRule() : super(code: _code);
 
@@ -2917,10 +2935,15 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
         if (returnType != null) {
           final String typeName = returnType.getDisplayString();
           if (typeName.startsWith('Future<') || typeName == 'Future') {
-            // Check it's not wrapped in unawaited()
+            // Skip if wrapped in unawaited()
             final AstNode? parent = node.parent;
             if (parent is! MethodInvocation ||
                 parent.methodName.name != 'unawaited') {
+              // Skip safe patterns: subscription.cancel() in dispose(),
+              // or chains ending with .catchError()/.ignore()
+              if (_isSafeFireAndForget(expr, node)) {
+                return;
+              }
               reporter.atNode(expr, code);
             }
           }
@@ -2938,5 +2961,58 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Returns true for patterns where unawaited futures are intentional and safe.
+  bool _isSafeFireAndForget(MethodInvocation expr, ExpressionStatement node) {
+    // dispose() is sync; subscription cleanup doesn't need await
+    if (_isSubscriptionCancelInDispose(expr, node)) {
+      return true;
+    }
+
+    // .catchError()/.ignore() means errors are already handled
+    if (_hasCatchErrorOrIgnore(expr)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /// StreamSubscription.cancel() in dispose() is safe - widget is dying anyway.
+  bool _isSubscriptionCancelInDispose(
+    MethodInvocation expr,
+    ExpressionStatement node,
+  ) {
+    if (expr.methodName.name != 'cancel') {
+      return false;
+    }
+
+    // Verify target is a StreamSubscription
+    final Expression? target = expr.target;
+    if (target != null) {
+      final DartType? targetType = target.staticType;
+      if (targetType != null) {
+        final String targetTypeName = targetType.getDisplayString();
+        if (!targetTypeName.contains('StreamSubscription')) {
+          return false;
+        }
+      }
+    }
+
+    // Walk up AST to find enclosing method
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        return current.name.lexeme == 'dispose';
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// .catchError() handles errors; .ignore() explicitly discards the future.
+  bool _hasCatchErrorOrIgnore(MethodInvocation expr) {
+    final String methodName = expr.methodName.name;
+    return methodName == 'catchError' || methodName == 'ignore';
   }
 }

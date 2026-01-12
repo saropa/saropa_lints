@@ -1,4 +1,5 @@
-# Roadmap: 1000 Lint Rules
+# Roadmap: Aiming for 2,000 Lint Rules
+
 <!-- cspell:disable -->
 ## Current Status
 
@@ -59,6 +60,24 @@ This ROADMAP is for **planned/unimplemented rules only**.
 | `[TOO-COMPLEX]` | Pattern too abstract for reliable AST detection | Detect "loading state" or "user feedback" generically |
 
 > **⭐ TO DO NEXT**: Rules marked with ⭐ are the **100 easiest rules to implement** - they match exact API/method names, check specific named parameters, or detect missing required parameters with low false-positive risk. Start here!
+
+## Deferred: Cross-File Analysis Rules (3 rules)
+
+> **Note**: These rules were originally marked with ⭐ but require **cross-file dependency graph analysis** which is significantly more complex than single-file AST patterns. They are deferred until the infrastructure for cross-file analysis is in place.
+
+| Rule | Tier | Severity | Why Complex |
+|------|------|----------|-------------|
+| `avoid_circular_imports` | Essential | ERROR | Requires building an **import graph** across all Dart files in the project, then running cycle detection (DFS). Cannot be done by analyzing a single file in isolation. |
+| `avoid_provider_circular_dependency` | Essential | ERROR | Requires tracking **Provider dependencies across files** (Provider A depends on Provider B in another file which depends on Provider A). Needs cross-file type resolution and dependency graph construction. |
+| `avoid_riverpod_circular_provider` | Essential | ERROR | Requires tracking `ref.watch()` and `ref.read()` calls across **multiple provider definitions in different files** to detect cycles. Needs cross-file provider dependency graph. |
+
+**Implementation Requirements**:
+1. Multi-file analysis pass to collect all imports/providers
+2. Dependency graph data structure
+3. Cycle detection algorithm (Tarjan's or DFS-based)
+4. Caching to avoid re-analyzing unchanged files
+
+These rules will be implemented when cross-file analysis infrastructure is added.
 
 ## Part 1: Detailed Rule Specifications
 
@@ -1128,7 +1147,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `avoid_provider_circular_dependency` | Essential | ERROR | Circular provider dependencies cause stack overflow. Detect A watches B watches A patterns. |
+| `avoid_provider_circular_dependency` | Essential | ERROR | `[CROSS-FILE]` Circular provider dependencies cause stack overflow. Detect A watches B watches A patterns. |
 | ⭐ `prefer_change_notifier_proxy_provider` | Professional | INFO | Providers depending on others should use ProxyProvider. Detect manual dependency passing. |
 | `avoid_provider_listen_false_in_build` | Recommended | INFO | `listen: false` in build prevents rebuilds but may show stale data. Detect inappropriate usage. |
 | ⭐ `prefer_selector_widget` | Professional | INFO | Selector limits rebuilds to specific fields. Detect Consumer rebuilding on unrelated changes. |
@@ -1138,7 +1157,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `avoid_riverpod_circular_provider` | Essential | ERROR | Circular provider dependencies crash. Detect provider A reading provider B reading A. |
+| `avoid_riverpod_circular_provider` | Essential | ERROR | `[CROSS-FILE]` Circular provider dependencies crash. Detect provider A reading provider B reading A. |
 | ⭐ `prefer_riverpod_auto_dispose` | Professional | INFO | Providers should auto-dispose when unused. Detect providers without autoDispose modifier. |
 | `require_riverpod_test_override` | Professional | INFO | `[CROSS-FILE]` Tests should override providers. Detect ProviderContainer without overrides in tests. |
 | ⭐ `prefer_riverpod_family_for_params` | Recommended | INFO | Providers with parameters should use .family. Detect parameter passing through other means. |
@@ -1344,7 +1363,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `avoid_expensive_did_change_dependencies` | Professional | WARNING | didChangeDependencies runs often. Detect heavy work in didChangeDependencies. |
 | `require_widgets_binding_callback` | Professional | INFO | Use addPostFrameCallback for post-build logic. Detect alternative patterns. |
 | `prefer_deactivate_for_cleanup` | Professional | INFO | Use deactivate for removable cleanup. Detect dispose-only cleanup that could be in deactivate. |
-| `avoid_using_context_after_dispose` | Essential | ERROR | Context invalid after dispose. Detect context usage after async in dispose. |
 
 ### 5.24 Form/TextFormField Rules
 
@@ -1511,7 +1529,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `prefer_feature_folders` | Professional | INFO | `[HEURISTIC]` Organize by feature, not type. Detect flat structure with many files. |
 | `prefer_composition_over_inheritance` | Professional | INFO | Use composition for flexibility. Detect deep inheritance hierarchies. |
 | `require_barrel_files` | Professional | INFO | Use barrel files for exports. Detect multiple individual imports. |
-| ⭐ `avoid_circular_imports` | Essential | ERROR | Circular imports cause issues. Detect import cycles. |
+| `avoid_circular_imports` | Essential | ERROR | `[CROSS-FILE]` Circular imports cause issues. Detect import cycles. |
 | `prefer_layer_separation` | Professional | INFO | `[CROSS-FILE]` Keep UI, business logic, data separate. Detect layer violations. |
 | `require_interface_for_dependency` | Professional | INFO | Use interfaces for testability. Detect concrete class dependencies. |
 | `avoid_util_class | Professional | INFO | `[HEURISTIC]` Util classes are code smells. Detect classes named Util/Helper. |

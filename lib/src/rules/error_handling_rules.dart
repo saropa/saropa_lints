@@ -1471,6 +1471,37 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackCommentForConstructorThrowFix()];
+}
+
+/// Quick fix: Adds a `HACK` comment suggesting factory constructor conversion.
+class _AddHackCommentForConstructorThrowFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addThrowExpression((ThrowExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for factory conversion',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Move validation to factory constructor or static method\n      ',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when cache keys use non-deterministic values.
@@ -1491,6 +1522,8 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
 /// final key = 'user_$userId';
 /// final key = 'item_${item.id}';
 /// ```
+///
+/// **Quick fix available:** Adds a `HACK` comment for manual key review.
 class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   const RequireCacheKeyDeterminismRule() : super(code: _code);
 
@@ -1507,15 +1540,90 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
-  /// Patterns that indicate non-deterministic values.
-  static const Set<String> _nonDeterministicPatterns = <String>{
-    'DateTime.now',
-    'Random',
-    'hashCode',
-    'identityHashCode',
-    'uuid',
-    'generateId',
-    'Uuid().v4',
+  /// Regex patterns that indicate non-deterministic values.
+  /// Uses word boundaries to avoid false positives on variable names.
+  /// Per CONTRIBUTING.md: Never use substring matching on variable names.
+  static final List<RegExp> _nonDeterministicPatterns = <RegExp>[
+    // Exact API calls - very safe patterns
+    RegExp(r'DateTime\.now\b'), // DateTime.now() or DateTime.now(
+    RegExp(r'\bRandom\s*\('), // Random() or Random(seed)
+    RegExp(r'\bidentityHashCode\s*\('), // identityHashCode(obj)
+
+    // Property access .hashCode - must have dot prefix to avoid myHashCode
+    RegExp(r'\.hashCode\b'), // obj.hashCode but not myHashCode
+
+    // Uuid patterns - constructor or static methods only
+    RegExp(r'\bUuid\s*\('), // Uuid() constructor
+    RegExp(r'\bUuid\.v[1-8]\b'), // Uuid.v1(), Uuid.v4(), etc.
+    RegExp(r'\.v4\s*\('), // someUuid.v4() instance method
+  ];
+
+  // FIX: Skip debug-only parameters when checking for non-deterministic values.
+  // Flutter's debugLabel (used by GlobalKey, AnimationController, FocusNode, etc.)
+  // is purely for DevTools/toString() output and does NOT affect key identity or
+  // caching behavior. Non-deterministic values like DateTime.now() are acceptable
+  // in these parameters since they're never used for actual cache key comparisons.
+  // See: https://api.flutter.dev/flutter/widgets/LabeledGlobalKey-class.html
+  static const Set<String> _debugOnlyParameters = <String>{
+    'debugLabel',
+    'debugName',
+  };
+
+  // FIX: Exclude Flutter Key types entirely - they're widget identity keys, NOT
+  // cache keys. Variables like `_key = GlobalKey(...)` should not trigger this
+  // rule even though the name contains "key".
+  static const Set<String> _flutterKeyTypes = <String>{
+    'GlobalKey',
+    'ValueKey',
+    'ObjectKey',
+    'UniqueKey',
+    'Key',
+    'LocalKey',
+    'PageStorageKey',
+  };
+
+  // API-based detection: Common caching method names where first argument is a key.
+  // Maps method name -> parameter name (null = first positional argument).
+  static const Map<String, String?> _cachingMethods = <String, String?>{
+    // SharedPreferences
+    'getString': null,
+    'setString': null,
+    'getInt': null,
+    'setInt': null,
+    'getBool': null,
+    'setBool': null,
+    'getDouble': null,
+    'setDouble': null,
+    'getStringList': null,
+    'setStringList': null,
+    'containsKey': null,
+    'remove': null,
+    // Hive
+    'get': null,
+    'put': null,
+    'delete': null,
+    // GetStorage
+    'read': null,
+    'write': null,
+    'hasData': null,
+    // flutter_secure_storage (uses named 'key' parameter)
+    // Generic cache patterns
+    'getFromCache': null,
+    'saveToCache': null,
+    'removeFromCache': null,
+    'getCached': null,
+    'setCached': null,
+  };
+
+  // Method receivers that indicate caching context (case-insensitive check).
+  // Only check 'get'/'put'/'delete' when called on these receiver types.
+  static const Set<String> _cacheReceiverPatterns = <String>{
+    'cache',
+    'storage',
+    'prefs',
+    'preferences',
+    'store',
+    'box', // Hive
   };
 
   @override
@@ -1524,23 +1632,200 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    // Check 1: Variables ending with 'key'
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       final String varName = node.name.lexeme.toLowerCase();
 
-      // Check if variable name suggests a cache key
-      if (!varName.contains('key') && !varName.contains('cache')) return;
+      // Only check variables that end with 'key' - this avoids false positives like
+      // 'monkey', 'keyboard', 'newCacheEntry'. Matches: key, cacheKey, userKey, _key
+      if (!varName.endsWith('key')) return;
 
       final Expression? initializer = node.initializer;
       if (initializer == null) return;
 
-      final String source = initializer.toSource();
+      // Skip Flutter Key types - they're widget identity keys, not cache keys
+      if (initializer is InstanceCreationExpression) {
+        final String typeName = initializer.constructorName.type.name.lexeme;
+        if (_flutterKeyTypes.contains(typeName)) return;
+      }
 
-      for (final String pattern in _nonDeterministicPatterns) {
-        if (source.contains(pattern)) {
-          reporter.atNode(node, code);
-          return;
+      // Check for non-deterministic patterns, but skip debug-only parameters
+      _checkForNonDeterministicValues(initializer, node, reporter);
+    });
+
+    // Check 2: API-based detection - monitor calls to known caching methods
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Skip if not a known caching method
+      if (!_cachingMethods.containsKey(methodName)) return;
+
+      // For generic methods like 'get', 'put', 'delete', verify receiver looks like a cache
+      if (_isGenericMethodName(methodName)) {
+        if (!_hasCacheReceiver(node)) return;
+      }
+
+      // Extract the key argument
+      final Expression? keyArg = _extractKeyArgument(node);
+      if (keyArg == null) return;
+
+      // Check if key contains non-deterministic values
+      if (_containsNonDeterministicValue(keyArg)) {
+        reporter.atNode(keyArg, code);
+      }
+    });
+  }
+
+  /// Returns true for generic method names that need receiver context validation.
+  bool _isGenericMethodName(String methodName) {
+    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}
+        .contains(methodName);
+  }
+
+  /// Checks if the method receiver suggests a caching context.
+  bool _hasCacheReceiver(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target == null) return false;
+
+    final String targetSource = target.toSource().toLowerCase();
+    for (final String pattern in _cacheReceiverPatterns) {
+      if (targetSource.contains(pattern)) return true;
+    }
+    return false;
+  }
+
+  /// Extracts the key argument from a caching method call.
+  Expression? _extractKeyArgument(MethodInvocation node) {
+    final ArgumentList args = node.argumentList;
+    if (args.arguments.isEmpty) return null;
+
+    // Check for named 'key' parameter first
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'key') {
+        return arg.expression;
+      }
+    }
+
+    // Otherwise, first positional argument is the key
+    final Expression firstArg = args.arguments.first;
+    if (firstArg is! NamedExpression) {
+      return firstArg;
+    }
+
+    return null;
+  }
+
+  /// Recursively checks for non-deterministic values, skipping debug-only parameters.
+  void _checkForNonDeterministicValues(
+    Expression expression,
+    AstNode reportNode,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    // For constructor/method calls, check arguments but skip debug-only params
+    if (expression is InstanceCreationExpression) {
+      for (final Expression arg in expression.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          // Skip debug-only parameters like debugLabel
+          if (_debugOnlyParameters.contains(arg.name.label.name)) {
+            continue;
+          }
+          // Check the value of non-debug parameters
+          if (_containsNonDeterministicValue(arg.expression)) {
+            reporter.atNode(reportNode, code);
+            return;
+          }
+        } else {
+          // Positional argument
+          if (_containsNonDeterministicValue(arg)) {
+            reporter.atNode(reportNode, code);
+            return;
+          }
         }
       }
+      return;
+    }
+
+    if (expression is MethodInvocation) {
+      for (final Expression arg in expression.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (_debugOnlyParameters.contains(arg.name.label.name)) {
+            continue;
+          }
+          if (_containsNonDeterministicValue(arg.expression)) {
+            reporter.atNode(reportNode, code);
+            return;
+          }
+        } else {
+          if (_containsNonDeterministicValue(arg)) {
+            reporter.atNode(reportNode, code);
+            return;
+          }
+        }
+      }
+      return;
+    }
+
+    // For other expressions, check the whole source
+    if (_containsNonDeterministicValue(expression)) {
+      reporter.atNode(reportNode, code);
+    }
+  }
+
+  /// Checks if an expression contains non-deterministic values.
+  bool _containsNonDeterministicValue(Expression expression) {
+    final String source = expression.toSource();
+    for (final RegExp pattern in _nonDeterministicPatterns) {
+      if (pattern.hasMatch(source)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
+}
+
+class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for cache key review',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Replace non-deterministic value with stable identifier (e.g., userId, itemId)\n    ',
+        );
+      });
+    });
+
+    // Also handle method invocation arguments (API-based detection)
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add HACK comment for cache key review',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// HACK: Cache key may be non-deterministic - use stable identifier\n    ',
+        );
+      });
     });
   }
 }
@@ -1619,4 +1904,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
       }
     });
   }
+
+  // No quick fix provided - permanent denial handling requires app-specific
+  // UI flow that cannot be safely auto-generated
 }
