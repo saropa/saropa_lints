@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.3.8.
 
+## [3.0.1] - 2026-01-12
+
+### Performance Optimizations
+
+#### Content Pre-filtering
+
+- **New `requiredPatterns` getter**: Rules can specify string patterns that must be present for the rule to run.
+- **Fast string search**: Checks for patterns BEFORE AST parsing, skipping irrelevant files instantly.
+- **Example usage**: A rule checking `Timer.periodic` can return `{'Timer.periodic'}` to skip files without timers.
+
+#### Skip Small Files
+
+- **New `minimumLineCount` getter**: High-cost rules can skip files under a threshold line count.
+- **Efficient counting**: Uses fast character scan instead of splitting into lines.
+- **Example usage**: Complex nested callback rules can set `minimumLineCount => 50` to skip small files.
+
+#### File Content Caching
+
+- **New `FileContentCache` class**: Tracks file content hashes to detect unchanged files.
+- **Rule pass tracking**: Records which rules passed on unchanged files to skip redundant analysis.
+- **Impact**: Files that haven't changed between saves can skip re-running passing rules.
+
+### Documentation
+
+- **Updated ROADMAP.md**: Added "Future Optimizations" section with Batch AST Visitors and Lazy Rule Instantiation as planned major refactors.
+
+---
+
 ## [3.0.0] - 2026-01-12
 
 ### Performance Optimizations
@@ -38,10 +66,40 @@ This release focuses on **significant performance improvements** for large codeb
 - **Slow rule logging**: Rules taking >10ms are logged immediately for investigation.
 - **Timing report**: Access `RuleTimingTracker.summary` for a report of the 20 slowest rules.
 
+#### Rule Cost Classification
+
+- **New `RuleCost` enum**: `trivial`, `low`, `medium`, `high`, `extreme`
+- **1483 rules tagged**: Every rule now has a `cost` getter indicating execution cost.
+- **Rule priority ordering**: Rules are sorted by cost so fast rules run first.
+- **Impact**: Expensive rules (type resolution, full AST traversal) run last, after quick wins.
+
+#### File Type Filtering
+
+- **New `FileType` enum**: `widget`, `test`, `bloc`, `provider`, `model`, `service`, `general`
+- **Early exit optimization**: Rules can declare `applicableFileTypes` to skip non-matching files entirely.
+- **377 rules with file type filtering**: Widget rules skip non-widget files, test rules skip non-test files, etc.
+- **`FileTypeDetector`**: Caches file type detection per file path for fast repeated access.
+- **Impact**: Widget-specific rules skip ~80% of files in typical projects.
+
+#### Project Context Caching
+
+- **New `ProjectContext` class**: Caches project root detection and pubspec parsing.
+- **One-time parsing**: Pubspec.yaml is parsed once per project, not per file.
+- **Impact**: Eliminates redundant file I/O across 1400+ rules.
+
 ### Documentation
 
 - **Added performance tips to README**: Guidance on using lower tiers during development for faster iteration.
 - **Tier speed comparison**: Documented the performance impact of each tier level.
+- **Updated CONTRIBUTING.md**: Added rule author guidance for `cost` and `applicableFileTypes` getters.
+
+### New Rules
+
+- **`prefer_expanded_at_call_site`**: Warns when a widget's `build()` method returns `Expanded`/`Flexible` directly. Returning these widgets couples the widget to Flex parents; if later wrapped with Padding etc., it will crash. Better to let the caller add `Expanded` where needed. **Quick fix available:** Adds HACK comment to mark for manual refactoring. (WARNING, recommended tier)
+
+### Improved Rules
+
+- **`avoid_expanded_outside_flex`**: Enhanced documentation explaining false positive cases (widgets returning Expanded that are used directly in Flex) and design guidance for preferring Expanded at call sites.
 
 ### Breaking Changes
 

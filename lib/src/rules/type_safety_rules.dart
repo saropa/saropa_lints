@@ -40,6 +40,9 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_cast',
     problemMessage: 'Direct cast with "as" may throw at runtime.',
@@ -92,6 +95,9 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_generics',
     problemMessage: 'Generic type parameter has no constraint.',
@@ -143,6 +149,9 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_covariant_documentation',
@@ -212,6 +221,9 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_safe_json_parsing',
     problemMessage: 'JSON parsing may throw on missing keys.',
@@ -276,6 +288,9 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_null_safe_extensions',
     problemMessage: 'Extension on nullable type uses null assertion.',
@@ -328,6 +343,9 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_specific_numeric_types',
@@ -387,6 +405,9 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_non_null_assertion',
     problemMessage: 'Avoid using the non-null assertion operator (!).',
@@ -430,6 +451,9 @@ class AvoidTypeCastsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_type_casts',
     problemMessage: 'Type cast with "as" may throw at runtime.',
@@ -469,6 +493,9 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_futureor_documentation',
@@ -521,6 +548,9 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_type_arguments',
@@ -607,6 +637,9 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
   /// Critical issue - always-failing cast causes runtime crash.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_casts',
@@ -703,6 +736,9 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_json_access',
     problemMessage: 'Chained JSON access without null checks may throw.',
@@ -786,6 +822,9 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
   /// Critical issue - null access causes crash.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_null_safe_json_access',
@@ -875,6 +914,9 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_json_chains',
     problemMessage: 'Deep JSON chain is fragile. Use typed models or helpers.',
@@ -953,6 +995,9 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
   /// High impact - crashes on new API values.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_enum_unknown_value',
@@ -1063,6 +1108,9 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
   /// Critical issue - forms never validate successfully.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_validator_return_null',

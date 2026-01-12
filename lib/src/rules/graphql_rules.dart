@@ -42,6 +42,9 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_graphql_string_queries',
     problemMessage:

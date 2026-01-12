@@ -49,6 +49,9 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_google_signin_error_handling',
     problemMessage: 'Google Sign-In calls should be wrapped in try-catch.',
@@ -200,6 +203,9 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_apple_signin_nonce',
     problemMessage:
@@ -298,6 +304,9 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_supabase_error_handling',
     problemMessage: 'Supabase calls should be wrapped in try-catch.',
@@ -366,6 +375,9 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_supabase_anon_key_in_code',
@@ -481,6 +493,9 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_supabase_realtime_unsubscribe',
@@ -646,6 +661,9 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_webview_ssl_error_handling',
     problemMessage: 'WebView should handle SSL errors explicitly.',
@@ -759,6 +777,9 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
   // WARNING severity with high impact - security concern but not crash-causing
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_webview_file_access',
@@ -896,6 +917,9 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_workmanager_constraints',
     problemMessage: 'WorkManager tasks should specify constraints.',
@@ -1005,6 +1029,9 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_workmanager_result_return',
@@ -1121,6 +1148,9 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_calendar_timezone_handling',
@@ -1256,6 +1286,12 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_keyboard_visibility_dispose',
     problemMessage:
@@ -1355,6 +1391,12 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_speech_stop_on_dispose',
@@ -1457,6 +1499,9 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_app_links_sensitive_params',
@@ -1601,6 +1646,9 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_envied_obfuscation',
     problemMessage: 'Envied should use obfuscation for security.',
@@ -1697,6 +1745,9 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_openai_key_in_code',
     problemMessage: 'OpenAI API key should not be hardcoded in source code.',
@@ -1760,6 +1811,9 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_openai_error_handling',
@@ -1849,6 +1903,9 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
   // Medium impact - UI fallback, not crash-causing
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_svg_error_handler',
@@ -1954,6 +2011,9 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_google_fonts_fallback',
     problemMessage: 'GoogleFonts should specify fontFamilyFallback.',
@@ -2044,6 +2104,9 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_uuid_v4',
@@ -2157,6 +2220,9 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
   /// High impact - OOM crashes affect user experience significantly.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_max_dimensions',
@@ -2283,6 +2349,9 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_mode',
     problemMessage:
@@ -2357,6 +2426,9 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
   /// High impact - affects battery life significantly.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_distance_filter',

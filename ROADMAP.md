@@ -79,6 +79,26 @@ This ROADMAP is for **planned/unimplemented rules only**.
 
 These rules will be implemented when cross-file analysis infrastructure is added.
 
+## Performance Architechure: Notable Framework Changes
+
+The `custom_lint` plugin architecture runs inside the Dart analysis server process. This provides excellent IDE integration (real-time squiggles, quick fixes, hover info) but the single-process model limits what's possible:
+
+| Limitation | Why It's Blocked | What We'll Build When Available |
+|------------|------------------|--------------------------------|
+| No parallel rule execution | Analysis server is single-threaded; plugins can't spawn Isolates | Run 1450+ rules concurrently for 4-8x speedup |
+| No incremental analysis | Plugin receives full file list each time; no change detection API | Cache results, only re-analyze modified files |
+| No cross-file analysis | Plugin analyzes files in isolation; no project-wide context | Implement [deferred cross-file rules](#deferred-cross-file-analysis-rules-3-rules), detect circular imports |
+| Per-rule callback registration | Each rule registers its own AST visitors independently | Single AST traversal dispatching to all rules |
+
+**Alternative under consideration**: A standalone precompiled CLI binary could bypass these limitations for CI pipelines (parallel execution, lower memory), but would sacrifice real-time IDE feedback. May revisit when rule count exceeds 2000.
+
+### Future Optimizations (Major Refactors)
+
+| Optimization | Effort | Impact | Description |
+|--------------|--------|--------|-------------|
+| Batch AST Visitors | High | High | Consolidate AST visitor callbacks across rules. Currently each rule registers independent callbacks, resulting in multiple AST traversals. A batched approach would traverse once and dispatch to relevant rules. Requires significant refactor of rule registration. |
+| Lazy Rule Instantiation | Medium | Low | Create rule instances on-demand based on enabled tier rather than `const` list. Current approach uses compile-time constants (low overhead), but lazy instantiation could reduce initial memory for projects using minimal tiers. |
+
 ## Part 1: Detailed Rule Specifications
 
 ### 1.1 Widget Rules
@@ -808,7 +828,6 @@ These rules are **not included in any tier** by default. They represent team pre
 |-----------|-------------|
 | `prefer_sorted_imports` | Alphabetically sort imports within groups |
 | `prefer_import_groups` | Group imports: dart, package, relative (with blank lines) |
-| `prefer_absolute_imports` | Use absolute `package:` imports (opposite of prefer_relative_imports) |
 | `prefer_deferred_imports` | Use deferred imports for large libraries |
 | `prefer_show_hide` | Explicit `show`/`hide` on imports |
 | `prefer_part_over_import` | Use `part`/`part of` for tightly coupled files |
@@ -833,10 +852,6 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Description |
 |-----------|-------------|
-| `prefer_public_members_first` | Public members before private in classes |
-| `prefer_private_members_first` | Private members before public in classes |
-| `prefer_fields_before_methods` | Field declarations at top of class |
-| `prefer_methods_before_fields` | Methods before field declarations |
 | `prefer_constructors_first` | Constructors before other members |
 | `prefer_getters_before_setters` | Getters immediately before their setters |
 | `prefer_static_before_instance` | Static members before instance members |
@@ -854,7 +869,6 @@ These rules are **not included in any tier** by default. They represent team pre
 
 | Rule Name | Description |
 |-----------|-------------|
-| `prefer_double_quotes` | Double quotes `"string"` for strings |
 | `prefer_raw_strings` | Raw strings `r'...'` when escapes are heavy |
 | `prefer_adjacent_strings` | Adjacent strings over `+` concatenation |
 | `prefer_interpolation_to_compose` | String interpolation `${}` over concatenation |
@@ -1450,7 +1464,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⭐ `require_error_logging` | Professional | INFO | Caught errors should be logged. Detect catch without logging. |
-| `prefer_specific_exceptions` | Professional | INFO | Catch specific exception types. Detect generic catch in specific contexts. |
 | `require_error_recovery` | Professional | INFO | Error handlers should enable recovery. Detect catch without user-recoverable action. |
 | `prefer_result_type` | Professional | INFO | Use Result/Either types for expected failures. Detect try-catch for business logic. |
 | `avoid_assert_in_production` | Essential | WARNING | Assert doesn't run in release mode. Detect assert for required checks. |

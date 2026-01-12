@@ -34,6 +34,9 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_qr_scan_feedback',
     problemMessage: 'QR scan callback should provide user feedback.',
@@ -121,6 +124,9 @@ class AvoidQrScannerAlwaysActiveRule extends SaropaLintRule {
   /// Battery optimization issue.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_qr_scanner_always_active',
@@ -230,6 +236,9 @@ class RequireQrContentValidationRule extends SaropaLintRule {
   /// Security issue - can lead to phishing or malicious redirects.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_qr_content_validation',

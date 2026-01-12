@@ -40,6 +40,9 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_dark_mode_testing',
     problemMessage:
@@ -117,6 +120,9 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
   /// Visual issues in dark mode affect user experience.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_elevation_opacity_in_dark',
@@ -201,6 +207,9 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
   /// Maintainability issue for theming architecture.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.high;
 
   static const LintCode _code = LintCode(
     name: 'prefer_theme_extensions',

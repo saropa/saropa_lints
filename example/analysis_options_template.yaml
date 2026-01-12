@@ -458,6 +458,7 @@ custom_lint:
     - avoid_expanded_as_spacer: false
     - avoid_flexible_outside_flex: false
     - avoid_expanded_outside_flex: false         # ERROR - Expanded needs Flex parent (v2.3.10)
+    - prefer_expanded_at_call_site: false        # WARNING - Don't return Expanded from build() (v3.0.0)
     - avoid_stack_without_positioned: false      # WARNING - Stack needs Positioned (v2.3.10)
     - avoid_builder_index_out_of_bounds: false   # WARNING - runtime crash (v2.3.11)
     - avoid_duplicate_widget_keys: false

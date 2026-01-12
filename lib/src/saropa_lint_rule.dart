@@ -9,6 +9,10 @@ import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import 'ignore_utils.dart';
+import 'project_context.dart';
+
+// Re-export types needed by rule implementations
+export 'project_context.dart' show FileContentCache, FileType, RuleCost;
 
 // =============================================================================
 // RULE TIMING INSTRUMENTATION (Performance Profiling)
@@ -408,6 +412,86 @@ abstract class SaropaLintRule extends DartLintRule {
   LintImpact get impact => LintImpact.medium;
 
   // ============================================================
+  // Rule Cost Classification (Performance Optimization)
+  // ============================================================
+
+  /// The estimated execution cost of this rule.
+  ///
+  /// Override to specify the cost level for your rule:
+  /// - [RuleCost.trivial]: Very fast (simple pattern matching)
+  /// - [RuleCost.low]: Fast (single AST node inspection)
+  /// - [RuleCost.medium]: Medium (traverse part of AST) - default
+  /// - [RuleCost.high]: Slow (traverse full AST or type resolution)
+  /// - [RuleCost.extreme]: Very slow (cross-file analysis simulation)
+  ///
+  /// Rules are sorted by cost before execution, so fast rules run first.
+  /// Default: [RuleCost.medium]
+  RuleCost get cost => RuleCost.medium;
+
+  // ============================================================
+  // File Type Filtering (Performance Optimization)
+  // ============================================================
+
+  /// The file types this rule applies to.
+  ///
+  /// Override to restrict this rule to specific file types for early exit.
+  /// Return `null` to apply to all files (default behavior).
+  ///
+  /// Example: A widget-specific rule should return `{FileType.widget}`:
+  /// ```dart
+  /// @override
+  /// Set<FileType>? get applicableFileTypes => {FileType.widget};
+  /// ```
+  ///
+  /// Files not matching any of the specified types will be skipped entirely,
+  /// avoiding expensive AST traversal for irrelevant files.
+  Set<FileType>? get applicableFileTypes => null;
+
+  // ============================================================
+  // Content Pre-filtering (Performance Optimization)
+  // ============================================================
+
+  /// String patterns that must be present in the file for this rule to run.
+  ///
+  /// Override to specify patterns for fast string-based early exit BEFORE
+  /// AST parsing. If the file content doesn't contain ANY of these patterns,
+  /// the rule is skipped entirely.
+  ///
+  /// Example: A rule checking `Timer.periodic` usage:
+  /// ```dart
+  /// @override
+  /// Set<String>? get requiredPatterns => {'Timer.periodic'};
+  /// ```
+  ///
+  /// Example: A rule checking various database calls:
+  /// ```dart
+  /// @override
+  /// Set<String>? get requiredPatterns => {'rawQuery', 'rawInsert', 'execute'};
+  /// ```
+  ///
+  /// This is faster than AST traversal since it's a simple string search.
+  /// Return `null` to skip this optimization (default).
+  Set<String>? get requiredPatterns => null;
+
+  // ============================================================
+  // Skip Small Files (Performance Optimization)
+  // ============================================================
+
+  /// Minimum line count for this rule to run.
+  ///
+  /// High-cost rules can override this to skip small files where complex
+  /// patterns are unlikely. Files with fewer lines than this value are skipped.
+  ///
+  /// Example: A rule checking for complex nested callbacks:
+  /// ```dart
+  /// @override
+  /// int get minimumLineCount => 50;
+  /// ```
+  ///
+  /// Default: 0 (no minimum, rule runs on all files)
+  int get minimumLineCount => 0;
+
+  // ============================================================
   // Context-Aware Auto-Suppression (#2)
   // ============================================================
 
@@ -550,6 +634,69 @@ abstract class SaropaLintRule extends DartLintRule {
     final path = resolver.source.fullName;
     if (_shouldSkipFile(path)) return;
 
+    // Get file content from resolver (already loaded by analyzer)
+    final content = resolver.source.contents.data;
+
+    // =========================================================================
+    // EARLY EXIT BY REQUIRED PATTERNS (Performance Optimization)
+    // =========================================================================
+    // If this rule specifies required patterns, check if the file contains
+    // any of them before doing expensive AST work. This is a fast string search.
+    final patterns = requiredPatterns;
+    if (patterns != null && patterns.isNotEmpty) {
+      final hasAnyPattern = patterns.any((p) => content.contains(p));
+      if (!hasAnyPattern) {
+        // Early exit - file doesn't contain any required patterns
+        return;
+      }
+    }
+
+    // =========================================================================
+    // EARLY EXIT BY MINIMUM LINE COUNT (Performance Optimization)
+    // =========================================================================
+    // High-cost rules can skip small files where complex patterns are unlikely.
+    final minLines = minimumLineCount;
+    if (minLines > 0) {
+      // Fast line count using newline characters
+      var lineCount = 1;
+      for (var i = 0; i < content.length && lineCount < minLines; i++) {
+        if (content.codeUnitAt(i) == 10) lineCount++; // 10 = '\n'
+      }
+      if (lineCount < minLines) {
+        // Early exit - file is too small for this rule
+        return;
+      }
+    }
+
+    // =========================================================================
+    // EARLY EXIT BY FILE TYPE (Performance Optimization)
+    // =========================================================================
+    // If this rule specifies applicable file types, check if the current file
+    // matches before doing any expensive AST work. This can skip entire rules
+    // for files where they don't apply (e.g., widget rules on non-widget files).
+    final applicable = applicableFileTypes;
+    if (applicable != null && applicable.isNotEmpty) {
+      final fileTypes = FileTypeDetector.detect(path, content);
+
+      // Check if any of the rule's applicable types match the file's types
+      final hasMatch = applicable.any((type) => fileTypes.contains(type));
+      if (!hasMatch) {
+        // Early exit - this rule doesn't apply to this file type
+        return;
+      }
+    }
+
+    // Run the rule
+    _runRuleWithReporter(resolver, reporter, path, context);
+  }
+
+  /// Internal helper to run the rule with timing and reporter wrapping.
+  void _runRuleWithReporter(
+    CustomLintResolver resolver,
+    DiagnosticReporter reporter,
+    String path,
+    CustomLintContext context,
+  ) {
     // Create wrapped reporter with severity override and impact tracking
     final wrappedReporter = SaropaDiagnosticReporter(
       reporter,

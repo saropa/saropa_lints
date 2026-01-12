@@ -77,6 +77,9 @@ class ExtendEquatableRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'extend_equatable',
     problemMessage:
@@ -177,6 +180,9 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
   /// Potential bug. Missing field in equality comparison.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'list_all_equatable_fields',
@@ -337,6 +343,9 @@ class PreferEquatableMixinRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_mixin',
     problemMessage:
@@ -473,6 +482,9 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_stringify',
     problemMessage: 'Equatable class does not override stringify to true.',
@@ -590,6 +602,9 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_annotation',
     problemMessage: 'Equatable class is not annotated with @immutable.',
@@ -692,6 +707,9 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   /// Potential bug. Nested objects may not serialize correctly.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_freezed_explicit_json',
@@ -852,6 +870,9 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_freezed_default_values',
     problemMessage:
@@ -961,6 +982,9 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
   /// Style preference. Records are more concise.
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_record_over_equatable',
@@ -1079,6 +1103,9 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_field_in_equatable',
     problemMessage:
@@ -1154,6 +1181,9 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_equatable_copy_with',
     problemMessage: 'Equatable class should have a copyWith method.',
@@ -1219,6 +1249,9 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
   /// copyWith that can't set null makes state management difficult.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_copy_with_null_handling',
@@ -1321,6 +1354,9 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_deep_equality_collections',
     problemMessage:
@@ -1421,6 +1457,9 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_equatable_datetime',
     problemMessage:
@@ -1518,6 +1557,9 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
   /// State mutation bugs from mutable collections.
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_unmodifiable_collections',

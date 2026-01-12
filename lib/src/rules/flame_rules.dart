@@ -41,6 +41,9 @@ class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_creating_vector_in_update',
     problemMessage: 'Creating Vector in update() causes GC churn every frame.',
@@ -128,6 +131,9 @@ class AvoidRedundantAsyncOnLoadRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_async_on_load',

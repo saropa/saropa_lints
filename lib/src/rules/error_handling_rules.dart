@@ -48,6 +48,9 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_swallowing_exceptions',
     problemMessage: 'Catch block swallows exception without handling.',
@@ -167,6 +170,9 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_losing_stack_trace',
     problemMessage: 'Stack trace is lost when rethrowing.',
@@ -280,6 +286,9 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_generic_exceptions',
     problemMessage: 'Avoid throwing generic Exception.',
@@ -327,6 +336,9 @@ class RequireErrorContextRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_error_context',
@@ -399,6 +411,9 @@ class PreferResultPatternRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_result_pattern',
@@ -481,6 +496,9 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_async_error_documentation',
@@ -590,6 +608,9 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.low;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try_statements',
     problemMessage: 'Avoid nested try statements.',
@@ -647,6 +668,9 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
@@ -763,6 +787,9 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_uncaught_future_errors',
@@ -1037,6 +1064,9 @@ class AvoidPrintErrorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_print_error',
     problemMessage:
@@ -1183,6 +1213,9 @@ class AvoidCatchAllRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_catch_all',
     problemMessage:
@@ -1302,6 +1335,9 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
   /// Significant issue. Address when count exceeds 10.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_catch_exception_alone',
@@ -1438,6 +1474,9 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_exception_in_constructor',
     problemMessage:
@@ -1530,6 +1569,9 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   /// Non-deterministic cache keys cause cache misses and memory bloat.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_cache_key_determinism',
@@ -1860,6 +1902,9 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_permission_permanent_denial_handling',
     problemMessage: 'Permission request without permanent denial handling.',
@@ -1942,6 +1987,9 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'require_notification_action_handling',
     problemMessage:
@@ -2020,6 +2068,9 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
   /// Resource leaks from missed cleanup.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_finally_cleanup',

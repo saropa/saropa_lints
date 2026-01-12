@@ -62,6 +62,9 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_encryption_keys',
     problemMessage:
@@ -212,6 +215,9 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random_for_crypto',
     problemMessage:
@@ -340,6 +346,9 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_deprecated_crypto_algorithms',
     problemMessage:
@@ -428,6 +437,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',

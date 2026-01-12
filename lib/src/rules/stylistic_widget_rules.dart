@@ -48,6 +48,12 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_sizedbox_over_container',
     problemMessage:
@@ -120,6 +126,12 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_container_over_sizedbox',
     problemMessage: 'Use Container instead of SizedBox for consistency.',
@@ -183,6 +195,12 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich_over_richtext',
     problemMessage: 'Use Text.rich() instead of RichText widget.',
@@ -236,6 +254,12 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_richtext_over_text_rich',
@@ -293,6 +317,12 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   //  cspell:ignore edgeinsets
   static const LintCode _code = LintCode(
@@ -372,6 +402,12 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_edgeinsets_only',
     problemMessage: 'Use EdgeInsets.only() for explicit side values.',
@@ -428,6 +464,12 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   // cspell:ignore borderradius
   static const LintCode _code = LintCode(
@@ -498,6 +540,12 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_over_flexible',
     problemMessage:
@@ -564,6 +612,12 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'prefer_flexible_over_expanded',
     problemMessage: 'Use Flexible instead of Expanded for consistency.',
@@ -620,6 +674,12 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_material_theme_colors',
@@ -698,6 +758,12 @@ class PreferExplicitColorsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_colors',

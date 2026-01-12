@@ -60,6 +60,12 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_media_player_dispose',
     problemMessage:
@@ -193,6 +199,12 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_dispose',
@@ -428,6 +440,12 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_text_editing_controller_dispose',
     problemMessage:
@@ -493,6 +511,12 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_page_controller_dispose',
@@ -578,6 +602,9 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
   /// Important for battery life and app stability.
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_lifecycle_observer',
@@ -674,6 +701,9 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_memory_leak',
@@ -779,6 +809,12 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_video_player_controller_dispose',
@@ -907,6 +943,9 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_stream_subscription_cancel',
@@ -1264,6 +1303,12 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'require_change_notifier_dispose',
     problemMessage: 'ChangeNotifier must be disposed to clear listeners.',
@@ -1361,6 +1406,9 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_receive_port_close',
@@ -1463,6 +1511,9 @@ class RequireSocketCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_socket_close',
@@ -1578,6 +1629,9 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.critical;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'require_debouncer_cancel',
     problemMessage: 'Debounce timer must be cancelled in dispose().',
@@ -1689,6 +1743,9 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_interval_timer_cancel',
@@ -1809,6 +1866,9 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_file_handle_close',
@@ -1933,6 +1993,12 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
   /// Critical - resources leak without dispose.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'require_dispose_implementation',
@@ -2098,6 +2164,12 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
   /// Critical - old resources leak on reassignment.
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
     name: 'prefer_dispose_before_new_instance',

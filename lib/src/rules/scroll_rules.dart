@@ -46,6 +46,9 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_shrinkwrap_in_scrollview',
     problemMessage: 'shrinkWrap: true in scrollable disables virtualization.',
@@ -185,6 +188,9 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables_conflict',
     problemMessage:
@@ -302,6 +308,9 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_listview_children_for_large_lists',
     problemMessage:
@@ -369,6 +378,9 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_bottom_nav_items',
@@ -443,6 +455,9 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_length_sync',
@@ -556,6 +571,9 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.high;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'avoid_refresh_without_await',
     problemMessage:
@@ -622,6 +640,9 @@ class AvoidMultipleAutofocusRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_autofocus',
@@ -703,6 +724,9 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
   /// UX improvement - standard mobile pattern.
   @override
   LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator_on_lists',
@@ -787,6 +811,9 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_expensive',
@@ -895,6 +922,9 @@ class PreferItemExtentRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.medium;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_item_extent',
     problemMessage:
@@ -967,6 +997,9 @@ class PreferPrototypeItemRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'prefer_prototype_item',
@@ -1043,6 +1076,9 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'require_key_for_reorderable',
@@ -1200,6 +1236,9 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'require_add_automatic_keep_alives_off',

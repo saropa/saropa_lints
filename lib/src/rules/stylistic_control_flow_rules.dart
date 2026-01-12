@@ -77,6 +77,9 @@ class PreferEarlyReturnRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
     problemMessage: 'Consider using early return instead of nested if blocks.',
@@ -164,6 +167,9 @@ class PreferSingleExitPointRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_exit_point',
@@ -270,6 +276,9 @@ class PreferGuardClausesRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_guard_clauses',
     problemMessage: 'Consider using guard clauses at the start of the function.',
@@ -338,6 +347,9 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_positive_conditions_first',
@@ -420,6 +432,9 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_switch_expression',
     problemMessage: 'Consider using switch expression instead of statement.',
@@ -501,6 +516,9 @@ class PreferSwitchStatementRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_switch_statement',
     problemMessage: 'Consider using switch statement instead of expression.',
@@ -555,6 +573,9 @@ class PreferCascadeOverChainedRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_cascade_over_chained',
@@ -640,6 +661,9 @@ class PreferChainedOverCascadeRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   static const LintCode _code = LintCode(
     name: 'prefer_chained_over_cascade',
     problemMessage: 'Consider using separate statements instead of cascade.',
@@ -697,6 +721,9 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_exhaustive_enums',
@@ -770,6 +797,9 @@ class PreferDefaultEnumCaseRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_default_enum_case',
@@ -848,6 +878,9 @@ class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_only_when_awaiting',
@@ -950,6 +983,9 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.opinionated;
 
+  @override
+  RuleCost get cost => RuleCost.low;
+
   static const LintCode _code = LintCode(
     name: 'prefer_await_over_then',
     problemMessage: 'Consider using await instead of .then() chains.',
@@ -1001,6 +1037,9 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_then_over_await',
@@ -1054,6 +1093,9 @@ class PreferSyncOverAsyncWhereSimpleRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
     name: 'prefer_sync_over_async_where_possible',
