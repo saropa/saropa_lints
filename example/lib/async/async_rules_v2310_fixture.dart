@@ -74,6 +74,42 @@ void goodAssigningFuture() {
 }
 
 // =========================================================================
+// avoid_unawaited_future - Safe fire-and-forget patterns (no lint expected)
+// =========================================================================
+
+// GOOD: cancel() in dispose() - sync method, widget is being destroyed
+class MyWidget {
+  StreamSubscription<int>? _subscription;
+
+  void dispose() {
+    _subscription?.cancel();
+  }
+}
+
+// GOOD: .catchError() chain - errors are explicitly handled
+class AnimationExample {
+  final _scrollController = _MockScrollController();
+
+  void scrollToPosition() {
+    _scrollController
+        .animateTo(100)
+        .catchError((Object error, StackTrace stack) {});
+  }
+}
+
+// GOOD: .ignore() - explicitly marked as fire-and-forget
+void goodFutureIgnore() {
+  saveData().ignore();
+}
+
+// BAD: cancel() outside dispose() - still needs explicit handling
+void badCancelOutsideDispose() {
+  StreamSubscription<int>? subscription;
+  // expect_lint: avoid_unawaited_future
+  subscription?.cancel();
+}
+
+// =========================================================================
 // Helper mocks
 // =========================================================================
 
@@ -81,3 +117,11 @@ Future<String> fetchData() async => 'data';
 void processData(String data) {}
 Future<void> saveData() async {}
 void unawaited(Future<void> future) {}
+
+class _MockScrollController {
+  Future<void> animateTo(double offset) async {}
+}
+
+extension FutureIgnoreExtension<T> on Future<T> {
+  void ignore() {}
+}

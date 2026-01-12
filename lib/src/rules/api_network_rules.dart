@@ -3776,6 +3776,70 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
       reporter.atNode(node, code);
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[
+        _AddTimeout30SecondsFix(),
+        _AddTimeout60SecondsFix(),
+      ];
+}
+
+/// Quick fix: adds `.timeout(const Duration(seconds: 30))` to HTTP requests.
+class _AddTimeout30SecondsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add .timeout(const Duration(seconds: 30))',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final int insertOffset = node.argumentList.rightParenthesis.end;
+        builder.addSimpleInsertion(
+          insertOffset,
+          '.timeout(const Duration(seconds: 30))',
+        );
+      });
+    });
+  }
+}
+
+/// Quick fix: adds `.timeout(const Duration(seconds: 60))` for slower APIs.
+class _AddTimeout60SecondsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add .timeout(const Duration(seconds: 60))',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final int insertOffset = node.argumentList.rightParenthesis.end;
+        builder.addSimpleInsertion(
+          insertOffset,
+          '.timeout(const Duration(seconds: 60))',
+        );
+      });
+    });
+  }
 }
 
 /// Warns when using the http package instead of Dio.
