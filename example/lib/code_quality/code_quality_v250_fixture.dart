@@ -141,6 +141,7 @@ void goodErrorLogging() {
 // =========================================================================
 
 class ApiService {}
+
 class UserRepository {}
 
 Future<String> fetchA() async => 'a';
