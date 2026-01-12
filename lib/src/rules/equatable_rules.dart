@@ -1287,3 +1287,313 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_deep_equality_collections
+// =============================================================================
+
+/// Collection fields in Equatable need DeepCollectionEquality.
+///
+/// List/Map/Set fields compared by reference, not contents.
+/// Use DeepCollectionEquality for proper comparison.
+///
+/// **BAD:**
+/// ```dart
+/// class MyState extends Equatable {
+///   final List<Item> items;
+///   @override
+///   List<Object?> get props => [items];  // Compares by reference!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyState extends Equatable {
+///   final List<Item> items;
+///   @override
+///   List<Object?> get props => [DeepCollectionEquality().hash(items)];
+/// }
+/// ```
+class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
+  const RequireDeepEqualityCollectionsRule() : super(code: _code);
+
+  /// State comparison bugs from reference equality.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_deep_equality_collections',
+    problemMessage:
+        'Collection in Equatable props compared by reference, not contents.',
+    correctionMessage:
+        'Use DeepCollectionEquality().hash(collection) or wrap in unmodifiable.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Equatable
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Equatable') return;
+
+      // Find collection fields
+      final Set<String> collectionFields = <String>{};
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration field
+              in member.fields.variables) {
+            final String? typeSource = member.fields.type?.toSource();
+            if (typeSource != null &&
+                (typeSource.startsWith('List') ||
+                    typeSource.startsWith('Set') ||
+                    typeSource.startsWith('Map') ||
+                    typeSource.startsWith('Iterable'))) {
+              final String? fieldName = field.name.lexeme;
+              if (fieldName != null) {
+                collectionFields.add(fieldName);
+              }
+            }
+          }
+        }
+      }
+
+      if (collectionFields.isEmpty) return;
+
+      // Find props getter
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'props' &&
+            member.isGetter) {
+          final String propsSource = member.toSource();
+
+          // Check if collections are used without DeepCollectionEquality
+          for (final String fieldName in collectionFields) {
+            if (propsSource.contains(fieldName) &&
+                !propsSource.contains('DeepCollectionEquality') &&
+                !propsSource.contains('ListEquality') &&
+                !propsSource.contains('SetEquality') &&
+                !propsSource.contains('MapEquality')) {
+              reporter.atNode(member, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_equatable_datetime
+// =============================================================================
+
+/// DateTime equality is problematic due to microsecond precision.
+///
+/// DateTime comparisons can fail due to microsecond differences.
+/// Compare truncated or formatted values instead.
+///
+/// **BAD:**
+/// ```dart
+/// class Event extends Equatable {
+///   final DateTime timestamp;
+///   @override
+///   List<Object?> get props => [timestamp];  // Microsecond differences!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// List<Object?> get props => [timestamp.millisecondsSinceEpoch];
+/// ```
+class AvoidEquatableDatetimeRule extends SaropaLintRule {
+  const AvoidEquatableDatetimeRule() : super(code: _code);
+
+  /// Flaky equality from microsecond precision.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_equatable_datetime',
+    problemMessage:
+        'DateTime in Equatable props may cause flaky equality checks.',
+    correctionMessage:
+        'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if extends Equatable
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Equatable') return;
+
+      // Find DateTime fields
+      final Set<String> dateTimeFields = <String>{};
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final String? typeSource = member.fields.type?.toSource();
+          if (typeSource != null && typeSource.contains('DateTime')) {
+            for (final VariableDeclaration field
+                in member.fields.variables) {
+              final String? fieldName = field.name.lexeme;
+              if (fieldName != null) {
+                dateTimeFields.add(fieldName);
+              }
+            }
+          }
+        }
+      }
+
+      if (dateTimeFields.isEmpty) return;
+
+      // Find props getter
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'props' &&
+            member.isGetter) {
+          final String propsSource = member.toSource();
+
+          // Check if DateTime fields are used directly
+          for (final String fieldName in dateTimeFields) {
+            // Check for direct field reference without conversion
+            if (propsSource.contains(fieldName) &&
+                !propsSource.contains('$fieldName.millisecondsSinceEpoch') &&
+                !propsSource.contains('$fieldName.toIso8601String') &&
+                !propsSource.contains('$fieldName?.millisecondsSinceEpoch') &&
+                !propsSource.contains('$fieldName?.toIso8601String')) {
+              reporter.atNode(member, code);
+              return;
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_unmodifiable_collections
+// =============================================================================
+
+/// Make collection fields unmodifiable to prevent mutation.
+///
+/// Mutable collections in state classes can be modified externally,
+/// breaking immutability expectations.
+///
+/// **BAD:**
+/// ```dart
+/// class State {
+///   final List<Item> items;
+///   State(this.items);  // Can be mutated externally!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class State {
+///   final List<Item> items;
+///   State(List<Item> items) : items = List.unmodifiable(items);
+/// }
+/// ```
+class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
+  const PreferUnmodifiableCollectionsRule() : super(code: _code);
+
+  /// State mutation bugs from mutable collections.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_unmodifiable_collections',
+    problemMessage:
+        'Collection field may be mutated externally. Consider making unmodifiable.',
+    correctionMessage:
+        'Use List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if it's a state/model class (extends Equatable or has immutable intent)
+      final ExtendsClause? extendsClause = node.extendsClause;
+      bool isImmutableClass = false;
+
+      if (extendsClause != null) {
+        final String superName = extendsClause.superclass.name.lexeme;
+        if (superName == 'Equatable' ||
+            superName.contains('State') ||
+            superName.contains('Event')) {
+          isImmutableClass = true;
+        }
+      }
+
+      // Check for @immutable annotation
+      for (final Annotation annotation in node.metadata) {
+        if (annotation.name.name == 'immutable') {
+          isImmutableClass = true;
+          break;
+        }
+      }
+
+      if (!isImmutableClass) return;
+
+      // Find collection fields
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration && member.fields.isFinal) {
+          final String? typeSource = member.fields.type?.toSource();
+          if (typeSource != null &&
+              (typeSource.startsWith('List') ||
+                  typeSource.startsWith('Set') ||
+                  typeSource.startsWith('Map'))) {
+            // Check if constructor makes it unmodifiable
+            bool madeUnmodifiable = false;
+
+            for (final ClassMember constructor in node.members) {
+              if (constructor is ConstructorDeclaration) {
+                final String? initSource = constructor.initializers
+                    .map((e) => e.toSource())
+                    .join();
+                if (initSource != null &&
+                    (initSource.contains('List.unmodifiable') ||
+                        initSource.contains('Map.unmodifiable') ||
+                        initSource.contains('UnmodifiableSetView') ||
+                        initSource.contains('List.of') ||
+                        initSource.contains('.toList()') ||
+                        initSource.contains('.toSet()') ||
+                        initSource.contains('.toMap()'))) {
+                  madeUnmodifiable = true;
+                  break;
+                }
+              }
+            }
+
+            if (!madeUnmodifiable) {
+              reporter.atNode(member, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}

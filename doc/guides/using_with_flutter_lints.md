@@ -7,7 +7,7 @@ This guide explains how `flutter_lints` and `saropa_lints` work together.
 | Aspect | flutter_lints | saropa_lints |
 |--------|--------------|--------------|
 | **Type** | Standard Dart analyzer rules | Custom lint rules (custom_lint) |
-| **Rule count** | ~30 rules | 767+ rules |
+| **Rule count** | ~30 rules | 1450+ rules |
 | **Analysis depth** | Syntax and style | Behavior and semantics |
 | **Provided by** | Flutter team (official) | Saropa (community) |
 
@@ -54,7 +54,7 @@ Use both packages together for comprehensive coverage:
 dev_dependencies:
   flutter_lints: ^5.0.0    # Standard rules (or comes with Flutter SDK)
   custom_lint: ^0.8.0       # Custom lint framework
-  saropa_lints: ^1.3.0      # Deep analysis rules
+  saropa_lints: ^2.6.0      # Deep analysis rules
 ```
 
 ### 2. Update analysis_options.yaml

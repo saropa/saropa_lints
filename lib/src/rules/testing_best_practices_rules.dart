@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
@@ -2554,6 +2555,583 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
     context.addPostRunCallback(() {
       if (!hasErrorCaseTest && mainFunction != null) {
         reporter.atToken(mainFunction!.name, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// ROADMAP_NEXT: Phase 3 - Testing Best Practices
+// =============================================================================
+
+/// Warns when find.byType is used instead of find.byKey in widget tests.
+///
+/// Alias: find_by_key, widget_test_key, prefer_key_finder
+///
+/// Using find.byType can be fragile when widget structure changes.
+/// Using find.byKey with ValueKey or Key is more reliable and explicit.
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('button test', (tester) async {
+///   await tester.pumpWidget(MyApp());
+///   final button = find.byType(ElevatedButton); // Fragile
+///   await tester.tap(button);
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('button test', (tester) async {
+///   await tester.pumpWidget(MyApp());
+///   final button = find.byKey(const Key('submit_button'));
+///   await tester.tap(button);
+/// });
+/// ```
+class PreferTestFindByKeyRule extends SaropaLintRule {
+  const PreferTestFindByKeyRule() : super(code: _code);
+
+  /// Test quality improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_test_find_by_key',
+    problemMessage:
+        'find.byType is fragile. Consider using find.byKey for reliable widget testing.',
+    correctionMessage:
+        'Add a Key to your widget and use find.byKey(Key(\'my_key\')) instead.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+
+    // Only check test files
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'byType') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'find') return;
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+/// Warns when test setup code is duplicated instead of using setUp/tearDown.
+///
+/// Alias: setup_teardown, test_setup, dry_tests
+///
+/// Repeated setup code in tests violates DRY and makes maintenance harder.
+/// Use setUp() and tearDown() for common test initialization.
+///
+/// **BAD:**
+/// ```dart
+/// test('test 1', () {
+///   final controller = StreamController<int>();
+///   final service = MyService(controller);
+///   // test logic
+///   controller.close();
+/// });
+///
+/// test('test 2', () {
+///   final controller = StreamController<int>();
+///   final service = MyService(controller);
+///   // test logic
+///   controller.close();
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late StreamController<int> controller;
+/// late MyService service;
+///
+/// setUp(() {
+///   controller = StreamController<int>();
+///   service = MyService(controller);
+/// });
+///
+/// tearDown(() {
+///   controller.close();
+/// });
+///
+/// test('test 1', () { /* test logic */ });
+/// test('test 2', () { /* test logic */ });
+/// ```
+class PreferSetupTeardownRule extends SaropaLintRule {
+  const PreferSetupTeardownRule() : super(code: _code);
+
+  /// Test quality improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_setup_teardown',
+    problemMessage:
+        'Duplicated test setup code. Consider using setUp()/tearDown().',
+    correctionMessage:
+        'Move common initialization to setUp() and cleanup to tearDown().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+
+    // Only check test files
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      // Find all test() calls in the file
+      final List<MethodInvocation> testCalls = [];
+      unit.accept(_TestCallCollector(testCalls));
+
+      if (testCalls.length < 2) return;
+
+      // Extract the first statements from each test
+      final Map<String, int> firstStatementCounts = <String, int>{};
+
+      for (final testCall in testCalls) {
+        final callback = _getTestCallback(testCall);
+        if (callback == null) continue;
+
+        final body = callback.body;
+        if (body is! BlockFunctionBody) continue;
+
+        final statements = body.block.statements;
+        if (statements.isEmpty) continue;
+
+        // Get first 1-2 statements as setup signature
+        final setupSignature = statements
+            .take(2)
+            .map((s) => s.toSource().replaceAll(RegExp(r'\s+'), ' '))
+            .join(';');
+
+        firstStatementCounts[setupSignature] =
+            (firstStatementCounts[setupSignature] ?? 0) + 1;
+      }
+
+      // If any setup pattern appears 3+ times, suggest setUp()
+      for (final entry in firstStatementCounts.entries) {
+        if (entry.value >= 3) {
+          // Report on the first test with duplicated setup
+          for (final testCall in testCalls) {
+            final callback = _getTestCallback(testCall);
+            if (callback == null) continue;
+
+            final body = callback.body;
+            if (body is! BlockFunctionBody) continue;
+
+            final statements = body.block.statements;
+            if (statements.isEmpty) continue;
+
+            final setupSignature = statements
+                .take(2)
+                .map((s) => s.toSource().replaceAll(RegExp(r'\s+'), ' '))
+                .join(';');
+
+            if (setupSignature == entry.key) {
+              reporter.atNode(testCall, code);
+              break;
+            }
+          }
+          break;
+        }
+      }
+    });
+  }
+
+  FunctionExpression? _getTestCallback(MethodInvocation testCall) {
+    final args = testCall.argumentList.arguments;
+    if (args.length < 2) return null;
+
+    final callback = args[1];
+    if (callback is FunctionExpression) {
+      return callback;
+    }
+    return null;
+  }
+}
+
+class _TestCallCollector extends RecursiveAstVisitor<void> {
+  _TestCallCollector(this.testCalls);
+
+  final List<MethodInvocation> testCalls;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final name = node.methodName.name;
+    if (name == 'test' || name == 'testWidgets') {
+      testCalls.add(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when test descriptions don't follow conventions.
+///
+/// Alias: test_description, test_naming_convention, descriptive_test
+///
+/// Test descriptions should explain WHAT is being tested and WHAT the
+/// expected behavior is. This helps with test maintenance and debugging.
+///
+/// **BAD:**
+/// ```dart
+/// test('test', () { });
+/// test('works', () { });
+/// test('UserService', () { });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('should return empty list when no users exist', () { });
+/// test('throws ArgumentError when input is null', () { });
+/// test('UserService.getById returns user with matching id', () { });
+/// ```
+class RequireTestDescriptionConventionRule extends SaropaLintRule {
+  const RequireTestDescriptionConventionRule() : super(code: _code);
+
+  /// Test quality improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_test_description_convention',
+    problemMessage:
+        'Test description should explain what is being tested and expected behavior.',
+    correctionMessage:
+        'Use format: "should [action] when [condition]" or "[Subject].[method] [expectation]".',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Words that indicate a good test description.
+  static const Set<String> _goodDescriptionWords = <String>{
+    'should',
+    'returns',
+    'throws',
+    'when',
+    'given',
+    'expect',
+    'creates',
+    'updates',
+    'deletes',
+    'validates',
+    'fails',
+    'succeeds',
+    'handles',
+    'emits',
+    'navigates',
+    'renders',
+    'displays',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final name = node.methodName.name;
+      if (name != 'test' && name != 'testWidgets') return;
+
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final firstArg = args.first;
+      if (firstArg is! StringLiteral) return;
+
+      final description = firstArg.stringValue?.toLowerCase() ?? '';
+
+      // Check if description has any good indicator words
+      final hasGoodWord =
+          _goodDescriptionWords.any((word) => description.contains(word));
+
+      // Check minimum length (should be descriptive)
+      final isTooShort = description.length < 15;
+
+      // Check if it's just a class name or method name (single word, PascalCase)
+      final isSingleWord =
+          !description.contains(' ') && !description.contains('.');
+
+      if (!hasGoodWord && (isTooShort || isSingleWord)) {
+        reporter.atNode(firstArg, code);
+      }
+    });
+  }
+}
+
+/// Warns when Bloc is tested without bloc_test package.
+///
+/// Alias: bloc_test, bloc_testing, use_bloc_test
+///
+/// The bloc_test package provides `blocTest()` which is specifically designed
+/// for testing Blocs with better state and event assertions.
+///
+/// **BAD:**
+/// ```dart
+/// test('emits states', () async {
+///   final bloc = MyBloc();
+///   bloc.add(MyEvent());
+///   await expectLater(
+///     bloc.stream,
+///     emitsInOrder([State1(), State2()]),
+///   );
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// blocTest<MyBloc, MyState>(
+///   'emits [State1, State2] when MyEvent is added',
+///   build: () => MyBloc(),
+///   act: (bloc) => bloc.add(MyEvent()),
+///   expect: () => [State1(), State2()],
+/// );
+/// ```
+class PreferBlocTestPackageRule extends SaropaLintRule {
+  const PreferBlocTestPackageRule() : super(code: _code);
+
+  /// Test quality improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_bloc_test_package',
+    problemMessage:
+        'Consider using blocTest() from bloc_test package for Bloc testing.',
+    correctionMessage:
+        'Add bloc_test to dev_dependencies and use blocTest<Bloc, State>().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+
+    // Only check test files
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for test() containing bloc.add() pattern
+      if (node.methodName.name != 'test' && node.methodName.name != 'group') {
+        return;
+      }
+
+      final source = node.toSource();
+
+      // Check for Bloc testing patterns without blocTest
+      if ((source.contains('.add(') || source.contains('.emit(')) &&
+          (source.contains('Bloc') || source.contains('Cubit')) &&
+          !source.contains('blocTest')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when mock verify() is not used to check method calls.
+///
+/// Alias: mock_verify, verify_mock_calls, mockito_verify
+///
+/// Using verify() ensures that expected method calls actually happened.
+/// Without verification, tests may pass even when methods aren't called.
+///
+/// **BAD:**
+/// ```dart
+/// test('saves user', () async {
+///   final mockRepo = MockUserRepository();
+///   when(mockRepo.save(any)).thenAnswer((_) async => true);
+///
+///   final service = UserService(mockRepo);
+///   await service.createUser(User());
+///   // No verification that save was called!
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// test('saves user', () async {
+///   final mockRepo = MockUserRepository();
+///   when(mockRepo.save(any)).thenAnswer((_) async => true);
+///
+///   final service = UserService(mockRepo);
+///   await service.createUser(User());
+///
+///   verify(mockRepo.save(any)).called(1);
+/// });
+/// ```
+class PreferMockVerifyRule extends SaropaLintRule {
+  const PreferMockVerifyRule() : super(code: _code);
+
+  /// Test quality improvement.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_mock_verify',
+    problemMessage:
+        'Mock setup with when() but no verify(). Test may pass without calling mock.',
+    correctionMessage:
+        'Add verify(mock.method()).called(n) to ensure method was called.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final String path = resolver.path;
+
+    // Only check test files
+    if (!path.endsWith('_test.dart') &&
+        !path.contains('/test/') &&
+        !path.contains(r'\test\')) {
+      return;
+    }
+
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Find test() calls
+      final name = node.methodName.name;
+      if (name != 'test' && name != 'testWidgets') return;
+
+      final source = node.toSource();
+
+      // Check for when() setup without verify()
+      if (source.contains('when(') &&
+          (source.contains('.thenReturn') || source.contains('.thenAnswer')) &&
+          !source.contains('verify(') &&
+          !source.contains('verifyNever(') &&
+          !source.contains('verifyInOrder(')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when catch blocks don't log errors.
+///
+/// Alias: error_logging, catch_logging, log_exceptions
+///
+/// Errors caught without logging are hard to debug. At minimum, log the
+/// error for debugging purposes.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   await api.fetchData();
+/// } catch (e) {
+///   // Silent failure - no logging!
+///   return null;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await api.fetchData();
+/// } catch (e, stackTrace) {
+///   log.error('Failed to fetch data', error: e, stackTrace: stackTrace);
+///   return null;
+/// }
+/// ```
+class RequireErrorLoggingRule extends SaropaLintRule {
+  const RequireErrorLoggingRule() : super(code: _code);
+
+  /// Error handling improvement.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_error_logging',
+    problemMessage:
+        'Caught error without logging. Silent failures are hard to debug.',
+    correctionMessage:
+        'Add logging: log.error(\'message\', error: e, stackTrace: s);',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Patterns that indicate error logging.
+  static const Set<String> _loggingPatterns = <String>{
+    'log.',
+    'logger.',
+    'print(',
+    'debugPrint(',
+    'Log.',
+    'Logger.',
+    'logging.',
+    'crashlytics',
+    'Crashlytics',
+    'sentry',
+    'Sentry',
+    'FirebaseCrashlytics',
+    'recordError',
+    'reportError',
+    'captureException',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      final body = node.body;
+      final String bodySource = body.toSource();
+
+      // Check if the catch block has any logging
+      final hasLogging = _loggingPatterns.any(
+        (pattern) => bodySource.contains(pattern),
+      );
+
+      // Check if it's a rethrow (which is fine)
+      final hasRethrow =
+          bodySource.contains('rethrow') || bodySource.contains('throw ');
+
+      // Check if it's intentionally ignoring specific errors
+      final isIntentionalIgnore = bodySource.contains('// ignore') ||
+          bodySource.contains('// expected') ||
+          bodySource.contains('// intentional');
+
+      // Check if body is empty or just returns
+      final isMinimalBody = body.statements.isEmpty ||
+          (body.statements.length == 1 && body.statements.first is ReturnStatement);
+
+      if (!hasLogging && !hasRethrow && !isIntentionalIgnore && isMinimalBody) {
+        reporter.atNode(node, code);
       }
     });
   }

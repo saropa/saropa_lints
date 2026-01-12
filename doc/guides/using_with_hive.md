@@ -363,6 +363,7 @@ dart run custom_lint
 | `require_hive_adapter_registration_order` | essential | Nested adapters registered after parent |
 | `require_hive_nested_object_adapter` | essential | Nested objects missing @HiveType |
 | `avoid_hive_box_name_collision` | essential | Same box name used for different types |
+| `prefer_hive_value_listenable` | professional | setState after Hive changes instead of box.listenable() (v2.6.0) |
 
 ## Common Patterns
 

@@ -2289,3 +2289,217 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_shell_route_shared_layout
+// =============================================================================
+
+/// Use ShellRoute for shared AppBar/BottomNav instead of duplicating Scaffold.
+///
+/// Multiple routes with the same Scaffold layout cause code duplication
+/// and inconsistent behavior. ShellRoute provides a shared wrapper.
+///
+/// **BAD:**
+/// ```dart
+/// GoRoute(path: '/home', builder: (_, __) => Scaffold(appBar: AppBar()...)),
+/// GoRoute(path: '/settings', builder: (_, __) => Scaffold(appBar: AppBar()...)),
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ShellRoute(
+///   builder: (_, __, child) => Scaffold(appBar: AppBar(), body: child),
+///   routes: [
+///     GoRoute(path: '/home', ...),
+///     GoRoute(path: '/settings', ...),
+///   ],
+/// )
+/// ```
+class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
+  const PreferShellRouteSharedLayoutRule() : super(code: _code);
+
+  /// Code duplication and maintenance burden.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_shell_route_shared_layout',
+    problemMessage: 'GoRoute with Scaffold builder may duplicate layout code.',
+    correctionMessage:
+        'Consider using ShellRoute for shared AppBar/BottomNav layouts.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GoRoute') return;
+
+      // Check for builder parameter with Scaffold
+      final ArgumentList args = node.argumentList;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
+          if (builderSource.contains('Scaffold(') &&
+              (builderSource.contains('AppBar(') ||
+                  builderSource.contains('BottomNavigationBar(') ||
+                  builderSource.contains('NavigationBar('))) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_stateful_shell_route_tabs
+// =============================================================================
+
+/// Tab navigation should use StatefulShellRoute to preserve state.
+///
+/// Regular ShellRoute recreates child widgets on tab switch, losing state.
+/// StatefulShellRoute preserves each tab's state.
+///
+/// **BAD:**
+/// ```dart
+/// ShellRoute(
+///   builder: (_, __, child) => TabScaffold(child: child),
+///   routes: [tab1Route, tab2Route],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// StatefulShellRoute.indexedStack(
+///   builder: (_, __, navigationShell) => TabScaffold(shell: navigationShell),
+///   branches: [branch1, branch2],
+/// )
+/// ```
+class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
+  const RequireStatefulShellRouteTabsRule() : super(code: _code);
+
+  /// Tab state loss on navigation.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_stateful_shell_route_tabs',
+    problemMessage:
+        'ShellRoute with tab-like navigation may lose state on tab switch.',
+    correctionMessage:
+        'Use StatefulShellRoute.indexedStack for preserving tab state.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'ShellRoute') return;
+
+      // Check for tab-related patterns in builder
+      final ArgumentList args = node.argumentList;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
+          // Look for tab-related widgets
+          if (builderSource.contains('BottomNavigationBar') ||
+              builderSource.contains('NavigationBar') ||
+              builderSource.contains('TabBar') ||
+              builderSource.contains('IndexedStack')) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_go_router_fallback_route
+// =============================================================================
+
+/// Router should have catch-all or error route for unknown paths.
+///
+/// Without error handling, navigating to unknown paths crashes or shows
+/// blank screens.
+///
+/// **BAD:**
+/// ```dart
+/// GoRouter(routes: [
+///   GoRoute(path: '/', builder: ...),
+///   // No fallback!
+/// ])
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GoRouter(
+///   errorBuilder: (context, state) => ErrorPage(),
+///   routes: [...],
+/// )
+/// ```
+class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
+  const RequireGoRouterFallbackRouteRule() : super(code: _code);
+
+  /// User-facing errors on invalid navigation.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  static const LintCode _code = LintCode(
+    name: 'require_go_router_fallback_route',
+    problemMessage: 'GoRouter without errorBuilder or errorPageBuilder.',
+    correctionMessage: 'Add errorBuilder: (context, state) => ErrorPage().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'GoRouter') return;
+
+      // Check for error handling parameters
+      final ArgumentList args = node.argumentList;
+      bool hasErrorHandler = false;
+
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
+          if (paramName == 'errorBuilder' ||
+              paramName == 'errorPageBuilder' ||
+              paramName == 'onException') {
+            hasErrorHandler = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasErrorHandler) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

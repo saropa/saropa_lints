@@ -270,7 +270,7 @@ dependencies:
 
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
 ```
 
 ### 2. Update analysis_options.yaml

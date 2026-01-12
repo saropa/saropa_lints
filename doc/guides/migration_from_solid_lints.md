@@ -6,14 +6,14 @@ This guide helps you migrate from `solid_lints` to `saropa_lints`.
 
 | Feature | solid_lints | saropa_lints |
 |---------|-------------|--------------|
-| **Custom rules** | 16 rules | 1184+ custom rules |
+| **Custom rules** | 16 rules | 1450+ custom rules |
 | **Framework** | custom_lint | custom_lint |
 | **Focus** | Clean code principles | Flutter-specific analysis |
 | **Configuration** | Single config | 5 progressive tiers |
 | **Specialization** | SOLID principles | Security, accessibility, state management |
 | **Cost** | Free & open source | Free & open source |
 
-**Good news**: saropa_lints implements 15 of solid_lints' 16 custom rules (94% coverage), plus 800+ additional rules.
+**Good news**: saropa_lints implements 15 of solid_lints' 16 custom rules (94% coverage), plus 1300+ additional rules.
 
 **Note**: Both packages use custom_lint, so you can only use one at a time (or carefully merge configurations).
 
@@ -29,7 +29,7 @@ dev_dependencies:
 # After
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^2.6.0
 ```
 
 ### Step 2: Update analysis_options.yaml
@@ -68,13 +68,15 @@ solid_lints has one configuration. saropa_lints offers progressive tiers:
 
 | solid_lints Usage | saropa_lints Tier | Description |
 |-------------------|-------------------|-------------|
-| Basic | **Essential** (~100 rules) | Critical bugs, memory leaks, security |
-| Full config | **Recommended** (~280 rules) | Balanced coverage |
-| + strict mode | **Professional** (~560 rules) | Enterprise-grade |
-| Maximum | **Comprehensive** (~700 rules) | Quality obsessed |
-| Everything | **Insanity** (1184+ rules) | Every single rule |
+| Basic | **Essential** (~256 rules) | Critical bugs, memory leaks, security |
+| Full config | **Recommended** (~573 rules) | Balanced coverage |
+| + strict mode | **Professional** (~979 rules) | Enterprise-grade |
+| Maximum | **Comprehensive** (~1202 rules) | Quality obsessed |
+| Everything | **Insanity** (1450+ rules) | Every single rule |
 
 **Start with `recommended`** - it provides similar coverage to solid_lints plus Flutter-specific rules.
+
+**Plus 114 optional stylistic rules** for team preferences (trailing commas, sorting, etc.) - see [stylistic rules](../../README_STYLISTIC.md).
 
 ## Rule Mapping
 
