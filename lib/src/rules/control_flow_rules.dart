@@ -35,7 +35,7 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_assignments_as_conditions',
     problemMessage:
-        'Assignment in condition. Likely meant == comparison, not = assignment.',
+        '[avoid_assignments_as_conditions] Assignment in condition. Likely meant == comparison, not = assignment.',
     correctionMessage:
         'Use == for comparison, or move assignment before the condition.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -128,7 +128,7 @@ class AvoidCollapsibleIfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_collapsible_if',
     problemMessage:
-        'Nested if without else. Extra nesting reduces readability.',
+        '[avoid_collapsible_if] Nested if without else. Extra nesting reduces readability.',
     correctionMessage: 'Combine into single if: if (a && b) { ... }.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -227,7 +227,7 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_conditions_with_boolean_literals',
     problemMessage:
-        'Avoid comparing with boolean literals or using them in logical expressions.',
+        '[avoid_conditions_with_boolean_literals] Avoid comparing with boolean literals or using them in logical expressions.',
     correctionMessage:
         'Use the boolean expression directly: x instead of x == true.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -349,7 +349,7 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_constant_assert_conditions',
-    problemMessage: 'Assert has a constant condition that is always {0}.',
+    problemMessage: '[avoid_constant_assert_conditions] Assert has a constant condition that is always {0}.',
     correctionMessage:
         'Use a meaningful condition or remove the assert statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -427,7 +427,7 @@ class AvoidConstantSwitchesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_constant_switches',
-    problemMessage: 'Switch expression is a constant value.',
+    problemMessage: '[avoid_constant_switches] Switch expression is a constant value.',
     correctionMessage:
         'Use a variable or expression, or replace with if statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -491,7 +491,7 @@ class AvoidContinueRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_continue',
-    problemMessage: 'Avoid using the continue statement.',
+    problemMessage: '[avoid_continue] Avoid using the continue statement.',
     correctionMessage: 'Restructure the loop logic to avoid continue.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -535,7 +535,7 @@ class AvoidDuplicateSwitchCaseConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_switch_case_conditions',
-    problemMessage: 'Duplicate switch case condition detected.',
+    problemMessage: '[avoid_duplicate_switch_case_conditions] Duplicate switch case condition detected.',
     correctionMessage: 'Remove the duplicate case or use a different value.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -607,7 +607,7 @@ class AvoidIfWithManyBranchesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_if_with_many_branches',
-    problemMessage: 'If statement has too many branches (max 4).',
+    problemMessage: '[avoid_if_with_many_branches] If statement has too many branches (max 4).',
     correctionMessage:
         'Consider using a switch statement or extracting to methods.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -669,7 +669,7 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_inverted_boolean_checks',
-    problemMessage: 'Inverted boolean check can be simplified.',
+    problemMessage: '[avoid_inverted_boolean_checks] Inverted boolean check can be simplified.',
     correctionMessage: 'Use the opposite operator instead of negating.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -782,7 +782,7 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_negated_conditions',
-    problemMessage: 'Negated condition can be simplified.',
+    problemMessage: '[avoid_negated_conditions] Negated condition can be simplified.',
     correctionMessage: 'Use the positive form (isNotEmpty, != null, etc.).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -910,7 +910,7 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_assignments',
-    problemMessage: 'Avoid using assignment inside another expression.',
+    problemMessage: '[avoid_nested_assignments] Avoid using assignment inside another expression.',
     correctionMessage: 'Extract the assignment to a separate statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -956,7 +956,7 @@ class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_conditional_expressions',
-    problemMessage: 'Avoid nested conditional expressions.',
+    problemMessage: '[avoid_nested_conditional_expressions] Avoid nested conditional expressions.',
     correctionMessage: 'Use if-else statements or extract to a method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1013,7 +1013,7 @@ class AvoidNestedSwitchesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switches',
-    problemMessage: 'Avoid nested switch statements.',
+    problemMessage: '[avoid_nested_switches] Avoid nested switch statements.',
     correctionMessage: 'Extract the inner switch to a separate method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1083,7 +1083,7 @@ class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switch_expressions',
-    problemMessage: 'Avoid nested switch expressions.',
+    problemMessage: '[avoid_nested_switch_expressions] Avoid nested switch expressions.',
     correctionMessage: 'Extract the inner switch to a separate function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1136,7 +1136,7 @@ class AvoidNestedTryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try',
-    problemMessage: 'Avoid nested try statements.',
+    problemMessage: '[avoid_nested_try] Avoid nested try statements.',
     correctionMessage: 'Extract the inner try to a separate method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1190,7 +1190,7 @@ class AvoidRedundantElseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_else',
-    problemMessage: 'Else is redundant after return/throw/break/continue.',
+    problemMessage: '[avoid_redundant_else] Else is redundant after return/throw/break/continue.',
     correctionMessage: 'Remove the else clause and un-indent the code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1265,7 +1265,7 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unconditional_break',
     problemMessage:
-        'Unconditional break/continue makes loop execute at most once.',
+        '[avoid_unconditional_break] Unconditional break/continue makes loop execute at most once.',
     correctionMessage:
         'Add a condition before break/continue or remove the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1343,7 +1343,7 @@ class AvoidUnnecessaryConditionalsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_conditionals',
-    problemMessage: 'Condition is unnecessary (always true or always false).',
+    problemMessage: '[avoid_unnecessary_conditionals] Condition is unnecessary (always true or always false).',
     correctionMessage: 'Remove the conditional or fix the condition.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1409,7 +1409,7 @@ class AvoidUnnecessaryContinueRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_continue',
-    problemMessage: 'Redundant continue statement at end of loop body.',
+    problemMessage: '[avoid_unnecessary_continue] Redundant continue statement at end of loop body.',
     correctionMessage: 'Remove the continue statement.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1483,7 +1483,7 @@ class AvoidUnnecessaryIfRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_if',
-    problemMessage: 'Unnecessary if statement.',
+    problemMessage: '[avoid_unnecessary_if] Unnecessary if statement.',
     correctionMessage: 'Simplify by returning the condition directly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1569,7 +1569,7 @@ class NoEqualConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_conditions',
-    problemMessage: 'Duplicate condition in if-else chain.',
+    problemMessage: '[no_equal_conditions] Duplicate condition in if-else chain.',
     correctionMessage: 'This condition was already checked above.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1638,7 +1638,7 @@ class NoEqualThenElseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_then_else',
-    problemMessage: 'If and else branches have identical code.',
+    problemMessage: '[no_equal_then_else] If and else branches have identical code.',
     correctionMessage: 'Remove the condition and keep only the common code.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1690,7 +1690,7 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_conditional_expressions',
-    problemMessage: 'Consider using a conditional expression.',
+    problemMessage: '[prefer_conditional_expressions] Consider using a conditional expression.',
     correctionMessage: 'Use condition ? thenValue : elseValue.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1774,7 +1774,7 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_switch_length',
-    problemMessage: 'Switch statement has too few cases.',
+    problemMessage: '[prefer_correct_switch_length] Switch statement has too few cases.',
     correctionMessage:
         'Consider using an if-else statement for $_minCases or fewer cases.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1830,7 +1830,7 @@ class PreferEarlyReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
-    problemMessage: 'Consider using early return to reduce nesting.',
+    problemMessage: '[prefer_early_return] Consider using early return to reduce nesting.',
     correctionMessage:
         'Invert the condition and return early instead of wrapping the body.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1908,7 +1908,7 @@ class PreferReturningConditionalsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_conditionals',
-    problemMessage: 'Return the condition directly instead of true/false.',
+    problemMessage: '[prefer_returning_conditionals] Return the condition directly instead of true/false.',
     correctionMessage: 'Simplify by returning the condition expression.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2004,7 +2004,7 @@ class PreferReturningConditionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_condition',
-    problemMessage: 'Prefer returning the condition directly.',
+    problemMessage: '[prefer_returning_condition] Prefer returning the condition directly.',
     correctionMessage: 'Replace if-else with direct return of the condition.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2089,7 +2089,7 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_when_guard_over_if',
-    problemMessage: 'Switch case with if statement could use a when guard.',
+    problemMessage: '[prefer_when_guard_over_if] Switch case with if statement could use a when guard.',
     correctionMessage:
         'Use "case pattern when condition:" instead of nested if.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2184,7 +2184,7 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_boolean_expressions',
-    problemMessage: 'Boolean expression can be simplified.',
+    problemMessage: '[prefer_simpler_boolean_expressions] Boolean expression can be simplified.',
     correctionMessage:
         'Apply De Morgan\'s law or remove double negation for clearer code.',
     errorSeverity: DiagnosticSeverity.INFO,

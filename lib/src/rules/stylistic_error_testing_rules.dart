@@ -55,7 +55,7 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_specific_exceptions',
     problemMessage:
-        'Throw specific exception types instead of generic Exception.',
+        '[prefer_specific_exceptions] Throw specific exception types instead of generic Exception.',
     correctionMessage:
         'Create a custom exception class for better error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -113,7 +113,7 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_generic_exception',
-    problemMessage: 'Consider using generic Exception for simplicity.',
+    problemMessage: '[prefer_generic_exception] Consider using generic Exception for simplicity.',
     correctionMessage: 'Generic Exception is often sufficient.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -178,7 +178,7 @@ class PreferExceptionSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_exception_suffix',
-    problemMessage: 'Exception classes should end with "Exception" suffix.',
+    problemMessage: '[prefer_exception_suffix] Exception classes should end with "Exception" suffix.',
     correctionMessage: 'Rename to end with "Exception" for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -245,7 +245,7 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_error_suffix',
-    problemMessage: 'Exception classes should end with "Error" suffix.',
+    problemMessage: '[prefer_error_suffix] Exception classes should end with "Error" suffix.',
     correctionMessage: 'Rename to end with "Error" for consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -323,7 +323,7 @@ class PreferOnOverCatchRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_on_over_catch',
-    problemMessage: 'Use "on ExceptionType" instead of bare "catch".',
+    problemMessage: '[prefer_on_over_catch] Use "on ExceptionType" instead of bare "catch".',
     correctionMessage: 'Specific exception types make error handling clearer.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -386,7 +386,7 @@ class PreferCatchOverOnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_catch_over_on',
-    problemMessage: 'Consider using bare "catch" for simplicity.',
+    problemMessage: '[prefer_catch_over_on] Consider using bare "catch" for simplicity.',
     correctionMessage: 'Bare catch is simpler and catches all exceptions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -459,7 +459,7 @@ class PreferGivenWhenThenCommentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_given_when_then_comments',
     problemMessage:
-        'Use Arrange/Act/Assert or Given/When/Then comments in tests.',
+        '[prefer_given_when_then_comments] Use Arrange/Act/Assert or Given/When/Then comments in tests.',
     correctionMessage: 'Add structure comments to organize test phases.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -550,7 +550,7 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_self_documenting_tests',
     problemMessage:
-        'Avoid Arrange/Act/Assert comments - prefer self-documenting code.',
+        '[prefer_self_documenting_tests] Avoid Arrange/Act/Assert comments - prefer self-documenting code.',
     correctionMessage:
         'Write clear, self-documenting tests without structure comments.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -637,7 +637,7 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_expect_over_assert_in_tests',
-    problemMessage: 'Use expect() instead of assert() in tests.',
+    problemMessage: '[prefer_expect_over_assert_in_tests] Use expect() instead of assert() in tests.',
     correctionMessage: 'expect() provides better error messages and matchers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -707,7 +707,7 @@ class PreferSingleExpectationPerTestRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_expectation_per_test',
-    problemMessage: 'Tests should have a single logical assertion.',
+    problemMessage: '[prefer_single_expectation_per_test] Tests should have a single logical assertion.',
     correctionMessage: 'Split into multiple tests for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -807,7 +807,7 @@ class PreferGroupedExpectationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_grouped_expectations',
-    problemMessage: 'Consider grouping related assertions in one test.',
+    problemMessage: '[prefer_grouped_expectations] Consider grouping related assertions in one test.',
     correctionMessage: 'Group related assertions to reduce test boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -896,7 +896,7 @@ class PreferTestNameShouldWhenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_should_when',
-    problemMessage: 'Test names should follow "should X when Y" pattern.',
+    problemMessage: '[prefer_test_name_should_when] Test names should follow "should X when Y" pattern.',
     correctionMessage: 'Use: test("should [behavior] when [condition]", ...)',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -964,7 +964,7 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_descriptive',
     problemMessage:
-        'Use descriptive test names instead of rigid should/when pattern.',
+        '[prefer_test_name_descriptive] Use descriptive test names instead of rigid should/when pattern.',
     correctionMessage: 'Use natural, descriptive test names.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

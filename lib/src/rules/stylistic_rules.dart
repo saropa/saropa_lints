@@ -59,7 +59,7 @@ class PreferRelativeImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_relative_imports',
-    problemMessage: 'Use relative imports instead of absolute package imports.',
+    problemMessage: '[prefer_relative_imports] Use relative imports instead of absolute package imports.',
     correctionMessage:
         'Consider using a relative import path for files within the same package.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -242,7 +242,7 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_one_widget_per_file',
-    problemMessage: 'Multiple widget classes defined in a single file.',
+    problemMessage: '[prefer_one_widget_per_file] Multiple widget classes defined in a single file.',
     correctionMessage:
         'Consider moving each widget class to its own file for better organization.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -329,7 +329,7 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_arrow_functions',
     problemMessage:
-        'Function body contains only a return statement; use arrow syntax.',
+        '[prefer_arrow_functions] Function body contains only a return statement; use arrow syntax.',
     correctionMessage: 'Convert to arrow function: => expression',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -511,7 +511,7 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_all_named_parameters',
     problemMessage:
-        'Function has $_threshold or more positional parameters; consider using named parameters.',
+        '[prefer_all_named_parameters] Function has $_threshold or more positional parameters; consider using named parameters.',
     correctionMessage:
         'Convert positional parameters to named parameters for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -628,7 +628,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma_always',
-    problemMessage: 'Multi-line construct should have a trailing comma.',
+    problemMessage: '[prefer_trailing_comma_always] Multi-line construct should have a trailing comma.',
     correctionMessage: 'Add a trailing comma for consistent formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -828,7 +828,7 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_private_underscore_prefix',
     problemMessage:
-        'Instance field should be private (prefixed with underscore).',
+        '[prefer_private_underscore_prefix] Instance field should be private (prefixed with underscore).',
     correctionMessage:
         'Consider making this field private and providing a getter if needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -967,7 +967,7 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_widget_methods_over_classes',
     problemMessage:
-        'Simple widget class could be a method in the parent widget.',
+        '[prefer_widget_methods_over_classes] Simple widget class could be a method in the parent widget.',
     correctionMessage:
         'Consider converting to a build method for less boilerplate.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1082,7 +1082,7 @@ class PreferExplicitTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_types',
-    problemMessage: 'Use explicit type annotation instead of var.',
+    problemMessage: '[prefer_explicit_types] Use explicit type annotation instead of var.',
     correctionMessage: 'Replace var with the explicit type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1175,7 +1175,7 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_class_over_record_return',
     problemMessage:
-        'Method returns a record; consider using a dedicated class.',
+        '[prefer_class_over_record_return] Method returns a record; consider using a dedicated class.',
     correctionMessage:
         'Create a class with named fields for better maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1271,7 +1271,7 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_inline_callbacks',
     problemMessage:
-        'Callback references a method; consider inlining for locality.',
+        '[prefer_inline_callbacks] Callback references a method; consider inlining for locality.',
     correctionMessage:
         'Inline simple callbacks to keep behavior close to its usage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1363,7 +1363,7 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_quotes',
-    problemMessage: 'Use single quotes instead of double quotes for strings.',
+    problemMessage: '[prefer_single_quotes] Use single quotes instead of double quotes for strings.',
     correctionMessage: "Replace double quotes with single quotes: 'string'",
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1490,7 +1490,7 @@ class PreferTodoFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_todo_format',
     problemMessage:
-        'TODO comment should follow format: TODO(author): description',
+        '[prefer_todo_format] TODO comment should follow format: TODO(author): description',
     correctionMessage: 'Add author name in parentheses: TODO(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1584,7 +1584,7 @@ class PreferFixmeFormatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_fixme_format',
     problemMessage:
-        'FIXME comment should follow format: FIXME(author): description',
+        '[prefer_fixme_format] FIXME comment should follow format: FIXME(author): description',
     correctionMessage: 'Add author name in parentheses: FIXME(author): ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1674,7 +1674,7 @@ class PreferSentenceCaseCommentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sentence_case_comments',
-    problemMessage: 'Comment should start with a capital letter.',
+    problemMessage: '[prefer_sentence_case_comments] Comment should start with a capital letter.',
     correctionMessage: 'Capitalize the first letter of the comment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1921,7 +1921,7 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_period_after_doc',
-    problemMessage: 'Doc comment should end with a period.',
+    problemMessage: '[prefer_period_after_doc] Doc comment should end with a period.',
     correctionMessage: 'Add a period at the end of the doc comment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2080,7 +2080,7 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_screaming_case_constants',
-    problemMessage: 'Constants should use SCREAMING_SNAKE_CASE.',
+    problemMessage: '[prefer_screaming_case_constants] Constants should use SCREAMING_SNAKE_CASE.',
     correctionMessage:
         'Rename to SCREAMING_SNAKE_CASE: MAX_VALUE instead of maxValue',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2223,7 +2223,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
     problemMessage:
-        'Boolean should use a descriptive prefix (is, has, can, should, etc.).',
+        '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.).',
     correctionMessage:
         'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2384,7 +2384,7 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_snake_case_files',
-    problemMessage: 'File name should use snake_case.',
+    problemMessage: '[prefer_snake_case_files] File name should use snake_case.',
     correctionMessage:
         'Rename file to snake_case: user_service.dart instead of UserService.dart',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2547,7 +2547,7 @@ class AvoidSmallTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_text',
     problemMessage:
-        'Font size is smaller than $_minFontSize. Consider increasing for accessibility.',
+        '[avoid_small_text] Font size is smaller than $_minFontSize. Consider increasing for accessibility.',
     correctionMessage:
         'Use a font size of at least $_minFontSize for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2677,7 +2677,7 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_doc_comments_over_regular',
     problemMessage:
-        'Use doc comments (///) instead of regular comments (//) for public API documentation.',
+        '[prefer_doc_comments_over_regular] Use doc comments (///) instead of regular comments (//) for public API documentation.',
     correctionMessage: 'Replace // with /// for documentation comments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3232,7 +3232,7 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'arguments_ordering',
-    problemMessage: 'Named arguments should be in alphabetical order.',
+    problemMessage: '[arguments_ordering] Named arguments should be in alphabetical order.',
     correctionMessage: 'Reorder named arguments alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

@@ -56,7 +56,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_controller_dispose',
     problemMessage:
-        'GetxController has disposable resources but no onClose() override.',
+        '[require_getx_controller_dispose] GetxController has disposable resources but no onClose() override.',
     correctionMessage:
         'Override onClose() to dispose controllers, cancel subscriptions, etc.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -196,7 +196,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_obs_outside_controller',
     problemMessage:
-        '.obs used outside GetxController causes memory leaks and lifecycle issues.',
+        '[avoid_obs_outside_controller] .obs used outside GetxController causes memory leaks and lifecycle issues.',
     correctionMessage:
         'Move observable state to a GetxController for proper lifecycle management.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -287,7 +287,7 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
-    problemMessage: 'GetxController lifecycle method must call super. '
+    problemMessage: '[proper_getx_super_calls] GetxController lifecycle method must call super. '
         'Missing super call breaks controller lifecycle.',
     correctionMessage:
         'Add super.onInit() at the start or super.onClose() at the end.',
@@ -398,7 +398,7 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'always_remove_getx_listener',
-    problemMessage: 'GetX worker is not assigned to a variable for cleanup. '
+    problemMessage: '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
         'This will cause a memory leak.',
     correctionMessage:
         'Assign the worker to a variable and call dispose() in onClose().',
@@ -468,7 +468,7 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
-    problemMessage: 'Creating .obs in build() causes memory leaks.',
+    problemMessage: '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
     correctionMessage: 'Move reactive variables to a GetxController.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -538,7 +538,7 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
-    problemMessage: 'Reassigning Rx variable breaks reactivity.',
+    problemMessage: '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
     correctionMessage: 'Use .value = or callable syntax to update.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -634,7 +634,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_getx_fields',
     problemMessage:
-        'GetxController has Worker fields that may not be disposed.',
+        '[dispose_getx_fields] GetxController has Worker fields that may not be disposed.',
     correctionMessage: 'Call dispose() on Worker fields in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -750,7 +750,7 @@ class PreferGetxBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_getx_builder',
     problemMessage:
-        '.obs value accessed without Obx wrapper. UI won\'t rebuild.',
+        '[prefer_getx_builder] .obs value accessed without Obx wrapper. UI won\'t rebuild.',
     correctionMessage: 'Wrap in Obx(() => ...) to enable reactive updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -849,7 +849,7 @@ class RequireGetxBindingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_binding',
     problemMessage:
-        'Get.put() in widget. Consider using Bindings for lifecycle management.',
+        '[require_getx_binding] Get.put() in widget. Consider using Bindings for lifecycle management.',
     correctionMessage:
         'Create a Binding class and register via GetPage binding parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -940,7 +940,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_worker_dispose',
     problemMessage:
-        'GetX Worker field is not disposed in onClose(). This causes memory leaks.',
+        '[require_getx_worker_dispose] GetX Worker field is not disposed in onClose(). This causes memory leaks.',
     correctionMessage:
         'Call worker.dispose() in onClose() before super.onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1068,7 +1068,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_permanent_cleanup',
     problemMessage:
-        'Get.put(permanent: true) requires manual Get.delete() call for cleanup.',
+        '[require_getx_permanent_cleanup] Get.put(permanent: true) requires manual Get.delete() call for cleanup.',
     correctionMessage:
         'Add Get.delete<T>() when the controller is no longer needed, or document why permanent is required.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1214,7 +1214,7 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_context_outside_widget',
     problemMessage:
-        'Get.context or Get.overlayContext used outside widget class. '
+        '[avoid_getx_context_outside_widget] Get.context or Get.overlayContext used outside widget class. '
         'This is unsafe and may cause crashes.',
     correctionMessage:
         'Use GetX navigation methods (Get.to, Get.snackbar, etc.) or pass context explicitly.',
@@ -1364,7 +1364,7 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getx_global_navigation',
     problemMessage:
-        'GetX global navigation (Get.to, Get.off) bypasses widget context.',
+        '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context.',
     correctionMessage:
         'Use Navigator.of(context) or a typed routing solution like GoRouter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1443,7 +1443,7 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_getx_binding_routes',
-    problemMessage: 'GetPage without binding parameter.',
+    problemMessage: '[require_getx_binding_routes] GetPage without binding parameter.',
     correctionMessage: 'Add binding: YourBinding() for proper DI lifecycle.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

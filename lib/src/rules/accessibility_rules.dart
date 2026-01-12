@@ -51,7 +51,7 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_icon_buttons_without_tooltip',
     problemMessage:
-        'IconButton lacks a tooltip. Screen readers cannot announce its purpose.',
+        '[avoid_icon_buttons_without_tooltip] IconButton lacks a tooltip. Screen readers cannot announce its purpose.',
     correctionMessage:
         "Add tooltip: 'Description of action' to describe what the button does.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -120,7 +120,7 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
     problemMessage:
-        'Touch target may be too small. Minimum recommended size is 48x48.',
+        '[avoid_small_touch_targets] Touch target may be too small. Minimum recommended size is 48x48.',
     correctionMessage:
         'Increase the size to at least 48x48 for better accessibility.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -253,7 +253,7 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_exclude_semantics_justification',
     problemMessage:
-        'ExcludeSemantics should have a comment explaining why content is excluded.',
+        '[require_exclude_semantics_justification] ExcludeSemantics should have a comment explaining why content is excluded.',
     correctionMessage:
         'Add a comment above ExcludeSemantics explaining the rationale.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -356,7 +356,7 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
     problemMessage:
-        'Avoid using color alone to convey information. Add icons or text.',
+        '[avoid_color_only_indicators] Avoid using color alone to convey information. Add icons or text.',
     correctionMessage:
         'Add an icon, text label, or pattern alongside the color indicator.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -441,7 +441,7 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
     problemMessage:
-        'GestureDetector should have keyboard accessibility alternatives.',
+        '[avoid_gesture_only_interactions] GestureDetector should have keyboard accessibility alternatives.',
     correctionMessage:
         'Wrap with Focus and handle keyboard events, or use a Button widget.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -531,7 +531,7 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
     problemMessage:
-        'Interactive Semantics widget lacks a label. Screen readers cannot describe it.',
+        '[require_semantics_label] Interactive Semantics widget lacks a label. Screen readers cannot describe it.',
     correctionMessage:
         "Add label: 'Description' to describe the interactive element's purpose.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -627,7 +627,7 @@ class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
     problemMessage:
-        'MergeSemantics contains interactive widgets. Buttons/inputs may become inaccessible.',
+        '[avoid_merged_semantics_hiding_info] MergeSemantics contains interactive widgets. Buttons/inputs may become inaccessible.',
     correctionMessage:
         'Move interactive widgets outside MergeSemantics, or wrap only related text content.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -723,7 +723,7 @@ class RequireLiveRegionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_live_region',
     problemMessage:
-        'Dynamic content that changes should use Semantics with liveRegion.',
+        '[require_live_region] Dynamic content that changes should use Semantics with liveRegion.',
     correctionMessage:
         'Wrap with Semantics(liveRegion: true) to announce changes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -837,7 +837,7 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
-    problemMessage: 'Section headers should have Semantics with header: true.',
+    problemMessage: '[require_heading_semantics] Section headers should have Semantics with header: true.',
     correctionMessage:
         'Wrap with Semantics(header: true) for screen reader navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -948,7 +948,7 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
     problemMessage:
-        'Image-based interactive elements need a Tooltip or semanticLabel.',
+        '[avoid_image_buttons_without_tooltip] Image-based interactive elements need a Tooltip or semanticLabel.',
     correctionMessage:
         'Wrap with Tooltip or add Semantics to describe the action.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1062,7 +1062,7 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor_ignore',
     problemMessage:
-        'Setting textScaleFactor to 1.0 ignores user accessibility settings.',
+        '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 ignores user accessibility settings.',
     correctionMessage:
         'Remove textScaleFactor or use clamp() to limit scaling range.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1153,7 +1153,7 @@ class RequireImageSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_semantics',
     problemMessage:
-        'Image lacks semanticLabel. Screen readers cannot describe this image.',
+        '[require_image_semantics] Image lacks semanticLabel. Screen readers cannot describe this image.',
     correctionMessage:
         "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1270,7 +1270,7 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hidden_interactive',
     problemMessage:
-        'Interactive element with excludeFromSemantics is inaccessible to screen readers.',
+        '[avoid_hidden_interactive] Interactive element with excludeFromSemantics is inaccessible to screen readers.',
     correctionMessage:
         'Remove excludeFromSemantics or provide Semantics wrapper with label.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1403,7 +1403,7 @@ class PreferScalableTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_scalable_text',
     problemMessage:
-        'Fixed font size does not scale with user accessibility settings.',
+        '[prefer_scalable_text] Fixed font size does not scale with user accessibility settings.',
     correctionMessage:
         'Use Theme.textTheme or consider MediaQuery.textScaleFactorOf for scaling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1484,7 +1484,7 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_button_semantics',
     problemMessage:
-        'Custom tap target needs Semantics with button: true for accessibility.',
+        '[require_button_semantics] Custom tap target needs Semantics with button: true for accessibility.',
     correctionMessage:
         'Wrap with Semantics(button: true, label: "...") or use IconButton/TextButton.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1589,7 +1589,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_semantics',
     problemMessage:
-        'Custom widget may need explicit Semantics for screen reader access.',
+        '[prefer_explicit_semantics] Custom widget may need explicit Semantics for screen reader access.',
     correctionMessage:
         'Consider adding Semantics(label: "...") to describe the widget purpose.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1688,7 +1688,7 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hover_only',
-    problemMessage: 'Hover-only interaction is inaccessible on touch devices.',
+    problemMessage: '[avoid_hover_only] Hover-only interaction is inaccessible on touch devices.',
     correctionMessage:
         'Add GestureDetector with onTap or use widgets like Tooltip that handle both.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1793,7 +1793,7 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_identification',
     problemMessage:
-        'Error state uses only color. Add icon, text label, or other non-color indicator.',
+        '[require_error_identification] Error state uses only color. Add icon, text label, or other non-color indicator.',
     correctionMessage:
         'Add an error icon (Icons.error) or text message alongside color change.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1901,7 +1901,7 @@ class RequireMinimumContrastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_minimum_contrast',
     problemMessage:
-        'Text color may have insufficient contrast. WCAG requires 4.5:1 ratio.',
+        '[require_minimum_contrast] Text color may have insufficient contrast. WCAG requires 4.5:1 ratio.',
     correctionMessage:
         'Use darker text on light backgrounds or lighter text on dark backgrounds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2026,7 +2026,7 @@ class RequireAvatarAltTextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_avatar_alt_text',
     problemMessage:
-        'CircleAvatar lacks semanticLabel. Screen readers cannot describe it.',
+        '[require_avatar_alt_text] CircleAvatar lacks semanticLabel. Screen readers cannot describe it.',
     correctionMessage:
         'Add semanticLabel: "Description of avatar" for accessibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2096,7 +2096,7 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_badge_semantics',
     problemMessage:
-        'Badge lacks accessibility semantics. Screen readers cannot announce it.',
+        '[require_badge_semantics] Badge lacks accessibility semantics. Screen readers cannot announce it.',
     correctionMessage: 'Wrap Badge in Semantics widget with descriptive label.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2170,7 +2170,7 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_badge_count_limit',
     problemMessage:
-        'Badge count exceeds 99. Use "99+" pattern for large numbers.',
+        '[require_badge_count_limit] Badge count exceeds 99. Use "99+" pattern for large numbers.',
     correctionMessage: 'Replace with: Text(count > 99 ? "99+" : "\$count")',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2248,7 +2248,7 @@ class RequireImageDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_description',
-    problemMessage: 'Image should have semanticLabel or excludeFromSemantics.',
+    problemMessage: '[require_image_description] Image should have semanticLabel or excludeFromSemantics.',
     correctionMessage:
         'Add semanticLabel for content images or excludeFromSemantics: true '
         'for decorative images.',
@@ -2318,7 +2318,7 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_semantics_exclusion',
     problemMessage:
-        'excludeFromSemantics: true should have a comment explaining why.',
+        '[avoid_semantics_exclusion] excludeFromSemantics: true should have a comment explaining why.',
     correctionMessage:
         'Add a comment explaining why this is decorative content.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2389,7 +2389,7 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_merge_semantics',
-    problemMessage: 'Icon + Text should be wrapped in MergeSemantics.',
+    problemMessage: '[prefer_merge_semantics] Icon + Text should be wrapped in MergeSemantics.',
     correctionMessage:
         'Wrap Row/Column with MergeSemantics for unified screen reader output.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2495,7 +2495,7 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_focus_indicator',
-    problemMessage: 'Interactive widget should have visible focus indicator.',
+    problemMessage: '[require_focus_indicator] Interactive widget should have visible focus indicator.',
     correctionMessage:
         'Wrap in Focus widget and show visual feedback on focus.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2583,7 +2583,7 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_flashing_content',
-    problemMessage: 'Animation may flash more than 3 times per second.',
+    problemMessage: '[avoid_flashing_content] Animation may flash more than 3 times per second.',
     correctionMessage:
         'Increase duration to at least 333ms to stay under 3 flashes/second.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2665,7 +2665,7 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_adequate_spacing',
-    problemMessage: 'Adjacent touch targets should have spacing between them.',
+    problemMessage: '[prefer_adequate_spacing] Adjacent touch targets should have spacing between them.',
     correctionMessage: 'Add SizedBox(width/height: 8) between touch targets.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2750,7 +2750,7 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_motion_without_reduce',
-    problemMessage: 'Animation should respect disableAnimations preference.',
+    problemMessage: '[avoid_motion_without_reduce] Animation should respect disableAnimations preference.',
     correctionMessage:
         'Check MediaQuery.disableAnimations and reduce/skip animation if true.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2833,7 +2833,7 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantic_label_icons',
     problemMessage:
-        'Icon lacks semanticLabel. Screen readers cannot describe this icon.',
+        '[require_semantic_label_icons] Icon lacks semanticLabel. Screen readers cannot describe this icon.',
     correctionMessage:
         "Add semanticLabel: 'description' to describe the icon's meaning.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2944,7 +2944,7 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_accessible_images',
     problemMessage:
-        'Image lacks accessibility handling. Screen readers cannot describe it.',
+        '[require_accessible_images] Image lacks accessibility handling. Screen readers cannot describe it.',
     correctionMessage:
         "Add semanticLabel: 'description' or excludeFromSemantics: true for decorative images.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3047,7 +3047,7 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_auto_play_media',
     problemMessage:
-        'Auto-playing media can be disorienting for users with disabilities.',
+        '[avoid_auto_play_media] Auto-playing media can be disorienting for users with disabilities.',
     correctionMessage:
         'Set autoPlay: false and let users control when media plays.',
     errorSeverity: DiagnosticSeverity.WARNING,

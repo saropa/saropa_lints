@@ -230,7 +230,7 @@ class AvoidEmptySetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_setstate',
-    problemMessage: 'Empty setState callback has no effect.',
+    problemMessage: '[avoid_empty_setstate] Empty setState callback has no effect.',
     correctionMessage: 'Add state changes or remove the setState call.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -298,7 +298,7 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_as_spacer',
-    problemMessage: 'Use Spacer() instead of Expanded with empty child.',
+    problemMessage: '[avoid_expanded_as_spacer] Use Spacer() instead of Expanded with empty child.',
     correctionMessage:
         'Replace Expanded(child: SizedBox/Container()) with Spacer().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -377,7 +377,7 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_flexible_outside_flex',
-    problemMessage: 'Flexible/Expanded used outside of Row, Column, or Flex.',
+    problemMessage: '[avoid_flexible_outside_flex] Flexible/Expanded used outside of Row, Column, or Flex.',
     correctionMessage:
         'Flexible and Expanded only work inside Row, Column, or Flex widgets.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -456,7 +456,7 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_incorrect_image_opacity',
     problemMessage:
-        'Image wrapped in Opacity. Use Image color property instead.',
+        '[avoid_incorrect_image_opacity] Image wrapped in Opacity. Use Image color property instead.',
     correctionMessage:
         'Use Image.color with colorBlendMode for better performance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -543,7 +543,7 @@ class AvoidLateContextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_late_context',
-    problemMessage: 'Avoid using BuildContext in late field initializers.',
+    problemMessage: '[avoid_late_context] Avoid using BuildContext in late field initializers.',
     correctionMessage:
         'Initialize in didChangeDependencies() or build() instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -660,7 +660,7 @@ class AvoidMisnamedPaddingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_misnamed_padding',
-    problemMessage: 'Parameter named "padding" is used as margin '
+    problemMessage: '[avoid_misnamed_padding] Parameter named "padding" is used as margin '
         '(via Padding widget or .withPadding()).',
     correctionMessage: 'Consider renaming to "margin" to reflect actual usage.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -796,7 +796,7 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_missing_image_alt',
-    problemMessage: 'Image is missing semanticLabel for accessibility.',
+    problemMessage: '[avoid_missing_image_alt] Image is missing semanticLabel for accessibility.',
     correctionMessage: 'Add semanticLabel parameter for screen reader support.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -889,7 +889,7 @@ class AvoidMountedInSetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mounted_in_setstate',
-    problemMessage: 'Avoid checking mounted inside setState callback.',
+    problemMessage: '[avoid_mounted_in_setstate] Avoid checking mounted inside setState callback.',
     correctionMessage: 'Check mounted before calling setState instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -950,7 +950,7 @@ class AvoidReturningWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_widgets',
-    problemMessage: 'Avoid methods that return widgets.',
+    problemMessage: '[avoid_returning_widgets] Avoid methods that return widgets.',
     correctionMessage: 'Extract to a separate Widget class.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1063,7 +1063,7 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_single_child_column_row',
-    problemMessage: 'Column/Row with single child is unnecessary.',
+    problemMessage: '[avoid_single_child_column_row] Column/Row with single child is unnecessary.',
     correctionMessage: 'Use the child directly or Align/Center for alignment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1143,7 +1143,7 @@ class AvoidStateConstructorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_state_constructors',
-    problemMessage: 'State class should not have constructor body.',
+    problemMessage: '[avoid_state_constructors] State class should not have constructor body.',
     correctionMessage: 'Use initState() for initialization instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1206,7 +1206,7 @@ class AvoidStatelessWidgetInitializedFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_stateless_widget_initialized_fields',
-    problemMessage: 'StatelessWidget should not have initialized fields.',
+    problemMessage: '[avoid_stateless_widget_initialized_fields] StatelessWidget should not have initialized fields.',
     correctionMessage: 'Pass values through the constructor instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1274,7 +1274,7 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_gesture_detector',
-    problemMessage: 'GestureDetector has no gesture callbacks defined.',
+    problemMessage: '[avoid_unnecessary_gesture_detector] GestureDetector has no gesture callbacks defined.',
     correctionMessage:
         'Add gesture callbacks or remove the GestureDetector wrapper.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1404,7 +1404,7 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_setstate',
-    problemMessage: 'setState called in lifecycle method where not needed.',
+    problemMessage: '[avoid_unnecessary_setstate] setState called in lifecycle method where not needed.',
     correctionMessage:
         'In initState/dispose, modify state directly without setState.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1496,7 +1496,7 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_stateful_widgets',
-    problemMessage: 'StatefulWidget may be unnecessary.',
+    problemMessage: '[avoid_unnecessary_stateful_widgets] StatefulWidget may be unnecessary.',
     correctionMessage:
         'Consider using StatelessWidget if no mutable state is needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1573,7 +1573,7 @@ class AvoidUnremovableCallbacksInListenersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unremovable_callbacks_in_listeners',
-    problemMessage: 'Anonymous function cannot be removed from listener.',
+    problemMessage: '[avoid_unremovable_callbacks_in_listeners] Anonymous function cannot be removed from listener.',
     correctionMessage:
         'Use a named function or store reference to remove later.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1654,7 +1654,7 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_setstate',
-    problemMessage: 'setState() called without a mounted check.',
+    problemMessage: '[avoid_unsafe_setstate] setState() called without a mounted check.',
     correctionMessage:
         'Wrap in `if (mounted)` or use `mounted ? setState(...) : null`.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1839,7 +1839,7 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_wrapping_in_padding',
     problemMessage:
-        'Widget has its own padding property, avoid wrapping in Padding.',
+        '[avoid_wrapping_in_padding] Widget has its own padding property, avoid wrapping in Padding.',
     correctionMessage: 'Use the padding property of the child widget instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1915,7 +1915,7 @@ class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'check_for_equals_in_render_object_setters',
     problemMessage:
-        'RenderObject setter should check equality before updating.',
+        '[check_for_equals_in_render_object_setters] RenderObject setter should check equality before updating.',
     correctionMessage:
         'Add equality check: if (_field == value) return; before assignment.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2064,7 +2064,7 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'consistent_update_render_object',
     problemMessage:
-        'updateRenderObject may be missing property updates from createRenderObject.',
+        '[consistent_update_render_object] updateRenderObject may be missing property updates from createRenderObject.',
     correctionMessage:
         'Ensure all properties set in createRenderObject are also updated in updateRenderObject.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2189,7 +2189,7 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_border_radius',
-    problemMessage: 'Prefer const BorderRadius.all for constant border radius.',
+    problemMessage: '[prefer_const_border_radius] Prefer const BorderRadius.all for constant border radius.',
     correctionMessage:
         'Use const BorderRadius.all(Radius.circular(x)) instead.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2248,7 +2248,7 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_edge_insets_constructor',
-    problemMessage: 'Consider using a more specific EdgeInsets constructor.',
+    problemMessage: '[prefer_correct_edge_insets_constructor] Consider using a more specific EdgeInsets constructor.',
     correctionMessage:
         'Use .all() for equal values or .symmetric() for symmetric values.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2372,7 +2372,7 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_define_hero_tag',
-    problemMessage: 'Hero widget should have an explicit tag.',
+    problemMessage: '[prefer_define_hero_tag] Hero widget should have an explicit tag.',
     correctionMessage: 'Add a tag parameter to the Hero widget.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2410,7 +2410,7 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_extracting_callbacks',
-    problemMessage: 'Consider extracting this callback to a method.',
+    problemMessage: '[prefer_extracting_callbacks] Consider extracting this callback to a method.',
     correctionMessage: 'Extract long callbacks to named methods.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2457,7 +2457,7 @@ class PreferSingleWidgetPerFileRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_widget_per_file',
-    problemMessage: 'File contains multiple public widget classes.',
+    problemMessage: '[prefer_single_widget_per_file] File contains multiple public widget classes.',
     correctionMessage: 'Move each public widget to its own file.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2529,7 +2529,7 @@ class PreferSliverPrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_prefix',
-    problemMessage: 'Sliver widget class should have "Sliver" prefix.',
+    problemMessage: '[prefer_sliver_prefix] Sliver widget class should have "Sliver" prefix.',
     correctionMessage: 'Rename the class to start with "Sliver".',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2629,7 +2629,7 @@ class PreferTextRichRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_text_rich',
-    problemMessage: 'Prefer Text.rich over RichText widget.',
+    problemMessage: '[prefer_text_rich] Prefer Text.rich over RichText widget.',
     correctionMessage:
         'Use Text.rich(TextSpan(...)) instead of RichText(text: TextSpan(...)).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2674,7 +2674,7 @@ class PreferUsingListViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_using_list_view',
     problemMessage:
-        'Column inside SingleChildScrollView. Consider using ListView.',
+        '[prefer_using_list_view] Column inside SingleChildScrollView. Consider using ListView.',
     correctionMessage:
         'Use ListView for better performance with scrollable lists.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2879,7 +2879,7 @@ class RequireDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dispose',
-    problemMessage: 'Disposable field may not be properly disposed.',
+    problemMessage: '[require_dispose] Disposable field may not be properly disposed.',
     correctionMessage: 'Add a dispose() method that disposes this field, '
         'or ensure the existing dispose() method handles it.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3161,7 +3161,7 @@ class RequireTimerCancellationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_timer_cancellation',
     problemMessage:
-        'Timer or StreamSubscription must be cancelled in dispose().',
+        '[require_timer_cancellation] Timer or StreamSubscription must be cancelled in dispose().',
     correctionMessage:
         'Add cancel() in dispose() to prevent crashes and memory leaks. '
         'Uncancelled timers continue firing after widget disposal.',
@@ -3378,7 +3378,7 @@ class NullifyAfterDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'nullify_after_dispose',
     problemMessage:
-        'Nullable disposable field should be set to null after disposal.',
+        '[nullify_after_dispose] Nullable disposable field should be set to null after disposal.',
     correctionMessage:
         'Add `fieldName = null;` after disposing to help garbage collection '
         'and prevent accidental reuse.',
@@ -3547,7 +3547,7 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'use_setstate_synchronously',
-    problemMessage: 'setState called after async gap without mounted check.',
+    problemMessage: '[use_setstate_synchronously] setState called after async gap without mounted check.',
     correctionMessage: 'Check mounted before calling setState after await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3706,7 +3706,7 @@ class AlwaysRemoveListenerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'always_remove_listener',
-    problemMessage: 'Listener added but may not be removed.',
+    problemMessage: '[always_remove_listener] Listener added but may not be removed.',
     correctionMessage: 'Ensure the listener is removed in dispose() '
         'to prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3852,7 +3852,7 @@ class AvoidBorderAllRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_border_all',
-    problemMessage: 'Prefer Border.fromBorderSide for const borders.',
+    problemMessage: '[avoid_border_all] Prefer Border.fromBorderSide for const borders.',
     correctionMessage:
         'Use const Border.fromBorderSide(BorderSide(...)) instead.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3923,7 +3923,7 @@ class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_deeply_nested_widgets',
-    problemMessage: 'Widget tree is too deeply nested.',
+    problemMessage: '[avoid_deeply_nested_widgets] Widget tree is too deeply nested.',
     correctionMessage:
         'Extract subtrees into separate widgets to improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4043,7 +4043,7 @@ class RequireAnimationDisposalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_animation_disposal',
-    problemMessage: 'AnimationController should be disposed.',
+    problemMessage: '[require_animation_disposal] AnimationController should be disposed.',
     correctionMessage: 'Add _controller.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -4178,7 +4178,7 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_uncontrolled_text_field',
     problemMessage:
-        'TextField should have a controller for proper state management.',
+        '[avoid_uncontrolled_text_field] TextField should have a controller for proper state management.',
     correctionMessage: 'Add a TextEditingController to the TextField.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4229,7 +4229,7 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_asset_paths',
-    problemMessage: 'Asset path should not be hardcoded.',
+    problemMessage: '[avoid_hardcoded_asset_paths] Asset path should not be hardcoded.',
     correctionMessage:
         'Use a constants class or generated assets for asset paths.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4317,7 +4317,7 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_print_in_production',
-    problemMessage: 'Avoid using print() in production code.',
+    problemMessage: '[avoid_print_in_production] Avoid using print() in production code.',
     correctionMessage: 'Use a proper logging framework instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -4427,7 +4427,7 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_catching_generic_exception',
-    problemMessage: 'Avoid catching generic exceptions.',
+    problemMessage: '[avoid_catching_generic_exception] Avoid catching generic exceptions.',
     correctionMessage: 'Catch specific exception types instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4498,7 +4498,7 @@ class AvoidServiceLocatorOveruseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_overuse',
     problemMessage:
-        'Service locator call in widget. Prefer constructor injection.',
+        '[avoid_service_locator_overuse] Service locator call in widget. Prefer constructor injection.',
     correctionMessage: 'Pass dependencies through the constructor instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4573,7 +4573,7 @@ class PreferUtcDateTimesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_utc_datetimes',
-    problemMessage: 'Consider using UTC DateTime for storage/transmission.',
+    problemMessage: '[prefer_utc_datetimes] Consider using UTC DateTime for storage/transmission.',
     correctionMessage:
         'Use DateTime.now().toUtc() or DateTime.utc() for timestamps.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -4642,7 +4642,7 @@ class AvoidRegexInLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_regex_in_loop',
     problemMessage:
-        'RegExp created inside loop. Move it outside for efficiency.',
+        '[avoid_regex_in_loop] RegExp created inside loop. Move it outside for efficiency.',
     correctionMessage: 'Create the RegExp once outside the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -4722,7 +4722,7 @@ class PreferGetterOverMethodRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_getter_over_method',
-    problemMessage: 'Use a getter instead of a method that returns a value.',
+    problemMessage: '[prefer_getter_over_method] Use a getter instead of a method that returns a value.',
     correctionMessage: 'Convert to a getter: get name => _name;',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4813,7 +4813,7 @@ class AvoidUnusedCallbackParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_callback_parameters',
-    problemMessage: 'Callback parameter is declared but not used.',
+    problemMessage: '[avoid_unused_callback_parameters] Callback parameter is declared but not used.',
     correctionMessage: 'Use underscore (_) for unused parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4878,7 +4878,7 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets_in_lists',
-    problemMessage: 'Widget list could be const.',
+    problemMessage: '[prefer_const_widgets_in_lists] Widget list could be const.',
     correctionMessage: 'Add const keyword to the list literal.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4979,7 +4979,7 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_scaffold_messenger_after_await',
     problemMessage:
-        'Using ScaffoldMessenger.of(context) after await may use an invalid context.',
+        '[avoid_scaffold_messenger_after_await] Using ScaffoldMessenger.of(context) after await may use an invalid context.',
     correctionMessage: 'Store ScaffoldMessenger.of(context) before the await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -5070,7 +5070,7 @@ class AvoidBuildContextInProvidersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_build_context_in_providers',
-    problemMessage: 'Storing BuildContext in providers can cause memory leaks.',
+    problemMessage: '[avoid_build_context_in_providers] Storing BuildContext in providers can cause memory leaks.',
     correctionMessage:
         'Pass BuildContext as a method parameter when needed instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5148,7 +5148,7 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_semantic_widget_names',
-    problemMessage: 'Consider using a more semantic widget.',
+    problemMessage: '[prefer_semantic_widget_names] Consider using a more semantic widget.',
     correctionMessage:
         'Replace Container with a more specific widget like DecoratedBox, SizedBox, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5224,7 +5224,7 @@ class AvoidTextScaleFactorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor',
-    problemMessage: 'textScaleFactor is deprecated.',
+    problemMessage: '[avoid_text_scale_factor] textScaleFactor is deprecated.',
     correctionMessage: 'Use textScaler instead of textScaleFactor.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -5273,7 +5273,7 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_widget_state_mixin',
-    problemMessage: 'Consider using WidgetStateMixin for interaction states.',
+    problemMessage: '[prefer_widget_state_mixin] Consider using WidgetStateMixin for interaction states.',
     correctionMessage:
         'Use WidgetStateMixin to manage hover, pressed, and focus states.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5363,7 +5363,7 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_without_cache',
     problemMessage:
-        'Image.network should specify cacheWidth/cacheHeight for memory efficiency.',
+        '[avoid_image_without_cache] Image.network should specify cacheWidth/cacheHeight for memory efficiency.',
     correctionMessage: 'Add cacheWidth and/or cacheHeight parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5435,7 +5435,7 @@ class PreferSplitWidgetConstRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_split_widget_const',
     problemMessage:
-        'Large widget subtree could be extracted to a const widget.',
+        '[prefer_split_widget_const] Large widget subtree could be extracted to a const widget.',
     correctionMessage:
         'Extract this subtree to a separate const widget for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5510,7 +5510,7 @@ class AvoidNavigatorPushWithoutRouteNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_without_route_name',
-    problemMessage: 'Prefer named routes for better navigation management.',
+    problemMessage: '[avoid_navigator_push_without_route_name] Prefer named routes for better navigation management.',
     correctionMessage: 'Use Navigator.pushNamed or a routing package.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5568,7 +5568,7 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_widget_keys',
-    problemMessage: 'Duplicate widget keys found in list.',
+    problemMessage: '[avoid_duplicate_widget_keys] Duplicate widget keys found in list.',
     correctionMessage: 'Ensure each widget in a list has a unique key.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -5657,7 +5657,7 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_consumer',
     problemMessage:
-        'SafeArea may be redundant when used directly inside Scaffold body.',
+        '[prefer_safe_area_consumer] SafeArea may be redundant when used directly inside Scaffold body.',
     correctionMessage:
         'Scaffold already handles safe areas via its appBar and bottomNavigationBar properties.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5722,7 +5722,7 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unrestricted_text_field_length',
     problemMessage:
-        'TextField should have maxLength to prevent excessive input.',
+        '[avoid_unrestricted_text_field_length] TextField should have maxLength to prevent excessive input.',
     correctionMessage: 'Add maxLength parameter to limit input length.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5783,7 +5783,7 @@ class PreferScaffoldMessengerMaybeOfRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_scaffold_messenger_maybeof',
     problemMessage:
-        'Consider using ScaffoldMessenger.maybeOf for safer access.',
+        '[prefer_scaffold_messenger_maybeof] Consider using ScaffoldMessenger.maybeOf for safer access.',
     correctionMessage:
         'Use maybeOf to handle cases where ScaffoldMessenger might not be available.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5838,7 +5838,7 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_key',
-    problemMessage: 'Form widget should have a GlobalKey for validation.',
+    problemMessage: '[avoid_form_without_key] Form widget should have a GlobalKey for validation.',
     correctionMessage: 'Add a GlobalKey<FormState> to the Form widget.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -5894,7 +5894,7 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_listview_without_item_extent',
     problemMessage:
-        'ListView.builder should specify itemExtent for better scroll performance.',
+        '[avoid_listview_without_item_extent] ListView.builder should specify itemExtent for better scroll performance.',
     correctionMessage: 'Add itemExtent or prototypeItem parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -5963,7 +5963,7 @@ class AvoidMediaQueryInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mediaquery_in_build',
-    problemMessage: 'Use specific MediaQuery methods instead of MediaQuery.of.',
+    problemMessage: '[avoid_mediaquery_in_build] Use specific MediaQuery methods instead of MediaQuery.of.',
     correctionMessage:
         'Use MediaQuery.sizeOf, MediaQuery.paddingOf, etc. for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6021,7 +6021,7 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list_delegate',
     problemMessage:
-        'Use SliverChildBuilderDelegate for better performance with large lists.',
+        '[prefer_sliver_list_delegate] Use SliverChildBuilderDelegate for better performance with large lists.',
     correctionMessage:
         'Replace SliverChildListDelegate with SliverChildBuilderDelegate.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6088,7 +6088,7 @@ class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_misuse',
-    problemMessage: 'LayoutBuilder should use constraints in its builder.',
+    problemMessage: '[avoid_layout_builder_misuse] LayoutBuilder should use constraints in its builder.',
     correctionMessage:
         'Ensure the builder actually uses the constraints parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6175,7 +6175,7 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_repaint_boundary_misuse',
     problemMessage:
-        'RepaintBoundary around const/static content provides no benefit.',
+        '[avoid_repaint_boundary_misuse] RepaintBoundary around const/static content provides no benefit.',
     correctionMessage: 'Use RepaintBoundary for frequently repainting content.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6245,7 +6245,7 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singlechildscrollview_with_column',
     problemMessage:
-        'SingleChildScrollView with Column may cause layout issues.',
+        '[avoid_singlechildscrollview_with_column] SingleChildScrollView with Column may cause layout issues.',
     correctionMessage:
         'Consider using ListView instead, or remove Expanded/Flexible children.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6327,7 +6327,7 @@ class PreferCachedNetworkImageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_network_image',
-    problemMessage: 'Consider using CachedNetworkImage for better caching.',
+    problemMessage: '[prefer_cached_network_image] Consider using CachedNetworkImage for better caching.',
     correctionMessage: 'Replace Image.network with CachedNetworkImage package.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6385,7 +6385,7 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_detector_in_scrollview',
     problemMessage:
-        'GestureDetector around scrollable can cause gesture conflicts.',
+        '[avoid_gesture_detector_in_scrollview] GestureDetector around scrollable can cause gesture conflicts.',
     correctionMessage:
         'Move GestureDetector to individual items inside the scrollable.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6459,7 +6459,7 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_widget_in_list',
     problemMessage:
-        'Creating StatefulWidget in list builder can cause state loss.',
+        '[avoid_stateful_widget_in_list] Creating StatefulWidget in list builder can cause state loss.',
     correctionMessage: 'Use keys or consider StatelessWidget for list items.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6548,7 +6548,7 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_opacity_widget',
-    problemMessage: 'Consider using Opacity widget for complex child widgets.',
+    problemMessage: '[prefer_opacity_widget] Consider using Opacity widget for complex child widgets.',
     correctionMessage:
         'Opacity widget can optimize rendering of transparent content.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -6610,7 +6610,7 @@ class AvoidInheritedWidgetInInitStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_inherited_widget_in_initstate',
-    problemMessage: 'Avoid accessing InheritedWidget in initState.',
+    problemMessage: '[avoid_inherited_widget_in_initstate] Avoid accessing InheritedWidget in initState.',
     correctionMessage: 'Use didChangeDependencies instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6690,7 +6690,7 @@ class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_recursive_widget_calls',
     problemMessage:
-        'Widget creates instance of itself, causing infinite recursion.',
+        '[avoid_recursive_widget_calls] Widget creates instance of itself, causing infinite recursion.',
     correctionMessage: 'Remove the recursive widget instantiation.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -6772,7 +6772,7 @@ class AvoidUndisposedInstancesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_undisposed_instances',
-    problemMessage: 'Disposable instance may not be properly disposed.',
+    problemMessage: '[avoid_undisposed_instances] Disposable instance may not be properly disposed.',
     correctionMessage: 'Call dispose() in the dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6974,7 +6974,7 @@ class AvoidUnnecessaryOverridesInStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_overrides_in_state',
-    problemMessage: 'Override only calls super with no additional logic.',
+    problemMessage: '[avoid_unnecessary_overrides_in_state] Override only calls super with no additional logic.',
     correctionMessage: 'Remove the unnecessary override.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -7055,7 +7055,7 @@ class DisposeFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_fields',
     problemMessage:
-        'Field requires disposal but dispose method is missing or incomplete.',
+        '[dispose_fields] Field requires disposal but dispose method is missing or incomplete.',
     correctionMessage: 'Add dispose method and call dispose on this field.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -7170,7 +7170,7 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_existing_future_to_future_builder',
     problemMessage:
-        'Creating new Future in FutureBuilder causes restart on every rebuild.',
+        '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder causes restart on every rebuild.',
     correctionMessage:
         'Cache the Future in initState() or a field and pass it to the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7246,7 +7246,7 @@ class PassExistingStreamToStreamBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'pass_existing_stream_to_stream_builder',
-    problemMessage: 'Creating new Stream in StreamBuilder causes rebuilds.',
+    problemMessage: '[pass_existing_stream_to_stream_builder] Creating new Stream in StreamBuilder causes rebuilds.',
     correctionMessage:
         'Store the Stream in a field and pass it to the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7306,7 +7306,7 @@ class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_text_widgets',
-    problemMessage: 'Avoid using Text widget with empty string.',
+    problemMessage: '[avoid_empty_text_widgets] Avoid using Text widget with empty string.',
     correctionMessage:
         'Use SizedBox.shrink() or remove the widget if no text is needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7411,7 +7411,7 @@ class AvoidFontWeightAsNumberRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_font_weight_as_number',
-    problemMessage: 'Use named FontWeight constants instead of numeric values.',
+    problemMessage: '[avoid_font_weight_as_number] Use named FontWeight constants instead of numeric values.',
     correctionMessage:
         'Replace FontWeight.w400 with FontWeight.normal, w700 with FontWeight.bold, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7513,7 +7513,7 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_for_whitespace',
-    problemMessage: 'Use SizedBox instead of Container for whitespace.',
+    problemMessage: '[prefer_sized_box_for_whitespace] Use SizedBox instead of Container for whitespace.',
     correctionMessage:
         'SizedBox is more efficient for spacing. Use SizedBox(width:) or SizedBox(height:).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7685,7 +7685,7 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scaffolds',
-    problemMessage: 'Avoid nesting Scaffold widgets inside other Scaffolds.',
+    problemMessage: '[avoid_nested_scaffolds] Avoid nesting Scaffold widgets inside other Scaffolds.',
     correctionMessage:
         'Remove the inner Scaffold and use its content directly.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7750,7 +7750,7 @@ class AvoidMultipleMaterialAppsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_material_apps',
-    problemMessage: 'Multiple MaterialApp widgets detected in widget tree.',
+    problemMessage: '[avoid_multiple_material_apps] Multiple MaterialApp widgets detected in widget tree.',
     correctionMessage:
         'Use only one MaterialApp at the root of your application.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7833,7 +7833,7 @@ class AvoidRawKeyboardListenerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_raw_keyboard_listener',
     problemMessage:
-        'RawKeyboardListener is deprecated. Use KeyboardListener instead.',
+        '[avoid_raw_keyboard_listener] RawKeyboardListener is deprecated. Use KeyboardListener instead.',
     correctionMessage:
         'Replace RawKeyboardListener with KeyboardListener or Focus.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -7922,7 +7922,7 @@ class AvoidImageRepeatRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_repeat',
     problemMessage:
-        'ImageRepeat is rarely needed and may indicate a design issue.',
+        '[avoid_image_repeat] ImageRepeat is rarely needed and may indicate a design issue.',
     correctionMessage: 'Consider removing repeat or using a pattern approach.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -7964,7 +7964,7 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_icon_size_override',
-    problemMessage: 'Avoid overriding icon size directly. Use IconTheme.',
+    problemMessage: '[avoid_icon_size_override] Avoid overriding icon size directly. Use IconTheme.',
     correctionMessage: 'Wrap icons in IconTheme for consistent sizing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -8025,7 +8025,7 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_inkwell_over_gesture',
-    problemMessage: 'Use InkWell instead of GestureDetector for tap feedback.',
+    problemMessage: '[prefer_inkwell_over_gesture] Use InkWell instead of GestureDetector for tap feedback.',
     correctionMessage:
         'Replace GestureDetector with InkWell for ripple effect.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8145,7 +8145,7 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_fitted_box_for_text',
-    problemMessage: 'Avoid using FittedBox to scale Text widgets.',
+    problemMessage: '[avoid_fitted_box_for_text] Avoid using FittedBox to scale Text widgets.',
     correctionMessage: 'Use maxLines and overflow for text handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -8212,7 +8212,7 @@ class PreferListViewBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_listview_builder',
-    problemMessage: 'Use ListView.builder for better performance.',
+    problemMessage: '[prefer_listview_builder] Use ListView.builder for better performance.',
     correctionMessage: 'Replace ListView(children:) with ListView.builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -8284,7 +8284,7 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_animation',
-    problemMessage: 'Use FadeTransition instead of animating Opacity.',
+    problemMessage: '[avoid_opacity_animation] Use FadeTransition instead of animating Opacity.',
     correctionMessage: 'FadeTransition is more performant for animations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -8373,7 +8373,7 @@ class AvoidSizedBoxExpandRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_sized_box_expand',
-    problemMessage: 'Avoid SizedBox.expand() as it fills all available space.',
+    problemMessage: '[avoid_sized_box_expand] Avoid SizedBox.expand() as it fills all available space.',
     correctionMessage: 'Use explicit width/height for predictable layouts.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -8424,7 +8424,7 @@ class PreferSelectableTextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_selectable_text',
-    problemMessage: 'Consider using SelectableText for long content.',
+    problemMessage: '[prefer_selectable_text] Consider using SelectableText for long content.',
     correctionMessage: 'SelectableText allows users to copy text.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -8515,7 +8515,7 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_spacing_over_sizedbox',
-    problemMessage: 'Use spacing parameter instead of SizedBox for spacing.',
+    problemMessage: '[prefer_spacing_over_sizedbox] Use spacing parameter instead of SizedBox for spacing.',
     correctionMessage: 'Row/Column support spacing since Flutter 3.10.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -8641,7 +8641,7 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_material2_fallback',
-    problemMessage: 'Avoid explicitly disabling Material 3.',
+    problemMessage: '[avoid_material2_fallback] Avoid explicitly disabling Material 3.',
     correctionMessage:
         'Remove useMaterial3: false or set to true. M3 is the default since Flutter 3.16.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8763,7 +8763,7 @@ class PreferOverlayPortalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_overlay_portal',
-    problemMessage: 'Consider using OverlayPortal instead of OverlayEntry.',
+    problemMessage: '[prefer_overlay_portal] Consider using OverlayPortal instead of OverlayEntry.',
     correctionMessage:
         'OverlayPortal provides a declarative API that integrates '
         'with InheritedWidgets (Flutter 3.10+).',
@@ -8816,7 +8816,7 @@ class PreferCarouselViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_carousel_view',
     problemMessage:
-        'Consider using built-in CarouselView instead of third-party carousel.',
+        '[prefer_carousel_view] Consider using built-in CarouselView instead of third-party carousel.',
     correctionMessage:
         'CarouselView is available in Flutter 3.24+ and provides '
         'standard M3 carousel behavior.',
@@ -8918,7 +8918,7 @@ class PreferSearchAnchorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_search_anchor',
     problemMessage:
-        'Consider using SearchAnchor instead of showSearch/SearchDelegate.',
+        '[prefer_search_anchor] Consider using SearchAnchor instead of showSearch/SearchDelegate.',
     correctionMessage: 'SearchAnchor provides a modern M3 search pattern '
         '(Flutter 3.10+).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -8993,7 +8993,7 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_tap_region_for_dismiss',
     problemMessage:
-        'Consider using TapRegion for tap-outside-to-dismiss patterns.',
+        '[prefer_tap_region_for_dismiss] Consider using TapRegion for tap-outside-to-dismiss patterns.',
     correctionMessage:
         'TapRegion provides onTapOutside callback (Flutter 3.10+).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -9103,7 +9103,7 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_handling',
     problemMessage:
-        'Text with dynamic content should have overflow handling to prevent layout issues.',
+        '[require_text_overflow_handling] Text with dynamic content should have overflow handling to prevent layout issues.',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis and/or maxLines: 1 parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -9239,7 +9239,7 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_error_builder',
-    problemMessage: 'Network image should have an errorBuilder.',
+    problemMessage: '[require_image_error_builder] Network image should have an errorBuilder.',
     correctionMessage:
         'Add errorBuilder to handle image loading failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -9317,7 +9317,7 @@ class RequireImageDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_dimensions',
     problemMessage:
-        'Network image should specify width and height to prevent layout shifts.',
+        '[require_image_dimensions] Network image should specify width and height to prevent layout shifts.',
     correctionMessage:
         'Add width and height, or wrap in SizedBox with dimensions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -9452,7 +9452,7 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_placeholder_for_network',
     problemMessage:
-        'Network image should have a placeholder or loadingBuilder.',
+        '[require_placeholder_for_network] Network image should have a placeholder or loadingBuilder.',
     correctionMessage:
         'Add loadingBuilder or placeholder to show feedback during loading.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -9533,7 +9533,7 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_scroll_controller_dispose',
     problemMessage:
-        'ScrollController is not disposed. This causes memory leaks.',
+        '[require_scroll_controller_dispose] ScrollController is not disposed. This causes memory leaks.',
     correctionMessage:
         'Add _controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -9756,7 +9756,7 @@ class RequireFocusNodeDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_focus_node_dispose',
-    problemMessage: 'FocusNode is not disposed. This causes memory leaks.',
+    problemMessage: '[require_focus_node_dispose] FocusNode is not disposed. This causes memory leaks.',
     correctionMessage:
         'Add _focusNode.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -9976,7 +9976,7 @@ class PreferTextThemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_text_theme',
     problemMessage:
-        'Consider using Theme.textTheme instead of hardcoded TextStyle.',
+        '[prefer_text_theme] Consider using Theme.textTheme instead of hardcoded TextStyle.',
     correctionMessage:
         'Use Theme.of(context).textTheme.* for consistent typography.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10057,7 +10057,7 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_scrollables',
-    problemMessage: 'Nested scrollable widgets can cause scroll conflicts.',
+    problemMessage: '[avoid_nested_scrollables] Nested scrollable widgets can cause scroll conflicts.',
     correctionMessage:
         'Use NestedScrollView, or add shrinkWrap: true and NeverScrollableScrollPhysics().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -10164,7 +10164,7 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_layout_values',
-    problemMessage: 'Avoid hardcoded numeric values in layout widgets.',
+    problemMessage: '[avoid_hardcoded_layout_values] Avoid hardcoded numeric values in layout widgets.',
     correctionMessage:
         'Extract magic numbers to named constants or use a spacing system.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10297,7 +10297,7 @@ class PreferIgnorePointerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ignore_pointer',
     problemMessage:
-        'AbsorbPointer blocks underlying widgets - is IgnorePointer better?',
+        '[prefer_ignore_pointer] AbsorbPointer blocks underlying widgets - is IgnorePointer better?',
     correctionMessage:
         'Use IgnorePointer if you don\'t need to block background interactions.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10356,7 +10356,7 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_without_behavior',
-    problemMessage: 'GestureDetector should specify HitTestBehavior.',
+    problemMessage: '[avoid_gesture_without_behavior] GestureDetector should specify HitTestBehavior.',
     correctionMessage:
         'Add behavior: HitTestBehavior.opaque (or translucent/deferToChild).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10415,7 +10415,7 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_tap_submit',
-    problemMessage: 'Button may allow double-tap submissions.',
+    problemMessage: '[avoid_double_tap_submit] Button may allow double-tap submissions.',
     correctionMessage:
         'Disable the button during submission or use a debounce mechanism.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -10528,7 +10528,7 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_cursor_for_buttons',
-    problemMessage: 'Interactive widget should specify mouse cursor for web.',
+    problemMessage: '[prefer_cursor_for_buttons] Interactive widget should specify mouse cursor for web.',
     correctionMessage:
         'Add mouseCursor: SystemMouseCursors.click (or similar).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10610,7 +10610,7 @@ class RequireHoverStatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hover_states',
     problemMessage:
-        'Interactive widget should handle hover state for web/desktop.',
+        '[require_hover_states] Interactive widget should handle hover state for web/desktop.',
     correctionMessage: 'Add onHover callback for visual feedback.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -10692,7 +10692,7 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_button_loading_state',
-    problemMessage: 'Async button should show loading state.',
+    problemMessage: '[require_button_loading_state] Async button should show loading state.',
     correctionMessage:
         'Disable button and show loading indicator during async operations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10798,7 +10798,7 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_text_styles',
-    problemMessage: 'Avoid inline TextStyle with hardcoded values.',
+    problemMessage: '[avoid_hardcoded_text_styles] Avoid inline TextStyle with hardcoded values.',
     correctionMessage:
         'Use Theme.of(context).textTheme or define styles in a central location.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10889,7 +10889,7 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_page_storage_key',
     problemMessage:
-        'Consider using PageStorageKey to preserve scroll position.',
+        '[prefer_page_storage_key] Consider using PageStorageKey to preserve scroll position.',
     correctionMessage:
         'Add key: PageStorageKey("unique_key") to the scrollable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -10974,7 +10974,7 @@ class RequireRefreshIndicatorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_refresh_indicator',
     problemMessage:
-        'List showing remote data should have RefreshIndicator for pull-to-refresh.',
+        '[require_refresh_indicator] List showing remote data should have RefreshIndicator for pull-to-refresh.',
     correctionMessage:
         'Wrap with RefreshIndicator(onRefresh: () => fetch(), child: ...).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -11068,7 +11068,7 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_scroll_physics',
-    problemMessage: 'Scrollable widget should specify scroll physics.',
+    problemMessage: '[require_scroll_physics] Scrollable widget should specify scroll physics.',
     correctionMessage:
         'Add physics: BouncingScrollPhysics() or ClampingScrollPhysics().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -11149,7 +11149,7 @@ class PreferSliverListRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_list',
     problemMessage:
-        'Use SliverList instead of ListView inside CustomScrollView.',
+        '[prefer_sliver_list] Use SliverList instead of ListView inside CustomScrollView.',
     correctionMessage:
         'Replace ListView with SliverList for proper sliver composition.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -11227,7 +11227,7 @@ class PreferKeepAliveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_keep_alive',
     problemMessage:
-        'Consider using AutomaticKeepAliveClientMixin to preserve state.',
+        '[prefer_keep_alive] Consider using AutomaticKeepAliveClientMixin to preserve state.',
     correctionMessage:
         'Add "with AutomaticKeepAliveClientMixin" to preserve state in tabs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -11310,7 +11310,7 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_default_text_style',
     problemMessage:
-        'Multiple Text widgets with same style - use DefaultTextStyle.',
+        '[require_default_text_style] Multiple Text widgets with same style - use DefaultTextStyle.',
     correctionMessage: 'Wrap with DefaultTextStyle to share common styles.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -11387,7 +11387,7 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wrap_over_overflow',
     problemMessage:
-        'Row with many children may overflow - consider using Wrap.',
+        '[prefer_wrap_over_overflow] Row with many children may overflow - consider using Wrap.',
     correctionMessage: 'Replace Row with Wrap for automatic wrapping.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -11465,7 +11465,7 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_asset_image_for_local',
-    problemMessage: 'Use AssetImage for bundled assets, not FileImage.',
+    problemMessage: '[prefer_asset_image_for_local] Use AssetImage for bundled assets, not FileImage.',
     correctionMessage: 'Replace FileImage with AssetImage or Image.asset().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -11532,7 +11532,7 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_fit_cover_for_background',
-    problemMessage: 'Background images should use BoxFit.cover.',
+    problemMessage: '[prefer_fit_cover_for_background] Background images should use BoxFit.cover.',
     correctionMessage: 'Add fit: BoxFit.cover to DecorationImage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -11606,7 +11606,7 @@ class RequireDisabledStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_disabled_state',
     problemMessage:
-        'Consider customizing disabled style for design consistency.',
+        '[require_disabled_state] Consider customizing disabled style for design consistency.',
     correctionMessage:
         'Add style with disabledBackgroundColor/disabledForegroundColor.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -11694,7 +11694,7 @@ class RequireDragFeedbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_drag_feedback',
-    problemMessage: 'Draggable should have feedback widget.',
+    problemMessage: '[require_drag_feedback] Draggable should have feedback widget.',
     correctionMessage: 'Add feedback: Widget to show during drag.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -11765,7 +11765,7 @@ class AvoidGestureConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_conflict',
     problemMessage:
-        'Nested GestureDetector widgets may cause gesture conflicts.',
+        '[avoid_gesture_conflict] Nested GestureDetector widgets may cause gesture conflicts.',
     correctionMessage: 'Consolidate gesture handling or use behavior property.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -11823,7 +11823,7 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_images_in_memory',
-    problemMessage: 'Image should specify size constraints to save memory.',
+    problemMessage: '[avoid_large_images_in_memory] Image should specify size constraints to save memory.',
     correctionMessage:
         'Add width/height and cacheWidth/cacheHeight parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -11906,7 +11906,7 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_layout_builder_in_scrollable',
     problemMessage:
-        'LayoutBuilder inside scrollable causes performance issues.',
+        '[avoid_layout_builder_in_scrollable] LayoutBuilder inside scrollable causes performance issues.',
     correctionMessage: 'Move LayoutBuilder outside the scrollable widget.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -11985,7 +11985,7 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_intrinsic_dimensions',
     problemMessage:
-        'Consider using IntrinsicWidth/Height for content-based sizing.',
+        '[prefer_intrinsic_dimensions] Consider using IntrinsicWidth/Height for content-based sizing.',
     correctionMessage: 'Wrap with IntrinsicWidth or IntrinsicHeight.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12073,7 +12073,7 @@ class PreferActionsAndShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_actions_and_shortcuts',
     problemMessage:
-        'Use Actions/Shortcuts system instead of RawKeyboardListener.',
+        '[prefer_actions_and_shortcuts] Use Actions/Shortcuts system instead of RawKeyboardListener.',
     correctionMessage: 'Replace with Shortcuts and Actions widgets.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12120,7 +12120,7 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_long_press_callback',
-    problemMessage: 'Consider adding onLongPress for context menu.',
+    problemMessage: '[require_long_press_callback] Consider adding onLongPress for context menu.',
     correctionMessage: 'Add onLongPress callback for additional actions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12203,7 +12203,7 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_find_child_in_build',
-    problemMessage: 'findChildIndexCallback should not be created in build.',
+    problemMessage: '[avoid_find_child_in_build] findChildIndexCallback should not be created in build.',
     correctionMessage: 'Extract callback to a field or use memoization.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12280,7 +12280,7 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_constraints',
     problemMessage:
-        'Column/Row in SingleChildScrollView may have unbounded constraints.',
+        '[avoid_unbounded_constraints] Column/Row in SingleChildScrollView may have unbounded constraints.',
     correctionMessage:
         'Wrap with ConstrainedBox or avoid Expanded/Flexible children.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -12373,7 +12373,7 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_fractional_sizing',
-    problemMessage: 'Use FractionallySizedBox for percentage-based sizing.',
+    problemMessage: '[prefer_fractional_sizing] Use FractionallySizedBox for percentage-based sizing.',
     correctionMessage:
         'Replace MediaQuery.size multiplication with FractionallySizedBox.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -12445,7 +12445,7 @@ class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unconstrained_box_misuse',
     problemMessage:
-        'UnconstrainedBox in constrained parent may cause overflow.',
+        '[avoid_unconstrained_box_misuse] UnconstrainedBox in constrained parent may cause overflow.',
     correctionMessage: 'Consider using FittedBox or OverflowBox instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -12522,7 +12522,7 @@ class RequireErrorWidgetRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_widget',
-    problemMessage: 'FutureBuilder/StreamBuilder should handle error state.',
+    problemMessage: '[require_error_widget] FutureBuilder/StreamBuilder should handle error state.',
     correctionMessage: 'Add error handling: if (snapshot.hasError) ...',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -12594,7 +12594,7 @@ class PreferSliverAppBarRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sliver_app_bar',
-    problemMessage: 'Use SliverAppBar inside CustomScrollView, not AppBar.',
+    problemMessage: '[prefer_sliver_app_bar] Use SliverAppBar inside CustomScrollView, not AppBar.',
     correctionMessage: 'Replace AppBar with SliverAppBar for scroll effects.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12663,7 +12663,7 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_opacity_misuse',
-    problemMessage: 'Use AnimatedOpacity for opacity animations.',
+    problemMessage: '[avoid_opacity_misuse] Use AnimatedOpacity for opacity animations.',
     correctionMessage:
         'Replace Opacity with AnimatedOpacity for smoother animations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -12731,7 +12731,7 @@ class PreferClipBehaviorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_clip_behavior',
-    problemMessage: 'Consider specifying clipBehavior for performance.',
+    problemMessage: '[prefer_clip_behavior] Consider specifying clipBehavior for performance.',
     correctionMessage: 'Add clipBehavior: Clip.none or Clip.hardEdge.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12796,7 +12796,7 @@ class RequireScrollControllerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_scroll_controller',
-    problemMessage: 'Consider adding ScrollController for scroll tracking.',
+    problemMessage: '[require_scroll_controller] Consider adding ScrollController for scroll tracking.',
     correctionMessage: 'Add controller: _scrollController for infinite scroll.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12867,7 +12867,7 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_positioned_directional',
-    problemMessage: 'Use PositionedDirectional for RTL support.',
+    problemMessage: '[prefer_positioned_directional] Use PositionedDirectional for RTL support.',
     correctionMessage: 'Replace Positioned with PositionedDirectional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -12941,7 +12941,7 @@ class AvoidStackOverflowRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_stack_overflow',
-    problemMessage: 'Stack children should use Positioned or Align.',
+    problemMessage: '[avoid_stack_overflow] Stack children should use Positioned or Align.',
     correctionMessage: 'Wrap child with Positioned, Align, or Center.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -13025,7 +13025,7 @@ class RequireFormValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_form_validation',
-    problemMessage: 'TextFormField in Form should have a validator.',
+    problemMessage: '[require_form_validation] TextFormField in Form should have a validator.',
     correctionMessage: 'Add validator: (value) => ... to validate input.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -13121,7 +13121,7 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_in_scroll',
     problemMessage:
-        'shrinkWrap: true causes O(n) layout cost and defeats lazy loading.',
+        '[avoid_shrink_wrap_in_scroll] shrinkWrap: true causes O(n) layout cost and defeats lazy loading.',
     correctionMessage:
         'Use ListView.builder with itemCount for lazy loading, or remove '
         'shrinkWrap if not needed.',
@@ -13212,7 +13212,7 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_deep_widget_nesting',
-    problemMessage: 'Widget tree exceeds 15 levels of nesting.',
+    problemMessage: '[avoid_deep_widget_nesting] Widget tree exceeds 15 levels of nesting.',
     correctionMessage:
         'Extract nested widgets into separate methods or widget classes '
         'for better readability and maintainability.',
@@ -13299,7 +13299,7 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_safe_area_aware',
-    problemMessage: 'Content may overlap device notch or system UI.',
+    problemMessage: '[prefer_safe_area_aware] Content may overlap device notch or system UI.',
     correctionMessage:
         'Wrap body content in SafeArea, or use AppBar which handles it '
         'automatically.',
@@ -13414,7 +13414,7 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_fixed_dimensions',
-    problemMessage: 'Fixed pixel dimensions may not work on all screen sizes.',
+    problemMessage: '[avoid_fixed_dimensions] Fixed pixel dimensions may not work on all screen sizes.',
     correctionMessage:
         'Use responsive sizing (Flexible, Expanded, FractionallySizedBox, or LayoutBuilder).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -13503,7 +13503,7 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_theme_color_from_scheme',
     problemMessage:
-        'Hardcoded color breaks theming. Use Theme.of(context).colorScheme.',
+        '[require_theme_color_from_scheme] Hardcoded color breaks theming. Use Theme.of(context).colorScheme.',
     correctionMessage:
         'Replace with colorScheme.primary, .secondary, .surface, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -13605,7 +13605,7 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_color_scheme_from_seed',
     problemMessage:
-        'Manual ColorScheme is error-prone. Use ColorScheme.fromSeed.',
+        '[prefer_color_scheme_from_seed] Manual ColorScheme is error-prone. Use ColorScheme.fromSeed.',
     correctionMessage:
         'ColorScheme.fromSeed(seedColor: yourPrimary) generates accessible palettes.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -13697,7 +13697,7 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_rich_text_for_complex',
     problemMessage:
-        'Multiple Text widgets in row could be combined with Text.rich.',
+        '[prefer_rich_text_for_complex] Multiple Text widgets in row could be combined with Text.rich.',
     correctionMessage:
         'Use Text.rich with TextSpan children for better performance and line wrapping.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -13783,7 +13783,7 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_system_theme_default',
     problemMessage:
-        'Hardcoded ThemeMode ignores user\'s OS dark mode preference.',
+        '[prefer_system_theme_default] Hardcoded ThemeMode ignores user\'s OS dark mode preference.',
     correctionMessage:
         'Use ThemeMode.system as default to respect user settings.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -13878,7 +13878,7 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_absorb_pointer_misuse',
     problemMessage:
-        'AbsorbPointer blocks ALL touch events. Consider IgnorePointer instead.',
+        '[avoid_absorb_pointer_misuse] AbsorbPointer blocks ALL touch events. Consider IgnorePointer instead.',
     correctionMessage:
         'IgnorePointer lets events pass through; AbsorbPointer stops them completely.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -13925,7 +13925,7 @@ class AvoidBrightnessCheckForThemeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_brightness_check_for_theme',
     problemMessage:
-        'Avoid checking brightness manually. Use colorScheme instead.',
+        '[avoid_brightness_check_for_theme] Avoid checking brightness manually. Use colorScheme instead.',
     correctionMessage:
         'Replace brightness checks with colorScheme.onSurface, colorScheme.surface, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -13990,7 +13990,7 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_safe_area_handling',
     problemMessage:
-        'Scaffold body should handle safe areas for notches and home indicators.',
+        '[require_safe_area_handling] Scaffold body should handle safe areas for notches and home indicators.',
     correctionMessage:
         'Wrap body content with SafeArea or use MediaQuery.padding.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -14108,7 +14108,7 @@ class PreferCupertinoForIosFeelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cupertino_for_ios_feel',
     problemMessage:
-        'Material widget has Cupertino equivalent for native iOS feel.',
+        '[prefer_cupertino_for_ios_feel] Material widget has Cupertino equivalent for native iOS feel.',
     correctionMessage:
         'Consider using Cupertino version or adaptive widget on iOS.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -14183,7 +14183,7 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_url_strategy_for_web',
     problemMessage:
-        'Web app should use path URL strategy for clean URLs and SEO.',
+        '[prefer_url_strategy_for_web] Web app should use path URL strategy for clean URLs and SEO.',
     correctionMessage:
         'Call usePathUrlStrategy() before runApp() for clean URLs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -14257,7 +14257,7 @@ class RequireWindowSizeConstraintsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_window_size_constraints',
-    problemMessage: 'Desktop app should set minimum window size constraints.',
+    problemMessage: '[require_window_size_constraints] Desktop app should set minimum window size constraints.',
     correctionMessage: 'Use window_manager or similar to set setMinimumSize().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -14351,7 +14351,7 @@ class PreferKeyboardShortcutsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_keyboard_shortcuts',
     problemMessage:
-        'Desktop app should implement keyboard shortcuts for common actions.',
+        '[prefer_keyboard_shortcuts] Desktop app should implement keyboard shortcuts for common actions.',
     correctionMessage:
         'Add Shortcuts and Actions widgets for Ctrl+S, Ctrl+Z, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -14456,7 +14456,7 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_widget_methods',
-    problemMessage: 'Avoid methods that return nullable Widget? types.',
+    problemMessage: '[avoid_nullable_widget_methods] Avoid methods that return nullable Widget? types.',
     correctionMessage:
         'Return SizedBox.shrink() instead of null, or use conditional '
         'rendering in the parent widget.',
@@ -14541,7 +14541,7 @@ class RequireOverflowBoxRationaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_overflow_box_rationale',
     problemMessage:
-        'OverflowBox used without comment explaining why overflow is needed.',
+        '[require_overflow_box_rationale] OverflowBox used without comment explaining why overflow is needed.',
     correctionMessage:
         'Add a comment above OverflowBox explaining the intentional overflow.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -14661,7 +14661,7 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unconstrained_images',
     problemMessage:
-        'Image without sizing constraints causes layout shifts on load.',
+        '[avoid_unconstrained_images] Image without sizing constraints causes layout shifts on load.',
     correctionMessage:
         'Add width/height, wrap in SizedBox, or use AspectRatio parent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -14826,7 +14826,7 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_sized_box_square',
     problemMessage:
-        'SizedBox has identical width and height. Use SizedBox.square() instead.',
+        '[prefer_sized_box_square] SizedBox has identical width and height. Use SizedBox.square() instead.',
     correctionMessage:
         'Replace with SizedBox.square(dimension: X) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -14995,7 +14995,7 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_center_over_align',
     problemMessage:
-        'Align with Alignment.center should use Center widget instead.',
+        '[prefer_center_over_align] Align with Alignment.center should use Center widget instead.',
     correctionMessage: 'Replace with Center(child: ...) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -15159,7 +15159,7 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_align_over_container',
     problemMessage:
-        'Container with only alignment should use Align widget instead.',
+        '[prefer_align_over_container] Container with only alignment should use Align widget instead.',
     correctionMessage:
         'Replace with Align(alignment: ..., child: ...) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -15330,7 +15330,7 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_padding_over_container',
     problemMessage:
-        'Container with only padding should use Padding widget instead.',
+        '[prefer_padding_over_container] Container with only padding should use Padding widget instead.',
     correctionMessage:
         'Replace with Padding(padding: ..., child: ...) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -15501,7 +15501,7 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_box_over_container',
     problemMessage:
-        'Container with only constraints should use ConstrainedBox instead.',
+        '[prefer_constrained_box_over_container] Container with only constraints should use ConstrainedBox instead.',
     correctionMessage:
         'Replace with ConstrainedBox(constraints: ...) for clearer intent.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -15671,7 +15671,7 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_transform_over_container',
-    problemMessage: 'Container with only transform should be a Transform.',
+    problemMessage: '[prefer_transform_over_container] Container with only transform should be a Transform.',
     correctionMessage: 'Use Transform widget for transform-only containers.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -15749,7 +15749,7 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_action_button_tooltip',
-    problemMessage: 'IconButton should have a tooltip for accessibility.',
+    problemMessage: '[prefer_action_button_tooltip] IconButton should have a tooltip for accessibility.',
     correctionMessage: 'Add tooltip parameter to describe the button action.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -15820,7 +15820,7 @@ class PreferVoidCallbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_void_callback',
-    problemMessage: 'Use VoidCallback instead of void Function().',
+    problemMessage: '[prefer_void_callback] Use VoidCallback instead of void Function().',
     correctionMessage: 'Replace with VoidCallback typedef.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -15926,7 +15926,7 @@ class RequireShouldRebuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_should_rebuild',
     problemMessage:
-        'InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds.',
+        '[require_should_rebuild] InheritedWidget missing updateShouldNotify. Causes unnecessary rebuilds.',
     correctionMessage:
         'Override updateShouldNotify to control when dependents rebuild.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -16017,7 +16017,7 @@ class RequireOrientationHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_orientation_handling',
     problemMessage:
-        'MaterialApp without orientation handling. May break in landscape.',
+        '[require_orientation_handling] MaterialApp without orientation handling. May break in landscape.',
     correctionMessage:
         'Use SystemChrome.setPreferredOrientations or OrientationBuilder.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -16100,7 +16100,7 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_web_renderer_awareness',
     problemMessage:
-        'kIsWeb check without renderer consideration. Behavior may vary.',
+        '[require_web_renderer_awareness] kIsWeb check without renderer consideration. Behavior may vary.',
     correctionMessage:
         'Consider if code depends on HTML vs CanvasKit renderer.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -16197,7 +16197,7 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_super_dispose_call',
-    problemMessage: 'dispose() must call super.dispose().',
+    problemMessage: '[require_super_dispose_call] dispose() must call super.dispose().',
     correctionMessage: 'Add super.dispose() at the end of your dispose method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -16270,7 +16270,7 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_super_init_state_call',
-    problemMessage: 'initState() must call super.initState().',
+    problemMessage: '[require_super_init_state_call] initState() must call super.initState().',
     correctionMessage:
         'Add super.initState() at the beginning of your initState method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -16343,7 +16343,7 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_set_state_in_dispose',
-    problemMessage: 'setState() must not be called inside dispose().',
+    problemMessage: '[avoid_set_state_in_dispose] setState() must not be called inside dispose().',
     correctionMessage:
         'Remove setState - state changes are invalid during disposal.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -16434,7 +16434,7 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_navigation_in_build',
-    problemMessage: 'Navigator calls must not be inside build().',
+    problemMessage: '[avoid_navigation_in_build] Navigator calls must not be inside build().',
     correctionMessage:
         'Use WidgetsBinding.instance.addPostFrameCallback or move to callback.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -16549,7 +16549,7 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_form_field_in_form',
     problemMessage:
-        'TextFormField should be inside a Form widget for validation to work.',
+        '[require_text_form_field_in_form] TextFormField should be inside a Form widget for validation to work.',
     correctionMessage:
         'Wrap with Form widget or use TextField if no validation needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -16644,7 +16644,7 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_navigation_delegate',
     problemMessage:
-        'WebView should have a navigationDelegate to control navigation.',
+        '[require_webview_navigation_delegate] WebView should have a navigationDelegate to control navigation.',
     correctionMessage:
         'Add navigationDelegate to validate URLs before navigation.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -16738,7 +16738,7 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_physics_for_nested_scroll',
     problemMessage:
-        'Nested scrollable should have NeverScrollableScrollPhysics.',
+        '[require_physics_for_nested_scroll] Nested scrollable should have NeverScrollableScrollPhysics.',
     correctionMessage:
         'Add physics: NeverScrollableScrollPhysics() to inner scrollable.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -16838,7 +16838,7 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animated_builder_child',
     problemMessage:
-        'AnimatedBuilder should use child parameter for static widgets.',
+        '[require_animated_builder_child] AnimatedBuilder should use child parameter for static widgets.',
     correctionMessage:
         'Move static widgets to child parameter to avoid rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -16910,7 +16910,7 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_rethrow_preserve_stack',
-    problemMessage: 'throw e loses stack trace. Use rethrow instead.',
+    problemMessage: '[require_rethrow_preserve_stack] throw e loses stack trace. Use rethrow instead.',
     correctionMessage: 'Replace "throw e" with "rethrow".',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -16979,7 +16979,7 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_https_over_http',
-    problemMessage: 'HTTP is insecure. Use HTTPS instead.',
+    problemMessage: '[require_https_over_http] HTTP is insecure. Use HTTPS instead.',
     correctionMessage: 'Replace http:// with https://.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -17032,7 +17032,7 @@ class RequireWssOverWsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_wss_over_ws',
-    problemMessage: 'ws:// is insecure. Use wss:// instead.',
+    problemMessage: '[require_wss_over_ws] ws:// is insecure. Use wss:// instead.',
     correctionMessage: 'Replace ws:// with wss://.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -17104,7 +17104,7 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_late_without_guarantee',
     problemMessage:
-        'late field may cause LateInitializationError if accessed before init.',
+        '[avoid_late_without_guarantee] late field may cause LateInitializationError if accessed before init.',
     correctionMessage:
         'Consider using nullable type or ensure init in initState/constructor.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -17193,7 +17193,7 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_permission_ios',
     problemMessage:
-        'image_picker usage detected. Verify iOS Info.plist has required keys.',
+        '[require_image_picker_permission_ios] image_picker usage detected. Verify iOS Info.plist has required keys.',
     correctionMessage:
         'Add NSPhotoLibraryUsageDescription and NSCameraUsageDescription to Info.plist.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17245,7 +17245,7 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_permission_android',
     problemMessage:
-        'image_picker camera usage. Verify AndroidManifest has CAMERA permission.',
+        '[require_image_picker_permission_android] image_picker camera usage. Verify AndroidManifest has CAMERA permission.',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17298,7 +17298,7 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_manifest_android',
     problemMessage:
-        'Permission request detected. Verify AndroidManifest.xml has entry.',
+        '[require_permission_manifest_android] Permission request detected. Verify AndroidManifest.xml has entry.',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.XXX"/> to manifest.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17350,7 +17350,7 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_plist_ios',
     problemMessage:
-        'Permission request detected. Verify Info.plist has usage description.',
+        '[require_permission_plist_ios] Permission request detected. Verify Info.plist has usage description.',
     correctionMessage:
         'Add NSxxxUsageDescription key to Info.plist for each permission.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17406,7 +17406,7 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_queries_android',
     problemMessage:
-        'url_launcher usage. Android 11+ requires queries element in manifest.',
+        '[require_url_launcher_queries_android] url_launcher usage. Android 11+ requires queries element in manifest.',
     correctionMessage:
         'Add <queries> element with intent filters to AndroidManifest.xml.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17462,7 +17462,7 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_schemes_ios',
     problemMessage:
-        'canLaunchUrl usage. iOS requires LSApplicationQueriesSchemes in Info.plist.',
+        '[require_url_launcher_schemes_ios] canLaunchUrl usage. iOS requires LSApplicationQueriesSchemes in Info.plist.',
     correctionMessage:
         'Add URL schemes to LSApplicationQueriesSchemes array in Info.plist.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17530,7 +17530,7 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_stack_without_positioned',
-    problemMessage: 'Stack child without Positioned. Layout may be unexpected.',
+    problemMessage: '[avoid_stack_without_positioned] Stack child without Positioned. Layout may be unexpected.',
     correctionMessage:
         'Wrap child in Positioned to explicitly control its position.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -17669,7 +17669,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_outside_flex',
     problemMessage:
-        'Expanded/Flexible outside Flex widget. This will crash at runtime.',
+        '[avoid_expanded_outside_flex] Expanded/Flexible outside Flex widget. This will crash at runtime.',
     correctionMessage: 'Use Expanded only inside Row, Column, or Flex.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -17798,7 +17798,7 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_expanded_at_call_site',
     problemMessage:
-        'Avoid returning Expanded/Flexible from build(). Add it at the call site instead.',
+        '[prefer_expanded_at_call_site] Avoid returning Expanded/Flexible from build(). Add it at the call site instead.',
     correctionMessage:
         'Return the child widget directly and let the caller wrap with Expanded if needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -17983,7 +17983,7 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_builder_index_out_of_bounds',
     problemMessage:
-        'itemBuilder accesses list without bounds check. Index may be out of bounds if list changes.',
+        '[avoid_builder_index_out_of_bounds] itemBuilder accesses list without bounds check. Index may be out of bounds if list changes.',
     correctionMessage:
         'Add bounds check: if (index >= items.length) return fallback;',
     errorSeverity: DiagnosticSeverity.WARNING,

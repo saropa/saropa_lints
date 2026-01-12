@@ -46,7 +46,7 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_case',
-    problemMessage: 'Add a newline before case clause for readability.',
+    problemMessage: '[prefer_blank_line_before_case] Add a newline before case clause for readability.',
     correctionMessage: 'Add blank line before this case.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -119,7 +119,7 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_constructor',
-    problemMessage: 'Add a blank line before constructor declaration.',
+    problemMessage: '[prefer_blank_line_before_constructor] Add a blank line before constructor declaration.',
     correctionMessage: 'Add blank line for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -202,7 +202,7 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_method',
-    problemMessage: 'Add a blank line before method declaration.',
+    problemMessage: '[prefer_blank_line_before_method] Add a blank line before method declaration.',
     correctionMessage: 'Add blank line for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -270,7 +270,7 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_return',
-    problemMessage: 'Add a blank line before the return statement.',
+    problemMessage: '[prefer_blank_line_before_return] Add a blank line before the return statement.',
     correctionMessage: 'Insert a blank line before return for readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -369,7 +369,7 @@ class PreferTrailingCommaRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma',
-    problemMessage: 'Missing trailing comma in multi-line construct.',
+    problemMessage: '[prefer_trailing_comma] Missing trailing comma in multi-line construct.',
     correctionMessage: 'Add a trailing comma.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -527,7 +527,7 @@ class UnnecessaryTrailingCommaRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'unnecessary_trailing_comma',
-    problemMessage: 'Unnecessary trailing comma for single-element collection.',
+    problemMessage: '[unnecessary_trailing_comma] Unnecessary trailing comma for single-element collection.',
     correctionMessage: 'Remove trailing comma or keep on single line.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -647,7 +647,7 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'format_comment',
-    problemMessage: 'Comment does not follow formatting conventions.',
+    problemMessage: '[format_comment] Comment does not follow formatting conventions.',
     correctionMessage: 'Start with capital letter and end with punctuation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -749,7 +749,7 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'member_ordering',
-    problemMessage: 'Class members are not in conventional order.',
+    problemMessage: '[member_ordering] Class members are not in conventional order.',
     correctionMessage:
         'Order members: static fields, fields, constructors, methods.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -820,7 +820,7 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'parameters_ordering',
-    problemMessage: 'Parameters are not in conventional order.',
+    problemMessage: '[parameters_ordering] Parameters are not in conventional order.',
     correctionMessage:
         'Order: required positional, optional positional, named.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -907,7 +907,7 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'enum_constants_ordering',
-    problemMessage: 'Enum constants are not in alphabetical order.',
+    problemMessage: '[enum_constants_ordering] Enum constants are not in alphabetical order.',
     correctionMessage: 'Consider ordering enum constants alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

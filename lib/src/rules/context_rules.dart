@@ -9,6 +9,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart'
     show AnalysisError, DiagnosticSeverity;
@@ -64,7 +65,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_context',
     problemMessage:
-        'BuildContext should not be stored in fields. It may become invalid.',
+        '[avoid_storing_context] BuildContext should not be stored in fields. It may become invalid.',
     correctionMessage:
         'Use context directly where needed and check mounted before use.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -112,6 +113,13 @@ class AvoidStoringContextRule extends SaropaLintRule {
   }
 
   bool _isContextType(String type) {
+    // Function types with BuildContext parameters are fine - they declare
+    // callback signatures, not store actual context instances
+    // e.g., `void Function(BuildContext context)` is safe
+    if (type.contains('Function')) {
+      return false;
+    }
+
     return type == 'BuildContext' ||
         type == 'BuildContext?' ||
         type == 'late BuildContext' ||
@@ -210,7 +218,7 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_across_async',
     problemMessage:
-        'BuildContext used after await. Widget may be disposed by then.',
+        '[avoid_context_across_async] BuildContext used after await. Widget may be disposed by then.',
     correctionMessage: 'Check "if (!mounted) return;" before using context.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -378,6 +386,19 @@ class _AddMountedGuardFix extends DartFix {
 /// This is the most dangerous pattern: after an await, the widget may have
 /// been disposed, making the context invalid. Using it will crash the app.
 ///
+/// ## Recognized Mounted Guards
+///
+/// The rule recognizes `context.mounted` guards and won't report false positives
+/// when context is properly guarded:
+///
+/// ```dart
+/// if (!context.mounted) return;        // Early exit guard
+/// if (context.mounted == false) return; // Explicit comparison
+/// if (context.mounted) { ... }          // Positive block guard
+/// if (context.mounted && other) { ... } // Compound conditions
+/// context.mounted ? context : null      // Guarded ternary
+/// ```
+///
 /// See also:
 /// - [AvoidContextInAsyncStaticRule] for any async static with context
 /// - [AvoidContextInStaticMethodsRule] for any static with context
@@ -392,7 +413,16 @@ class _AddMountedGuardFix extends DartFix {
 /// }
 /// ```
 ///
-/// **GOOD - Check mounted or use callback:**
+/// **GOOD - Check mounted before using context:**
+/// ```dart
+/// static Future<void> fetchAndShow(BuildContext context) async {
+///   final data = await fetchData();
+///   if (!context.mounted) return;  // Guard protects subsequent code
+///   ScaffoldMessenger.of(context).showSnackBar(...);  // Safe!
+/// }
+/// ```
+///
+/// **ALSO GOOD - Use callback or navigator key:**
 /// ```dart
 /// // Option 1: Pass mounted check callback
 /// static Future<void> fetchAndShow(
@@ -423,7 +453,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_await_in_static',
     problemMessage:
-        'BuildContext used after await in static method. Context may be '
+        '[avoid_context_after_await_in_static] BuildContext used after await in static method. Context may be '
         'invalid after async gap.',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or restructure '
@@ -453,15 +483,179 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
       }
       if (contextParamNames.isEmpty) return;
 
-      // Find await expressions and context usages after them
-      final visitor = _ContextAfterAwaitVisitor(contextParamNames);
-      body.block.accept(visitor);
-
-      // Report each context usage after await
-      for (final usage in visitor.contextUsagesAfterAwait) {
-        reporter.atNode(usage, _code);
-      }
+      // Analyze block for context usages after await without guards
+      _checkAsyncStaticBody(
+        body.block,
+        contextParamNames,
+        (node) => reporter.atNode(node, _code),
+      );
     });
+  }
+
+  /// Analyzes async static method body for context usage after await.
+  ///
+  /// Similar to [AvoidContextAcrossAsyncRule._checkAsyncBody] but tracks
+  /// context parameter names instead of just 'context', and recognizes
+  /// `context.mounted` guards in static methods.
+  static void _checkAsyncStaticBody(
+    Block block,
+    List<String> contextParamNames,
+    void Function(AstNode) onUnguardedUsage,
+  ) {
+    bool seenAwait = false;
+    bool hasGuard = false;
+
+    for (final statement in block.statements) {
+      // Await found: enter danger zone, reset any previous guard
+      if (containsAwait(statement)) {
+        seenAwait = true;
+        hasGuard = false;
+        // Context in same statement as await is OK (e.g., `await foo(context)`)
+        continue;
+      }
+
+      // Early-exit guard: `if (!context.mounted) return;` protects all code after
+      if (seenAwait && _isContextMountedGuard(statement, contextParamNames)) {
+        hasGuard = true;
+        continue;
+      }
+
+      // Positive guard: `if (context.mounted) { ... }` - code inside is safe
+      // But code after the if-statement is NOT protected
+      if (seenAwait &&
+          _isPositiveContextMountedGuard(statement, contextParamNames)) {
+        final ifStmt = statement as IfStatement;
+        // Report context in else-branch (not protected)
+        if (ifStmt.elseStatement != null) {
+          _reportContextUsageInStatic(
+            ifStmt.elseStatement!,
+            contextParamNames,
+            onUnguardedUsage,
+          );
+        }
+        continue;
+      }
+
+      // In danger zone without guard: report any context usage
+      if (seenAwait && !hasGuard) {
+        _reportContextUsageInStatic(
+          statement,
+          contextParamNames,
+          onUnguardedUsage,
+        );
+      }
+    }
+  }
+
+  /// Checks if statement is `if (!context.mounted) return;` for static methods.
+  static bool _isContextMountedGuard(
+    Statement stmt,
+    List<String> contextParamNames,
+  ) {
+    if (stmt is! IfStatement) return false;
+
+    // Must be a negated context.mounted check
+    if (!_checksNotContextMounted(stmt.expression, contextParamNames)) {
+      return false;
+    }
+
+    // Then branch must contain early exit (return or throw)
+    return _containsEarlyExit(stmt.thenStatement);
+  }
+
+  /// Checks if statement is `if (context.mounted) { ... }` for static methods.
+  static bool _isPositiveContextMountedGuard(
+    Statement stmt,
+    List<String> contextParamNames,
+  ) {
+    if (stmt is! IfStatement) return false;
+    return _checksContextMounted(stmt.expression, contextParamNames);
+  }
+
+  /// Checks if expression is `context.mounted` where context is a param name.
+  static bool _checksContextMounted(
+    Expression expr,
+    List<String> contextParamNames,
+  ) {
+    // context.mounted
+    if (expr is PrefixedIdentifier &&
+        expr.identifier.name == 'mounted' &&
+        contextParamNames.contains(expr.prefix.name)) {
+      return true;
+    }
+
+    // context.mounted == true or true == context.mounted
+    if (expr is BinaryExpression && expr.operator.type == TokenType.EQ_EQ) {
+      final left = expr.leftOperand;
+      final right = expr.rightOperand;
+      if (left is BooleanLiteral && left.value == true) {
+        return _checksContextMounted(right, contextParamNames);
+      }
+      if (right is BooleanLiteral && right.value == true) {
+        return _checksContextMounted(left, contextParamNames);
+      }
+    }
+
+    // Compound && conditions
+    if (expr is BinaryExpression &&
+        expr.operator.type == TokenType.AMPERSAND_AMPERSAND) {
+      return _checksContextMounted(expr.leftOperand, contextParamNames) ||
+          _checksContextMounted(expr.rightOperand, contextParamNames);
+    }
+
+    return false;
+  }
+
+  /// Checks if expression is `!context.mounted` where context is a param name.
+  static bool _checksNotContextMounted(
+    Expression expr,
+    List<String> contextParamNames,
+  ) {
+    // !context.mounted
+    if (expr is PrefixExpression && expr.operator.type == TokenType.BANG) {
+      return _checksContextMounted(expr.operand, contextParamNames);
+    }
+
+    // context.mounted == false or false == context.mounted
+    if (expr is BinaryExpression && expr.operator.type == TokenType.EQ_EQ) {
+      final left = expr.leftOperand;
+      final right = expr.rightOperand;
+      if (left is BooleanLiteral && left.value == false) {
+        return _checksContextMounted(right, contextParamNames);
+      }
+      if (right is BooleanLiteral && right.value == false) {
+        return _checksContextMounted(left, contextParamNames);
+      }
+    }
+
+    return false;
+  }
+
+  /// Reports context usage in a statement for static methods.
+  static void _reportContextUsageInStatic(
+    Statement stmt,
+    List<String> contextParamNames,
+    void Function(AstNode) onUnguardedUsage,
+  ) {
+    stmt.visitChildren(
+      _StaticContextUsageFinder(
+        contextParamNames: contextParamNames,
+        onContextFound: onUnguardedUsage,
+      ),
+    );
+  }
+
+  /// Checks if a statement contains an early exit (return or throw).
+  static bool _containsEarlyExit(Statement stmt) {
+    if (stmt is ReturnStatement) return true;
+    if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
+      return true;
+    }
+    // Handle block with single return/throw
+    if (stmt is Block && stmt.statements.length == 1) {
+      return _containsEarlyExit(stmt.statements.first);
+    }
+    return false;
   }
 
   String? _getBuildContextParamName(FormalParameter param) {
@@ -481,28 +675,32 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   }
 }
 
-/// Visitor to find context usages after await expressions.
-class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
-  _ContextAfterAwaitVisitor(this.contextParamNames);
+/// Visitor that finds context usage in static methods by parameter name.
+///
+/// Similar to [ContextUsageFinder] but tracks named context parameters
+/// instead of just the literal 'context' identifier. Also checks for
+/// ancestor mounted guards using `context.mounted`.
+class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
+  _StaticContextUsageFinder({
+    required this.contextParamNames,
+    required this.onContextFound,
+  });
 
   final List<String> contextParamNames;
-  final List<AstNode> contextUsagesAfterAwait = [];
-  bool _seenAwait = false;
-
-  @override
-  void visitAwaitExpression(AwaitExpression node) {
-    // Visit children first - context usage within await args is safe
-    super.visitAwaitExpression(node);
-    // Then mark await as seen - subsequent statements are dangerous
-    _seenAwait = true;
-  }
+  final void Function(AstNode) onContextFound;
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (_seenAwait && contextParamNames.contains(node.name)) {
-      // Check if this is actually using the context (not just declaring)
+    if (contextParamNames.contains(node.name)) {
+      // Skip if this is a parameter declaration or variable declaration
       final parent = node.parent;
       if (parent is FormalParameter || parent is VariableDeclaration) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
+      // Skip if this is a named argument label (e.g., `foo(context: value)`)
+      if (parent is Label) {
         super.visitSimpleIdentifier(node);
         return;
       }
@@ -519,22 +717,57 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
         return;
       }
 
-      contextUsagesAfterAwait.add(node);
+      // Safe: inside a mounted guard: if (context.mounted) { ... }
+      if (_hasAncestorContextMountedCheck(node)) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
+      onContextFound(node);
     }
     super.visitSimpleIdentifier(node);
   }
 
+  /// Checks if node has an ancestor if-statement with context.mounted check.
+  bool _hasAncestorContextMountedCheck(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        if (AvoidContextAfterAwaitInStaticRule._checksContextMounted(
+          current.expression,
+          contextParamNames,
+        )) {
+          // Verify node is in THEN branch (protected), not ELSE branch
+          if (_isInThenBranch(node, current)) return true;
+        }
+      }
+      // Stop at function boundaries
+      if (current is FunctionExpression || current is MethodDeclaration) break;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if node is in the then-branch of an if-statement.
+  bool _isInThenBranch(AstNode node, IfStatement ifStmt) {
+    AstNode? current = node;
+    while (current != null && current != ifStmt) {
+      if (current == ifStmt.thenStatement) return true;
+      if (current == ifStmt.elseStatement) return false;
+      current = current.parent;
+    }
+    return false;
+  }
+
   /// Checks if node is in the then-branch of a mounted-guarded ternary.
-  /// Pattern: `context.mounted ? context : null`
   bool _isInMountedGuardedTernary(SimpleIdentifier node) {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is ConditionalExpression) {
-        // Check if this node is in the then-expression (not condition or else)
+        // Check if this node is in the then-expression
         if (_isDescendantOf(node, current.thenExpression)) {
           // Check if condition is a mounted check
-          final condition = current.condition;
-          if (_isMountedCheck(condition)) {
+          if (_isMountedCheck(current.condition)) {
             return true;
           }
         }
@@ -545,13 +778,11 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
     return false;
   }
 
-  /// Checks if the expression is a mounted check (context.mounted or mounted).
+  /// Checks if expression is context.mounted or mounted.
   bool _isMountedCheck(Expression expr) {
-    // context.mounted
     if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
-      return true;
+      return contextParamNames.contains(expr.prefix.name);
     }
-    // mounted
     if (expr is SimpleIdentifier && expr.name == 'mounted') {
       return true;
     }
@@ -570,8 +801,7 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
-    // Don't descend into nested function expressions (callbacks)
-    // They have their own async context
+    // Don't descend into callbacks - they have their own valid context scope
     return;
   }
 }
@@ -624,7 +854,7 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_async_static',
     problemMessage:
-        'BuildContext in async static method may become invalid during '
+        '[avoid_context_in_async_static] BuildContext in async static method may become invalid during '
         'async operations.',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or convert to '
@@ -768,7 +998,7 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_static_methods',
     problemMessage:
-        'BuildContext in static method. Consider instance method or '
+        '[avoid_context_in_static_methods] BuildContext in static method. Consider instance method or '
         'extension instead.',
     correctionMessage:
         'Use instance methods, extension methods, or a navigator key.',

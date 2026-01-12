@@ -34,7 +34,7 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_cascades',
-    problemMessage: 'Avoid returning cascade expressions.',
+    problemMessage: '[avoid_returning_cascades] Avoid returning cascade expressions.',
     correctionMessage: 'Separate the cascade from the return statement.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -86,7 +86,7 @@ class AvoidReturningVoidRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_returning_void',
-    problemMessage: 'Avoid explicitly returning void.',
+    problemMessage: '[avoid_returning_void] Avoid explicitly returning void.',
     correctionMessage:
         'Remove the return statement or use return without a value.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -147,7 +147,7 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_return',
-    problemMessage: 'Unnecessary return statement at end of void function.',
+    problemMessage: '[avoid_unnecessary_return] Unnecessary return statement at end of void function.',
     correctionMessage: 'Remove the redundant return statement.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -253,7 +253,7 @@ class PreferImmediateReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immediate_return',
-    problemMessage: 'Variable is declared and immediately returned.',
+    problemMessage: '[prefer_immediate_return] Variable is declared and immediately returned.',
     correctionMessage:
         'Return the expression directly instead of storing in a variable.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -372,7 +372,7 @@ class PreferReturningShorthandsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_shorthands',
-    problemMessage: 'Use arrow syntax for simple return statements.',
+    problemMessage: '[prefer_returning_shorthands] Use arrow syntax for simple return statements.',
     correctionMessage: 'Convert to expression body with =>.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

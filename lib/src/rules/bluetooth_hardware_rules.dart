@@ -31,7 +31,7 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bluetooth_scan_without_timeout',
     problemMessage:
-        'Bluetooth scan should have a timeout to prevent battery drain.',
+        '[avoid_bluetooth_scan_without_timeout] Bluetooth scan should have a timeout to prevent battery drain.',
     correctionMessage:
         'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -104,7 +104,7 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bluetooth_state_check',
-    problemMessage: 'BLE operations should check adapter state first.',
+    problemMessage: '[require_bluetooth_state_check] BLE operations should check adapter state first.',
     correctionMessage:
         'Check FlutterBluePlus.adapterState before BLE operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -213,7 +213,7 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ble_disconnect_handling',
-    problemMessage: 'BLE connection should handle disconnect state.',
+    problemMessage: '[require_ble_disconnect_handling] BLE connection should handle disconnect state.',
     correctionMessage:
         'Listen to device.connectionState for disconnect events.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -307,7 +307,7 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_audio_focus_handling',
     problemMessage:
-        'Audio playback should configure AudioSession for proper focus handling.',
+        '[require_audio_focus_handling] Audio playback should configure AudioSession for proper focus handling.',
     correctionMessage: 'Use AudioSession.instance to configure audio behavior.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -408,7 +408,7 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_qr_permission_check',
-    problemMessage: 'QR scanner requires camera permission check.',
+    problemMessage: '[require_qr_permission_check] QR scanner requires camera permission check.',
     correctionMessage: 'Request Permission.camera before showing QR scanner.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -499,7 +499,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_geolocator_permission_check',
-    problemMessage: 'Location access without permission check. Crashes on iOS.',
+    problemMessage: '[require_geolocator_permission_check] Location access without permission check. Crashes on iOS.',
     correctionMessage:
         'Call Geolocator.checkPermission() before getCurrentPosition().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -576,7 +576,7 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_service_enabled',
     problemMessage:
-        'Location request without service check. May fail if GPS is off.',
+        '[require_geolocator_service_enabled] Location request without service check. May fail if GPS is off.',
     correctionMessage: 'Call Geolocator.isLocationServiceEnabled() first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -652,7 +652,7 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_stream_cancel',
     problemMessage:
-        'Position stream subscription without cancel. Battery drain.',
+        '[require_geolocator_stream_cancel] Position stream subscription without cancel. Battery drain.',
     correctionMessage: 'Store subscription and call cancel() in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -716,7 +716,7 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_error_handling',
     problemMessage:
-        'Location request without error handling. May crash on failure.',
+        '[require_geolocator_error_handling] Location request without error handling. May crash on failure.',
     correctionMessage: 'Wrap in try-catch to handle location errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -788,7 +788,7 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ble_mtu_negotiation',
     problemMessage:
-        'BLE data transfer without MTU negotiation causes slow, fragmented transfers.',
+        '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers.',
     correctionMessage:
         'Call device.requestMtu(512) after connect() and before write operations.',
     errorSeverity: DiagnosticSeverity.INFO,

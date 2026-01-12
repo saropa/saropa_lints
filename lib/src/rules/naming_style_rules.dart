@@ -79,7 +79,7 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_ascii_symbols',
-    problemMessage: 'String contains non-ASCII characters.',
+    problemMessage: '[avoid_non_ascii_symbols] String contains non-ASCII characters.',
     correctionMessage: 'Use only ASCII characters or escape sequences.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -135,7 +135,7 @@ class FormatCommentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'capitalize_comment',
-    problemMessage: 'Comment should start with capital letter.',
+    problemMessage: '[capitalize_comment] Comment should start with capital letter.',
     correctionMessage: 'Capitalize the first letter of the comment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -213,7 +213,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'match_class_name_pattern',
-    problemMessage: 'Class name does not follow expected pattern.',
+    problemMessage: '[match_class_name_pattern] Class name does not follow expected pattern.',
     correctionMessage: 'Ensure class name follows naming conventions.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -304,7 +304,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'match_getter_setter_field_names',
-    problemMessage: 'Getter/setter name should match the backing field.',
+    problemMessage: '[match_getter_setter_field_names] Getter/setter name should match the backing field.',
     correctionMessage: 'Rename to match the field name (without underscore).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -385,7 +385,7 @@ class MatchLibFolderStructureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'match_lib_folder_structure',
-    problemMessage: 'Test file location should mirror lib folder structure.',
+    problemMessage: '[match_lib_folder_structure] Test file location should mirror lib folder structure.',
     correctionMessage: 'Move test file to match the lib directory structure.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -433,7 +433,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'match_positional_field_names_on_assignment',
     problemMessage:
-        'Positional field name should match the variable being assigned.',
+        '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned.',
     correctionMessage:
         'Rename the positional field to match the assignment target.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -519,7 +519,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes',
     problemMessage:
-        'Boolean variable should have a prefix (is/has/can/should/will/did).',
+        '[prefer_boolean_prefixes] Boolean variable should have a prefix (is/has/can/should/will/did).',
     correctionMessage:
         'Rename to use a boolean prefix like isEnabled, hasData, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -716,7 +716,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_locals',
     problemMessage:
-        'Local boolean variable should have a prefix (is/has/can/should/will/did).',
+        '[prefer_boolean_prefixes_for_locals] Local boolean variable should have a prefix (is/has/can/should/will/did).',
     correctionMessage:
         'Rename to use a boolean prefix like isEnabled, hasData, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -888,7 +888,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_boolean_prefixes_for_params',
     problemMessage:
-        'Boolean parameter should have a prefix (is/has/can/should/will/did).',
+        '[prefer_boolean_prefixes_for_params] Boolean parameter should have a prefix (is/has/can/should/will/did).',
     correctionMessage:
         'Rename to use a boolean prefix like isEnabled, hasData, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1221,7 +1221,7 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_error_name',
-    problemMessage: 'Catch parameter should be named "e" or "error".',
+    problemMessage: '[prefer_correct_error_name] Catch parameter should be named "e" or "error".',
     correctionMessage: 'Rename to "e" or "error".',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1274,7 +1274,7 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_handler_name',
-    problemMessage: 'Event handler should start with "on" or "_on".',
+    problemMessage: '[prefer_correct_handler_name] Event handler should start with "on" or "_on".',
     correctionMessage: 'Rename to follow handler naming convention.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1352,7 +1352,7 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_identifier_length',
-    problemMessage: 'Identifier name length is not ideal.',
+    problemMessage: '[prefer_correct_identifier_length] Identifier name length is not ideal.',
     correctionMessage:
         'Use names between 2-30 characters (except common short names).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1451,7 +1451,7 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_setter_parameter_name',
-    problemMessage: 'Setter parameter should be named "value".',
+    problemMessage: '[prefer_correct_setter_parameter_name] Setter parameter should be named "value".',
     correctionMessage: 'Rename the parameter to "value".',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1514,7 +1514,7 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_parameter_names',
-    problemMessage: 'Function type parameters should have names.',
+    problemMessage: '[prefer_explicit_parameter_names] Function type parameters should have names.',
     correctionMessage: 'Add parameter names for better documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1556,7 +1556,7 @@ class PreferMatchFileNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_match_file_name',
-    problemMessage: 'File name should match the primary class name.',
+    problemMessage: '[prefer_match_file_name] File name should match the primary class name.',
     correctionMessage: 'Rename the file or class to match.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1622,7 +1622,7 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_prefixed_global_constants',
-    problemMessage: 'Global constant should have a descriptive prefix.',
+    problemMessage: '[prefer_prefixed_global_constants] Global constant should have a descriptive prefix.',
     correctionMessage:
         'Consider prefixing with "k" or using a descriptive name.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1688,7 +1688,7 @@ class TagNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_kebab_tag_name',
-    problemMessage: 'Tag name should follow naming conventions.',
+    problemMessage: '[prefer_kebab_tag_name] Tag name should follow naming conventions.',
     correctionMessage: 'Use kebab-case for tag names.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1753,7 +1753,7 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_extensions',
-    problemMessage: 'Anonymous extension should be named.',
+    problemMessage: '[prefer_named_extensions] Anonymous extension should be named.',
     correctionMessage:
         'Add a name to the extension for better debugging and documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1802,7 +1802,7 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_typedef_for_callbacks',
-    problemMessage: 'Consider using typedef for repeated function types.',
+    problemMessage: '[prefer_typedef_for_callbacks] Consider using typedef for repeated function types.',
     correctionMessage:
         'Create a typedef for this function type to improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1874,7 +1874,7 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_enhanced_enums',
-    problemMessage: 'Consider using enhanced enum instead of extension.',
+    problemMessage: '[prefer_enhanced_enums] Consider using enhanced enum instead of extension.',
     correctionMessage: 'Move extension members into the enum itself.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1936,7 +1936,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_for_unused_param',
     problemMessage:
-        'Parameter is unused. Consider using _ wildcard (Dart 3.7+).',
+        '[prefer_wildcard_for_unused_param] Parameter is unused. Consider using _ wildcard (Dart 3.7+).',
     correctionMessage:
         'Replace with _ to indicate the parameter is intentionally unused.',
     errorSeverity: DiagnosticSeverity.INFO,

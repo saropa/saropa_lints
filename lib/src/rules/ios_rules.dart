@@ -108,7 +108,7 @@ class PreferIosSafeAreaRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ios_safe_area',
     problemMessage:
-        'Scaffold body without SafeArea may have content hidden by iOS notch '
+        '[prefer_ios_safe_area] Scaffold body without SafeArea may have content hidden by iOS notch '
         'or Dynamic Island.',
     correctionMessage:
         'Wrap body content with SafeArea to avoid UI overlap on iOS devices.',
@@ -255,7 +255,7 @@ class AvoidIosHardcodedStatusBarRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_status_bar',
     problemMessage:
-        'Hardcoded status bar height (20, 44, 47, or 59) may cause UI issues '
+        '[avoid_ios_hardcoded_status_bar] Hardcoded status bar height (20, 44, 47, or 59) may cause UI issues '
         'on different iOS devices.',
     correctionMessage:
         'Use MediaQuery.of(context).padding.top for dynamic status bar height.',
@@ -442,7 +442,7 @@ class PreferIosHapticFeedbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ios_haptic_feedback',
     problemMessage:
-        'Consider adding haptic feedback for important button interactions '
+        '[prefer_ios_haptic_feedback] Consider adding haptic feedback for important button interactions '
         'on iOS.',
     correctionMessage:
         'Use HapticFeedback.mediumImpact() or similar for tactile response.',
@@ -592,7 +592,7 @@ class RequireIosPlatformCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_platform_check',
     problemMessage:
-        'iOS-specific MethodChannel without Platform.isIOS check may crash '
+        '[require_ios_platform_check] iOS-specific MethodChannel without Platform.isIOS check may crash '
         'on other platforms.',
     correctionMessage: 'Wrap iOS-specific code with if (Platform.isIOS) check.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -780,7 +780,7 @@ class AvoidIosBackgroundFetchAbuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_background_fetch_abuse',
     problemMessage:
-        'Future.delayed duration exceeds iOS 30-second background limit.',
+        '[avoid_ios_background_fetch_abuse] Future.delayed duration exceeds iOS 30-second background limit.',
     correctionMessage:
         'Design background tasks to complete within iOS time limits '
         '(~30 seconds).',
@@ -918,7 +918,7 @@ class PreferMacosMenuBarIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_macos_menu_bar_integration',
     problemMessage:
-        'macOS apps should use PlatformMenuBar for native menu integration.',
+        '[prefer_macos_menu_bar_integration] macOS apps should use PlatformMenuBar for native menu integration.',
     correctionMessage:
         'Add PlatformMenuBar with standard macOS menus (File, Edit, View, etc.).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1017,7 +1017,7 @@ class PreferMacosKeyboardShortcutsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_macos_keyboard_shortcuts',
-    problemMessage: 'macOS apps should implement standard keyboard shortcuts.',
+    problemMessage: '[prefer_macos_keyboard_shortcuts] macOS apps should implement standard keyboard shortcuts.',
     correctionMessage:
         'Use Shortcuts widget with common macOS shortcuts (Cmd+S, Cmd+Z, etc.).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1111,7 +1111,7 @@ class RequireMacosWindowSizeConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_macos_window_size_constraints',
     problemMessage:
-        'macOS app without window size constraints may resize to unusable '
+        '[require_macos_window_size_constraints] macOS app without window size constraints may resize to unusable '
         'dimensions.',
     correctionMessage:
         'Use window_manager package to set minimum/maximum window size.',
@@ -1207,7 +1207,7 @@ class RequireMethodChannelErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_method_channel_error_handling',
     problemMessage:
-        'MethodChannel.invokeMethod without error handling may crash on '
+        '[require_method_channel_error_handling] MethodChannel.invokeMethod without error handling may crash on '
         'iOS/macOS.',
     correctionMessage: 'Wrap in try-catch and handle PlatformException.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1380,7 +1380,7 @@ class RequireUniversalLinkValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_universal_link_validation',
     problemMessage:
-        'Deep link route may need iOS Universal Links server configuration.',
+        '[require_universal_link_validation] Deep link route may need iOS Universal Links server configuration.',
     correctionMessage:
         'Ensure apple-app-site-association is configured and test on real '
         'iOS device.',
@@ -1470,7 +1470,7 @@ class PreferCupertinoForIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cupertino_for_ios',
     problemMessage:
-        'Material widget in iOS-specific code block. Consider using '
+        '[prefer_cupertino_for_ios] Material widget in iOS-specific code block. Consider using '
         'Cupertino equivalent for native iOS feel.',
     correctionMessage:
         'Use CupertinoAlertDialog, CupertinoSwitch, etc. for native iOS feel.',
@@ -1585,7 +1585,7 @@ class RequireHttpsForIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_https_for_ios',
     problemMessage:
-        'HTTP URL will be blocked by iOS App Transport Security unless '
+        '[require_https_for_ios] HTTP URL will be blocked by iOS App Transport Security unless '
         'exception is configured.',
     correctionMessage:
         'Use HTTPS or add NSAppTransportSecurity exception in Info.plist.',
@@ -1744,7 +1744,7 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_permission_description',
     problemMessage:
-        'Permission-requiring API used. Missing Info.plist key(s): {0}',
+        '[require_ios_permission_description] Permission-requiring API used. Missing Info.plist key(s): {0}',
     correctionMessage: 'Add the missing key(s) to ios/Runner/Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1936,7 +1936,7 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_privacy_manifest',
-    problemMessage: 'API requires iOS Privacy Manifest entry (iOS 17+).',
+    problemMessage: '[require_ios_privacy_manifest] API requires iOS Privacy Manifest entry (iOS 17+).',
     correctionMessage:
         'Add PrivacyInfo.xcprivacy with required reason API declarations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2046,7 +2046,7 @@ class RequireAppleSignInRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_apple_sign_in',
-    problemMessage: 'Third-party login detected without Sign in with Apple. '
+    problemMessage: '[require_apple_sign_in] Third-party login detected without Sign in with Apple. '
         'iOS apps with social login must offer Sign in with Apple.',
     correctionMessage:
         'Add Sign in with Apple using the sign_in_with_apple package '
@@ -2193,7 +2193,7 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_background_mode',
     problemMessage:
-        'Background task pattern detected. iOS requires specific capabilities '
+        '[require_ios_background_mode] Background task pattern detected. iOS requires specific capabilities '
         'for background execution.',
     correctionMessage:
         'Add background capabilities in Xcode (Background fetch, '
@@ -2289,7 +2289,7 @@ class AvoidIos13DeprecationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_13_deprecations',
     problemMessage:
-        'Deprecated iOS API detected. This API is deprecated since iOS 13 '
+        '[avoid_ios_13_deprecations] Deprecated iOS API detected. This API is deprecated since iOS 13 '
         'and may cause App Store rejection.',
     correctionMessage:
         'Use the modern replacement API. See Apple documentation for '
@@ -2387,7 +2387,7 @@ class AvoidIosSimulatorOnlyCodeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_simulator_only_code',
     problemMessage:
-        'iOS Simulator-only code pattern detected. This code may not work '
+        '[avoid_ios_simulator_only_code] iOS Simulator-only code pattern detected. This code may not work '
         'on real iOS devices.',
     correctionMessage:
         'Use platform-agnostic paths (path_provider) and proper environment '
@@ -2484,7 +2484,7 @@ class RequireIosMinimumVersionCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_minimum_version_check',
     problemMessage:
-        'iOS version-specific API detected. Ensure iOS version is checked '
+        '[require_ios_minimum_version_check] iOS version-specific API detected. Ensure iOS version is checked '
         'before using this API.',
     correctionMessage:
         'Add iOS version check before calling version-specific APIs.',
@@ -2592,7 +2592,7 @@ class AvoidIosDeprecatedUikitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_deprecated_uikit',
     problemMessage:
-        'Deprecated UIKit API pattern detected in platform channel code.',
+        '[avoid_ios_deprecated_uikit] Deprecated UIKit API pattern detected in platform channel code.',
     correctionMessage: 'Update platform channel code to use modern iOS APIs. '
         'See Xcode warnings for specific replacements.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2687,7 +2687,7 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_app_tracking_transparency',
     problemMessage:
-        'Advertising/tracking SDK detected. iOS 14.5+ requires App Tracking '
+        '[require_ios_app_tracking_transparency] Advertising/tracking SDK detected. iOS 14.5+ requires App Tracking '
         'Transparency permission before tracking users.',
     correctionMessage:
         'Use AppTrackingTransparency.requestTrackingAuthorization() before '
@@ -2811,7 +2811,7 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_face_id_usage_description',
-    problemMessage: 'Biometric authentication detected. iOS requires '
+    problemMessage: '[require_ios_face_id_usage_description] Biometric authentication detected. iOS requires '
         'NSFaceIDUsageDescription in Info.plist for Face ID.',
     correctionMessage:
         'Add NSFaceIDUsageDescription to ios/Runner/Info.plist explaining '
@@ -2915,7 +2915,7 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_photo_library_add_usage',
     problemMessage:
-        'Photo saving detected. iOS requires NSPhotoLibraryAddUsageDescription '
+        '[require_ios_photo_library_add_usage] Photo saving detected. iOS requires NSPhotoLibraryAddUsageDescription '
         'for saving photos (separate from read permission).',
     correctionMessage:
         'Add NSPhotoLibraryAddUsageDescription to ios/Runner/Info.plist.',
@@ -3009,7 +3009,7 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_in_app_browser_for_auth',
     problemMessage:
-        'OAuth URL detected in WebView. Google and Apple block OAuth via '
+        '[avoid_ios_in_app_browser_for_auth] OAuth URL detected in WebView. Google and Apple block OAuth via '
         'in-app WebView for security reasons.',
     correctionMessage: 'Use flutter_appauth or url_launcher for OAuth. '
         'ASWebAuthenticationSession is required on iOS.',
@@ -3137,7 +3137,7 @@ class RequireIosAppReviewPromptTimingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_app_review_prompt_timing',
-    problemMessage: 'App review request detected in initialization context. '
+    problemMessage: '[require_ios_app_review_prompt_timing] App review request detected in initialization context. '
         'Do not request reviews on first launch or during startup.',
     correctionMessage: 'Move review request after meaningful user engagement. '
         'Apple rejects apps that prompt too early.',
@@ -3257,7 +3257,7 @@ class RequireIosKeychainAccessibilityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_keychain_accessibility',
     problemMessage:
-        'Keychain write detected. Consider specifying iOS accessibility level '
+        '[require_ios_keychain_accessibility] Keychain write detected. Consider specifying iOS accessibility level '
         'for security.',
     correctionMessage:
         'Use IOSOptions with KeychainAccessibility to control when data '
@@ -3347,7 +3347,7 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_bundle_id',
-    problemMessage: 'Hardcoded bundle ID detected. Bundle IDs should come from '
+    problemMessage: '[avoid_ios_hardcoded_bundle_id] Hardcoded bundle ID detected. Bundle IDs should come from '
         'configuration, not hardcoded strings.',
     correctionMessage:
         'Use PackageInfo.fromPlatform().packageName or build-time configuration.',
@@ -3445,7 +3445,7 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_push_notification_capability',
     problemMessage:
-        'Push notification usage detected. Ensure Push Notifications '
+        '[require_ios_push_notification_capability] Push notification usage detected. Ensure Push Notifications '
         'capability is enabled in Xcode and APNs is configured.',
     correctionMessage:
         'Enable Push Notifications in Xcode Signing & Capabilities. '
@@ -3552,7 +3552,7 @@ class RequireMacosFileAccessIntentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_macos_file_access_intent',
     problemMessage:
-        'Direct file path access detected. macOS sandboxed apps require '
+        '[require_macos_file_access_intent] Direct file path access detected. macOS sandboxed apps require '
         'user intent (file picker, drag-drop) for file access.',
     correctionMessage:
         'Use FilePicker or drag-and-drop for user-selected files. '
@@ -3633,7 +3633,7 @@ class AvoidMacosDeprecatedSecurityApisRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_macos_deprecated_security_apis',
     problemMessage:
-        'Deprecated macOS Security API detected. Use modern equivalents.',
+        '[avoid_macos_deprecated_security_apis] Deprecated macOS Security API detected. Use modern equivalents.',
     correctionMessage:
         'Replace deprecated Keychain APIs with SecItem* functions.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3726,7 +3726,7 @@ class RequireIosAtsExceptionDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_ats_exception_documentation',
     problemMessage:
-        'HTTP URL detected. If intentional, document the ATS exception '
+        '[require_ios_ats_exception_documentation] HTTP URL detected. If intentional, document the ATS exception '
         'required in Info.plist with a comment.',
     correctionMessage:
         'Add a comment explaining why HTTP is needed and which ATS exception '
@@ -3821,7 +3821,7 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_local_notification_permission',
     problemMessage:
-        'Local notification scheduling detected. Ensure iOS notification '
+        '[require_ios_local_notification_permission] Local notification scheduling detected. Ensure iOS notification '
         'permission is requested before scheduling.',
     correctionMessage:
         'Call requestPermissions() on IOSFlutterLocalNotificationsPlugin '
@@ -3913,7 +3913,7 @@ class AvoidIosHardcodedDeviceModelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_device_model',
     problemMessage:
-        'Hardcoded iOS device model detected. Device-specific code breaks '
+        '[avoid_ios_hardcoded_device_model] Hardcoded iOS device model detected. Device-specific code breaks '
         'when new devices are released.',
     correctionMessage:
         'Use platform APIs to detect capabilities instead of device names.',
@@ -3986,7 +3986,7 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_app_group_capability',
     problemMessage:
-        'App extension data sharing detected. Ensure App Groups capability '
+        '[require_ios_app_group_capability] App extension data sharing detected. Ensure App Groups capability '
         'is enabled in Xcode for both main app and extensions.',
     correctionMessage:
         'Add App Groups capability in Xcode Signing & Capabilities. '
@@ -4089,7 +4089,7 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_healthkit_authorization',
     problemMessage:
-        'HealthKit data access detected. Ensure authorization is requested '
+        '[require_ios_healthkit_authorization] HealthKit data access detected. Ensure authorization is requested '
         'before reading or writing health data.',
     correctionMessage:
         'Call requestAuthorization() before accessing health data. '
@@ -4175,7 +4175,7 @@ class RequireMacosHardenedRuntimeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_macos_hardened_runtime',
     problemMessage:
-        'Operation detected that may require Hardened Runtime entitlement. '
+        '[require_macos_hardened_runtime] Operation detected that may require Hardened Runtime entitlement. '
         'Ensure proper entitlements are configured for notarization.',
     correctionMessage:
         'Add required entitlements in macos/Runner/Release.entitlements.',
@@ -4279,7 +4279,7 @@ class AvoidMacosCatalystUnsupportedApisRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_macos_catalyst_unsupported_apis',
-    problemMessage: 'API detected that is not available on Mac Catalyst. '
+    problemMessage: '[avoid_macos_catalyst_unsupported_apis] API detected that is not available on Mac Catalyst. '
         'Add platform check if supporting Mac Catalyst.',
     correctionMessage:
         'Wrap with Platform.isMacOS check or use kIsWeb/defaultTargetPlatform.',
@@ -4382,7 +4382,7 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_siri_intent_definition',
     problemMessage:
-        'Siri Shortcuts usage detected. Ensure Intent Definition file '
+        '[require_ios_siri_intent_definition] Siri Shortcuts usage detected. Ensure Intent Definition file '
         'exists in Xcode and SiriKit capability is enabled.',
     correctionMessage:
         'Add Intent Definition file in Xcode: File > New > File > Intent Definition. '
@@ -4483,7 +4483,7 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_widget_extension_capability',
     problemMessage:
-        'Home Screen widget usage detected. Ensure Widget Extension target '
+        '[require_ios_widget_extension_capability] Home Screen widget usage detected. Ensure Widget Extension target '
         'and App Groups are configured in Xcode.',
     correctionMessage:
         'Create Widget Extension target in Xcode. Enable App Groups in both '
@@ -4588,7 +4588,7 @@ class RequireIosReceiptValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_receipt_validation',
     problemMessage:
-        'In-app purchase detected. Ensure receipt is validated with server, '
+        '[require_ios_receipt_validation] In-app purchase detected. Ensure receipt is validated with server, '
         'not just locally.',
     correctionMessage:
         'Send receipt data to your server for validation with Apple. '
@@ -4670,7 +4670,7 @@ class RequireIosDatabaseConflictResolutionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_database_conflict_resolution',
     problemMessage:
-        'Database sync detected. Ensure conflict resolution is implemented '
+        '[require_ios_database_conflict_resolution] Database sync detected. Ensure conflict resolution is implemented '
         'for multi-device sync scenarios.',
     correctionMessage:
         'Implement conflict resolution handlers for sync errors.',
@@ -4758,7 +4758,7 @@ class AvoidIosContinuousLocationTrackingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_continuous_location_tracking',
-    problemMessage: 'Continuous location tracking detected with high accuracy. '
+    problemMessage: '[avoid_ios_continuous_location_tracking] Continuous location tracking detected with high accuracy. '
         'Consider using lower accuracy or distance filters to save battery.',
     correctionMessage:
         'Use LocationAccuracy.medium or lower, and set distanceFilter.',
@@ -4814,7 +4814,7 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_background_audio_capability',
     problemMessage:
-        'Audio playback detected. If audio should play in background, '
+        '[require_ios_background_audio_capability] Audio playback detected. If audio should play in background, '
         'enable Background Modes > Audio capability in Xcode.',
     correctionMessage:
         'Add Background Modes capability and enable Audio, AirPlay, '
@@ -4886,7 +4886,7 @@ class PreferIosStoreKit2Rule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ios_storekit2',
     problemMessage:
-        'Consider using StoreKit 2 APIs for new in-app purchase implementations. '
+        '[prefer_ios_storekit2] Consider using StoreKit 2 APIs for new in-app purchase implementations. '
         'StoreKit 2 offers better async support and automatic receipt verification.',
     correctionMessage:
         'Evaluate migrating to StoreKit 2 for simpler IAP implementation.',
@@ -4944,7 +4944,7 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_app_clip_size_limit',
     problemMessage:
-        'App Clip detected. Ensure App Clip bundle stays under 10 MB. '
+        '[require_ios_app_clip_size_limit] App Clip detected. Ensure App Clip bundle stays under 10 MB. '
         'Large dependencies can exceed this limit.',
     correctionMessage: 'Minimize dependencies and assets in App Clip target. '
         'Consider lazy loading heavy features.',
@@ -5029,7 +5029,7 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_keychain_sync_awareness',
     problemMessage:
-        'Keychain write of sensitive key detected. Consider if this should '
+        '[require_ios_keychain_sync_awareness] Keychain write of sensitive key detected. Consider if this should '
         'sync across devices via iCloud Keychain.',
     correctionMessage:
         'For device-only secrets, use accessibility ending in ThisDeviceOnly.',
@@ -5108,7 +5108,7 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_share_sheet_uti_declaration',
     problemMessage:
-        'File sharing with custom type detected. Ensure UTI is declared '
+        '[require_ios_share_sheet_uti_declaration] File sharing with custom type detected. Ensure UTI is declared '
         'in Info.plist for custom file types.',
     correctionMessage:
         'Add UTExportedTypeDeclarations or UTImportedTypeDeclarations '
@@ -5162,7 +5162,7 @@ class RequireIosLifecycleHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_lifecycle_handling',
     problemMessage:
-        'Timer or subscription detected without lifecycle handling. '
+        '[require_ios_lifecycle_handling] Timer or subscription detected without lifecycle handling. '
         'Stop background work when app is inactive to save battery.',
     correctionMessage: 'Implement WidgetsBindingObserver and pause/resume in '
         'didChangeAppLifecycleState.',
@@ -5229,7 +5229,7 @@ class RequireIosIcloudKvstoreLimitationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_icloud_kvstore_limitations',
     problemMessage:
-        'iCloud Key-Value Storage has 1 MB limit and 1024 keys max. '
+        '[require_ios_icloud_kvstore_limitations] iCloud Key-Value Storage has 1 MB limit and 1024 keys max. '
         'Use only for small preferences.',
     correctionMessage:
         'For larger data, use CloudKit or iCloud Documents instead.',
@@ -5276,7 +5276,7 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_accessibility_labels',
     problemMessage:
-        'Interactive widget without Semantics wrapper. VoiceOver users '
+        '[require_ios_accessibility_labels] Interactive widget without Semantics wrapper. VoiceOver users '
         'cannot identify this element.',
     correctionMessage:
         'Wrap with Semantics widget and provide label for VoiceOver.',
@@ -5339,7 +5339,7 @@ class RequireIosOrientationHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_orientation_handling',
     problemMessage:
-        'Orientation lock detected. Ensure Info.plist declares supported '
+        '[require_ios_orientation_handling] Orientation lock detected. Ensure Info.plist declares supported '
         'orientations and UI handles all locked orientations.',
     correctionMessage:
         'Set UISupportedInterfaceOrientations in Info.plist to match '
@@ -5380,7 +5380,7 @@ class RequireIosUniversalLinksDomainMatchingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_universal_links_domain_matching',
     problemMessage:
-        'Deep link pattern detected. Ensure apple-app-site-association '
+        '[require_ios_universal_links_domain_matching] Deep link pattern detected. Ensure apple-app-site-association '
         'paths match exactly for Universal Links to work.',
     correctionMessage:
         'Verify apple-app-site-association on server matches app paths exactly.',
@@ -5430,7 +5430,7 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_nfc_capability_check',
-    problemMessage: 'NFC usage detected. Not all iOS devices support NFC. '
+    problemMessage: '[require_ios_nfc_capability_check] NFC usage detected. Not all iOS devices support NFC. '
         'Check capability before use.',
     correctionMessage:
         'Use NFCNDEFReaderSession.readingAvailable before scanning.',
@@ -5492,7 +5492,7 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_callkit_integration',
     problemMessage:
-        'VoIP call handling detected. iOS requires CallKit for native call UI.',
+        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit for native call UI.',
     correctionMessage:
         'Implement CallKit using flutter_callkit_incoming or similar package.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5564,7 +5564,7 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_carplay_setup',
     problemMessage:
-        'CarPlay-related code detected. CarPlay requires Apple approval '
+        '[require_ios_carplay_setup] CarPlay-related code detected. CarPlay requires Apple approval '
         'and specific entitlements.',
     correctionMessage: 'Apply for CarPlay entitlement at developer.apple.com. '
         'Implement CPTemplateApplicationSceneDelegate.',
@@ -5622,7 +5622,7 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_live_activities_setup',
     problemMessage:
-        'Live Activity usage detected. Ensure ActivityKit capability '
+        '[require_ios_live_activities_setup] Live Activity usage detected. Ensure ActivityKit capability '
         'and Widget Extension are configured.',
     correctionMessage: 'Add Widget Extension with ActivityConfiguration. '
         'Enable Push Notifications for remote updates.',
@@ -5691,7 +5691,7 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_promotion_display_support',
     problemMessage:
-        'Manual frame timing detected. ProMotion displays run at 120Hz. '
+        '[require_ios_promotion_display_support] Manual frame timing detected. ProMotion displays run at 120Hz. '
         'Use Flutter animations for automatic frame rate adaptation.',
     correctionMessage:
         'Use AnimationController instead of manual timing for smooth animations.',
@@ -5737,7 +5737,7 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_photo_library_limited_access',
     problemMessage:
-        'Photo library access detected. Handle iOS 14+ limited access mode '
+        '[require_ios_photo_library_limited_access] Photo library access detected. Handle iOS 14+ limited access mode '
         'where user may only grant access to selected photos.',
     correctionMessage:
         'Check for PHAuthorizationStatus.limited and provide UI to '
@@ -5815,7 +5815,7 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_pasteboard_privacy_handling',
     problemMessage:
-        'Clipboard access detected. On iOS 16+, users see a notification '
+        '[require_ios_pasteboard_privacy_handling] Clipboard access detected. On iOS 16+, users see a notification '
         'when apps read the clipboard. Only access after explicit user action.',
     correctionMessage:
         'Access clipboard only in response to user paste action.',
@@ -5864,7 +5864,7 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_background_refresh_declaration',
     problemMessage:
-        'Background task scheduling detected. Ensure UIBackgroundModes '
+        '[require_ios_background_refresh_declaration] Background task scheduling detected. Ensure UIBackgroundModes '
         'includes "fetch" in Info.plist for background refresh.',
     correctionMessage: 'Add UIBackgroundModes with "fetch" to Info.plist.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -5929,7 +5929,7 @@ class RequireIosSceneDelegateAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_scene_delegate_awareness',
     problemMessage:
-        'App lifecycle handling detected. On iOS 13+, consider using '
+        '[require_ios_scene_delegate_awareness] App lifecycle handling detected. On iOS 13+, consider using '
         'scene-based lifecycle for multi-window support.',
     correctionMessage: 'Use WidgetsBindingObserver.didChangeAppLifecycleState '
         'which handles both app and scene lifecycle.',
@@ -6000,7 +6000,7 @@ class RequireIosMethodChannelCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_method_channel_cleanup',
     problemMessage:
-        'MethodChannel handler set without cleanup. Set handler to null '
+        '[require_ios_method_channel_cleanup] MethodChannel handler set without cleanup. Set handler to null '
         'in dispose() to prevent memory leaks.',
     correctionMessage:
         'Add channel.setMethodCallHandler(null) in dispose() method.',
@@ -6063,7 +6063,7 @@ class AvoidIosForceUnwrapInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_force_unwrap_in_callbacks',
     problemMessage:
-        'Force unwrap on MethodChannel result detected. Native code may '
+        '[avoid_ios_force_unwrap_in_callbacks] Force unwrap on MethodChannel result detected. Native code may '
         'return null unexpectedly, causing crashes.',
     correctionMessage: 'Use null-safe access (?.) and provide default values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6119,7 +6119,7 @@ class RequireIosReviewPromptFrequencyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_review_prompt_frequency',
     problemMessage:
-        'In-app review detected. Apple limits StoreKit prompts to 3x per year. '
+        '[require_ios_review_prompt_frequency] In-app review detected. Apple limits StoreKit prompts to 3x per year. '
         'Track and limit prompt frequency.',
     correctionMessage:
         'Implement review prompt tracking to respect Apple\'s limits.',
@@ -6167,7 +6167,7 @@ class RequireMacosWindowRestorationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_macos_window_restoration',
     problemMessage:
-        'macOS window configuration detected. Consider implementing window '
+        '[require_macos_window_restoration] macOS window configuration detected. Consider implementing window '
         'state restoration for better UX.',
     correctionMessage:
         'Save and restore window position/size using SharedPreferences '
@@ -6227,7 +6227,7 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_deployment_target_consistency',
     problemMessage:
-        'API requiring iOS 15+ detected. Ensure minimum deployment target '
+        '[require_ios_deployment_target_consistency] API requiring iOS 15+ detected. Ensure minimum deployment target '
         'matches or add version guards.',
     correctionMessage: 'Check iOS version before using newer APIs or increase '
         'minimum deployment target.',
@@ -6293,7 +6293,7 @@ class RequireIosDynamicIslandSafeZonesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_dynamic_island_safe_zones',
     problemMessage:
-        'Fixed top padding (44pt or 59pt) detected. Dynamic Island height '
+        '[require_ios_dynamic_island_safe_zones] Fixed top padding (44pt or 59pt) detected. Dynamic Island height '
         'varies by device. Use MediaQuery.padding.top instead.',
     correctionMessage:
         'Replace hardcoded value with MediaQuery.of(context).padding.top.',
@@ -6346,7 +6346,7 @@ class PreferIosAppIntentsFrameworkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ios_app_intents_framework',
     problemMessage:
-        'Legacy SiriKit Intent detected. Consider migrating to App Intents '
+        '[prefer_ios_app_intents_framework] Legacy SiriKit Intent detected. Consider migrating to App Intents '
         'framework (iOS 16+) for better Siri and Shortcuts integration.',
     correctionMessage:
         'Migrate from INIntent to AppIntent for modern Siri integration.',
@@ -6401,7 +6401,7 @@ class AvoidMacosFullDiskAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_macos_full_disk_access',
     problemMessage:
-        'Accessing protected paths detected. Consider using NSOpenPanel '
+        '[avoid_macos_full_disk_access] Accessing protected paths detected. Consider using NSOpenPanel '
         'for user-selected file access instead of Full Disk Access.',
     correctionMessage:
         'Use file_picker or NSOpenPanel to let users choose files '
@@ -6453,7 +6453,7 @@ class RequireIosAgeRatingConsiderationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_age_rating_consideration',
-    problemMessage: 'Feature requiring age rating consideration detected. '
+    problemMessage: '[require_ios_age_rating_consideration] Feature requiring age rating consideration detected. '
         'Verify App Store Connect age rating matches app content.',
     correctionMessage:
         'Review App Store Connect age rating for user-generated content, '
@@ -6513,7 +6513,7 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_certificate_pinning',
     problemMessage:
-        'Sensitive API endpoint detected. Consider implementing SSL '
+        '[require_ios_certificate_pinning] Sensitive API endpoint detected. Consider implementing SSL '
         'certificate pinning for additional security.',
     correctionMessage:
         'Use Dio with certificate pinning or platform-specific SSL pinning.',
@@ -6575,7 +6575,7 @@ class RequireIosKeychainForCredentialsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_keychain_for_credentials',
     problemMessage:
-        'Credential storage in SharedPreferences detected. Use iOS Keychain '
+        '[require_ios_keychain_for_credentials] Credential storage in SharedPreferences detected. Use iOS Keychain '
         '(flutter_secure_storage) for sensitive data.',
     correctionMessage:
         'Replace SharedPreferences with FlutterSecureStorage for credentials.',
@@ -6639,7 +6639,7 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_debug_code_in_release',
     problemMessage:
-        'Debug code detected. Ensure this is conditionally compiled out '
+        '[avoid_ios_debug_code_in_release] Debug code detected. Ensure this is conditionally compiled out '
         'for release builds.',
     correctionMessage:
         'Wrap debug code in kDebugMode or assert() for automatic removal.',
@@ -6694,7 +6694,7 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_biometric_fallback',
     problemMessage:
-        'Biometric authentication detected. Ensure fallback authentication '
+        '[require_ios_biometric_fallback] Biometric authentication detected. Ensure fallback authentication '
         '(passcode) is available for devices without biometrics.',
     correctionMessage:
         'Handle BiometricType.none and provide alternative login method.',
@@ -6749,7 +6749,7 @@ class RequireMacosSandboxEntitlementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_sandbox_entitlements',
-    problemMessage: 'Feature requiring macOS sandbox entitlement detected. '
+    problemMessage: '[require_macos_sandbox_entitlements] Feature requiring macOS sandbox entitlement detected. '
         'Ensure entitlements file includes required permissions.',
     correctionMessage:
         'Add required entitlements to macOS/Runner/Release.entitlements.',
@@ -6802,7 +6802,7 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_misleading_push_notifications',
     problemMessage:
-        'Marketing notification pattern detected. Push notifications must '
+        '[avoid_ios_misleading_push_notifications] Marketing notification pattern detected. Push notifications must '
         'be relevant to user interests to comply with Apple guidelines.',
     correctionMessage: 'Ensure notifications are personalized and relevant. '
         'Avoid generic marketing messages.',
@@ -6863,6 +6863,19 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
 /// - Users may lose data if operations are interrupted
 /// - App may be flagged for poor battery performance
 ///
+/// ## What This Rule Checks
+///
+/// - `Isolate.spawn` / `Isolate.run` - Flags these as they create persistent
+///   isolates that could run indefinitely
+/// - `compute()` - Only flags if there's no indication the developer
+///   understands it's for short-lived foreground work. Add comments mentioning
+///   "foreground", "short-lived", "cpu-bound", or "offload" to suppress.
+///
+/// Note: `compute()` is designed for one-shot, short-lived operations that
+/// offload CPU-bound work to avoid UI jank. It's fundamentally different from
+/// `Isolate.spawn` and is NOT flagged when used in StreamTransformers or with
+/// appropriate comments indicating intentional foreground use.
+///
 /// ## Example
 ///
 /// **BAD:**
@@ -6879,6 +6892,10 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
 ///   'syncTask',
 ///   constraints: Constraints(networkType: NetworkType.connected),
 /// );
+///
+/// // compute() for short-lived foreground work is fine
+/// // Short-lived foreground processing - offloads CPU-bound work
+/// final result = await compute(convertModels, data);
 /// ```
 ///
 /// @see [Background Execution](https://developer.apple.com/documentation/uikit/app_and_environment/scenes/preparing_your_ui_to_run_in_the_background)
@@ -6895,7 +6912,7 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_running_isolates',
     problemMessage:
-        'Long-running isolate detected. iOS kills background tasks after '
+        '[avoid_long_running_isolates] Long-running isolate detected. iOS kills background tasks after '
         '~30 seconds. Design tasks to complete quickly.',
     correctionMessage:
         'Use workmanager package for reliable background tasks, or break '
@@ -6926,21 +6943,38 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
         }
       }
 
-      // Also detect compute() calls
+      // Also detect compute() calls - but be less aggressive since compute()
+      // is designed for short-lived, one-shot operations (unlike Isolate.spawn).
+      // Only flag if there's evidence of potentially long-running work.
       if (methodName == 'compute') {
         final String fileSource = resolver.source.contents.data;
         if (!fileSource.contains('workmanager') &&
             !fileSource.contains('Workmanager')) {
-          // Only warn if file doesn't show background task awareness
+          // Only warn if file doesn't show awareness of compute() being
+          // for short-lived foreground work
           final int nodeOffset = node.offset;
-          final String preceding = fileSource.substring(
-            nodeOffset > 100 ? nodeOffset - 100 : 0,
-            nodeOffset,
-          );
-          if (!preceding.contains('background') &&
-              !preceding.contains('Background')) {
-            reporter.atNode(node, code);
+          final int startOffset = nodeOffset > 200 ? nodeOffset - 200 : 0;
+          final String preceding = fileSource.substring(startOffset, nodeOffset);
+          final String precedingLower = preceding.toLowerCase();
+
+          // Skip if comments indicate intentional short-lived foreground use
+          if (precedingLower.contains('background') ||
+              precedingLower.contains('foreground') ||
+              precedingLower.contains('short-lived') ||
+              precedingLower.contains('one-shot') ||
+              precedingLower.contains('ui jank') ||
+              precedingLower.contains('cpu-bound') ||
+              precedingLower.contains('offload')) {
+            return;
           }
+
+          // Skip if in a StreamTransformer (common legitimate pattern)
+          if (fileSource.contains('StreamTransformer') ||
+              fileSource.contains('asyncMap')) {
+            return;
+          }
+
+          reporter.atNode(node, code);
         }
       }
     });
@@ -6990,7 +7024,7 @@ class RequireWorkmanagerForBackgroundRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_workmanager_for_background',
     problemMessage:
-        'Periodic task detected without workmanager. Dart isolates die when '
+        '[require_workmanager_for_background] Periodic task detected without workmanager. Dart isolates die when '
         'app backgrounds. Use workmanager for reliable background tasks.',
     correctionMessage:
         'Replace Timer.periodic with Workmanager().registerPeriodicTask() '
@@ -7069,7 +7103,7 @@ class RequireNotificationForLongTasksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_for_long_tasks',
     problemMessage:
-        'Long-running operation detected without progress notification. '
+        '[require_notification_for_long_tasks] Long-running operation detected without progress notification. '
         'Silent background work may be killed by OS.',
     correctionMessage:
         'Show a progress notification for operations that take more than '
@@ -7180,7 +7214,7 @@ class PreferDelayedPermissionPromptRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_delayed_permission_prompt',
-    problemMessage: 'Permission request detected in main() or initState(). '
+    problemMessage: '[prefer_delayed_permission_prompt] Permission request detected in main() or initState(). '
         'Asking too early reduces acceptance rates.',
     correctionMessage:
         'Wait until user interaction shows they need the feature, '
@@ -7271,7 +7305,7 @@ class AvoidNotificationSpamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_spam',
     problemMessage:
-        'Notification inside loop detected. Sending too many notifications '
+        '[avoid_notification_spam] Notification inside loop detected. Sending too many notifications '
         'causes users to disable notifications or uninstall.',
     correctionMessage:
         'Batch notifications or use a summary notification when there are '
@@ -7364,7 +7398,7 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_purchase_verification',
-    problemMessage: 'In-app purchase without server verification detected. '
+    problemMessage: '[require_purchase_verification] In-app purchase without server verification detected. '
         'Client-side verification can be bypassed by attackers.',
     correctionMessage:
         'Verify purchase receipts server-side with Apple/Google. '
@@ -7466,7 +7500,7 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_purchase_restoration',
-    problemMessage: 'In-app purchase detected without restore functionality. '
+    problemMessage: '[require_purchase_restoration] In-app purchase detected without restore functionality. '
         'App Store requires "Restore Purchases" for non-consumables.',
     correctionMessage: 'Add a "Restore Purchases" button that calls '
         'InAppPurchase.instance.restorePurchases().',
@@ -7552,7 +7586,7 @@ class PreferBackgroundSyncRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_background_sync',
-    problemMessage: 'Data sync in initState() only runs when app is open. '
+    problemMessage: '[prefer_background_sync] Data sync in initState() only runs when app is open. '
         'Consider background sync for better user experience.',
     correctionMessage:
         'Use Workmanager for background sync. Data stays fresh even when '
@@ -7647,7 +7681,7 @@ class RequireSyncErrorRecoveryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_sync_error_recovery',
-    problemMessage: 'Sync operation without error recovery detected. '
+    problemMessage: '[require_sync_error_recovery] Sync operation without error recovery detected. '
         'Failed syncs should retry and notify user of unrecoverable errors.',
     correctionMessage: 'Implement exponential backoff retry and notify user of '
         'persistent failures.',
@@ -7766,7 +7800,7 @@ class AvoidIosWifiOnlyAssumptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_wifi_only_assumption',
-    problemMessage: 'Large download without connectivity check. Users may have '
+    problemMessage: '[avoid_ios_wifi_only_assumption] Large download without connectivity check. Users may have '
         'expensive cellular plans.',
     correctionMessage:
         'Check connectivity type and warn user before large downloads '
@@ -7842,7 +7876,7 @@ class RequireIosLowPowerModeHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_low_power_mode_handling',
-    problemMessage: 'Heavy animation or background activity detected. Consider '
+    problemMessage: '[require_ios_low_power_mode_handling] Heavy animation or background activity detected. Consider '
         'checking iOS Low Power Mode and adapting behavior.',
     correctionMessage:
         'Check ProcessInfo.isLowPowerModeEnabled and reduce animations '
@@ -7927,7 +7961,7 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_ios_accessibility_large_text',
-    problemMessage: 'Hardcoded font size may not respect iOS Dynamic Type. '
+    problemMessage: '[require_ios_accessibility_large_text] Hardcoded font size may not respect iOS Dynamic Type. '
         'Use theme text styles for accessibility.',
     correctionMessage: 'Use Theme.of(context).textTheme styles or apply '
         'MediaQuery.textScaleFactorOf(context).',
@@ -8029,7 +8063,7 @@ class PreferIosContextMenuRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ios_context_menu',
     problemMessage:
-        'ListTile with multiple actions could benefit from a context menu. '
+        '[prefer_ios_context_menu] ListTile with multiple actions could benefit from a context menu. '
         'iOS users expect long-press for secondary actions.',
     correctionMessage:
         'Wrap actionable items with CupertinoContextMenu for better iOS UX.',
@@ -8112,7 +8146,7 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_quick_note_awareness',
     problemMessage:
-        'Document viewing detected. Consider implementing NSUserActivity '
+        '[require_ios_quick_note_awareness] Document viewing detected. Consider implementing NSUserActivity '
         'for iOS Quick Note compatibility.',
     correctionMessage:
         'Set NSUserActivity with document context so users can link '
@@ -8194,7 +8228,7 @@ class AvoidIosHardcodedKeyboardHeightRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ios_hardcoded_keyboard_height',
     problemMessage:
-        'Hardcoded bottom padding may be for keyboard. iOS keyboard height '
+        '[avoid_ios_hardcoded_keyboard_height] Hardcoded bottom padding may be for keyboard. iOS keyboard height '
         'varies by device and input type.',
     correctionMessage:
         'Use MediaQuery.of(context).viewInsets.bottom for keyboard height.',
@@ -8290,7 +8324,7 @@ class RequireIosMultitaskingSupportRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_multitasking_support',
     problemMessage:
-        'Fixed layout detected. iPads support Split View and Slide Over. '
+        '[require_ios_multitasking_support] Fixed layout detected. iPads support Split View and Slide Over. '
         'Layouts should adapt to window size changes.',
     correctionMessage:
         'Use LayoutBuilder or MediaQuery breakpoints to create responsive '
@@ -8375,7 +8409,7 @@ class PreferIosSpotlightIndexingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ios_spotlight_indexing',
     problemMessage:
-        'Searchable content detected. Consider indexing with Core Spotlight '
+        '[prefer_ios_spotlight_indexing] Searchable content detected. Consider indexing with Core Spotlight '
         'so users can find content from iOS home screen.',
     correctionMessage:
         'Use CSSearchableItem to index content for Spotlight search.',
@@ -8458,7 +8492,7 @@ class RequireIosDataProtectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_data_protection',
     problemMessage:
-        'Sensitive file storage detected. Consider using iOS Data Protection '
+        '[require_ios_data_protection] Sensitive file storage detected. Consider using iOS Data Protection '
         'to encrypt files when device is locked.',
     correctionMessage: 'Set appropriate FileProtectionType for sensitive data. '
         'Use "complete" protection for highly sensitive files.',
@@ -8558,7 +8592,7 @@ class AvoidIosBatteryDrainPatternsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_ios_battery_drain_patterns',
-    problemMessage: 'Pattern detected that may cause excessive battery drain. '
+    problemMessage: '[avoid_ios_battery_drain_patterns] Pattern detected that may cause excessive battery drain. '
         'iOS shows high battery usage in Settings.',
     correctionMessage: 'Use push notifications instead of polling. '
         'Reduce location accuracy and frequency.',
@@ -8652,7 +8686,7 @@ class RequireMacosSandboxExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_sandbox_exceptions',
-    problemMessage: 'Feature requiring macOS sandbox entitlement detected. '
+    problemMessage: '[require_macos_sandbox_exceptions] Feature requiring macOS sandbox entitlement detected. '
         'App Store apps must declare entitlements.',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements.',
@@ -8738,7 +8772,7 @@ class AvoidMacosHardenedRuntimeViolationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_macos_hardened_runtime_violations',
-    problemMessage: 'Pattern detected that may violate macOS Hardened Runtime. '
+    problemMessage: '[avoid_macos_hardened_runtime_violations] Pattern detected that may violate macOS Hardened Runtime. '
         'Apps must pass notarization for distribution.',
     correctionMessage:
         'Avoid loading unsigned dynamic libraries or using JIT compilation '
@@ -8809,7 +8843,7 @@ class RequireMacosAppTransportSecurityRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_app_transport_security',
-    problemMessage: 'HTTP URL detected. macOS enforces App Transport Security. '
+    problemMessage: '[require_macos_app_transport_security] HTTP URL detected. macOS enforces App Transport Security. '
         'Use HTTPS or declare exception in Info.plist.',
     correctionMessage:
         'Change to HTTPS or add NSAppTransportSecurity exception '
@@ -8882,7 +8916,7 @@ class RequireMacosNotarizationReadyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_macos_notarization_ready',
     problemMessage:
-        'macOS app detected. Ensure notarization is configured for distribution. '
+        '[require_macos_notarization_ready] macOS app detected. Ensure notarization is configured for distribution. '
         'Apps without notarization show security warnings.',
     correctionMessage:
         'Configure code signing, enable Hardened Runtime, and notarize '
@@ -8960,7 +8994,7 @@ class RequireMacosEntitlementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_macos_entitlements',
-    problemMessage: 'Feature detected that requires macOS entitlement. '
+    problemMessage: '[require_macos_entitlements] Feature detected that requires macOS entitlement. '
         'Sandboxed apps crash without proper entitlements.',
     correctionMessage:
         'Add the required entitlement to macos/Runner/Release.entitlements '
@@ -9039,7 +9073,7 @@ class RequireIosEntitlementsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_entitlements',
     problemMessage:
-        'Feature detected that requires iOS entitlement/capability. '
+        '[require_ios_entitlements] Feature detected that requires iOS entitlement/capability. '
         'Enable in Xcode Signing & Capabilities.',
     correctionMessage:
         'Open Xcode, select Runner target, go to Signing & Capabilities, '
@@ -9107,7 +9141,7 @@ class RequireIosLaunchStoryboardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_launch_storyboard',
     problemMessage:
-        'iOS app detected. Ensure LaunchScreen.storyboard is properly '
+        '[require_ios_launch_storyboard] iOS app detected. Ensure LaunchScreen.storyboard is properly '
         'configured. Apps without launch screen are rejected.',
     correctionMessage:
         'Verify ios/Runner/Base.lproj/LaunchScreen.storyboard exists '
@@ -9194,7 +9228,7 @@ class RequireIosVersionCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_version_check',
     problemMessage:
-        'iOS version-specific feature detected without version check. '
+        '[require_ios_version_check] iOS version-specific feature detected without version check. '
         'Crashes may occur on older iOS versions.',
     correctionMessage: 'Check iOS version before using newer APIs. '
         'Use device_info_plus to get iOS version.',
@@ -9275,7 +9309,7 @@ class RequireIosFocusModeAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_focus_mode_awareness',
     problemMessage:
-        'Notification without interruption level detected. iOS Focus mode '
+        '[require_ios_focus_mode_awareness] Notification without interruption level detected. iOS Focus mode '
         'may silence notifications. Set appropriate interruption level.',
     correctionMessage:
         'Use interruptionLevel parameter to indicate notification importance. '
@@ -9349,7 +9383,7 @@ class PreferIosHandoffSupportRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_ios_handoff_support',
     problemMessage:
-        'Document or content editing detected. Consider implementing '
+        '[prefer_ios_handoff_support] Document or content editing detected. Consider implementing '
         'iOS Handoff for continuity across devices.',
     correctionMessage:
         'Use NSUserActivity to enable Handoff. Users can continue work '
@@ -9430,7 +9464,7 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_voiceover_gesture_compatibility',
     problemMessage:
-        'Custom gesture without accessibility action. VoiceOver users may '
+        '[require_ios_voiceover_gesture_compatibility] Custom gesture without accessibility action. VoiceOver users may '
         'not be able to perform this action.',
     correctionMessage:
         'Wrap with Semantics and provide onDismiss, onScrollLeft, '

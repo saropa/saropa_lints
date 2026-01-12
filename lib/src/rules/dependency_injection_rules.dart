@@ -56,7 +56,7 @@ class AvoidServiceLocatorInWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_service_locator_in_widgets',
     problemMessage:
-        'Service locator in widget hides dependencies. Cannot mock in widget tests.',
+        '[avoid_service_locator_in_widgets] Service locator in widget hides dependencies. Cannot mock in widget tests.',
     correctionMessage:
         'Add required constructor parameter: MyWidget({required this.service}).',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -142,7 +142,7 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_too_many_dependencies',
     problemMessage:
-        'Constructor has >5 dependencies. Class likely violates Single Responsibility.',
+        '[avoid_too_many_dependencies] Constructor has >5 dependencies. Class likely violates Single Responsibility.',
     correctionMessage:
         'Group related dependencies into a facade class, or split this class.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -250,7 +250,7 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_internal_dependency_creation',
     problemMessage:
-        'Dependency created internally. Cannot substitute mock for testing.',
+        '[avoid_internal_dependency_creation] Dependency created internally. Cannot substitute mock for testing.',
     correctionMessage:
         'Add constructor parameter: MyClass(this._repo); then inject from outside.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -331,7 +331,7 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_abstract_dependencies',
     problemMessage:
-        'Depends on concrete implementation. Tight coupling prevents substitution.',
+        '[prefer_abstract_dependencies] Depends on concrete implementation. Tight coupling prevents substitution.',
     correctionMessage:
         'Use abstract type: replace PostgresUserRepo with UserRepository interface.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -423,7 +423,7 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_singleton_for_scoped_dependencies',
     problemMessage:
-        'Scoped data as singleton. State will persist across sessions/screens.',
+        '[avoid_singleton_for_scoped_dependencies] Scoped data as singleton. State will persist across sessions/screens.',
     correctionMessage:
         'Use registerFactory(() => MySession()) for fresh instance per scope.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -508,7 +508,7 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_circular_di_dependencies',
-    problemMessage: 'Potential circular dependency detected.',
+    problemMessage: '[avoid_circular_di_dependencies] Potential circular dependency detected.',
     correctionMessage:
         'Refactor to break the cycle using interfaces or events.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -621,7 +621,7 @@ class PreferNullObjectPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_null_object_pattern',
     problemMessage:
-        'Consider using null object pattern for optional dependency.',
+        '[prefer_null_object_pattern] Consider using null object pattern for optional dependency.',
     correctionMessage: 'Provide a no-op implementation instead of using null.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -688,7 +688,7 @@ class RequireTypedDiRegistrationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_typed_di_registration',
-    problemMessage: 'DI registration should have explicit type parameter.',
+    problemMessage: '[require_typed_di_registration] DI registration should have explicit type parameter.',
     correctionMessage:
         'Add type parameter like registerSingleton<Type>(instance).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -755,7 +755,7 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_functions_in_register_singleton',
     problemMessage:
-        'registerSingleton expects an instance, not a factory function.',
+        '[avoid_functions_in_register_singleton] registerSingleton expects an instance, not a factory function.',
     correctionMessage:
         'Use registerLazySingleton(() => ...) or registerFactory(() => ...) '
         'for lazy instantiation. Use registerSingleton(MyService()) for eager.',
@@ -828,7 +828,7 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getit_registration_order',
     problemMessage:
-        'GetIt registration uses dependency not yet registered at this point.',
+        '[require_getit_registration_order] GetIt registration uses dependency not yet registered at this point.',
     correctionMessage:
         'Register dependencies before services that depend on them, or use registerLazySingleton.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1001,7 +1001,7 @@ class RequireDefaultConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_default_config',
     problemMessage:
-        'Config access without default value. Will crash if value is missing.',
+        '[require_default_config] Config access without default value. Will crash if value is missing.',
     correctionMessage:
         'Provide a fallback value or use nullable access with null check.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1111,7 +1111,7 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_constructor_injection',
     problemMessage:
-        'Setter/method injection hides dependencies. Use constructor injection.',
+        '[prefer_constructor_injection] Setter/method injection hides dependencies. Use constructor injection.',
     correctionMessage:
         'Make this a final field and add a constructor parameter: '
         'MyClass(this._service);',
@@ -1305,7 +1305,7 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_di_scope_awareness',
     problemMessage:
-        'Review DI scope: singleton retains state, factory creates each time.',
+        '[require_di_scope_awareness] Review DI scope: singleton retains state, factory creates each time.',
     correctionMessage:
         'Use lazySingleton for expensive objects, factory for stateless handlers.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -48,7 +48,7 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_graphql_string_queries',
     problemMessage:
-        'Raw GraphQL string queries lack type safety and compile-time validation.',
+        '[avoid_graphql_string_queries] Raw GraphQL string queries lack type safety and compile-time validation.',
     correctionMessage:
         'Use graphql_codegen or artemis to generate type-safe query classes from .graphql files.',
     errorSeverity: DiagnosticSeverity.INFO,

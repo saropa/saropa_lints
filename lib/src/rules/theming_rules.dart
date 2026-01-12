@@ -46,7 +46,7 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dark_mode_testing',
     problemMessage:
-        'MaterialApp missing darkTheme. App won\'t adapt to dark mode.',
+        '[require_dark_mode_testing] MaterialApp missing darkTheme. App won\'t adapt to dark mode.',
     correctionMessage: 'Add darkTheme parameter to support dark mode.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -127,7 +127,7 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_elevation_opacity_in_dark',
     problemMessage:
-        'High elevation (>4) without brightness check. Shadows look poor in dark mode.',
+        '[avoid_elevation_opacity_in_dark] High elevation (>4) without brightness check. Shadows look poor in dark mode.',
     correctionMessage:
         'Check Theme.of(context).brightness or use lower elevation in dark mode.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -214,7 +214,7 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_theme_extensions',
     problemMessage:
-        'ThemeData.copyWith used for custom colors. Consider ThemeExtension.',
+        '[prefer_theme_extensions] ThemeData.copyWith used for custom colors. Consider ThemeExtension.',
     correctionMessage:
         'Create a ThemeExtension subclass for type-safe custom theme properties.',
     errorSeverity: DiagnosticSeverity.INFO,

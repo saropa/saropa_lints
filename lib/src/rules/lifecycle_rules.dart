@@ -58,7 +58,7 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_work_in_paused_state',
     problemMessage:
-        'Timer.periodic without lifecycle handling. Will run when app is backgrounded.',
+        '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded.',
     correctionMessage:
         'Add WidgetsBindingObserver and pause timer in didChangeAppLifecycleState.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -188,7 +188,7 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_resume_state_refresh',
     problemMessage:
-        'didChangeAppLifecycleState handles paused but not resumed.',
+        '[require_resume_state_refresh] didChangeAppLifecycleState handles paused but not resumed.',
     correctionMessage:
         'Add handling for AppLifecycleState.resumed to refresh data.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -269,7 +269,7 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_did_update_widget_check',
     problemMessage:
-        'didUpdateWidget should compare oldWidget properties before updating.',
+        '[require_did_update_widget_check] didUpdateWidget should compare oldWidget properties before updating.',
     correctionMessage:
         'Compare oldWidget.property != widget.property before state updates.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -53,7 +53,7 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_swallowing_exceptions',
-    problemMessage: 'Catch block swallows exception without handling.',
+    problemMessage: '[avoid_swallowing_exceptions] Catch block swallows exception without handling.',
     correctionMessage: 'Log the error, rethrow, or handle it properly.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -175,7 +175,7 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_losing_stack_trace',
-    problemMessage: 'Stack trace is lost when rethrowing.',
+    problemMessage: '[avoid_losing_stack_trace] Stack trace is lost when rethrowing.',
     correctionMessage:
         'Capture stack trace parameter and pass it to Error.throwWithStackTrace or include in new exception.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -291,7 +291,7 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_generic_exceptions',
-    problemMessage: 'Avoid throwing generic Exception.',
+    problemMessage: '[avoid_generic_exceptions] Avoid throwing generic Exception.',
     correctionMessage: 'Create and throw a specific exception type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -342,7 +342,7 @@ class RequireErrorContextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_context',
-    problemMessage: 'Error message lacks context.',
+    problemMessage: '[require_error_context] Error message lacks context.',
     correctionMessage:
         'Include relevant context like IDs, state, or operation details.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -417,7 +417,7 @@ class PreferResultPatternRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_result_pattern',
-    problemMessage: 'Consider using Result pattern for expected failures.',
+    problemMessage: '[prefer_result_pattern] Consider using Result pattern for expected failures.',
     correctionMessage:
         'Return Result<T, E> instead of throwing for recoverable errors.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -503,7 +503,7 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_async_error_documentation',
     problemMessage:
-        'Async function with await should document or handle errors.',
+        '[require_async_error_documentation] Async function with await should document or handle errors.',
     correctionMessage:
         'Add try/catch or document thrown exceptions with /// Throws.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -613,7 +613,7 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try_statements',
-    problemMessage: 'Avoid nested try statements.',
+    problemMessage: '[avoid_nested_try_statements] Avoid nested try statements.',
     correctionMessage: 'Extract inner try-catch into a separate function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -674,7 +674,7 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
-    problemMessage: 'App should have an error boundary.',
+    problemMessage: '[require_error_boundary] App should have an error boundary.',
     correctionMessage:
         'Wrap app content in an ErrorBoundary widget or use builder with error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -793,7 +793,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_uncaught_future_errors',
-    problemMessage: 'Future without error handling may crash app.',
+    problemMessage: '[avoid_uncaught_future_errors] Future without error handling may crash app.',
     correctionMessage:
         'Add try-catch to the function, use .ignore(), or add .catchError().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1070,7 +1070,7 @@ class AvoidPrintErrorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_print_error',
     problemMessage:
-        'Using print() for error logging. Errors may be lost in production.',
+        '[avoid_print_error] Using print() for error logging. Errors may be lost in production.',
     correctionMessage:
         'Use a proper logging framework like logger, crashlytics, or sentry.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1219,7 +1219,7 @@ class AvoidCatchAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catch_all',
     problemMessage:
-        'Bare catch without on clause. Use explicit type to show intent.',
+        '[avoid_catch_all] Bare catch without on clause. Use explicit type to show intent.',
     correctionMessage:
         'Use "on Object catch" for comprehensive handling, or specific types '
         'like HttpException.',
@@ -1342,7 +1342,7 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catch_exception_alone',
     problemMessage:
-        'on Exception catch misses Error types (StateError, TypeError, etc.).',
+        '[avoid_catch_exception_alone] on Exception catch misses Error types (StateError, TypeError, etc.).',
     correctionMessage:
         'Use "on Object catch" to catch all throwables, or add an '
         '"on Object catch" fallback to handle Error types.',
@@ -1480,7 +1480,7 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_exception_in_constructor',
     problemMessage:
-        'Throwing in constructor. Use factory or static method for fallible operations.',
+        '[avoid_exception_in_constructor] Throwing in constructor. Use factory or static method for fallible operations.',
     correctionMessage:
         'Use factory constructor, static method, or return null for invalid input.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1576,7 +1576,7 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_key_determinism',
     problemMessage:
-        'Cache key may be non-deterministic. Use stable identifiers for cache keys.',
+        '[require_cache_key_determinism] Cache key may be non-deterministic. Use stable identifiers for cache keys.',
     correctionMessage:
         'Use deterministic values like IDs or stable hashes for cache keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1907,7 +1907,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_permission_permanent_denial_handling',
-    problemMessage: 'Permission request without permanent denial handling.',
+    problemMessage: '[require_permission_permanent_denial_handling] Permission request without permanent denial handling.',
     correctionMessage:
         'Check isPermanentlyDenied and call openAppSettings() to guide users.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1992,7 +1992,7 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_notification_action_handling',
-    problemMessage: 'Notification with actions may lack action handler setup.',
+    problemMessage: '[require_notification_action_handling] Notification with actions may lack action handler setup.',
     correctionMessage:
         'Ensure onDidReceiveNotificationResponse handles action IDs.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2074,7 +2074,7 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_finally_cleanup',
     problemMessage:
-        'Cleanup in catch block. Use finally for guaranteed cleanup.',
+        '[require_finally_cleanup] Cleanup in catch block. Use finally for guaranteed cleanup.',
     correctionMessage: 'Move cleanup code to finally block.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

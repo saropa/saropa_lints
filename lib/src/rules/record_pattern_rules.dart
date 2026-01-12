@@ -37,7 +37,7 @@ class AvoidBottomTypeInPatternsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_patterns',
     problemMessage:
-        'Pattern uses bottom type which will never match (void/Never) or only matches null.',
+        '[avoid_bottom_type_in_patterns] Pattern uses bottom type which will never match (void/Never) or only matches null.',
     correctionMessage:
         'Replace with the actual expected type, or use Object? for any value.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -94,7 +94,7 @@ class AvoidBottomTypeInRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bottom_type_in_records',
     problemMessage:
-        'Record field uses void/Never/Null which cannot hold useful values.',
+        '[avoid_bottom_type_in_records] Record field uses void/Never/Null which cannot hold useful values.',
     correctionMessage:
         'Replace with a meaningful type. Use dynamic or Object? if any type is needed.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -165,7 +165,7 @@ class AvoidExplicitPatternFieldNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_explicit_pattern_field_name',
-    problemMessage: 'Explicit pattern field name matches variable name.',
+    problemMessage: '[avoid_explicit_pattern_field_name] Explicit pattern field name matches variable name.',
     correctionMessage: 'Use shorthand syntax: `:fieldName` instead of '
         '`fieldName: fieldName`.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -269,7 +269,7 @@ class AvoidExtensionsOnRecordsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_extensions_on_records',
     problemMessage:
-        'Extension on record type. Records lack identity for extension discovery.',
+        '[avoid_extensions_on_records] Extension on record type. Records lack identity for extension discovery.',
     correctionMessage:
         'Create a class with named fields and methods, or use a typedef with extension.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -320,7 +320,7 @@ class AvoidFunctionTypeInRecordsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_function_type_in_records',
-    problemMessage: 'Inline function type in record reduces readability.',
+    problemMessage: '[avoid_function_type_in_records] Inline function type in record reduces readability.',
     correctionMessage:
         'Create typedef: typedef MyCallback = void Function(String); then use (int, MyCallback).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -378,7 +378,7 @@ class AvoidKeywordsInWildcardPatternRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_keywords_in_wildcard_pattern',
-    problemMessage: 'Pattern variable uses a Dart keyword.',
+    problemMessage: '[avoid_keywords_in_wildcard_pattern] Pattern variable uses a Dart keyword.',
     correctionMessage: 'Use a different variable name.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -489,7 +489,7 @@ class AvoidLongRecordsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_records',
-    problemMessage: 'Record has more than $_maxFields fields.',
+    problemMessage: '[avoid_long_records] Record has more than $_maxFields fields.',
     correctionMessage: 'Consider using a class for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -548,7 +548,7 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mixing_named_and_positional_fields',
-    problemMessage: 'Record mixes named and positional fields.',
+    problemMessage: '[avoid_mixing_named_and_positional_fields] Record mixes named and positional fields.',
     correctionMessage: 'Use either all named or all positional fields.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -613,7 +613,7 @@ class AvoidNestedRecordsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_records',
-    problemMessage: 'Avoid nested record types.',
+    problemMessage: '[avoid_nested_records] Avoid nested record types.',
     correctionMessage: 'Flatten the record or use a class/typedef instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -671,7 +671,7 @@ class AvoidOneFieldRecordsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_one_field_records',
-    problemMessage: 'Avoid records with only one field.',
+    problemMessage: '[avoid_one_field_records] Avoid records with only one field.',
     correctionMessage: 'Use the value type directly instead of a record.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -711,7 +711,7 @@ class AvoidPositionalRecordFieldAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_positional_record_field_access',
     problemMessage:
-        'Avoid accessing positional record fields with \$1, \$2, etc.',
+        '[avoid_positional_record_field_access] Avoid accessing positional record fields with \$1, \$2, etc.',
     correctionMessage: 'Use destructuring or named record fields instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -760,7 +760,7 @@ class AvoidRedundantPositionalFieldNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_positional_field_name',
-    problemMessage: 'Positional record field uses redundant default name.',
+    problemMessage: '[avoid_redundant_positional_field_name] Positional record field uses redundant default name.',
     correctionMessage: 'Use a meaningful name or omit the name entirely.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -817,7 +817,7 @@ class AvoidSingleFieldDestructuringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_single_field_destructuring',
-    problemMessage: 'Avoid destructuring for a single field.',
+    problemMessage: '[avoid_single_field_destructuring] Avoid destructuring for a single field.',
     correctionMessage: 'Use direct property access instead: final x = obj.x;',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -881,7 +881,7 @@ class MoveRecordsToTypedefsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'move_records_to_typedefs',
     problemMessage:
-        'Record with >$_maxInlineFields fields should be a typedef.',
+        '[move_records_to_typedefs] Record with >$_maxInlineFields fields should be a typedef.',
     correctionMessage: 'Extract to a typedef for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -930,7 +930,7 @@ class PatternFieldsOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_pattern_fields',
-    problemMessage: 'Pattern fields should be in alphabetical order.',
+    problemMessage: '[prefer_sorted_pattern_fields] Pattern fields should be in alphabetical order.',
     correctionMessage: 'Reorder pattern fields alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -994,7 +994,7 @@ class PreferSimplerPatternsNullCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_patterns_null_check',
-    problemMessage: 'Consider simpler null check pattern.',
+    problemMessage: '[prefer_simpler_patterns_null_check] Consider simpler null check pattern.',
     correctionMessage: 'Use != null or final instead of var for null checks.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1048,7 +1048,7 @@ class PreferWildcardPatternRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_wildcard_pattern',
-    problemMessage: 'Unused pattern variable should use wildcard (_).',
+    problemMessage: '[prefer_wildcard_pattern] Unused pattern variable should use wildcard (_).',
     correctionMessage: 'Replace with _ if the value is not used.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1105,7 +1105,7 @@ class RecordFieldsOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_record_fields',
-    problemMessage: 'Record named fields should be in alphabetical order.',
+    problemMessage: '[prefer_sorted_record_fields] Record named fields should be in alphabetical order.',
     correctionMessage: 'Reorder fields alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1161,7 +1161,7 @@ class PreferPatternDestructuringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_pattern_destructuring',
     problemMessage:
-        'Multiple positional record field accesses could use destructuring.',
+        '[prefer_pattern_destructuring] Multiple positional record field accesses could use destructuring.',
     correctionMessage:
         'Use pattern destructuring: final (a, b) = record; (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,

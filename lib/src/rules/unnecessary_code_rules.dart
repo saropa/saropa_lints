@@ -35,7 +35,7 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_spread',
-    problemMessage: 'Empty spread has no effect.',
+    problemMessage: '[avoid_empty_spread] Empty spread has no effect.',
     correctionMessage: 'Remove the empty spread expression.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -124,7 +124,7 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_block',
-    problemMessage: 'Unnecessary nested block.',
+    problemMessage: '[avoid_unnecessary_block] Unnecessary nested block.',
     correctionMessage: 'Remove the extra braces.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -178,7 +178,7 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_call',
-    problemMessage: 'Unnecessary explicit .call() invocation.',
+    problemMessage: '[avoid_unnecessary_call] Unnecessary explicit .call() invocation.',
     correctionMessage: 'Use implicit call with () instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -272,7 +272,7 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_constructor',
     problemMessage:
-        'Unnecessary constructor. Dart provides a default constructor.',
+        '[avoid_unnecessary_constructor] Unnecessary constructor. Dart provides a default constructor.',
     correctionMessage: 'Remove the empty constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -379,7 +379,7 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_arguments',
-    problemMessage: 'Enum argument matches default value and can be omitted.',
+    problemMessage: '[avoid_unnecessary_enum_arguments] Enum argument matches default value and can be omitted.',
     correctionMessage: 'Remove the argument to use the default value.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -424,7 +424,7 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_prefix',
-    problemMessage: 'Unnecessary enum name prefix inside enum declaration.',
+    problemMessage: '[avoid_unnecessary_enum_prefix] Unnecessary enum name prefix inside enum declaration.',
     correctionMessage: 'Remove the enum name prefix when referencing values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -564,7 +564,7 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_extends',
-    problemMessage: 'Unnecessary extends Object.',
+    problemMessage: '[avoid_unnecessary_extends] Unnecessary extends Object.',
     correctionMessage: 'Remove the extends clause.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -659,7 +659,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_getter',
     problemMessage:
-        'Getter just returns a final field without additional logic.',
+        '[avoid_unnecessary_getter] Getter just returns a final field without additional logic.',
     correctionMessage:
         'Consider making the field public or adding meaningful logic.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -749,7 +749,7 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_length_check',
-    problemMessage: 'Use isNotEmpty instead of length comparison.',
+    problemMessage: '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison.',
     correctionMessage: 'Replace with .isNotEmpty or .isEmpty.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -927,7 +927,7 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_negations',
-    problemMessage: 'Unnecessary negation can be simplified.',
+    problemMessage: '[avoid_unnecessary_negations] Unnecessary negation can be simplified.',
     correctionMessage:
         'Simplify by using the opposite operator or removing double negation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1000,7 +1000,7 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_super',
-    problemMessage: 'Unnecessary super() call with no arguments.',
+    problemMessage: '[avoid_unnecessary_super] Unnecessary super() call with no arguments.',
     correctionMessage: 'Remove the super() call - it is implicit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1271,7 +1271,7 @@ class NoEmptyStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_empty_string',
-    problemMessage: 'Avoid empty string literals.',
+    problemMessage: '[no_empty_string] Avoid empty string literals.',
     correctionMessage: 'Use .isEmpty for comparisons.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

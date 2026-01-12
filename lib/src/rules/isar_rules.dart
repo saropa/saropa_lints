@@ -57,7 +57,7 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_enum_field',
-    problemMessage: 'Enum fields in Isar collections can cause data corruption '
+    problemMessage: '[avoid_isar_enum_field] Enum fields in Isar collections can cause data corruption '
         'if the enum is renamed or reordered.',
     correctionMessage: 'Store the enum as a String field and use an @ignore '
         'getter to parse it. See rule documentation for the pattern.',
@@ -397,7 +397,7 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_collection_annotation',
-    problemMessage: 'Class used with Isar must have @collection annotation.',
+    problemMessage: '[require_isar_collection_annotation] Class used with Isar must have @collection annotation.',
     correctionMessage: 'Add @collection annotation to the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -475,7 +475,7 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_id_field',
-    problemMessage: 'Isar @collection class must have an Id? id field.',
+    problemMessage: '[require_isar_id_field] Isar @collection class must have an Id? id field.',
     correctionMessage: 'Add "Id? id;" as the first field in the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -565,7 +565,7 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_close_on_dispose',
     problemMessage:
-        'Isar instance must be closed in dispose() to release file handles.',
+        '[require_isar_close_on_dispose] Isar instance must be closed in dispose() to release file handles.',
     correctionMessage: 'Add isar.close() in the dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -650,7 +650,7 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_async_writes',
     problemMessage:
-        'Avoid writeTxnSync in build methods - it blocks the UI thread.',
+        '[prefer_isar_async_writes] Avoid writeTxnSync in build methods - it blocks the UI thread.',
     correctionMessage: 'Use writeTxn (async) instead of writeTxnSync.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -713,7 +713,7 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_transaction_nesting',
-    problemMessage: 'Nested writeTxn calls cause deadlocks.',
+    problemMessage: '[avoid_isar_transaction_nesting] Nested writeTxn calls cause deadlocks.',
     correctionMessage: 'Combine operations into a single writeTxn block.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -794,7 +794,7 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_batch_operations',
     problemMessage:
-        'Use putAll() instead of put() in loops - batch operations are ~100x faster.',
+        '[prefer_isar_batch_operations] Use putAll() instead of put() in loops - batch operations are ~100x faster.',
     correctionMessage:
         'Collect items and use putAll() instead of individual put() calls.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -855,7 +855,7 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_float_equality_queries',
     problemMessage:
-        'Float equality queries are imprecise. Use between() instead.',
+        '[avoid_isar_float_equality_queries] Float equality queries are imprecise. Use between() instead.',
     correctionMessage:
         'Use .between(value - epsilon, value + epsilon) for float comparisons.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -913,7 +913,7 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isar_inspector_debug_only',
-    problemMessage: 'Isar Inspector should only be enabled in debug mode.',
+    problemMessage: '[require_isar_inspector_debug_only] Isar Inspector should only be enabled in debug mode.',
     correctionMessage: 'Use inspector: kDebugMode instead of inspector: true.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -976,7 +976,7 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_clear_in_production',
-    problemMessage: 'isar.clear() deletes all data. Wrap in kDebugMode check.',
+    problemMessage: '[avoid_isar_clear_in_production] isar.clear() deletes all data. Wrap in kDebugMode check.',
     correctionMessage: 'Add if (kDebugMode) guard before calling clear().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1039,7 +1039,7 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_links_load',
     problemMessage:
-        'IsarLinks must be loaded before accessing. Call load() first.',
+        '[require_isar_links_load] IsarLinks must be loaded before accessing. Call load() first.',
     correctionMessage:
         'Add await links.load() or links.loadSync() before accessing.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1118,7 +1118,7 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_query_stream',
     problemMessage:
-        'Use Isar watch() instead of Timer-based polling for reactive queries.',
+        '[prefer_isar_query_stream] Use Isar watch() instead of Timer-based polling for reactive queries.',
     correctionMessage:
         'Replace Timer.periodic with collection.where().watch().listen().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1181,7 +1181,7 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_isar_web_limitations',
-    problemMessage: 'Isar sync APIs do not work on web. Use async methods.',
+    problemMessage: '[avoid_isar_web_limitations] Isar sync APIs do not work on web. Use async methods.',
     correctionMessage:
         'Replace Sync methods with async equivalents for web compatibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1250,7 +1250,7 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_index_for_queries',
     problemMessage:
-        'Consider adding @Index to frequently queried fields for better performance.',
+        '[prefer_isar_index_for_queries] Consider adding @Index to frequently queried fields for better performance.',
     correctionMessage: 'Add @Index() annotation to the field being queried.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1319,7 +1319,7 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_embedded_large_objects',
     problemMessage:
-        '@embedded objects are duplicated in every record. Use IsarLink for large/shared objects.',
+        '[avoid_isar_embedded_large_objects] @embedded objects are duplicated in every record. Use IsarLink for large/shared objects.',
     correctionMessage:
         'Consider using IsarLink<T> instead of @embedded for large objects.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1387,7 +1387,7 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_lazy_links',
     problemMessage:
-        'Consider using IsarLinks.lazy() for large linked collections.',
+        '[prefer_isar_lazy_links] Consider using IsarLinks.lazy() for large linked collections.',
     correctionMessage:
         'Replace IsarLinks<T>() with IsarLinks<T>.lazy() for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1436,7 +1436,7 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_schema_breaking_changes',
     problemMessage:
-        'Isar field changes may break migrations. Use @Name to preserve DB field names.',
+        '[avoid_isar_schema_breaking_changes] Isar field changes may break migrations. Use @Name to preserve DB field names.',
     correctionMessage: 'Add @Name("originalFieldName") when renaming fields.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1506,7 +1506,7 @@ class RequireIsarNonNullableMigrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_non_nullable_migration',
     problemMessage:
-        'Non-nullable Isar fields need default values for migration safety.',
+        '[require_isar_non_nullable_migration] Non-nullable Isar fields need default values for migration safety.',
     correctionMessage: 'Make the field nullable or provide a default value.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1584,7 +1584,7 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_isar_composite_index',
-    problemMessage: 'Multi-field queries benefit from composite indexes.',
+    problemMessage: '[prefer_isar_composite_index] Multi-field queries benefit from composite indexes.',
     correctionMessage:
         'Add @Index(composite: [...]) for frequently used field combinations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1651,7 +1651,7 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_string_contains_without_index',
     problemMessage:
-        'String contains queries need full-text index for performance.',
+        '[avoid_isar_string_contains_without_index] String contains queries need full-text index for performance.',
     correctionMessage:
         'Add @Index(type: IndexType.value) to the field being searched.',
     errorSeverity: DiagnosticSeverity.WARNING,

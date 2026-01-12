@@ -55,7 +55,7 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_file_close_in_finally',
-    problemMessage: 'File handle should be closed in finally block.',
+    problemMessage: '[require_file_close_in_finally] File handle should be closed in finally block.',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -167,7 +167,7 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_database_close',
-    problemMessage: 'Database connection should be closed.',
+    problemMessage: '[require_database_close] Database connection should be closed.',
     correctionMessage:
         'Close database in finally block or use connection pool.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -247,7 +247,7 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_http_client_close',
-    problemMessage: 'HttpClient should be closed when done.',
+    problemMessage: '[require_http_client_close] HttpClient should be closed when done.',
     correctionMessage: 'Call client.close() in finally block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -312,7 +312,7 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_native_resource_cleanup',
-    problemMessage: 'Native resource should be freed.',
+    problemMessage: '[require_native_resource_cleanup] Native resource should be freed.',
     correctionMessage: 'Call free() in finally block for native allocations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -404,7 +404,7 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_close',
-    problemMessage: 'WebSocket should be closed in dispose.',
+    problemMessage: '[require_websocket_close] WebSocket should be closed in dispose.',
     correctionMessage: 'Add _socket.close() in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -501,7 +501,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_platform_channel_cleanup',
-    problemMessage: 'Platform channel handler should be removed in dispose.',
+    problemMessage: '[require_platform_channel_cleanup] Platform channel handler should be removed in dispose.',
     correctionMessage: 'Set handler to null in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -596,7 +596,7 @@ class RequireIsolateKillRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_isolate_kill',
-    problemMessage: 'Spawned Isolate should be killed when done.',
+    problemMessage: '[require_isolate_kill] Spawned Isolate should be killed when done.',
     correctionMessage: 'Call isolate.kill() in cleanup/dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -680,7 +680,7 @@ class RequireCameraDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_camera_dispose',
     problemMessage:
-        'CameraController must be disposed to release camera hardware.',
+        '[require_camera_dispose] CameraController must be disposed to release camera hardware.',
     correctionMessage:
         'Add _controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -865,7 +865,7 @@ class RequireImageCompressionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_compression',
     problemMessage:
-        'Camera image captured without compression. Large files waste bandwidth.',
+        '[require_image_compression] Camera image captured without compression. Large files waste bandwidth.',
     correctionMessage:
         'Add maxWidth, maxHeight, or imageQuality parameters to limit file size.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -981,7 +981,7 @@ class PreferCoarseLocationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_coarse_location_when_sufficient',
     problemMessage:
-        'High accuracy location uses more battery. Consider coarse location.',
+        '[prefer_coarse_location_when_sufficient] High accuracy location uses more battery. Consider coarse location.',
     correctionMessage:
         'Use LocationAccuracy.low or .medium if you only need city-level location.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1050,7 +1050,7 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_picker_without_source',
     problemMessage:
-        'ImagePicker without source shows blank picker on some devices.',
+        '[avoid_image_picker_without_source] ImagePicker without source shows blank picker on some devices.',
     correctionMessage:
         'Specify source: ImageSource.camera or ImageSource.gallery.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1168,7 +1168,7 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_accuracy_appropriate',
     problemMessage:
-        'LocationAccuracy.high uses GPS and drains battery significantly.',
+        '[prefer_geolocator_accuracy_appropriate] LocationAccuracy.high uses GPS and drains battery significantly.',
     correctionMessage:
         'Consider LocationAccuracy.low or .medium if precise location not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1238,7 +1238,7 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_geolocator_last_known',
     problemMessage:
-        'getCurrentPosition polls GPS. Consider getLastKnownPosition for cached location.',
+        '[prefer_geolocator_last_known] getCurrentPosition polls GPS. Consider getLastKnownPosition for cached location.',
     correctionMessage:
         'Use Geolocator.getLastKnownPosition() when fresh location not critical.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1316,7 +1316,7 @@ class PreferImagePickerMultiSelectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_multi_selection',
     problemMessage:
-        'pickImage in loop. Use pickMultiImage for batch selection.',
+        '[prefer_image_picker_multi_selection] pickImage in loop. Use pickMultiImage for batch selection.',
     correctionMessage: 'Replace with ImagePicker().pickMultiImage().',
     errorSeverity: DiagnosticSeverity.INFO,
   );

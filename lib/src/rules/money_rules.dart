@@ -48,7 +48,7 @@ class AvoidDoubleForMoneyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_double_for_money',
     problemMessage:
-        'double has precision issues for money. Use int cents or Decimal.',
+        '[avoid_double_for_money] double has precision issues for money. Use int cents or Decimal.',
     correctionMessage: 'Store money as int cents or use a Decimal package.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

@@ -45,7 +45,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_cast',
-    problemMessage: 'Direct cast with "as" may throw at runtime.',
+    problemMessage: '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime.',
     correctionMessage: 'Use "is" check or pattern matching instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -100,7 +100,7 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_generics',
-    problemMessage: 'Generic type parameter has no constraint.',
+    problemMessage: '[prefer_constrained_generics] Generic type parameter has no constraint.',
     correctionMessage: 'Consider adding extends clause to constrain the type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -155,7 +155,7 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_covariant_documentation',
-    problemMessage: 'Covariant parameter should be documented.',
+    problemMessage: '[require_covariant_documentation] Covariant parameter should be documented.',
     correctionMessage:
         'Add documentation explaining why covariant is necessary.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -226,7 +226,7 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_safe_json_parsing',
-    problemMessage: 'JSON parsing may throw on missing keys.',
+    problemMessage: '[require_safe_json_parsing] JSON parsing may throw on missing keys.',
     correctionMessage: 'Use null-aware operators or provide defaults.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -293,7 +293,7 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_null_safe_extensions',
-    problemMessage: 'Extension on nullable type uses null assertion.',
+    problemMessage: '[require_null_safe_extensions] Extension on nullable type uses null assertion.',
     correctionMessage: 'Use null-aware operators instead of "!".',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -349,7 +349,7 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_specific_numeric_types',
-    problemMessage: 'Prefer int or double over num for better type safety.',
+    problemMessage: '[prefer_specific_numeric_types] Prefer int or double over num for better type safety.',
     correctionMessage: 'Use int or double instead of num.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -410,7 +410,7 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_null_assertion',
-    problemMessage: 'Avoid using the non-null assertion operator (!).',
+    problemMessage: '[avoid_non_null_assertion] Avoid using the non-null assertion operator (!).',
     correctionMessage: 'Use null-aware operators or explicit null checks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -456,7 +456,7 @@ class AvoidTypeCastsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_type_casts',
-    problemMessage: 'Type cast with "as" may throw at runtime.',
+    problemMessage: '[avoid_type_casts] Type cast with "as" may throw at runtime.',
     correctionMessage: 'Use "is" check or pattern matching instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -499,7 +499,7 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_futureor_documentation',
-    problemMessage: 'FutureOr return type should be documented.',
+    problemMessage: '[require_futureor_documentation] FutureOr return type should be documented.',
     correctionMessage: 'Add documentation explaining when sync vs async.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -554,7 +554,7 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_type_arguments',
-    problemMessage: 'Generic type without explicit type arguments.',
+    problemMessage: '[prefer_explicit_type_arguments] Generic type without explicit type arguments.',
     correctionMessage: 'Add explicit type arguments for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -643,7 +643,7 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_casts',
-    problemMessage: 'Cast between unrelated types will always fail at runtime.',
+    problemMessage: '[avoid_unrelated_type_casts] Cast between unrelated types will always fail at runtime.',
     correctionMessage: 'Use "is" check or verify type hierarchy.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -741,7 +741,7 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_json_access',
-    problemMessage: 'Chained JSON access without null checks may throw.',
+    problemMessage: '[avoid_dynamic_json_access] Chained JSON access without null checks may throw.',
     correctionMessage: 'Use null-aware operators or validate each level.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -828,7 +828,7 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_null_safe_json_access',
-    problemMessage: 'JSON map access without null handling may throw.',
+    problemMessage: '[require_null_safe_json_access] JSON map access without null handling may throw.',
     correctionMessage: 'Use "as Type?" with null coalescing or null check.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -919,7 +919,7 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_json_chains',
-    problemMessage: 'Deep JSON chain is fragile. Use typed models or helpers.',
+    problemMessage: '[avoid_dynamic_json_chains] Deep JSON chain is fragile. Use typed models or helpers.',
     correctionMessage: 'Break into separate accesses with null checks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1001,7 +1001,7 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_enum_unknown_value',
-    problemMessage: 'Enum parsing without fallback crashes on unknown values.',
+    problemMessage: '[require_enum_unknown_value] Enum parsing without fallback crashes on unknown values.',
     correctionMessage: 'Add fallback value or use tryByName pattern.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1114,7 +1114,7 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_validator_return_null',
-    problemMessage: 'Form validator must return null for valid input.',
+    problemMessage: '[require_validator_return_null] Form validator must return null for valid input.',
     correctionMessage: 'Add "return null;" for the valid case.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

@@ -47,7 +47,7 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_public_api_documentation',
-    problemMessage: 'Public API should be documented.',
+    problemMessage: '[require_public_api_documentation] Public API should be documented.',
     correctionMessage: 'Add a doc comment explaining the purpose and usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -116,7 +116,7 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_misleading_documentation',
-    problemMessage: 'Documentation may not match the method name.',
+    problemMessage: '[avoid_misleading_documentation] Documentation may not match the method name.',
     correctionMessage: 'Ensure documentation accurately describes the code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -181,7 +181,7 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_deprecation_message',
-    problemMessage: 'Deprecated annotation should include migration guidance.',
+    problemMessage: '[require_deprecation_message] Deprecated annotation should include migration guidance.',
     correctionMessage:
         'Use @Deprecated("message") with explanation of what to use instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -258,7 +258,7 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_complex_logic_comments',
-    problemMessage: 'Complex method lacks explanatory comments.',
+    problemMessage: '[require_complex_logic_comments] Complex method lacks explanatory comments.',
     correctionMessage:
         'Add comments explaining the logic, especially for chained operations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -332,7 +332,7 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_parameter_documentation',
-    problemMessage: 'Parameters should be documented.',
+    problemMessage: '[require_parameter_documentation] Parameters should be documented.',
     correctionMessage: 'Add [paramName] documentation for each parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -415,7 +415,7 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_return_documentation',
-    problemMessage: 'Return value should be documented.',
+    problemMessage: '[require_return_documentation] Return value should be documented.',
     correctionMessage: 'Add documentation explaining what the method returns.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -487,7 +487,7 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_exception_documentation',
-    problemMessage: 'Thrown exceptions should be documented.',
+    problemMessage: '[require_exception_documentation] Thrown exceptions should be documented.',
     correctionMessage: 'Add "Throws [ExceptionType]" to documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -558,7 +558,7 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_example_in_documentation',
-    problemMessage: 'Public class documentation should include an example.',
+    problemMessage: '[require_example_in_documentation] Public class documentation should include an example.',
     correctionMessage: 'Add an example code block showing typical usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
