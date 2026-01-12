@@ -365,10 +365,9 @@ v2.4.0 adds 28 additional iOS/macOS rules covering:
 - `prefer_delayed_permission_prompt` - Don't request permissions on launch
 - `avoid_notification_spam` - Batch notifications properly
 
-**In-App Purchase Rules (3 rules)**
+**In-App Purchase Rules (2 rules)**
 - `require_purchase_verification` - Server-side receipt verification
 - `require_purchase_restoration` - App Store requires restore button
-- `prefer_revenuecat` - RevenueCat for IAP management
 
 **iOS Platform Enhancement (16 rules)**
 - `avoid_ios_wifi_only_assumption`, `require_ios_low_power_mode_handling`, `require_ios_accessibility_large_text`, `prefer_ios_context_menu`, `require_ios_quick_note_awareness`, `avoid_ios_hardcoded_keyboard_height`, `require_ios_multitasking_support`, `prefer_ios_spotlight_indexing`, `require_ios_data_protection`, `avoid_ios_battery_drain_patterns`, `require_ios_entitlements`, `require_ios_launch_storyboard`, `require_ios_version_check`, `require_ios_focus_mode_awareness`, `prefer_ios_handoff_support`, `require_ios_voiceover_gesture_compatibility`
@@ -390,6 +389,18 @@ When using `dart:ffi` for iOS/macOS native code integration, the Dart analyzer p
 | `native_field_not_static` | Native fields must be static |
 
 These are automatically enabled when using `dart:ffi`.
+
+## Out of Scope: Commercial Product Recommendations
+
+saropa_lints intentionally does **not** recommend specific commercial products or services. While some third-party SDKs can simplify complex tasks like in-app purchases (IAP), subscription management, or analytics, recommending specific vendors is outside the scope of a lint package.
+
+**Examples of products NOT recommended by these rules:**
+- IAP SDKs (RevenueCat, Adapty, Qonversion, Purchasely, etc.)
+- Analytics platforms (Amplitude, Mixpanel, Segment, etc.)
+- Crash reporting services (beyond Firebase Crashlytics which is free-tier)
+- Push notification services
+
+The rules focus on **correct usage patterns** and **platform requirements**, not vendor selection. Teams should evaluate commercial products based on their own requirements, pricing, and support needs.
 
 ## Related Resources
 
@@ -467,6 +478,7 @@ For issues we cannot detect directly, saropa_lints provides:
 
 For complete Apple platform compliance, use these tools alongside saropa_lints:
 
+<!-- cspell:ignore xcrun altool -->
 | Tool | What It Checks |
 |------|----------------|
 | **Xcode Analyzer** | Static analysis of Swift/Objective-C code |

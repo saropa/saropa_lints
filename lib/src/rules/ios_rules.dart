@@ -7119,7 +7119,7 @@ class RequirePurchaseVerificationRule extends SaropaLintRule {
         'Client-side verification can be bypassed by attackers.',
     correctionMessage:
         'Verify purchase receipts server-side with Apple/Google. '
-        'Consider using RevenueCat for cross-platform verification.',
+        'Consider using an IAP SDK for cross-platform verification.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -7246,86 +7246,6 @@ class RequirePurchaseRestorationRule extends SaropaLintRule {
     context.registry.addSimpleIdentifier((SimpleIdentifier node) {
       if (node.name == 'InAppPurchase' || node.name == 'StoreKit') {
         reporter.atNode(node, code);
-      }
-    });
-  }
-}
-
-/// Suggests using RevenueCat for cross-platform in-app purchases.
-///
-/// In-app purchases are complex with many edge cases. RevenueCat handles
-/// cross-platform receipt validation, subscription management, and analytics.
-///
-/// ## Why This Matters
-///
-/// - Subscription renewals, cancellations, refunds are complex
-/// - Receipt validation differs between platforms
-/// - Analytics for subscription revenue
-/// - Reduces development and maintenance time
-///
-/// ## Example
-///
-/// **MANUAL (complex):**
-/// ```dart
-/// // Handle all edge cases yourself
-/// await InAppPurchase.instance.buyNonConsumable(...);
-/// await verifyReceiptOnServer(...);
-/// await handleRenewal(...);
-/// await handleCancellation(...);
-/// await handleRefund(...);
-/// ```
-///
-/// **WITH REVENUECAT (simpler):**
-/// ```dart
-/// await Purchases.purchaseProduct(productId);
-/// final info = await Purchases.getCustomerInfo();
-/// if (info.entitlements.active.containsKey('premium')) {
-///   // User has access
-/// }
-/// ```
-///
-/// @see [RevenueCat](https://www.revenuecat.com/)
-class PreferRevenueCatRule extends SaropaLintRule {
-  /// Creates a new instance of [PreferRevenueCatRule].
-  const PreferRevenueCatRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.low;
-
-  static const LintCode _code = LintCode(
-    name: 'prefer_revenue_cat',
-    problemMessage:
-        'Manual in-app purchase implementation detected. Consider using '
-        'RevenueCat for simpler cross-platform subscription management.',
-    correctionMessage:
-        'RevenueCat handles receipt validation, subscription management, '
-        'and analytics. See https://www.revenuecat.com/',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    final String fileSource = resolver.source.contents.data;
-
-    // Skip if already using RevenueCat
-    if (fileSource.contains('RevenueCat') ||
-        fileSource.contains('purchases_flutter') ||
-        fileSource.contains('Purchases.')) {
-      return;
-    }
-
-    context.registry.addSimpleIdentifier((SimpleIdentifier node) {
-      if (node.name == 'InAppPurchase') {
-        // Only report once per file
-        final int nodeOffset = node.offset;
-        final String preceding = fileSource.substring(0, nodeOffset);
-        if (!preceding.contains('InAppPurchase')) {
-          reporter.atNode(node, code);
-        }
       }
     });
   }
