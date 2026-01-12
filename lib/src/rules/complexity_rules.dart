@@ -106,7 +106,8 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_cascade_after_if_null',
-    problemMessage: '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence.',
+    problemMessage:
+        '[avoid_cascade_after_if_null] Cascade after ?? may have unexpected precedence.',
     correctionMessage:
         'Wrap the ?? expression in parentheses: (a ?? b)..cascade',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -243,7 +244,8 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_complex_conditions',
-    problemMessage: '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators.',
+    problemMessage:
+        '[avoid_complex_conditions] Condition has more than $_maxOperators logical operators.',
     correctionMessage: 'Extract parts into named boolean variables.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -327,7 +329,8 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_cascades',
-    problemMessage: '[avoid_duplicate_cascades] Duplicate cascade operation detected.',
+    problemMessage:
+        '[avoid_duplicate_cascades] Duplicate cascade operation detected.',
     correctionMessage: 'Remove the duplicate or verify this is intentional.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -460,7 +463,8 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_immediately_invoked_functions',
-    problemMessage: '[avoid_immediately_invoked_functions] Function is immediately invoked after definition.',
+    problemMessage:
+        '[avoid_immediately_invoked_functions] Function is immediately invoked after definition.',
     correctionMessage: 'Extract the logic inline or to a named function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -504,7 +508,8 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_shorthands',
-    problemMessage: '[avoid_nested_shorthands] Avoid nesting shorthand syntax too deeply.',
+    problemMessage:
+        '[avoid_nested_shorthands] Avoid nesting shorthand syntax too deeply.',
     correctionMessage: 'Extract nested expressions to improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -573,7 +578,8 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_multi_assignment',
-    problemMessage: '[avoid_multi_assignment] Multiple chained assignments detected.',
+    problemMessage:
+        '[avoid_multi_assignment] Multiple chained assignments detected.',
     correctionMessage: 'Split into separate assignment statements.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -602,7 +608,8 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'binary_expression_operand_order',
-    problemMessage: '[binary_expression_operand_order] Consider reordering operands for readability.',
+    problemMessage:
+        '[binary_expression_operand_order] Consider reordering operands for readability.',
     correctionMessage: 'Place the variable on the left side of the comparison.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -642,7 +649,8 @@ class PreferMovingToVariableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_moving_to_variable',
-    problemMessage: '[prefer_moving_to_variable] Consider extracting repeated expression to a variable.',
+    problemMessage:
+        '[prefer_moving_to_variable] Consider extracting repeated expression to a variable.',
     correctionMessage: 'Extract to a local variable to avoid repetition.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -724,7 +732,8 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_parentheses_with_if_null',
-    problemMessage: '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence.',
+    problemMessage:
+        '[prefer_parentheses_with_if_null] Add parentheses to clarify if-null expression precedence.',
     correctionMessage: 'Wrap operands in parentheses for clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

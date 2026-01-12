@@ -456,7 +456,8 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_in_ui',
-    problemMessage: '[avoid_string_concatenation_in_ui] String concatenation breaks internationalization.',
+    problemMessage:
+        '[avoid_string_concatenation_in_ui] String concatenation breaks internationalization.',
     correctionMessage: 'Use localized strings with placeholders.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -603,7 +604,8 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_app_name',
-    problemMessage: '[avoid_hardcoded_app_name] App name should not be hardcoded in UI.',
+    problemMessage:
+        '[avoid_hardcoded_app_name] App name should not be hardcoded in UI.',
     correctionMessage: 'Use a configuration constant or localized string.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -672,7 +674,8 @@ class PreferDateFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_date_format',
-    problemMessage: '[prefer_date_format] Raw DateTime formatting ignores user locale.',
+    problemMessage:
+        '[prefer_date_format] Raw DateTime formatting ignores user locale.',
     correctionMessage:
         'Use DateFormat from intl package for locale-aware formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -817,7 +820,8 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_description',
-    problemMessage: '[prefer_providing_intl_description] Intl.message without description.',
+    problemMessage:
+        '[prefer_providing_intl_description] Intl.message without description.',
     correctionMessage:
         'Add desc parameter to help translators understand context.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -893,7 +897,8 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_examples',
-    problemMessage: '[prefer_providing_intl_examples] Intl.message with args but no examples.',
+    problemMessage:
+        '[prefer_providing_intl_examples] Intl.message with args but no examples.',
     correctionMessage: 'Add examples parameter to help translators.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1313,7 +1318,8 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_manual_date_formatting',
-    problemMessage: '[avoid_manual_date_formatting] Manual date formatting is error-prone and ignores locale.',
+    problemMessage:
+        '[avoid_manual_date_formatting] Manual date formatting is error-prone and ignores locale.',
     correctionMessage:
         'Use DateFormat from intl: DateFormat.yMd(locale).format(date)',
     errorSeverity: DiagnosticSeverity.WARNING,

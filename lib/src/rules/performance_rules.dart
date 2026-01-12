@@ -57,7 +57,8 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_keys_in_animated_lists',
-    problemMessage: '[require_keys_in_animated_lists] AnimatedList/AnimatedGrid items should have keys.',
+    problemMessage:
+        '[require_keys_in_animated_lists] AnimatedList/AnimatedGrid items should have keys.',
     correctionMessage:
         'Add a Key to the returned widget for correct animations.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -208,7 +209,8 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_build',
-    problemMessage: '[avoid_expensive_build] Expensive operation in build method.',
+    problemMessage:
+        '[avoid_expensive_build] Expensive operation in build method.',
     correctionMessage:
         'Move expensive operations to initState, didChangeDependencies, or cache the result.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -327,7 +329,8 @@ class PreferConstChildWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_child_widgets',
-    problemMessage: '[prefer_const_child_widgets] Child widgets could be const.',
+    problemMessage:
+        '[prefer_const_child_widgets] Child widgets could be const.',
     correctionMessage:
         'Add const to the list literal to prevent unnecessary rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -441,7 +444,8 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_synchronous_file_io',
-    problemMessage: '[avoid_synchronous_file_io] Avoid synchronous file I/O operations.',
+    problemMessage:
+        '[avoid_synchronous_file_io] Avoid synchronous file I/O operations.',
     correctionMessage: 'Use async file operations to avoid blocking the UI.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -501,7 +505,8 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_compute_for_heavy_work',
-    problemMessage: '[prefer_compute_for_heavy_work] Heavy computation should use compute() or Isolate.',
+    problemMessage:
+        '[prefer_compute_for_heavy_work] Heavy computation should use compute() or Isolate.',
     correctionMessage:
         'Move heavy work to a separate isolate using compute() or Isolate.run().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -592,7 +597,8 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_object_creation_in_hot_loops',
-    problemMessage: '[avoid_object_creation_in_hot_loops] Object creation inside loop causes GC pressure.',
+    problemMessage:
+        '[avoid_object_creation_in_hot_loops] Object creation inside loop causes GC pressure.',
     correctionMessage: 'Move object creation outside the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -699,7 +705,8 @@ class PreferCachedGetterRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_getter',
-    problemMessage: '[prefer_cached_getter] Getter called multiple times - consider caching.',
+    problemMessage:
+        '[prefer_cached_getter] Getter called multiple times - consider caching.',
     correctionMessage:
         'Store the getter result in a local variable if called multiple times.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -886,7 +893,8 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_item_extent_for_large_lists',
-    problemMessage: '[require_item_extent_for_large_lists] Large list should specify itemExtent for performance.',
+    problemMessage:
+        '[require_item_extent_for_large_lists] Large list should specify itemExtent for performance.',
     correctionMessage:
         'Add itemExtent or prototypeItem for better scrolling performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -972,7 +980,8 @@ class PreferImagePrecacheRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_image_precache',
-    problemMessage: '[prefer_image_precache] Consider precaching large or hero images.',
+    problemMessage:
+        '[prefer_image_precache] Consider precaching large or hero images.',
     correctionMessage:
         'Use precacheImage() in didChangeDependencies for smoother UX.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1056,7 +1065,8 @@ class AvoidControllerInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_controller_in_build',
-    problemMessage: '[avoid_controller_in_build] Controller should not be created in build method.',
+    problemMessage:
+        '[avoid_controller_in_build] Controller should not be created in build method.',
     correctionMessage:
         'Create controllers as class fields and dispose them properly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1151,7 +1161,8 @@ class AvoidSetStateInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_setstate_in_build',
-    problemMessage: '[avoid_setstate_in_build] setState should not be called in build method.',
+    problemMessage:
+        '[avoid_setstate_in_build] setState should not be called in build method.',
     correctionMessage:
         'Use addPostFrameCallback or move state changes to event handlers.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1273,7 +1284,8 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_loop',
-    problemMessage: '[avoid_string_concatenation_loop] Avoid string concatenation inside loops.',
+    problemMessage:
+        '[avoid_string_concatenation_loop] Avoid string concatenation inside loops.',
     correctionMessage: 'Use StringBuffer for building strings in loops.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1784,7 +1796,8 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
-    problemMessage: '[avoid_text_span_in_build] TextSpan created in build() prevents text layout caching.',
+    problemMessage:
+        '[avoid_text_span_in_build] TextSpan created in build() prevents text layout caching.',
     correctionMessage:
         'Cache TextSpan as a static const or class field for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1864,7 +1877,8 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_large_list_copy',
-    problemMessage: '[avoid_large_list_copy] List.from() and toList() copy all elements.',
+    problemMessage:
+        '[avoid_large_list_copy] List.from() and toList() copy all elements.',
     correctionMessage:
         'Consider lazy Iterable operations or document intentional copies.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2391,7 +2405,8 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_cache_management',
-    problemMessage: '[require_image_cache_management] Class loads many images but never clears imageCache.',
+    problemMessage:
+        '[require_image_cache_management] Class loads many images but never clears imageCache.',
     correctionMessage:
         'Call imageCache.clear() or imageCache.evict() in dispose().',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3138,7 +3153,8 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_platform_channel_on_web',
-    problemMessage: '[avoid_platform_channel_on_web] MethodChannel is not available on web platform.',
+    problemMessage:
+        '[avoid_platform_channel_on_web] MethodChannel is not available on web platform.',
     correctionMessage: 'Wrap with kIsWeb check or use conditional imports.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -3213,7 +3229,8 @@ class RequireCorsHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cors_handling',
-    problemMessage: '[require_cors_handling] HTTP calls on web may require CORS handling.',
+    problemMessage:
+        '[require_cors_handling] HTTP calls on web may require CORS handling.',
     correctionMessage:
         'Ensure server returns CORS headers or use appropriate configuration.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3291,7 +3308,8 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_deferred_loading_web',
-    problemMessage: '[prefer_deferred_loading_web] Consider deferred loading for large packages on web.',
+    problemMessage:
+        '[prefer_deferred_loading_web] Consider deferred loading for large packages on web.',
     correctionMessage: 'Use "deferred as" import for better web load times.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3371,7 +3389,8 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_menu_bar_for_desktop',
-    problemMessage: '[require_menu_bar_for_desktop] Desktop app should have a PlatformMenuBar.',
+    problemMessage:
+        '[require_menu_bar_for_desktop] Desktop app should have a PlatformMenuBar.',
     correctionMessage: 'Add PlatformMenuBar for standard desktop experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3454,7 +3473,8 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_window_close_confirmation',
-    problemMessage: '[require_window_close_confirmation] Desktop app should handle window close confirmation.',
+    problemMessage:
+        '[require_window_close_confirmation] Desktop app should handle window close confirmation.',
     correctionMessage: 'Implement didRequestAppExit for save confirmation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3533,7 +3553,8 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_native_file_dialogs',
-    problemMessage: '[prefer_native_file_dialogs] Consider using native file dialogs on desktop.',
+    problemMessage:
+        '[prefer_native_file_dialogs] Consider using native file dialogs on desktop.',
     correctionMessage:
         'Use file_picker or file_selector for native experience.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3797,7 +3818,8 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_blocking_database_ui',
-    problemMessage: '[avoid_blocking_database_ui] Database operation in build method may block UI thread.',
+    problemMessage:
+        '[avoid_blocking_database_ui] Database operation in build method may block UI thread.',
     correctionMessage:
         'Load data in initState or use FutureBuilder/StreamBuilder.',
     errorSeverity: DiagnosticSeverity.WARNING,

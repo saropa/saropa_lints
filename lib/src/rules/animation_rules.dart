@@ -54,7 +54,8 @@ class RequireVsyncMixinRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_vsync_mixin',
-    problemMessage: '[require_vsync_mixin] AnimationController created without vsync parameter.',
+    problemMessage:
+        '[require_vsync_mixin] AnimationController created without vsync parameter.',
     correctionMessage:
         'Add vsync: this and use SingleTickerProviderStateMixin or TickerProviderStateMixin.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1058,7 +1059,8 @@ class PreferTweenSequenceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_tween_sequence',
-    problemMessage: '[prefer_tween_sequence] Multiple chained animations should use TweenSequence.',
+    problemMessage:
+        '[prefer_tween_sequence] Multiple chained animations should use TweenSequence.',
     correctionMessage: 'Use TweenSequence for sequential animations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1211,7 +1213,8 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_overlapping_animations',
-    problemMessage: '[avoid_overlapping_animations] Multiple animations on same property cause conflicts.',
+    problemMessage:
+        '[avoid_overlapping_animations] Multiple animations on same property cause conflicts.',
     correctionMessage:
         'Combine into single animation or use different properties.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1306,7 +1309,8 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_animation_rebuild_waste',
-    problemMessage: '[avoid_animation_rebuild_waste] AnimatedBuilder wraps too much of the widget tree.',
+    problemMessage:
+        '[avoid_animation_rebuild_waste] AnimatedBuilder wraps too much of the widget tree.',
     correctionMessage: 'Move AnimatedBuilder closer to animated widgets only.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
