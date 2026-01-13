@@ -378,29 +378,201 @@ class AvoidGlobalStateRule extends SaropaLintRule {
   List<Fix> getFixes() => <Fix>[_AddHackForGlobalStateFix()];
 }
 
-/// Warns when a file exceeds the maximum line count.
+// =============================================================================
+// FILE LENGTH RULES (Tiered) - OPINIONATED STYLE PREFERENCES
+// =============================================================================
+//
+// These are OPINIONATED style preferences, NOT quality indicators.
+//
+// Large files are often necessary and completely valid for:
+// - Data files, enums, constants, lookup tables
+// - Generated code
+// - Configuration/theme files
+// - Localization/translation files
+// - Test fixtures with many test cases
+//
+// All rules use INFO severity. Enable only if your team prefers smaller files.
+// Disable for files where large size is intentional (use ignore comments).
+//
+// | Threshold | Rule                    | Tier          |
+// |-----------|-------------------------|---------------|
+// | 200 lines | prefer_small_files      | insanity      |
+// | 300 lines | avoid_medium_files      | professional  |
+// | 500 lines | avoid_long_files        | comprehensive |
+// | 1000 lines| avoid_very_long_files   | recommended   |
+// =============================================================================
+
+/// **OPINIONATED**: Suggests keeping files under 200 lines for maximum
+/// maintainability.
 ///
-/// Long files are harder to navigate and maintain. Consider splitting
-/// into multiple files.
+/// Small files are easier to understand at a glance, have clearer
+/// responsibilities, and are simpler to test in isolation. The 200-line
+/// threshold encourages the Single Responsibility Principle - if a file
+/// exceeds this, it likely has multiple concerns that could be separated.
 ///
-/// ### Configuration
-/// Default maximum: 500 lines
+/// **Best practice**: Each file should do one thing well. When you can't
+/// describe what a file does in a single sentence, it's probably too big.
+///
+/// Disable for data files, enums, or generated code:
+/// ```dart
+/// // ignore_for_file: prefer_small_files
+/// ```
+class PreferSmallFilesRule extends SaropaLintRule {
+  const PreferSmallFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const int _maxLines = 200;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_small_files',
+    problemMessage:
+        '[prefer_small_files] File has more than $_maxLines lines. '
+        'Smaller files are easier to understand and maintain.',
+    correctionMessage:
+        'Split this file into focused modules with single responsibilities. '
+        'For data/enum files, disable with: // ignore_for_file: prefer_small_files',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final Token endToken = unit.endToken;
+      final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
+
+      if (lineCount > _maxLines) {
+        reporter.atToken(unit.beginToken, code);
+      }
+    });
+  }
+}
+
+/// **OPINIONATED**: Flags files exceeding 300 lines.
+///
+/// This is ESLint's default threshold. Many valid files exceed this.
+///
+/// Disable for files where size is intentional:
+/// ```dart
+/// // ignore_for_file: avoid_medium_files
+/// ```
+class AvoidMediumFilesRule extends SaropaLintRule {
+  const AvoidMediumFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const int _maxLines = 300;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_medium_files',
+    problemMessage: '[avoid_medium_files] File exceeds $_maxLines lines.',
+    correctionMessage:
+        'Consider splitting into smaller modules, or disable this rule '
+        'for data/enum files where large size is intentional.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final Token endToken = unit.endToken;
+      final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
+
+      if (lineCount > _maxLines) {
+        reporter.atToken(unit.beginToken, code);
+      }
+    });
+  }
+}
+
+/// **OPINIONATED**: Flags files exceeding 500 lines.
+///
+/// A common threshold in style guides. Many valid files exceed this.
+///
+/// Disable for files where size is intentional:
+/// ```dart
+/// // ignore_for_file: avoid_long_files
+/// ```
 class AvoidLongFilesRule extends SaropaLintRule {
   const AvoidLongFilesRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.low;
 
   @override
-  RuleCost get cost => RuleCost.medium;
+  RuleCost get cost => RuleCost.trivial;
 
   static const int _maxLines = 500;
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_files',
     problemMessage: '[avoid_long_files] File exceeds $_maxLines lines.',
-    correctionMessage: 'Consider splitting this file into smaller modules.',
+    correctionMessage:
+        'Consider splitting into smaller modules, or disable this rule '
+        'for data/enum files where large size is intentional.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final Token endToken = unit.endToken;
+      final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
+
+      if (lineCount > _maxLines) {
+        reporter.atToken(unit.beginToken, code);
+      }
+    });
+  }
+}
+
+/// **OPINIONATED**: Flags files exceeding 1000 lines.
+///
+/// Large files are often necessary for data, enums, constants, configs,
+/// generated code, and lookup tables. This rule is a style preference,
+/// not a quality indicator.
+///
+/// Disable for files where size is intentional:
+/// ```dart
+/// // ignore_for_file: avoid_very_long_files
+/// ```
+class AvoidVeryLongFilesRule extends SaropaLintRule {
+  const AvoidVeryLongFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const int _maxLines = 1000;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_very_long_files',
+    problemMessage: '[avoid_very_long_files] File exceeds $_maxLines lines.',
+    correctionMessage:
+        'Consider splitting into smaller modules, or disable this rule '
+        'for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

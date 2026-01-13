@@ -8,11 +8,67 @@ import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:analyzer/error/listener.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import 'baseline/baseline_manager.dart';
 import 'ignore_utils.dart';
+import 'owasp/owasp.dart';
 import 'project_context.dart';
+import 'tiers.dart' show essentialRules;
 
 // Re-export types needed by rule implementations
-export 'project_context.dart' show FileContentCache, FileType, RuleCost;
+export 'owasp/owasp.dart' show OwaspMapping, OwaspMobile, OwaspWeb;
+export 'project_context.dart'
+    show
+        AstNodeCategory,
+        AstNodeTypeRegistry,
+        BaselineAwareEarlyExit,
+        BatchableRuleInfo,
+        BloomFilter,
+        CachedSymbolInfo,
+        GitAwarePriority,
+        CompilationUnitCache,
+        CompilationUnitDerivedData,
+        ConsolidatedVisitorDispatch,
+        ContentFingerprint,
+        ContentRegionIndex,
+        ContentRegions,
+        DiffBasedAnalysis,
+        FileContentCache,
+        FileMetrics,
+        FileMetricsCache,
+        FileType,
+        HotPathProfiler,
+        ImportGraphCache,
+        ImportNode,
+        IncrementalAnalysisTracker,
+        initializeCacheManagement,
+        LazyPattern,
+        LazyPatternCache,
+        LineRange,
+        LruCache,
+        MemoryPressureHandler,
+        NodeVisitCallback,
+        ParallelAnalysisResult,
+        ParallelAnalyzer,
+        PatternIndex,
+        ProfilingEntry,
+        RuleBatchExecutor,
+        RuleCost,
+        RuleDependencyGraph,
+        RuleExecutionStats,
+        RuleGroup,
+        RuleGroupExecutor,
+        RulePatternInfo,
+        RulePriorityInfo,
+        RulePriorityQueue,
+        SemanticTokenCache,
+        SmartContentFilter,
+        SourceLocation,
+        SourceLocationCache,
+        SpeculativeAnalysis,
+        StringInterner,
+        SymbolKind,
+        ThrottledAnalysis,
+        ViolationBatch;
 
 // =============================================================================
 // RULE TIMING INSTRUMENTATION (Performance Profiling)
@@ -429,6 +485,30 @@ abstract class SaropaLintRule extends DartLintRule {
   RuleCost get cost => RuleCost.medium;
 
   // ============================================================
+  // OWASP Security Compliance Mapping
+  // ============================================================
+
+  /// OWASP categories this rule helps prevent.
+  ///
+  /// Override to specify OWASP Mobile Top 10 and/or Web Top 10 categories
+  /// that this rule addresses. Returns `null` for non-security rules.
+  ///
+  /// Example:
+  /// ```dart
+  /// @override
+  /// OwaspMapping? get owasp => const OwaspMapping(
+  ///   mobile: {OwaspMobile.m1, OwaspMobile.m10},
+  ///   web: {OwaspWeb.a02, OwaspWeb.a07},
+  /// );
+  /// ```
+  ///
+  /// This mapping enables:
+  /// - Compliance reporting for security audits
+  /// - Risk categorization aligned with industry standards
+  /// - Coverage analysis across OWASP categories
+  OwaspMapping? get owasp => null;
+
+  // ============================================================
   // File Type Filtering (Performance Optimization)
   // ============================================================
 
@@ -490,6 +570,155 @@ abstract class SaropaLintRule extends DartLintRule {
   ///
   /// Default: 0 (no minimum, rule runs on all files)
   int get minimumLineCount => 0;
+
+  // ============================================================
+  // Skip Large Files (DANGEROUS - Use Sparingly)
+  // ============================================================
+
+  /// Maximum line count for this rule to run.
+  ///
+  /// **WARNING**: Use this ONLY for rules with O(n²) or worse complexity
+  /// where analysis time becomes prohibitive. Large files often NEED
+  /// linting most - skipping them can hide real bugs!
+  ///
+  /// Consider using `avoid_long_files` rule to encourage file splitting
+  /// instead of silently skipping analysis.
+  ///
+  /// Default: 0 (OFF - rule runs on all files regardless of size)
+  int get maximumLineCount => 0;
+
+  // ============================================================
+  // Content Type Requirements (Performance Optimization)
+  // ============================================================
+
+  /// Whether this rule only applies to async code.
+  ///
+  /// If true, the rule is skipped for files without 'async' or 'Future'.
+  /// This is a fast pre-filter before AST analysis.
+  ///
+  /// Example: Rules checking for missing await:
+  /// ```dart
+  /// @override
+  /// bool get requiresAsync => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresAsync => false;
+
+  /// Whether this rule only applies to Flutter widget code.
+  ///
+  /// If true, the rule is skipped for files without Widget/State patterns.
+  /// This is a fast pre-filter before AST analysis.
+  ///
+  /// Example: Rules checking StatefulWidget lifecycle:
+  /// ```dart
+  /// @override
+  /// bool get requiresWidgets => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresWidgets => false;
+
+  /// Whether this rule only applies to files with class declarations.
+  ///
+  /// If true, the rule is skipped for files without class/mixin/extension.
+  /// Uses ContentRegionIndex for fast detection.
+  ///
+  /// Example: Rules checking class structure:
+  /// ```dart
+  /// @override
+  /// bool get requiresClassDeclaration => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresClassDeclaration => false;
+
+  /// Whether this rule only applies to files with a main() function.
+  ///
+  /// If true, the rule is skipped for library files without main().
+  /// Uses ContentRegionIndex for fast detection.
+  ///
+  /// Example: Rules checking app entry points:
+  /// ```dart
+  /// @override
+  /// bool get requiresMainFunction => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresMainFunction => false;
+
+  /// Whether this rule only applies to files with imports.
+  ///
+  /// If true, the rule is skipped for files without import/export statements.
+  /// Uses ContentRegionIndex for fast detection.
+  ///
+  /// Example: Rules checking import organization:
+  /// ```dart
+  /// @override
+  /// bool get requiresImports => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresImports => false;
+
+  /// Whether this rule only applies to files that import Flutter.
+  ///
+  /// If true, the rule is skipped for files without `package:flutter/` imports.
+  /// Uses cached FileMetrics for O(1) lookup after first computation.
+  ///
+  /// Example: Widget-specific rules:
+  /// ```dart
+  /// @override
+  /// bool get requiresFlutterImport => true;
+  /// ```
+  ///
+  /// **Impact**: Skips ~300+ widget rules instantly for pure Dart files.
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresFlutterImport => false;
+
+  /// Whether this rule only applies to files that import Bloc.
+  ///
+  /// If true, the rule is skipped for files without `package:bloc/` or
+  /// `package:flutter_bloc/` imports. Uses cached FileMetrics.
+  ///
+  /// Example: Bloc-specific rules:
+  /// ```dart
+  /// @override
+  /// bool get requiresBlocImport => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresBlocImport => false;
+
+  /// Whether this rule only applies to files that import Provider.
+  ///
+  /// If true, the rule is skipped for files without `package:provider/` imports.
+  /// Uses cached FileMetrics.
+  ///
+  /// Example: Provider-specific rules:
+  /// ```dart
+  /// @override
+  /// bool get requiresProviderImport => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresProviderImport => false;
+
+  /// Whether this rule only applies to files that import Riverpod.
+  ///
+  /// If true, the rule is skipped for files without `package:riverpod/`,
+  /// `package:flutter_riverpod/`, or `package:hooks_riverpod/` imports.
+  /// Uses cached FileMetrics.
+  ///
+  /// Example: Riverpod-specific rules:
+  /// ```dart
+  /// @override
+  /// bool get requiresRiverpodImport => true;
+  /// ```
+  ///
+  /// Default: false (runs on all files)
+  bool get requiresRiverpodImport => false;
 
   // ============================================================
   // Context-Aware Auto-Suppression (#2)
@@ -621,6 +850,59 @@ abstract class SaropaLintRule extends DartLintRule {
   // Core Implementation
   // ============================================================
 
+  // Track if we've initialized the project root for disk persistence
+  static bool _projectRootInitialized = false;
+
+  // Track recent analysis for throttling: "path:contentHash" -> timestamp
+  // Prevents duplicate analysis of identical content within short windows
+  static final Map<String, DateTime> _recentAnalysis = {};
+  static const Duration _throttleWindow = Duration(milliseconds: 300);
+
+  // Track edit frequency per file for adaptive tier switching
+  // Maps file path to list of recent analysis timestamps
+  static final Map<String, List<DateTime>> _fileEditHistory = {};
+  static const Duration _rapidEditWindow = Duration(seconds: 2);
+  static const int _rapidEditThreshold = 3;
+
+  /// Check if a file is being rapidly edited (3+ analyses in 2 seconds).
+  ///
+  /// During rapid editing, only essential-tier rules run for faster feedback.
+  static bool _isRapidEditMode(String path) {
+    final now = DateTime.now();
+    final history = _fileEditHistory[path];
+
+    if (history == null) {
+      _fileEditHistory[path] = [now];
+      return false;
+    }
+
+    // Add current timestamp
+    history.add(now);
+
+    // Remove old entries outside the window
+    final cutoff = now.subtract(_rapidEditWindow);
+    history.removeWhere((t) => t.isBefore(cutoff));
+
+    // Cleanup: limit total tracked files to prevent memory growth
+    if (_fileEditHistory.length > 100) {
+      // Remove files not edited recently
+      final oldCutoff = now.subtract(const Duration(seconds: 30));
+      _fileEditHistory.removeWhere(
+        (_, times) => times.isEmpty || times.last.isBefore(oldCutoff),
+      );
+    }
+
+    // Rapid mode if 3+ edits in the window
+    return history.length >= _rapidEditThreshold;
+  }
+
+  /// Check if this rule belongs to the essential tier.
+  ///
+  /// Essential-tier rules run even during rapid editing.
+  bool _isEssentialTierRule() {
+    return essentialRules.contains(code.name);
+  }
+
   @override
   void run(
     CustomLintResolver resolver,
@@ -634,8 +916,68 @@ abstract class SaropaLintRule extends DartLintRule {
     final path = resolver.source.fullName;
     if (_shouldSkipFile(path)) return;
 
+    // =========================================================================
+    // BATCH EXECUTION PLAN CHECK (Performance Optimization)
+    // =========================================================================
+    // If a batch execution plan was created, check if this rule should run
+    // on this file. The plan was computed via parallel pre-analysis.
+    if (!RuleBatchExecutor.shouldRuleRunOnFile(code.name, path)) {
+      return;
+    }
+
     // Get file content from resolver (already loaded by analyzer)
     final content = resolver.source.contents.data;
+
+    // =========================================================================
+    // DISK PERSISTENCE INITIALIZATION (Performance Optimization)
+    // =========================================================================
+    // On first file, detect project root and load cached analysis state.
+    // This allows the cache to survive IDE restarts.
+    if (!_projectRootInitialized) {
+      _projectRootInitialized = true;
+      final projectRoot = ProjectContext.findProjectRoot(path);
+      if (projectRoot != null) {
+        IncrementalAnalysisTracker.setProjectRoot(projectRoot);
+        // Initialize git-aware prioritization for faster feedback on edited files
+        GitAwarePriority.initialize(projectRoot);
+      }
+    }
+
+    // =========================================================================
+    // MEMORY PRESSURE CHECK (Performance Optimization)
+    // =========================================================================
+    // Record that a file is being processed. This triggers automatic cache
+    // clearing when memory usage exceeds the configured threshold.
+    MemoryPressureHandler.recordFileProcessed();
+
+    // =========================================================================
+    // RAPID ANALYSIS THROTTLE (Performance Optimization)
+    // =========================================================================
+    // Skip if we just analyzed this exact content. This prevents redundant
+    // analysis during rapid saves while still analyzing changed content.
+    final analysisKey = '$path:${content.hashCode}';
+    final now = DateTime.now();
+    final lastAnalysis = _recentAnalysis[analysisKey];
+    if (lastAnalysis != null &&
+        now.difference(lastAnalysis) < _throttleWindow) {
+      return; // Same content analyzed too recently
+    }
+    _recentAnalysis[analysisKey] = now;
+
+    // Cleanup stale entries periodically to prevent memory leaks
+    if (_recentAnalysis.length > 1000) {
+      final cutoff = now.subtract(const Duration(seconds: 10));
+      _recentAnalysis.removeWhere((_, time) => time.isBefore(cutoff));
+    }
+
+    // =========================================================================
+    // INCREMENTAL ANALYSIS CHECK (Performance Optimization)
+    // =========================================================================
+    // If this rule already passed on this unchanged file, skip re-analysis.
+    // This provides massive speedups for subsequent analysis runs.
+    if (IncrementalAnalysisTracker.canSkipRule(path, content, code.name)) {
+      return;
+    }
 
     // =========================================================================
     // EARLY EXIT BY REQUIRED PATTERNS (Performance Optimization)
@@ -647,25 +989,101 @@ abstract class SaropaLintRule extends DartLintRule {
       final hasAnyPattern = patterns.any((p) => content.contains(p));
       if (!hasAnyPattern) {
         // Early exit - file doesn't contain any required patterns
+        // Record as passed since it can never violate this rule
+        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
         return;
       }
     }
 
     // =========================================================================
-    // EARLY EXIT BY MINIMUM LINE COUNT (Performance Optimization)
+    // FILE METRICS CHECKS (Performance Optimization)
     // =========================================================================
-    // High-cost rules can skip small files where complex patterns are unlikely.
+    // Use cached file metrics for fast filtering based on file characteristics.
+    final metrics = FileMetricsCache.get(path, content);
+
+    // Check minimum line count
     final minLines = minimumLineCount;
-    if (minLines > 0) {
-      // Fast line count using newline characters
-      var lineCount = 1;
-      for (var i = 0; i < content.length && lineCount < minLines; i++) {
-        if (content.codeUnitAt(i) == 10) lineCount++; // 10 = '\n'
-      }
-      if (lineCount < minLines) {
-        // Early exit - file is too small for this rule
+    if (minLines > 0 && metrics.lineCount < minLines) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+
+    // Check maximum line count (DANGEROUS - only for O(n²) rules)
+    final maxLines = maximumLineCount;
+    if (maxLines > 0 && metrics.lineCount > maxLines) {
+      // NOTE: This skips analysis! Only use for prohibitively slow rules.
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+
+    // Check async code requirement
+    if (requiresAsync && !metrics.hasAsyncCode) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+
+    // Check widget code requirement
+    if (requiresWidgets && !metrics.hasWidgets) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+
+    // =========================================================================
+    // CONTENT REGION CHECKS (Performance Optimization)
+    // =========================================================================
+    // Use ContentRegionIndex for fast structural checks without full AST parse.
+    if (requiresClassDeclaration || requiresMainFunction || requiresImports) {
+      final regions = ContentRegionIndex.get(path, content);
+
+      // Check class declaration requirement
+      if (requiresClassDeclaration && regions.classDeclarations.isEmpty) {
+        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
         return;
       }
+
+      // Check main function requirement
+      if (requiresMainFunction && !regions.hasMain) {
+        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+        return;
+      }
+
+      // Check imports requirement
+      if (requiresImports && regions.importRegion.isEmpty) {
+        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+        return;
+      }
+    }
+
+    // =========================================================================
+    // PACKAGE IMPORT CHECKS (Performance Optimization)
+    // =========================================================================
+    // Use cached FileMetrics for O(1) import detection. Avoids redundant
+    // string searches when multiple rules check the same imports.
+    if (requiresFlutterImport && !metrics.hasFlutterImport) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+    if (requiresBlocImport && !metrics.hasBlocImport) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+    if (requiresProviderImport && !metrics.hasProviderImport) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+    if (requiresRiverpodImport && !metrics.hasRiverpodImport) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
+      return;
+    }
+
+    // =========================================================================
+    // ADAPTIVE TIER SWITCHING (Performance Optimization)
+    // =========================================================================
+    // During rapid editing (same file analyzed 3+ times in 2 seconds), only
+    // run essential-tier rules. Full analysis runs after editing settles.
+    if (_isRapidEditMode(path) && !_isEssentialTierRule()) {
+      // Skip non-essential rules during rapid editing for faster feedback
+      return;
     }
 
     // =========================================================================
@@ -682,12 +1100,13 @@ abstract class SaropaLintRule extends DartLintRule {
       final hasMatch = applicable.any((type) => fileTypes.contains(type));
       if (!hasMatch) {
         // Early exit - this rule doesn't apply to this file type
+        IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
         return;
       }
     }
 
     // Run the rule
-    _runRuleWithReporter(resolver, reporter, path, context);
+    _runRuleWithReporter(resolver, reporter, path, content, context);
   }
 
   /// Internal helper to run the rule with timing and reporter wrapping.
@@ -695,6 +1114,7 @@ abstract class SaropaLintRule extends DartLintRule {
     CustomLintResolver resolver,
     DiagnosticReporter reporter,
     String path,
+    String content,
     CustomLintContext context,
   ) {
     // Create wrapped reporter with severity override and impact tracking
@@ -706,6 +1126,13 @@ abstract class SaropaLintRule extends DartLintRule {
       severityOverride: severityOverrides?[code.name],
     );
 
+    // Track whether rule reports any violations
+    var hadViolations = false;
+    final trackingReporter = _TrackingReporter(
+      wrappedReporter,
+      onViolation: () => hadViolations = true,
+    );
+
     // =========================================================================
     // TIMING INSTRUMENTATION
     // =========================================================================
@@ -713,11 +1140,20 @@ abstract class SaropaLintRule extends DartLintRule {
     // execution time and log slow rules (>10ms) for performance investigation.
     if (_profilingEnabled) {
       final stopwatch = Stopwatch()..start();
-      runWithReporter(resolver, wrappedReporter, context);
+      runWithReporter(resolver, trackingReporter, context);
       stopwatch.stop();
       RuleTimingTracker.record(code.name, stopwatch.elapsed);
     } else {
-      runWithReporter(resolver, wrappedReporter, context);
+      runWithReporter(resolver, trackingReporter, context);
+    }
+
+    // =========================================================================
+    // RECORD CLEAN FILES (Performance Optimization)
+    // =========================================================================
+    // If the rule found no violations, record this for incremental analysis.
+    // Next time, we can skip this rule entirely if the file hasn't changed.
+    if (!hadViolations) {
+      IncrementalAnalysisTracker.recordRulePassed(path, content, code.name);
     }
   }
 
@@ -772,15 +1208,22 @@ class SaropaDiagnosticReporter {
   }
 
   /// Reports a diagnostic at the given [node], unless an ignore comment
-  /// is present (supports both underscore and hyphen formats).
+  /// is present (supports both underscore and hyphen formats), or the
+  /// violation is suppressed by baseline configuration.
   void atNode(AstNode node, LintCode code) {
     // Check for hyphenated ignore comment before reporting
     if (IgnoreUtils.hasIgnoreComment(node, _ruleName)) {
       return;
     }
 
+    // Check if violation is suppressed by baseline
+    final line = _getLineNumber(node.offset, node);
+    if (BaselineManager.isBaselined(filePath, _ruleName, line)) {
+      return;
+    }
+
     // Track the violation by impact level
-    _trackViolation(code, _getLineNumber(node.offset, node));
+    _trackViolation(code, line);
 
     _delegate.atNode(node, _applyOverride(code));
   }
@@ -789,6 +1232,12 @@ class SaropaDiagnosticReporter {
   void atToken(Token token, LintCode code) {
     // Check for hyphenated ignore comment on the token
     if (IgnoreUtils.hasIgnoreCommentOnToken(token, _ruleName)) {
+      return;
+    }
+
+    // Check if violation is suppressed by baseline (path-based only for tokens)
+    // Token doesn't have easy line access, so line-based baseline won't match
+    if (BaselineManager.isBaselined(filePath, _ruleName, 0)) {
       return;
     }
 
@@ -807,13 +1256,18 @@ class SaropaDiagnosticReporter {
 
   /// Reports a diagnostic at the given offset and length.
   ///
-  /// Note: This method cannot check for ignore comments since we only have
-  /// offset/length, not an AST node. Use [atNode] when possible.
+  /// Note: This method cannot check for ignore comments or line-based baseline
+  /// since we only have offset/length, not an AST node. Use [atNode] when possible.
   void atOffset({
     required int offset,
     required int length,
     required LintCode errorCode,
   }) {
+    // Check if violation is suppressed by baseline (path-based only)
+    if (BaselineManager.isBaselined(filePath, errorCode.name, 0)) {
+      return;
+    }
+
     // Track the violation by impact level
     _trackViolation(errorCode, 0);
 
@@ -849,5 +1303,46 @@ class SaropaDiagnosticReporter {
       // Fall back to 0 if we can't determine the line
     }
     return 0;
+  }
+}
+
+/// A wrapper reporter that tracks whether any violations were reported.
+///
+/// Used by the incremental analysis system to record rules that pass
+/// (report no violations) so they can be skipped on subsequent runs.
+class _TrackingReporter extends SaropaDiagnosticReporter {
+  _TrackingReporter(
+    SaropaDiagnosticReporter delegate, {
+    required this.onViolation,
+  }) : super(
+          delegate._delegate,
+          delegate._ruleName,
+          filePath: delegate.filePath,
+          impact: delegate.impact,
+          severityOverride: delegate.severityOverride,
+        );
+
+  final void Function() onViolation;
+
+  @override
+  void atNode(AstNode node, LintCode code) {
+    onViolation();
+    super.atNode(node, code);
+  }
+
+  @override
+  void atToken(Token token, LintCode code) {
+    onViolation();
+    super.atToken(token, code);
+  }
+
+  @override
+  void atOffset({
+    required int offset,
+    required int length,
+    required LintCode errorCode,
+  }) {
+    onViolation();
+    super.atOffset(offset: offset, length: length, errorCode: errorCode);
   }
 }

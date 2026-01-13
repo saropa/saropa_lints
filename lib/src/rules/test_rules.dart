@@ -2074,7 +2074,9 @@ class MissingTestAssertionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'missing_test_assertion',
-    problemMessage: '[missing_test_assertion] Test has no assertions.',
+    problemMessage:
+        '[missing_test_assertion] Test without assertions always passes, giving '
+        'false confidence. Bugs slip through undetected.',
     correctionMessage:
         'Add expect(), verify(), or other assertion to validate behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2326,7 +2328,8 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_async_callback_in_fake_async',
     problemMessage:
-        '[avoid_async_callback_in_fake_async] Async callback inside fakeAsync defeats fake time control.',
+        '[avoid_async_callback_in_fake_async] Async callback uses real time, '
+        'making tests hang or timeout instead of using controlled fake time.',
     correctionMessage:
         'Remove async keyword. Use synchronous code with fake.elapse() '
         'to control time.',

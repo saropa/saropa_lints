@@ -675,3 +675,181 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
     });
   }
 }
+
+/// Detects circular import dependencies between files.
+///
+/// Circular imports create tight coupling between modules and can cause:
+/// - Initialization order issues
+/// - Difficulty testing in isolation
+/// - Hard-to-follow dependency chains
+///
+/// This rule uses the cached import graph to efficiently detect cycles.
+/// The import graph is built once and reused across all files in the project.
+///
+/// **BAD:**
+/// ```dart
+/// // file_a.dart
+/// import 'file_b.dart'; // file_b imports file_a → cycle!
+///
+/// // file_b.dart
+/// import 'file_a.dart';
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // file_a.dart
+/// import 'shared_types.dart';
+///
+/// // file_b.dart
+/// import 'shared_types.dart';
+/// // Both depend on shared module, no cycle
+/// ```
+class AvoidCircularImportsRule extends SaropaLintRule {
+  const AvoidCircularImportsRule() : super(code: _code);
+
+  /// Architecture issue. Circular dependencies break modularity.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_circular_imports',
+    problemMessage:
+        '[avoid_circular_imports] Circular import detected. This file is part '
+        'of an import cycle.',
+    correctionMessage:
+        'Extract shared types to a separate file that both modules can import, '
+        'or use dependency injection to break the cycle.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  Set<String> get requiredPatterns => const {'import'};
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    final filePath = resolver.source.fullName;
+
+    // Build import graph if not already built
+    // Note: In production, this would be triggered once at analysis start
+    _ensureImportGraphBuilt(filePath);
+
+    // Detect cycles involving this file
+    final cycles = ImportGraphCache.detectCircularImports(filePath);
+
+    if (cycles.isEmpty) return;
+
+    // Report on import directives that are part of cycles
+    context.registry.addImportDirective((ImportDirective node) {
+      final importUri = node.uri.stringValue;
+      if (importUri == null) return;
+
+      // Check if this import is part of any detected cycle
+      for (final cycle in cycles) {
+        // Resolve the import to absolute path
+        final resolvedPath = _resolveImportPath(importUri, filePath);
+        if (resolvedPath != null && cycle.contains(resolvedPath)) {
+          // This import is part of a cycle
+          reporter.atNode(
+            node,
+            LintCode(
+              name: 'avoid_circular_imports',
+              problemMessage:
+                  '[avoid_circular_imports] Circular import detected: '
+                  '${_formatCycle(cycle)}',
+              correctionMessage:
+                  'Extract shared types to break the cycle, or use dependency '
+                  'injection.',
+              errorSeverity: DiagnosticSeverity.WARNING,
+            ),
+          );
+          break;
+        }
+      }
+    });
+  }
+
+  /// Ensure the import graph is built for the project containing this file.
+  void _ensureImportGraphBuilt(String filePath) {
+    // Check if already built
+    if (ImportGraphCache.hasFile(filePath)) return;
+
+    // Find project root (look for pubspec.yaml)
+    var dir = filePath;
+    var projectRoot = '';
+
+    // Walk up to find pubspec.yaml
+    while (dir.isNotEmpty) {
+      final separator = dir.contains('/') ? '/' : '\\';
+      final lastSep = dir.lastIndexOf(separator);
+      if (lastSep < 0) break;
+
+      dir = dir.substring(0, lastSep);
+      // Check for pubspec.yaml (simplified check)
+      if (dir.endsWith('/lib') || dir.endsWith('\\lib')) {
+        projectRoot = dir.substring(0, dir.length - 4);
+        break;
+      }
+    }
+
+    if (projectRoot.isEmpty) return;
+
+    // Build graph synchronously (blocking but only happens once per session)
+    // In practice, this would be triggered at plugin initialization
+    ImportGraphCache.buildFromDirectory(projectRoot);
+  }
+
+  /// Resolve an import URI to an absolute file path.
+  String? _resolveImportPath(String importUri, String fromFile) {
+    // Package imports - cannot resolve without pubspec context
+    if (importUri.startsWith('package:') || importUri.startsWith('dart:')) {
+      return null;
+    }
+
+    // Relative import
+    final separator = fromFile.contains('/') ? '/' : '\\';
+    final fromDir = fromFile.substring(0, fromFile.lastIndexOf(separator));
+
+    var resolved = '$fromDir$separator$importUri';
+
+    // Normalize path
+    resolved = resolved.replaceAll('\\', '/');
+    final parts = resolved.split('/');
+    final normalized = <String>[];
+
+    for (final part in parts) {
+      if (part == '..') {
+        if (normalized.isNotEmpty) normalized.removeLast();
+      } else if (part != '.' && part.isNotEmpty) {
+        normalized.add(part);
+      }
+    }
+
+    return normalized.join('/');
+  }
+
+  /// Format a cycle for display in the error message.
+  String _formatCycle(List<String> cycle) {
+    if (cycle.isEmpty) return '';
+
+    // Extract just file names for readability
+    final names = cycle.map((path) {
+      final separator = path.contains('/') ? '/' : '\\';
+      final lastSep = path.lastIndexOf(separator);
+      return lastSep >= 0 ? path.substring(lastSep + 1) : path;
+    }).toList();
+
+    if (names.length <= 3) {
+      return names.join(' → ');
+    }
+
+    // Truncate long cycles
+    return '${names[0]} → ${names[1]} → ... → ${names.last}';
+  }
+}

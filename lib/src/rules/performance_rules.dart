@@ -58,7 +58,8 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keys_in_animated_lists',
     problemMessage:
-        '[require_keys_in_animated_lists] AnimatedList/AnimatedGrid items should have keys.',
+        '[require_keys_in_animated_lists] Without keys, AnimatedList animations '
+        'target wrong items after insert/remove operations.',
     correctionMessage:
         'Add a Key to the returned widget for correct animations.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -210,7 +211,8 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_build',
     problemMessage:
-        '[avoid_expensive_build] Expensive operation in build method.',
+        '[avoid_expensive_build] Expensive operations in build() run on every '
+        'frame, causing jank and dropped frames during animations.',
     correctionMessage:
         'Move expensive operations to initState, didChangeDependencies, or cache the result.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -330,7 +332,8 @@ class PreferConstChildWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_child_widgets',
     problemMessage:
-        '[prefer_const_child_widgets] Child widgets could be const.',
+        '[prefer_const_child_widgets] Non-const child list recreates widget '
+        'instances on every build, preventing Flutter rebuild optimizations.',
     correctionMessage:
         'Add const to the list literal to prevent unnecessary rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -445,7 +448,8 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_synchronous_file_io',
     problemMessage:
-        '[avoid_synchronous_file_io] Avoid synchronous file I/O operations.',
+        '[avoid_synchronous_file_io] Synchronous file I/O blocks the main '
+        'thread, causing UI freezes and dropped frames during disk access.',
     correctionMessage: 'Use async file operations to avoid blocking the UI.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -706,7 +710,8 @@ class PreferCachedGetterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_getter',
     problemMessage:
-        '[prefer_cached_getter] Getter called multiple times - consider caching.',
+        '[prefer_cached_getter] Repeated getter calls recompute expensive values '
+        'each time, wasting CPU cycles when caching would suffice.',
     correctionMessage:
         'Store the getter result in a local variable if called multiple times.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -802,7 +807,9 @@ class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_widget_depth',
-    problemMessage: '[avoid_excessive_widget_depth] Widget tree is too deep.',
+    problemMessage:
+        '[avoid_excessive_widget_depth] Deep widget nesting rebuilds entire '
+        'subtree on changes, hurting performance and making code hard to maintain.',
     correctionMessage:
         'Extract nested widgets into separate widget classes for better performance.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -981,7 +988,8 @@ class PreferImagePrecacheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_precache',
     problemMessage:
-        '[prefer_image_precache] Consider precaching large or hero images.',
+        '[prefer_image_precache] Large images without precaching cause visible '
+        'loading delays and layout shifts when they appear on screen.',
     correctionMessage:
         'Use precacheImage() in didChangeDependencies for smoother UX.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1066,7 +1074,8 @@ class AvoidControllerInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_controller_in_build',
     problemMessage:
-        '[avoid_controller_in_build] Controller should not be created in build method.',
+        '[avoid_controller_in_build] Controller created in build() leaks '
+        'memory as new instance is created on every rebuild.',
     correctionMessage:
         'Create controllers as class fields and dispose them properly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1285,7 +1294,8 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_loop',
     problemMessage:
-        '[avoid_string_concatenation_loop] Avoid string concatenation inside loops.',
+        '[avoid_string_concatenation_loop] Each += creates new String object, '
+        'causing O(n²) memory allocations in loops.',
     correctionMessage: 'Use StringBuffer for building strings in loops.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2651,7 +2661,8 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_static_const_widgets',
     problemMessage:
-        '[prefer_static_const_widgets] Const widget field could be static for compile-time creation.',
+        '[prefer_static_const_widgets] Non-static const field is created per '
+        'instance instead of sharing single compile-time object.',
     correctionMessage: 'Add static modifier: static const widget = Widget();',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3154,7 +3165,8 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_platform_channel_on_web',
     problemMessage:
-        '[avoid_platform_channel_on_web] MethodChannel is not available on web platform.',
+        '[avoid_platform_channel_on_web] MethodChannel throws '
+        'MissingPluginException on web, crashing the application.',
     correctionMessage: 'Wrap with kIsWeb check or use conditional imports.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

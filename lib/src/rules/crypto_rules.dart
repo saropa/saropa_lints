@@ -65,10 +65,17 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_encryption_keys',
     problemMessage:
-        '[avoid_hardcoded_encryption_keys] Hardcoded encryption key can be extracted from compiled app.',
+        '[avoid_hardcoded_encryption_keys] Hardcoded keys can be extracted '
+        'from app binary, compromising all encrypted data for all users.',
     correctionMessage: 'Load key from secure storage or derive at runtime.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -218,6 +225,12 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
+
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random_for_crypto',
     problemMessage:
@@ -349,10 +362,17 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
+
   static const LintCode _code = LintCode(
     name: 'avoid_deprecated_crypto_algorithms',
     problemMessage:
-        '[avoid_deprecated_crypto_algorithms] Deprecated cryptographic algorithm. Use SHA-256 or stronger.',
+        '[avoid_deprecated_crypto_algorithms] MD5/SHA1/DES have known '
+        'vulnerabilities. Attackers can forge hashes or break encryption.',
     correctionMessage:
         'Replace MD5/SHA1 with SHA-256+. Replace DES with AES-256.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -440,6 +460,12 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m10},
+        web: <OwaspWeb>{OwaspWeb.a02},
+      );
 
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',

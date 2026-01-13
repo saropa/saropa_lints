@@ -384,7 +384,8 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_supabase_anon_key_in_code',
     problemMessage:
-        '[avoid_supabase_anon_key_in_code] Supabase anon key should not be hardcoded in source code.',
+        '[avoid_supabase_anon_key_in_code] Hardcoded keys can be extracted '
+        'from app binary. Attackers gain direct access to your Supabase project.',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -503,7 +504,8 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_supabase_realtime_unsubscribe',
     problemMessage:
-        '[require_supabase_realtime_unsubscribe] Supabase realtime channel must be unsubscribed in dispose().',
+        '[require_supabase_realtime_unsubscribe] Unsubscribed channel keeps '
+        'WebSocket open, leaking connections and receiving stale updates.',
     correctionMessage:
         'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1042,7 +1044,8 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_workmanager_result_return',
     problemMessage:
-        '[require_workmanager_result_return] WorkManager callback must return a result.',
+        '[require_workmanager_result_return] Missing return value makes '
+        'WorkManager assume failure, triggering unnecessary retries.',
     correctionMessage:
         'Return true/false from the executeTask callback to indicate success.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1302,7 +1305,8 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_keyboard_visibility_dispose',
     problemMessage:
-        '[require_keyboard_visibility_dispose] KeyboardVisibilityController subscription must be cancelled.',
+        '[require_keyboard_visibility_dispose] Uncancelled subscription keeps '
+        'firing callbacks after dispose, causing setState errors.',
     correctionMessage: 'Store and cancel the stream subscription in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1408,7 +1412,8 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_speech_stop_on_dispose',
     problemMessage:
-        '[require_speech_stop_on_dispose] SpeechToText must be stopped in dispose() method.',
+        '[require_speech_stop_on_dispose] Unreleased SpeechToText keeps '
+        'microphone active, draining battery and blocking other apps.',
     correctionMessage:
         'Add _speech.stop() in dispose() to release microphone resources.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1514,7 +1519,8 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_app_links_sensitive_params',
     problemMessage:
-        '[avoid_app_links_sensitive_params] Deep links should not contain sensitive parameters.',
+        '[avoid_app_links_sensitive_params] Deep link params are logged by '
+        'OS and analytics, exposing tokens in crash reports and logs.',
     correctionMessage:
         'Use one-time codes instead of tokens or passwords in URLs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1761,7 +1767,8 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_openai_key_in_code',
     problemMessage:
-        '[avoid_openai_key_in_code] OpenAI API key should not be hardcoded in source code.',
+        '[avoid_openai_key_in_code] Hardcoded OpenAI keys are extractable '
+        'from binaries, enabling API abuse charged to your account.',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,

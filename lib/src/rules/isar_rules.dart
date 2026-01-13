@@ -399,7 +399,8 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_collection_annotation',
     problemMessage:
-        '[require_isar_collection_annotation] Class used with Isar must have @collection annotation.',
+        '[require_isar_collection_annotation] Without @collection, Isar cannot '
+        'generate code for this class. Build will fail with missing adapter.',
     correctionMessage: 'Add @collection annotation to the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -478,7 +479,8 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_id_field',
     problemMessage:
-        '[require_isar_id_field] Isar @collection class must have an Id? id field.',
+        '[require_isar_id_field] Isar requires Id field for primary key. '
+        'Code generation fails without it, breaking the build.',
     correctionMessage: 'Add "Id? id;" as the first field in the class.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -717,7 +719,8 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_transaction_nesting',
     problemMessage:
-        '[avoid_isar_transaction_nesting] Nested writeTxn calls cause deadlocks.',
+        '[avoid_isar_transaction_nesting] Nested writeTxn causes deadlock. '
+        'Isar cannot acquire second write lock while first is held.',
     correctionMessage: 'Combine operations into a single writeTxn block.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -982,7 +985,8 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_clear_in_production',
     problemMessage:
-        '[avoid_isar_clear_in_production] isar.clear() deletes all data. Wrap in kDebugMode check.',
+        '[avoid_isar_clear_in_production] isar.clear() wipes all user data '
+        'permanently. If this runs in production, users lose everything.',
     correctionMessage: 'Add if (kDebugMode) guard before calling clear().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

@@ -375,6 +375,11 @@ const Set<String> essentialRules = <String>{
   'require_hive_nested_object_adapter', // ERROR - runtime crash
   'avoid_api_key_in_code', // ERROR - security critical
   'avoid_storing_sensitive_unencrypted', // ERROR - security critical
+  'avoid_ignoring_ssl_errors', // ERROR - MITM attack prevention (OWASP M5, A05)
+  'require_https_only', // WARNING - unencrypted traffic (OWASP M5, A05)
+  'avoid_unsafe_deserialization', // WARNING - data integrity (OWASP A08)
+  'avoid_user_controlled_urls', // WARNING - SSRF prevention (OWASP A10)
+  'require_catch_logging', // WARNING - security event logging (OWASP A09)
   'require_intl_args_match', // ERROR - runtime crash
   'require_cache_key_determinism', // ERROR - memory bloat
 
@@ -399,6 +404,87 @@ const Set<String> essentialRules = <String>{
   'require_purchase_restoration', // ERROR - App Store requires restore purchases
   'require_macos_notarization_ready', // INFO - macOS distribution requirement reminder
   'require_ios_data_protection', // WARNING - file encryption for sensitive data
+
+  // =========================================================================
+  // Orphan Rule Assignment (v4.1.0) - Previously untiered critical/high rules
+  // =========================================================================
+
+  // Security (Critical)
+  'avoid_deep_link_sensitive_params', // ERROR - token exposure in deep links
+  'avoid_path_traversal', // ERROR - directory traversal attack
+  'avoid_webview_insecure_content', // ERROR - mixed content security
+  'require_data_encryption', // ERROR - sensitive data must be encrypted
+  'require_secure_password_field', // ERROR - password field security
+
+  // JSON/Type Safety (Critical)
+  'avoid_dynamic_json_access', // ERROR - unsafe dynamic access
+  'avoid_dynamic_json_chains', // ERROR - chained dynamic access crashes
+  'avoid_unrelated_type_casts', // ERROR - invalid cast crash
+  'require_null_safe_json_access', // ERROR - null safety in JSON
+
+  // Platform/Permissions (Critical)
+  'avoid_platform_channel_on_web', // ERROR - crashes on web
+  'require_image_picker_permission_android', // ERROR - permission required
+  'require_image_picker_permission_ios', // ERROR - permission required
+  'require_permission_manifest_android', // ERROR - manifest entry required
+  'require_permission_plist_ios', // ERROR - plist entry required
+  'require_url_launcher_queries_android', // ERROR - queries element required
+  'require_url_launcher_schemes_ios', // ERROR - LSApplicationQueriesSchemes
+
+  // Memory/Resource Leaks (Critical/High)
+  'avoid_stream_subscription_in_field', // ERROR - subscription leak
+  'avoid_websocket_memory_leak', // ERROR - WebSocket leak
+  'prefer_dispose_before_new_instance', // ERROR - dispose before reassign
+  'require_dispose_implementation', // ERROR - disposable must implement dispose
+  'require_video_player_controller_dispose', // ERROR - video controller leak
+
+  // Widget Lifecycle (Critical/High)
+  'check_mounted_after_async', // ERROR - setState after dispose
+  'avoid_ref_in_build_body', // ERROR - ref.watch in wrong place
+  'avoid_flashing_content', // ERROR - accessibility seizure risk
+
+  // Animation (High)
+  'avoid_animation_rebuild_waste', // WARNING - animation performance
+  'avoid_overlapping_animations', // WARNING - animation conflicts
+
+  // Navigation (High)
+  'prefer_maybe_pop', // WARNING - safe navigation
+  'require_deep_link_fallback', // WARNING - deep link error handling
+  'require_stepper_validation', // WARNING - stepper form validation
+
+  // Firebase/Backend (High)
+  'prefer_firebase_remote_config_defaults', // WARNING - config defaults
+  'require_background_message_handler', // WARNING - FCM background
+  'require_fcm_token_refresh_handler', // WARNING - token refresh
+
+  // Forms/Input (High)
+  'require_validator_return_null', // WARNING - validator pattern
+  'avoid_image_picker_large_files', // WARNING - OOM prevention
+
+  // WebView (High)
+  'prefer_webview_javascript_disabled', // WARNING - security default
+  'require_webview_error_handling', // WARNING - error handling
+  'require_webview_navigation_delegate', // WARNING - navigation control
+  'require_websocket_message_validation', // WARNING - message validation
+
+  // Data/Storage (High)
+  'prefer_utc_for_storage', // WARNING - timezone consistency
+  'require_database_migration', // WARNING - migration safety
+  'require_enum_unknown_value', // WARNING - future-proof enums
+
+  // UI/UX (High)
+  'prefer_html_escape', // WARNING - XSS prevention
+  'require_error_widget', // WARNING - error boundary
+  'require_feature_flag_default', // WARNING - feature flag safety
+  'require_immutable_bloc_state', // WARNING - state immutability
+  'require_map_idle_callback', // WARNING - map performance
+  'require_media_loading_state', // WARNING - loading indicators
+
+  // State Management (High)
+  'prefer_bloc_listener_for_side_effects', // WARNING - side effect pattern
+
+  // Network (High)
+  'require_cors_handling', // WARNING - CORS on web
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -546,6 +632,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_future_wait', // INFO - parallel independent awaits
 
   // Code Quality
+  'avoid_very_long_files', // 1000 lines - code smell
   'avoid_self_assignment',
   'avoid_self_compare',
   'avoid_assignments_as_conditions',
@@ -893,6 +980,127 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_freezed_lint_package', // INFO - Freezed best practices
   'prefer_image_picker_multi_selection', // INFO - better UX
   'prefer_hive_value_listenable', // INFO - reactive UI
+
+  // =========================================================================
+  // Orphan Rule Assignment (v4.1.0) - Previously untiered medium rules
+  // =========================================================================
+
+  // Widget Structure (Medium)
+  'avoid_deep_widget_nesting', // INFO - widget depth warning
+  'avoid_find_child_in_build', // INFO - avoid widget finding in build
+  'avoid_layout_builder_in_scrollable', // INFO - layout builder misuse
+  'avoid_nested_providers', // INFO - provider nesting
+  'avoid_opacity_misuse', // INFO - opacity performance
+  'avoid_shrink_wrap_in_scroll', // INFO - shrinkWrap performance
+  'avoid_unbounded_constraints', // INFO - constraint issues
+  'avoid_unconstrained_box_misuse', // INFO - UnconstrainedBox misuse
+
+  // Gesture/Input (Medium)
+  'avoid_double_tap_submit', // INFO - double tap prevention
+  'avoid_gesture_conflict', // INFO - gesture detector conflicts
+  'avoid_gesture_without_behavior', // INFO - HitTestBehavior missing
+  'prefer_actions_and_shortcuts', // INFO - keyboard shortcuts
+  'prefer_cursor_for_buttons', // INFO - cursor on clickable
+  'require_disabled_state', // INFO - disabled button state
+  'require_drag_feedback', // INFO - drag feedback
+  'require_focus_indicator', // INFO - focus visibility
+  'require_hover_states', // INFO - hover feedback
+  'require_long_press_callback', // INFO - long press handler
+
+  // Forms/Validation (Medium)
+  'require_button_loading_state', // INFO - loading state on buttons
+  'require_form_validation', // INFO - form validation
+  'require_step_count_indicator', // INFO - stepper indicators
+
+  // Testing (Medium)
+  'avoid_flaky_tests', // INFO - test reliability
+  'avoid_real_timer_in_widget_test', // INFO - fake timers in tests
+  'avoid_stateful_test_setup', // INFO - test setup pattern
+  'prefer_matcher_over_equals', // INFO - test matchers
+  'prefer_mock_http', // INFO - mock HTTP in tests
+  'require_golden_test', // INFO - golden tests
+  'require_mock_verification', // INFO - mock verification
+  'require_riverpod_lint', // INFO - Riverpod linting
+  'require_screen_size_tests', // INFO - responsive tests
+
+  // Performance (Medium)
+  'avoid_hardcoded_layout_values', // INFO - layout flexibility
+  'avoid_hardcoded_text_styles', // INFO - text style theming
+  'avoid_large_images_in_memory', // INFO - image memory
+  'avoid_map_markers_in_build', // INFO - map marker creation
+  'avoid_stack_overflow', // INFO - recursion depth
+  'prefer_clip_behavior', // INFO - clip behavior
+  'prefer_deferred_loading_web', // INFO - web bundle splitting
+  'prefer_fit_cover_for_background', // INFO - BoxFit.cover
+  'prefer_fractional_sizing', // INFO - fractional vs fixed
+  'prefer_intrinsic_dimensions', // INFO - intrinsic sizing
+  'prefer_keep_alive', // INFO - AutomaticKeepAliveClientMixin
+  'prefer_page_storage_key', // INFO - scroll position persistence
+  'prefer_positioned_directional', // INFO - RTL support
+  'prefer_sliver_app_bar', // INFO - sliver app bars
+  'prefer_sliver_list', // INFO - sliver lists
+
+  // State Management (Medium)
+  'avoid_late_context', // INFO - late context access
+  'prefer_cubit_for_simple_state', // INFO - Cubit vs Bloc choice
+  'prefer_selector_over_consumer', // INFO - targeted rebuilds
+  'require_bloc_consumer_when_both', // INFO - BlocConsumer pattern
+
+  // Accessibility (Medium)
+  'avoid_screenshot_sensitive', // INFO - screenshot protection
+  'avoid_semantics_exclusion', // INFO - semantics exclusion
+  'prefer_merge_semantics', // INFO - merge semantics
+  'avoid_small_text', // INFO - minimum text size
+
+  // Data/Collections (Medium)
+  'avoid_misused_set_literals', // INFO - set literal usage
+  'avoid_non_null_assertion', // INFO - null assertion warning
+  'move_variable_closer_to_its_usage', // INFO - variable scope
+
+  // Images/Media (Medium)
+  'prefer_asset_image_for_local', // INFO - local image loading
+  'prefer_image_picker_request_full_metadata', // INFO - EXIF metadata
+  'prefer_marker_clustering', // INFO - map marker clustering
+  'require_pdf_loading_indicator', // INFO - PDF loading state
+
+  // Database (Medium)
+  'require_database_index', // INFO - database indexes
+  'prefer_transaction_for_batch', // INFO - batch transactions
+
+  // Navigation (Medium)
+  'prefer_typed_route_params', // INFO - typed route parameters
+  'require_refresh_indicator', // INFO - pull to refresh
+  'require_scroll_controller', // INFO - scroll controller
+  'require_scroll_physics', // INFO - scroll physics
+
+  // Security (Medium)
+  'prefer_clipboard_feedback', // INFO - clipboard feedback
+  'prefer_data_masking', // INFO - sensitive data masking
+
+  // Desktop/Platform (Medium)
+  'require_menu_bar_for_desktop', // INFO - desktop menu bar
+  'require_window_close_confirmation', // INFO - unsaved changes
+
+  // Animation (Medium)
+  'prefer_tween_sequence', // INFO - tween sequences
+
+  // i18n (Medium)
+  'require_intl_locale_initialization', // INFO - intl locale init
+  'require_notification_timezone_awareness', // INFO - timezone handling
+
+  // Misc (Medium)
+  'prefer_adequate_spacing', // INFO - spacing consistency
+  'prefer_safe_area_aware', // INFO - safe area handling
+  'prefer_wrap_over_overflow', // INFO - overflow handling
+  'require_default_text_style', // INFO - text style defaults
+  'require_freezed_explicit_json', // INFO - Freezed JSON
+  'require_webview_progress_indicator', // INFO - WebView progress
+  'prefer_sorted_pattern_fields', // INFO - pattern field ordering
+  'prefer_sorted_record_fields', // INFO - record field ordering
+
+  // Additional orphans (missed in initial pass)
+  'require_image_error_fallback', // INFO - image error handling
+  'prefer_ignore_pointer', // INFO - IgnorePointer for non-interactive
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1129,6 +1337,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_async_callback',
 
   // Code Quality
+  'avoid_medium_files', // 300 lines - starting to get complex
   'avoid_long_functions',
   'avoid_long_parameter_list',
   'avoid_shadowing',
@@ -1289,6 +1498,7 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Platform rules (roadmap_up_next)
   'avoid_touch_only_gestures',
+  'avoid_circular_imports',
 
   // Test rules (roadmap_up_next)
   'require_test_cleanup',
@@ -1772,6 +1982,91 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_ios_spotlight_indexing', // INFO - Core Spotlight integration
   'prefer_ios_handoff_support', // INFO - Handoff/Continuity support
   'require_ios_voiceover_gesture_compatibility', // INFO - VoiceOver accessibility
+
+  // =========================================================================
+  // Orphan Rule Assignment (v4.1.0) - Previously untiered low/stylistic rules
+  // =========================================================================
+
+  // Code Style (Low - comprehensive for thorough coverage)
+  'avoid_digit_separators', // INFO - digit separator style
+  'avoid_nested_try_statements', // INFO - nested try style
+  'avoid_type_casts', // INFO - cast warning
+
+  // Documentation/Naming (Low)
+  'prefer_concise_variable_names', // INFO - naming brevity
+  'prefer_descriptive_variable_names', // INFO - naming clarity
+  'prefer_doc_comments_over_regular', // INFO - doc comments
+  'prefer_error_suffix', // INFO - Error suffix convention
+  'prefer_exception_suffix', // INFO - Exception suffix convention
+  'prefer_private_underscore_prefix', // INFO - private naming
+
+  // Pattern/Record (Low)
+  'prefer_class_over_record_return', // INFO - return type style
+  'prefer_record_over_equatable', // INFO - record vs Equatable
+
+  // Constructor/Factory (Low)
+  'prefer_constructor_assertion', // INFO - constructor asserts
+  'prefer_constructor_body_assignment', // INFO - constructor style
+  'prefer_factory_for_validation', // INFO - factory pattern
+  'prefer_initializing_formals', // INFO - initializing formals
+  'prefer_super_parameters', // INFO - super parameters
+
+  // Enum/Switch (Low)
+  'prefer_default_enum_case', // INFO - default case style
+  'prefer_exhaustive_enums', // INFO - exhaustive switches
+
+  // Async (Low)
+  'prefer_async_only_when_awaiting', // INFO - async usage
+  'prefer_await_over_then', // INFO - await vs then
+  'prefer_future_void_function_over_async_callback', // INFO - callback types
+  'prefer_sync_over_async_where_possible', // INFO - sync preference
+  'prefer_then_over_await', // INFO - then vs await (opposite preference)
+
+  // Collections (Low)
+  'prefer_keys_with_lookup', // INFO - map lookup pattern
+  'prefer_map_entries_iteration', // INFO - map iteration
+  'prefer_mutable_collections', // INFO - collection mutability
+  'prefer_wheretype_over_where_is', // INFO - whereType usage
+
+  // Testing (Low)
+  'prefer_expect_over_assert_in_tests', // INFO - test assertions
+  'prefer_single_expectation_per_test', // INFO - test style
+
+  // Control Flow (Low)
+  'prefer_guard_clauses', // INFO - guard clause style
+  'prefer_positive_conditions_first', // INFO - condition ordering
+  'prefer_single_exit_point', // INFO - function exits
+
+  // Callbacks (Low)
+  'prefer_inline_callbacks', // INFO - callback style
+
+  // Formatting (Low)
+  'prefer_single_blank_line_max', // INFO - blank line limit
+
+  // Required/Optional (Low)
+  'prefer_all_named_parameters', // INFO - named params
+  'prefer_required_before_optional', // INFO - parameter ordering
+
+  // Exceptions (Low)
+  'prefer_generic_exception', // INFO - exception hierarchy
+  'prefer_specific_exceptions', // INFO - exception specificity
+
+  // Widgets (Low)
+  'prefer_one_widget_per_file', // INFO - file organization
+  'prefer_widget_methods_over_classes', // INFO - widget extraction
+
+  // EdgeInsets (Low)
+  'prefer_edgeinsets_only', // INFO - EdgeInsets.only
+  'prefer_edgeinsets_symmetric', // INFO - EdgeInsets.symmetric
+  'prefer_borderradius_circular', // INFO - BorderRadius.circular
+
+  // Misc (Low)
+  'prefer_equatable_stringify', // INFO - Equatable stringify
+  'prefer_freezed_default_values', // INFO - Freezed defaults
+  'prefer_immutable_annotation', // INFO - @immutable annotation
+  'prefer_native_file_dialogs', // INFO - native dialogs
+  'prefer_physics_simulation', // INFO - physics animations
+  'require_multi_provider', // INFO - MultiProvider pattern
 };
 
 // =============================================================================
@@ -1853,6 +2148,7 @@ const Set<String> insanityOnlyRules = <String>{
   'prefer_static_class',
   'prefer_extracting_callbacks',
   'prefer_single_widget_per_file',
+  'prefer_small_files', // 200 lines - ideal for single responsibility
 
   // Style Preferences
   'prefer_getter_over_method',
