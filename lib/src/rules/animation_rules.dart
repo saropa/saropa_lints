@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -55,7 +56,8 @@ class RequireVsyncMixinRule extends SaropaLintRule {
     name: 'require_vsync_mixin',
     problemMessage:
         '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper resource management.',
-    correctionMessage: 'Add vsync: this and mix in SingleTickerProviderStateMixin.',
+    correctionMessage:
+        'Add vsync: this and mix in SingleTickerProviderStateMixin.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -291,7 +293,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
     name: 'require_animation_controller_dispose',
     problemMessage:
         '[require_animation_controller_dispose] AnimationController field is missing a call to dispose(). This results in a memory leak because the Ticker keeps a reference to the State object, preventing garbage collection and causing the app to retain unused resources. Over time, this can lead to increased memory usage, degraded performance, and even crashes. Always call _controller.dispose() in dispose() before super.dispose().',
-    correctionMessage: 'Add _controller.dispose() in dispose() before super.dispose().',
+    correctionMessage:
+        'Add _controller.dispose() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -332,7 +335,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
             }
 
             if (initializer is InstanceCreationExpression) {
-              final String initType = initializer.constructorName.type.name.lexeme;
+              final String initType =
+                  initializer.constructorName.type.name.lexeme;
               if (initType == 'AnimationController') {
                 controllerNames.add(variable.name.lexeme);
               }
@@ -365,7 +369,8 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -496,7 +501,8 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
     name: 'require_hero_tag_uniqueness',
     problemMessage:
         '[require_hero_tag_uniqueness] Duplicate Hero tag detected. When multiple Hero widgets share the same tag, Flutter cannot distinguish between them during navigation transitions, resulting in a "Multiple heroes" error. This breaks the animation and confuses users, making navigation unpredictable. Always use unique tags for each Hero widget, such as including IDs or indices, to ensure smooth transitions.',
-    correctionMessage: 'Use unique tags for each Hero widget, e.g., include IDs or indices.',
+    correctionMessage:
+        'Use unique tags for each Hero widget, e.g., include IDs or indices.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -592,7 +598,8 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
     name: 'avoid_layout_passes',
     problemMessage:
         '[avoid_layout_passes] Using IntrinsicWidth or IntrinsicHeight causes Flutter to perform two layout passes for affected widgets, which significantly hurts performance, especially in complex UIs or lists. This can lead to dropped frames, laggy animations, and poor user experience. Prefer using CrossAxisAlignment.stretch, Expanded, or fixed dimensions to avoid extra layout computation.',
-    correctionMessage: 'Use CrossAxisAlignment.stretch, Expanded, or fixed dimensions instead.',
+    correctionMessage:
+        'Use CrossAxisAlignment.stretch, Expanded, or fixed dimensions instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -606,7 +613,8 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'IntrinsicWidth' && constructorName != 'IntrinsicHeight') {
+      if (constructorName != 'IntrinsicWidth' &&
+          constructorName != 'IntrinsicHeight') {
         return;
       }
 
@@ -656,7 +664,8 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
     name: 'avoid_hardcoded_duration',
     problemMessage:
         '[avoid_hardcoded_duration] Hardcoded Duration values make it difficult to maintain consistent timing across the app and can lead to subtle bugs when timings need to be updated globally. This practice reduces maintainability and increases the risk of inconsistent user experiences. Always extract Duration values to named constants for clarity, reusability, and easier updates.',
-    correctionMessage: 'Extract Duration to a named constant for consistency and maintainability.',
+    correctionMessage:
+        'Extract Duration to a named constant for consistency and maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -676,7 +685,8 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is VariableDeclaration) {
-          final VariableDeclarationList? varList = current.parent as VariableDeclarationList?;
+          final VariableDeclarationList? varList =
+              current.parent as VariableDeclarationList?;
           if (varList != null && varList.isConst) {
             return; // This is a const declaration, allowed
           }
@@ -753,7 +763,8 @@ class RequireAnimationCurveRule extends SaropaLintRule {
     name: 'require_animation_curve',
     problemMessage:
         '[require_animation_curve] Animation uses the default linear curve, which often results in unnatural or robotic motion. Without specifying a curve, transitions may feel abrupt and lack the smoothness users expect. Always wrap with CurvedAnimation or use .animate() with a curve parameter to create more natural, visually appealing animations that enhance user experience.',
-    correctionMessage: 'Wrap with CurvedAnimation or use .animate() with a curve parameter.',
+    correctionMessage:
+        'Wrap with CurvedAnimation or use .animate() with a curve parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -866,7 +877,8 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Track transitions per class to avoid O(n^2) complexity
-    final Map<ClassDeclaration, int> transitionCounts = <ClassDeclaration, int>{};
+    final Map<ClassDeclaration, int> transitionCounts =
+        <ClassDeclaration, int>{};
     final List<_TransitionNode> pendingReports = <_TransitionNode>[];
 
     context.registry.addInstanceCreationExpression((
@@ -953,7 +965,8 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
     name: 'require_staggered_animation_delays',
     problemMessage:
         '[require_staggered_animation_delays] List item animations are not staggered, resulting in all items animating simultaneously. This creates a chaotic and unnatural cascade effect, making it hard for users to follow the UI changes. Use index-based delays (e.g., Interval(index * 0.1, ...)) to stagger animations for a smooth, visually appealing transition.',
-    correctionMessage: 'Use Interval with index-based delays: Interval(index * 0.1, ...).',
+    correctionMessage:
+        'Use Interval with index-based delays: Interval(index * 0.1, ...).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1127,7 +1140,8 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
   ) {
     // Track controllers and their listeners
     final Set<String> controllersWithListener = <String>{};
-    final Map<String, MethodInvocation> forwardCalls = <String, MethodInvocation>{};
+    final Map<String, MethodInvocation> forwardCalls =
+        <String, MethodInvocation>{};
 
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
@@ -1152,7 +1166,8 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
     });
 
     context.addPostRunCallback(() {
-      for (final MapEntry<String, MethodInvocation> entry in forwardCalls.entries) {
+      for (final MapEntry<String, MethodInvocation> entry
+          in forwardCalls.entries) {
         if (!controllersWithListener.contains(entry.key)) {
           reporter.atNode(entry.value, code);
         }
@@ -1199,7 +1214,8 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
     name: 'avoid_overlapping_animations',
     problemMessage:
         '[avoid_overlapping_animations] Multiple animations on same property cause visual jitter and unpredictable results. Overlapping animations can confuse users and make UI behavior unpredictable.',
-    correctionMessage: 'Combine into single animation or use different properties.',
+    correctionMessage:
+        'Combine into single animation or use different properties.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1377,7 +1393,8 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
     name: 'prefer_physics_simulation',
     problemMessage:
         '[prefer_physics_simulation] Drag-release should use physics simulation for natural feel.',
-    correctionMessage: 'Use SpringSimulation or FrictionSimulation with animateWith.',
+    correctionMessage:
+        'Use SpringSimulation or FrictionSimulation with animateWith.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1398,7 +1415,8 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
       final String bodySource = callback.body.toSource();
 
       // Check if using animateTo/animateBack without physics
-      if (bodySource.contains('animateTo') || bodySource.contains('animateBack')) {
+      if (bodySource.contains('animateTo') ||
+          bodySource.contains('animateBack')) {
         // OK if using physics simulation
         if (bodySource.contains('Simulation') ||
             bodySource.contains('animateWith') ||
@@ -1484,7 +1502,8 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
     name: 'require_animation_ticker_disposal',
     problemMessage:
         '[require_animation_ticker_disposal] Ticker must be stopped in dispose() to prevent memory leaks.',
-    correctionMessage: 'Add _ticker.stop() in dispose() method before super.dispose().',
+    correctionMessage:
+        'Add _ticker.stop() in dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1510,8 +1529,10 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && (typeName == 'Ticker' || typeName == 'Ticker?')) {
-            for (final VariableDeclaration variable in member.fields.variables) {
+          if (typeName != null &&
+              (typeName == 'Ticker' || typeName == 'Ticker?')) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
               tickerFields.add(variable.name.lexeme);
             }
           }
@@ -1540,7 +1561,8 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
         if (!isStopped) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }

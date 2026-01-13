@@ -382,11 +382,14 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
       if (inner is ReturnStatement) {
         // Check if condition is negative
         final condition = node.expression;
-        if (condition is BinaryExpression && condition.operator.type == TokenType.EQ_EQ) {
-          if (condition.rightOperand is NullLiteral || condition.leftOperand is NullLiteral) {
+        if (condition is BinaryExpression &&
+            condition.operator.type == TokenType.EQ_EQ) {
+          if (condition.rightOperand is NullLiteral ||
+              condition.leftOperand is NullLiteral) {
             reporter.atNode(node, code);
           }
-        } else if (condition is PrefixExpression && condition.operator.type == TokenType.BANG) {
+        } else if (condition is PrefixExpression &&
+            condition.operator.type == TokenType.BANG) {
           reporter.atNode(node, code);
         }
       }
@@ -440,7 +443,8 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
     name: 'prefer_switch_expression',
     problemMessage:
         '[prefer_switch_expression] Consider using switch expression instead of statement. Switch expressions are more concise and provide exhaustiveness checking.',
-    correctionMessage: 'Switch expressions are more concise for value production.',
+    correctionMessage:
+        'Switch expressions are more concise for value production.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -734,7 +738,8 @@ class PreferExhaustiveEnumsRule extends SaropaLintRule {
     name: 'prefer_exhaustive_enums',
     problemMessage:
         '[prefer_exhaustive_enums] Prefer exhaustive enum cases instead of default. Exhaustive cases catch missing logic at compile time and prevent silent failures.',
-    correctionMessage: 'Exhaustive switches catch missing cases at compile time.',
+    correctionMessage:
+        'Exhaustive switches catch missing cases at compile time.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -891,7 +896,8 @@ class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_only_when_awaiting',
-    problemMessage: '[prefer_async_only_when_awaiting] Function is async but does not use await.',
+    problemMessage:
+        '[prefer_async_only_when_awaiting] Function is async but does not use await.',
     correctionMessage: 'Remove async or add await expressions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -918,7 +924,8 @@ class PreferAsyncOnlyWhenAwaitingRule extends SaropaLintRule {
           if (_containsAwaitExpression(stmt.expression!)) hasAwait = true;
         } else if (stmt is VariableDeclarationStatement) {
           for (final v in stmt.variables.variables) {
-            if (v.initializer != null && _containsAwaitExpression(v.initializer!)) {
+            if (v.initializer != null &&
+                _containsAwaitExpression(v.initializer!)) {
               hasAwait = true;
             }
           }
@@ -995,7 +1002,8 @@ class PreferAwaitOverThenRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_await_over_then',
-    problemMessage: '[prefer_await_over_then] Consider using await instead of .then() chains.',
+    problemMessage:
+        '[prefer_await_over_then] Consider using await instead of .then() chains.',
     correctionMessage: 'await provides better readability and error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1050,7 +1058,8 @@ class PreferThenOverAwaitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_then_over_await',
-    problemMessage: '[prefer_then_over_await] Consider using .then() for functional style.',
+    problemMessage:
+        '[prefer_then_over_await] Consider using .then() for functional style.',
     correctionMessage: '.then() provides explicit Future chaining.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
