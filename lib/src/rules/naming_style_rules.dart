@@ -23,7 +23,7 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getter_prefix',
-    problemMessage: "Getter name should not start with 'get'.",
+    problemMessage: "[avoid_getter_prefix] Getter name should not start with 'get'.",
     correctionMessage: "Remove the 'get' prefix from the getter name.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1099,7 +1099,7 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_callback_field_name',
-    problemMessage: "Callback field should be named with 'on' prefix.",
+    problemMessage: "[prefer_correct_callback_field_name] Callback field should be named with 'on' prefix.",
     correctionMessage: "Rename to 'onX' pattern (e.g., onPressed, onChanged).",
     errorSeverity: DiagnosticSeverity.INFO,
   );

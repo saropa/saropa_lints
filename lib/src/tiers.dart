@@ -1043,6 +1043,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_find_all',
   'require_integration_test_setup',
   'prefer_descriptive_test_name',
+  'prefer_descriptive_bool_names', // INFO - lenient bool naming (allows action verbs)
   'prefer_fake_over_mock',
   'require_edge_case_tests',
   'avoid_test_implementation_details',
@@ -1858,6 +1859,7 @@ const Set<String> insanityOnlyRules = <String>{
   'prefer_static_method',
   'prefer_named_parameters',
   'prefer_named_boolean_parameters',
+  'prefer_descriptive_bool_names_strict', // INFO - strict bool naming (no action verbs)
   'avoid_font_weight_as_number',
   'prefer_explicit_function_type',
   'prefer_explicit_parameter_names',
