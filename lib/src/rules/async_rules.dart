@@ -543,7 +543,8 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_await',
-    problemMessage: "[prefer_async_await] Prefer 'async/await' over '.then()' in async functions.",
+    problemMessage:
+        "[prefer_async_await] Prefer 'async/await' over '.then()' in async functions.",
     correctionMessage: 'Refactor to use async/await syntax.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
