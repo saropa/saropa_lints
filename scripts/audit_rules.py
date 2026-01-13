@@ -375,6 +375,24 @@ def get_rules_with_corrections(rules_dir: Path) -> tuple[set[str], set[str]]:
     return with_correction, without_correction
 
 
+def get_opinionated_rules(rules_dir: Path) -> set[str]:
+    """Extract all rules with LintImpact.opinionated from Dart rule files."""
+    opinionated_rules: set[str] = set()
+    name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    impact_pattern = re.compile(r"LintImpact get impact => LintImpact.opinionated;")
+    for dart_file in rules_dir.glob("*.dart"):
+        content = dart_file.read_text(encoding="utf-8")
+        # Find all rule classes with opinionated impact
+        for match in impact_pattern.finditer(content):
+            # Search backwards for the nearest rule name
+            pre_content = content[:match.start()]
+            name_matches = list(name_pattern.finditer(pre_content))
+            if name_matches:
+                rule_name = name_matches[-1].group(1)
+                opinionated_rules.add(rule_name)
+    return opinionated_rules
+
+
 # =============================================================================
 # OWASP COVERAGE
 # =============================================================================
@@ -542,7 +560,7 @@ def print_owasp_coverage(coverage: OwaspCoverage) -> None:
 # =============================================================================
 
 # Tier names in order
-TIERS = ["essential", "recommended", "professional", "comprehensive", "insanity"]
+TIERS = ["essential", "recommended", "professional", "comprehensive", "insanity", "stylistic"]
 
 # Severity levels
 SEVERITIES = ["critical", "high", "medium", "low"]
@@ -554,6 +572,7 @@ class TierStats:
     def __init__(self):
         self.counts: dict[str, int] = {tier: 0 for tier in TIERS}
         self.rules: dict[str, set[str]] = {tier: set() for tier in TIERS}
+        self.stylistic_rules: set[str] = set()
 
     @property
     def total(self) -> int:
@@ -582,10 +601,7 @@ class SeverityStats:
 
 
 def get_tier_stats(tiers_path: Path) -> TierStats:
-    """Extract tier statistics from tiers.dart.
-
-    Counts rules in each tier-specific set (not cumulative).
-    """
+    """Extract tier statistics from tiers.dart, including stylistic rules as a pseudo-tier."""
     stats = TierStats()
 
     content = tiers_path.read_text(encoding="utf-8")
@@ -608,6 +624,18 @@ def get_tier_stats(tiers_path: Path) -> TierStats:
             stats.counts[tier] = len(rule_names)
             stats.rules[tier] = set(rule_names)
 
+    # Stylistic rules: parse from README_STYLISTIC.md
+    stylistic_path = tiers_path.parent.parent.parent / "README_STYLISTIC.md"
+    stylistic_rules = set()
+    if stylistic_path.exists():
+        md = stylistic_path.read_text(encoding="utf-8")
+        stylistic_rules.update(re.findall(r"\| [`]?([a-z_]+)[`]?\s*\|", md))
+    # Add all opinionated rules from Dart files
+    rules_dir = tiers_path.parent / "rules"
+    stylistic_rules.update(get_opinionated_rules(rules_dir))
+    stats.counts["stylistic"] = len(stylistic_rules)
+    stats.rules["stylistic"] = stylistic_rules
+    stats.stylistic_rules = stylistic_rules
     return stats
 
 
@@ -632,7 +660,7 @@ def get_severity_stats(rules_dir: Path) -> SeverityStats:
 
 
 def print_tier_stats(stats: TierStats) -> None:
-    """Print tier distribution statistics."""
+    """Print tier distribution statistics, including stylistic rules."""
     print_subheader("Rules by Tier")
 
     # Calculate cumulative totals for reference
@@ -643,6 +671,7 @@ def print_tier_stats(stats: TierStats) -> None:
         "professional": Color.GREEN,
         "comprehensive": Color.CYAN,
         "insanity": Color.MAGENTA,
+        "stylistic": Color.BLUE,
     }
 
     for tier in TIERS:
@@ -687,8 +716,8 @@ def find_orphan_rules(
     implemented_rules: set[str],
     tier_stats: TierStats
 ) -> set[str]:
-    """Find rules that are implemented but not assigned to any tier."""
-    return implemented_rules - tier_stats.all_tier_rules
+    """Find rules that are implemented but not assigned to any tier (excluding stylistic)."""
+    return implemented_rules - tier_stats.all_tier_rules - tier_stats.stylistic_rules
 
 
 def print_quality_metrics(
@@ -904,11 +933,11 @@ class RuleMessage:
         # =================================================================
         # MESSAGE LENGTH CHECK (-25 if too short)
         # =================================================================
-        if len(content) < 40 and self.impact in ("critical", "high"):
-            self.dx_issues.append(f"Too short ({len(content)} chars) - add context")
+        if len(content) < 200 and self.impact in ("critical", "high"):
+            self.dx_issues.append(f"Too short ({len(content)} chars) - add context (min 200)")
             self.dx_score -= 25
-        elif len(content) < 30 and self.impact == "medium":
-            self.dx_issues.append(f"Very short ({len(content)} chars)")
+        elif len(content) < 150 and self.impact == "medium":
+            self.dx_issues.append(f"Very short ({len(content)} chars) - add context (min 150)")
             self.dx_score -= 15
 
         # =================================================================
@@ -1213,6 +1242,74 @@ def export_dx_report(messages: list[RuleMessage], output_dir: Path) -> Path:
     return output_path
 
 
+def export_full_audit_report(
+    file_stats: list[FileStats],
+    rules: set[str],
+    aliases: set[str],
+    quick_fixes: int,
+    with_corrections: set[str],
+    without_corrections: set[str],
+    tier_stats: TierStats,
+    orphan_rules: set[str],
+    severity_stats: SeverityStats,
+    owasp_coverage: OwaspCoverage,
+    dx_messages: list[RuleMessage],
+    output_dir: Path
+) -> Path:
+    """Export a full audit report to markdown, covering all analysis sections."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"full_audit_{timestamp}.md"
+    output_path = output_dir / filename
+    lines: list[str] = []
+    lines.append(f"# Saropa Lints Full Audit Report\n")
+    lines.append(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+    lines.append("## Rule Inventory\n")
+    lines.append(f"- Implemented rules: {len(rules)}\n")
+    lines.append(f"- Documented aliases: {len(aliases)}\n")
+    lines.append(f"- Quick fixes: {quick_fixes}\n")
+    lines.append(f"- Rules with correction messages: {len(with_corrections)}\n")
+    lines.append(f"- Rules without correction messages: {len(without_corrections)}\n")
+    lines.append("")
+    lines.append("### Rule Files\n")
+    for s in file_stats:
+        lines.append(f"- {s.name}: {s.rules} rules, {s.fixes} fixes, {s.lines} lines")
+    lines.append("")
+    lines.append("## Tier Assignment\n")
+    for tier in TIERS:
+        rules_in_tier = tier_stats.rules[tier]
+        lines.append(f"### {tier.capitalize()} ({len(rules_in_tier)})\n")
+        for rule in sorted(rules_in_tier):
+            lines.append(f"- {rule}")
+        lines.append("")
+    lines.append(f"### Unassigned ({len(orphan_rules)})\n")
+    for rule in sorted(orphan_rules):
+        lines.append(f"- {rule}")
+    lines.append("")
+    lines.append("## Severity Distribution\n")
+    for severity in SEVERITIES:
+        lines.append(f"- {severity.capitalize()}: {severity_stats.counts[severity]}")
+    lines.append("")
+    lines.append("## OWASP Coverage\n")
+    lines.append(f"Mobile categories covered: {owasp_coverage.mobile_covered}/10\n")
+    lines.append(f"Web categories covered: {owasp_coverage.web_covered}/10\n")
+    lines.append(f"Total mobile mappings: {owasp_coverage.total_mobile_mappings}\n")
+    lines.append(f"Total web mappings: {owasp_coverage.total_web_mappings}\n")
+    lines.append("")
+    lines.append("## DX Message Audit\n")
+    for m in dx_messages:
+        lines.append(f"### {m.name}")
+        lines.append(f"- Impact: {m.impact}")
+        lines.append(f"- DX Score: {m.dx_score}")
+        if m.dx_issues:
+            lines.append(f"- Issues: {', '.join(m.dx_issues)}")
+        lines.append(f"- Problem Message: {m.problem_message}")
+        if m.correction_message:
+            lines.append(f"- Correction Message: {m.correction_message}")
+        lines.append("")
+    output_path.write_text("\n".join(lines), encoding="utf-8")
+    return output_path
+
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -1361,6 +1458,15 @@ def main() -> int:
             report_path = export_dx_report(messages, reports_dir)
             print()
             print_info(f"Report: {report_path.relative_to(project_root)}")
+
+        # Auto-export full audit report
+        full_report_path = export_full_audit_report(
+            file_stats, rules, aliases, quick_fixes,
+            with_corrections, without_corrections,
+            tier_stats, orphan_rules, severity_stats,
+            owasp_coverage, messages, reports_dir
+        )
+        print_info(f"Full report: {full_report_path.relative_to(project_root)}")
 
     # =========================================================================
     # SUMMARY

@@ -177,7 +177,7 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_losing_stack_trace',
     problemMessage:
-        '[avoid_losing_stack_trace] Stack trace is lost when rethrowing.',
+        '[avoid_losing_stack_trace] Rethrowing without stack trace makes debugging impossible - original error location is lost.',
     correctionMessage:
         'Capture stack trace parameter and pass it to Error.throwWithStackTrace or include in new exception.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -346,7 +346,7 @@ class RequireErrorContextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_context',
-    problemMessage: '[require_error_context] Error message lacks context.',
+    problemMessage: '[require_error_context] Error message without IDs or state makes debugging production issues extremely difficult.',
     correctionMessage:
         'Include relevant context like IDs, state, or operation details.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -422,7 +422,7 @@ class PreferResultPatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_result_pattern',
     problemMessage:
-        '[prefer_result_pattern] Consider using Result pattern for expected failures.',
+        '[prefer_result_pattern] Throwing for validation errors forces try-catch everywhere and obscures control flow.',
     correctionMessage:
         'Return Result<T, E> instead of throwing for recoverable errors.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1228,7 +1228,7 @@ class AvoidCatchAllRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_catch_all',
     problemMessage:
-        '[avoid_catch_all] Bare catch without on clause. Use explicit type to show intent.',
+        '[avoid_catch_all] Bare catch hides error types, silently swallowing OutOfMemoryError and other critical failures.',
     correctionMessage:
         'Use "on Object catch" for comprehensive handling, or specific types '
         'like HttpException.',
@@ -1585,7 +1585,7 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_key_determinism',
     problemMessage:
-        '[require_cache_key_determinism] Cache key may be non-deterministic. Use stable identifiers for cache keys.',
+        '[require_cache_key_determinism] Cache key using DateTime.now/Random causes cache misses and duplicated data on every access.',
     correctionMessage:
         'Use deterministic values like IDs or stable hashes for cache keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -2003,7 +2003,7 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_action_handling',
     problemMessage:
-        '[require_notification_action_handling] Notification with actions may lack action handler setup.',
+        '[require_notification_action_handling] Notification actions without handler cause button taps to do nothing, frustrating users.',
     correctionMessage:
         'Ensure onDidReceiveNotificationResponse handles action IDs.',
     errorSeverity: DiagnosticSeverity.INFO,
