@@ -2300,7 +2300,8 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
 
   static const LintCode _codeDoubleNegation = LintCode(
     name: 'prefer_simpler_boolean_expressions',
-    problemMessage: '[prefer_simpler_boolean_expressions] Double negation (!!x) can be simplified to x.',
+    problemMessage:
+        '[prefer_simpler_boolean_expressions] Double negation (!!x) can be simplified to x.',
     correctionMessage: 'Remove the double negation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

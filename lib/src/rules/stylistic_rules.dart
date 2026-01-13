@@ -3404,24 +3404,29 @@ class _ReplaceStraightApostropheFix extends DartFix {
   ) {
     // Doc comments are stored on declaration nodes, not as precedingComments
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry.addFieldDeclaration((FieldDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
 
     context.registry
         .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
-      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
     });
   }
 
