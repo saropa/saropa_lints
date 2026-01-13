@@ -31,7 +31,8 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bluetooth_scan_without_timeout',
     problemMessage:
-        '[avoid_bluetooth_scan_without_timeout] Bluetooth scan should have a timeout to prevent battery drain.',
+        '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
+        'battery and may run until app termination.',
     correctionMessage:
         'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -411,7 +412,8 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_qr_permission_check',
     problemMessage:
-        '[require_qr_permission_check] QR scanner requires camera permission check.',
+        '[require_qr_permission_check] Opening QR scanner without permission '
+        'shows black screen on iOS or crashes on some Android devices.',
     correctionMessage: 'Request Permission.camera before showing QR scanner.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

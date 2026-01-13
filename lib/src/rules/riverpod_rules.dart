@@ -194,7 +194,8 @@ class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_inside_state_dispose',
     problemMessage:
-        '[avoid_ref_inside_state_dispose] Do not use ref in dispose().',
+        '[avoid_ref_inside_state_dispose] Ref may already be disposed when '
+        'dispose() runs, causing "already disposed" errors or crashes.',
     correctionMessage: 'Cache values in initState instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -267,7 +268,8 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_ref_read_synchronously',
     problemMessage:
-        '[use_ref_read_synchronously] ref.read() should be called before await.',
+        '[use_ref_read_synchronously] ref.read() after await may access a '
+        'disposed or invalidated provider, causing crashes or stale reads.',
     correctionMessage: 'Cache ref.read() result before async gap.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -351,8 +353,9 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'use_ref_and_state_synchronously',
     problemMessage:
-        '[use_ref_and_state_synchronously] ref should be used before async gap.',
-    correctionMessage: 'Cache ref before await.',
+        '[use_ref_and_state_synchronously] Using ref after await risks '
+        'accessing disposed provider, causing runtime errors or stale data.',
+    correctionMessage: 'Cache ref values before await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -440,8 +443,9 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_assigning_notifiers',
     problemMessage:
-        '[avoid_assigning_notifiers] Do not assign to notifier variables.',
-    correctionMessage: 'Notifiers manage their own state.',
+        '[avoid_assigning_notifiers] Reassigning Notifier breaks provider '
+        'contract. State updates are lost and listeners receive stale data.',
+    correctionMessage: 'Modify state through Notifier methods instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -617,7 +621,8 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notifier_constructors',
     problemMessage:
-        '[avoid_notifier_constructors] Avoid using constructors for Notifiers.',
+        '[avoid_notifier_constructors] Notifier constructors break Riverpod '
+        'lifecycle management. Initialization logic is skipped during rebuild.',
     correctionMessage: 'Use build() method for initialization.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1168,7 +1173,8 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_flutter_riverpod_package',
     problemMessage:
-        '[require_flutter_riverpod_package] Use flutter_riverpod instead of riverpod in Flutter apps.',
+        '[require_flutter_riverpod_package] Base riverpod package lacks '
+        'Flutter widgets (ProviderScope, ConsumerWidget), causing errors.',
     correctionMessage:
         'Import package:flutter_riverpod/flutter_riverpod.dart instead.',
     errorSeverity: DiagnosticSeverity.ERROR,

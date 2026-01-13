@@ -2758,10 +2758,39 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
 ///   await tester.tap(button);
 /// });
 /// ```
+/// Suggests `find.byKey()` over `find.byType()` for widget interactions.
+///
+/// `find.byType()` is fragile because:
+/// - Multiple widgets of the same type may exist in the tree
+/// - Widget types may change during refactoring
+/// - Generic types like `Text` or `Container` are too broad
+///
+/// `find.byKey()` is more reliable because:
+/// - Keys are explicit and unique identifiers
+/// - They survive widget type changes
+/// - They express test intent clearly
+///
+/// **BAD:**
+/// ```dart
+/// testWidgets('taps submit button', (tester) async {
+///   await tester.pumpWidget(MyForm());
+///   await tester.tap(find.byType(ElevatedButton)); // Which button?
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// testWidgets('taps submit button', (tester) async {
+///   await tester.pumpWidget(MyForm());
+///   await tester.tap(find.byKey(Key('submit_button')));
+/// });
+/// ```
+///
+/// **Note:** This rule only flags `find.byType()` usage. For `find.text()`
+/// used in interactions, see `avoid_find_by_text`.
 class PreferTestFindByKeyRule extends SaropaLintRule {
   const PreferTestFindByKeyRule() : super(code: _code);
 
-  /// Test quality improvement.
   @override
   LintImpact get impact => LintImpact.low;
 
@@ -2774,7 +2803,7 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_find_by_key',
     problemMessage:
-        '[prefer_test_find_by_key] find.byType is fragile. Consider using find.byKey for reliable widget testing.',
+        '[prefer_test_find_by_key] find.byType() is fragile. Consider using find.byKey() for reliable widget testing.',
     correctionMessage:
         'Add a Key to your widget and use find.byKey(Key(\'my_key\')) instead.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2786,15 +2815,7 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    final String path = resolver.path;
-
-    // Only check test files
-    if (!path.endsWith('_test.dart') &&
-        !path.contains('/test/') &&
-        !path.contains(r'\test\')) {
-      return;
-    }
-
+    // File type filtering is handled by applicableFileTypes
     context.registry.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'byType') return;
 
@@ -2876,15 +2897,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    final String path = resolver.path;
-
-    // Only check test files
-    if (!path.endsWith('_test.dart') &&
-        !path.contains('/test/') &&
-        !path.contains(r'\test\')) {
-      return;
-    }
-
+    // File type filtering is handled by applicableFileTypes
     context.registry.addCompilationUnit((CompilationUnit unit) {
       // Find all test() calls in the file
       final List<MethodInvocation> testCalls = [];
@@ -3127,15 +3140,7 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    final String path = resolver.path;
-
-    // Only check test files
-    if (!path.endsWith('_test.dart') &&
-        !path.contains('/test/') &&
-        !path.contains(r'\test\')) {
-      return;
-    }
-
+    // File type filtering is handled by applicableFileTypes
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for test() containing bloc.add() pattern
       if (node.methodName.name != 'test' && node.methodName.name != 'group') {
@@ -3213,15 +3218,7 @@ class PreferMockVerifyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    final String path = resolver.path;
-
-    // Only check test files
-    if (!path.endsWith('_test.dart') &&
-        !path.contains('/test/') &&
-        !path.contains(r'\test\')) {
-      return;
-    }
-
+    // File type filtering is handled by applicableFileTypes
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Find test() calls
       final name = node.methodName.name;

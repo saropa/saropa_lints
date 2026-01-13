@@ -4,175 +4,119 @@
 
 ---
 
-## Why Static Analysis Matters
+## Moving Beyond "Just Linting"
 
-Static analysis catches bugs **before they reach production**. Industry data shows:
+Static analysis tools are essential, but they are passive. They find issues, but they don't fix architecture, ensure security compliance, or reduce technical debt.
 
-- **30-50% reduction** in production defects ([NIST](https://www.nist.gov/))
-- **6-10x cost savings** — fixing bugs in development vs production ([IBM](https://www.ibm.com/))
+**Saropa Services** bridges the gap between **finding bugs** and **shipping secure, stable software**. We leverage our proprietary analysis engine (1,500+ rules mapped to OWASP standards) to provide high-impact remediation and compliance services for professional Flutter teams.
 
-### What Saropa Lints Catches
+### OWASP Compliance Ready
 
-| Category | Examples |
-|----------|----------|
-| **Crashes** | Null reference errors, memory leaks, resource leaks |
-| **Security** | Hardcoded credentials, insecure storage, input validation |
-| **Performance** | Unnecessary rebuilds, expensive operations in build methods |
-| **Accessibility** | Missing screen reader labels, inadequate touch targets |
+Our security rules are mapped to **OWASP Mobile Top 10 (2024)** and **OWASP Top 10 (2021)** standards. This isn't just a linter — it's a **security audit tool** that speaks the language your security team and auditors understand.
 
----
+| Standard | Categories Covered |
+|----------|-------------------|
+| OWASP Mobile Top 10 | M1, M3, M4, M5, M6, M8, M9, M10 (8/10) |
+| OWASP Top 10 Web | A01, A02, A03, A05, A07, A09 (6/10) |
 
-## Business Value
-
-### For Product Owners
-
-| Metric | Impact |
-|--------|--------|
-| Bug counts | 30-50% fewer production defects |
-| Release velocity | Faster code reviews, less rework |
-| Maintenance costs | Consistent code = easier to modify |
-| Compliance | WCAG accessibility, security best practices |
-
-### For Development Teams
-
-| Activity | Without Linting | With Linting |
-|----------|-----------------|--------------|
-| Code review | 45 min (manual style checks) | 15 min (focus on logic) |
-| Bug investigation | Hours of debugging | Immediate IDE feedback |
-| New developer onboarding | Weeks learning patterns | Days with enforced standards |
+**What this means for you**: Compliance reports that map directly to industry-recognized security standards, not just code style violations.
 
 ---
 
-## Professional Services from Saropa
+## Core Service Offerings
 
-Different projects have different needs. We offer three core services:
+### 1. OWASP Security Assessment
+**Compliance-ready security audits.**
 
-### New Projects
+For teams requiring security compliance documentation or preparing for external audits. We analyze your codebase against OWASP Mobile Top 10 (2024) and OWASP Top 10 (2021) standards.
 
-Scoped to your stage:
+**The Deliverable:**
+A comprehensive PDF Security Assessment including:
+- **OWASP Coverage Matrix:** Which categories you pass, which have gaps
+- **Violation Details:** Specific code locations with severity and remediation guidance
+- **Compliance Summary:** Executive summary suitable for auditors and stakeholders
+- **Remediation Roadmap:** Prioritized fixes by risk level
 
-| Stage | What's included | Best for |
-|-------|-----------------|----------|
-| **MVP** | Core stability — crashes, security, null safety | Early-stage, validating fast |
-| **Production** | Above + performance, error handling, edge cases | Scaling, real users |
-| **Enterprise** | Above + accessibility, compliance, documentation | Regulated markets, enterprise sales |
+**Standards Covered:**
+| OWASP Mobile | OWASP Web |
+|--------------|-----------|
+| M1 Credential Usage | A01 Broken Access Control |
+| M3 Authentication | A02 Cryptographic Failures |
+| M4 Input Validation | A03 Injection |
+| M5 Communication | A05 Misconfiguration |
+| M6 Privacy Controls | A07 Authentication Failures |
+| M8 Misconfiguration | A09 Logging Failures |
+| M9 Data Storage | |
+| M10 Cryptography | |
 
-Each is a complete product. You're not buying quality levels — you're matching the scope to the project's needs.
+**Best For:** FinTech, Healthcare, Government, App Store compliance, security audits, due diligence.
 
-### Upgrade
+### 2. Technical Debt Remediation
+**Clean up the mess without stopping development.**
 
-Existing projects you've built, moving to a higher tier.
+Many teams want to adopt stricter linting but are blocked by thousands of legacy warnings. We use our **Baseline Technology** to snapshot your current state, allowing you to enforce high standards on *new* code immediately while we systematically burn down the legacy debt.
 
-Your project succeeded. Now it's growing. We help you upgrade from MVP-tier to Production-tier or Enterprise-tier practices. This is progression, not remediation.
+**We handle:**
+- Configuration of the **Baseline** to silence legacy noise.
+- Systematic refactoring of critical issues (Null safety, Async gaps, Resources).
+- CI/CD integration to prevent regression.
 
-Typical phased approach:
-- **Phase 1**: Enable critical rules — memory leaks, null safety, security
-- **Phase 2**: Add performance and error handling rules
-- **Phase 3**: Enable documentation, testing, accessibility rules
-- **Phase 4**: Full enablement with team-specific exclusions
+**Best For:** Mature apps with significant technical debt or teams upgrading strictness tiers.
 
-### Audit
+### 3. Compliance & Security Retainer
+**Continuous OWASP compliance for regulated industries.**
 
-Existing code you didn't build — or inherited from previous contractors.
+For FinTech, Healthcare, and Government applications where "good enough" isn't acceptable. We act as your external code quality assurance team.
 
-We assess the codebase, produce a prioritized report, and quote remediation separately. The report is the deliverable:
+**Includes:**
+- **Monthly OWASP Compliance Reports:** Proof of adherence to OWASP Mobile Top 10 and Web Top 10 standards
+- **Trend Analysis:** Track security posture improvements over time
+- **Custom Rule Maintenance:** Updates to rules as your internal architecture evolves
+- **Dependency Audits:** Proactive warnings about deprecated or insecure packages (covers OWASP M2/A06 gaps)
+- **Remediation Support:** Guidance on fixing identified vulnerabilities
 
-- **Current state analysis** — How many issues, what categories, severity distribution
-- **Risk prioritization** — Which issues pose the greatest risk to stability, security, and maintainability
-- **Remediation roadmap** — Phased plan to resolve issues without disrupting feature development
-- **Estimated effort** — Scope of work if you want us to handle remediation
+**Best For:** Regulated industries requiring audit trails, continuous compliance monitoring, and guaranteed stability.
 
 ---
 
-### Additional Services
+## specialized Solutions
 
-| Service | Description |
-|---------|-------------|
-| **Custom Rules** | Rules specific to your architecture, patterns, or compliance requirements |
-| **Training** | Team workshops on Flutter best practices and lint-driven development |
-| **Ongoing Support** | We manage your lint configuration as your codebase evolves |
-| **Alpha Access** | Early access to new rules and features before public release |
-| **Priority Support** | Direct communication channel with the Saropa Lints team |
-| **Custom Builds** | Private fork of Saropa Lints tailored to your organization's standards |
-| **Tailored Lint Sets** | We create a curated lint configuration specific to your tech stack, compliance requirements, and team preferences |
-| **Sponsored Rules** | Fund development of new rules that get added to the public package — your organization gets recognition while the community benefits |
+### Custom Rule Development
+**Enforce your architecture.**
 
-### Sponsor Rules for the Public Package
+Generic rules catch generic bugs. **Custom rules catch architectural violations.** We build rules specific to your team's conventions so that "doing the right thing" becomes the path of least resistance.
 
-Organizations can sponsor the development of specific lint rules. Sponsored rules are added to the public Saropa Lints package, giving your organization visibility in the open source community while improving code quality for everyone. You choose the rule, we build and maintain it.
+**Examples:**
+- "All Repositories must handle `DioException`."
+- "UI Widgets cannot import `infrastructure` layer directly."
+- "Analytics events must follow the `event_verb_noun` naming convention."
 
-### Tailored Lint Sets for Your Organization
+### Migration Services
+**Switching tools?**
 
-Every team has different needs. We create custom lint configurations that match your:
+If you are moving from **Dart Code Metrics (DCM)**, **Very Good Analysis**, or **Effective Dart**, we handle the transition. We map your existing rules to Saropa equivalents, ensuring no drop in coverage while unlocking hundreds of new checks.
 
-- **Tech stack** — Firebase, GraphQL, specific state management solutions
-- **Compliance requirements** — HIPAA, PCI-DSS, GDPR-related patterns
-- **Architectural decisions** — Your specific layers, naming conventions, and boundaries
-- **Team preferences** — Severity levels, rule selections, and exceptions that fit your workflow
+---
 
-Tailored lint sets can be delivered as a configuration file for the public package or as a private fork with custom rules baked in.
+## Why Partner With Us?
 
-### Why Pay for Services?
-
-- **Time**: Your team stays on feature work while we handle code quality
-- **Expertise**: We've seen hundreds of Flutter codebases and know the patterns
-- **Custom Rules**: Rules that enforce your specific architectural decisions
-- **Prioritization**: We know which warnings matter and which can wait
+| Feature | The Value |
+|---------|-----------|
+| **We Build The Engine** | We maintain the open source package. We know the 1,500+ rules better than anyone. |
+| **OWASP Mapped** | Security rules mapped to OWASP Mobile Top 10 and Web Top 10. Reports auditors understand. |
+| **No "Tool Fatigue"** | We don't just sell you a license and a dashboard. We provide the expertise to fix the issues the tool finds. |
+| **Brownfield Specialists** | We specialize in legacy code. We know how to modernize apps without rewriting them. |
+| **Compliance Focused** | We speak the language of Security and Risk, not just code style. |
 
 ---
 
 ## Contact
 
-**Website**: [saropa.com](https://saropa.com)
+Ready to eliminate technical debt?
+
 **Email**: [services@saropa.com](mailto:services@saropa.com)
+**Web**: [saropa.com](https://saropa.com)
 
 ---
 
-## FAQ
-
-### How long does adoption take?
-
-For a medium-sized codebase, expect 2-4 weeks to resolve critical issues and 2-3 months for full adoption. With our remediation service, we can compress this significantly.
-
-### Will this slow down our developers?
-
-Initially, there may be a 1-2 week adjustment period. After that, development typically accelerates — fewer bugs to investigate, faster code reviews, less production firefighting.
-
-### Is custom_lint slow with 1400+ rules?
-
-It can be. We've implemented significant performance optimizations in v3.0.0 (tier caching, rule filtering cache, analyzer excludes). For detailed optimization strategies, see our **[Performance Guide](PERFORMANCE.md)**.
-
-**Quick tips:**
-- Use `essential` tier locally (~400 rules, 3-5x faster)
-- Use `professional` in CI (thorough checking)
-- Exclude generated code in `analysis_options.yaml`
-
-### Can we customize which rules are enabled?
-
-Yes. Every rule can be enabled, disabled, or adjusted. We can help you create a configuration that matches your team's priorities.
-
-### What if we disagree with a rule?
-
-Disable it. Or tell us why — if your argument is good, we'll change the rule or move it to a different tier.
-
-### Do you offer trials?
-
-The package is free and open source. Try it on your codebase. If you want help with adoption or custom rules, contact us.
-
-### Can you build custom rules for our codebase?
-
-Yes. We build rules that enforce your specific patterns — internal API usage, architectural boundaries, naming conventions, deprecated code detection, or any other pattern you want to enforce. Custom rules integrate seamlessly with the existing Saropa Lints package.
-
-### Can we get early access to new features?
-
-Yes. Enterprise partners get alpha access to new rules and features before public release. This lets you test changes against your codebase and provide feedback before general availability.
-
-### Can we get a custom build for our organization?
-
-Yes. We can create a private fork of Saropa Lints pre-configured for your organization — your tier settings, custom rules, and rule adjustments baked in. Your developers just add the dependency and everything works. We maintain the fork and merge upstream improvements automatically.
-
-### We're using another linter. Can we switch?
-
-Yes. See our migration guides:
-- [Migrating from very_good_analysis](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_vga.md)
-- [Migrating from DCM (Dart Code Metrics)](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_dcm.md)
+*Saropa Lints is open source (MIT). These services are optional for teams requiring accelerated implementation, security compliance, or architectural enforcement.*

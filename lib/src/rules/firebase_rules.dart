@@ -256,7 +256,8 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_prefs_key_constants',
     problemMessage:
-        '[require_prefs_key_constants] SharedPreferences key should be a constant, not a string literal.',
+        '[require_prefs_key_constants] String literal keys cause silent bugs '
+        'when misspelled and make searching/refactoring keys impossible.',
     correctionMessage:
         'Define preference keys as constants to avoid typos and enable refactoring.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -533,7 +534,8 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_firebase_init_before_use',
     problemMessage:
-        '[require_firebase_init_before_use] Firebase service used without ensuring Firebase.initializeApp() was called.',
+        '[require_firebase_init_before_use] Firebase services crash if accessed '
+        'before initializeApp() completes. App fails on startup.',
     correctionMessage:
         'Ensure Firebase.initializeApp() completes in main() before runApp().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1237,7 +1239,8 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_event_name',
     problemMessage:
-        '[incorrect_firebase_event_name] Firebase Analytics event name does not follow conventions.',
+        '[incorrect_firebase_event_name] Invalid event name is silently dropped '
+        'by Firebase Analytics. Your analytics data will be incomplete.',
     correctionMessage:
         'Event names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
@@ -1337,7 +1340,8 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_parameter_name',
     problemMessage:
-        '[incorrect_firebase_parameter_name] Firebase Analytics parameter name does not follow conventions.',
+        '[incorrect_firebase_parameter_name] Invalid parameter names are '
+        'silently dropped by Firebase. Event data will be missing fields.',
     correctionMessage:
         'Parameter names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
@@ -1619,7 +1623,8 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_remote_config_defaults',
     problemMessage:
-        '[prefer_firebase_remote_config_defaults] RemoteConfig should have defaults set before use.',
+        '[prefer_firebase_remote_config_defaults] Missing defaults cause '
+        'null/zero values when fetch fails, breaking app behavior.',
     correctionMessage: 'Call setDefaults() with fallback values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1698,7 +1703,8 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_fcm_token_refresh_handler',
     problemMessage:
-        '[require_fcm_token_refresh_handler] FCM token refresh should be handled.',
+        '[require_fcm_token_refresh_handler] FCM tokens expire periodically. '
+        'Without onTokenRefresh handling, push notifications will stop working.',
     correctionMessage:
         'Listen to onTokenRefresh to update server with new tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1779,7 +1785,8 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_background_message_handler',
     problemMessage:
-        '[require_background_message_handler] FCM should have a background message handler.',
+        '[require_background_message_handler] Push notifications received when '
+        'app is terminated are silently dropped without handler.',
     correctionMessage:
         'Add onBackgroundMessage with a top-level handler function.',
     errorSeverity: DiagnosticSeverity.WARNING,

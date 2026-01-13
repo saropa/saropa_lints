@@ -38,7 +38,8 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_snackbar_duration',
     problemMessage:
-        '[require_snackbar_duration] SnackBar should have explicit duration.',
+        '[require_snackbar_duration] Default duration varies by platform, '
+        'causing inconsistent UX across devices.',
     correctionMessage: 'Add duration parameter for consistent UX timing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -106,7 +107,8 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dialog_barrier_dismissible',
     problemMessage:
-        '[require_dialog_barrier_dismissible] showDialog should have explicit barrierDismissible.',
+        '[require_dialog_barrier_dismissible] Default barrier behavior may '
+        'allow accidental dismissal, losing unsaved user input.',
     correctionMessage:
         'Add barrierDismissible: true or false to make intent clear.',
     errorSeverity: DiagnosticSeverity.INFO,

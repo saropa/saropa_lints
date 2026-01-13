@@ -245,6 +245,84 @@ dart run custom_lint
 
 ---
 
+## Handling Legacy Codebases (Baseline Feature)
+
+### The Problem
+
+You want to adopt saropa_lints on an existing project. You run analysis and see:
+
+```
+... 500+ violations in legacy code
+```
+
+You can't fix them all before your next sprint. But ignoring linting entirely means new bugs slip through.
+
+### The Solution
+
+The **baseline feature** records existing violations and hides them:
+
+```bash
+dart run saropa_lints:baseline
+```
+
+- **Old code**: Violations hidden (baselined)
+- **New code**: Violations reported normally
+
+### Why Use Baseline
+
+- **Adopt linting today** - Don't wait until legacy code is fixed
+- **Catch new bugs** - New code is still checked
+- **Gradual cleanup** - Fix old violations over time, run `--update` to shrink baseline
+- **Priority filtering** - Keep seeing critical issues while baselining low-severity ones
+
+### Three Baseline Types
+
+| Type | Config | Description | Performance |
+|------|--------|-------------|-------------|
+| **File-based** | `baseline.file` | JSON listing specific violations | O(1) lookup |
+| **Path-based** | `baseline.paths` | Glob patterns for directories | Pre-compiled regex |
+| **Date-based** | `baseline.date` | Git blame - ignore old code | Cached per-file |
+
+### Full Configuration
+
+```yaml
+custom_lint:
+  saropa_lints:
+    tier: professional
+    baseline:
+      file: "saropa_baseline.json"    # Specific violations
+      date: "2025-01-15"              # Code unchanged since date
+      paths:                           # Directories to ignore
+        - "lib/legacy/"
+        - "lib/deprecated/"
+        - "**/generated/"
+      only_impacts: [low, medium]     # Keep seeing critical/high
+```
+
+### Workflow
+
+1. **Initial setup**: Run `dart run saropa_lints:baseline`
+2. **Development**: New code is linted normally, old violations hidden
+3. **Cleanup sprints**: Fix violations, then `dart run saropa_lints:baseline --update`
+4. **Goal**: Eventually remove baseline entirely
+
+### Performance Impact
+
+The baseline feature has minimal performance impact:
+
+| Component | Implementation | Impact |
+|-----------|---------------|--------|
+| File baseline | Hash table lookup | O(1) per violation |
+| Path baseline | Pre-compiled regex | O(patterns) per file |
+| Date baseline | Cached git blame | First access: O(lines), subsequent: O(1) |
+| Impact filter | String comparison | Negligible |
+
+**Best practice**: Use file-based and path-based baselines for best performance. Date-based baseline involves git operations and is slower on first access (but cached afterwards).
+
+See [README.md](README.md#baseline-for-brownfield-projects) for full documentation.
+
+---
+
 ## Benchmarking
 
 ### Measure Analysis Time

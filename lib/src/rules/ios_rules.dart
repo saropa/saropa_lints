@@ -1745,7 +1745,8 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_permission_description',
     problemMessage:
-        '[require_ios_permission_description] Permission-requiring API used. Missing Info.plist key(s): {0}',
+        '[require_ios_permission_description] Missing Info.plist keys cause App '
+        'Store rejection or instant crash when the permission is requested.',
     correctionMessage: 'Add the missing key(s) to ios/Runner/Info.plist.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

@@ -464,7 +464,8 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_length_sync',
     problemMessage:
-        '[require_tab_controller_length_sync] TabController length must match TabBar/TabBarView children count.',
+        '[require_tab_controller_length_sync] TabController length mismatch '
+        'throws RangeError when switching tabs, crashing the app.',
     correctionMessage: 'Ensure TabController length equals the number of tabs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1085,7 +1086,8 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_key_for_reorderable',
     problemMessage:
-        '[require_key_for_reorderable] ReorderableListView items must have unique keys for proper reordering.',
+        '[require_key_for_reorderable] Without unique keys, reordering fails '
+        'silently or shows wrong items after drag-and-drop.',
     correctionMessage: 'Add a key parameter (e.g., ValueKey) to each item.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

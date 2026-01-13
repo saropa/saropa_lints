@@ -933,7 +933,8 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_json_chains',
     problemMessage:
-        '[avoid_dynamic_json_chains] Deep JSON chain is fragile. Use typed models or helpers.',
+        '[avoid_dynamic_json_chains] Deep dynamic access throws NoSuchMethodError '
+        'or TypeError at runtime when any nested key is missing.',
     correctionMessage: 'Break into separate accesses with null checks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1130,7 +1131,8 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_validator_return_null',
     problemMessage:
-        '[require_validator_return_null] Form validator must return null for valid input.',
+        '[require_validator_return_null] Non-null return on valid input shows '
+        'error message even when field is correct, confusing users.',
     correctionMessage: 'Add "return null;" for the valid case.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

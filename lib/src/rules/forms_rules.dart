@@ -634,7 +634,8 @@ class RequireFormKeyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_form_key',
     problemMessage:
-        '[require_form_key] Form should have a GlobalKey to access FormState.',
+        '[require_form_key] Without GlobalKey, validate() and save() calls '
+        'fail because FormState cannot be accessed.',
     correctionMessage:
         'Add key: _formKey where _formKey = GlobalKey<FormState>()',
     errorSeverity: DiagnosticSeverity.WARNING,

@@ -253,7 +253,8 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_typed_api_response',
     problemMessage:
-        '[require_typed_api_response] API response should be parsed into a typed model.',
+        '[require_typed_api_response] Untyped API access via dynamic keys '
+        'loses type safety. Typos cause runtime errors, not compile errors.',
     correctionMessage: 'Create a model class and use fromJson/fromMap.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -350,7 +351,8 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_connectivity_check',
     problemMessage:
-        '[require_connectivity_check] Consider checking connectivity before network operations.',
+        '[require_connectivity_check] Network calls without connectivity check '
+        'cause poor UX with long timeouts and unhelpful error messages.',
     correctionMessage: 'Use Connectivity package to check network status.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -733,7 +735,8 @@ class PreferStreamingResponseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_streaming_response',
     problemMessage:
-        '[prefer_streaming_response] Large download uses bodyBytes. Consider streaming for large files.',
+        '[prefer_streaming_response] bodyBytes loads entire file into memory, '
+        'causing OutOfMemoryError for large downloads. Stream to disk instead.',
     correctionMessage:
         'Use client.send() with StreamedResponse and pipe to file.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2915,7 +2918,8 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_handler_top_level',
     problemMessage:
-        '[require_notification_handler_top_level] Background message handler must be top-level or static function.',
+        '[require_notification_handler_top_level] Non-top-level handlers fail '
+        'silently in background. Messages are lost when app is terminated.',
     correctionMessage:
         'Move handler to top-level function with @pragma("vm:entry-point").',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3131,7 +3135,8 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_result_handling',
     problemMessage:
-        '[require_image_picker_result_handling] pickImage result should be checked for null.',
+        '[require_image_picker_result_handling] pickImage returns null when '
+        'user cancels. Missing null check causes NoSuchMethodError crash.',
     correctionMessage: 'Add null check: if (image == null) return;',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
