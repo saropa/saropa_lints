@@ -430,8 +430,7 @@ class PreferSmallFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_small_files',
-    problemMessage:
-        '[prefer_small_files] File has more than $_maxLines lines. '
+    problemMessage: '[prefer_small_files] File has more than $_maxLines lines. '
         'Smaller files are easier to understand and maintain.',
     correctionMessage:
         'Split this file into focused modules with single responsibilities. '

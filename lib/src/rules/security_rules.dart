@@ -5280,7 +5280,8 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     name: 'require_https_only',
     problemMessage:
         '[require_https_only] HTTP URL detected. HTTP traffic is unencrypted and vulnerable to interception.',
-    correctionMessage: 'Replace http:// with https:// for secure communication.',
+    correctionMessage:
+        'Replace http:// with https:// for secure communication.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

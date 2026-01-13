@@ -17,7 +17,8 @@ enum OwaspMobile {
     name: 'Improper Credential Usage',
     description: 'Hardcoded credentials, insecure credential storage, '
         'or improper credential transmission.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m1-improper-credential-usage',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m1-improper-credential-usage',
   ),
 
   /// M2: Inadequate Supply Chain Security
@@ -28,7 +29,8 @@ enum OwaspMobile {
     name: 'Inadequate Supply Chain Security',
     description: 'Vulnerabilities in third-party libraries, SDKs, '
         'or dependencies.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m2-inadequate-supply-chain-security',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m2-inadequate-supply-chain-security',
   ),
 
   /// M3: Insecure Authentication/Authorization
@@ -39,7 +41,8 @@ enum OwaspMobile {
     name: 'Insecure Authentication/Authorization',
     description: 'Weak authentication mechanisms or improper '
         'authorization controls.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m3-insecure-authentication-authorization',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m3-insecure-authentication-authorization',
   ),
 
   /// M4: Insufficient Input/Output Validation
@@ -51,7 +54,8 @@ enum OwaspMobile {
     name: 'Insufficient Input/Output Validation',
     description: 'Failure to properly validate, filter, or sanitize '
         'user input and output data.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m4-insufficient-input-output-validation',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m4-insufficient-input-output-validation',
   ),
 
   /// M5: Insecure Communication
@@ -63,7 +67,8 @@ enum OwaspMobile {
     name: 'Insecure Communication',
     description: 'Transmitting sensitive data over unencrypted channels '
         'or improper certificate validation.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m5-insecure-communication',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m5-insecure-communication',
   ),
 
   /// M6: Inadequate Privacy Controls
@@ -75,7 +80,8 @@ enum OwaspMobile {
     name: 'Inadequate Privacy Controls',
     description: 'Improper handling of PII, excessive data collection, '
         'or insufficient privacy protections.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m6-inadequate-privacy-controls',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m6-inadequate-privacy-controls',
   ),
 
   /// M7: Insufficient Binary Protections
@@ -87,7 +93,8 @@ enum OwaspMobile {
     name: 'Insufficient Binary Protections',
     description: 'Lack of code obfuscation, anti-tampering, or '
         'reverse engineering protections.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m7-insufficient-binary-protections',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m7-insufficient-binary-protections',
   ),
 
   /// M8: Security Misconfiguration
@@ -99,7 +106,8 @@ enum OwaspMobile {
     name: 'Security Misconfiguration',
     description: 'Insecure default settings, overly permissive configurations, '
         'or improper security controls.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m8-security-misconfiguration',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m8-security-misconfiguration',
   ),
 
   /// M9: Insecure Data Storage
@@ -111,7 +119,8 @@ enum OwaspMobile {
     name: 'Insecure Data Storage',
     description: 'Storing sensitive data insecurely on the device, '
         'including unencrypted storage or world-readable files.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m9-insecure-data-storage',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m9-insecure-data-storage',
   ),
 
   /// M10: Insufficient Cryptography
@@ -121,9 +130,11 @@ enum OwaspMobile {
   m10(
     id: 'M10',
     name: 'Insufficient Cryptography',
-    description: 'Use of weak cryptographic algorithms, improper key management, '
+    description:
+        'Use of weak cryptographic algorithms, improper key management, '
         'or flawed cryptographic implementations.',
-    url: 'https://owasp.org/www-project-mobile-top-10/2024-risks/m10-insufficient-cryptography',
+    url:
+        'https://owasp.org/www-project-mobile-top-10/2024-risks/m10-insufficient-cryptography',
   );
 
   const OwaspMobile({
@@ -234,7 +245,8 @@ enum OwaspWeb {
     name: 'Identification and Authentication Failures',
     description: 'Weaknesses in authentication and session management '
         'that allow attackers to compromise identities.',
-    url: 'https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/',
+    url:
+        'https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/',
   ),
 
   /// A08: Software and Data Integrity Failures
@@ -246,7 +258,8 @@ enum OwaspWeb {
     name: 'Software and Data Integrity Failures',
     description: 'Code and infrastructure that does not protect '
         'against integrity violations.',
-    url: 'https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/',
+    url:
+        'https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/',
   ),
 
   /// A09: Security Logging and Monitoring Failures
@@ -258,7 +271,8 @@ enum OwaspWeb {
     name: 'Security Logging and Monitoring Failures',
     description: 'Insufficient logging, detection, monitoring, '
         'and active response capabilities.',
-    url: 'https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/',
+    url:
+        'https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/',
   ),
 
   /// A10: Server-Side Request Forgery (SSRF)
@@ -270,7 +284,8 @@ enum OwaspWeb {
     name: 'Server-Side Request Forgery (SSRF)',
     description: 'Application fetches remote resources without '
         'validating user-supplied URLs.',
-    url: 'https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/',
+    url:
+        'https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/',
   );
 
   const OwaspWeb({

@@ -13,8 +13,7 @@ import 'owasp_category.dart';
 Map<OwaspMobile, List<String>> getMobileCoverage(
   Map<String, OwaspMapping> ruleMappings,
 ) {
-  final Map<OwaspMobile, List<String>> coverage =
-      <OwaspMobile, List<String>>{};
+  final Map<OwaspMobile, List<String>> coverage = <OwaspMobile, List<String>>{};
 
   for (final OwaspMobile category in OwaspMobile.values) {
     coverage[category] = <String>[];

@@ -225,8 +225,7 @@ class GitAwarePriority {
 
   /// Check if a file is either modified or staged.
   static bool isRelevant(String filePath) {
-    return _modifiedFiles.contains(filePath) ||
-        _stagedFiles.contains(filePath);
+    return _modifiedFiles.contains(filePath) || _stagedFiles.contains(filePath);
   }
 
   /// Get all modified files.
@@ -236,8 +235,7 @@ class GitAwarePriority {
   static Set<String> get stagedFiles => Set.unmodifiable(_stagedFiles);
 
   /// Get all relevant files (modified + staged).
-  static Set<String> get relevantFiles =>
-      {..._modifiedFiles, ..._stagedFiles};
+  static Set<String> get relevantFiles => {..._modifiedFiles, ..._stagedFiles};
 
   /// Get priority score for a file.
   ///

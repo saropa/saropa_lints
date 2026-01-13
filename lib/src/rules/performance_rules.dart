@@ -3164,8 +3164,7 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_platform_channel_on_web',
-    problemMessage:
-        '[avoid_platform_channel_on_web] MethodChannel throws '
+    problemMessage: '[avoid_platform_channel_on_web] MethodChannel throws '
         'MissingPluginException on web, crashing the application.',
     correctionMessage: 'Wrap with kIsWeb check or use conditional imports.',
     errorSeverity: DiagnosticSeverity.ERROR,

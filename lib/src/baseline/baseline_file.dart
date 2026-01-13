@@ -60,9 +60,8 @@ class BaselineFile {
     }
 
     final generatedStr = json['generated'] as String?;
-    final generated = generatedStr != null
-        ? DateTime.tryParse(generatedStr)
-        : DateTime.now();
+    final generated =
+        generatedStr != null ? DateTime.tryParse(generatedStr) : DateTime.now();
 
     final violationsRaw = json['violations'] as Map<String, dynamic>? ?? {};
     final violations = <String, Map<String, List<int>>>{};
