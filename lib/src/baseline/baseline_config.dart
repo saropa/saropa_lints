@@ -12,6 +12,8 @@
 ///         - "lib/deprecated/"
 ///       only_impacts: [low, medium]
 /// ```
+library;
+
 class BaselineConfig {
   const BaselineConfig({
     this.file,
