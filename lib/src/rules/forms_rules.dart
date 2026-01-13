@@ -287,7 +287,7 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_overflow_in_row',
     problemMessage:
-        '[require_text_overflow_in_row] Text in Row without overflow handling may cause overflow error.',
+        '[require_text_overflow_in_row] Text in Row without overflow handling shows yellow/black overflow stripes on long content.',
     correctionMessage:
         'Add overflow: TextOverflow.ellipsis or wrap in Expanded/Flexible.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -375,7 +375,7 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_secure_keyboard',
     problemMessage:
-        '[require_secure_keyboard] Password field should use obscureText: true.',
+        '[require_secure_keyboard] Password field without obscureText exposes password to shoulder surfers.',
     correctionMessage: 'Add obscureText: true to hide password input.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -535,7 +535,7 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_message_context',
     problemMessage:
-        '[require_error_message_context] Validation error message is too generic. Include field name and expected format.',
+        '[require_error_message_context] Generic "Invalid" error leaves users guessing what went wrong or how to fix it.',
     correctionMessage:
         'Replace with descriptive message: "Email must be valid" instead of "Invalid".',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -713,7 +713,7 @@ class AvoidValidationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_validation_in_build',
     problemMessage:
-        '[avoid_validation_in_build] Complex/async validation in validator runs on every keystroke.',
+        '[avoid_validation_in_build] Complex/async validation on every keystroke causes input lag and excessive API calls.',
     correctionMessage: 'Move complex validation to onSubmit or use debouncing.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -798,7 +798,7 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_submit_button_state',
     problemMessage:
-        '[require_submit_button_state] Async submit button should show loading state and disable during submission.',
+        '[require_submit_button_state] Submit button without loading state allows double-submission, causing duplicate requests.',
     correctionMessage:
         'Add loading state: onPressed: _isLoading ? null : _submit',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -871,7 +871,7 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_form_without_unfocus',
     problemMessage:
-        '[avoid_form_without_unfocus] Form submission should close keyboard with FocusScope.unfocus().',
+        '[avoid_form_without_unfocus] Form submission without unfocus() leaves keyboard open, blocking success feedback.',
     correctionMessage:
         'Add FocusScope.of(context).unfocus() at start of submit handler.',
     errorSeverity: DiagnosticSeverity.INFO,

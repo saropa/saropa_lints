@@ -58,6 +58,18 @@ Core stylistic preferences for imports, functions, formatting, naming, and comme
 | [`avoid_small_text`](#avoid_small_text) | Font size at least 12 for accessibility | Yes |
 | [`prefer_doc_comments_over_regular`](#prefer_doc_comments_over_regular) | Use `///` instead of `//` for public API docs | Yes |
 | [`prefer_literal_apostrophe`](#prefer_literal_apostrophe) | Use `'` instead of `\'` by switching to double quotes | Yes |
+| [`arguments_ordering`](#arguments_ordering) | Named arguments should be in alphabetical order | Yes |
+| [`capitalize_comment`](#capitalize_comment) | Comments should start with a capital letter | Yes |
+| [`firebase_custom`](#firebase_custom) | Custom Firebase usage should follow team conventions | |
+| [`greeting`](#greeting) | Greeting messages should follow team style conventions | |
+| [`prefer_kebab_tag_name`](#prefer_kebab_tag_name) | Tag names should use kebab-case | |
+| [`prefer_rethrow_over_throw_e`](#prefer_rethrow_over_throw_e) | Prefer 'rethrow' over 'throw e' in catch blocks | |
+| [`prefer_sorted_members`](#prefer_sorted_members) | Class members should be sorted by team convention | |
+| [`prefer_sorted_parameters`](#prefer_sorted_parameters) | Function parameters should be sorted by team convention | |
+| [`purchase`](#purchase) | Purchase logic should follow team style conventions | |
+| [`purchase_completed`](#purchase_completed) | Purchase completion logic should follow team style conventions | |
+| [`save`](#save) | Save logic should follow team style conventions | |
+| [`user_clicked_button`](#user_clicked_button) | Button click logic should follow team style conventions | |
 
 ---
 

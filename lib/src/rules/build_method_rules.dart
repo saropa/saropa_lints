@@ -8,8 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -56,9 +55,8 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gradient_in_build',
     problemMessage:
-        '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations.',
-    correctionMessage:
-        'Store gradient as a static const field or create outside build().',
+        '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain.',
+    correctionMessage: 'Store gradient as a static const field or create outside build().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -93,8 +91,8 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName = node.constructorName.type.element?.name ??
-        node.constructorName.type.name2.lexeme;
+    final String typeName =
+        node.constructorName.type.element?.name ?? node.constructorName.type.name2.lexeme;
 
     if (gradientTypes.contains(typeName)) {
       // Skip const gradients - they're properly reused
@@ -159,11 +157,9 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dialog_in_build',
-    problemMessage:
-        '[avoid_dialog_in_build] showDialog in build() triggers rebuild which '
+    problemMessage: '[avoid_dialog_in_build] showDialog in build() triggers rebuild which '
         'shows another dialog, creating infinite loop and freezing the app.',
-    correctionMessage:
-        'Move dialog calls to event handlers or lifecycle methods.',
+    correctionMessage: 'Move dialog calls to event handlers or lifecycle methods.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -300,7 +296,7 @@ class AvoidSnackbarInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_in_build',
     problemMessage:
-        '[avoid_snackbar_in_build] showSnackBar in build() causes repeated snackbars.',
+        '[avoid_snackbar_in_build] showSnackBar in build() causes repeated snackbars. This leads to poor UX and can overwhelm users with duplicate messages.',
     correctionMessage: 'Move snackbar calls to event handlers.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -390,7 +386,7 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_analytics_in_build',
     problemMessage:
-        '[avoid_analytics_in_build] Analytics calls in build() fire on every rebuild.',
+        '[avoid_analytics_in_build] Analytics calls in build() fire on every rebuild. This can skew analytics data and degrade app performance.',
     correctionMessage: 'Move analytics to initState() or event handlers.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -426,8 +422,7 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
       final String? returnType = node.returnType?.toSource();
       if (returnType != 'Widget') return;
 
-      node.body
-          .visitChildren(_AnalyticsVisitor(reporter, code, _analyticsMethods));
+      node.body.visitChildren(_AnalyticsVisitor(reporter, code, _analyticsMethods));
     });
   }
 }
@@ -538,8 +533,7 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'jsonEncode' ||
-        node.methodName.name == 'json.encode') {
+    if (node.methodName.name == 'jsonEncode' || node.methodName.name == 'json.encode') {
       reporter.atNode(node, code);
     }
     super.visitMethodInvocation(node);
@@ -594,10 +588,8 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getit_in_build',
-    problemMessage:
-        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies.',
-    correctionMessage:
-        'Inject dependencies via constructor or access in initState().',
+    problemMessage: '[avoid_getit_in_build] GetIt service locator in build() hides dependencies.',
+    correctionMessage: 'Inject dependencies via constructor or access in initState().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -687,7 +679,7 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_canvas_operations_in_build',
     problemMessage:
-        '[avoid_canvas_operations_in_build] Canvas operations belong in CustomPainter, not build().',
+        '[avoid_canvas_operations_in_build] Canvas operations belong in CustomPainter, not build(). Doing this in build() can cause performance issues and unpredictable rendering.',
     correctionMessage: 'Move canvas operations to CustomPainter.paint().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -847,8 +839,7 @@ class PreferSingleSetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_setstate',
-    problemMessage:
-        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds.',
+    problemMessage: '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds.',
     correctionMessage: 'Combine setState calls into a single call.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1005,8 +996,7 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
       // Check if inside a children argument
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is NamedExpression &&
-            current.name.label.name == 'children') {
+        if (current is NamedExpression && current.name.label.name == 'children') {
           reporter.atNode(node, code);
           return;
         }
@@ -1058,8 +1048,7 @@ class PreferContainerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_container',
-    problemMessage:
-        '[prefer_container] Nested decoration widgets could be a single Container.',
+    problemMessage: '[prefer_container] Nested decoration widgets could be a single Container.',
     correctionMessage: 'Use Container with padding, decoration, and size.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1090,8 +1079,7 @@ class PreferContainerRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression childExpr = arg.expression;
           if (childExpr is InstanceCreationExpression) {
-            final String? childType =
-                childExpr.constructorName.type.element?.name;
+            final String? childType = childExpr.constructorName.type.element?.name;
             if (_containerRelatedWidgets.contains(childType)) {
               reporter.atNode(node, code);
               return;

@@ -169,7 +169,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
     problemMessage:
-        '[require_stream_controller_dispose] StreamController is not closed in dispose.',
+        '[require_stream_controller_dispose] Unclosed StreamController leaks memory and keeps listeners active after widget disposal.',
     correctionMessage: 'Add controller.close() in dispose method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -645,7 +645,7 @@ class RequireMountedCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
     problemMessage:
-        '[require_mounted_check] setState called after await without mounted check.',
+        '[require_mounted_check] setState after await without mounted check throws "setState called after dispose" error.',
     correctionMessage: 'Add "if (!mounted) return;" before setState.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -873,7 +873,7 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
     problemMessage:
-        '[avoid_bloc_event_in_constructor] Avoid adding BLoC events in constructor.',
+        '[avoid_bloc_event_in_constructor] BLoC event added in constructor runs before listeners attach, causing missed state updates.',
     correctionMessage:
         'Add initial events from the widget that creates the BLoC.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -952,7 +952,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
     problemMessage:
-        '[require_update_should_notify] InheritedWidget should override updateShouldNotify.',
+        '[require_update_should_notify] InheritedWidget without updateShouldNotify causes all dependents to rebuild on every change.',
     correctionMessage:
         'Add updateShouldNotify to control when dependents rebuild.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1204,7 +1204,7 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_in_build',
     problemMessage:
-        '[avoid_global_key_in_build] GlobalKey should not be created in build method.',
+        '[avoid_global_key_in_build] GlobalKey created in build() is recreated each rebuild, losing widget state.',
     correctionMessage: 'Create GlobalKey as a class field instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -2307,7 +2307,7 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple',
     problemMessage:
-        '[prefer_cubit_for_simple] Simple Bloc with few events could be a Cubit for simpler code.',
+        '[prefer_cubit_for_simple] Simple Bloc with few events adds unnecessary event boilerplate and indirection.',
     correctionMessage:
         'Cubit is simpler for straightforward state. Use Bloc for complex event handling.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2766,7 +2766,7 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_family_for_params',
     problemMessage:
-        '[prefer_family_for_params] Provider with parameters should use .family modifier for proper caching.',
+        '[prefer_family_for_params] Provider without .family creates new instance each call, breaking caching and causing duplicates.',
     correctionMessage:
         'Use Provider.family((ref, param) => ...) and watch with provider(param).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3134,7 +3134,7 @@ class RequireInitialStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
     problemMessage:
-        '[require_initial_state] BLoC constructor must pass initial state to super().',
+        '[require_initial_state] BLoC without initial state throws LateInitializationError when BlocBuilder reads state.',
     correctionMessage:
         'Add initial state: super(InitialState()) or super(const State()).',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3646,7 +3646,7 @@ class RequireProviderDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_provider_dispose',
     problemMessage:
-        '[require_provider_dispose] Provider without dispose callback may leak ChangeNotifier resources.',
+        '[require_provider_dispose] Provider creating ChangeNotifier without dispose callback leaks listeners and memory.',
     correctionMessage:
         'Use ChangeNotifierProvider (auto-disposes) or add dispose callback.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4230,7 +4230,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_controller_dispose',
     problemMessage:
-        '[require_getx_controller_dispose] GetxController has disposable resources but no onClose() override.',
+        '[require_getx_controller_dispose] GetxController has TextEditingController/StreamSubscription but no onClose() to dispose them.',
     correctionMessage:
         'Override onClose() to dispose controllers, cancel subscriptions, etc.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5476,7 +5476,7 @@ class DisposeProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_providers',
     problemMessage:
-        '[dispose_providers] Provider lacks dispose callback. Resources may not be cleaned up.',
+        '[dispose_providers] Provider creating disposable instance without dispose callback leaks controllers and streams.',
     correctionMessage:
         'Add dispose: (_, instance) => instance.dispose() to clean up resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6972,7 +6972,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_provided_instances',
     problemMessage:
-        '[dispose_provided_instances] Provider creates disposable instance without dispose callback.',
+        '[dispose_provided_instances] Provider creates disposable instance without dispose callback, causing memory leaks.',
     correctionMessage:
         'Add dispose: (_, instance) => instance.dispose() to clean up.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7439,7 +7439,7 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_listen_in_async',
     problemMessage:
-        '[avoid_listen_in_async] context.watch() in async callback. Use read() instead.',
+        '[avoid_listen_in_async] context.watch() in async callback triggers rebuild during async, causing stale closures.',
     correctionMessage: 'Replace watch() with read() in async callbacks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -9170,7 +9170,7 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_init_state',
     problemMessage:
-        '[avoid_provider_in_init_state] Provider.of or context.read/watch should not be used in initState.',
+        '[avoid_provider_in_init_state] Provider access in initState() may fail because context is not fully ready.',
     correctionMessage: 'Move to didChangeDependencies() instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -9364,7 +9364,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_manual_dispose',
     problemMessage:
-        '[require_bloc_manual_dispose] Bloc/Cubit has disposable resources but no close() override.',
+        '[require_bloc_manual_dispose] Bloc/Cubit has StreamController/Timer but no close() override to dispose them.',
     correctionMessage:
         'Override close() to dispose controllers and close streams.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -10534,7 +10534,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_business_logic_in_ui',
     problemMessage:
-        '[avoid_bloc_business_logic_in_ui] UI code detected in Bloc. Blocs should contain only business logic.',
+        '[avoid_bloc_business_logic_in_ui] UI code in Bloc breaks separation of concerns and makes testing impossible.',
     correctionMessage:
         'Emit a state instead and handle the UI action in BlocListener.',
     errorSeverity: DiagnosticSeverity.WARNING,

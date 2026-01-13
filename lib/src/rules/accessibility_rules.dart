@@ -532,7 +532,7 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
     problemMessage:
-        '[require_semantics_label] Interactive Semantics widget lacks a label. Screen readers cannot describe it.',
+        '[require_semantics_label] Semantics with button/link role lacks label. Screen readers announce role without describing action.',
     correctionMessage:
         "Add label: 'Description' to describe the interactive element's purpose.",
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -952,7 +952,7 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
     problemMessage:
-        '[avoid_image_buttons_without_tooltip] Image-based interactive elements need a Tooltip or semanticLabel.',
+        '[avoid_image_buttons_without_tooltip] Image-only button lacks accessible label. Screen readers announce nothing, leaving blind users unable to interact.',
     correctionMessage:
         'Wrap with Tooltip or add Semantics to describe the action.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1593,7 +1593,7 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_semantics',
     problemMessage:
-        '[prefer_explicit_semantics] Custom widget may need explicit Semantics for screen reader access.',
+        '[prefer_explicit_semantics] Custom StatelessWidget/StatefulWidget may be invisible to screen readers without Semantics.',
     correctionMessage:
         'Consider adding Semantics(label: "...") to describe the widget purpose.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1693,7 +1693,7 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hover_only',
     problemMessage:
-        '[avoid_hover_only] Hover-only interaction is inaccessible on touch devices.',
+        '[avoid_hover_only] Hover-only interaction excludes all mobile users and those with motor disabilities using touch.',
     correctionMessage:
         'Add GestureDetector with onTap or use widgets like Tooltip that handle both.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1906,7 +1906,7 @@ class RequireMinimumContrastRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_minimum_contrast',
     problemMessage:
-        '[require_minimum_contrast] Text color may have insufficient contrast. WCAG requires 4.5:1 ratio.',
+        '[require_minimum_contrast] Low contrast text is unreadable for users with low vision. WCAG 2.1 requires 4.5:1 minimum.',
     correctionMessage:
         'Use darker text on light backgrounds or lighter text on dark backgrounds.',
     errorSeverity: DiagnosticSeverity.WARNING,
