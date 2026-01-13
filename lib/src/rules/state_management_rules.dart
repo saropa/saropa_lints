@@ -9,8 +9,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -80,8 +79,7 @@ class RequireNotifyListenersRule extends SaropaLintRule {
     });
   }
 
-  void _checkMethod(
-      MethodDeclaration method, SaropaDiagnosticReporter reporter) {
+  void _checkMethod(MethodDeclaration method, SaropaDiagnosticReporter reporter) {
     // Skip getters and constructors
     if (method.isGetter || method.isStatic) return;
 
@@ -169,8 +167,9 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_dispose',
     problemMessage:
-        '[require_stream_controller_dispose] Unclosed StreamController leaks memory and keeps listeners active after widget disposal.',
-    correctionMessage: 'Add controller.close() in dispose method.',
+        '[require_stream_controller_dispose] If you do not close a StreamController in dispose, it will leak memory, keep listeners active, and may cause app slowdowns or crashes. Always close StreamControllers to prevent resource leaks and unexpected behavior after widget disposal.',
+    correctionMessage:
+        'Add controller.close() in the dispose method of your widget or class to properly release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -204,8 +203,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
             // Also check initializers
             final Expression? initializer = variable.initializer;
             if (initializer is InstanceCreationExpression) {
-              final String? initTypeName =
-                  initializer.constructorName.type.element?.name;
+              final String? initTypeName = initializer.constructorName.type.element?.name;
               if (initTypeName == 'StreamController') {
                 controllerNames.add(variable.name.lexeme);
               }
@@ -239,8 +237,7 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
           // Find the field to report on
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -358,10 +355,10 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_value_notifier_dispose',
     problemMessage:
-        '[require_value_notifier_dispose] Undisposed ValueNotifier leaks memory '
-        'and keeps listeners attached, potentially updating disposed widgets.',
-    correctionMessage: 'Add notifier.dispose() in dispose method.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        '[require_value_notifier_dispose] If you do not dispose a ValueNotifier, it will leak memory, keep listeners attached, and may update widgets that have already been disposed. This can cause memory leaks, unexpected UI updates, and hard-to-find bugs in your app.',
+    correctionMessage:
+        'Call notifier.dispose() in the dispose method of your widget or class to properly release resources and prevent memory leaks.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -409,8 +406,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
             }
             // Also check initializers for ValueNotifier creation
             if (initializer is InstanceCreationExpression) {
-              final String? initTypeName =
-                  initializer.constructorName.type.element?.name;
+              final String? initTypeName = initializer.constructorName.type.element?.name;
               if (initTypeName == 'ValueNotifier') {
                 singleNotifierNames.add(variable.name.lexeme);
               }
@@ -645,8 +641,9 @@ class RequireMountedCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mounted_check',
     problemMessage:
-        '[require_mounted_check] setState after await without mounted check throws "setState called after dispose" error.',
-    correctionMessage: 'Add "if (!mounted) return;" before setState.',
+        '[require_mounted_check] Calling setState after an await without checking if the widget is still mounted can throw a "setState called after dispose" error. This leads to runtime exceptions, app instability, and hard-to-debug crashes, especially in async code.',
+    correctionMessage:
+        'Add "if (!mounted) return;" before calling setState after an await to ensure the widget is still in the widget tree and prevent runtime errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -661,8 +658,7 @@ class RequireMountedCheckRule extends SaropaLintRule {
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -806,10 +802,10 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_watch_in_callbacks',
     problemMessage:
-        '[avoid_watch_in_callbacks] Using watch in callbacks creates new '
-        'subscriptions on every call, causing memory leaks and redundant rebuilds.',
-    correctionMessage: 'Use read instead of watch in event handlers.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        '[avoid_watch_in_callbacks] Using watch in callbacks (like onPressed or onTap) creates new subscriptions on every call, leading to memory leaks, redundant widget rebuilds, and degraded app performance. This can cause your app to slow down or even crash over time.',
+    correctionMessage:
+        'Use ref.read instead of ref.watch in event handlers and callbacks to avoid creating unnecessary subscriptions and prevent memory leaks.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -873,10 +869,10 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_in_constructor',
     problemMessage:
-        '[avoid_bloc_event_in_constructor] BLoC event added in constructor runs before listeners attach, causing missed state updates.',
+        '[avoid_bloc_event_in_constructor] Adding a BLoC event in the constructor runs it before listeners are attached, causing missed state updates and unpredictable app behavior. This can result in lost events, bugs that are hard to trace, and inconsistent UI state.',
     correctionMessage:
-        'Add initial events from the widget that creates the BLoC.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Dispatch initial events from the widget that creates the BLoC, not from the BLoC constructor, to ensure all listeners are attached and receive the event.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -887,8 +883,7 @@ class AvoidBlocEventInConstructorRule extends SaropaLintRule {
   ) {
     context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
       // Check if in a Bloc class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -952,10 +947,10 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
     problemMessage:
-        '[require_update_should_notify] InheritedWidget without updateShouldNotify causes all dependents to rebuild on every change.',
+        '[require_update_should_notify] If an InheritedWidget does not override updateShouldNotify, all dependents rebuild on every change, causing unnecessary rebuilds, degraded performance, and battery drain. This can make your app slow and unresponsive.',
     correctionMessage:
-        'Add updateShouldNotify to control when dependents rebuild.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Override updateShouldNotify in your InheritedWidget to control when dependents rebuild and optimize app performance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -979,8 +974,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
       // Check for updateShouldNotify method
       bool hasUpdateShouldNotify = false;
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration &&
-            member.name.lexeme == 'updateShouldNotify') {
+        if (member is MethodDeclaration && member.name.lexeme == 'updateShouldNotify') {
           hasUpdateShouldNotify = true;
           break;
         }
@@ -1027,11 +1021,10 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_riverpod_providers',
     problemMessage:
-        '[avoid_global_riverpod_providers] Global providers create implicit '
-        'dependencies, making testing harder and state leakage between tests.',
+        '[avoid_global_riverpod_providers] Defining providers at the global scope creates implicit dependencies, makes testing difficult, and can cause state to leak between tests or app sessions. This leads to flaky tests, unpredictable bugs, and hard-to-maintain code.',
     correctionMessage:
-        'Document provider scope or use ProviderScope for isolation.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Define providers inside a ProviderScope or document their scope clearly to ensure test isolation and predictable state management.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -1064,8 +1057,7 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
           }
         }
         if (initializer is InstanceCreationExpression) {
-          final String? typeName =
-              initializer.constructorName.type.element?.name;
+          final String? typeName = initializer.constructorName.type.element?.name;
           if (typeName != null && _providerTypes.contains(typeName)) {
             reporter.atNode(variable, code);
           }
@@ -1115,11 +1107,10 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stateful_without_state',
     problemMessage:
-        '[avoid_stateful_without_state] StatefulWidget without state fields '
-        'adds unnecessary complexity and lifecycle overhead for nothing.',
+        '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted resources, and potential performance issues.',
     correctionMessage:
-        'Convert to StatelessWidget if no state is being managed.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Convert the widget to a StatelessWidget if it does not manage any state. This simplifies your code and improves performance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -1204,8 +1195,9 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_in_build',
     problemMessage:
-        '[avoid_global_key_in_build] GlobalKey created in build() is recreated each rebuild, losing widget state.',
-    correctionMessage: 'Create GlobalKey as a class field instead.',
+        '[avoid_global_key_in_build] Creating a GlobalKey inside the build() method causes it to be recreated on every rebuild, which results in lost widget state, broken references, and unpredictable UI behavior. This can cause your app to lose user input or fail to maintain state across rebuilds.',
+    correctionMessage:
+        'Create the GlobalKey as a class field (not inside build) to preserve widget state and ensure consistent behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1316,9 +1308,9 @@ class RequireBlocCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_close',
     problemMessage:
-        '[require_bloc_close] Bloc/Cubit is not closed in dispose(). This causes memory leaks.',
+        '[require_bloc_close] If you do not close your Bloc or Cubit in dispose(), it will leak memory, keep listeners active, and may cause app slowdowns or crashes. Always close Blocs and Cubits to prevent resource leaks and unexpected behavior after widget disposal.',
     correctionMessage:
-        'Add _bloc.close() in the dispose() method before super.dispose().',
+        'Add _bloc.close() (or cubit.close()) in the dispose() method before calling super.dispose() to properly release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1362,8 +1354,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
 
             // Check initializer type
             if (initializer is InstanceCreationExpression) {
-              final String initType =
-                  initializer.constructorName.type.name.lexeme;
+              final String initType = initializer.constructorName.type.name.lexeme;
               if (initType.endsWith('Bloc') || initType.endsWith('Cubit')) {
                 if (!blocNames.contains(variable.name.lexeme)) {
                   blocNames.add(variable.name.lexeme);
@@ -1398,8 +1389,7 @@ class RequireBlocCloseRule extends SaropaLintRule {
           // Find and report the field declaration
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -1540,11 +1530,10 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_widget',
     problemMessage:
-        '[prefer_consumer_widget] Consumer wrapper adds nesting and boilerplate. '
-        'ConsumerWidget provides ref directly with cleaner syntax.',
+        '[prefer_consumer_widget] Wrapping widgets with Consumer adds unnecessary nesting and boilerplate, making code harder to read and maintain. Using ConsumerWidget provides ref directly, resulting in cleaner, more maintainable code and fewer widget rebuilds.',
     correctionMessage:
-        'Extend ConsumerWidget instead of wrapping with Consumer.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Extend ConsumerWidget instead of wrapping with Consumer to simplify your widget tree and improve code clarity.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -1568,8 +1557,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
             final AstNode? blockParent = returnParent.parent;
             if (blockParent is BlockFunctionBody) {
               final AstNode? bodyParent = blockParent.parent;
-              if (bodyParent is MethodDeclaration &&
-                  bodyParent.name.lexeme == 'build') {
+              if (bodyParent is MethodDeclaration && bodyParent.name.lexeme == 'build') {
                 reporter.atNode(node, code);
                 return;
               }
@@ -1579,8 +1567,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
         // Also check for expression body: Widget build(...) => Consumer(...)
         if (current is ExpressionFunctionBody) {
           final AstNode? bodyParent = current.parent;
-          if (bodyParent is MethodDeclaration &&
-              bodyParent.name.lexeme == 'build') {
+          if (bodyParent is MethodDeclaration && bodyParent.name.lexeme == 'build') {
             reporter.atNode(node, code);
             return;
           }
@@ -1624,10 +1611,10 @@ class RequireAutoDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_auto_dispose',
     problemMessage:
-        '[require_auto_dispose] Riverpod provider should use autoDispose to prevent memory leaks.',
+        '[require_auto_dispose] Not using autoDispose with Riverpod providers can cause memory leaks, as providers and their resources may remain in memory after they are no longer needed. This can lead to increased memory usage and degraded app performance.',
     correctionMessage:
-        'Use Provider.autoDispose, StateProvider.autoDispose, etc.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Use Provider.autoDispose, StateProvider.autoDispose, etc., to ensure providers are disposed when no longer needed and prevent memory leaks.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -1674,14 +1661,12 @@ class RequireAutoDisposeRule extends SaropaLintRule {
         // Handle direct construction like StateProvider<int>((ref) => 0)
         if (initializer is InstanceCreationExpression) {
           final String typeName = initializer.constructorName.type.name.lexeme;
-          final String? constructorName =
-              initializer.constructorName.name?.name;
+          final String? constructorName = initializer.constructorName.name?.name;
 
           // Check if it's a provider without autoDispose
           if (_providerTypes.contains(typeName)) {
             // Check if it uses autoDispose constructor
-            if (constructorName != 'autoDispose' &&
-                !typeName.contains('AutoDispose')) {
+            if (constructorName != 'autoDispose' && !typeName.contains('AutoDispose')) {
               reporter.atNode(variable, code);
             }
           }
@@ -1734,11 +1719,10 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_in_build_body',
     problemMessage:
-        '[avoid_ref_in_build_body] ref.read() in build() won\'t trigger rebuilds when the provider changes.',
+        '[avoid_ref_in_build_body] Using ref.read() in build() does not trigger widget rebuilds when the provider changes, leading to stale UI, missed updates, and confusing bugs. This breaks the reactive model of Riverpod and can cause your app to display outdated information.',
     correctionMessage:
-        'Use ref.watch() for reactive updates in build(), or move ref.read() '
-        'to a callback like onPressed.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Use ref.watch() for reactive updates in build(), or move ref.read() to a callback like onPressed to ensure the UI updates correctly.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -1831,8 +1815,7 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
     // Function expressions in callbacks are OK for ref.read()
     // Only increment if parent is a callback argument
     final AstNode? parent = node.parent;
-    if (parent is NamedExpression &&
-        _callbackMethods.contains(parent.name.label.name)) {
+    if (parent is NamedExpression && _callbackMethods.contains(parent.name.label.name)) {
       _callbackDepth++;
       super.visitFunctionExpression(node);
       _callbackDepth--;
@@ -1892,11 +1875,9 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_immutable_bloc_state',
     problemMessage:
-        '[require_immutable_bloc_state] Mutable BLoC state causes unpredictable '
-        'UI updates and breaks state comparison, leading to missed rebuilds.',
+        '[require_immutable_bloc_state] If your BLoC state is mutable, it causes unpredictable UI updates, breaks state comparison, and leads to missed widget rebuilds. This results in subtle bugs, inconsistent UI, and hard-to-maintain code.',
     correctionMessage:
-        'Add @immutable annotation or extend Equatable to ensure state '
-        'immutability and proper equality comparisons.',
+        'Add the @immutable annotation or extend Equatable to ensure your BLoC state is immutable and supports proper equality comparisons. This guarantees reliable UI updates and easier debugging.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1948,8 +1929,7 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
       if (withClause != null) {
         for (final NamedType mixin in withClause.mixinTypes) {
           final String mixinName = mixin.name.lexeme;
-          if (mixinName == 'EquatableMixin' ||
-              mixinName.contains('Equatable')) {
+          if (mixinName == 'EquatableMixin' || mixinName.contains('Equatable')) {
             hasEquatable = true;
             break;
           }
@@ -2022,10 +2002,10 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_of_in_build',
     problemMessage:
-        '[avoid_provider_of_in_build] Provider.of in build() causes rebuilds. Use context.read() for actions.',
+        '[avoid_provider_of_in_build] Using Provider.of in build() causes the widget to rebuild every time the provider changes, which can lead to performance issues and unnecessary UI updates. This can make your app less efficient and harder to maintain.',
     correctionMessage:
-        'Use context.watch() for reactive UI or context.read() in callbacks.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Use context.watch() for reactive UI updates, or context.read() in callbacks (like onPressed) to avoid unnecessary rebuilds and improve performance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2120,10 +2100,10 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_get_find_in_build',
     problemMessage:
-        '[avoid_get_find_in_build] Get.find() in build() is inefficient. Use GetBuilder or Obx instead.',
+        '[avoid_get_find_in_build] Calling Get.find() inside build() is inefficient and can cause unnecessary object creation and performance issues. This leads to wasted resources and can make your app less responsive.',
     correctionMessage:
-        'Use GetBuilder<T> or Obx for reactive updates with GetX.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Use GetBuilder<T> or Obx for reactive updates with GetX, and avoid calling Get.find() in build() to improve performance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2207,10 +2187,10 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_recreate',
     problemMessage:
-        '[avoid_provider_recreate] Provider created in frequently rebuilding build() loses state.',
+        '[avoid_provider_recreate] Creating a Provider inside a frequently rebuilding build() method causes the provider to be recreated, losing its state and causing unexpected behavior. This can result in lost user input, bugs, and degraded app performance.',
     correctionMessage:
-        'Move Provider creation to a parent widget that does not rebuild often.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Move Provider creation to a parent widget that does not rebuild often to preserve provider state and ensure consistent behavior.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2223,8 +2203,7 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
       if (node.name.lexeme != 'build') return;
 
       // Check if this is a StatefulWidget's State class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -2307,10 +2286,10 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cubit_for_simple',
     problemMessage:
-        '[prefer_cubit_for_simple] Simple Bloc with few events adds unnecessary event boilerplate and indirection.',
+        '[prefer_cubit_for_simple] Using Bloc for simple state management with few events adds unnecessary boilerplate, indirection, and makes code harder to maintain. This can slow down development and introduce avoidable complexity.',
     correctionMessage:
-        'Cubit is simpler for straightforward state. Use Bloc for complex event handling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Use Cubit for straightforward state management. Reserve Bloc for cases with complex event handling or multiple event types.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2375,9 +2354,9 @@ class AvoidRefInDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_in_dispose',
     problemMessage:
-        '[avoid_ref_in_dispose] Using ref in dispose() is unsafe - the provider may already be destroyed.',
+        '[avoid_ref_in_dispose] Using ref in dispose() is unsafe because the provider may already be destroyed, leading to runtime errors, crashes, or accessing invalid state. This can cause unpredictable bugs and app instability.',
     correctionMessage:
-        'Remove ref usage from dispose(). Access provider values earlier if needed.',
+        'Remove ref usage from dispose(). Access provider values earlier in the widget lifecycle if needed to ensure safe and predictable behavior.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2391,8 +2370,7 @@ class AvoidRefInDisposeRule extends SaropaLintRule {
       if (node.name.lexeme != 'dispose') return;
 
       // Check if this is in a ConsumerState class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -2462,9 +2440,9 @@ class RequireProviderScopeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_provider_scope',
     problemMessage:
-        '[require_provider_scope] Riverpod app is missing ProviderScope at root. Provider access will crash.',
+        '[require_provider_scope] If your Riverpod app is missing ProviderScope at the root, any attempt to access providers will throw runtime exceptions and crash the app. This makes the app unusable and breaks all provider-based state management.',
     correctionMessage:
-        'Wrap your app with ProviderScope: runApp(ProviderScope(child: MyApp()))',
+        'Wrap your app with ProviderScope: runApp(ProviderScope(child: MyApp())) to enable provider access and prevent crashes.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2486,8 +2464,7 @@ class RequireProviderScopeRule extends SaropaLintRule {
           bodySource.contains('ref.read');
 
       // Also check the whole file for Riverpod patterns
-      final CompilationUnit? unit =
-          node.thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
       if (unit == null) return;
 
       final String fileSource = unit.toSource();
@@ -2540,10 +2517,10 @@ class PreferSelectForPartialRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_select_for_partial',
     problemMessage:
-        '[prefer_select_for_partial] Watching entire provider when only one field is used causes unnecessary rebuilds.',
+        '[prefer_select_for_partial] Watching the entire provider when only one field is needed causes unnecessary widget rebuilds, wasting resources and reducing app performance. This can make your UI less efficient and responsive.',
     correctionMessage:
-        'Use ref.watch(provider.select((s) => s.field)) for partial watching.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Use ref.watch(provider.select((s) => s.field)) for partial watching to optimize rebuilds and improve performance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2557,8 +2534,7 @@ class PreferSelectForPartialRule extends SaropaLintRule {
 
       // Collect watched providers and how they're used
       final Map<String, Set<String>> providerUsage = <String, Set<String>>{};
-      final Map<String, MethodInvocation> watchCalls =
-          <String, MethodInvocation>{};
+      final Map<String, MethodInvocation> watchCalls = <String, MethodInvocation>{};
 
       node.body.visitChildren(
         _ProviderUsageVisitor(
@@ -2681,10 +2657,10 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_in_widget',
     problemMessage:
-        '[avoid_provider_in_widget] Provider declared inside widget class breaks Riverpod\'s global state model.',
+        '[avoid_provider_in_widget] Declaring a provider inside a widget class breaks Riverpod\'s global state model, leading to multiple provider instances, lost state, and unpredictable bugs. This can make your app behave inconsistently and is hard to debug.',
     correctionMessage:
-        'Move provider declaration to file level as a top-level final variable.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Move provider declaration to the file level as a top-level final variable to ensure a single, consistent provider instance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _providerTypes = <String>{
@@ -2706,8 +2682,7 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
       // Check if inside a class
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       // Check each field
@@ -2766,10 +2741,10 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_family_for_params',
     problemMessage:
-        '[prefer_family_for_params] Provider without .family creates new instance each call, breaking caching and causing duplicates.',
+        '[prefer_family_for_params] Not using .family for parameterized providers creates a new provider instance on each call, breaking caching and causing duplicate providers. This leads to wasted resources, memory leaks, and unpredictable app behavior.',
     correctionMessage:
-        'Use Provider.family((ref, param) => ...) and watch with provider(param).',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Use Provider.family((ref, param) => ...) and watch with provider(param) to ensure proper caching and a single provider instance per parameter.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2859,11 +2834,10 @@ class RequireBlocObserverRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_observer',
     problemMessage:
-        '[require_bloc_observer] Without BlocObserver, state transitions and '
-        'errors are invisible, making debugging production issues very difficult.',
+        '[require_bloc_observer] Without a BlocObserver, state transitions and errors are invisible, making it extremely difficult to debug production issues, track bugs, or monitor app health. This can lead to undetected failures and poor user experience.',
     correctionMessage:
-        'Add Bloc.observer = AppBlocObserver() in main() for centralized logging and error handling.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Add Bloc.observer = AppBlocObserver() in main() to enable centralized logging and error handling for all Blocs and Cubits.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -2879,14 +2853,12 @@ class RequireBlocObserverRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check if using Bloc
-      if (!bodySource.contains('BlocProvider') &&
-          !bodySource.contains('MultiBlocProvider')) {
+      if (!bodySource.contains('BlocProvider') && !bodySource.contains('MultiBlocProvider')) {
         return;
       }
 
       // Check if BlocObserver is set
-      if (!bodySource.contains('Bloc.observer') &&
-          !bodySource.contains('BlocObserver')) {
+      if (!bodySource.contains('Bloc.observer') && !bodySource.contains('BlocObserver')) {
         reporter.atNode(node, code);
       }
     });
@@ -2935,9 +2907,9 @@ class AvoidBlocEventMutationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_event_mutation',
     problemMessage:
-        '[avoid_bloc_event_mutation] Mutable events can be modified during '
-        'processing, causing race conditions and unpredictable state changes.',
-    correctionMessage: 'Make event fields final and use const constructor.',
+        '[avoid_bloc_event_mutation] If BLoC events are mutable, they can be modified during processing, causing race conditions, unpredictable state changes, and hard-to-debug bugs. This breaks the contract of event immutability and can destabilize your app.',
+    correctionMessage:
+        'Make all event fields final and use a const constructor to ensure events are immutable and safe to use in BLoC.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2991,9 +2963,10 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
     problemMessage:
-        '[prefer_copy_with_for_state] Directly modifying state breaks immutability.',
-    correctionMessage: 'Use state.copyWith(field: value) to create new state.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        '[prefer_copy_with_for_state] Directly modifying BLoC state breaks immutability, leading to unpredictable UI updates, missed rebuilds, and subtle bugs. This makes your app harder to debug and maintain.',
+    correctionMessage:
+        'Use state.copyWith(field: value) to create a new immutable state object and trigger proper UI updates.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -3053,9 +3026,10 @@ class AvoidBlocListenInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_listen_in_build',
     problemMessage:
-        '[avoid_bloc_listen_in_build] BlocProvider.of in build() causes rebuilds. Use BlocBuilder instead.',
-    correctionMessage: 'Use BlocBuilder or context.read() for one-time access.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        '[avoid_bloc_listen_in_build] Using BlocProvider.of in build() with listen:true causes the widget to rebuild on every state change, leading to performance issues and unpredictable UI updates. This can make your app less efficient and harder to maintain.',
+    correctionMessage:
+        'Use BlocBuilder for reactive UI updates, or context.read() for one-time access to the bloc, to avoid unnecessary rebuilds and improve performance.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -3134,9 +3108,9 @@ class RequireInitialStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_initial_state',
     problemMessage:
-        '[require_initial_state] BLoC without initial state throws LateInitializationError when BlocBuilder reads state.',
+        '[require_initial_state] If a BLoC or Cubit does not provide an initial state, it will throw a LateInitializationError at runtime when BlocBuilder or BlocConsumer tries to read the state. This causes your app to crash and makes debugging difficult.',
     correctionMessage:
-        'Add initial state: super(InitialState()) or super(const State()).',
+        'Always add an initial state: super(InitialState()) or super(const State()) in your BLoC/Cubit constructor to prevent runtime errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3208,10 +3182,10 @@ class RequireErrorStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_state',
     problemMessage:
-        '[require_error_state] BLoC state hierarchy should include an error state.',
+        '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug.',
     correctionMessage:
-        'Add an Error state class (e.g., UserError) to handle failures.',
-    errorSeverity: DiagnosticSeverity.INFO,
+        'Add an Error state class (e.g., UserError) to your BLoC state hierarchy to handle failures gracefully and display error messages to users.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -3220,8 +3194,7 @@ class RequireErrorStateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    final Map<String, ClassDeclaration> stateClasses =
-        <String, ClassDeclaration>{};
+    final Map<String, ClassDeclaration> stateClasses = <String, ClassDeclaration>{};
     final Set<String> sealedBases = <String>{};
 
     context.registry.addClassDeclaration((ClassDeclaration node) {
@@ -3297,8 +3270,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
     name: 'avoid_bloc_in_bloc',
     problemMessage:
         '[avoid_bloc_in_bloc] BLoC should not directly call another BLoC. This creates tight coupling.',
-    correctionMessage:
-        'Coordinate between BLoCs at the widget layer or use streams.',
+    correctionMessage: 'Coordinate between BLoCs at the widget layer or use streams.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3331,8 +3303,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
       // Check for .add() calls on bloc fields
       for (final ClassMember member in node.members) {
         if (member is MethodDeclaration) {
-          member.body
-              .visitChildren(_BlocAddVisitor(reporter, code, blocFields));
+          member.body.visitChildren(_BlocAddVisitor(reporter, code, blocFields));
         }
       }
     });
@@ -3388,11 +3359,9 @@ class PreferSealedEventsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_events',
-    problemMessage:
-        '[prefer_sealed_events] Non-sealed events allow subclassing anywhere, '
+    problemMessage: '[prefer_sealed_events] Non-sealed events allow subclassing anywhere, '
         'preventing compiler exhaustiveness checks in switch statements.',
-    correctionMessage:
-        'Use sealed class instead of abstract class for event hierarchy.',
+    correctionMessage: 'Use sealed class instead of abstract class for event hierarchy.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3563,8 +3532,7 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
     name: 'avoid_change_notifier_in_widget',
     problemMessage:
         '[avoid_change_notifier_in_widget] ChangeNotifier created in build() loses state on every rebuild.',
-    correctionMessage:
-        'Create in ChangeNotifierProvider or StatefulWidget.initState().',
+    correctionMessage: 'Create in ChangeNotifierProvider or StatefulWidget.initState().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3647,8 +3615,7 @@ class RequireProviderDisposeRule extends SaropaLintRule {
     name: 'require_provider_dispose',
     problemMessage:
         '[require_provider_dispose] Provider creating ChangeNotifier without dispose callback leaks listeners and memory.',
-    correctionMessage:
-        'Use ChangeNotifierProvider (auto-disposes) or add dispose callback.',
+    correctionMessage: 'Use ChangeNotifierProvider (auto-disposes) or add dispose callback.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3770,8 +3737,7 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
     problemMessage:
         '[avoid_setstate_in_large_state_class] setState() in a large State class causes expensive full rebuilds. '
         'Consider breaking into smaller widgets or using granular state.',
-    correctionMessage:
-        'Extract parts of this widget into smaller stateless/stateful widgets, '
+    correctionMessage: 'Extract parts of this widget into smaller stateless/stateful widgets, '
         'or use ValueNotifier/ValueListenableBuilder for targeted rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3801,8 +3767,7 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
       final int memberCount = node.members.length;
 
       // Check if class is "large"
-      final bool isLargeClass =
-          lineCount >= _lineThreshold || memberCount >= _memberThreshold;
+      final bool isLargeClass = lineCount >= _lineThreshold || memberCount >= _memberThreshold;
 
       if (!isLargeClass) return;
 
@@ -3881,12 +3846,10 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_circular_provider_deps',
     problemMessage:
-        '[avoid_circular_provider_deps] Circular dependency causes stack '
-        'overflow or infinite loops when providers try to initialize.',
+        '[avoid_circular_provider_deps] Circular dependencies between providers cause stack overflows, infinite loops, and unpredictable initialization order. This leads to runtime crashes, hard-to-debug errors, and broken state management. If not fixed, your app may crash or behave unpredictably in production. Always design provider graphs to be acyclic for reliability and maintainability.',
     correctionMessage:
-        'Analyze provider dependency graph. Break cycles by extracting shared '
-        'logic or using ref.read in callbacks instead of ref.watch.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Analyze the provider dependency graph and break cycles by extracting shared logic, refactoring providers, or using ref.read in callbacks instead of ref.watch. Ensure no provider directly or indirectly depends on itself. Use tools or diagrams to visualize dependencies if needed.',
+    errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -3910,8 +3873,7 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
 
         // Check if this is a provider
         final String initSource = initializer.toSource();
-        if (!initSource.contains('Provider') &&
-            !initSource.contains('Notifier')) {
+        if (!initSource.contains('Provider') && !initSource.contains('Notifier')) {
           continue;
         }
 
@@ -3969,9 +3931,7 @@ class _ProviderDepVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String methodName = node.methodName.name;
-    if (methodName == 'watch' ||
-        methodName == 'read' ||
-        methodName == 'listen') {
+    if (methodName == 'watch' || methodName == 'read' || methodName == 'listen') {
       final Expression? target = node.target;
       if (target is SimpleIdentifier && target.name == 'ref') {
         // Get the provider name from arguments
@@ -4029,8 +3989,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
     name: 'require_error_handling_in_async',
     problemMessage:
         '[require_error_handling_in_async] Async provider without error handling. Errors will propagate unhandled.',
-    correctionMessage:
-        'Add try-catch in provider or handle AsyncValue.error in UI with .when().',
+    correctionMessage: 'Add try-catch in provider or handle AsyncValue.error in UI with .when().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4064,8 +4023,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
           }
         }
 
-        if (providerType == null ||
-            !_asyncProviderTypes.contains(providerType)) {
+        if (providerType == null || !_asyncProviderTypes.contains(providerType)) {
           continue;
         }
 
@@ -4168,8 +4126,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
 
     context.addPostRunCallback(() {
       // Report StateProviders with multiple mutation sites
-      for (final MapEntry<String, int> entry
-          in stateProviderMutations.entries) {
+      for (final MapEntry<String, int> entry in stateProviderMutations.entries) {
         if (entry.value >= 3) {
           final AstNode? decl = stateProviderDecls[entry.key];
           if (decl != null) {
@@ -4231,8 +4188,7 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
     name: 'require_getx_controller_dispose',
     problemMessage:
         '[require_getx_controller_dispose] GetxController has TextEditingController/StreamSubscription but no onClose() to dispose them.',
-    correctionMessage:
-        'Override onClose() to dispose controllers, cancel subscriptions, etc.',
+    correctionMessage: 'Override onClose() to dispose controllers, cancel subscriptions, etc.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4369,8 +4325,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
     name: 'avoid_obs_outside_controller',
     problemMessage:
         '[avoid_obs_outside_controller] .obs used outside GetxController causes memory leaks and lifecycle issues.',
-    correctionMessage:
-        'Move observable state to a GetxController for proper lifecycle management.',
+    correctionMessage: 'Move observable state to a GetxController for proper lifecycle management.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4391,8 +4346,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   ) {
     // Check for .obs in field declarations (most common case)
     context.registry.addFieldDeclaration((FieldDeclaration node) {
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       // Check if this class extends a GetX controller type
@@ -4466,8 +4420,7 @@ class RequireBlocTransformerRule extends SaropaLintRule {
     name: 'require_bloc_transformer',
     problemMessage:
         '[require_bloc_transformer] Bloc on<Event> without transformer processes all events sequentially.',
-    correctionMessage:
-        'Add transformer: for debounce, throttle, or concurrent event handling.',
+    correctionMessage: 'Add transformer: for debounce, throttle, or concurrent event handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4570,8 +4523,7 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
     name: 'avoid_long_event_handlers',
     problemMessage:
         '[avoid_long_event_handlers] Bloc event handler is too long. Extract logic to separate methods.',
-    correctionMessage:
-        'Move complex logic to named methods or use cases for better testability.',
+    correctionMessage: 'Move complex logic to named methods or use cases for better testability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4641,8 +4593,7 @@ class RequireRiverpodLintRule extends SaropaLintRule {
     name: 'require_riverpod_lint',
     problemMessage:
         '[require_riverpod_lint] Project uses Riverpod but riverpod_lint is not configured.',
-    correctionMessage:
-        'Add riverpod_lint to dev_dependencies for Riverpod-specific linting.',
+    correctionMessage: 'Add riverpod_lint to dev_dependencies for Riverpod-specific linting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4741,8 +4692,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
     name: 'require_multi_provider',
     problemMessage:
         '[require_multi_provider] Nested Provider widgets. Use MultiProvider for better readability.',
-    correctionMessage:
-        'Replace nested Providers with MultiProvider(providers: [...], child: ...).',
+    correctionMessage: 'Replace nested Providers with MultiProvider(providers: [...], child: ...).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4767,8 +4717,7 @@ class RequireMultiProviderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_providerTypes.contains(typeName)) return;
@@ -4840,8 +4789,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
     name: 'avoid_nested_providers',
     problemMessage:
         '[avoid_nested_providers] Provider created inside Consumer or builder callback.',
-    correctionMessage:
-        'Use ProxyProvider or move provider to MultiProvider at tree root.',
+    correctionMessage: 'Use ProxyProvider or move provider to MultiProvider at tree root.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4875,8 +4823,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (!_providerTypes.contains(typeName)) return;
@@ -4887,14 +4834,12 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
       while (current != null) {
         // Check for builder callback pattern
         if (current is NamedExpression &&
-            (current.name.label.name == 'builder' ||
-                current.name.label.name == 'selector')) {
+            (current.name.label.name == 'builder' || current.name.label.name == 'selector')) {
           // Check if this builder belongs to a Consumer
           AstNode? builderParent = current.parent;
           while (builderParent != null) {
             if (builderParent is InstanceCreationExpression) {
-              final String parentType =
-                  builderParent.constructorName.type.name.lexeme;
+              final String parentType = builderParent.constructorName.type.name.lexeme;
               if (_consumerTypes.contains(parentType)) {
                 reporter.atNode(node, code);
                 return;
@@ -4909,8 +4854,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
           AstNode? childParent = current.parent;
           while (childParent != null) {
             if (childParent is InstanceCreationExpression) {
-              final String parentType =
-                  childParent.constructorName.type.name.lexeme;
+              final String parentType = childParent.constructorName.type.name.lexeme;
               if (_providerTypes.contains(parentType)) {
                 // This is direct nesting - handled by RequireMultiProviderRule
                 return;
@@ -4971,8 +4915,7 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
     name: 'prefer_multi_bloc_provider',
     problemMessage:
         '[prefer_multi_bloc_provider] Nested BlocProviders should use MultiBlocProvider instead.',
-    correctionMessage:
-        'Combine into MultiBlocProvider(providers: [...], child: ...).',
+    correctionMessage: 'Combine into MultiBlocProvider(providers: [...], child: ...).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4982,8 +4925,7 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
 
@@ -5046,11 +4988,9 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_bloc_value_provider',
     problemMessage:
-        '[avoid_instantiating_in_bloc_value_provider] BlocProvider.value should not create a new bloc instance. '
-        'The bloc will not be automatically closed.',
+        '[avoid_instantiating_in_bloc_value_provider] Creating a new bloc instance inside BlocProvider.value prevents the bloc from being automatically closed, leading to memory leaks and unpredictable state. This is a critical resource management issue that can degrade app performance and reliability.',
     correctionMessage:
-        'Use BlocProvider(create: ...) for new instances, or pass an existing '
-        'bloc variable to BlocProvider.value.',
+        'Always use BlocProvider(create: ...) to create new bloc instances, or pass an existing bloc variable to BlocProvider.value. Never instantiate a bloc directly inside BlocProvider.value.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -5060,8 +5000,7 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
@@ -5128,11 +5067,9 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_existing_instances_in_bloc_provider',
     problemMessage:
-        '[avoid_existing_instances_in_bloc_provider] BlocProvider(create: ...) should create a new bloc, not return an '
-        'existing instance. The bloc will be closed when the provider disposes.',
+        '[avoid_existing_instances_in_bloc_provider] Returning an existing bloc instance from BlocProvider(create: ...) causes the bloc to be closed when the provider disposes, even if it is still used elsewhere. This can lead to unexpected state loss, runtime errors, and hard-to-debug bugs. Always use the correct provider pattern for new vs. existing blocs.',
     correctionMessage:
-        'Use BlocProvider.value(value: existingBloc) for existing instances, '
-        'or create a new bloc inside the create callback.',
+        'For existing bloc instances, use BlocProvider.value(value: existingBloc). Only use BlocProvider(create: ...) to create new bloc instances. This ensures proper lifecycle management and prevents accidental closure of shared blocs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -5142,8 +5079,7 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
@@ -5216,8 +5152,7 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
     problemMessage:
         '[prefer_correct_bloc_provider] Using context.read() in BlocProvider.create returns an existing bloc. '
         'Use BlocProvider.value instead.',
-    correctionMessage:
-        'Replace with BlocProvider.value(value: context.read<T>(), ...).',
+    correctionMessage: 'Replace with BlocProvider.value(value: context.read<T>(), ...).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5227,8 +5162,7 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (typeName != 'BlocProvider') return;
@@ -5301,10 +5235,8 @@ class PreferMultiProviderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_multi_provider',
-    problemMessage:
-        '[prefer_multi_provider] Nested Providers should use MultiProvider instead.',
-    correctionMessage:
-        'Combine into MultiProvider(providers: [...], child: ...).',
+    problemMessage: '[prefer_multi_provider] Nested Providers should use MultiProvider instead.',
+    correctionMessage: 'Combine into MultiProvider(providers: [...], child: ...).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -5325,8 +5257,7 @@ class PreferMultiProviderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_providerTypes.contains(typeName)) return;
 
@@ -5392,11 +5323,9 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_instantiating_in_value_provider',
     problemMessage:
-        '[avoid_instantiating_in_value_provider] Provider.value should not create a new instance. '
-        'The instance lifecycle will not be properly managed.',
+        '[avoid_instantiating_in_value_provider] Creating a new instance inside Provider.value prevents proper lifecycle management, leading to memory leaks, resource retention, and unpredictable behavior. This is a critical issue for stateful objects like ChangeNotifiers and ValueListenables.',
     correctionMessage:
-        'Use Provider(create: ...) for new instances, or pass an existing '
-        'instance variable to Provider.value.',
+        'Always use Provider(create: ...) to create new instances, or pass an existing instance variable to Provider.value. Never instantiate objects directly inside Provider.value.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -5413,8 +5342,7 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
       if (!_providerTypes.contains(typeName)) return;
@@ -5477,8 +5405,7 @@ class DisposeProvidersRule extends SaropaLintRule {
     name: 'dispose_providers',
     problemMessage:
         '[dispose_providers] Provider creating disposable instance without dispose callback leaks controllers and streams.',
-    correctionMessage:
-        'Add dispose: (_, instance) => instance.dispose() to clean up resources.',
+    correctionMessage: 'Add dispose: (_, instance) => instance.dispose() to clean up resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5488,8 +5415,7 @@ class DisposeProvidersRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -5570,10 +5496,9 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
     problemMessage:
-        '[proper_getx_super_calls] GetxController lifecycle method must call super. '
-        'Missing super call breaks controller lifecycle.',
+        '[proper_getx_super_calls] Omitting a call to super in GetxController lifecycle methods (onInit, onReady, onClose) breaks the controller lifecycle, causing incomplete initialization, missed cleanup, and unpredictable behavior. This can lead to memory leaks, resource retention, and subtle bugs that are hard to diagnose.',
     correctionMessage:
-        'Add super.onInit() at the start or super.onClose() at the end.',
+        'Always call the corresponding super method (e.g., super.onInit(), super.onClose()) in GetxController lifecycle overrides. Place super.onInit() at the start and super.onClose() at the end to ensure proper initialization and cleanup.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -5682,8 +5607,7 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
     problemMessage:
         '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
         'This will cause a memory leak.',
-    correctionMessage:
-        'Assign the worker to a variable and call dispose() in onClose().',
+    correctionMessage: 'Assign the worker to a variable and call dispose() in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5752,8 +5676,7 @@ class AvoidHooksOutsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hooks_outside_build',
-    problemMessage:
-        '[avoid_hooks_outside_build] Hook function called outside of build method. '
+    problemMessage: '[avoid_hooks_outside_build] Hook function called outside of build method. '
         'Hooks must only be called from build().',
     correctionMessage: 'Move this hook call inside the build() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -5803,8 +5726,7 @@ bool _isHookFunction(String methodName) {
   // The character after 'use' must be uppercase (PascalCase convention)
   // This distinguishes useState from userDOB
   final charAfterUse = methodName[3];
-  return charAfterUse == charAfterUse.toUpperCase() &&
-      charAfterUse != charAfterUse.toLowerCase();
+  return charAfterUse == charAfterUse.toUpperCase() && charAfterUse != charAfterUse.toLowerCase();
 }
 
 /// Warns when Flutter Hooks are called inside conditionals.
@@ -5845,8 +5767,7 @@ class AvoidConditionalHooksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditional_hooks',
-    problemMessage:
-        '[avoid_conditional_hooks] Hook function called conditionally. '
+    problemMessage: '[avoid_conditional_hooks] Hook function called conditionally. '
         'Hooks must be called unconditionally in the same order.',
     correctionMessage:
         'Move hook calls outside of conditionals. Use the hook value conditionally instead.',
@@ -5972,8 +5893,7 @@ class AvoidUnnecessaryHookWidgetsRule extends SaropaLintRule {
       if (extendsClause == null) return;
 
       final String superclassName = extendsClause.superclass.name.lexeme;
-      if (superclassName != 'HookWidget' &&
-          superclassName != 'HookConsumerWidget') {
+      if (superclassName != 'HookWidget' && superclassName != 'HookConsumerWidget') {
         return;
       }
 
@@ -6049,11 +5969,9 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'check_is_not_closed_after_async_gap',
-    problemMessage:
-        '[check_is_not_closed_after_async_gap] Emitting to closed Bloc throws '
+    problemMessage: '[check_is_not_closed_after_async_gap] Emitting to closed Bloc throws '
         'StateError, crashing the app when widget is disposed during async.',
-    correctionMessage:
-        'Add if (!isClosed) check before emit() after async operations.',
+    correctionMessage: 'Add if (!isClosed) check before emit() after async operations.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -6177,11 +6095,9 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_bloc_event_handlers',
-    problemMessage:
-        '[avoid_duplicate_bloc_event_handlers] Second handler for same event '
+    problemMessage: '[avoid_duplicate_bloc_event_handlers] Second handler for same event '
         'type is ignored, causing silent bugs when expected logic runs.',
-    correctionMessage:
-        'Combine handlers into one on<Event> call. Only one handler per event type.',
+    correctionMessage: 'Combine handlers into one on<Event> call. Only one handler per event type.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -6211,8 +6127,7 @@ class AvoidDuplicateBlocEventHandlersRule extends SaropaLintRule {
       if (constructor == null) return;
 
       // Find all on<Event> calls
-      final Map<String, List<MethodInvocation>> eventHandlers =
-          <String, List<MethodInvocation>>{};
+      final Map<String, List<MethodInvocation>> eventHandlers = <String, List<MethodInvocation>>{};
 
       final _OnCallVisitor visitor = _OnCallVisitor();
       constructor.body.accept(visitor);
@@ -6289,8 +6204,7 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_events',
-    problemMessage:
-        '[prefer_immutable_bloc_events] Mutable event fields can be changed '
+    problemMessage: '[prefer_immutable_bloc_events] Mutable event fields can be changed '
         'during processing, causing inconsistent state and debugging nightmares.',
     correctionMessage: 'Mark all fields as final for immutable events.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6357,8 +6271,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_state',
-    problemMessage:
-        '[prefer_immutable_bloc_state] Mutable state fields break equality '
+    problemMessage: '[prefer_immutable_bloc_state] Mutable state fields break equality '
         'comparison, causing BlocBuilder to miss or duplicate updates.',
     correctionMessage: 'Mark all fields as final for immutable state.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6428,8 +6341,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_events',
-    problemMessage:
-        '[prefer_sealed_bloc_events] Bloc event base class should be sealed.',
+    problemMessage: '[prefer_sealed_bloc_events] Bloc event base class should be sealed.',
     correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6496,8 +6408,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_state',
-    problemMessage:
-        '[prefer_sealed_bloc_state] Bloc state base class should be sealed.',
+    problemMessage: '[prefer_sealed_bloc_state] Bloc state base class should be sealed.',
     correctionMessage: 'Use sealed keyword for exhaustive pattern matching.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6562,10 +6473,8 @@ class PreferBlocEventSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_event_suffix',
-    problemMessage:
-        '[prefer_bloc_event_suffix] Bloc event class should end with "Event" suffix.',
-    correctionMessage:
-        'Rename class to include Event suffix (e.g., LoadUserEvent).',
+    problemMessage: '[prefer_bloc_event_suffix] Bloc event class should end with "Event" suffix.',
+    correctionMessage: 'Rename class to include Event suffix (e.g., LoadUserEvent).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6622,10 +6531,8 @@ class PreferBlocStateSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_state_suffix',
-    problemMessage:
-        '[prefer_bloc_state_suffix] Bloc state class should end with "State" suffix.',
-    correctionMessage:
-        'Rename class to include State suffix (e.g., UserLoadingState).',
+    problemMessage: '[prefer_bloc_state_suffix] Bloc state class should end with "State" suffix.',
+    correctionMessage: 'Rename class to include State suffix (e.g., UserLoadingState).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -6708,8 +6615,7 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
       if (typeName != 'Selector') return;
 
       // Check type argument
-      final TypeArgumentList? typeArgs =
-          node.constructorName.type.typeArguments;
+      final TypeArgumentList? typeArgs = node.constructorName.type.typeArguments;
       if (typeArgs == null || typeArgs.arguments.length < 2) return;
 
       final TypeAnnotation selectedType = typeArgs.arguments[1];
@@ -6756,8 +6662,7 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_provider_extensions',
-    problemMessage:
-        '[prefer_provider_extensions] Long provider access chain is hard to read.',
+    problemMessage: '[prefer_provider_extensions] Long provider access chain is hard to read.',
     correctionMessage: 'Consider using an extension method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -6770,9 +6675,7 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'read' &&
-          methodName != 'watch' &&
-          methodName != 'select') {
+      if (methodName != 'read' && methodName != 'watch' && methodName != 'select') {
         return;
       }
 
@@ -6824,8 +6727,7 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
-    problemMessage:
-        '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
+    problemMessage: '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
     correctionMessage: 'Move reactive variables to a GetxController.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6893,8 +6795,7 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
-    problemMessage:
-        '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
+    problemMessage: '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
     correctionMessage: 'Use .value = or callable syntax to update.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -6973,8 +6874,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
     name: 'dispose_provided_instances',
     problemMessage:
         '[dispose_provided_instances] Provider creates disposable instance without dispose callback, causing memory leaks.',
-    correctionMessage:
-        'Add dispose: (_, instance) => instance.dispose() to clean up.',
+    correctionMessage: 'Add dispose: (_, instance) => instance.dispose() to clean up.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -6998,8 +6898,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -7026,8 +6925,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
           final Expression expr = body.expression;
           if (expr is InstanceCreationExpression) {
             final String? createdType =
-                expr.constructorName.type.element?.name ??
-                    expr.constructorName.type.name.lexeme;
+                expr.constructorName.type.element?.name ?? expr.constructorName.type.name.lexeme;
             if (_disposableTypes.contains(createdType)) {
               reporter.atNode(node, code);
             }
@@ -7089,8 +6987,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'dispose_getx_fields',
-    problemMessage:
-        '[dispose_getx_fields] Undisposed Worker keeps timer running after '
+    problemMessage: '[dispose_getx_fields] Undisposed Worker keeps timer running after '
         'GetxController closes, causing memory leaks and stale updates.',
     correctionMessage: 'Call dispose() on Worker fields in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -7116,8 +7013,7 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName == 'Worker' || typeName == 'Worker?') {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               workerFields.add(variable.name.lexeme);
             }
           }
@@ -7220,8 +7116,7 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -7306,11 +7201,9 @@ class AvoidYieldInOnEventRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_yield_in_on_event',
-    problemMessage:
-        '[avoid_yield_in_on_event] yield breaks Bloc 8.0+ concurrency and '
+    problemMessage: '[avoid_yield_in_on_event] yield breaks Bloc 8.0+ concurrency and '
         'event ordering, causing unpredictable state updates.',
-    correctionMessage:
-        'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
+    correctionMessage: 'Replace yield with emit() - yield is deprecated in Bloc 8.0+.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -7376,8 +7269,7 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
     name: 'prefer_consumer_over_provider_of',
     problemMessage:
         '[prefer_consumer_over_provider_of] Provider.of in build. Use Consumer for granular rebuilds.',
-    correctionMessage:
-        'Replace with Consumer<T> or context.select() for better performance.',
+    correctionMessage: 'Replace with Consumer<T> or context.select() for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7548,17 +7440,13 @@ class PreferGetxBuilderRule extends SaropaLintRule {
         }
         if (current is MethodInvocation) {
           final String methodName = current.methodName.name;
-          if (methodName == 'Obx' ||
-              methodName == 'GetX' ||
-              methodName == 'GetBuilder') {
+          if (methodName == 'Obx' || methodName == 'GetX' || methodName == 'GetBuilder') {
             insideObx = true;
           }
         }
         if (current is InstanceCreationExpression) {
           final String typeName = current.constructorName.type.name.lexeme;
-          if (typeName == 'Obx' ||
-              typeName == 'GetX' ||
-              typeName == 'GetBuilder') {
+          if (typeName == 'Obx' || typeName == 'GetX' || typeName == 'GetBuilder') {
             insideObx = true;
           }
         }
@@ -7603,8 +7491,7 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'emit_new_bloc_state_instances',
-    problemMessage:
-        '[emit_new_bloc_state_instances] Mutating state object breaks equality '
+    problemMessage: '[emit_new_bloc_state_instances] Mutating state object breaks equality '
         'checks, preventing BlocBuilder from detecting changes.',
     correctionMessage: 'Use copyWith() or constructor to create new state.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -7670,8 +7557,7 @@ class AvoidBlocPublicFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_public_fields',
-    problemMessage:
-        '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private.',
+    problemMessage: '[avoid_bloc_public_fields] Public field in Bloc. Keep internals private.',
     correctionMessage: 'Make field private (_fieldName) or final.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -7856,9 +7742,7 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
 
       // Expected order: data, error, loading
       if (paramOrder.length == 3) {
-        if (paramOrder[0] != 'data' ||
-            paramOrder[1] != 'error' ||
-            paramOrder[2] != 'loading') {
+        if (paramOrder[0] != 'data' || paramOrder[1] != 'error' || paramOrder[2] != 'loading') {
           reporter.atNode(node, code);
         }
       }
@@ -7906,8 +7790,7 @@ class RequireBlocSelectorRule extends SaropaLintRule {
     name: 'require_bloc_selector',
     problemMessage:
         '[require_bloc_selector] BlocBuilder accessing single field. Use BlocSelector instead.',
-    correctionMessage:
-        'Replace with BlocSelector for targeted rebuilds on specific field.',
+    correctionMessage: 'Replace with BlocSelector for targeted rebuilds on specific field.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -7933,8 +7816,7 @@ class RequireBlocSelectorRule extends SaropaLintRule {
             builderExpr.body.accept(counter);
 
             // If only one unique field is accessed, suggest BlocSelector
-            if (counter.accessedFields.length == 1 &&
-                counter.accessCount <= 2) {
+            if (counter.accessedFields.length == 1 && counter.accessCount <= 2) {
               reporter.atNode(node, code);
             }
           }
@@ -7998,8 +7880,7 @@ class PreferSelectorRule extends SaropaLintRule {
     name: 'prefer_selector',
     problemMessage:
         '[prefer_selector] context.watch() accessing property. Use select() for efficiency.',
-    correctionMessage:
-        'Replace with context.select((notifier) => notifier.field).',
+    correctionMessage: 'Replace with context.select((notifier) => notifier.field).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -8068,8 +7949,7 @@ class RequireGetxBindingRule extends SaropaLintRule {
     name: 'require_getx_binding',
     problemMessage:
         '[require_getx_binding] Get.put() in widget. Consider using Bindings for lifecycle management.',
-    correctionMessage:
-        'Create a Binding class and register via GetPage binding parameter.',
+    correctionMessage: 'Create a Binding class and register via GetPage binding parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -8134,8 +8014,7 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_provider_generic_type',
-    problemMessage:
-        '[require_provider_generic_type] Missing generic type causes runtime '
+    problemMessage: '[require_provider_generic_type] Missing generic type causes runtime '
         'cast errors when Provider returns dynamic instead of expected type.',
     correctionMessage: 'Add <Type> to Provider.of<Type>(context).',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -8206,8 +8085,9 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_emit_after_close',
     problemMessage:
-        '[avoid_bloc_emit_after_close] emit() after await may throw if Bloc is closed.',
-    correctionMessage: 'Add "if (!isClosed)" check before emit after await.',
+        '[avoid_bloc_emit_after_close] Calling emit() after an await may throw an exception if the Bloc has been closed, leading to runtime errors and unpredictable state changes. This can cause crashes or silent failures, especially in asynchronous event handlers. Always check that the Bloc is still open before emitting new states after an await.',
+    correctionMessage:
+        'Before calling emit() after an await, add an "if (!isClosed)" check to ensure the Bloc is still active. This prevents exceptions and ensures state updates are only performed on open Blocs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -8244,8 +8124,7 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
       final emitOffset = node.offset - enclosingMethod.body.offset;
 
       // Simple heuristic: check if there's an await before this emit
-      final beforeEmit =
-          methodSource.substring(0, emitOffset.clamp(0, methodSource.length));
+      final beforeEmit = methodSource.substring(0, emitOffset.clamp(0, methodSource.length));
       if (!beforeEmit.contains('await ')) return;
 
       // Check if there's an isClosed check protecting this emit
@@ -8255,8 +8134,7 @@ class AvoidBlocEmitAfterCloseRule extends SaropaLintRule {
       while (parentNode != null && parentNode != enclosingMethod) {
         if (parentNode is IfStatement) {
           final condition = parentNode.expression.toSource();
-          if (condition.contains('isClosed') ||
-              condition.contains('!isClosed')) {
+          if (condition.contains('isClosed') || condition.contains('!isClosed')) {
             hasIsClosedCheck = true;
             break;
           }
@@ -8306,8 +8184,7 @@ class AvoidBlocStateMutationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_state_mutation',
-    problemMessage:
-        '[avoid_bloc_state_mutation] Direct mutation bypasses equality checks, '
+    problemMessage: '[avoid_bloc_state_mutation] Direct mutation bypasses equality checks, '
         'preventing UI rebuild and causing stale data display.',
     correctionMessage: 'Use state.copyWith() to create a new state instance.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -8465,9 +8342,9 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_freezed_json_serializable_conflict',
     problemMessage:
-        '[avoid_freezed_json_serializable_conflict] @freezed and @JsonSerializable conflict. Use only @freezed.',
+        '[avoid_freezed_json_serializable_conflict] Applying both @freezed and @JsonSerializable to the same class causes code generation conflicts and unpredictable serialization behavior. This can result in broken toJson/fromJson methods, runtime errors, and maintenance headaches. Only one annotation should be used for JSON serialization.',
     correctionMessage:
-        'Remove @JsonSerializable - @freezed handles JSON generation.',
+        'Remove the @JsonSerializable annotation when using @freezed. The @freezed package provides its own JSON serialization logic and does not require @JsonSerializable.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -8536,9 +8413,9 @@ class RequireFreezedArrowSyntaxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_freezed_arrow_syntax',
     problemMessage:
-        '[require_freezed_arrow_syntax] Freezed fromJson must use arrow syntax (=>).',
+        '[require_freezed_arrow_syntax] The fromJson factory in a @freezed class must use arrow syntax (=>) to ensure correct code generation. Using block syntax ({}) breaks the generated code, causing runtime errors, missing serialization, and build_runner failures. This leads to broken deserialization and hard-to-debug bugs in your models.',
     correctionMessage:
-        'Use: factory User.fromJson(Map<String, dynamic> json) => _\$UserFromJson(json);',
+        'Change the fromJson factory to use arrow syntax. Example: factory User.fromJson(Map<String, dynamic> json) => _\$UserFromJson(json);',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -8610,8 +8487,7 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_freezed_private_constructor',
-    problemMessage:
-        '[require_freezed_private_constructor] Missing private constructor '
+    problemMessage: '[require_freezed_private_constructor] Missing private constructor '
         'breaks code generation, causing build_runner to fail.',
     correctionMessage: 'Add: const ClassName._();',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -8704,8 +8580,7 @@ class RequireEquatableImmutableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_immutable',
-    problemMessage:
-        '[require_equatable_immutable] Mutable fields break equality after '
+    problemMessage: '[require_equatable_immutable] Mutable fields break equality after '
         'modification, causing BlocBuilder to miss state changes.',
     correctionMessage: 'Make all fields final.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -8768,8 +8643,7 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_props_override',
-    problemMessage:
-        '[require_equatable_props_override] Without props override, equality '
+    problemMessage: '[require_equatable_props_override] Without props override, equality '
         'defaults to identity comparison, breaking state deduplication.',
     correctionMessage: 'Add: List<Object?> get props => [field1, field2];',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -8790,9 +8664,7 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
       // Check for props getter
       bool hasProps = false;
       for (final member in node.members) {
-        if (member is MethodDeclaration &&
-            member.isGetter &&
-            member.name.lexeme == 'props') {
+        if (member is MethodDeclaration && member.isGetter && member.name.lexeme == 'props') {
           hasProps = true;
           break;
         }
@@ -8842,8 +8714,7 @@ class AvoidEquatableMutableCollectionsRule extends SaropaLintRule {
     name: 'avoid_equatable_mutable_collections',
     problemMessage:
         '[avoid_equatable_mutable_collections] Mutable collections in Equatable can break equality comparison.',
-    correctionMessage:
-        'Use List.unmodifiable() or immutable collections like IList.',
+    correctionMessage: 'Use List.unmodifiable() or immutable collections like IList.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -8863,9 +8734,7 @@ class AvoidEquatableMutableCollectionsRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           final type = member.fields.type?.toSource() ?? '';
-          if (type.startsWith('List<') ||
-              type.startsWith('Map<') ||
-              type.startsWith('Set<')) {
+          if (type.startsWith('List<') || type.startsWith('Map<') || type.startsWith('Set<')) {
             reporter.atNode(member, code);
           }
         }
@@ -8914,8 +8783,7 @@ class RequireBlocLoadingStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_loading_state',
-    problemMessage:
-        '[require_bloc_loading_state] Async Bloc handler should emit loading state.',
+    problemMessage: '[require_bloc_loading_state] Async Bloc handler should emit loading state.',
     correctionMessage: 'Add emit(LoadingState()) before async operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -9006,8 +8874,7 @@ class RequireBlocErrorStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_error_state',
-    problemMessage:
-        '[require_bloc_error_state] Bloc state sealed class should have an error case.',
+    problemMessage: '[require_bloc_error_state] Bloc state sealed class should have an error case.',
     correctionMessage: 'Add an error state class (e.g., UserError).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -9079,8 +8946,7 @@ class AvoidStaticStateRule extends SaropaLintRule {
     name: 'avoid_static_state',
     problemMessage:
         '[avoid_static_state] Static mutable state can cause testing and hot-reload issues.',
-    correctionMessage:
-        'Use proper state management (Provider, Riverpod, Bloc) instead.',
+    correctionMessage: 'Use proper state management (Provider, Riverpod, Bloc) instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -9115,9 +8981,8 @@ class AvoidStaticStateRule extends SaropaLintRule {
 
       // Check for mutable types
       final type = node.fields.type?.toSource() ?? '';
-      final isMutableCollection = type.startsWith('List') ||
-          type.startsWith('Map') ||
-          type.startsWith('Set');
+      final isMutableCollection =
+          type.startsWith('List') || type.startsWith('Map') || type.startsWith('Set');
 
       // Non-final static or mutable collection
       if (!node.fields.isFinal || isMutableCollection) {
@@ -9192,8 +9057,7 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
         if (methodName == 'of') isProviderCall = true;
       } else if (target != null) {
         final String targetSource = target.toSource().toLowerCase();
-        if (targetSource.contains('context') &&
-            (methodName == 'read' || methodName == 'watch')) {
+        if (targetSource.contains('context') && (methodName == 'read' || methodName == 'watch')) {
           isProviderCall = true;
         }
       }
@@ -9365,8 +9229,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
     name: 'require_bloc_manual_dispose',
     problemMessage:
         '[require_bloc_manual_dispose] Bloc/Cubit has StreamController/Timer but no close() override to dispose them.',
-    correctionMessage:
-        'Override close() to dispose controllers and close streams.',
+    correctionMessage: 'Override close() to dispose controllers and close streams.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -9407,8 +9270,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
           if (typeName != null) {
             for (final String disposableType in _disposableTypes) {
               if (typeName.contains(disposableType)) {
-                for (final VariableDeclaration variable
-                    in member.fields.variables) {
+                for (final VariableDeclaration variable in member.fields.variables) {
                   disposableFields.add(variable.name.lexeme);
                 }
                 break;
@@ -9419,8 +9281,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
           for (final VariableDeclaration variable in member.fields.variables) {
             final Expression? initializer = variable.initializer;
             if (initializer is InstanceCreationExpression) {
-              final String initType =
-                  initializer.constructorName.type.name.lexeme;
+              final String initType = initializer.constructorName.type.name.lexeme;
               if (_disposableTypes.contains(initType)) {
                 if (!disposableFields.contains(variable.name.lexeme)) {
                   disposableFields.add(variable.name.lexeme);
@@ -9464,8 +9325,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
           // Report the specific field that's not cleaned up
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }
@@ -9556,8 +9416,7 @@ class PreferProxyProviderRule extends SaropaLintRule {
           final Expression createExpr = arg.expression;
 
           // Check if the create callback accesses other providers
-          final _ProxyProviderAccessVisitor visitor =
-              _ProxyProviderAccessVisitor();
+          final _ProxyProviderAccessVisitor visitor = _ProxyProviderAccessVisitor();
           createExpr.visitChildren(visitor);
 
           if (visitor.accessesProviders) {
@@ -9797,8 +9656,7 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
     name: 'prefer_selector_over_consumer',
     problemMessage:
         '[prefer_selector_over_consumer] Consumer accessing single property. Use Selector for granular rebuilds.',
-    correctionMessage:
-        'Use Selector widget or ref.watch(provider.select(...)) for efficiency.',
+    correctionMessage: 'Use Selector widget or ref.watch(provider.select(...)) for efficiency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -9808,8 +9666,7 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Consumer') return;
 
@@ -9828,8 +9685,7 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
               r'ref\.watch\([^)]+\)\.(\w+)[^.\w]',
             );
 
-            final Iterable<RegExpMatch> matches =
-                singlePropertyPattern.allMatches(bodySource);
+            final Iterable<RegExpMatch> matches = singlePropertyPattern.allMatches(bodySource);
 
             // If we only see one property being accessed from the watched
             // provider, suggest using Selector
@@ -9889,8 +9745,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
     name: 'prefer_cubit_for_simple_state',
     problemMessage:
         '[prefer_cubit_for_simple_state] Bloc with single event type. Consider using Cubit for simpler code.',
-    correctionMessage:
-        'Replace with Cubit when only one event/action is needed.',
+    correctionMessage: 'Replace with Cubit when only one event/action is needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -9918,8 +9773,7 @@ class PreferCubitForSimpleStateRule extends SaropaLintRule {
 
           // Find all on<EventType> patterns
           final RegExp onEventPattern = RegExp(r'on<(\w+)>');
-          final Iterable<RegExpMatch> matches =
-              onEventPattern.allMatches(bodySource);
+          final Iterable<RegExpMatch> matches = onEventPattern.allMatches(bodySource);
 
           for (final RegExpMatch match in matches) {
             eventHandlerCount++;
@@ -10012,8 +9866,7 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'BlocBuilder') return;
 
@@ -10081,8 +9934,7 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
     name: 'require_bloc_consumer_when_both',
     problemMessage:
         '[require_bloc_consumer_when_both] Nested BlocListener + BlocBuilder. Use BlocConsumer instead.',
-    correctionMessage:
-        'Replace with BlocConsumer which combines listener and builder.',
+    correctionMessage: 'Replace with BlocConsumer which combines listener and builder.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -10092,8 +9944,7 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'BlocListener') return;
 
@@ -10103,12 +9954,10 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
           final Expression childExpr = arg.expression;
 
           if (childExpr is InstanceCreationExpression) {
-            final String childTypeName =
-                childExpr.constructorName.type.name.lexeme;
+            final String childTypeName = childExpr.constructorName.type.name.lexeme;
             if (childTypeName == 'BlocBuilder') {
               // Check if they're for the same Bloc type
-              final TypeArgumentList? listenerTypeArgs =
-                  node.constructorName.type.typeArguments;
+              final TypeArgumentList? listenerTypeArgs = node.constructorName.type.typeArguments;
               final TypeArgumentList? builderTypeArgs =
                   childExpr.constructorName.type.typeArguments;
 
@@ -10170,8 +10019,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
     name: 'avoid_bloc_context_dependency',
     problemMessage:
         '[avoid_bloc_context_dependency] Bloc should not depend on BuildContext. This couples Bloc to UI.',
-    correctionMessage:
-        'Inject dependencies through constructor instead of passing context.',
+    correctionMessage: 'Inject dependencies through constructor instead of passing context.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10262,8 +10110,7 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
     name: 'avoid_provider_value_rebuild',
     problemMessage:
         '[avoid_provider_value_rebuild] Provider.value with inline creation. Notifier recreated every build.',
-    correctionMessage:
-        'Use existing instance with Provider.value or use Provider constructor.',
+    correctionMessage: 'Use existing instance with Provider.value or use Provider constructor.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10273,8 +10120,7 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for Provider.value, ChangeNotifierProvider.value, etc.
       final String constructorName = node.constructorName.toSource();
       if (!constructorName.contains('.value')) return;
@@ -10351,8 +10197,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
     name: 'avoid_riverpod_notifier_in_build',
     problemMessage:
         '[avoid_riverpod_notifier_in_build] Notifier created in build. State will be lost on every rebuild.',
-    correctionMessage:
-        'Define the provider outside the widget and use ref.watch() to access it.',
+    correctionMessage: 'Define the provider outside the widget and use ref.watch() to access it.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10372,8 +10217,7 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check if it's a Notifier type
@@ -10443,8 +10287,7 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
     name: 'require_riverpod_async_value_guard',
     problemMessage:
         '[require_riverpod_async_value_guard] Try-catch in async provider. Consider using AsyncValue.guard for consistent error handling.',
-    correctionMessage:
-        'Replace try-catch with AsyncValue.guard(() => yourAsyncOperation()).',
+    correctionMessage: 'Replace try-catch with AsyncValue.guard(() => yourAsyncOperation()).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10461,11 +10304,9 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
 
       while (current != null) {
         if (current is ClassDeclaration) {
-          final String? extendsName =
-              current.extendsClause?.superclass.name2.lexeme;
+          final String? extendsName = current.extendsClause?.superclass.name2.lexeme;
           if (extendsName != null &&
-              (extendsName.contains('AsyncNotifier') ||
-                  extendsName.contains('FutureProvider'))) {
+              (extendsName.contains('AsyncNotifier') || extendsName.contains('FutureProvider'))) {
             inAsyncNotifier = true;
           }
           break;
@@ -10535,8 +10376,7 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
     name: 'avoid_bloc_business_logic_in_ui',
     problemMessage:
         '[avoid_bloc_business_logic_in_ui] UI code in Bloc breaks separation of concerns and makes testing impossible.',
-    correctionMessage:
-        'Emit a state instead and handle the UI action in BlocListener.',
+    correctionMessage: 'Emit a state instead and handle the UI action in BlocListener.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -10568,10 +10408,8 @@ class AvoidBlocBusinessLogicInUiRule extends SaropaLintRule {
       AstNode? current = node.parent;
       while (current != null) {
         if (current is ClassDeclaration) {
-          final String? extendsName =
-              current.extendsClause?.superclass.name2.lexeme;
-          if (extendsName != null &&
-              (extendsName == 'Bloc' || extendsName == 'Cubit')) {
+          final String? extendsName = current.extendsClause?.superclass.name2.lexeme;
+          if (extendsName != null && (extendsName == 'Bloc' || extendsName == 'Cubit')) {
             reporter.atNode(node, code);
           }
           return;
@@ -10627,8 +10465,7 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
     name: 'prefer_change_notifier_proxy',
     problemMessage:
         '[prefer_change_notifier_proxy] Provider.of without listen:false in callback. Use context.read() or add listen: false.',
-    correctionMessage:
-        'Add listen: false parameter, or use context.read<T>() for one-time reads.',
+    correctionMessage: 'Add listen: false parameter, or use context.read<T>() for one-time reads.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -10800,8 +10637,7 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
               for (final stmt in body.block.statements) {
                 if (stmt is ReturnStatement) {
                   final returnExpr = stmt.expression;
-                  if (returnExpr != null &&
-                      _isComplexWidgetReturn(returnExpr)) {
+                  if (returnExpr != null && _isComplexWidgetReturn(returnExpr)) {
                     reporter.atNode(node, code);
                     break;
                   }
@@ -10946,8 +10782,7 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
     name: 'require_bloc_repository_abstraction',
     problemMessage:
         '[require_bloc_repository_abstraction] Bloc depends on concrete repository. Use abstract interface for testability.',
-    correctionMessage:
-        'Inject UserRepository interface instead of FirebaseUserRepository.',
+    correctionMessage: 'Inject UserRepository interface instead of FirebaseUserRepository.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -11049,8 +10884,7 @@ class AvoidGetxGlobalStateRule extends SaropaLintRule {
     name: 'avoid_getx_global_state',
     problemMessage:
         '[avoid_getx_global_state] Global GetX state (Get.put/Get.find) makes testing difficult.',
-    correctionMessage:
-        'Use GetBuilder with init: parameter, or inject controller via constructor.',
+    correctionMessage: 'Use GetBuilder with init: parameter, or inject controller via constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -11131,8 +10965,7 @@ class PreferBlocTransformRule extends SaropaLintRule {
     name: 'prefer_bloc_transform',
     problemMessage:
         '[prefer_bloc_transform] Search/input event without transformer. Consider debounce/throttle.',
-    correctionMessage:
-        'Add transformer: debounce(Duration(milliseconds: 300)) to on<Event>().',
+    correctionMessage: 'Add transformer: debounce(Duration(milliseconds: 300)) to on<Event>().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

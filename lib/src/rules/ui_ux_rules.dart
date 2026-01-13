@@ -30,10 +30,8 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_responsive_breakpoints',
-    problemMessage:
-        '[require_responsive_breakpoints] Breakpoint value should be a named constant.',
-    correctionMessage:
-        'Extract the magic number to a constant like kTabletBreakpoint.',
+    problemMessage: '[require_responsive_breakpoints] Breakpoint value should be a named constant.',
+    correctionMessage: 'Extract the magic number to a constant like kTabletBreakpoint.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -71,8 +69,7 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
       // Check if the other side contains MediaQuery.of(context).size.width
       final String otherSource = otherSide.toSource();
       if (!otherSource.contains('MediaQuery') ||
-          (!otherSource.contains('.width') &&
-              !otherSource.contains('.height'))) {
+          (!otherSource.contains('.width') && !otherSource.contains('.height'))) {
         return;
       }
 
@@ -211,8 +208,7 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
     name: 'require_custom_painter_shouldrepaint',
     problemMessage:
         '[require_custom_painter_shouldrepaint] shouldRepaint always returns true, causing unnecessary repaints.',
-    correctionMessage:
-        'Compare relevant fields instead of always returning true.',
+    correctionMessage: 'Compare relevant fields instead of always returning true.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -248,11 +244,9 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
       } else if (body is BlockFunctionBody) {
         final List<Statement> statements = body.block.statements;
         if (statements.length == 1 && statements.first is ReturnStatement) {
-          final ReturnStatement returnStmt =
-              statements.first as ReturnStatement;
+          final ReturnStatement returnStmt = statements.first as ReturnStatement;
           if (returnStmt.expression is BooleanLiteral) {
-            final BooleanLiteral boolLit =
-                returnStmt.expression as BooleanLiteral;
+            final BooleanLiteral boolLit = returnStmt.expression as BooleanLiteral;
             if (boolLit.value) {
               reporter.atNode(returnStmt.expression!, code);
             }
@@ -293,8 +287,7 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
     name: 'require_currency_formatting_locale',
     problemMessage:
         '[require_currency_formatting_locale] NumberFormat.currency should have explicit locale.',
-    correctionMessage:
-        'Add locale parameter for consistent currency formatting.',
+    correctionMessage: 'Add locale parameter for consistent currency formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -318,8 +311,7 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.name?.name;
 
       if (typeName != 'NumberFormat') return;
-      if (constructorName == null ||
-          !_currencyConstructors.contains(constructorName)) {
+      if (constructorName == null || !_currencyConstructors.contains(constructorName)) {
         return;
       }
 
@@ -367,8 +359,7 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_number_formatting_locale',
-    problemMessage:
-        '[require_number_formatting_locale] NumberFormat should have explicit locale.',
+    problemMessage: '[require_number_formatting_locale] NumberFormat should have explicit locale.',
     correctionMessage: 'Add locale parameter for consistent number formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -457,8 +448,7 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_graphql_operation_names',
-    problemMessage:
-        '[require_graphql_operation_names] GraphQL operation should have a name.',
+    problemMessage: '[require_graphql_operation_names] GraphQL operation should have a name.',
     correctionMessage: 'Add operation name after query/mutation keyword.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -523,8 +513,7 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_badge_without_meaning',
-    problemMessage:
-        '[avoid_badge_without_meaning] Badge with count 0 should be hidden.',
+    problemMessage: '[avoid_badge_without_meaning] Badge with count 0 should be hidden.',
     correctionMessage: 'Add isLabelVisible: count > 0 to hide when empty.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -597,8 +586,7 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_logger_over_print',
-    problemMessage:
-        '[prefer_logger_over_print] Use log() from dart:developer instead of print().',
+    problemMessage: '[prefer_logger_over_print] Use log() from dart:developer instead of print().',
     correctionMessage: 'Replace print() with log() for better log management.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -656,8 +644,7 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
     name: 'prefer_itemextent_when_known',
     problemMessage:
         '[prefer_itemextent_when_known] Consider adding itemExtent for better scroll performance.',
-    correctionMessage:
-        'Set itemExtent when all list items have the same height.',
+    correctionMessage: 'Set itemExtent when all list items have the same height.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -808,8 +795,7 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
     name: 'prefer_skeleton_over_spinner',
     problemMessage:
         '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Consider skeleton loaders.',
-    correctionMessage:
-        'Use skeleton/shimmer loaders for better perceived performance.',
+    correctionMessage: 'Use skeleton/shimmer loaders for better perceived performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -822,17 +808,14 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
     context.registry.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
-      if (typeName != 'CircularProgressIndicator' &&
-          typeName != 'LinearProgressIndicator') {
+      if (typeName != 'CircularProgressIndicator' && typeName != 'LinearProgressIndicator') {
         return;
       }
 
       // Check if inside conditional (loading state)
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is ConditionalExpression ||
-            current is IfStatement ||
-            current is IfElement) {
+        if (current is ConditionalExpression || current is IfStatement || current is IfElement) {
           // Found in conditional - likely a loading state
           reporter.atNode(node.constructorName, code);
           return;
@@ -922,8 +905,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
       final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
 
       // Check if it's search-related
-      final isSearchRelated =
-          _searchTerms.any((term) => itemCountSource.contains(term));
+      final isSearchRelated = _searchTerms.any((term) => itemCountSource.contains(term));
 
       if (!isSearchRelated) {
         return;
@@ -936,9 +918,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
         if (source.contains('.isempty') || source.contains('.isnotempty')) {
           return; // Has empty check
         }
-        if (current is ConditionalExpression ||
-            current is IfStatement ||
-            current is IfElement) {
+        if (current is ConditionalExpression || current is IfStatement || current is IfElement) {
           // Check if condition checks for empty
           if (source.contains('length') && source.contains('0')) {
             return;
@@ -992,8 +972,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
     name: 'require_search_loading_indicator',
     problemMessage:
         '[require_search_loading_indicator] Search callback without loading state management.',
-    correctionMessage:
-        'Set loading state before search and clear it on completion.',
+    correctionMessage: 'Set loading state before search and clear it on completion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1079,9 +1058,9 @@ class RequireSearchDebounceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_search_debounce',
     problemMessage:
-        '[require_search_debounce] Search API called on each keystroke. Add debounce to reduce calls.',
+        '[require_search_debounce] Calling a search API on every keystroke can overwhelm your backend, degrade performance, and create a poor user experience. Without debouncing, users may see lag, rate limits, or unnecessary network traffic.',
     correctionMessage:
-        'Use a Debouncer or Timer to delay search until user stops typing.',
+        'Wrap your search trigger in a Debouncer or Timer so the API is only called after the user stops typing for a short period (e.g., 300ms). This reduces load and improves responsiveness.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1179,8 +1158,7 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
     name: 'require_pagination_loading_state',
     problemMessage:
         '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator.',
-    correctionMessage:
-        'Add +1 to itemCount when loading and show indicator at the end.',
+    correctionMessage: 'Add +1 to itemCount when loading and show indicator at the end.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1304,8 +1282,7 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
     name: 'require_webview_progress_indicator',
     problemMessage:
         '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback.',
-    correctionMessage:
-        'Add onProgress/onProgressChanged callback to show loading state.',
+    correctionMessage: 'Add onProgress/onProgressChanged callback to show loading state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

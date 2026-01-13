@@ -12,34 +12,20 @@ library;
 
 /// Stylistic tier rules - rules focused on code style, formatting, and opinionated patterns.
 const Set<String> stylisticRules = <String>{
-  'prefer_single_quotes',
-  'prefer_double_quotes',
-  'prefer_trailing_commas',
-  'prefer_named_parameters',
-  'prefer_final_locals',
-  'prefer_const_constructors',
-  'prefer_const_declarations',
-  'prefer_typedefs',
-  'prefer_arrow_functions',
-  'prefer_expression_function_bodies',
-  'prefer_collection_literals',
-  'prefer_spread_collections',
-  'prefer_null_aware_operators',
-  'prefer_cascade',
-  // Explicitly added unassigned rules
-  'always_fail',
+  'always_fail', // test rule
   'arguments_ordering',
   'capitalize_comment',
   'firebase_custom',
   'greeting',
-  'prefer_kebab_tag_name',
-  'prefer_rethrow_over_throw_e',
-  'prefer_sorted_members',
-  'prefer_sorted_parameters',
+  'prefer_arrow_functions',
+
+  'purchase_completed',
   'purchase',
-  'saropa',
   'saropa_lints',
+  'saropa',
+  'save',
   'tag_name',
+  'user_clicked_button'
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -148,7 +134,7 @@ const Set<String> essentialRules = <String>{
   // Error Handling
   'avoid_swallowing_exceptions',
   'avoid_losing_stack_trace',
-  'no_empty_block',
+
   'avoid_print_error', // Print for error logging loses errors in production
 
   // Collection/Loop Safety (Phase 2)
@@ -344,7 +330,6 @@ const Set<String> essentialRules = <String>{
   // Part 3 - Widget Lifecycle Rules (Essential - crashes)
   'require_super_dispose_call', // ERROR - broken lifecycle
   'require_super_init_state_call', // ERROR - broken lifecycle
-  'avoid_set_state_in_build', // ERROR - infinite rebuild
   'avoid_set_state_in_dispose', // ERROR - disposed widget
   'avoid_navigation_in_build', // ERROR - navigation chaos
 
@@ -539,7 +524,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_stateful_widget_in_list',
   'prefer_cached_network_image',
   'avoid_controller_in_build',
-  'avoid_setstate_in_build',
+
   'avoid_regex_in_loop',
   'prefer_const_string_list',
   'prefer_const_widgets_in_lists',
@@ -686,21 +671,20 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_contains',
   'prefer_first',
   'prefer_last',
-  'prefer_where_or_null',
+  'prefer_where_or_null', // Prefer whereOrNull for idiomatic Dart
 
-  // Testing
   'require_test_assertions',
-  'avoid_real_network_calls_in_tests',
+
   'avoid_hardcoded_test_delays',
-  'avoid_duplicate_test_assertions',
+
   'avoid_test_coupling',
-  'require_test_isolation',
+
   'avoid_real_dependencies_in_tests',
-  'require_error_case_tests',
+
   'prefer_test_wrapper',
 
   // State Management (Batch 10)
-  'prefer_copy_with_for_state',
+
   'avoid_bloc_listen_in_build',
 
   // Performance (Batch 11)
@@ -913,6 +897,11 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_test_find_by_key', // INFO - prefer find.byKey over find.byType
   'prefer_setup_teardown', // INFO - extract repeated test setup
   'require_test_description_convention', // INFO - descriptive test names
+  // Test Quality (New assignments)
+  'avoid_duplicate_test_assertions', // Prevents redundant assertions in tests
+  'avoid_real_network_calls_in_tests', // Ensures tests do not hit real network
+  'require_error_case_tests', // Ensures error cases are tested
+  'require_test_isolation', // Ensures tests do not share mutable state
 
   // Async Rules (Recommended - readability)
   'avoid_future_then_in_async', // WARNING - use await instead
@@ -1243,6 +1232,8 @@ const Set<String> professionalOnlyRules = <String>{
   'require_error_state',
   'avoid_bloc_in_bloc',
   'prefer_sealed_events',
+  // State Management (New assignment)
+  'prefer_copy_with_for_state', // Ensures state classes have copyWith for immutability
 
   // Performance (Batch 11)
   'prefer_const_widgets',
@@ -1271,7 +1262,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_correct_test_file_name',
   'avoid_top_level_members_in_tests',
   'require_test_setup_teardown',
-  'format_test_name',
+
   'prefer_unique_test_names',
   'prefer_test_structure',
   'prefer_test_matchers',
@@ -1624,6 +1615,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_isar_composite_index', // INFO - query performance
   'prefer_isar_query_stream', // INFO - reactivity
   'avoid_isar_float_equality_queries', // WARNING - precision
+  'avoid_cached_isar_stream', // ERROR - Isar streams must not be cached
 
   // Part 7 - Dio Rules (Professional - architecture)
   'require_dio_singleton', // INFO - consistency
@@ -1868,8 +1860,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'move_records_to_typedefs',
   'match_positional_field_names_on_assignment',
   'use_existing_destructuring',
-  'record_fields_ordering',
-  'pattern_fields_ordering',
   'prefer_pattern_destructuring',
 
   // Formatting
@@ -1878,9 +1868,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_commenting_future_delayed',
   'prefer_trailing_comma',
   'unnecessary_trailing_comma',
-  'newline_before_case',
-  'newline_before_method',
-  'newline_before_constructor',
 
   // Imports
   'avoid_barrel_files',
@@ -1950,7 +1937,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_global_state',
   'avoid_multi_assignment',
   'avoid_nested_assignments',
-  'move_variable_closer_to_usage',
+  'move_variable_closer_to_its_usage',
   'move_variable_outside_iteration',
   'use_existing_variable',
   'prefer_type_over_var',
@@ -2067,7 +2054,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Control Flow (Low)
   'prefer_guard_clauses', // INFO - guard clause style
   'prefer_positive_conditions_first', // INFO - condition ordering
-  'prefer_single_exit_point', // INFO - function exits
 
   // Callbacks (Low)
   'prefer_inline_callbacks', // INFO - callback style
@@ -2128,9 +2114,9 @@ class _TierCache {
   /// Essential + Recommended rules (cached).
   static Set<String> get recommended =>
       _recommended ??= <String>{...essentialRules, ...recommendedOnlyRules};
+
   /// Stylistic rules only (cached).
-  static Set<String> get stylistic =>
-      _stylistic ??= <String>{...stylisticRules};
+  static Set<String> get stylistic => _stylistic ??= <String>{...stylisticRules};
 
   /// Essential + Recommended + Professional rules (cached).
   static Set<String> get professional => _professional ??= <String>{

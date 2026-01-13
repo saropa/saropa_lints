@@ -1,6 +1,6 @@
 # Roadmap: Aiming for 2,000 Lint Rules
-
 <!-- cspell:disable -->
+
 ## Current Status
 
 See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for implemented rules. Goal: 2000 rules.
@@ -988,6 +988,49 @@ These rules are **not included in any tier** by default. They represent team pre
 > **See [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for full documentation on implemented stylistic rules.
 
 **Planned:**
+
+### Miscellaneous Rules
+
+| Rule Name | Tier | Severity | Description |
+|-----------|------|----------|-------------|
+| `avoid_bool_in_widget_constructors` | Planned | INFO | Avoid using bools in widget constructors; prefer enums for clarity. |
+| `avoid_cascades` | Planned | INFO | Discourage use of cascade (..) for clarity and maintainability. |
+| `avoid_classes_with_only_static_members` | Planned | INFO | Avoid classes with only static members; use top-level functions or variables. |
+| `avoid_double_and_int_checks` | Planned | INFO | Avoid type checks for double/int; use num or generic constraints. |
+| `avoid_dynamic_calls` | Planned | INFO | Avoid dynamic calls; prefer static typing for safety. |
+| `avoid_equals_and_hash_code_on_mutable_classes` | Planned | INFO | Avoid overriding equals/hashCode on mutable classes. |
+| `avoid_escaping_inner_quotes` | Planned | INFO | Prefer consistent quote usage to avoid escaping. |
+| `avoid_field_initializers_in_const_classes` | Planned | INFO | Avoid field initializers in const classes; use constructor initializers. |
+| `avoid_function_literals_in_foreach_calls` | Planned | INFO | Prefer method references over function literals in forEach. |
+| `avoid_implementing_value_types` | Planned | INFO | Avoid implementing value types; use composition instead. |
+| `avoid_js_rounded_ints` | Planned | INFO | Avoid relying on JS number rounding for ints. |
+| `avoid_null_checks_in_equality_operators` | Planned | INFO | Avoid null checks in == operator; use identical or null-aware logic. |
+| `avoid_positional_boolean_parameters` | Planned | INFO | Avoid positional boolean parameters; use named or enums. |
+| `avoid_private_typedef_functions` | Planned | INFO | Avoid private typedef functions; prefer public for clarity. |
+| `avoid_redundant_argument_values` | Planned | INFO | Avoid redundant argument values; use defaults. |
+| `avoid_redundant_await` | Planned | INFO | Avoid redundant await; return the future directly. |
+| `avoid_returning_null_for_future` | Planned | INFO | Avoid returning null for Future; return Future.value(). |
+| `avoid_returning_null_for_void` | Planned | INFO | Avoid returning null for void; just return. |
+| `avoid_returning_this` | Planned | INFO | Avoid returning this from methods; prefer fluent interfaces. |
+| `avoid_setters_without_getters` | Planned | INFO | Avoid setters without corresponding getters. |
+| `avoid_shadowing_type_parameters` | Planned | INFO | Avoid shadowing type parameters in generics. |
+| `avoid_single_cascade_in_expression_statements` | Planned | INFO | Avoid single cascade in expression statements; use direct call. |
+| `avoid_types_on_closure_parameters` | Planned | INFO | Avoid explicit types on closure parameters when unnecessary. |
+| `avoid_unnecessary_containers` | Planned | INFO | Avoid unnecessary Container widgets in Flutter. |
+| `avoid_unused_constructor_parameters` | Planned | INFO | Avoid unused constructor parameters; remove or use them. |
+| `avoid_void_async` | Planned | INFO | Avoid async functions that return void. |
+| `prefer_asserts_in_initializer_lists` | Planned | INFO | Prefer asserts in initializer lists for constructors. |
+| `prefer_const_constructors_in_immutables` | Planned | INFO | Prefer const constructors in immutable classes. |
+| `prefer_const_declarations` | Planned | INFO | Prefer const declarations where possible. |
+| `prefer_const_literals_to_create_immutables` | Planned | INFO | Prefer const literals to create immutable collections. |
+| `prefer_constructors_over_static_methods` | Planned | INFO | Prefer constructors over static factory methods. |
+| `prefer_expression_function_bodies` | Planned | INFO | Prefer expression function bodies for simple functions. |
+| `prefer_final_fields` | Planned | INFO | Prefer final fields for immutability. |
+| `prefer_final_locals` | Planned | INFO | Prefer final for local variables. |
+| `prefer_foreach` | Planned | INFO | Prefer forEach over for-in for readability. |
+| `prefer_if_elements_to_conditional_expressions` | Planned | INFO | Prefer if elements in collections to conditional expressions. |
+| `prefer_inlined_adds` | Planned | INFO | Prefer inlined adds in collection literals. |
+| `prefer_single_exit_point` | Planned | INFO | Prefer a single exit point in functions. |
 
 #### Import & File Organization
 

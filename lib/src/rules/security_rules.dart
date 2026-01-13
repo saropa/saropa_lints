@@ -58,9 +58,9 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_logging_sensitive_data',
     problemMessage:
-        '[avoid_logging_sensitive_data] Sensitive data in log. Will appear in crash reports and debug output.',
+        '[avoid_logging_sensitive_data] Logging sensitive data such as passwords, tokens, or personally identifiable information (PII) exposes users to privacy risks and can result in data leaks if logs are accessed by unauthorized parties. Sensitive information in logs may appear in crash reports, debug output, or be inadvertently shared with third parties, leading to compliance violations and loss of user trust. Always sanitize logs to prevent exposure of confidential data.',
     correctionMessage:
-        'Remove passwords, tokens, and PII from logs. Log a success/failure message instead.',
+        'Remove all sensitive data (passwords, tokens, PII) from logs. Instead, log only non-sensitive metadata or a generic success/failure message. Use dedicated logging utilities to redact or filter sensitive fields before outputting logs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -365,8 +365,9 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_credentials',
     problemMessage:
-        '[avoid_hardcoded_credentials] Hardcoded credential will be committed to version control and exposed.',
-    correctionMessage: "Use String.fromEnvironment('KEY') or read from secure storage at runtime.",
+        '[avoid_hardcoded_credentials] Hardcoding credentials (such as passwords, API keys, or tokens) in source code exposes them to anyone with access to the codebase, including public repositories and version control history. This can lead to unauthorized access, data breaches, and compromised systems. Credentials should always be stored securely and never committed to version control.',
+    correctionMessage:
+        'Store credentials in secure storage or environment variables. Use String.fromEnvironment(\'KEY\') or a secure vault at runtime. Never commit secrets to source control.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2909,8 +2910,9 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_secure_password_field',
     problemMessage:
-        '[require_secure_password_field] Password field missing secure keyboard settings.',
-    correctionMessage: 'Add enableSuggestions: false and autocorrect: false for passwords.',
+        '[require_secure_password_field] Password input fields must disable suggestions and autocorrect to prevent sensitive information from being stored in device dictionaries or suggested to users inappropriately. Failing to do so increases the risk of password leakage, accidental exposure, and poor user privacy. Always configure password fields to maximize security and user trust.',
+    correctionMessage:
+        'Set enableSuggestions: false and autocorrect: false on all password fields (TextField, TextFormField, CupertinoTextField) to prevent password suggestions and autocorrect. This helps protect user credentials from being stored or exposed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3046,7 +3048,8 @@ class AvoidPathTraversalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_path_traversal',
     problemMessage: '[avoid_path_traversal] File path may be vulnerable to path traversal attack.',
-    correctionMessage: 'Validate paths: check for "..", use basename, verify resolved path.',
+    correctionMessage:
+        'Validate all file and directory paths received from user input or external sources. Check for path traversal patterns (such as ".."), use path.basename to sanitize, and verify the resolved path stays within the intended directory. This prevents attackers from accessing or overwriting sensitive files outside the allowed scope.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3148,8 +3151,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_html_escape',
     problemMessage:
-        '[prefer_html_escape] User content in WebView without HTML escaping. XSS vulnerability.',
-    correctionMessage: 'Use htmlEscape.convert() or a sanitization library for user content.',
+        '[prefer_html_escape] Displaying user-generated content in a WebView without proper HTML escaping exposes your app to cross-site scripting (XSS) attacks. Malicious input can execute scripts, steal user data, or compromise device security. Always sanitize and escape user content before rendering it in a web context.',
+    correctionMessage:
+        'Escape all user content using htmlEscape.convert() or a trusted sanitization library before displaying it in a WebView or similar widget. This prevents XSS and protects users from malicious input.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3247,7 +3251,8 @@ class AvoidSensitiveDataInLogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_logs',
     problemMessage: '[avoid_sensitive_data_in_logs] Sensitive data in logs creates security risks.',
-    correctionMessage: 'Remove sensitive data or log only non-sensitive metadata.',
+    correctionMessage:
+        'Never log sensitive data such as passwords, tokens, or PII. Instead, log only non-sensitive metadata or anonymized information. Use logging utilities that support redaction or filtering of sensitive fields to ensure compliance and user privacy.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -4566,8 +4571,9 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_webview_insecure_content',
     problemMessage:
-        '[avoid_webview_insecure_content] WebView configured to allow mixed (insecure) content. Security risk.',
-    correctionMessage: 'Set mixedContentMode to MIXED_CONTENT_NEVER_ALLOW or never.',
+        '[avoid_webview_insecure_content] Allowing mixed (HTTP and HTTPS) content in a WebView exposes users to man-in-the-middle attacks, data interception, and content tampering. Insecure content can compromise the confidentiality and integrity of user data. Always restrict WebView to load only secure (HTTPS) content.',
+    correctionMessage:
+        'Set mixedContentMode to MIXED_CONTENT_NEVER_ALLOW (or equivalent) to block insecure HTTP content in WebView. This ensures all loaded resources are secure and protects users from network-based attacks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
