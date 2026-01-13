@@ -1682,8 +1682,8 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
     problemMessage:
         '[require_intl_args_match] Intl.message args may not match placeholders in the message.',
     correctionMessage:
-        'Ensure args list contains all variables used in the message string.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+      'Always ensure that the args list for Intl.message contains every variable referenced in the message string. Missing or mismatched arguments can cause runtime errors, broken translations, and confusing user experiences.'
+  ,  errorSeverity: DiagnosticSeverity.ERROR,
   );
 
   @override

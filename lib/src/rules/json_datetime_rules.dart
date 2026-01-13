@@ -7,8 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -63,8 +62,7 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
       }
     });
 
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final String source = node.function.toSource();
       if (source != 'jsonDecode') return;
 
@@ -225,7 +223,8 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
     name: 'prefer_try_parse_for_dynamic_data',
     problemMessage:
         '[prefer_try_parse_for_dynamic_data] parse() throws on invalid input. Use tryParse() for dynamic data.',
-    correctionMessage: 'Replace with tryParse() and handle null result.',
+    correctionMessage:
+        'Use tryParse() instead of parse() when handling dynamic or user-provided input. Always check for null results to avoid runtime exceptions and ensure your code gracefully handles invalid or unexpected values.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -333,8 +332,7 @@ class PreferDurationConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
-    problemMessage:
-        '[prefer_duration_constants] Duration can use a cleaner unit.',
+    problemMessage: '[prefer_duration_constants] Duration can use a cleaner unit.',
     correctionMessage: 'Use a larger unit for cleaner code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -361,9 +359,7 @@ class PreferDurationConstantsRule extends SaropaLintRule {
         if (intValue <= 0) continue;
 
         // Check for conversions
-        if (name == 'milliseconds' &&
-            intValue >= 1000 &&
-            intValue % 1000 == 0) {
+        if (name == 'milliseconds' && intValue >= 1000 && intValue % 1000 == 0) {
           reporter.atNode(arg, code);
         } else if (name == 'seconds' && intValue >= 60 && intValue % 60 == 0) {
           reporter.atNode(arg, code);
@@ -413,8 +409,7 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
     name: 'avoid_datetime_now_in_tests',
     problemMessage:
         '[avoid_datetime_now_in_tests] DateTime.now() in tests can cause flaky behavior.',
-    correctionMessage:
-        'Use fixed datetime values or a clock abstraction for predictable tests.',
+    correctionMessage: 'Use fixed datetime values or a clock abstraction for predictable tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -491,8 +486,7 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
     name: 'avoid_not_encodable_in_to_json',
     problemMessage:
         '[avoid_not_encodable_in_to_json] Value is not JSON-encodable and will cause runtime error.',
-    correctionMessage:
-        'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
+    correctionMessage: 'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
         '.toJson() for objects, or remove non-serializable values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -760,8 +754,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
     name: 'require_freezed_json_converter',
     problemMessage:
         '[require_freezed_json_converter] Freezed class with DateTime/Color field may need JsonConverter.',
-    correctionMessage:
-        'Add @JsonSerializable(converters: [...]) for custom types.',
+    correctionMessage: 'Add @JsonSerializable(converters: [...]) for custom types.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -823,6 +816,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
               typeSource = param.type?.toSource();
             }
 
+            // cspell:ignore annot
             if (typeSource != null) {
               for (final String typeName in _typesNeedingConverter) {
                 if (typeSource.contains(typeName)) {
@@ -836,8 +830,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
                       break;
                     }
                     if (annotSource.contains('JsonKey') &&
-                        (annotSource.contains('fromJson') ||
-                            annotSource.contains('toJson'))) {
+                        (annotSource.contains('fromJson') || annotSource.contains('toJson'))) {
                       hasConverter = true;
                       break;
                     }

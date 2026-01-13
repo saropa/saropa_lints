@@ -1,0 +1,444 @@
+
+[38;5;208m                               ....[0m
+[38;5;208m                       `-+shdmNMMMMNmdhs+-[0m
+[38;5;209m                    -odMMMNyo/-..````.++:+o+/-[0m
+[38;5;215m                 `/dMMMMMM/`          ``````````[0m
+[38;5;220m                `dMMMMMMMMNdhhhdddmmmNmmddhs+-[0m
+[38;5;226m                /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh/[0m
+[38;5;190m              . :sdmNNNNMMMMMNNNMMMMMMMMMMMMMMMMm+[0m
+[38;5;154m              o     `..~~~::~+==+~:/+sdNMMMMMMMMMMMo[0m
+[38;5;118m              m                        .+NMMMMMMMMMN[0m
+[38;5;123m              m+                         :MMMMMMMMMm[0m
+[38;5;87m              /N:                        :MMMMMMMMM/[0m
+[38;5;51m               oNs.                    `+NMMMMMMMMo[0m
+[38;5;45m                :dNy/.              ./smMMMMMMMMm:[0m
+[38;5;39m                 `/dMNmhyso+++oosydNNMMMMMMMMMd/[0m
+[38;5;33m                    .odMMMMMMMMMMMMMMMMMMMMdo-[0m
+[38;5;57m                       `-+shdNNMMMMNNdhs+-[0m
+[38;5;57m                               ````[0m
+
+[38;5;195m(c) 2024-2026 Saropa. All rights reserved.[0m
+[38;5;117mhttps://saropa.com[0m
+
+
+[96m======================================================================[0m
+[96m  SAROPA LINTS AUDIT v2.0[0m
+[96m======================================================================[0m
+
+
+[2m──────────────────────────────────────────────────────────────────────[0m
+[1m  RULE INVENTORY[0m
+[2m──────────────────────────────────────────────────────────────────────[0m
+
+
+[93m▶ Overview[0m
+
+    [2mImplemented rules:[0m [92m1536[0m
+    [2mDocumented aliases:[0m [96m831[0m
+    [2mQuick fixes:[0m [95m201[0m
+    [2mROADMAP entries remaining:[0m [93m500[0m
+
+[2m──────────────────────────────────────────────────────────────────────[0m
+[1m  DISTRIBUTION ANALYSIS[0m
+[2m──────────────────────────────────────────────────────────────────────[0m
+
+
+[93m▶ Rules by Tier[0m
+
+    [91mEssential     [0m  310  [91m██████████████████████████████[0m [2mΣ 310[0m
+    [93mRecommended   [0m  402  [93m██████████████████████████████[0m [2mΣ 712[0m
+    [92mProfessional  [0m  409  [92m██████████████████████████████[0m [2mΣ 1121[0m
+    [96mComprehensive [0m  271  [96m███████████████████████████[0m [2mΣ 1392[0m
+    [95mInsanity      [0m   74  [95m███████[0m [2mΣ 1466[0m
+    [94mStylistic     [0m  182  [94m██████████████████[0m [2mΣ 1648[0m
+
+    [2mTotal in tier system:[0m [96m1648[0m
+
+[93m▶ Rules by Severity[0m
+
+    Critical             [91m██░░░░░░░░░░░░░░░░░░[0m  160/1372 ( 11.7%)
+    High                 [93m█████░░░░░░░░░░░░░░░[0m  370/1372 ( 27.0%)
+    Medium               [97m████████░░░░░░░░░░░░[0m  604/1372 ( 44.0%)
+    Low                  [2m███░░░░░░░░░░░░░░░░░[0m  238/1372 ( 17.3%)
+
+[2m──────────────────────────────────────────────────────────────────────[0m
+[1m  SECURITY & COMPLIANCE[0m
+[2m──────────────────────────────────────────────────────────────────────[0m
+
+
+[93m▶ OWASP Security Coverage[0m
+
+    Mobile Top 10        [92m████████████████░░░░[0m    8/10   ( 80.0%)
+    Web Top 10           [96m████████████████████[0m   10/10   (100.0%)
+
+    [2mTotal mobile rule mappings:[0m [2m56[0m
+    [2mTotal web rule mappings:[0m [2m62[0m
+
+[93m  ⚠ Uncovered Mobile: M2, M7[0m
+
+[2m──────────────────────────────────────────────────────────────────────[0m
+[1m  QUALITY METRICS[0m
+[2m──────────────────────────────────────────────────────────────────────[0m
+
+
+[93m▶ Quality Metrics[0m
+
+    Quick fix coverage   [93m██░░░░░░░░░░░░░░░░░░[0m  201/1536 ( 13.1%)
+    Correction messages  [92m███████████████████░[0m 1530/1536 ( 99.6%)
+
+    [2mTotal lines of code:[0m [96m148,042[0m
+    [2mAvg lines per rule:[0m [2m96[0m
+
+[93m▶ Tier Assignment[0m
+
+[92m  ✓ All rules are assigned to tiers[0m
+
+[93m▶ File Health[0m
+
+[2m    Largest files (by rule count):[0m
+      [93mflutter_widget_rules.dart                    [0m 195 rules
+      [93mstate_management_rules.dart                  [0m 117 rules
+      [93mios_rules.dart                               [0m 105 rules
+      [93mcode_quality_rules.dart                      [0m  97 rules
+      [97msecurity_rules.dart                          [0m  50 rules
+
+[93m    Files needing quick fixes: 34[0m
+
+[2m──────────────────────────────────────────────────────────────────────[0m
+[1m  ROADMAP SYNC[0m
+[2m──────────────────────────────────────────────────────────────────────[0m
+
+[92m  ✓ ROADMAP is clean - no duplicates[0m
+
+[2m──────────────────────────────────────────────────────────────────────[0m
+[1m  DX MESSAGE AUDIT[0m
+[2m──────────────────────────────────────────────────────────────────────[0m
+
+
+[93m▶ DX Message Quality (963 total issues)[0m
+
+    [91mCritical  [0m  13/46  passing  [91m( 28.3%)[0m
+    [93mHigh      [0m   4/274 passing  [91m(  1.5%)[0m
+    [97mMedium    [0m   3/592 passing  [91m(  0.5%)[0m
+    [2mLow       [0m 142/213 passing  [93m( 66.7%)[0m
+
+[2m    Worst offenders (critical/high):[0m
+      [91m 35[0m require_test_widget_pump                 [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_future_tostring                    [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_nested_futures                     [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_assigning_await_expressions       [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_specifying_future_value_type      [2mMissing consequence (why it ma[0m
+      [91m 45[0m list_all_equatable_fields                [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_deep_equality_collections        [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_cache_key_determinism            [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_sqflite_reserved_words             [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_firestore_unbounded_query          [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_database_in_build                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_secure_storage_on_web              [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_prefs_for_large_data               [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_type_adapter_registration        [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_firestore_in_widget_build          [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_map_idle_callback                [2mMissing consequence (why it ma[0m
+      [91m 45[0m pass_existing_future_to_future_builder   [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_autovalidate_on_interaction       [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_keyboard_type                    [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_text_overflow_in_row             [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_validation_in_build                [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_submit_button_state              [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_form_restoration                 [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_form_field_controller            [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_form_in_alert_dialog               [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_getx_permanent_cleanup           [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_type_adapter_registration        [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_media_loading_state              [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_cached_image_dimensions          [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_image_picker_large_files           [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_intl_date_format_locale          [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_number_format_locale             [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_intl_currency_format             [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_intl_plural_rules                [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_ios_privacy_manifest             [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_ios_callkit_integration          [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_isar_close_on_dispose            [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_isar_inspector_debug_only        [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_isar_links_load                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_isar_non_nullable_migration      [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_route_transition_consistency     [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_navigator_push_unnamed             [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_route_guards                     [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_circular_redirects                 [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_shell_route_for_persistent_ui     [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_stepper_validation               [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_go_router_inline_creation          [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_maybe_pop                         [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_url_launcher_encoding            [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_notification_channel_android     [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_notification_payload_sensitive     [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_notification_initialize_per_platform [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_notification_same_id               [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_workmanager_constraints          [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_calendar_timezone_handling       [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_image_picker_max_dimensions       [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_compute_for_heavy_work            [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_setstate_in_build                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_scroll_listener_in_build           [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_text_span_in_build                 [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_large_list_copy                    [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_const_widgets                     [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_widget_creation_in_loop            [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_calling_of_in_build                [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_image_cache_management           [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_cors_handling                    [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_money_arithmetic_on_double         [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_rebuild_on_scroll                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_image_picker_without_source        [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_ref_watch_outside_build            [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_shrinkwrap_in_scrollview           [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_refresh_without_await              [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_certificate_pinning              [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_generic_key_in_url                 [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_jwt_decode_client                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_logout_cleanup                   [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_deep_link_validation             [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_shared_prefs_null_handling       [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_url_validation                   [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_webview_javascript_disabled       [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_unsafe_deserialization             [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_bloc_event_in_constructor          [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_global_key_in_build                [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_provider_of_in_build               [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_get_find_in_build                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_provider_recreate                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_cubit_for_simple                  [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_ref_in_dispose                     [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_select_for_partial                [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_bloc_listen_in_build               [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_bloc_in_bloc                       [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_static_state                       [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_bloc_manual_dispose              [2mMissing consequence (why it ma[0m
+      [91m 45[0m prefer_bloc_listener_for_side_effects    [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_bloc_context_dependency            [2mMissing consequence (why it ma[0m
+      [91m 45[0m avoid_provider_value_rebuild             [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_getit_reset_in_tests             [2mMissing consequence (why it ma[0m
+      [91m 45[0m require_search_debounce                  [2mMissing consequence (why it ma[0m
+      [93m 55[0m require_sqflite_error_handling           [2mVague 'should have' - state co[0m
+      [93m 55[0m require_avatar_fallback                  [2mVague 'should have' - state co[0m
+      [93m 55[0m require_image_error_fallback             [2mVague 'should have' - state co[0m
+      [93m 55[0m require_google_signin_error_handling     [2mVague 'should be' - state cons[0m
+      [93m 55[0m require_supabase_error_handling          [2mVague 'should be' - state cons[0m
+      [93m 55[0m avoid_webview_file_access                [2mVague 'should be' - state cons[0m
+      [93m 55[0m require_openai_error_handling            [2mVague 'should be' - state cons[0m
+      [93m 55[0m prefer_value_listenable_builder          [2mVague 'better' - quantify the [0m
+      [93m 60[0m avoid_obs_outside_controller             [2mGeneric 'controller' - specify[0m
+      [93m 60[0m avoid_obs_outside_controller             [2mGeneric 'controller' - specify[0m
+      [93m 65[0m require_lifecycle_observer               [2mGeneric 'resource' - specify t[0m
+      [93m 65[0m require_hive_box_close                   [2mGeneric 'resource' - specify t[0m
+      [93m 65[0m require_hive_box_close                   [2mGeneric 'resource' - specify t[0m
+      [93m 65[0m avoid_closure_memory_leak                [2mGeneric 'widget' - add context[0m
+      [93m 65[0m require_dispose_pattern                  [2mGeneric 'resource' - specify t[0m
+      [93m 65[0m require_stream_controller_dispose        [2mGeneric 'widget' - add context[0m
+      [97m 75[0m require_animation_ticker_disposal        [2mToo short (60 chars) - add con[0m
+      [97m 75[0m require_connectivity_subscription_cancel [2mToo short (60 chars) - add con[0m
+      [97m 75[0m require_sse_subscription_cancel          [2mToo short (81 chars) - add con[0m
+      [97m 75[0m require_stream_controller_close          [2mToo short (63 chars) - add con[0m
+      [97m 75[0m require_geolocator_permission_check      [2mToo short (57 chars) - add con[0m
+      [97m 75[0m avoid_storing_context                    [2mToo short (67 chars) - add con[0m
+      [97m 75[0m prefer_secure_random_for_crypto          [2mToo short (58 chars) - add con[0m
+      [97m 75[0m require_unique_iv_per_encryption         [2mToo short (47 chars) - add con[0m
+      [97m 75[0m require_page_controller_dispose          [2mToo short (93 chars) - add con[0m
+      [97m 75[0m avoid_websocket_memory_leak              [2mToo short (112 chars) - add co[0m
+      [97m 75[0m require_video_player_controller_dispose  [2mToo short (115 chars) - add co[0m
+      [97m 75[0m require_change_notifier_dispose          [2mToo short (51 chars) - add con[0m
+      [97m 75[0m require_receive_port_close               [2mToo short (56 chars) - add con[0m
+      [97m 75[0m require_socket_close                     [2mToo short (51 chars) - add con[0m
+      [97m 75[0m avoid_mutable_field_in_equatable         [2mToo short (70 chars) - add con[0m
+      [97m 75[0m require_sqflite_whereargs                [2mToo short (75 chars) - add con[0m
+      [97m 75[0m avoid_hive_field_index_reuse             [2mToo short (77 chars) - add con[0m
+      [97m 75[0m require_intl_args_match                  [2mToo short (60 chars) - add con[0m
+      [97m 75[0m prefer_try_parse_for_dynamic_data        [2mToo short (65 chars) - add con[0m
+      [97m 75[0m require_image_disposal                   [2mToo short (49 chars) - add con[0m
+      [97m 75[0m avoid_expando_circular_references        [2mToo short (57 chars) - add con[0m
+      [97m 75[0m require_apple_signin_nonce               [2mToo short (58 chars) - add con[0m
+      [97m 75[0m require_webview_ssl_error_handling       [2mToo short (44 chars) - add con[0m
+      [97m 75[0m avoid_dynamic_sql                        [2mToo short (73 chars) - add con[0m
+      [97m 75[0m avoid_path_traversal                     [2mToo short (53 chars) - add con[0m
+      [97m 75[0m avoid_sensitive_data_in_logs             [2mToo short (46 chars) - add con[0m
+      [97m 75[0m avoid_ignoring_ssl_errors                [2mToo short (81 chars) - add con[0m
+      [97m 75[0m avoid_user_controlled_urls               [2mToo short (66 chars) - add con[0m
+      [97m 75[0m require_freezed_arrow_syntax             [2mToo short (44 chars) - add con[0m
+      [97m 75[0m require_null_safe_json_access            [2mToo short (48 chars) - add con[0m
+      [97m 75[0m avoid_icon_buttons_without_tooltip       [2mToo short (71 chars) - add con[0m
+      [97m 75[0m avoid_gesture_only_interactions          [2mToo short (109 chars) - add co[0m
+      [97m 75[0m require_semantics_label                  [2mToo short (100 chars) - add co[0m
+      [97m 75[0m require_live_region                      [2mToo short (66 chars) - add con[0m
+      [97m 75[0m avoid_image_buttons_without_tooltip      [2mToo short (114 chars) - add co[0m
+      [97m 75[0m avoid_text_scale_factor_ignore           [2mToo short (67 chars) - add con[0m
+      [97m 75[0m require_image_semantics                  [2mToo short (69 chars) - add con[0m
+      [97m 75[0m avoid_hidden_interactive                 [2mToo short (80 chars) - add con[0m
+      [97m 75[0m prefer_scalable_text                     [2mToo short (64 chars) - add con[0m
+      [97m 75[0m require_button_semantics                 [2mToo short (70 chars) - add con[0m
+      [97m 75[0m prefer_explicit_semantics                [2mToo short (91 chars) - add con[0m
+      [97m 75[0m avoid_hover_only                         [2mToo short (95 chars) - add con[0m
+      [97m 75[0m require_error_identification             [2mToo short (80 chars) - add con[0m
+      [97m 75[0m require_avatar_alt_text                  [2mToo short (68 chars) - add con[0m
+      [97m 75[0m require_badge_semantics                  [2mToo short (71 chars) - add con[0m
+      [97m 75[0m require_semantic_label_icons             [2mToo short (67 chars) - add con[0m
+      [97m 75[0m require_accessible_images                [2mToo short (70 chars) - add con[0m
+      [97m 75[0m avoid_auto_play_media                    [2mToo short (67 chars) - add con[0m
+      [97m 75[0m avoid_overlapping_animations             [2mToo short (160 chars) - add co[0m
+      [97m 75[0m avoid_animation_rebuild_waste            [2mToo short (50 chars) - add con[0m
+      [97m 75[0m require_websocket_error_handling         [2mToo short (55 chars) - add con[0m
+      [97m 75[0m require_dio_timeout                      [2mToo short (75 chars) - add con[0m
+      [97m 75[0m require_dio_error_handling               [2mToo short (68 chars) - add con[0m
+      [97m 75[0m require_dio_ssl_pinning                  [2mToo short (62 chars) - add con[0m
+      [97m 75[0m avoid_dio_debug_print_production         [2mToo short (86 chars) - add con[0m
+      [97m 75[0m require_url_launcher_error_handling      [2mToo short (43 chars) - add con[0m
+      [97m 75[0m require_image_picker_error_handling      [2mToo short (47 chars) - add con[0m
+      [97m 75[0m require_geolocator_timeout               [2mToo short (46 chars) - add con[0m
+      [97m 75[0m require_permission_denied_handling       [2mToo short (97 chars) - add con[0m
+      [97m 75[0m require_sqflite_migration                [2mToo short (113 chars) - add co[0m
+      [97m 75[0m require_permission_status_check          [2mToo short (76 chars) - add con[0m
+      [97m 75[0m prefer_timeout_on_requests               [2mToo short (60 chars) - add con[0m
+      [97m 75[0m avoid_future_ignore                      [2mToo short (146 chars) - add co[0m
+      [97m 75[0m avoid_nested_streams_and_futures         [2mToo short (193 chars) - add co[0m
+      [97m 75[0m avoid_passing_async_when_sync_expected   [2mToo short (95 chars) - add con[0m
+      [97m 75[0m avoid_redundant_async                    [2mToo short (95 chars) - add con[0m
+      [97m 75[0m avoid_stream_tostring                    [2mToo short (82 chars) - add con[0m
+      [97m 75[0m avoid_unassigned_stream_subscriptions    [2mToo short (73 chars) - add con[0m
+      [97m 75[0m prefer_async_await                       [2mToo short (90 chars) - add con[0m
+      [97m 75[0m prefer_return_await                      [2mToo short (58 chars) - add con[0m
+      [97m 75[0m avoid_multiple_stream_listeners          [2mToo short (139 chars) - add co[0m
+      [97m 75[0m require_stream_error_handling            [2mToo short (65 chars) - add con[0m
+      [97m 75[0m require_future_timeout                   [2mToo short (59 chars) - add con[0m
+      [97m 75[0m require_completer_error_handling         [2mToo short (64 chars) - add con[0m
+      [97m 75[0m avoid_unawaited_future                   [2mToo short (48 chars) - add con[0m
+      [97m 75[0m require_bluetooth_state_check            [2mToo short (144 chars) - add co[0m
+      [97m 75[0m require_ble_disconnect_handling          [2mToo short (129 chars) - add co[0m
+      [97m 75[0m require_geolocator_service_enabled       [2mToo short (63 chars) - add con[0m
+      [97m 75[0m require_geolocator_stream_cancel         [2mToo short (59 chars) - add con[0m
+      [97m 75[0m require_geolocator_error_handling        [2mToo short (62 chars) - add con[0m
+      [97m 75[0m avoid_snackbar_in_build                  [2mToo short (121 chars) - add co[0m
+      [97m 75[0m avoid_analytics_in_build                 [2mToo short (107 chars) - add co[0m
+      [97m 75[0m avoid_canvas_operations_in_build         [2mToo short (135 chars) - add co[0m
+      [97m 75[0m avoid_unreachable_for_loop               [2mToo short (112 chars) - add co[0m
+      [97m 75[0m require_key_for_collection               [2mToo short (139 chars) - add co[0m
+      [97m 75[0m require_getit_registration_order         [2mToo short (139 chars) - add co[0m
+      [97m 75[0m require_default_config                   [2mToo short (68 chars) - add con[0m
+      [97m 75[0m require_file_handle_close                [2mToo short (132 chars) - add co[0m
+      [97m 75[0m avoid_swallowing_exceptions              [2mToo short (48 chars) - add con[0m
+      [97m 75[0m avoid_losing_stack_trace                 [2mToo short (92 chars) - add con[0m
+      [97m 75[0m require_error_context                    [2mToo short (89 chars) - add con[0m
+      [97m 75[0m prefer_result_pattern                    [2mToo short (85 chars) - add con[0m
+      [97m 75[0m require_async_error_documentation        [2mToo short (59 chars) - add con[0m
+      [97m 75[0m avoid_uncaught_future_errors             [2mToo short (44 chars) - add con[0m
+      [97m 75[0m avoid_print_error                        [2mToo short (66 chars) - add con[0m
+      [97m 75[0m avoid_catch_all                          [2mToo short (95 chars) - add con[0m
+      [97m 75[0m avoid_catch_exception_alone              [2mToo short (68 chars) - add con[0m
+      [97m 75[0m require_notification_action_handling     [2mToo short (88 chars) - add con[0m
+      [97m 75[0m require_finally_cleanup                  [2mToo short (59 chars) - add con[0m
+      [97m 75[0m avoid_throw_in_catch_block               [2mToo short (55 chars) - add con[0m
+      [97m 75[0m avoid_throw_objects_without_tostring     [2mToo short (54 chars) - add con[0m
+      [97m 75[0m require_graphql_error_handling           [2mToo short (63 chars) - add con[0m
+      [97m 75[0m require_sqflite_close                    [2mToo short (55 chars) - add con[0m
+      [97m 75[0m avoid_loading_full_pdf_in_memory         [2mToo short (62 chars) - add con[0m
+      [97m 75[0m require_database_migration               [2mToo short (72 chars) - add con[0m
+      [97m 75[0m require_hive_database_close              [2mToo short (64 chars) - add con[0m
+      [97m 75[0m avoid_creating_vector_in_update          [2mToo short (56 chars) - add con[0m
+      [97m 75[0m require_error_widget                     [2mToo short (54 chars) - add con[0m
+      [97m 75[0m avoid_builder_index_out_of_bounds        [2mToo short (91 chars) - add con[0m
+      [97m 75[0m require_secure_keyboard                  [2mToo short (72 chars) - add con[0m
+      [97m 75[0m require_error_message_context            [2mToo short (79 chars) - add con[0m
+      [97m 75[0m avoid_form_without_unfocus               [2mToo short (82 chars) - add con[0m
+      [97m 75[0m avoid_clearing_form_on_error             [2mToo short (58 chars) - add con[0m
+      [97m 75[0m require_form_key_in_stateful_widget      [2mToo short (70 chars) - add con[0m
+      [97m 75[0m avoid_getx_rx_inside_build               [2mToo short (45 chars) - add con[0m
+      [97m 75[0m avoid_mutable_rx_variables               [2mToo short (42 chars) - add con[0m
+      [97m 75[0m require_getx_worker_dispose              [2mToo short (73 chars) - add con[0m
+      [97m 75[0m require_hive_database_close              [2mToo short (64 chars) - add con[0m
+      [97m 75[0m require_hive_field_default_value         [2mToo short (82 chars) - add con[0m
+      [97m 75[0m require_image_stream_dispose             [2mToo short (74 chars) - add con[0m
+      [97m 75[0m require_image_cache_dimensions           [2mToo short (64 chars) - add con[0m
+      [97m 75[0m avoid_manual_date_formatting             [2mToo short (57 chars) - add con[0m
+      [97m 75[0m avoid_isar_schema_breaking_changes       [2mToo short (78 chars) - add con[0m
+      [97m 75[0m require_json_decode_try_catch            [2mToo short (55 chars) - add con[0m
+      [97m 75[0m avoid_datetime_parse_unvalidated         [2mToo short (66 chars) - add con[0m
+      [97m 75[0m require_freezed_json_converter           [2mToo short (63 chars) - add con[0m
+      [97m 75[0m avoid_large_objects_in_state             [2mToo short (55 chars) - add con[0m
+      [97m 75[0m avoid_capturing_this_in_callbacks        [2mToo short (66 chars) - add con[0m
+      [97m 75[0m require_unknown_route_handler            [2mToo short (64 chars) - add con[0m
+      [97m 75[0m avoid_pop_without_result                 [2mToo short (74 chars) - add con[0m
+      [97m 75[0m require_deep_link_fallback               [2mToo short (56 chars) - add con[0m
+      [97m 75[0m require_go_router_fallback_route         [2mToo short (50 chars) - add con[0m
+      [97m 75[0m require_envied_obfuscation               [2mToo short (43 chars) - add con[0m
+      [97m 75[0m prefer_geolocator_distance_filter        [2mToo short (82 chars) - add con[0m
+      [97m 75[0m avoid_object_creation_in_hot_loops       [2mToo short (47 chars) - add con[0m
+      [97m 75[0m require_item_extent_for_large_lists      [2mToo short (53 chars) - add con[0m
+      [97m 75[0m avoid_global_key_misuse                  [2mToo short (78 chars) - add con[0m
+      [97m 75[0m require_repaint_boundary                 [2mToo short (71 chars) - add con[0m
+      [97m 75[0m avoid_expensive_computation_in_build     [2mToo short (66 chars) - add con[0m
+      [97m 75[0m require_build_context_scope              [2mToo short (63 chars) - add con[0m
+      [97m 75[0m avoid_memory_intensive_operations        [2mToo short (60 chars) - add con[0m
+      [97m 75[0m avoid_blocking_database_ui               [2mToo short (55 chars) - add con[0m
+      [97m 75[0m require_qr_content_validation            [2mToo short (54 chars) - add con[0m
+      [97m 75[0m require_riverpod_error_handling          [2mToo short (72 chars) - add con[0m
+      [97m 75[0m prefer_riverpod_auto_dispose             [2mToo short (65 chars) - add con[0m
+      [97m 75[0m avoid_shrink_wrap_expensive              [2mToo short (74 chars) - add con[0m
+      [97m 75[0m avoid_webview_javascript_enabled         [2mToo short (65 chars) - add con[0m
+      [97m 75[0m prefer_secure_random                     [2mToo short (73 chars) - add con[0m
+      [97m 75[0m avoid_redirect_injection                 [2mToo short (74 chars) - add con[0m
+      [97m 75[0m require_webview_error_handling           [2mToo short (64 chars) - add con[0m
+      [97m 75[0m require_https_only                       [2mToo short (78 chars) - add con[0m
+      [97m 75[0m require_catch_logging                    [2mToo short (77 chars) - add con[0m
+      [97m 75[0m require_notify_listeners                 [2mToo short (71 chars) - add con[0m
+      [97m 75[0m require_mounted_check                    [2mToo short (88 chars) - add con[0m
+      [97m 75[0m require_update_should_notify             [2mToo short (92 chars) - add con[0m
+      [97m 75[0m require_bloc_close                       [2mToo short (64 chars) - add con[0m
+      [97m 75[0m require_auto_dispose                     [2mToo short (65 chars) - add con[0m
+      [97m 75[0m require_provider_scope                   [2mToo short (74 chars) - add con[0m
+      [97m 75[0m prefer_family_for_params                 [2mToo short (97 chars) - add con[0m
+      [97m 75[0m prefer_copy_with_for_state               [2mToo short (45 chars) - add con[0m
+      [97m 75[0m require_initial_state                    [2mToo short (87 chars) - add con[0m
+      [97m 75[0m require_error_state                      [2mToo short (51 chars) - add con[0m
+      [97m 75[0m avoid_change_notifier_in_widget          [2mToo short (63 chars) - add con[0m
+      [97m 75[0m require_provider_dispose                 [2mToo short (85 chars) - add con[0m
+      [97m 75[0m require_error_handling_in_async          [2mToo short (71 chars) - add con[0m
+      [97m 75[0m require_getx_controller_dispose          [2mToo short (93 chars) - add con[0m
+      [97m 75[0m dispose_providers                        [2mToo short (93 chars) - add con[0m
+      [97m 75[0m avoid_getx_rx_inside_build               [2mToo short (45 chars) - add con[0m
+      [97m 75[0m avoid_mutable_rx_variables               [2mToo short (42 chars) - add con[0m
+      [97m 75[0m dispose_provided_instances               [2mToo short (84 chars) - add con[0m
+      [97m 75[0m avoid_listen_in_async                    [2mToo short (88 chars) - add con[0m
+      [97m 75[0m avoid_equatable_mutable_collections      [2mToo short (63 chars) - add con[0m
+      [97m 75[0m avoid_provider_in_init_state             [2mToo short (75 chars) - add con[0m
+      [97m 75[0m avoid_riverpod_notifier_in_build         [2mToo short (63 chars) - add con[0m
+      [97m 75[0m avoid_bloc_business_logic_in_ui          [2mToo short (75 chars) - add con[0m
+      [97m 75[0m require_mock_http_client                 [2mToo short (80 chars) - add con[0m
+      [97m 75[0m avoid_dynamic_json_access                [2mToo short (50 chars) - add con[0m
+      [97m 75[0m require_enum_unknown_value               [2mToo short (56 chars) - add con[0m
+      [97m 80[0m avoid_freezed_json_serializable_conflict [2mVague 'should be' - state cons[0m
+      [97m 80[0m require_api_error_mapping                [2mVague 'better' - quantify the [0m
+      [97m 85[0m avoid_small_touch_targets                [2mToo short (99 chars) - add con[0m
+      [97m 85[0m avoid_color_only_indicators              [2mToo short (100 chars) - add co[0m
+      [97m 85[0m require_minimum_contrast                 [2mToo short (91 chars) - add con[0m
+      [97m 90[0m require_hero_tag_uniqueness              [2mGeneric 'widget' - add context[0m
+      [97m 90[0m require_text_editing_controller_dispose  [2mGeneric 'widget' - add context[0m
+      [97m 90[0m require_vsync_mixin                      [2mGeneric 'resource' - specify t[0m
+      [97m 90[0m avoid_layout_passes                      [2mGeneric 'widget' - add context[0m
+      [97m 90[0m require_request_timeout                  [2mGeneric 'resource' - specify t[0m
+      [97m 90[0m require_cancel_token                     [2mGeneric 'widget' - add context[0m
+
+[96m  ℹ Report: reports\dx_audit_20260113_113837.md[0m
+[96m  ℹ Full report: reports\full_audit_20260113_113837.md[0m
+
+[96m======================================================================[0m
+[96m  SUMMARY[0m
+[96m======================================================================[0m
+
+    [2mTotal rules:[0m [92m1536[0m
+    [2mROADMAP remaining:[0m [93m500[0m
+    [2mOWASP Mobile:[0m [92m8/10[0m
+    [2mOWASP Web:[0m [92m10/10[0m
+    [2mQuick fix coverage:[0m [93m201/1536 (13%)[0m
+    [2mDX issues:[0m [91m303[0m
+
+[92m  ✓ All checks passed![0m

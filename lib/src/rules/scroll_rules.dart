@@ -53,8 +53,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
     name: 'avoid_shrinkwrap_in_scrollview',
     problemMessage:
         '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true in scrollable disables virtualization.',
-    correctionMessage:
-        'Use CustomScrollView with slivers, or add NeverScrollableScrollPhysics.',
+    correctionMessage: 'Use CustomScrollView with slivers, or add NeverScrollableScrollPhysics.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -102,8 +101,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
       if (arg is NamedExpression && arg.name.label.name == 'physics') {
         final Expression physicsValue = arg.expression;
         if (physicsValue is InstanceCreationExpression) {
-          final String typeName =
-              physicsValue.constructorName.type.name2.lexeme;
+          final String typeName = physicsValue.constructorName.type.name2.lexeme;
           if (typeName == 'NeverScrollableScrollPhysics') {
             return true;
           }
@@ -196,8 +194,7 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
     name: 'avoid_nested_scrollables_conflict',
     problemMessage:
         '[avoid_nested_scrollables_conflict] Nested scrollable without explicit physics causes gesture conflicts.',
-    correctionMessage:
-        'Add physics: NeverScrollableScrollPhysics() to inner scrollable.',
+    correctionMessage: 'Add physics: NeverScrollableScrollPhysics() to inner scrollable.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -217,8 +214,7 @@ class AvoidNestedScrollablesConflictRule extends SaropaLintRule {
   ) {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
-      node.body.visitChildren(
-          _NestedScrollableVisitor(reporter, code, _scrollableTypes));
+      node.body.visitChildren(_NestedScrollableVisitor(reporter, code, _scrollableTypes));
     });
   }
 }
@@ -232,8 +228,7 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    _checkScrollable(
-        node, node.constructorName.type.name2.lexeme, node.argumentList);
+    _checkScrollable(node, node.constructorName.type.name2.lexeme, node.argumentList);
     super.visitInstanceCreationExpression(node);
   }
 
@@ -329,8 +324,7 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'ListView' && typeName != 'GridView') return;
@@ -345,8 +339,7 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'children') {
           final Expression value = arg.expression;
-          if (value is ListLiteral &&
-              value.elements.length > _maxChildrenCount) {
+          if (value is ListLiteral && value.elements.length > _maxChildrenCount) {
             reporter.atNode(node.constructorName, code);
           }
         }
@@ -387,8 +380,7 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
     name: 'avoid_excessive_bottom_nav_items',
     problemMessage:
         '[avoid_excessive_bottom_nav_items] BottomNavigationBar with more than 5 items crowds the UI.',
-    correctionMessage:
-        'Limit to 5 items or use a navigation drawer for additional options.',
+    correctionMessage: 'Limit to 5 items or use a navigation drawer for additional options.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -463,8 +455,7 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_length_sync',
-    problemMessage:
-        '[require_tab_controller_length_sync] TabController length mismatch '
+    problemMessage: '[require_tab_controller_length_sync] TabController length mismatch '
         'throws RangeError when switching tabs, crashing the app.',
     correctionMessage: 'Ensure TabController length equals the number of tabs.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -492,39 +483,33 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Look for TabController(length: N)
-      final RegExp controllerPattern =
-          RegExp(r'TabController\s*\(\s*length\s*:\s*(\d+)');
+      final RegExp controllerPattern = RegExp(r'TabController\s*\(\s*length\s*:\s*(\d+)');
       final Match? controllerMatch = controllerPattern.firstMatch(classSource);
       if (controllerMatch != null) {
         controllerLength = int.tryParse(controllerMatch.group(1) ?? '');
       }
 
       // Look for TabBar(tabs: [...])
-      final RegExp tabBarPattern =
-          RegExp(r'TabBar\s*\([^)]*tabs\s*:\s*\[([^\]]*)\]');
+      final RegExp tabBarPattern = RegExp(r'TabBar\s*\([^)]*tabs\s*:\s*\[([^\]]*)\]');
       final Match? tabBarMatch = tabBarPattern.firstMatch(classSource);
       if (tabBarMatch != null) {
         // Count commas + 1 for number of items
         final String tabsContent = tabBarMatch.group(1) ?? '';
         if (tabsContent.trim().isNotEmpty) {
-          tabBarTabCount =
-              tabsContent.split(',').where((s) => s.trim().isNotEmpty).length;
+          tabBarTabCount = tabsContent.split(',').where((s) => s.trim().isNotEmpty).length;
         } else {
           tabBarTabCount = 0;
         }
       }
 
       // Look for TabBarView(children: [...])
-      final RegExp tabBarViewPattern =
-          RegExp(r'TabBarView\s*\([^)]*children\s*:\s*\[([^\]]*)\]');
+      final RegExp tabBarViewPattern = RegExp(r'TabBarView\s*\([^)]*children\s*:\s*\[([^\]]*)\]');
       final Match? tabBarViewMatch = tabBarViewPattern.firstMatch(classSource);
       if (tabBarViewMatch != null) {
         final String childrenContent = tabBarViewMatch.group(1) ?? '';
         if (childrenContent.trim().isNotEmpty) {
-          tabBarViewChildCount = childrenContent
-              .split(',')
-              .where((s) => s.trim().isNotEmpty)
-              .length;
+          tabBarViewChildCount =
+              childrenContent.split(',').where((s) => s.trim().isNotEmpty).length;
         } else {
           tabBarViewChildCount = 0;
         }
@@ -535,8 +520,7 @@ class RequireTabControllerLengthSyncRule extends SaropaLintRule {
         if (tabBarTabCount != null && controllerLength != tabBarTabCount) {
           reporter.atNode(node, code);
         }
-        if (tabBarViewChildCount != null &&
-            controllerLength != tabBarViewChildCount) {
+        if (tabBarViewChildCount != null && controllerLength != tabBarViewChildCount) {
           reporter.atNode(node, code);
         }
       }
@@ -591,8 +575,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'RefreshIndicator') return;
@@ -618,6 +601,8 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
 ///
 /// Only one widget can have autofocus at a time. Multiple autofocus
 /// widgets cause unpredictable focus behavior.
+///
+/// Alias: autofocus
 ///
 /// **BAD:**
 /// ```dart
@@ -735,8 +720,7 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
     name: 'require_refresh_indicator_on_lists',
     problemMessage:
         '[require_refresh_indicator_on_lists] ListView without RefreshIndicator. Users can\'t pull to refresh.',
-    correctionMessage:
-        'Wrap with RefreshIndicator for pull-to-refresh support.',
+    correctionMessage: 'Wrap with RefreshIndicator for pull-to-refresh support.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -822,8 +806,7 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
     name: 'avoid_shrink_wrap_expensive',
     problemMessage:
         '[avoid_shrink_wrap_expensive] shrinkWrap: true disables virtualization and can cause performance issues.',
-    correctionMessage:
-        'Use a fixed-height container, Slivers, or reconsider the layout.',
+    correctionMessage: 'Use a fixed-height container, Slivers, or reconsider the layout.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -932,8 +915,7 @@ class PreferItemExtentRule extends SaropaLintRule {
     name: 'prefer_item_extent',
     problemMessage:
         '[prefer_item_extent] ListView with uniform items should specify itemExtent for better performance.',
-    correctionMessage:
-        'Add itemExtent parameter if all items have the same height.',
+    correctionMessage: 'Add itemExtent parameter if all items have the same height.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -943,8 +925,7 @@ class PreferItemExtentRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'ListView') return;
@@ -1008,8 +989,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
     name: 'prefer_prototype_item',
     problemMessage:
         '[prefer_prototype_item] Consider using prototypeItem for ListView with consistent item sizes.',
-    correctionMessage:
-        'Add prototypeItem parameter if items have consistent dimensions.',
+    correctionMessage: 'Add prototypeItem parameter if items have consistent dimensions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1019,8 +999,7 @@ class PreferPrototypeItemRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (typeName != 'ListView') return;
@@ -1085,8 +1064,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_key_for_reorderable',
-    problemMessage:
-        '[require_key_for_reorderable] Without unique keys, reordering fails '
+    problemMessage: '[require_key_for_reorderable] Without unique keys, reordering fails '
         'silently or shows wrong items after drag-and-drop.',
     correctionMessage: 'Add a key parameter (e.g., ValueKey) to each item.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1103,8 +1081,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (!_reorderableTypes.contains(typeName)) return;
@@ -1124,8 +1101,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     });
   }
 
-  void _checkChildrenForKeys(
-      Expression childrenExpr, SaropaDiagnosticReporter reporter) {
+  void _checkChildrenForKeys(Expression childrenExpr, SaropaDiagnosticReporter reporter) {
     if (childrenExpr is ListLiteral) {
       for (final CollectionElement element in childrenExpr.elements) {
         if (element is InstanceCreationExpression) {
@@ -1147,8 +1123,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     }
   }
 
-  void _checkMapCallback(
-      MethodInvocation mapInvocation, SaropaDiagnosticReporter reporter) {
+  void _checkMapCallback(MethodInvocation mapInvocation, SaropaDiagnosticReporter reporter) {
     if (mapInvocation.argumentList.arguments.isNotEmpty) {
       final Expression callback = mapInvocation.argumentList.arguments.first;
       if (callback is FunctionExpression) {
@@ -1157,15 +1132,13 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     }
   }
 
-  void _checkItemBuilderForKeys(
-      Expression builderExpr, SaropaDiagnosticReporter reporter) {
+  void _checkItemBuilderForKeys(Expression builderExpr, SaropaDiagnosticReporter reporter) {
     if (builderExpr is FunctionExpression) {
       _checkBuilderBodyForKey(builderExpr.body, reporter);
     }
   }
 
-  void _checkBuilderBodyForKey(
-      FunctionBody body, SaropaDiagnosticReporter reporter) {
+  void _checkBuilderBodyForKey(FunctionBody body, SaropaDiagnosticReporter reporter) {
     if (body is ExpressionFunctionBody) {
       final Expression expr = body.expression;
       if (expr is InstanceCreationExpression) {
@@ -1248,8 +1221,7 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
     name: 'require_add_automatic_keep_alives_off',
     problemMessage:
         '[require_add_automatic_keep_alives_off] Long lists with addAutomaticKeepAlives: true (default) can cause memory issues.',
-    correctionMessage:
-        'Add addAutomaticKeepAlives: false for better memory efficiency.',
+    correctionMessage: 'Add addAutomaticKeepAlives: false for better memory efficiency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1267,8 +1239,7 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       if (!_listTypes.contains(typeName)) return;

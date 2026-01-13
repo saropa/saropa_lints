@@ -51,6 +51,8 @@ import '../saropa_lint_rule.dart';
 ///   return sum + product;
 /// }
 /// ```
+///
+/// Alias: prefer_blank_line_before_return
 class PreferBlankLineBeforeReturnRule extends SaropaLintRule {
   const PreferBlankLineBeforeReturnRule() : super(code: _code);
 
@@ -84,10 +86,8 @@ class PreferBlankLineBeforeReturnRule extends SaropaLintRule {
       final secondLastStmt = statements[statements.length - 2];
 
       // Get line numbers
-      final lastLine =
-          resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
-      final prevLine =
-          resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
+      final lastLine = resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
+      final prevLine = resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
 
       // Should have at least one blank line between them
       if (lastLine - prevLine < 2) {
@@ -127,6 +127,8 @@ class PreferBlankLineBeforeReturnRule extends SaropaLintRule {
 ///   return sum;
 /// }
 /// ```
+///
+/// Alias: prefer_no_blank_line_before_return
 class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
   const PreferNoBlankLineBeforeReturnRule() : super(code: _code);
 
@@ -159,10 +161,8 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
 
       final secondLastStmt = statements[statements.length - 2];
 
-      final lastLine =
-          resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
-      final prevLine =
-          resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
+      final lastLine = resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
+      final prevLine = resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
 
       // Flag if there's a blank line
       if (lastLine - prevLine >= 2) {
@@ -204,6 +204,10 @@ class PreferNoBlankLineBeforeReturnRule extends SaropaLintRule {
 ///   print(a + b);
 /// }
 /// ```
+///
+/// Alias: prefer_blank_line_after_declarations
+///
+/// Alias: prefer_blank_line_after_declarations
 class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
   const PreferBlankLineAfterDeclarationsRule() : super(code: _code);
 
@@ -236,12 +240,9 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
         final next = statements[i + 1];
 
         // Check if current is a variable declaration and next is not
-        if (current is VariableDeclarationStatement &&
-            next is! VariableDeclarationStatement) {
-          final currentLine =
-              resolver.lineInfo.getLocation(current.end).lineNumber;
-          final nextLine =
-              resolver.lineInfo.getLocation(next.offset).lineNumber;
+        if (current is VariableDeclarationStatement && next is! VariableDeclarationStatement) {
+          final currentLine = resolver.lineInfo.getLocation(current.end).lineNumber;
+          final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine < 2) {
             reporter.atNode(current, code);
@@ -281,6 +282,8 @@ class PreferBlankLineAfterDeclarationsRule extends SaropaLintRule {
 ///   print(a);
 /// }
 /// ```
+///
+/// Alias: prefer_compact_declarations
 class PreferCompactDeclarationsRule extends SaropaLintRule {
   const PreferCompactDeclarationsRule() : super(code: _code);
 
@@ -292,8 +295,7 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_compact_declarations',
-    problemMessage:
-        '[prefer_compact_declarations] Remove blank line after variable declarations.',
+    problemMessage: '[prefer_compact_declarations] Remove blank line after variable declarations.',
     correctionMessage: 'Keep declarations close to their usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -312,12 +314,9 @@ class PreferCompactDeclarationsRule extends SaropaLintRule {
         final current = statements[i];
         final next = statements[i + 1];
 
-        if (current is VariableDeclarationStatement &&
-            next is! VariableDeclarationStatement) {
-          final currentLine =
-              resolver.lineInfo.getLocation(current.end).lineNumber;
-          final nextLine =
-              resolver.lineInfo.getLocation(next.offset).lineNumber;
+        if (current is VariableDeclarationStatement && next is! VariableDeclarationStatement) {
+          final currentLine = resolver.lineInfo.getLocation(current.end).lineNumber;
+          final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
 
           if (nextLine - currentLine >= 2) {
             reporter.atNode(current, code);
@@ -370,8 +369,7 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_lines_between_members',
-    problemMessage:
-        '[prefer_blank_lines_between_members] Add a blank line between class members.',
+    problemMessage: '[prefer_blank_lines_between_members] Add a blank line between class members.',
     correctionMessage: 'Blank lines between members improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -393,8 +391,7 @@ class PreferBlankLinesBetweenMembersRule extends SaropaLintRule {
         // Skip field declarations - they can be grouped
         if (current is FieldDeclaration && next is FieldDeclaration) continue;
 
-        final currentLine =
-            resolver.lineInfo.getLocation(current.end).lineNumber;
+        final currentLine = resolver.lineInfo.getLocation(current.end).lineNumber;
         final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
 
         if (nextLine - currentLine < 2) {
@@ -445,8 +442,7 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_compact_class_members',
-    problemMessage:
-        '[prefer_compact_class_members] Remove blank lines between class members.',
+    problemMessage: '[prefer_compact_class_members] Remove blank lines between class members.',
     correctionMessage: 'Compact members make classes easier to overview.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -465,8 +461,7 @@ class PreferCompactClassMembersRule extends SaropaLintRule {
         final current = members[i];
         final next = members[i + 1];
 
-        final currentLine =
-            resolver.lineInfo.getLocation(current.end).lineNumber;
+        final currentLine = resolver.lineInfo.getLocation(current.end).lineNumber;
         final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
 
         if (nextLine - currentLine >= 2) {
@@ -519,8 +514,7 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_no_blank_line_inside_blocks',
-    problemMessage:
-        '[prefer_no_blank_line_inside_blocks] Remove blank line at start/end of block.',
+    problemMessage: '[prefer_no_blank_line_inside_blocks] Remove blank line at start/end of block.',
     correctionMessage: 'Blocks should not have leading/trailing blank lines.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -535,21 +529,16 @@ class PreferNoBlankLineInsideBlocksRule extends SaropaLintRule {
       if (node.statements.isEmpty) return;
 
       // Check for blank line at start
-      final openBraceLine =
-          resolver.lineInfo.getLocation(node.leftBracket.offset).lineNumber;
-      final firstStmtLine = resolver.lineInfo
-          .getLocation(node.statements.first.offset)
-          .lineNumber;
+      final openBraceLine = resolver.lineInfo.getLocation(node.leftBracket.offset).lineNumber;
+      final firstStmtLine = resolver.lineInfo.getLocation(node.statements.first.offset).lineNumber;
 
       if (firstStmtLine - openBraceLine > 1) {
         reporter.atNode(node.statements.first, code);
       }
 
       // Check for blank line at end
-      final lastStmtLine =
-          resolver.lineInfo.getLocation(node.statements.last.end).lineNumber;
-      final closeBraceLine =
-          resolver.lineInfo.getLocation(node.rightBracket.offset).lineNumber;
+      final lastStmtLine = resolver.lineInfo.getLocation(node.statements.last.end).lineNumber;
+      final closeBraceLine = resolver.lineInfo.getLocation(node.rightBracket.offset).lineNumber;
 
       if (closeBraceLine - lastStmtLine > 1) {
         reporter.atNode(node.statements.last, code);
@@ -596,8 +585,7 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_blank_line_max',
-    problemMessage:
-        '[prefer_single_blank_line_max] Use at most one consecutive blank line.',
+    problemMessage: '[prefer_single_blank_line_max] Use at most one consecutive blank line.',
     correctionMessage: 'Multiple blank lines waste vertical space.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -616,8 +604,7 @@ class PreferSingleBlankLineMaxRule extends SaropaLintRule {
         final current = declarations[i];
         final next = declarations[i + 1];
 
-        final currentLine =
-            resolver.lineInfo.getLocation(current.end).lineNumber;
+        final currentLine = resolver.lineInfo.getLocation(current.end).lineNumber;
         final nextLine = resolver.lineInfo.getLocation(next.offset).lineNumber;
 
         // More than 2 lines difference means 2+ blank lines
@@ -696,8 +683,7 @@ class PreferSuperParametersRule extends SaropaLintRule {
                 // Check if this identifier matches a constructor parameter
                 for (final param in node.parameters.parameters) {
                   final paramName = param.name?.lexeme;
-                  if (paramName == expr.name &&
-                      arg.name.label.name == paramName) {
+                  if (paramName == expr.name && arg.name.label.name == paramName) {
                     reporter.atNode(arg, code);
                   }
                 }
@@ -771,8 +757,7 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
             // Check if the value matches a parameter name
             for (final param in node.parameters.parameters) {
               final paramName = param.name?.lexeme;
-              if (paramName == value.name &&
-                  initializer.fieldName.name == paramName) {
+              if (paramName == value.name && initializer.fieldName.name == paramName) {
                 reporter.atNode(initializer, code);
               }
             }
@@ -921,13 +906,11 @@ class PreferFactoryForValidationRule extends SaropaLintRule {
           if (inner is Block && inner.statements.isNotEmpty) {
             inner = inner.statements.first;
           }
-          if (inner is ExpressionStatement &&
-              inner.expression is ThrowExpression) {
+          if (inner is ExpressionStatement && inner.expression is ThrowExpression) {
             reporter.atNode(node, code);
             return;
           }
-        } else if (stmt is ExpressionStatement &&
-            stmt.expression is ThrowExpression) {
+        } else if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
           reporter.atNode(node, code);
           return;
         }
@@ -983,8 +966,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
     name: 'prefer_constructor_assertion',
     problemMessage:
         '[prefer_constructor_assertion] Consider using constructor assertion instead of factory.',
-    correctionMessage:
-        'Constructor assertions are simpler for debug validation.',
+    correctionMessage: 'Constructor assertions are simpler for debug validation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1013,8 +995,7 @@ class PreferConstructorAssertionRule extends SaropaLintRule {
         if (inner is Block && inner.statements.length == 1) {
           inner = inner.statements.first;
         }
-        if (inner is ExpressionStatement &&
-            inner.expression is ThrowExpression) {
+        if (inner is ExpressionStatement && inner.expression is ThrowExpression) {
           reporter.atNode(node, code);
         }
       }
@@ -1222,8 +1203,7 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
           final expr = stmt.expression;
           if (expr is ThrowExpression) {
             final thrown = expr.expression;
-            if (thrown is SimpleIdentifier &&
-                thrown.name == exceptionParam.lexeme) {
+            if (thrown is SimpleIdentifier && thrown.name == exceptionParam.lexeme) {
               reporter.atNode(expr, code);
             }
           }
