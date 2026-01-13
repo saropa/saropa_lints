@@ -56,7 +56,8 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_controller_dispose',
     problemMessage:
-        '[require_getx_controller_dispose] GetxController has disposable resources but no onClose() override.',
+        '[require_getx_controller_dispose] Missing onClose() leaves resources '
+        'undisposed. Subscriptions and controllers leak memory when widget closes.',
     correctionMessage:
         'Override onClose() to dispose controllers, cancel subscriptions, etc.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -638,7 +639,8 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'dispose_getx_fields',
     problemMessage:
-        '[dispose_getx_fields] GetxController has Worker fields that may not be disposed.',
+        '[dispose_getx_fields] Undisposed Worker keeps timer running after '
+        'GetxController closes, causing memory leaks and stale updates.',
     correctionMessage: 'Call dispose() on Worker fields in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 3.1.1)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 4.1.0)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -17,11 +17,11 @@
 #
 # TIER GUIDE
 # ==========
-# - essential      : Critical rules (~45) - prevents crashes, security issues
-# - recommended    : Essential + common mistakes (~150) - default for most teams
-# - professional   : Recommended + architecture/testing (~350) - enterprise teams
-# - comprehensive  : Professional + thorough coverage (~700) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1450+) - greenfield projects
+# - essential      : Critical rules (~310) - prevents crashes, security issues
+# - recommended    : Essential + common mistakes (~712) - default for most teams
+# - professional   : Recommended + architecture/testing (~1121) - enterprise teams
+# - comprehensive  : Professional + thorough coverage (~1392) - quality obsessed
+# - insanity       : Everything including opinionated rules (~1466) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -788,6 +788,12 @@ custom_lint:
     - avoid_sensitive_data_in_logs: false
     - avoid_api_key_in_code: false               # ERROR - security critical (v2.3.11)
     - avoid_storing_sensitive_unencrypted: false # ERROR - security critical (v2.3.11)
+    # OWASP Coverage Gap Rules (v3.2.0)
+    - avoid_ignoring_ssl_errors: false           # ERROR - MITM attack prevention (OWASP M5, A05)
+    - require_https_only: false                  # WARNING - unencrypted traffic (OWASP M5, A05)
+    - avoid_unsafe_deserialization: false        # WARNING - data integrity (OWASP M4, A08)
+    - avoid_user_controlled_urls: false          # WARNING - SSRF prevention (OWASP M4, A10)
+    - require_catch_logging: false               # WARNING - security event logging (OWASP M8, A09)
 
     # =========================================================================
     # EQUATABLE (v2.3.9)

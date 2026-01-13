@@ -218,7 +218,8 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_across_async',
     problemMessage:
-        '[avoid_context_across_async] BuildContext used after await. Widget may be disposed by then.',
+        '[avoid_context_across_async] BuildContext used after await crashes '
+        'if widget was disposed during the async gap. Check mounted first.',
     correctionMessage: 'Check "if (!mounted) return;" before using context.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

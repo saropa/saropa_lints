@@ -197,23 +197,34 @@ class _AddHackForCollapsibleIfFix extends DartFix {
   }
 }
 
-/// Warns when boolean literals are used in conditions.
+/// Warns when boolean literals are used in logical expressions.
+///
+/// Using boolean literals with `&&` or `||` operators is always redundant:
+/// - `x || true` is always `true`
+/// - `x || false` is always `x`
+/// - `x && true` is always `x`
+/// - `x && false` is always `false`
+///
+/// **Note:** For equality comparisons (`== true`, `== false`), see the
+/// `no_boolean_literal_compare` rule which handles nullable type checking.
 ///
 /// Example of **bad** code:
 /// ```dart
-/// if (x == true) { }
-/// if (y || false) { }
-/// if (z && true) { }
+/// if (y || false) { }  // Redundant: just use y
+/// if (z && true) { }   // Redundant: just use z
+/// final a = x || true; // Always true!
+/// final b = x && false; // Always false!
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// if (x) { }
 /// if (y) { }
 /// if (z) { }
+/// final a = true;
+/// final b = false;
 /// ```
 ///
-/// **Quick fix available:** Simplifies `x == true` to `x`, `x == false` to `!x`, etc.
+/// **Quick fix available:** Simplifies to the non-redundant expression.
 class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
   const AvoidConditionsWithBooleanLiteralsRule() : super(code: _code);
 
@@ -222,14 +233,15 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.medium;
 
   @override
-  RuleCost get cost => RuleCost.medium;
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
     name: 'avoid_conditions_with_boolean_literals',
     problemMessage:
-        '[avoid_conditions_with_boolean_literals] Avoid comparing with boolean literals or using them in logical expressions.',
+        '[avoid_conditions_with_boolean_literals] Avoid using boolean literals in logical expressions.',
     correctionMessage:
-        'Use the boolean expression directly: x instead of x == true.',
+        'Simplify: x || true is always true, x && false is always false, '
+        'x || false is x, x && true is x.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -242,15 +254,9 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
     context.registry.addBinaryExpression((BinaryExpression node) {
       final TokenType operator = node.operator.type;
 
-      // Check for x == true, x == false, x != true, x != false
-      if (operator == TokenType.EQ_EQ || operator == TokenType.BANG_EQ) {
-        if (node.leftOperand is BooleanLiteral ||
-            node.rightOperand is BooleanLiteral) {
-          reporter.atNode(node, code);
-        }
-      }
-
-      // Check for x || true, x || false, x && true, x && false
+      // Only check logical operators (&&, ||)
+      // Equality comparisons (==, !=) are handled by no_boolean_literal_compare
+      // which has proper nullable type checking
       if (operator == TokenType.BAR_BAR ||
           operator == TokenType.AMPERSAND_AMPERSAND) {
         if (node.leftOperand is BooleanLiteral ||
@@ -280,26 +286,36 @@ class _SimplifyBooleanComparisonFix extends DartFix {
       final TokenType operator = node.operator.type;
       String? replacement;
 
-      // Handle x == true, x == false, x != true, x != false
-      if (operator == TokenType.EQ_EQ || operator == TokenType.BANG_EQ) {
-        final bool isEquals = operator == TokenType.EQ_EQ;
+      // Handle logical operators with boolean literals:
+      // x || true  -> true
+      // x || false -> x
+      // x && true  -> x
+      // x && false -> false
+      if (operator == TokenType.BAR_BAR ||
+          operator == TokenType.AMPERSAND_AMPERSAND) {
+        final bool isOr = operator == TokenType.BAR_BAR;
+        final Expression left = node.leftOperand;
+        final Expression right = node.rightOperand;
 
-        if (node.rightOperand is BooleanLiteral) {
-          final bool literalValue = (node.rightOperand as BooleanLiteral).value;
-          final String expr = node.leftOperand.toSource();
-          // x == true -> x, x == false -> !x, x != true -> !x, x != false -> x
-          if (isEquals == literalValue) {
-            replacement = expr;
+        BooleanLiteral? literal;
+        Expression? other;
+
+        if (left is BooleanLiteral) {
+          literal = left;
+          other = right;
+        } else if (right is BooleanLiteral) {
+          literal = right;
+          other = left;
+        }
+
+        if (literal != null && other != null) {
+          final bool value = literal.value;
+          if (isOr) {
+            // x || true -> true, x || false -> x
+            replacement = value ? 'true' : other.toSource();
           } else {
-            replacement = '!$expr';
-          }
-        } else if (node.leftOperand is BooleanLiteral) {
-          final bool literalValue = (node.leftOperand as BooleanLiteral).value;
-          final String expr = node.rightOperand.toSource();
-          if (isEquals == literalValue) {
-            replacement = expr;
-          } else {
-            replacement = '!$expr';
+            // x && true -> x, x && false -> false
+            replacement = value ? other.toSource() : 'false';
           }
         }
       }
@@ -307,7 +323,7 @@ class _SimplifyBooleanComparisonFix extends DartFix {
       if (replacement == null) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: 'Simplify boolean comparison',
+        message: 'Simplify to: $replacement',
         priority: 1,
       );
 

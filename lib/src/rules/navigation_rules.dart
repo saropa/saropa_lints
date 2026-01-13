@@ -145,7 +145,8 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_navigation',
     problemMessage:
-        '[avoid_context_after_navigation] Using context after await navigation. Widget may be disposed.',
+        '[avoid_context_after_navigation] Context used after navigation may '
+        'reference disposed widget, throwing FlutterError.',
     correctionMessage: 'Add "if (!mounted) return;" before using context.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -935,7 +936,8 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
     problemMessage:
-        '[avoid_deep_link_sensitive_params] Deep link should not contain sensitive parameters.',
+        '[avoid_deep_link_sensitive_params] Deep links appear in logs, browser '
+        'history, and referrer headers. Sensitive data will be exposed.',
     correctionMessage:
         'Do not pass passwords, tokens, or secrets via deep link.',
     errorSeverity: DiagnosticSeverity.ERROR,

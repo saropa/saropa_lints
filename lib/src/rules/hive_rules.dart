@@ -153,7 +153,8 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_type_adapter',
     problemMessage:
-        '[require_hive_type_adapter] Storing object in Hive. Ensure class has @HiveType annotation.',
+        '[require_hive_type_adapter] Hive cannot serialize this object without '
+        '@HiveType annotation. Storing will throw a HiveError at runtime.',
     correctionMessage:
         'Add @HiveType(typeId: X) annotation and generate adapter with build_runner.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -332,7 +333,8 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
     problemMessage:
-        '[prefer_hive_encryption] Sensitive data stored in unencrypted Hive box.',
+        '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
+        'Anyone with device access can read sensitive user data.',
     correctionMessage:
         'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -411,7 +413,8 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_encryption_key_secure',
     problemMessage:
-        '[require_hive_encryption_key_secure] Hardcoded Hive encryption key. Can be extracted from app binary.',
+        '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
+        'Anyone decompiling the app can decrypt all stored user data.',
     correctionMessage:
         'Store encryption key in flutter_secure_storage, not in code.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1054,7 +1057,8 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_adapter_registration_order',
     problemMessage:
-        '[require_hive_adapter_registration_order] Hive.openBox may be called before registering adapters in this function.',
+        '[require_hive_adapter_registration_order] Opening box before registering '
+        'adapters throws HiveError. Adapters must be registered first.',
     correctionMessage:
         'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1169,7 +1173,8 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_nested_object_adapter',
     problemMessage:
-        '[require_hive_nested_object_adapter] @HiveField contains custom type. Ensure it has @HiveType annotation.',
+        '[require_hive_nested_object_adapter] Nested custom type without adapter '
+        'causes runtime crash when Hive tries to serialize the object.',
     correctionMessage:
         'Add @HiveType annotation to the nested class or use a primitive type.',
     errorSeverity: DiagnosticSeverity.ERROR,

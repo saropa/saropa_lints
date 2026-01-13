@@ -337,7 +337,8 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_eviction_policy',
     problemMessage:
-        '[require_cache_eviction_policy] Cache lacks eviction policy and may grow unbounded.',
+        '[require_cache_eviction_policy] Unbounded cache consumes memory until '
+        'app crashes with OutOfMemoryError after extended use.',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

@@ -37,6 +37,8 @@ library;
 
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import 'package:saropa_lints/src/baseline/baseline_config.dart';
+import 'package:saropa_lints/src/baseline/baseline_manager.dart';
 import 'package:saropa_lints/src/rules/all_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:saropa_lints/src/tiers.dart';
@@ -47,13 +49,46 @@ export 'package:saropa_lints/src/saropa_lint_rule.dart'
     show
         ImpactTracker,
         LintImpact,
+        OwaspMapping,
+        OwaspMobile,
+        OwaspWeb,
         RuleTimingRecord,
         RuleTimingTracker,
         SaropaLintRule,
         ViolationRecord;
+export 'package:saropa_lints/src/baseline/baseline_config.dart';
+export 'package:saropa_lints/src/baseline/baseline_date.dart';
+export 'package:saropa_lints/src/baseline/baseline_file.dart';
+export 'package:saropa_lints/src/baseline/baseline_manager.dart';
+export 'package:saropa_lints/src/baseline/baseline_paths.dart';
 export 'package:saropa_lints/src/tiers.dart';
 export 'package:saropa_lints/src/project_context.dart'
-    show FileType, FileTypeDetector, ProjectContext, RuleCost;
+    show
+        AstNodeCategory,
+        AstNodeTypeRegistry,
+        ContentFingerprint,
+        ContentRegionIndex,
+        ContentRegions,
+        FileMetrics,
+        FileMetricsCache,
+        FileType,
+        FileTypeDetector,
+        IncrementalAnalysisTracker,
+        initializeCacheManagement,
+        LazyPattern,
+        LazyPatternCache,
+        LruCache,
+        MemoryPressureHandler,
+        PatternIndex,
+        ProjectContext,
+        RuleCost,
+        RuleDependencyGraph,
+        RuleExecutionStats,
+        RulePatternInfo,
+        RulePriorityInfo,
+        RulePriorityQueue,
+        SmartContentFilter,
+        ViolationBatch;
 
 /// All available Saropa lint rules.
 ///
@@ -124,6 +159,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidConditionsWithBooleanLiteralsRule(),
   AvoidSelfAssignmentRule(),
   AvoidSelfCompareRule(),
+  NoBooleanLiteralCompareRule(),
   NoEmptyBlockRule(),
   PreferLastRule(),
   AvoidDoubleSlashImportsRule(),
@@ -237,6 +273,9 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidLongFilesRule(),
   AvoidLongFunctionsRule(),
   AvoidLongRecordsRule(),
+  AvoidMediumFilesRule(),
+  AvoidVeryLongFilesRule(),
+  PreferSmallFilesRule(),
   AvoidComplexArithmeticExpressionsRule(),
   AvoidComplexConditionsRule(),
   AvoidNonAsciiSymbolsRule(),
@@ -735,6 +774,13 @@ const List<LintRule> _allRules = <LintRule>[
 
   // New test rule
   PreferPumpAndSettleRule(),
+
+  // Testing best practices rules (Section 5.31)
+  PreferTestFindByKeyRule(),
+  PreferSetupTeardownRule(),
+  RequireTestDescriptionConventionRule(),
+  PreferBlocTestPackageRule(),
+  PreferMockVerifyRule(),
 
   // New state management rules
   RequireBlocCloseRule(),
@@ -1384,6 +1430,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferDeferredLoadingWebRule(),
   RequireMenuBarForDesktopRule(),
   AvoidTouchOnlyGesturesRule(),
+  AvoidCircularImportsRule(),
   RequireWindowCloseConfirmationRule(),
   PreferNativeFileDialogsRule(),
 
@@ -1644,6 +1691,13 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidApiKeyInCodeRule(),
   AvoidStoringSensitiveUnencryptedRule(),
 
+  // OWASP Coverage Gap Rules (v3.2.0)
+  AvoidIgnoringSslErrorsRule(),
+  RequireHttpsOnlyRule(),
+  AvoidUnsafeDeserializationRule(),
+  AvoidUserControlledUrlsRule(),
+  RequireCatchLoggingRule(),
+
   // State management rules
   AvoidRiverpodNotifierInBuildRule(),
   RequireRiverpodAsyncValueGuardRule(),
@@ -1902,9 +1956,46 @@ class _SaropaLints extends PluginBase {
     // custom_lint:
     //   saropa_lints:
     //     tier: recommended
+    //     baseline:
+    //       file: "saropa_baseline.json"
+    //       paths: ["lib/legacy/"]
     final LintOptions? saropaConfig = configs.rules['saropa_lints'];
     final String tier = saropaConfig?.json['tier'] as String? ?? 'essential';
     final bool enableAll = configs.enableAllLintRules == true;
+
+    // =========================================================================
+    // BASELINE CONFIGURATION
+    // =========================================================================
+    // Initialize baseline manager for suppressing legacy violations.
+    // This allows brownfield projects to adopt linting without being
+    // overwhelmed by existing issues.
+    final baselineConfig = BaselineConfig.fromYaml(
+      saropaConfig?.json['baseline'],
+    );
+    if (baselineConfig.isEnabled) {
+      BaselineManager.initialize(baselineConfig);
+    }
+
+    // =========================================================================
+    // PERFORMANCE INFRASTRUCTURE INITIALIZATION
+    // =========================================================================
+    // Initialize caches, string interning, and memory management on first run.
+    // This happens once per analysis session, not per file.
+    if (_cachedFilteredRules == null) {
+      // Initialize cache management with memory pressure handling
+      initializeCacheManagement(
+        maxFileContentCache: 500,
+        maxMetricsCache: 2000,
+        maxLocationCache: 2000,
+        memoryThresholdMb: 512,
+      );
+
+      // Pre-intern common Dart/Flutter strings for memory efficiency
+      StringInterner.preInternCommon();
+
+      // Register rule groups for batch execution
+      _registerRuleGroups();
+    }
 
     // =========================================================================
     // PERFORMANCE: Return cached rules if tier hasn't changed
@@ -1951,6 +2042,32 @@ class _SaropaLints extends PluginBase {
       return costA.index.compareTo(costB.index);
     });
 
+    // =========================================================================
+    // BUILD PATTERN INDEX (Performance Optimization)
+    // =========================================================================
+    // Build a combined index of all required patterns across rules.
+    // This allows single-pass content scanning instead of per-rule scanning.
+    final List<RulePatternInfo> patternInfos = filteredRules
+        .whereType<SaropaLintRule>()
+        .map((SaropaLintRule rule) => RulePatternInfo(
+              name: rule.code.name,
+              patterns: rule.requiredPatterns,
+            ))
+        .toList();
+    PatternIndex.build(patternInfos);
+
+    // =========================================================================
+    // SET RULE CONFIG HASH (Performance Optimization)
+    // =========================================================================
+    // Compute a hash of the current rule configuration for incremental analysis.
+    // If the config changes, all cached analysis results are invalidated.
+    final int configHash = Object.hashAll(<Object>[
+      tier,
+      enableAll,
+      ...filteredRules.map((LintRule r) => r.code.name),
+    ]);
+    IncrementalAnalysisTracker.setRuleConfig(configHash);
+
     // Cache the result for subsequent files
     _cachedFilteredRules = filteredRules;
     _cachedTier = tier;
@@ -1970,4 +2087,93 @@ RuleCost _getRuleCost(LintRule rule) {
   }
   // Non-Saropa rules default to medium cost
   return RuleCost.medium;
+}
+
+/// Register rule groups for batch execution optimization.
+///
+/// Groups related rules that share patterns and can benefit from
+/// shared setup/teardown and intermediate results.
+void _registerRuleGroups() {
+  // Async rules - share Future/async/await patterns
+  RuleGroupExecutor.registerGroup(RuleGroup(
+    name: 'async_rules',
+    rules: const {
+      'avoid_slow_async_io',
+      'unawaited_futures',
+      'await_only_futures',
+      'prefer_async_await',
+      'avoid_async_void',
+      'avoid_unnecessary_async',
+      'missing_await_in_async',
+    },
+    sharedPatterns: const {'async', 'await', 'Future'},
+    priority: 10,
+  ));
+
+  // Widget rules - share StatelessWidget/StatefulWidget patterns
+  RuleGroupExecutor.registerGroup(RuleGroup(
+    name: 'widget_rules',
+    rules: const {
+      'avoid_stateless_widget_initialized_fields',
+      'avoid_state_constructors',
+      'prefer_const_constructors_in_immutables',
+      'avoid_unnecessary_setstate',
+      'use_build_context_synchronously',
+      'prefer_stateless_widget',
+    },
+    sharedPatterns: const {'StatelessWidget', 'StatefulWidget', 'State<', 'build('},
+    priority: 20,
+  ));
+
+  // Context rules - share BuildContext patterns
+  RuleGroupExecutor.registerGroup(RuleGroup(
+    name: 'context_rules',
+    rules: const {
+      'use_build_context_synchronously',
+      'avoid_context_across_async_gaps',
+      'prefer_context_extension',
+    },
+    sharedPatterns: const {'BuildContext', 'context'},
+    priority: 30,
+  ));
+
+  // Dispose rules - share dispose/controller patterns
+  RuleGroupExecutor.registerGroup(RuleGroup(
+    name: 'dispose_rules',
+    rules: const {
+      'close_sinks',
+      'cancel_subscriptions',
+      'dispose_controllers',
+      'require_dispose_method',
+    },
+    sharedPatterns: const {'dispose', 'Controller', 'StreamSubscription', 'StreamController'},
+    priority: 40,
+  ));
+
+  // Test rules - share test patterns
+  RuleGroupExecutor.registerGroup(RuleGroup(
+    name: 'test_rules',
+    rules: const {
+      'avoid_test_sleep',
+      'avoid_find_by_text',
+      'require_test_keys',
+      'prefer_pump_and_settle',
+      'prefer_test_find_by_key',
+    },
+    sharedPatterns: const {'test(', 'testWidgets(', 'expect(', 'find.'},
+    priority: 50,
+  ));
+
+  // Security rules - share security-sensitive patterns
+  RuleGroupExecutor.registerGroup(RuleGroup(
+    name: 'security_rules',
+    rules: const {
+      'avoid_weak_cryptographic_algorithms',
+      'avoid_hardcoded_credentials',
+      'avoid_dynamic_sql',
+      'avoid_insecure_random',
+    },
+    sharedPatterns: const {'password', 'secret', 'token', 'credential', 'MD5', 'SHA1'},
+    priority: 60,
+  ));
 }
