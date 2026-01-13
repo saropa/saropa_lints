@@ -11,6 +11,7 @@
 /// 2. Parses the output to extract violations
 /// 3. Generates a baseline JSON file
 /// 4. Optionally updates analysis_options.yaml
+library;
 
 import 'dart:convert';
 import 'dart:io';
