@@ -478,7 +478,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
       // Get BuildContext parameter names
       final contextParamNames = <String>[];
       for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
-        final name = _getBuildContextParamName(param);
+        final name = getBuildContextParamName(param);
         if (name != null) contextParamNames.add(name);
       }
       if (contextParamNames.isEmpty) return;
@@ -560,7 +560,7 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
     }
 
     // Then branch must contain early exit (return or throw)
-    return _containsEarlyExit(stmt.thenStatement);
+    return containsEarlyExit(stmt.thenStatement);
   }
 
   /// Checks if statement is `if (context.mounted) { ... }` for static methods.
@@ -645,34 +645,6 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
     );
   }
 
-  /// Checks if a statement contains an early exit (return or throw).
-  static bool _containsEarlyExit(Statement stmt) {
-    if (stmt is ReturnStatement) return true;
-    if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
-      return true;
-    }
-    // Handle block with single return/throw
-    if (stmt is Block && stmt.statements.length == 1) {
-      return _containsEarlyExit(stmt.statements.first);
-    }
-    return false;
-  }
-
-  String? _getBuildContextParamName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
-      final typeSource = param.type?.toSource();
-      if (typeSource == null) return null;
-      if (typeSource == 'BuildContext' ||
-          typeSource == 'BuildContext?' ||
-          typeSource.contains('BuildContext')) {
-        return param.name?.lexeme;
-      }
-    }
-    if (param is DefaultFormalParameter) {
-      return _getBuildContextParamName(param.parameter);
-    }
-    return null;
-  }
 }
 
 /// Visitor that finds context usage in static methods by parameter name.
@@ -878,25 +850,11 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
 
       // Check parameters for BuildContext
       for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
-        if (_isBuildContextParam(param)) {
+        if (isBuildContextParam(param)) {
           reporter.atNode(param, _code);
         }
       }
     });
-  }
-
-  bool _isBuildContextParam(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
-      final typeSource = param.type?.toSource();
-      if (typeSource == null) return false;
-      return typeSource == 'BuildContext' ||
-          typeSource == 'BuildContext?' ||
-          typeSource.contains('BuildContext');
-    }
-    if (param is DefaultFormalParameter) {
-      return _isBuildContextParam(param.parameter);
-    }
-    return false;
   }
 
   @override
@@ -1023,24 +981,10 @@ class AvoidContextInStaticMethodsRule extends SaropaLintRule {
 
       // Check parameters for BuildContext
       for (final param in node.parameters?.parameters ?? <FormalParameter>[]) {
-        if (_isBuildContextParam(param)) {
+        if (isBuildContextParam(param)) {
           reporter.atNode(param, _code);
         }
       }
     });
-  }
-
-  bool _isBuildContextParam(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
-      final typeSource = param.type?.toSource();
-      if (typeSource == null) return false;
-      return typeSource == 'BuildContext' ||
-          typeSource == 'BuildContext?' ||
-          typeSource.contains('BuildContext');
-    }
-    if (param is DefaultFormalParameter) {
-      return _isBuildContextParam(param.parameter);
-    }
-    return false;
   }
 }

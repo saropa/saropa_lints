@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 3.0.2)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 3.1.1)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -1075,9 +1075,12 @@ custom_lint:
     - prefer_sentence_case_comments: false
     - prefer_period_after_doc: false
     - prefer_screaming_case_constants: false
-    - prefer_descriptive_bool_names: false
+    - prefer_descriptive_bool_names: false       # Lenient - allows action verbs
+    - prefer_descriptive_bool_names_strict: false # Strict - no action verbs
     - prefer_snake_case_files: false
     - prefer_doc_comments_over_regular: false
+    - prefer_doc_curly_apostrophe: false         # Curly apostrophe in doc comments
+    - prefer_straight_apostrophe: false          # Straight apostrophe in strings
 
     # --- Widget Style Rules (v2.7.0) ---
     - prefer_sized_box_over_container: false     # SizedBox for dimensions only

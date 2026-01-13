@@ -80,7 +80,7 @@ class AvoidFutureToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_future_tostring',
     problemMessage:
-        "Future.toString() returns 'Instance of Future', not the resolved value.",
+        "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value.",
     correctionMessage:
         'Use await to get the value first: (await future).toString().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -543,7 +543,7 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_await',
-    problemMessage: "Prefer 'async/await' over '.then()' in async functions.",
+    problemMessage: "[prefer_async_await] Prefer 'async/await' over '.then()' in async functions.",
     correctionMessage: 'Refactor to use async/await syntax.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

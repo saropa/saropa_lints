@@ -139,12 +139,12 @@ class IosPermissionMapping {
   const IosPermissionMapping._();
 
   /// Maps class names to required Info.plist keys.
+  ///
+  /// Note: ImagePicker is intentionally excluded here because the
+  /// RequireIosPermissionDescriptionRule has smart detection that checks
+  /// the actual `source` parameter (gallery vs camera) at method invocation.
   static const Map<String, List<String>> typeToKeys = {
-    // Camera/Photo
-    'ImagePicker': [
-      'NSPhotoLibraryUsageDescription',
-      'NSCameraUsageDescription',
-    ],
+    // Camera/Photo (ImagePicker handled separately via method invocation check)
     'CameraPlatform': ['NSCameraUsageDescription'],
     'CameraController': ['NSCameraUsageDescription'],
 

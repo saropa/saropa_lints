@@ -2284,7 +2284,7 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
 
   static const LintCode _codeDoubleNegation = LintCode(
     name: 'prefer_simpler_boolean_expressions',
-    problemMessage: 'Double negation (!!x) can be simplified to x.',
+    problemMessage: '[prefer_simpler_boolean_expressions] Double negation (!!x) can be simplified to x.',
     correctionMessage: 'Remove the double negation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2292,7 +2292,7 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
   static const LintCode _codeDeMorgan = LintCode(
     name: 'prefer_simpler_boolean_expressions',
     problemMessage:
-        'Negated compound expression can be simplified using De Morgan\'s law.',
+        '[prefer_simpler_boolean_expressions] Negated compound expression can be simplified using De Morgan\'s law.',
     correctionMessage: 'Use !(a && b) → !a || !b, or !(a || b) → !a && !b.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
