@@ -376,6 +376,21 @@ def main() -> int:
     extensions_dir = get_vscode_extensions_dir()
     insiders_dir = get_vscode_insiders_extensions_dir()
 
+    # Cleanup: Remove existing extension from both standard and Insiders
+    def cleanup_extension(ext_dir: Path | None, name: str) -> None:
+        if ext_dir:
+            target = ext_dir / EXTENSION_NAME
+            if target.exists():
+                print_info(f"Removing existing {name} extension at: {target}")
+                try:
+                    shutil.rmtree(target)
+                    print_success(f"Removed {name} extension")
+                except Exception as e:
+                    print_warning(f"Failed to remove {name} extension: {e}")
+
+    cleanup_extension(extensions_dir, "VS Code")
+    cleanup_extension(insiders_dir, "VS Code Insiders")
+
     # Determine which VS Code to install to
     target_dir = None
     vscode_variant = None

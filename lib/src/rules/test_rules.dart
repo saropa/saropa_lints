@@ -1881,7 +1881,7 @@ class RequireGetItResetInTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getit_reset_in_tests',
     problemMessage:
-        '[require_getit_reset_in_tests] GetIt singletons persist across tests. Reset in setUp.',
+        '[require_getit_reset_in_tests] GetIt singletons persist across tests, causing test pollution and flaky results.',
     correctionMessage: 'Add GetIt.I.reset() in setUp() or setUpAll().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2977,7 +2977,7 @@ class RequireMockHttpClientRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_mock_http_client',
     problemMessage:
-        '[require_mock_http_client] Real HTTP call in test. Tests should use mocked HTTP clients.',
+        '[require_mock_http_client] Real HTTP call in test causes flaky tests and slow CI from network dependencies.',
     correctionMessage:
         'Use MockClient or mock the HTTP layer for deterministic tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3075,7 +3075,7 @@ class RequireTestWidgetPumpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_test_widget_pump',
     problemMessage:
-        '[require_test_widget_pump] Widget interaction without pump(). Event may not be processed.',
+        '[require_test_widget_pump] Tap/enterText without pump() leaves event unprocessed, causing test to pass incorrectly.',
     correctionMessage:
         'Call await tester.pump() or pumpAndSettle() after the interaction.',
     errorSeverity: DiagnosticSeverity.ERROR,
