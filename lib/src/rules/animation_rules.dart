@@ -55,9 +55,9 @@ class RequireVsyncMixinRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_vsync_mixin',
     problemMessage:
-        '[require_vsync_mixin] AnimationController created without vsync parameter.',
+        '[require_vsync_mixin] AnimationController without vsync. Animations run without frame sync - causes visual tearing and wasted CPU cycles.',
     correctionMessage:
-        'Add vsync: this and use SingleTickerProviderStateMixin or TickerProviderStateMixin.',
+        'Add vsync: this and mix in SingleTickerProviderStateMixin.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -169,9 +169,9 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_animation_in_build',
     problemMessage:
-        '[avoid_animation_in_build] AnimationController created in build() is recreated on every rebuild.',
+        '[avoid_animation_in_build] AnimationController in build(). Memory leak - new controller created on every rebuild, old ones never disposed.',
     correctionMessage:
-        'Create AnimationController in initState() or as a late final field.',
+        'Create in initState() as field; dispose in dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -293,9 +293,9 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_animation_controller_dispose',
     problemMessage:
-        '[require_animation_controller_dispose] AnimationController is not disposed. This causes memory leaks.',
+        '[require_animation_controller_dispose] AnimationController field without dispose(). Memory leak - Ticker keeps reference to State, preventing GC.',
     correctionMessage:
-        'Add _controller.dispose() in dispose() method before super.dispose().',
+        'Add _controller.dispose() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

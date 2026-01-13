@@ -21,6 +21,9 @@ CLAUDE.md
 # Articles (not part of the package)
 articles/
 __pycache__/
+
+# Generated reports
+reports/
 .claude/agents/validator/AGENT.md
 .claude/skills/lint-rules/SKILL.md
 .claude/skills/publishing/SKILL.md

@@ -269,8 +269,35 @@ All rules should have quick fixes when feasible:
 2. Fix type guidelines:
    - **Simple transformations**: Apply directly (e.g., `!(a == b)` → `a != b`)
    - **Debug/intentional code**: Comment out to preserve developer history
-   - **Complex issues**: Add `// HACK:` comment for manual attention
-3. **All WARNING/ERROR severity rules must have at least a HACK comment fix**
+   - **Wrap/add required code**: Add missing parameters, wrap with widgets, etc.
+
+#### HACK Comment Fixes Are Discouraged
+
+**Do NOT use `// HACK:` comment fixes as a shortcut.** These provide no real value:
+
+```dart
+// BAD: Lazy fix that just adds a comment
+builder.addSimpleInsertion(node.offset, '// HACK: Fix this manually\n');
+
+// GOOD: Actual fix that transforms the code
+builder.addSimpleReplacement(range, 'await $expression');
+```
+
+HACK fixes are acceptable ONLY when:
+- The fix requires human judgment (e.g., choosing between multiple valid approaches)
+- The fix requires context not available in the AST (e.g., business logic decisions)
+- The rule is newly added and a real fix is planned for a follow-up PR
+
+**If you can't write a real fix, don't add a fix at all.** A rule without a fix is better than a rule with a useless HACK comment fix that clutters the codebase.
+
+#### Quick Fix Priority (for contributors)
+
+When adding fixes, prioritize by impact:
+1. **High-value fixes**: Actual code transformations (await, dispose, null checks)
+2. **Wrap fixes**: Wrap expressions with required widgets/builders
+3. **Parameter fixes**: Add missing required parameters with sensible defaults
+4. **Remove fixes**: Comment out problematic code (preserves history)
+5. **Last resort**: Skip the fix entirely — document why in the rule's doc comment
 
 ### 7. Add tests
 
@@ -307,6 +334,12 @@ Before submitting a PR with new or modified lint rules, review **only the files 
 ### Code Quality
 
 - [ ] **Correct file placement** — Is each rule in the appropriate `lib/src/rules/<category>_rules.dart` file?
+
+> **Note on file length**: Rule files in `lib/src/rules/` are exempt from file length
+> restrictions. These files contain declarative rule definitions organized by domain
+> (e.g., `flutter_widget_rules.dart`, `security_rules.dart`). Each rule is self-contained
+> with no shared state—similar to data files, enums, or lookup tables. Domain grouping
+> aids discoverability. Don't split rule files just because they're large.
 - [ ] **Logic correctness** — Does the detection logic handle all edge cases correctly?
 - [ ] **Heuristics safety** — If using name-based detection, have you avoided false positives? (See "Avoiding False Positives" section below)
 - [ ] **No recursion risks** — Does the visitor avoid infinite loops or excessive tree traversal?
@@ -328,7 +361,8 @@ Before submitting a PR with new or modified lint rules, review **only the files 
 
 ### Quick Fixes
 
-- [ ] **Quick fix implemented** — Add quick fixes where feasible (all WARNING/ERROR rules should have at least a HACK comment fix)
+- [ ] **Quick fix implemented** — Add quick fixes where feasible with real code transformations
+- [ ] **No lazy HACK fixes** — HACK comment fixes are discouraged; prefer real fixes or no fix
 - [ ] **Fix preserves intent** — Comment out code rather than deleting when removing debug statements
 - [ ] **Fix is safe** — The fix doesn't introduce new issues or change behavior unexpectedly
 
@@ -450,19 +484,50 @@ The `problemMessage` appears in IDEs and tells developers what's wrong. **All me
 problemMessage: '[rule_name] [What is wrong]. [Why it matters/consequence].',
 ```
 
+#### The DX Principle: Warnings That Drive Action
+
+A warning is only "nagging" if the developer doesn't understand *why* it matters or *how* to solve it.
+
+| Type | Example | Developer Reaction |
+|------|---------|-------------------|
+| **Bad DX** | `[Error] Avoid hardcoded keys.` | "Whatever, I'll fix it later." |
+| **Good DX** | `[Error] Hardcoded keys are extractable via APK decompilation (OWASP M2). Move to FlutterSecureStorage.` | "Oh, that's a real security risk." |
+
+**Every problem message should answer:**
+1. **What's wrong?** — The specific issue detected
+2. **Why it matters?** — The concrete consequence (security risk, crash, memory leak, perf hit)
+3. **What's the fix?** — Provided in `correctionMessage`, but hint at it when space allows
+
+#### AI Copilot Compatibility
+
+Developers increasingly paste lint errors into AI assistants (ChatGPT, Cursor, Copilot). Messages should contain enough factual context for an AI to understand and suggest a fix - no fluff, just problem statements and facts.
+
+| Quality | Example | AI Can Help? |
+|---------|---------|--------------|
+| **Bad** | `Undisposed controller.` | No - which controller? What widget type? |
+| **Good** | `TextEditingController field in StatelessWidget without disposal. Memory leak - controller outlives widget.` | Yes - AI knows to suggest StatefulWidget refactor with dispose() |
+
+**Write messages that work as AI prompts:**
+- Include the specific type (TextEditingController, not just "controller")
+- Include the context (StatelessWidget, build method, async gap)
+- State the consequence factually (memory leak, crash, invalid state)
+- Skip marketing language - AIs don't need persuasion, just facts
+
 **Guidelines:**
 - **Always prefix with `[rule_name]`** — This makes the rule name visible in IDE Problems panels
 - Start with the specific issue detected (not "Avoid..." - that's the correction)
 - Include the consequence when not obvious
 - Keep under 100 characters when possible (including the prefix)
 - Use concrete language, not vague warnings
+- Reference standards where applicable (OWASP, WCAG, platform guidelines)
 
 **Examples:**
 | BAD | GOOD |
 |-----|------|
-| `'Avoid using print.'` | `'[avoid_print] print() found. Will appear in production logs.'` |
-| `'HTTP status should be checked.'` | `'[require_http_status_check] HTTP response used without status check.'` |
-| `'Class has too many responsibilities.'` | `'[avoid_large_class] Class has >15 fields or >20 methods.'` |
+| `'Avoid using print.'` | `'[avoid_print] print() found. Will appear in production logs and expose debug info.'` |
+| `'HTTP status should be checked.'` | `'[require_http_status_check] HTTP response used without status check. Crashes on 4xx/5xx.'` |
+| `'Class has too many responsibilities.'` | `'[avoid_large_class] Class has >15 fields or >20 methods. Hard to test and maintain.'` |
+| `'Missing tooltip.'` | `'[avoid_icon_buttons_without_tooltip] IconButton missing tooltip. Screen readers announce nothing (WCAG 2.4.4).'` |
 
 ### Correction Message Format
 

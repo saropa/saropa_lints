@@ -16295,7 +16295,8 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_super_dispose_call',
     problemMessage:
-        '[require_super_dispose_call] dispose() must call super.dispose().',
+        '[require_super_dispose_call] Missing super.dispose() prevents parent '
+        'State cleanup, causing memory leaks and broken widget lifecycle.',
     correctionMessage: 'Add super.dispose() at the end of your dispose method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -16369,7 +16370,8 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_super_init_state_call',
     problemMessage:
-        '[require_super_init_state_call] initState() must call super.initState().',
+        '[require_super_init_state_call] Missing super.initState() skips parent '
+        'initialization, breaking framework contracts and causing subtle bugs.',
     correctionMessage:
         'Add super.initState() at the beginning of your initState method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -16443,7 +16445,8 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_set_state_in_dispose',
     problemMessage:
-        '[avoid_set_state_in_dispose] setState() must not be called inside dispose().',
+        '[avoid_set_state_in_dispose] setState in dispose() throws "setState '
+        'called after dispose" error, crashing the app during navigation.',
     correctionMessage:
         'Remove setState - state changes are invalid during disposal.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -16535,7 +16538,8 @@ class AvoidNavigationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_navigation_in_build',
     problemMessage:
-        '[avoid_navigation_in_build] Navigator calls must not be inside build().',
+        '[avoid_navigation_in_build] Navigation in build() triggers during '
+        'rebuild, causing infinite navigation loops or flickering screens.',
     correctionMessage:
         'Use WidgetsBinding.instance.addPostFrameCallback or move to callback.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -16745,7 +16749,8 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_navigation_delegate',
     problemMessage:
-        '[require_webview_navigation_delegate] WebView should have a navigationDelegate to control navigation.',
+        '[require_webview_navigation_delegate] Without navigation delegate, '
+        'WebView can navigate to malicious or phishing sites.',
     correctionMessage:
         'Add navigationDelegate to validate URLs before navigation.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -17082,7 +17087,8 @@ class RequireHttpsOverHttpRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_https_over_http',
     problemMessage:
-        '[require_https_over_http] HTTP is insecure. Use HTTPS instead.',
+        '[require_https_over_http] HTTP transmits data in plaintext. '
+        'Attackers can intercept credentials, tokens, and user data.',
     correctionMessage: 'Replace http:// with https://.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -17136,7 +17142,8 @@ class RequireWssOverWsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_wss_over_ws',
     problemMessage:
-        '[require_wss_over_ws] ws:// is insecure. Use wss:// instead.',
+        '[require_wss_over_ws] ws:// transmits data unencrypted. Attackers '
+        'can intercept, read, and modify WebSocket messages in transit.',
     correctionMessage: 'Replace ws:// with wss://.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -17297,7 +17304,8 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_permission_ios',
     problemMessage:
-        '[require_image_picker_permission_ios] image_picker usage detected. Verify iOS Info.plist has required keys.',
+        '[require_image_picker_permission_ios] Missing Info.plist entries cause '
+        'app rejection by App Store or instant crash when accessing photos.',
     correctionMessage:
         'Add NSPhotoLibraryUsageDescription and NSCameraUsageDescription to Info.plist.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17349,7 +17357,8 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_picker_permission_android',
     problemMessage:
-        '[require_image_picker_permission_android] image_picker camera usage. Verify AndroidManifest has CAMERA permission.',
+        '[require_image_picker_permission_android] Missing CAMERA permission '
+        'causes SecurityException crash when user tries to take a photo.',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17402,7 +17411,8 @@ class RequirePermissionManifestAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_manifest_android',
     problemMessage:
-        '[require_permission_manifest_android] Permission request detected. Verify AndroidManifest.xml has entry.',
+        '[require_permission_manifest_android] Runtime permission request without '
+        'manifest entry always fails. Feature silently stops working.',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.XXX"/> to manifest.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17454,7 +17464,8 @@ class RequirePermissionPlistIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_permission_plist_ios',
     problemMessage:
-        '[require_permission_plist_ios] Permission request detected. Verify Info.plist has usage description.',
+        '[require_permission_plist_ios] iOS requires usage descriptions in '
+        'Info.plist. App crashes or gets rejected from App Store without them.',
     correctionMessage:
         'Add NSxxxUsageDescription key to Info.plist for each permission.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17510,7 +17521,8 @@ class RequireUrlLauncherQueriesAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_queries_android',
     problemMessage:
-        '[require_url_launcher_queries_android] url_launcher usage. Android 11+ requires queries element in manifest.',
+        '[require_url_launcher_queries_android] Without <queries> in manifest, '
+        'canLaunchUrl returns false on Android 11+ even for installed apps.',
     correctionMessage:
         'Add <queries> element with intent filters to AndroidManifest.xml.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17566,7 +17578,8 @@ class RequireUrlLauncherSchemesIosRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_schemes_ios',
     problemMessage:
-        '[require_url_launcher_schemes_ios] canLaunchUrl usage. iOS requires LSApplicationQueriesSchemes in Info.plist.',
+        '[require_url_launcher_schemes_ios] Without LSApplicationQueriesSchemes, '
+        'canLaunchUrl returns false on iOS even for available URL schemes.',
     correctionMessage:
         'Add URL schemes to LSApplicationQueriesSchemes array in Info.plist.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -17774,7 +17787,8 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expanded_outside_flex',
     problemMessage:
-        '[avoid_expanded_outside_flex] Expanded/Flexible outside Flex widget. This will crash at runtime.',
+        '[avoid_expanded_outside_flex] Expanded without Row/Column parent '
+        'throws FlutterError, crashing the app at runtime.',
     correctionMessage: 'Use Expanded only inside Row, Column, or Flex.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

@@ -52,52 +52,225 @@ This ROADMAP is for **planned/unimplemented rules only**.
 
 | Marker | Meaning | Example Pattern |
 |--------|---------|-----------------|
-| ⭐ | **TO DO NEXT**: Easiest 100 rules to implement | Exact API/parameter matching, low false-positive risk |
+| ⭐ | **TO DO NEXT**: Easiest 40 rules to implement | Exact API/parameter matching, low false-positive risk |
 | — | Safe: Exact API/parameter matching | `Image.network` without `errorBuilder` |
 | `[CONTEXT]` | Needs build/test context detection | Detect if inside `build()` method |
 | `[HEURISTIC]` | Variable name or string pattern matching | Detect "money" in variable names |
 | `[CROSS-FILE]` | Requires analysis across multiple files | Check if type is registered elsewhere |
 | `[TOO-COMPLEX]` | Pattern too abstract for reliable AST detection | Detect "loading state" or "user feedback" generically |
 
-> **⭐ TO DO NEXT**: Rules marked with ⭐ are the **100 easiest rules to implement** - they match exact API/method names, check specific named parameters, or detect missing required parameters with low false-positive risk. Start here!
+> **⭐ TO DO NEXT**: Rules marked with ⭐ are the **40 easiest rules to implement** - they match exact API/method names, check specific named parameters, or detect missing required parameters with low false-positive risk. Start here!
 
-## Deferred: Cross-File Analysis Rules (3 rules)
+## Deferred: Cross-File Analysis Rules (2 rules)
 
-> **Note**: These rules were originally marked with ⭐ but require **cross-file dependency graph analysis** which is significantly more complex than single-file AST patterns. They are deferred until the infrastructure for cross-file analysis is in place.
+> **Note**: These rules require **cross-file dependency graph analysis**. The `avoid_circular_imports` rule has been implemented using the `ImportGraphCache` infrastructure.
 
 | Rule | Tier | Severity | Why Complex |
 |------|------|----------|-------------|
-| `avoid_circular_imports` | Essential | ERROR | Requires building an **import graph** across all Dart files in the project, then running cycle detection (DFS). Cannot be done by analyzing a single file in isolation. |
 | `avoid_provider_circular_dependency` | Essential | ERROR | Requires tracking **Provider dependencies across files** (Provider A depends on Provider B in another file which depends on Provider A). Needs cross-file type resolution and dependency graph construction. |
 | `avoid_riverpod_circular_provider` | Essential | ERROR | Requires tracking `ref.watch()` and `ref.read()` calls across **multiple provider definitions in different files** to detect cycles. Needs cross-file provider dependency graph. |
 
 **Implementation Requirements**:
-1. Multi-file analysis pass to collect all imports/providers
-2. Dependency graph data structure
-3. Cycle detection algorithm (Tarjan's or DFS-based)
-4. Caching to avoid re-analyzing unchanged files
+1. Build on existing `ImportGraphCache` infrastructure
+2. Add Provider/Riverpod-specific dependency tracking
+3. Extend cycle detection for provider dependencies
 
-These rules will be implemented when cross-file analysis infrastructure is added.
+## Performance Architecture
 
-## Performance Architechure: Notable Framework Changes
+The `custom_lint` plugin architecture runs inside the Dart analysis server process. This provides excellent IDE integration (real-time squiggles, quick fixes, hover info).
 
-The `custom_lint` plugin architecture runs inside the Dart analysis server process. This provides excellent IDE integration (real-time squiggles, quick fixes, hover info) but the single-process model limits what's possible:
+### Implemented Optimizations ✅
 
-| Limitation | Why It's Blocked | What We'll Build When Available |
-|------------|------------------|--------------------------------|
-| No parallel rule execution | Analysis server is single-threaded; plugins can't spawn Isolates | Run 1450+ rules concurrently for 4-8x speedup |
-| No incremental analysis | Plugin receives full file list each time; no change detection API | Cache results, only re-analyze modified files |
-| No cross-file analysis | Plugin analyzes files in isolation; no project-wide context | Implement [deferred cross-file rules](#deferred-cross-file-analysis-rules-3-rules), detect circular imports |
-| Per-rule callback registration | Each rule registers its own AST visitors independently | Single AST traversal dispatching to all rules |
+| Optimization | Status | Description |
+|--------------|--------|-------------|
+| **Caching Infrastructure** | ✅ Done | `SourceLocationCache`, `SemanticTokenCache`, `CompilationUnitCache`, `ImportGraphCache`, `FileMetricsCache`, `ContentFingerprint`, `LazyPatternCache` |
+| **IDE Integration** | ⚠️ Partial | `ThrottledAnalysis`, `SpeculativeAnalysis` exist but require IDE hooks not available in custom_lint |
+| **Rule Execution** | ✅ Done | `RuleGroupExecutor`, `ConsolidatedVisitorDispatch`, `BaselineAwareEarlyExit`, `DiffBasedAnalysis`, `PatternIndex`, `RulePriorityQueue` |
+| **Memory Optimization** | ✅ Done | `StringInterner`, `LruCache` with size limits, `MemoryPressureHandler` |
+| **Profiling** | ✅ Done | `HotPathProfiler`, `RuleExecutionStats` |
+| **Persistence** | ✅ Done | `IncrementalAnalysisTracker` with disk caching |
+| **Parallel Execution** | ✅ Done | `ParallelAnalyzer` with real `Isolate.run()` support |
+| **Cross-File Analysis** | ✅ Done | `avoid_circular_imports` using `ImportGraphCache` |
+| **Rapid Analysis Throttle** | ✅ Done | Content-hash-based throttle prevents duplicate analysis of identical content within 300ms |
+| **Bloom Filter Pre-screening** | ✅ Done | `BloomFilter` class provides O(1) probabilistic membership testing for pattern pre-screening in `PatternIndex` |
+| **Content Region Skipping** | ✅ Done | Rules can declare `requiresClassDeclaration`, `requiresMainFunction`, `requiresImports` to skip files missing required structures |
+| **Git-Aware File Priority** | ✅ Done | `GitAwarePriority` tracks modified/staged files for prioritized analysis of actively-edited code |
+| **Import-Based Rule Filtering** | ✅ Done | `requiresFlutterImport` getter skips widget rules instantly for pure Dart files without pattern matching |
+| **Adaptive Tier Switching** | ✅ Done | Auto-switches to essential-tier rules during rapid editing (3+ analyses in 2s), full analysis after editing settles |
 
-**Alternative under consideration**: A standalone precompiled CLI binary could bypass these limitations for CI pipelines (parallel execution, lower memory), but would sacrifice real-time IDE feedback. May revisit when rule count exceeds 2000.
+### Integration Status
 
-### Future Optimizations (Major Refactors)
+Infrastructure that is **wired up and active**:
+
+- ✅ `initializeCacheManagement()` called at plugin startup ([saropa_lints.dart](lib/saropa_lints.dart))
+- ✅ `StringInterner.preInternCommon()` called at plugin startup
+- ✅ `_registerRuleGroups()` registers 6 rule groups (async, widget, context, dispose, test, security)
+- ✅ `MemoryPressureHandler.recordFileProcessed()` called per-file ([saropa_lint_rule.dart](lib/src/saropa_lint_rule.dart))
+- ✅ `IncrementalAnalysisTracker` skips unchanged files with disk persistence
+- ✅ `PatternIndex` built from rule patterns for fast content filtering
+- ✅ Rapid analysis throttle prevents redundant analysis of same content
+- ✅ `BloomFilter` provides O(1) pre-screening in `PatternIndex.getMatchingRules()`
+- ✅ Content region checks skip rules when required structures (classes, main, imports) are missing
+- ✅ `GitAwarePriority.initialize()` called at startup to track modified/staged files
+- ✅ `requiresFlutterImport` check skips widget rules for non-Flutter files before pattern matching
+- ✅ Adaptive tier switching runs only essential rules during rapid editing (3+ in 2s)
+
+Infrastructure that **exists but cannot be integrated** (requires custom_lint framework changes):
+
+- ❌ `ThrottledAnalysis.recordEdit()` - needs IDE keystroke events
+- ❌ `SpeculativeAnalysis.recordFileOpened()` - needs IDE file open events
+- ❌ `RuleGroupExecutor` batch execution - custom_lint runs rules independently
+
+### Future Optimizations (Deferred)
 
 | Optimization | Effort | Impact | Description |
 |--------------|--------|--------|-------------|
-| Batch AST Visitors | High | High | Consolidate AST visitor callbacks across rules. Currently each rule registers independent callbacks, resulting in multiple AST traversals. A batched approach would traverse once and dispatch to relevant rules. Requires significant refactor of rule registration. |
+| **Speculative Analysis** | Hard | Medium | `SpeculativeAnalysis` class exists but requires IDE hooks to know when files are opened. custom_lint doesn't expose these events. Would pre-analyze files the user is likely to open next. |
+| **Full Throttled Analysis** | Hard | Medium | `ThrottledAnalysis` class exists but debounce requires `recordEdit()` calls when user types. custom_lint doesn't expose keystroke events. Current workaround: simple content-hash-based throttle in `run()` prevents duplicate analysis of identical content within 300ms. |
+| Cache Warming on Startup | Medium | Low | Pre-analyze visible/open files when IDE starts. Requires knowing which files are open (IDE-specific) or using heuristics (recent files, pubspec.yaml siblings). Could delay startup. |
+| Result Memoization by AST Hash | Hard | Medium | Cache rule results keyed by AST subtree hash. Skip re-running rules on unchanged AST nodes. Requires efficient AST hashing, careful invalidation logic, and significant memory management. |
+| Central Stats Aggregator | Low | Low | Unified API to get all cache statistics in one call. Useful for debugging and monitoring. |
+| Auto-Disable Inactive Rules | Medium | Low | Track rule hit rates over many analysis runs. Rules with 0% violation rate over 100+ files are candidates for automatic disabling (opt-in). Requires persistence of hit rate statistics and user configuration. |
+| Memory Pooling | Medium | Low | Reuse visitor and reporter objects instead of allocating new ones for each file. Reduces GC pressure for high-frequency analysis. Would require resettable object design and pool management. |
 | Lazy Rule Instantiation | Medium | Low | Create rule instances on-demand based on enabled tier rather than `const` list. Current approach uses compile-time constants (low overhead), but lazy instantiation could reduce initial memory for projects using minimal tiers. |
+| **Rule Hit Rate Decay** | Medium | High | Track violation rate per rule. Rules with 0% hits over 50+ files get deprioritized (run last). Self-tuning optimization that adapts to codebase patterns. |
+| ~~**Negative Pattern Index**~~ | Low | Medium | **SKIPPED - Safety Risk**: At startup, scan codebase for patterns that NEVER appear. Skip rules requiring absent patterns globally. **Problem**: If a developer adds a pattern (e.g., `Timer.periodic`) to a file after IDE startup, rules would be incorrectly skipped until IDE restart, causing real violations to be missed. This optimization trades correctness for speed, which violates our principle that optimizations must never miss actual violations. |
+| **Semantic Similarity Skip** | Hard | High | Files with identical import+class structure likely have same violations. Hash structure → cache rule results. Skip analysis on structurally identical files. |
+| **Violation Locality Heuristic** | Medium | Medium | Track where violations cluster (imports, class bodies, etc). Focus analysis on high-violation regions first for faster initial feedback. |
+| **Co-Edit Prediction** | Hard | Medium | From git history, learn which files are edited together. When A changes, pre-warm B's cache. Requires git log parsing and pattern learning. |
+| **Type Resolution Batching** | Medium | High | Rules needing type resolution share the expensive resolver setup. Batch them instead of per-rule setup cost. Requires grouping rules by type resolution needs. |
+
+**Alternative under consideration**: A standalone precompiled CLI binary could bypass framework limitations for CI pipelines (parallel execution, lower memory), but would sacrifice real-time IDE feedback. May revisit when rule count exceeds 2000.
+
+## Quick Fix Implementation Plan
+
+**Target: 90% of rules with useful quick fixes that DO NOT break apps.**
+
+Current status: ~200 fixes for ~1530 rules (13%). Goal: ~1377 fixes (90%).
+
+### Guiding Principles
+
+1. **Safety first**: A fix that breaks code is worse than no fix. When in doubt, don't add a fix.
+2. **No HACK comments**: `// HACK: fix this manually` adds no value. Either fix it properly or don't add a fix.
+3. **Context matters**: The "correct" fix often depends on surrounding code that the AST doesn't reveal.
+4. **Multiple valid fixes**: When there are several correct approaches, offer multiple fix options or skip the fix.
+
+### Fix Categories by Feasibility
+
+#### Category A: Safe Transformations (Target: 100% coverage)
+
+These fixes have exactly one correct transformation and cannot break code:
+
+| Pattern | Example Rule | Fix |
+|---------|--------------|-----|
+| Operator replacement | `prefer_not_equals` | `!(a == b)` → `a != b` |
+| Constant replacement | `prefer_const_constructor` | Add `const` keyword |
+| Remove redundant code | `unnecessary_this` | Remove `this.` prefix |
+| Add missing keyword | `prefer_final_locals` | Add `final` keyword |
+| Invert condition | `prefer_if_null_operators` | `x != null ? x : y` → `x ?? y` |
+| Simplify expression | `prefer_is_empty` | `list.length == 0` → `list.isEmpty` |
+
+**Estimated rules in this category: ~200**
+
+#### Category B: Contextual Transformations (Target: 80% coverage)
+
+These fixes are correct in most contexts but need validation:
+
+| Pattern | Context Check Required | Fix |
+|---------|----------------------|-----|
+| Add `await` | Function must be `async` | Insert `await` (only if already async) |
+| Add `await` | Function is sync lifecycle method | Offer `unawaited()` with import |
+| Wrap with widget | Must maintain child relationship | Wrap expression, preserve indentation |
+| Add parameter | Default value must be sensible | Add parameter with documented default |
+| Add null check | Must not change semantics | Add `?.` or `?? defaultValue` |
+
+**Estimated rules in this category: ~400**
+
+**Implementation approach:**
+1. Check preconditions in the fix's `run()` method
+2. If preconditions not met, don't apply the fix (return early)
+3. Document which contexts the fix handles in the rule's doc comment
+
+#### Category C: Multi-Choice Fixes (Target: 50% coverage)
+
+Multiple valid fixes exist; offer choices or pick the safest:
+
+| Scenario | Options | Approach |
+|----------|---------|----------|
+| Dispose missing | Add to existing `dispose()` vs create override | Check if `dispose()` exists; add appropriately |
+| Error handling | try-catch vs `.catchError()` vs `.onError` | Offer multiple fix options in IDE |
+| Async in sync context | `unawaited()` vs extract to async method vs `.then()` | Offer options; `unawaited()` as default |
+| Missing import | Multiple packages export same symbol | Don't auto-import; leave to IDE |
+
+**Estimated rules in this category: ~300**
+
+#### Category D: Human Judgment Required (Target: 0% fix coverage)
+
+Do NOT add fixes for these. Document why in the rule's doc comment:
+
+| Scenario | Why No Fix |
+|----------|-----------|
+| Architecture decisions | "Extract to service" - where? which service? |
+| Business logic | "Add validation" - what validation logic? |
+| Naming conventions | "Use descriptive name" - that's subjective |
+| Complex refactoring | "Split large class" - how to split? |
+| Cross-file changes | "Move to separate file" - what filename? |
+
+**Estimated rules in this category: ~600**
+
+### Implementation Phases
+
+#### Phase 1: Category A Rules (Safe Transformations)
+
+Audit all rules to identify Category A patterns. These can be implemented quickly with high confidence:
+
+- [ ] Audit `stylistic_rules.dart` - many are simple transformations
+- [ ] Audit `unnecessary_code_rules.dart` - removal/simplification patterns
+- [ ] Audit `formatting_rules.dart` - whitespace/keyword additions
+- [ ] Audit `equality_rules.dart` - operator replacements
+
+#### Phase 2: Category B Rules (Contextual Transformations)
+
+Create helper utilities for common context checks:
+
+- [ ] `isInAsyncFunction(node)` - check if containing function is async
+- [ ] `isInLifecycleMethod(node)` - check if in initState/dispose/build
+- [ ] `hasExistingDispose(classNode)` - check for dispose override
+- [ ] `getContainingWidget(node)` - find enclosing widget class
+
+Then implement fixes that use these utilities.
+
+#### Phase 3: Category C Rules (Multi-Choice)
+
+For rules where multiple fixes are valid:
+
+- [ ] Implement `getFixes()` returning multiple `Fix` instances
+- [ ] Each fix has distinct `message` explaining the approach
+- [ ] User chooses in IDE quick-fix menu
+
+#### Phase 4: Documentation
+
+For Category D rules (no fix possible):
+
+- [ ] Add `/// **No quick fix**: [reason]` to doc comments
+- [ ] Ensure `correctionMessage` gives actionable human guidance
+
+### Tracking Progress
+
+Update `scripts/audit_rules.py` to track:
+- Rules with fixes vs without
+- Rules documented as "no fix possible" vs "fix TODO"
+- Category breakdown (A/B/C/D)
+
+### Safety Checklist for Every Fix
+
+Before merging any fix:
+
+- [ ] **Does not delete code** (comment out instead, if removal needed)
+- [ ] **Does not change runtime behavior** (except to fix the lint issue)
+- [ ] **Does not add imports** (unless absolutely required and unambiguous)
+- [ ] **Works in edge cases** (empty files, nested structures, generated code)
+- [ ] **Tested in example fixtures** (both success and failure cases)
 
 ## Part 1: Detailed Rule Specifications
 
@@ -661,27 +834,21 @@ The `custom_lint` plugin architecture runs inside the Dart analysis server proce
 | `avoid_suspicious_super_overrides` | Professional | WARNING | Detect suspicious super.method() calls in overrides. |
 | `prefer_class_destructuring` | Professional | INFO | Use record destructuring for class field access when beneficial. |
 
-### 1.59 Boolean & Conditional Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-| ⭐ `no_boolean_literal_compare` | Recommended | INFO | Avoid comparing boolean expressions to boolean literals (`if (x == true)`). |
-
-### 1.60 JSON & Serialization Rules
+### 1.59 JSON & Serialization Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⭐ `avoid_not_encodable_in_to_json` | Professional | WARNING | Detect toJson methods that return non-encodable types. |
 | `prefer_correct_json_casts` | Professional | INFO | Use proper type casts when working with JSON data. |
 
-### 1.61 Ordering & Pattern Rules
+### 1.60 Ordering & Pattern Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `pattern_fields_ordering` | Stylistic | INFO | Enforce consistent ordering of fields in pattern matching. |
 | `record_fields_ordering` | Stylistic | INFO | Enforce consistent ordering of fields in record declarations. |
 
-### 1.62 Code Quality Rules
+### 1.61 Code Quality Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
@@ -697,14 +864,14 @@ The `custom_lint` plugin architecture runs inside the Dart analysis server proce
 | `tag_name` | Professional | INFO | Validate custom element tag names follow conventions. |
 | `banned_usage` | Professional | WARNING | Configurable rule to ban specific APIs, classes, or patterns. |
 
-### 1.63 Bloc/Cubit Rules
+### 1.62 Bloc/Cubit Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_cubits` | Stylistic | INFO | Prefer Bloc over Cubit for better event traceability. |
-| `avoid_passing_bloc_to_bloc` | Professional | WARNING | Blocs should not directly depend on other Blocs - use streams or events. |
-| `avoid_passing_build_context_to_blocs` | Essential | WARNING | BuildContext in Blocs couples UI to business logic. |
-| `avoid_returning_value_from_cubit_methods` | Professional | INFO | Cubit methods should emit states, not return values. |
+| ⭐ `avoid_passing_bloc_to_bloc` | Professional | WARNING | Blocs should not directly depend on other Blocs - use streams or events. |
+| ⭐ `avoid_passing_build_context_to_blocs` | Essential | WARNING | BuildContext in Blocs couples UI to business logic. |
+| ⭐ `avoid_returning_value_from_cubit_methods` | Professional | INFO | Cubit methods should emit states, not return values. |
 | `handle_bloc_event_subclasses` | Professional | INFO | Ensure all event subclasses are handled in event handlers. |
 | `prefer_bloc_extensions` | Professional | INFO | Use Bloc extension methods for cleaner code. |
 
@@ -741,8 +908,8 @@ The `custom_lint` plugin architecture runs inside the Dart analysis server proce
 |-----------|------|----------|-------------|
 | `avoid_missing_tr` | Essential | WARNING | Detect strings that should be translated but aren't. |
 | `avoid_missing_tr_on_strings` | Essential | WARNING | User-visible strings should use translation methods. |
-| `prefer_number_format` | Recommended | INFO | Use NumberFormat with locale for consistent number formatting. |
-| `provide_correct_intl_args` | Essential | ERROR | Intl.message args must match placeholders in the message. |
+| ⭐ `prefer_number_format` | Recommended | INFO | Use NumberFormat with locale for consistent number formatting. |
+| ⭐ `provide_correct_intl_args` | Essential | ERROR | Intl.message args must match placeholders in the message. |
 
 #### Testing Rules
 
@@ -786,7 +953,7 @@ The `custom_lint` plugin architecture runs inside the Dart analysis server proce
 | `avoid_collection_mutating_methods` | Professional | WARNING | Avoid methods that mutate collections in place. |
 | `avoid_missing_controller` | Essential | WARNING | Widgets requiring controllers should have them provided. |
 | `avoid_unnecessary_null_aware_elements` | Recommended | INFO | Null-aware elements in collections that can't be null. |
-| `dispose_class_fields` | Essential | WARNING | Class fields that are disposable should be disposed. |
+| ⭐ `dispose_class_fields` | Essential | WARNING | Class fields that are disposable should be disposed. |
 | `prefer_spacing` | Recommended | INFO | Use Spacing widget (or SizedBox) for consistent spacing. |
 | `use_closest_build_context` | Professional | INFO | Use the closest available BuildContext for better performance. |
 
@@ -1169,7 +1336,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | ⭐ `require_bloc_event_sealed` | Professional | INFO | Events should be sealed classes for exhaustiveness. Detect non-sealed event hierarchies. |
 | ⭐ `require_bloc_repository_injection` | Professional | INFO | Blocs should receive repositories via constructor. Detect Bloc creating its own dependencies. |
 | ⭐ `prefer_bloc_transform_events` | Professional | INFO | Use transformer for event debouncing/throttling. Detect manual debounce in event handlers. |
-| `prefer_bloc_hydration` | Professional | INFO | Persistent state should use HydratedBloc. Detect manual SharedPreferences in Bloc. |
+| ⭐ `prefer_bloc_hydration` | Professional | INFO | Persistent state should use HydratedBloc. Detect manual SharedPreferences in Bloc. |
 | `avoid_behavior_subject_last_value` | Professional | WARNING | BehaviorSubject retains value after close. Use PublishSubject when appropriate. |
 
 ### 5.6 GetX Anti-Pattern Rules
@@ -1177,10 +1344,10 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_getx_for_everything` | Professional | INFO | `[HEURISTIC]` GetX shouldn't be used for all patterns. Detect project over-reliance on GetX. |
-| `avoid_getx_dialog_snackbar_in_controller` | Essential | WARNING | Dialogs/snackbars in controllers can't be tested. Detect Get.snackbar in GetxController. |
+| ⭐ `avoid_getx_dialog_snackbar_in_controller` | Essential | WARNING | Dialogs/snackbars in controllers can't be tested. Detect Get.snackbar in GetxController. |
 | `prefer_getx_builder_over_obx` | Recommended | INFO | GetBuilder is more explicit than Obx for state. Detect mixed patterns. |
 | `avoid_getx_static_get` | Professional | WARNING | Get.find() is hard to test. Prefer constructor injection. Detect Get.find in methods. |
-| `require_getx_lazy_put` | Professional | INFO | Use Get.lazyPut for lazy initialization. Detect Get.put for rarely-used controllers. |
+| ⭐ `require_getx_lazy_put` | Professional | INFO | Use Get.lazyPut for lazy initialization. Detect Get.put for rarely-used controllers. |
 | `avoid_getx_rx_nested_obs` | Professional | WARNING | Nested .obs creates complex reactive trees. Detect Rx<List<Rx<Type>>>. |
 | `avoid_getx_build_context_bypass` | Essential | ERROR | Bypassing BuildContext hides Flutter fundamentals. Detect excessive Get.context usage. |
 
@@ -1188,8 +1355,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_hive_lazy_box` | Professional | INFO | Large boxes should use LazyBox to avoid memory issues. Detect Box with many entries. |
-| `avoid_hive_binary_storage` | Professional | INFO | Store file paths, not binary data in Hive. Detect Uint8List fields in Hive types. |
+| ⭐ `prefer_hive_lazy_box` | Professional | INFO | Large boxes should use LazyBox to avoid memory issues. Detect Box with many entries. |
+| ⭐ `avoid_hive_binary_storage` | Professional | INFO | Store file paths, not binary data in Hive. Detect Uint8List fields in Hive types. |
 | `avoid_hive_type_modification` | Professional | WARNING | Modifying Hive type fields breaks existing data. Detect field type changes. |
 | `prefer_hive_compact` | Professional | INFO | Large boxes should be compacted periodically. Detect long-running box without compact. |
 | `require_hive_migration_strategy` | Professional | INFO | Schema changes need migration handling. Detect version field or migration logic. |
@@ -1201,11 +1368,11 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_shared_prefs_large_data` | Professional | WARNING | SharedPreferences isn't for large data. Detect storing >1KB values. |
-| `require_shared_prefs_prefix` | Professional | INFO | Set prefix to avoid conflicts. Detect SharedPreferences without setPrefix call. |
-| `prefer_shared_prefs_async_api` | Recommended | INFO | Use SharedPreferencesAsync for new code. Detect legacy SharedPreferences API. |
+| ⭐ `require_shared_prefs_prefix` | Professional | INFO | Set prefix to avoid conflicts. Detect SharedPreferences without setPrefix call. |
+| ⭐ `prefer_shared_prefs_async_api` | Recommended | INFO | Use SharedPreferencesAsync for new code. Detect legacy SharedPreferences API. |
 | `avoid_shared_prefs_sync_race` | Professional | WARNING | Multiple writers can race. Detect concurrent SharedPreferences writes. |
 | `prefer_typed_prefs_wrapper` | Professional | INFO | Wrap SharedPreferences in typed class. Detect raw getString/setString calls. |
-| `avoid_shared_prefs_in_isolate` | Essential | ERROR | SharedPreferences doesn't work in isolates. Detect isolate usage with prefs. |
+| ⭐ `avoid_shared_prefs_in_isolate` | Essential | ERROR | SharedPreferences doesn't work in isolates. Detect isolate usage with prefs. |
 
 ### 5.9 sqflite Database Rules
 
@@ -1284,7 +1451,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `avoid_freezed_invalid_annotation_target` | Recommended | INFO | Disable invalid_annotation_target warning in analysis_options. |
 | `prefer_freezed_for_data_classes` | Recommended | INFO | Use Freezed for data classes with equality. Detect manual == override. |
-| `avoid_freezed_for_logic_classes` | Professional | WARNING | Don't use Freezed for Blocs/services. Detect @freezed on non-data classes. |
+| ⭐ `avoid_freezed_for_logic_classes` | Professional | WARNING | Don't use Freezed for Blocs/services. Detect @freezed on non-data classes. |
 | `prefer_freezed_union_types` | Professional | INFO | Use Freezed unions for sealed state. Detect manual sealed class hierarchies. |
 | `avoid_freezed_any_map_issue` | Professional | WARNING | any_map in build.yaml not respected in .freezed.dart. Document workaround. |
 
@@ -1321,8 +1488,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_stream_distinct` | Professional | INFO | Use distinct() to skip duplicate events. Detect StreamBuilder rebuilding on same value. |
-| `prefer_broadcast_stream` | Professional | INFO | Use asBroadcastStream() for multiple listeners. Detect single-listener stream with multiple uses. |
+| ⭐ `prefer_stream_distinct` | Professional | INFO | Use distinct() to skip duplicate events. Detect StreamBuilder rebuilding on same value. |
+| ⭐ `prefer_broadcast_stream` | Professional | INFO | Use asBroadcastStream() for multiple listeners. Detect single-listener stream with multiple uses. |
 | `avoid_stream_sync_events` | Professional | WARNING | Streams emitting synchronously can cause issues. Detect sync: true without reason. |
 | `prefer_stream_transformer` | Professional | INFO | Use transformers for complex operations. Detect manual stream manipulation. |
 | `require_stream_cancel_on_error | Professional | INFO | Consider cancelOnError for critical streams. Detect error-sensitive streams. |
@@ -1332,12 +1499,12 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_future_in_build` | Essential | WARNING | Create futures in initState. Detect Future creation in build triggering rebuilds. |
+| ⭐ `avoid_future_in_build` | Essential | WARNING | Create futures in initState. Detect Future creation in build triggering rebuilds. |
 | ⭐ `require_mounted_check_after_await` | Essential | WARNING | Check mounted after await in StatefulWidget. Detect setState after await without check. |
 | `avoid_sequential_awaits` | Professional | INFO | Await independent futures in parallel. Detect sequential awaits that could be parallel. |
 | ⭐ `prefer_future_wait` | Professional | INFO | Use Future.wait for parallel execution. Detect multiple sequential awaits. |
-| `avoid_async_in_build` | Professional | WARNING | async operations shouldn't be in build. Detect async call in build method. |
-| `prefer_async_init_state` | Professional | INFO | Use FutureBuilder for async initialization. Detect async call in initState. |
+| ⭐ `avoid_async_in_build` | Professional | WARNING | async operations shouldn't be in build. Detect async call in build method. |
+| ⭐ `prefer_async_init_state` | Professional | INFO | Use FutureBuilder for async initialization. Detect async call in initState. |
 | `require_cancellable_operations` | Professional | INFO | Long operations should be cancellable. Detect Completer without cancel mechanism. |
 
 ### 5.23 Widget Lifecycle Rules
@@ -1345,7 +1512,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_expensive_did_change_dependencies` | Professional | WARNING | didChangeDependencies runs often. Detect heavy work in didChangeDependencies. |
-| `require_widgets_binding_callback` | Professional | INFO | Use addPostFrameCallback for post-build logic. Detect alternative patterns. |
+| ⭐ `require_widgets_binding_callback` | Professional | INFO | Use addPostFrameCallback for post-build logic. Detect alternative patterns. |
 | `prefer_deactivate_for_cleanup` | Professional | INFO | Use deactivate for removable cleanup. Detect dispose-only cleanup that could be in deactivate. |
 
 ### 5.24 Form/TextFormField Rules
@@ -1362,9 +1529,9 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_const_list_items` | Professional | INFO | List items should be const when possible. Detect non-const static items. |
-| `prefer_sliver_list | Professional | INFO | Use SliverList for CustomScrollView. Detect ListView in CustomScrollView. |
+| ⭐ `prefer_sliver_list` | Professional | INFO | Use SliverList for CustomScrollView. Detect ListView in CustomScrollView. |
 | `prefer_cache_extent` | Professional | INFO | Tune cacheExtent for performance. Detect default cacheExtent with issues. |
-| `require_addAutomaticKeepAlives_off` | Professional | INFO | Disable for memory savings in long lists. Detect long list with default true. |
+| ⭐ `require_addAutomaticKeepAlives_off` | Professional | INFO | Disable for memory savings in long lists. Detect long list with default true. |
 | `prefer_find_child_index_callback` | Professional | INFO | Use for custom child positioning. Detect custom index needs. |
 
 ### 5.26 Navigator Rules
@@ -1375,7 +1542,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_pop_result_type` | Professional | INFO | MaterialPageRoute should have type for pop result. Detect untyped route with result. |
 | `avoid_push_replacement_misuse` | Recommended | WARNING | Understand push vs pushReplacement. Detect inappropriate replacement. |
 | `require_will_pop_scope | Professional | INFO | Handle back button appropriately. Detect navigation without back handling. |
-| `prefer_route_settings_name` | Professional | INFO | Use RouteSettings.name for analytics. Detect routes without names. |
+| ⭐ `prefer_route_settings_name` | Professional | INFO | Use RouteSettings.name for analytics. Detect routes without names. |
 | `require_navigation_result_handling` | Professional | INFO | Handle pushed route's result. Detect push without await or then. |
 | `prefer_named_routes_for_deep_links` | Professional | INFO | Named routes enable deep linking. Detect anonymous route construction. |
 
@@ -1432,14 +1599,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `avoid_test_sleep | Essential | WARNING | Don't use sleep in tests. Detect Duration sleep in tests; use pump. |
 | `require_test_golden_threshold` | Professional | INFO | Set golden test threshold for CI differences. Detect default threshold. |
-| ⭐ `prefer_test_find_by_key` | Professional | INFO | Use Keys for reliable widget finding. Detect find.text for dynamic text. |
-| ⭐ `prefer_setup_teardown` | Recommended | INFO | Use setUp/tearDown for common operations. Detect repeated test setup. |
 | `require_test_coverage_threshold` | Professional | INFO | Set minimum coverage threshold. Detect coverage below threshold. |
-| ⭐ `require_test_description` | Recommended | INFO | Test names should describe behavior. Detect vague test names. |
-| ⭐ `prefer_bloc_test_package` | Professional | INFO | Use bloc_test for Bloc testing. Detect manual Bloc test setup. |
-| ⭐ `prefer_mock_verify` | Professional | INFO | Verify mock interactions. Detect mocks without verify calls. |
 
 ### 5.32 Dispose Pattern Rules
 
@@ -1511,7 +1672,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `prefer_feature_folders` | Professional | INFO | `[HEURISTIC]` Organize by feature, not type. Detect flat structure with many files. |
 | `prefer_composition_over_inheritance` | Professional | INFO | Use composition for flexibility. Detect deep inheritance hierarchies. |
 | `require_barrel_files` | Professional | INFO | Use barrel files for exports. Detect multiple individual imports. |
-| `avoid_circular_imports` | Essential | ERROR | `[CROSS-FILE]` Circular imports cause issues. Detect import cycles. |
 | `prefer_layer_separation` | Professional | INFO | `[CROSS-FILE]` Keep UI, business logic, data separate. Detect layer violations. |
 | `require_interface_for_dependency` | Professional | INFO | Use interfaces for testability. Detect concrete class dependencies. |
 | `avoid_util_class | Professional | INFO | `[HEURISTIC]` Util classes are code smells. Detect classes named Util/Helper. |
@@ -1564,9 +1724,9 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `prefer_injectable_package` | Professional | INFO | Use code generation for DI. Detect manual registration boilerplate. |
 | `avoid_service_locator_abuse` | Professional | WARNING | `[HEURISTIC]` Don't use GetIt everywhere. Detect GetIt.I in business logic. |
 | ⭐ `prefer_constructor_injection` | Essential | INFO | Inject via constructor, not locator. Detect GetIt.I in constructor body. |
-| `avoid_di_in_widgets` | Recommended | WARNING | Use InheritedWidget/Provider in widgets. Detect GetIt.I in widget. |
+| ⭐ `avoid_di_in_widgets` | Recommended | WARNING | Use InheritedWidget/Provider in widgets. Detect GetIt.I in widget. |
 | `require_di_module_separation` | Professional | INFO | Separate DI configuration into modules. Detect monolithic registration. |
-| `prefer_abstraction_injection` | Professional | INFO | Inject interfaces, not implementations. Detect concrete type injection. |
+| ⭐ `prefer_abstraction_injection` | Professional | INFO | Inject interfaces, not implementations. Detect concrete type injection. |
 
 ### 5.43 Accessibility Advanced Rules
 
@@ -1575,7 +1735,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_text_scale_factor_awareness` | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
 | `avoid_insufficient_contrast` | Essential | WARNING | `[HEURISTIC]` Text needs sufficient contrast. Detect low contrast color combinations. |
 | `require_focus_order` | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
-| `prefer_large_touch_targets` | Essential | WARNING | Touch targets should be ≥48px. Detect small interactive widgets. |
+| ⭐ `prefer_large_touch_targets` | Essential | WARNING | Touch targets should be ≥48px. Detect small interactive widgets. |
 | `require_reduced_motion_support` | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
 | `prefer_readable_line_length` | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
 | `require_heading_hierarchy` | Professional | INFO | Use proper heading structure. Detect inconsistent heading levels. |
@@ -1596,14 +1756,14 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_init_state_idempotent` | Essential | WARNING | initState may run multiple times. Detect non-idempotent initialization. |
-| `avoid_global_keys_in_state` | Professional | WARNING | GlobalKeys persist across hot reload. Detect GlobalKey field in StatefulWidget. |
-| `avoid_static_route_config` | Essential | WARNING | Static GoRouter causes hot reload issues. Detect static final router. |
+| ⭐ `avoid_global_keys_in_state` | Professional | WARNING | GlobalKeys persist across hot reload. Detect GlobalKey field in StatefulWidget. |
+| ⭐ `avoid_static_route_config` | Essential | WARNING | Static GoRouter causes hot reload issues. Detect static final router. |
 
 ### 5.47 Package Version Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_flutter_riverpod_not_riverpod` | Essential | ERROR | Flutter apps need flutter_riverpod. Detect riverpod without flutter_riverpod. |
+| ⭐ `require_flutter_riverpod_not_riverpod` | Essential | ERROR | Flutter apps need flutter_riverpod. Detect riverpod without flutter_riverpod. |
 | `require_compatible_versions` | Essential | ERROR | Check for incompatible package versions. Detect known version conflicts. |
 | `prefer_latest_stable` | Recommended | INFO | Use latest stable versions. Detect outdated packages. |
 | `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |

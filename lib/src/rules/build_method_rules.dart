@@ -160,7 +160,8 @@ class AvoidDialogInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dialog_in_build',
     problemMessage:
-        '[avoid_dialog_in_build] showDialog in build() causes infinite dialog loop.',
+        '[avoid_dialog_in_build] showDialog in build() triggers rebuild which '
+        'shows another dialog, creating infinite loop and freezing the app.',
     correctionMessage:
         'Move dialog calls to event handlers or lifecycle methods.',
     errorSeverity: DiagnosticSeverity.ERROR,

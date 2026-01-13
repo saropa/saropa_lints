@@ -120,9 +120,9 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_small_touch_targets',
     problemMessage:
-        '[avoid_small_touch_targets] Touch target may be too small. Minimum recommended size is 48x48.',
+        '[avoid_small_touch_targets] Touch target under 44px. Users with motor impairments will struggle to tap accurately (WCAG 2.5.5).',
     correctionMessage:
-        'Increase the size to at least 48x48 for better accessibility.',
+        'Wrap in SizedBox(width: 48, height: 48) or use Material minimumSize.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -253,7 +253,8 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_exclude_semantics_justification',
     problemMessage:
-        '[require_exclude_semantics_justification] ExcludeSemantics should have a comment explaining why content is excluded.',
+        '[require_exclude_semantics_justification] ExcludeSemantics without '
+        'justification makes accessibility audits harder to pass.',
     correctionMessage:
         'Add a comment above ExcludeSemantics explaining the rationale.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -356,9 +357,9 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_color_only_indicators',
     problemMessage:
-        '[avoid_color_only_indicators] Avoid using color alone to convey information. Add icons or text.',
+        '[avoid_color_only_indicators] Color-only status indicator. 8% of men are colorblind and cannot distinguish red/green (WCAG 1.4.1).',
     correctionMessage:
-        'Add an icon, text label, or pattern alongside the color indicator.',
+        'Add Icon(isError ? Icons.error : Icons.check) alongside the color.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -441,9 +442,9 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
     problemMessage:
-        '[avoid_gesture_only_interactions] GestureDetector should have keyboard accessibility alternatives.',
+        '[avoid_gesture_only_interactions] GestureDetector without keyboard support. Users with motor disabilities using switch control cannot activate.',
     correctionMessage:
-        'Wrap with Focus and handle keyboard events, or use a Button widget.',
+        'Wrap with Focus + onKeyEvent, or replace with InkWell/Button.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -627,7 +628,8 @@ class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
     problemMessage:
-        '[avoid_merged_semantics_hiding_info] MergeSemantics contains interactive widgets. Buttons/inputs may become inaccessible.',
+        '[avoid_merged_semantics_hiding_info] MergeSemantics hides interactive '
+        'elements from screen readers, making buttons/inputs unusable.',
     correctionMessage:
         'Move interactive widgets outside MergeSemantics, or wrap only related text content.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -838,7 +840,8 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
     problemMessage:
-        '[require_heading_semantics] Section headers should have Semantics with header: true.',
+        '[require_heading_semantics] Missing header semantics prevents screen '
+        'reader users from navigating by headings.',
     correctionMessage:
         'Wrap with Semantics(header: true) for screen reader navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2251,7 +2254,8 @@ class RequireImageDescriptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_description',
     problemMessage:
-        '[require_image_description] Image should have semanticLabel or excludeFromSemantics.',
+        '[require_image_description] Image without semanticLabel is announced '
+        'as "image" by screen readers, providing no useful information.',
     correctionMessage:
         'Add semanticLabel for content images or excludeFromSemantics: true '
         'for decorative images.',
@@ -2589,7 +2593,8 @@ class AvoidFlashingContentRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_flashing_content',
     problemMessage:
-        '[avoid_flashing_content] Animation may flash more than 3 times per second.',
+        '[avoid_flashing_content] Flashing >3Hz can trigger seizures in users '
+        'with photosensitive epilepsy. WCAG 2.3.1 compliance required.',
     correctionMessage:
         'Increase duration to at least 333ms to stay under 3 flashes/second.',
     errorSeverity: DiagnosticSeverity.WARNING,

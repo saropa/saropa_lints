@@ -56,7 +56,8 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_file_close_in_finally',
     problemMessage:
-        '[require_file_close_in_finally] File handle should be closed in finally block.',
+        '[require_file_close_in_finally] Unclosed file handle on exception '
+        'leaks file descriptor, exhausting system limits.',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -169,7 +170,8 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_database_close',
     problemMessage:
-        '[require_database_close] Database connection should be closed.',
+        '[require_database_close] Unclosed database connection leaks resources '
+        'and may exhaust connection pool, causing app failures.',
     correctionMessage:
         'Close database in finally block or use connection pool.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -250,7 +252,8 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_http_client_close',
     problemMessage:
-        '[require_http_client_close] HttpClient should be closed when done.',
+        '[require_http_client_close] Unclosed HttpClient leaks socket '
+        'connections and memory, eventually exhausting system resources.',
     correctionMessage: 'Call client.close() in finally block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -316,7 +319,8 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_native_resource_cleanup',
     problemMessage:
-        '[require_native_resource_cleanup] Native resource should be freed.',
+        '[require_native_resource_cleanup] Unfreed native memory leaks '
+        'outside Dart GC, causing permanent memory loss until app restart.',
     correctionMessage: 'Call free() in finally block for native allocations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -409,7 +413,8 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_websocket_close',
     problemMessage:
-        '[require_websocket_close] WebSocket should be closed in dispose.',
+        '[require_websocket_close] Unclosed WebSocket leaks connections and '
+        'continues receiving data after widget disposal, causing errors.',
     correctionMessage: 'Add _socket.close() in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -507,7 +512,8 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_platform_channel_cleanup',
     problemMessage:
-        '[require_platform_channel_cleanup] Platform channel handler should be removed in dispose.',
+        '[require_platform_channel_cleanup] Active platform channel handler '
+        'receives callbacks after dispose, causing setState on unmounted widget.',
     correctionMessage: 'Set handler to null in dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -603,7 +609,8 @@ class RequireIsolateKillRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isolate_kill',
     problemMessage:
-        '[require_isolate_kill] Spawned Isolate should be killed when done.',
+        '[require_isolate_kill] Unkilled Isolate continues consuming CPU and '
+        'memory, and may send messages to disposed handlers causing crashes.',
     correctionMessage: 'Call isolate.kill() in cleanup/dispose method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -687,7 +694,8 @@ class RequireCameraDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_camera_dispose',
     problemMessage:
-        '[require_camera_dispose] CameraController must be disposed to release camera hardware.',
+        '[require_camera_dispose] Undisposed camera holds hardware exclusively, '
+        'blocking other apps from accessing camera until app restart.',
     correctionMessage:
         'Add _controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,

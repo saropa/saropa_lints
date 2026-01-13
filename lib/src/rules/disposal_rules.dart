@@ -69,7 +69,8 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_media_player_dispose',
     problemMessage:
-        '[require_media_player_dispose] Media player controller must be disposed to release hardware resources.',
+        '[require_media_player_dispose] Undisposed media controller holds '
+        'audio/video hardware, blocking other apps and draining battery.',
     correctionMessage:
         'Add controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -209,7 +210,8 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_dispose',
     problemMessage:
-        '[require_tab_controller_dispose] TabController must be disposed to free animation resources.',
+        '[require_tab_controller_dispose] Undisposed TabController leaks '
+        'AnimationController, causing memory exhaustion over time.',
     correctionMessage:
         'Add _tabController.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -449,8 +451,9 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_editing_controller_dispose',
     problemMessage:
-        '[require_text_editing_controller_dispose] TextEditingController must be disposed to prevent memory leaks.',
-    correctionMessage: 'Add _textController.dispose() in the dispose() method.',
+        '[require_text_editing_controller_dispose] TextEditingController field without dispose(). Memory leak - holds listeners and text buffer.',
+    correctionMessage:
+        'Add _controller.dispose() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -521,8 +524,9 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_page_controller_dispose',
     problemMessage:
-        '[require_page_controller_dispose] PageController must be disposed to prevent memory leaks.',
-    correctionMessage: 'Add _pageController.dispose() in the dispose() method.',
+        '[require_page_controller_dispose] PageController field without dispose(). Memory leak - scroll position and listeners retained.',
+    correctionMessage:
+        'Add _pageController.dispose() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -702,16 +706,20 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
   const AvoidWebsocketMemoryLeakRule() : super(code: _code);
 
   @override
-  LintImpact get impact => LintImpact.high;
+  LintImpact get impact => LintImpact.critical;
 
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_memory_leak',
     problemMessage:
-        '[avoid_websocket_memory_leak] WebSocketChannel must be closed in dispose().',
-    correctionMessage: 'Add channel.sink.close() to dispose method.',
+        '[avoid_websocket_memory_leak] WebSocketChannel field without close(). Connection stays open - wastes bandwidth, battery, and server resources.',
+    correctionMessage:
+        'Add channel.sink.close() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -822,8 +830,9 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_video_player_controller_dispose',
     problemMessage:
-        '[require_video_player_controller_dispose] VideoPlayerController must be disposed.',
-    correctionMessage: 'Add _controller.dispose() to dispose method.',
+        '[require_video_player_controller_dispose] VideoPlayerController without dispose(). Video keeps playing in background - drains battery and blocks audio focus.',
+    correctionMessage:
+        'Add _controller.dispose() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -954,10 +963,10 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_subscription_cancel',
     problemMessage:
-        '[require_stream_subscription_cancel] StreamSubscription must be cancelled in dispose().',
+        '[require_stream_subscription_cancel] StreamSubscription field without cancel(). '
+        'Callbacks fire after State disposal, causing setState errors and memory leaks.',
     correctionMessage:
-        'Add _subscription?.cancel() for single subscriptions, or iterate '
-        'with for-in/forEach for collections.',
+        'Add _sub?.cancel() in dispose(), or for-in loop for collections.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1643,7 +1652,8 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_debouncer_cancel',
     problemMessage:
-        '[require_debouncer_cancel] Debounce timer must be cancelled in dispose().',
+        '[require_debouncer_cancel] Uncancelled debounce timer fires after '
+        'dispose, calling setState on unmounted widget causing crashes.',
     correctionMessage: 'Add _debounce?.cancel() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1759,8 +1769,10 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_interval_timer_cancel',
     problemMessage:
-        '[require_interval_timer_cancel] Timer.periodic must be cancelled in dispose().',
-    correctionMessage: 'Add _timer?.cancel() in the dispose() method.',
+        '[require_interval_timer_cancel] Timer.periodic without cancel(). '
+        'Timer keeps firing after State disposal, draining battery and causing setState errors.',
+    correctionMessage:
+        'Add _timer?.cancel() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2013,7 +2025,8 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dispose_implementation',
     problemMessage:
-        '[require_dispose_implementation] StatefulWidget has disposable resources but no dispose() method.',
+        '[require_dispose_implementation] Controllers, subscriptions, or timers '
+        'without cleanup cause memory leaks and setState errors.',
     correctionMessage:
         'Add dispose() method to clean up controllers, subscriptions, and timers.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2184,7 +2197,8 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_dispose_before_new_instance',
     problemMessage:
-        '[prefer_dispose_before_new_instance] Disposable field reassigned without disposing old value.',
+        '[prefer_dispose_before_new_instance] Reassigning without dispose leaks '
+        'the old instance. Listeners and resources remain active forever.',
     correctionMessage:
         'Call dispose() on the old value before assigning a new instance.',
     errorSeverity: DiagnosticSeverity.WARNING,

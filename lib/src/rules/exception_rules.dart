@@ -26,7 +26,8 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_non_final_exception_class_fields',
     problemMessage:
-        '[avoid_non_final_exception_class_fields] Exception class fields should be final.',
+        '[avoid_non_final_exception_class_fields] Mutable exception fields '
+        'allow modification after throw, corrupting error data for handlers.',
     correctionMessage: 'Make all fields final in exception classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -98,7 +99,9 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_only_rethrow',
-    problemMessage: '[avoid_only_rethrow] Catch clause only contains rethrow.',
+    problemMessage:
+        '[avoid_only_rethrow] Catch-rethrow with no handling is dead code that '
+        'adds nesting and complexity without providing any value.',
     correctionMessage: 'Remove the try-catch or add meaningful error handling.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -305,7 +308,8 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_public_exception_classes',
     problemMessage:
-        '[prefer_public_exception_classes] Exception classes should be public.',
+        '[prefer_public_exception_classes] Private exception classes cannot be '
+        'caught by name outside this library, forcing generic catch blocks.',
     correctionMessage: 'Remove underscore prefix from exception class name.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

@@ -294,7 +294,8 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_generic_exceptions',
     problemMessage:
-        '[avoid_generic_exceptions] Avoid throwing generic Exception.',
+        '[avoid_generic_exceptions] Generic Exception prevents callers from '
+        'handling specific error cases, forcing catch-all blocks.',
     correctionMessage: 'Create and throw a specific exception type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -680,7 +681,8 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
     problemMessage:
-        '[require_error_boundary] App should have an error boundary.',
+        '[require_error_boundary] Unhandled widget errors crash the entire '
+        'app instead of showing a fallback UI.',
     correctionMessage:
         'Wrap app content in an ErrorBoundary widget or use builder with error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
