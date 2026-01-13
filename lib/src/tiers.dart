@@ -10,6 +10,38 @@ library;
 
 // cspell:ignore require_sqflite_whereargs getit futureor shouldrepaint itemextent singlechildscrollview
 
+/// Stylistic tier rules - rules focused on code style, formatting, and opinionated patterns.
+const Set<String> stylisticRules = <String>{
+  'prefer_single_quotes',
+  'prefer_double_quotes',
+  'prefer_trailing_commas',
+  'prefer_named_parameters',
+  'prefer_final_locals',
+  'prefer_const_constructors',
+  'prefer_const_declarations',
+  'prefer_typedefs',
+  'prefer_arrow_functions',
+  'prefer_expression_function_bodies',
+  'prefer_collection_literals',
+  'prefer_spread_collections',
+  'prefer_null_aware_operators',
+  'prefer_cascade',
+  // Explicitly added unassigned rules
+  'always_fail',
+  'arguments_ordering',
+  'capitalize_comment',
+  'firebase_custom',
+  'greeting',
+  'prefer_kebab_tag_name',
+  'prefer_rethrow_over_throw_e',
+  'prefer_sorted_members',
+  'prefer_sorted_parameters',
+  'purchase',
+  'saropa',
+  'saropa_lints',
+  'tag_name',
+};
+
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 const Set<String> essentialRules = <String>{
   // Memory Leaks - Controllers (dispose)
@@ -2091,10 +2123,14 @@ class _TierCache {
   static Set<String>? _professional;
   static Set<String>? _comprehensive;
   static Set<String>? _insanity;
+  static Set<String>? _stylistic;
 
   /// Essential + Recommended rules (cached).
   static Set<String> get recommended =>
       _recommended ??= <String>{...essentialRules, ...recommendedOnlyRules};
+  /// Stylistic rules only (cached).
+  static Set<String> get stylistic =>
+      _stylistic ??= <String>{...stylisticRules};
 
   /// Essential + Recommended + Professional rules (cached).
   static Set<String> get professional => _professional ??= <String>{
@@ -2222,20 +2258,17 @@ Set<String> getRulesForTier(String tier) {
     case 'essential':
       return essentialRules;
     case 'recommended':
-      // Uses cached set instead of rebuilding on every call
       return _TierCache.recommended;
     case 'professional':
-      // Uses cached set instead of rebuilding on every call
       return _TierCache.professional;
     case 'comprehensive':
-      // Uses cached set instead of rebuilding on every call
       return _TierCache.comprehensive;
+    case 'stylistic':
+      return _TierCache.stylistic;
     case 'insanity':
     case 'all':
-      // Uses cached set instead of rebuilding on every call
       return _TierCache.insanity;
     default:
-      // Default to essential if unknown tier
       return essentialRules;
   }
 }
