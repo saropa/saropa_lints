@@ -123,6 +123,7 @@ dart run custom_lint
 |------|------|-----------------|
 | `avoid_isar_enum_field` | essential | Enum fields that corrupt on schema changes |
 | `require_database_close` | recommended | Unclosed database connections |
+| `avoid_cached_isar_stream` | professional | Caching Isar query streams (runtime crash risk); quick fix to inline offending stream |
 
 ## Safe Enum Patterns
 
@@ -231,9 +232,6 @@ void main() async {
   await IsarDatabase.getInstance();
 
   runApp(const MyApp());
-}
-
-// On app termination (if needed)
 @override
 void dispose() {
   IsarDatabase.close();

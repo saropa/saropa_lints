@@ -1,3 +1,25 @@
+#
+# 4.1.3 - 2026-01-13
+
+### Added
+- **New Rule:** `avoid_cached_isar_stream` ([lib/src/rules/isar_rules.dart])
+  - Detects and prevents caching of Isar query streams (must be created inline).
+  - **Tier:** Professional
+  - **Quick Fix:** Inlines offending Isar stream expressions at usage sites and removes the cached variable.
+  - **Example:** [example/lib/isar/avoid_cached_isar_stream_fixture.dart]
+
+### Changed
+- **analysis_options_template.yaml:** Rule now available for override in the template.
+- **tiers.dart:** Rule assigned to professional tier.
+
+### Docs
+- **isar_rules.dart:** Added verbose doc header and developer comments for the rule.
+- **README.md:** Updated rule count, quick fix count, and Isar section.
+- **doc/guides/using_with_isar.md:** Documented new rule, rationale, and usage.
+- **ROADMAP.md:** Rule removed (now implemented).
+
+### Version
+- Patch release (not breaking)
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -6,6 +28,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
+
+## [4.1.2] - 2026-01-13
+
+### Tier Assignment for Previously Unassigned Rules
+
+The following 6 rules, previously implemented but not assigned to any tier, are now included in the most appropriate tier sets in `lib/src/tiers.dart`:
+
+- **Recommended Tier:**
+  - `avoid_duplicate_test_assertions` (test quality)
+  - `avoid_real_network_calls_in_tests` (test reliability)
+  - `require_error_case_tests` (test completeness)
+  - `require_test_isolation` (test reliability)
+  - `prefer_where_or_null` (idiomatic Dart collections)
+- **Professional Tier:**
+  - `prefer_copy_with_for_state` (state management, immutability)
+
+This ensures all implemented rules are available through tiered configuration and improves coverage for test and state management best practices.
+
+### Rule Tier Assignment Audit
+
+- Ran `scripts/audit_rules.py` to identify all implemented rules not assigned to any tier.
+- Assigned the following rules to the most appropriate tier sets in `lib/src/tiers.dart`:
+  - **Recommended:** `avoid_duplicate_test_assertions`, `avoid_real_network_calls_in_tests`, `require_error_case_tests`, `require_test_isolation`, `prefer_where_or_null`
+  - **Professional:** `prefer_copy_with_for_state`
+- All implemented rules are now available through tiered configuration. This ensures no orphaned rules and improves test and state management coverage.
+- Updated changelog to document these assignments and maintain full transparency of tier coverage.
+
+### Tier Set Maintenance
+
+- Commented out unimplemented rules in all tier sets in `lib/src/tiers.dart` to ensure only implemented rules are active per tier.
+- Confirmed all unimplemented rules are tracked in `ROADMAP.md` for future implementation.
+- This change improves roadmap alignment and prevents accidental activation of unimplemented rules.
+- Materially improve the message quality for all Critial rules
 
 ## [4.1.0] - 2026-01-12
 
@@ -610,7 +665,7 @@ This release focuses on **significant performance improvements** for large codeb
 
 #### Rule Filtering Cache
 
-- **Cached filtered rule list**: Previously, the 1400+ rule list was filtered on every file. Now the filtered list is computed once per analysis session and reused.
+- **Cached filtered rule list**: Previously, the 1400+ rule list was filtering on every file. Now the filtered list is computed once per analysis session and reused.
 - **Impact**: Eliminates O(n) filtering on each of thousands of files.
 
 #### Analyzer Excludes
@@ -671,3 +726,14 @@ None. All changes are backwards-compatible performance improvements.
 
 ## [2.7.0] and Earlier
 For details on the initial release and versions 0.1.0 through 1.6.0, please refer to [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md).
+
+## [Unassigned Rules Notice] - 2026-01-13
+
+The following 6 implemented rules are not currently assigned to any tier. They remain available for manual configuration and will be reviewed for tier assignment in a future release:
+
+- `avoid_duplicate_test_assertions`
+- `avoid_real_network_calls_in_tests`
+- `prefer_copy_with_for_state`
+- `prefer_where_or_null`
+- `require_error_case_tests`
+- `require_test_isolation`

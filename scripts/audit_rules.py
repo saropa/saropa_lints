@@ -619,16 +619,33 @@ def get_tier_stats(tiers_path: Path) -> TierStats:
         match = re.search(pattern, content, re.DOTALL)
         if match:
             set_content = match.group(1)
+            # Remove commented lines
+            set_content = '\n'.join(
+                line for line in set_content.splitlines()
+                if not line.strip().startswith('//')
+            )
             # Extract quoted rule names (not comments)
             rule_names = re.findall(r"'([a-z_]+)'", set_content)
             stats.counts[tier] = len(rule_names)
             stats.rules[tier] = set(rule_names)
 
-    # Stylistic rules: parse from README_STYLISTIC.md
-    stylistic_path = tiers_path.parent.parent.parent / "README_STYLISTIC.md"
+    # Stylistic rules: parse from tiers.dart stylisticRules set
+    stylistic_pattern = r"const Set<String> stylisticRules = <String>\{([^}]*)\};"
     stylistic_rules = set()
+    match = re.search(stylistic_pattern, content, re.DOTALL)
+    if match:
+        set_content = match.group(1)
+        stylistic_rules.update(re.findall(r"'([a-z_]+)'", set_content))
+
+    # Also add from README_STYLISTIC.md (for doc completeness)
+    stylistic_path = tiers_path.parent.parent.parent / "README_STYLISTIC.md"
     if stylistic_path.exists():
         md = stylistic_path.read_text(encoding="utf-8")
+        stylistic_rules.update(re.findall(r"\| [`]?([a-z_]+)[`]?\s*\|", md))
+    # Also add from README.md (for doc completeness)
+    readme_path = tiers_path.parent.parent.parent / "README.md"
+    if readme_path.exists():
+        md = readme_path.read_text(encoding="utf-8")
         stylistic_rules.update(re.findall(r"\| [`]?([a-z_]+)[`]?\s*\|", md))
     # Add all opinionated rules from Dart files
     rules_dir = tiers_path.parent / "rules"
@@ -716,8 +733,9 @@ def find_orphan_rules(
     implemented_rules: set[str],
     tier_stats: TierStats
 ) -> set[str]:
-    """Find rules that are implemented but not assigned to any tier (excluding stylistic)."""
-    return implemented_rules - tier_stats.all_tier_rules - tier_stats.stylistic_rules
+    """Find rules that are implemented but not assigned to any tier, including stylistic as a valid tier."""
+    # Now stylistic_rules are considered a valid tier assignment
+    return implemented_rules - tier_stats.all_tier_rules
 
 
 def print_quality_metrics(
@@ -790,15 +808,18 @@ def print_orphan_analysis(
         print_success("All rules are assigned to tiers")
         return
 
-    print_warning(f"{len(orphan_rules)} rules not assigned to any tier:")
+    # Only report non-stylistic orphans
+    non_stylistic_orphans = [r for r in sorted(orphan_rules) if r not in tier_stats.stylistic_rules]
+    if not non_stylistic_orphans:
+        print_success("All rules are assigned to tiers (including stylistic)")
+        return
+
+    print_warning(f"{len(non_stylistic_orphans)} rules not assigned to any tier:")
     print()
-
-    # Show first 10
-    for rule in sorted(orphan_rules)[:10]:
+    for rule in non_stylistic_orphans[:10]:
         print(f"      {Color.DIM.value}{rule}{Color.RESET.value}")
-
-    if len(orphan_rules) > 10:
-        print(f"      {Color.DIM.value}... and {len(orphan_rules) - 10} more{Color.RESET.value}")
+    if len(non_stylistic_orphans) > 10:
+        print(f"      {Color.DIM.value}... and {len(non_stylistic_orphans) - 10} more{Color.RESET.value}")
 
 
 # =============================================================================
@@ -1342,10 +1363,7 @@ def main() -> int:
     file_stats = get_file_stats(rules_dir)
     with_corrections, without_corrections = get_rules_with_corrections(rules_dir)
 
-    # File table (unless compact mode)
-    if not compact:
-        print_subheader("Rule Files")
-        print_file_stats_table(file_stats, compact=False)
+    # File table removed from terminal output; still included in markdown report
 
     # Summary stats
     print_subheader("Overview")
@@ -1353,6 +1371,7 @@ def main() -> int:
     print_stat("Documented aliases", len(aliases), Color.CYAN)
     print_stat("Quick fixes", quick_fixes, Color.MAGENTA)
     print_stat("ROADMAP entries remaining", len(roadmap), Color.YELLOW)
+
 
     # =========================================================================
     # SECTION 2: Distribution Analysis
@@ -1365,12 +1384,40 @@ def main() -> int:
         tier_stats = get_tier_stats(tiers_path)
         print_tier_stats(tier_stats)
 
+        # List rules in tiers.dart that are not implemented, and distinguish aliases
+        not_implemented = sorted(tier_stats.all_tier_rules - rules)
+        print_subheader("Rules in tiers.dart NOT implemented")
+        if not_implemented:
+            # Partition not_implemented into those covered by aliases and those truly missing
+            alias_covered = [rule for rule in not_implemented if rule in aliases]
+            truly_missing = [rule for rule in not_implemented if rule not in aliases]
+            total_missing = len(not_implemented)
+            print_warning(f"{total_missing} rules in tiers.dart are not implemented:")
+
+            # NOTE: use [:20] to LIMIT THE RESULT. e.g.
+            if alias_covered:
+                print_info(f"Aliases covering missing tiered rules ({len(alias_covered)}):")
+                for rule in alias_covered:
+                    print(f"      {Color.CYAN.value}{rule}{Color.RESET.value} (alias)")
+            if truly_missing:
+                print_error(f"Truly missing rules ({len(truly_missing)}):")
+                for rule in truly_missing:
+                    print(f"      {Color.RED.value}{rule}{Color.RESET.value}")
+                # for rule in truly_missing[:20]:
+                    # print(f"      {Color.RED.value}{rule}{Color.RESET.value}")
+                # if len(truly_missing) > 20:
+                #     print(f"      {Color.DIM.value}... and {len(truly_missing) - 20} more{Color.RESET.value}")
+            if not truly_missing:
+                print_success("All missing tiered rules are covered by aliases.")
+        else:
+            print_success("All rules in tiers.dart are implemented.")
+
     # Severity statistics
     severity_stats = get_severity_stats(rules_dir)
     print_severity_stats(severity_stats)
 
     # =========================================================================
-    # SECTION 3: Security & Compliance
+    # SECTION 3: SECURITY & COMPLIANCE
     # =========================================================================
     print_section("SECURITY & COMPLIANCE")
 
@@ -1379,7 +1426,7 @@ def main() -> int:
     print_owasp_coverage(owasp_coverage)
 
     # =========================================================================
-    # SECTION 4: Quality Metrics
+    # SECTION 4: QUALITY METRICS
     # =========================================================================
     print_section("QUALITY METRICS")
 
@@ -1441,7 +1488,7 @@ def main() -> int:
             print(f"      {Color.DIM.value}... and {len(near_matches) - 5} more{Color.RESET.value}")
 
     # =========================================================================
-    # SECTION 6: DX Message Audit
+    # SECTION 6: DX MESSAGE AUDIT
     # =========================================================================
     dx_issues_count = 0
     report_path: Path | None = None

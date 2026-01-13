@@ -49,8 +49,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
     name: 'avoid_large_objects_in_state',
     problemMessage:
         '[avoid_large_objects_in_state] Large data structures in State may cause memory issues.',
-    correctionMessage:
-        'Consider pagination, streaming, or external state management.',
+    correctionMessage: 'Consider pagination, streaming, or external state management.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -141,9 +140,9 @@ class RequireImageDisposalRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_disposal',
-    problemMessage:
-        '[require_image_disposal] ui.Image objects must be disposed to free memory.',
-    correctionMessage: 'Call image.dispose() in the dispose() method.',
+    problemMessage: '[require_image_disposal] ui.Image objects must be disposed to free memory.',
+    correctionMessage:
+        'Always call image.dispose() in the dispose() method to release native memory held by ui.Image objects. Failing to do so can cause memory leaks, degraded performance, and even app crashes, especially in image-heavy widgets or long-running apps.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -169,8 +168,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource();
           if (fieldSource.contains('ui.Image') ||
-              fieldSource.contains('Image ') &&
-                  fieldSource.contains('dart:ui')) {
+              fieldSource.contains('Image ') && fieldSource.contains('dart:ui')) {
             hasUiImageField = true;
           }
         }
@@ -178,8 +176,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.body.toSource();
           // Check for dispose (including *Safe extension variants)
-          if (disposeSource.contains('.dispose()') ||
-              disposeSource.contains('.disposeSafe(')) {
+          if (disposeSource.contains('.dispose()') || disposeSource.contains('.disposeSafe(')) {
             hasDisposeCall = true;
           }
         }
@@ -336,8 +333,7 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cache_eviction_policy',
-    problemMessage:
-        '[require_cache_eviction_policy] Unbounded cache consumes memory until '
+    problemMessage: '[require_cache_eviction_policy] Unbounded cache consumes memory until '
         'app crashes with OutOfMemoryError after extended use.',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -414,8 +410,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
     name: 'prefer_weak_references_for_cache',
     problemMessage:
         '[prefer_weak_references_for_cache] Consider using WeakReference for cache entries.',
-    correctionMessage:
-        'WeakReference allows garbage collection under memory pressure.',
+    correctionMessage: 'WeakReference allows garbage collection under memory pressure.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -440,8 +435,7 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
           final String typeSource = type.toSource();
 
           // Check for Map that doesn't use WeakReference
-          if (typeSource.contains('Map<') &&
-              !typeSource.contains('WeakReference')) {
+          if (typeSource.contains('Map<') && !typeSource.contains('WeakReference')) {
             reporter.atNode(member, code);
           }
         }
@@ -492,7 +486,7 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
     problemMessage:
         '[avoid_expando_circular_references] Expando value may reference its key, causing memory leak.',
     correctionMessage:
-        'Ensure Expando values do not hold references to their keys.',
+        'Never store a reference to the Expando key inside its value. This creates a strong reference cycle, preventing garbage collection and causing memory leaks. Always design Expando values to be independent of their keys.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -509,8 +503,7 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 
       // Check if target is likely an Expando
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('expando') &&
-          !targetSource.contains('_meta')) {
+      if (!targetSource.contains('expando') && !targetSource.contains('_meta')) {
         return;
       }
 
@@ -602,8 +595,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource().toLowerCase();
-          if (targetSource.contains('port') ||
-              targetSource.contains('sendport')) {
+          if (targetSource.contains('port') || targetSource.contains('sendport')) {
             final NodeList<Expression> args = node.argumentList.arguments;
             if (args.isNotEmpty) {
               final String argSource = args.first.toSource().toLowerCase();

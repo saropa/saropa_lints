@@ -439,8 +439,9 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_text_editing_controller_dispose',
     problemMessage:
-        '[require_text_editing_controller_dispose] TextEditingController field without dispose(). Memory leak - holds listeners and text buffer.',
-    correctionMessage: 'Add _controller.dispose() in dispose() before super.dispose().',
+        '[require_text_editing_controller_dispose] If a TextEditingController is not disposed in the dispose() method, it will retain listeners and its text buffer, causing memory leaks and potential performance degradation. This is especially problematic in widgets that are frequently created and destroyed, leading to increased memory usage and possible app instability.',
+    correctionMessage:
+        'Always call _controller.dispose() in the dispose() method before super.dispose(). This ensures all resources are released and prevents memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -511,7 +512,8 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
     name: 'require_page_controller_dispose',
     problemMessage:
         '[require_page_controller_dispose] PageController field without dispose(). Memory leak - scroll position and listeners retained.',
-    correctionMessage: 'Add _pageController.dispose() in dispose() before super.dispose().',
+    correctionMessage:
+        'Always call _pageController.dispose() in the dispose() method before super.dispose(). This releases scroll position and listeners, preventing memory leaks and ensuring proper cleanup of resources.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -700,7 +702,8 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
     name: 'avoid_websocket_memory_leak',
     problemMessage:
         '[avoid_websocket_memory_leak] WebSocketChannel field without close(). Connection stays open - wastes bandwidth, battery, and server resources.',
-    correctionMessage: 'Add channel.sink.close() in dispose() before super.dispose().',
+    correctionMessage:
+        'Always call channel.sink.close() in the dispose() method before super.dispose(). This ensures the WebSocket connection is properly closed, freeing network resources and preventing memory leaks or battery drain.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
