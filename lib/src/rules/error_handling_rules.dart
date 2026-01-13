@@ -346,7 +346,8 @@ class RequireErrorContextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_context',
-    problemMessage: '[require_error_context] Error message without IDs or state makes debugging production issues extremely difficult.',
+    problemMessage:
+        '[require_error_context] Error message without IDs or state makes debugging production issues extremely difficult.',
     correctionMessage:
         'Include relevant context like IDs, state, or operation details.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -30,9 +30,11 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bluetooth_scan_without_timeout',
-    problemMessage: '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
+    problemMessage:
+        '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
         'battery and may run until app termination.',
-    correctionMessage: 'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
+    correctionMessage:
+        'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -105,7 +107,8 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
     name: 'require_bluetooth_state_check',
     problemMessage:
         '[require_bluetooth_state_check] BLE operations should check adapter state first. Skipping this check can cause failed connections, wasted battery, and degraded user experience.',
-    correctionMessage: 'Check FlutterBluePlus.adapterState before BLE operations.',
+    correctionMessage:
+        'Check FlutterBluePlus.adapterState before BLE operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -214,7 +217,8 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
     name: 'require_ble_disconnect_handling',
     problemMessage:
         '[require_ble_disconnect_handling] BLE connection should handle disconnect state. Not handling disconnects can lead to stale UI, resource leaks, and user confusion.',
-    correctionMessage: 'Listen to device.connectionState for disconnect events.',
+    correctionMessage:
+        'Listen to device.connectionState for disconnect events.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -407,7 +411,8 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_qr_permission_check',
-    problemMessage: '[require_qr_permission_check] Opening QR scanner without permission '
+    problemMessage:
+        '[require_qr_permission_check] Opening QR scanner without permission '
         'shows black screen on iOS or crashes on some Android devices.',
     correctionMessage: 'Request Permission.camera before showing QR scanner.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -501,7 +506,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
     name: 'require_geolocator_permission_check',
     problemMessage:
         '[require_geolocator_permission_check] Location access without permission check. Crashes on iOS.',
-    correctionMessage: 'Call Geolocator.checkPermission() before getCurrentPosition().',
+    correctionMessage:
+        'Call Geolocator.checkPermission() before getCurrentPosition().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -513,7 +519,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'getCurrentPosition' && methodName != 'getPositionStream') {
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getPositionStream') {
         return;
       }
 
@@ -538,7 +545,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('checkPermission') && !bodySource.contains('requestPermission')) {
+      if (!bodySource.contains('checkPermission') &&
+          !bodySource.contains('requestPermission')) {
         reporter.atNode(node, code);
       }
     });
@@ -727,7 +735,8 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'getCurrentPosition' && methodName != 'getLastKnownPosition') {
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getLastKnownPosition') {
         return;
       }
 
@@ -786,7 +795,8 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
     name: 'prefer_ble_mtu_negotiation',
     problemMessage:
         '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers.',
-    correctionMessage: 'Call device.requestMtu(512) after connect() and before write operations.',
+    correctionMessage:
+        'Call device.requestMtu(512) after connect() and before write operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -850,7 +860,8 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
         while (current != null) {
           if (current is MethodDeclaration) {
             final String methodSource = current.toSource();
-            if (methodSource.contains('requestMtu') || methodSource.contains('mtuRequest')) {
+            if (methodSource.contains('requestMtu') ||
+                methodSource.contains('mtuRequest')) {
               hasMtuNegotiation = true;
             }
             break;
