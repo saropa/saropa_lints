@@ -8385,8 +8385,7 @@ class RequireBlocInitialStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_bloc_initial_state',
-    problemMessage:
-        '[require_bloc_initial_state] Missing initial state throws '
+    problemMessage: '[require_bloc_initial_state] Missing initial state throws '
         'LateInitializationError when BlocBuilder tries to read state.',
     correctionMessage: 'Add : super(InitialState()) to the constructor.',
     errorSeverity: DiagnosticSeverity.ERROR,
