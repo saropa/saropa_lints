@@ -6,6 +6,16 @@
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
 [![rules](https://img.shields.io/badge/rules-1500%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+
+> **New in 4.1.3:**
+> - **Isar:** Added `avoid_cached_isar_stream` rule (professional tier) to prevent caching Isar query streams. Includes a quick fix to inline the stream expression at usage sites.
+
+# Saropa Lints
+
+[![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
+[![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
+[![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
+[![rules](https://img.shields.io/badge/rules-1500%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -63,11 +73,11 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 | **Riverpod** | Circular provider deps, ref.read() in build, missing ProviderScope | [Using with Riverpod](doc/guides/using_with_riverpod.md) |
 | **Provider** | Provider.of in build causing rebuilds, recreated providers losing state | [Using with Provider](doc/guides/using_with_provider.md) |
 | **Bloc** | Events in constructor, mutable state, unclosed Blocs, BlocListener in build | [Using with Bloc](doc/guides/using_with_bloc.md) |
-| **Isar** | Enum fields causing data corruption on schema changes | [Using with Isar](doc/guides/using_with_isar.md) |
+| **Isar** | Enum fields causing data corruption on schema changes; caching Isar streams (runtime crash risk) | [Using with Isar](doc/guides/using_with_isar.md) |
 | **Hive** | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues | [Using with Hive](doc/guides/using_with_hive.md) |
 | **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
-Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production.
+Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
 
 ### Why it matters
 

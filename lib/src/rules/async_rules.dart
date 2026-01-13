@@ -405,6 +405,8 @@ class _AwaitFinder extends RecursiveAstVisitor<void> {
   }
 }
 
+// cspell:ignore tolist
+
 /// Warns when a Stream is converted to String via toString().
 ///
 /// Alias: no_stream_tostring, stream_to_string, stream_tolist_instead
@@ -577,7 +579,7 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 
 /// Warns when await is used inline instead of assigning to a variable first.
 ///
-/// Alias: inline_await, extract_await, await_variable
+/// Alias: prefer_await_completion, inline_await, extract_await, await_variable
 class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
   const PreferAssigningAwaitExpressionsRule() : super(code: _code);
 
@@ -2611,7 +2613,7 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
 
 /// Warns when Completer is created but never completed in error paths.
 ///
-/// Uncomopleted Completers can cause futures to hang forever.
+/// Uncompleted Completers can cause futures to hang forever.
 /// Always complete with error in catch blocks.
 ///
 /// **BAD:**

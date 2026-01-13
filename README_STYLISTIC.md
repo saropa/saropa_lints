@@ -109,21 +109,21 @@ Preferences for null-aware operators and collection manipulation patterns.
 
 | Rule | Description | Opposing Rule |
 |------|-------------|---------------|
-| `prefer_ifnull_over_ternary` | Use `??` instead of ternary for null defaults | `prefer_ternary_over_ifnull` |
-| `prefer_ternary_over_ifnull` | Use explicit ternary for null checks | `prefer_ifnull_over_ternary` |
-| `prefer_cascade_over_multiple_calls` | Use `..` cascade notation | `prefer_multiple_calls_over_cascade` |
-| `prefer_multiple_calls_over_cascade` | Use separate method calls | `prefer_cascade_over_multiple_calls` |
-| `prefer_map_entries_over_foreach` | Use map.entries instead of forEach | `prefer_foreach_over_map_entries` |
-| `prefer_foreach_over_map_entries` | Use forEach for map iteration | `prefer_map_entries_over_foreach` |
-| `prefer_spread_over_addall` | Use `...` spread operator | `prefer_addall_over_spread` |
 | `prefer_addall_over_spread` | Use addAll method | `prefer_spread_over_addall` |
+| `prefer_asmap_over_indexed_iteration` | Use `.asMap().entries` for indexed access | |
+| `prefer_cascade_over_multiple_calls` | Use `..` cascade notation | `prefer_multiple_calls_over_cascade` |
 | `prefer_collection_literals` | Use `[]`, `{}` over constructors | `prefer_constructor_over_literals` |
 | `prefer_constructor_over_literals` | Use `List()`, `Map()` constructors | `prefer_collection_literals` |
-| `prefer_wheretype_over_wherecast` | Use `.whereType<T>()` for filtering | `prefer_wherecast_over_wheretype` |
-| `prefer_wherecast_over_wheretype` | Use `.where().cast<T>()` pattern | `prefer_wheretype_over_wherecast` |
 | `prefer_fold_over_reduce` | Use fold with initial value | `prefer_reduce_over_fold` |
+| `prefer_foreach_over_map_entries` | Use forEach for map iteration | `prefer_map_entries_over_foreach` |
+| `prefer_ifnull_over_ternary` | Use `??` instead of ternary for null defaults | `prefer_ternary_over_ifnull` |
+| `prefer_map_entries_over_foreach` | Use map.entries instead of forEach | `prefer_foreach_over_map_entries` |
+| `prefer_multiple_calls_over_cascade` | Use separate method calls | `prefer_cascade_over_multiple_calls` |
 | `prefer_reduce_over_fold` | Use reduce when no initial value needed | `prefer_fold_over_reduce` |
-| `prefer_asmap_over_indexed_iteration` | Use `.asMap().entries` for indexed access | |
+| `prefer_spread_over_addall` | Use `...` spread operator | `prefer_addall_over_spread` |
+| `prefer_ternary_over_ifnull` | Use explicit ternary for null checks | `prefer_ifnull_over_ternary` |
+| `prefer_wherecast_over_wheretype` | Use `.where().cast<T>()` pattern | `prefer_wheretype_over_wherecast` |
+| `prefer_wheretype_over_wherecast` | Use `.whereType<T>()` for filtering | `prefer_wherecast_over_wheretype` |
 
 ### Example: Cascade vs Multiple Calls
 
