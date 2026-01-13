@@ -762,11 +762,12 @@ const List<LintRule> _allRules = <LintRule>[
   PreferPeriodAfterDocRule(),
   PreferScreamingCaseConstantsRule(),
   PreferDescriptiveBoolNamesRule(),
+  PreferDescriptiveBoolNamesStrictRule(),
   PreferSnakeCaseFilesRule(),
   AvoidSmallTextRule(),
   PreferDocCommentsOverRegularRule(),
   PreferStraightApostropheRule(),
-  PreferCurlyApostropheRule(),
+  PreferDocCurlyApostropheRule(),
 
   // =========================================================================
   // NEW STYLISTIC RULES v2.5.0 (76+ opinionated rules with opposites)

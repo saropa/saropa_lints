@@ -2189,10 +2189,14 @@ class _ConvertToScreamingCaseFix extends DartFix {
 
 /// Warns when boolean variables/parameters don't use descriptive prefixes.
 ///
-/// This is an **opinionated rule** - not included in any tier by default.
+/// This rule is suitable for the **professional** tier.
+///
+/// This is the lenient version that allows action verb prefixes (like
+/// `processData`, `sortItems`, `removeEntry`) in addition to standard boolean
+/// prefixes. For stricter enforcement, use `prefer_descriptive_bool_names_strict`.
 ///
 /// Boolean names should use prefixes like `is`, `has`, `can`, `should`, `will`,
-/// `was`, `did`, or `does` to make their purpose clear.
+/// `was`, `did`, `does`, or action verbs to make their purpose clear.
 ///
 /// **Pros of prefixed boolean names:**
 /// - Self-documenting code
@@ -2216,8 +2220,12 @@ class _ConvertToScreamingCaseFix extends DartFix {
 /// ```dart
 /// bool isLoading = true;
 /// bool isVisible = false;
+/// bool processData = true;  // Action verb - allowed in lenient mode
+/// bool sortAlphabetically = true;  // Action verb - allowed
 /// void setEnabled(bool isEnabled) { ... }
 /// ```
+///
+/// See also: [PreferDescriptiveBoolNamesStrictRule] for stricter enforcement.
 class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   const PreferDescriptiveBoolNamesRule() : super(code: _code);
 
@@ -2231,7 +2239,279 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_descriptive_bool_names',
     problemMessage:
-        '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.).',
+        '[prefer_descriptive_bool_names] Boolean should use a descriptive prefix (is, has, can, should, etc.) or action verb.',
+    correctionMessage:
+        'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate, processData',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Valid boolean prefixes (state-based)
+  static final RegExp _validBoolPrefix = RegExp(
+    r'^(is|has|have|can|should|will|was|did|does|allow|enable|disable|show|hide|include|exclude)[A-Z]',
+  );
+
+  /// Valid action verb prefixes (allowed in lenient mode)
+  static final RegExp _actionVerbPrefix = RegExp(
+    r'^(process|sort|remove|update|create|validate|fetch|build|compute|get|set|load|save|refresh|clear|reset|toggle|submit|apply|execute|run|start|stop|pause|resume|send|receive|handle|perform|calculate|generate|parse|format|transform|convert|filter|search|find|check|verify|confirm|accept|reject|approve|deny|skip|ignore|use|need|want|require|prefer|force|auto|try|await|defer|delay|cache|store|retrieve|delete|add|insert|append|prepend|merge|split|join|concat|trim|truncate|normalize|sanitize|encode|decode|encrypt|decrypt|compress|decompress|serialize|deserialize|render|display|print|log|trace|debug|notify|alert|warn|error|throw|catch|retry|fallback|override|replace|swap|move|copy|clone|duplicate|mirror|sync|async|batch|queue|schedule|dispatch|emit|broadcast|publish|subscribe|unsubscribe|listen|watch|observe|monitor|track|measure|record|capture|snapshot|restore|backup|export|import|upload|download|stream|buffer|flush|drain|pipe|pump|push|pop|shift|unshift|enqueue|dequeue)[A-Z]',
+  );
+
+  /// Also allow common boolean suffixes
+  static final RegExp _validBoolSuffix = RegExp(
+    r'(Enabled|Disabled|Visible|Hidden|Active|Valid|Invalid|Empty|Loading|Loaded|Complete|Done|Open|Closed|Required|Optional|Selected|Checked|Available|Initialized|Value)$',
+  );
+
+  /// Set of allowed boolean type representations.
+  static const Set<String> _boolTypes = <String>{'bool', 'bool?'};
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check variable declarations
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      final element = node.declaredElement;
+      if (element == null) return;
+
+      // Check for bool or bool?
+      final String typeStr = element.type.toString();
+      if (!_boolTypes.contains(typeStr)) return;
+
+      _checkName(node.name, reporter);
+    });
+
+    // Check parameters
+    context.registry.addSimpleFormalParameter((SimpleFormalParameter node) {
+      // Check the type annotation
+      final TypeAnnotation? typeAnnotation = node.type;
+      if (typeAnnotation == null) return;
+
+      // Check if it's a bool or bool? type
+      final String typeName = typeAnnotation.toString();
+      if (!_boolTypes.contains(typeName)) return;
+
+      final Token? name = node.name;
+      if (name != null) {
+        _checkName(name, reporter);
+      }
+    });
+
+    // Check field declarations (class members)
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      for (final VariableDeclaration variable in node.fields.variables) {
+        final element = variable.declaredElement;
+        if (element == null) continue;
+
+        final String typeStr = element.type.toString();
+        if (!_boolTypes.contains(typeStr)) continue;
+
+        _checkName(variable.name, reporter);
+      }
+    });
+  }
+
+  void _checkName(Token nameToken, SaropaDiagnosticReporter reporter) {
+    final String name = nameToken.lexeme;
+
+    // Skip private names (they may have different conventions)
+    if (name.startsWith('_')) return;
+
+    // Skip single letter names (usually in tests or lambdas)
+    if (name.length <= 2) return;
+
+    // Check for valid prefix or suffix
+    if (_validBoolPrefix.hasMatch(name)) return;
+    if (_actionVerbPrefix.hasMatch(name)) return;
+    if (_validBoolSuffix.hasMatch(name)) return;
+
+    // Special case: common boolean names that are clear without prefix
+    const Set<String> allowedNames = <String>{
+      'enabled',
+      'disabled',
+      'visible',
+      'hidden',
+      'active',
+      'valid',
+      'invalid',
+      'empty',
+      'loading',
+      'loaded',
+      'complete',
+      'done',
+      'open',
+      'closed',
+      'required',
+      'optional',
+      'selected',
+      'checked',
+      'available',
+      'nullable',
+      'mounted',
+      'disposed',
+      'async',
+      'sync',
+      'success',
+      'failed',
+      'ready',
+      'pending',
+      'expanded',
+      'collapsed',
+      'focused',
+      'hovering',
+      'pressed',
+      'dragging',
+      'value', // Common in generic contexts
+    };
+    if (allowedNames.contains(name.toLowerCase())) return;
+
+    reporter.atToken(nameToken, code);
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddBoolPrefixFix()];
+}
+
+/// Quick fix that adds "is" prefix to boolean names.
+///
+/// Transforms names like `loading` → `isLoading`, `visible` → `isVisible`.
+/// For unknown names, simply prefixes with "is" and capitalizes.
+class _AddBoolPrefixFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      _tryFix(node.name, analysisError, reporter);
+    });
+
+    context.registry.addSimpleFormalParameter((SimpleFormalParameter node) {
+      final name = node.name;
+      if (name != null) {
+        _tryFix(name, analysisError, reporter);
+      }
+    });
+
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      for (final variable in node.fields.variables) {
+        _tryFix(variable.name, analysisError, reporter);
+      }
+    });
+  }
+
+  void _tryFix(
+    Token nameToken,
+    AnalysisError analysisError,
+    ChangeReporter reporter,
+  ) {
+    final tokenRange = SourceRange(nameToken.offset, nameToken.length);
+    if (!analysisError.sourceRange.intersects(tokenRange)) return;
+
+    final String name = nameToken.lexeme;
+    final String newName = _suggestBoolName(name);
+
+    if (newName == name) return;
+
+    final changeBuilder = reporter.createChangeBuilder(
+      message: 'Rename to "$newName"',
+      priority: 1,
+    );
+
+    changeBuilder.addDartFileEdit((builder) {
+      builder.addSimpleReplacement(tokenRange, newName);
+    });
+  }
+
+  /// Suggests a better boolean name with "is" prefix.
+  static String _suggestBoolName(String name) {
+    // Handle common patterns with proper casing
+    final lower = name.toLowerCase();
+
+    // Common adjective -> is + Adjective
+    const Map<String, String> commonMappings = {
+      'loading': 'isLoading',
+      'loaded': 'isLoaded',
+      'visible': 'isVisible',
+      'hidden': 'isHidden',
+      'active': 'isActive',
+      'valid': 'isValid',
+      'invalid': 'isInvalid',
+      'empty': 'isEmpty',
+      'complete': 'isComplete',
+      'done': 'isDone',
+      'open': 'isOpen',
+      'closed': 'isClosed',
+      'selected': 'isSelected',
+      'checked': 'isChecked',
+      'ready': 'isReady',
+      'pending': 'isPending',
+      'expanded': 'isExpanded',
+      'collapsed': 'isCollapsed',
+      'focused': 'isFocused',
+      'enabled': 'isEnabled',
+      'disabled': 'isDisabled',
+      'success': 'isSuccess',
+      'failed': 'hasFailed',
+      'error': 'hasError',
+      'data': 'hasData',
+    };
+
+    if (commonMappings.containsKey(lower)) {
+      return commonMappings[lower]!;
+    }
+
+    // Default: add "is" prefix and capitalize first letter
+    return 'is${name[0].toUpperCase()}${name.substring(1)}';
+  }
+}
+
+/// Warns when boolean variables/parameters don't use descriptive prefixes.
+///
+/// This rule is suitable for the **insanity** tier.
+///
+/// This is the strict version that only allows traditional boolean prefixes
+/// like `is`, `has`, `can`, `should`. Action verbs like `processData` are NOT
+/// allowed. For a more lenient version, use `prefer_descriptive_bool_names`.
+///
+/// **When to use this rule:**
+/// - Greenfield projects with strict naming conventions
+/// - Teams that want all booleans to read as questions/states
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// bool loading = true;
+/// bool processData = true;  // Not allowed - use shouldProcessData
+/// bool sortAlphabetically = true;  // Not allowed - use shouldSortAlphabetically
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// bool isLoading = true;
+/// bool shouldProcessData = true;
+/// bool shouldSortAlphabetically = true;
+/// ```
+///
+/// See also: [PreferDescriptiveBoolNamesRule] for lenient enforcement.
+class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
+  const PreferDescriptiveBoolNamesStrictRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_descriptive_bool_names_strict',
+    problemMessage:
+        '[prefer_descriptive_bool_names_strict] Boolean should use a descriptive prefix (is, has, can, should, etc.).',
     correctionMessage:
         'Rename with a prefix: isEnabled, hasData, canEdit, shouldUpdate',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2352,6 +2632,9 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
 
     reporter.atToken(nameToken, code);
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddBoolPrefixFix()];
 }
 
 /// Warns when Dart file names don't use snake_case.
@@ -2907,7 +3190,7 @@ class PreferStraightApostropheRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_straight_apostrophe',
     problemMessage:
-        "Use straight apostrophe (') instead of Right Single Quotation Mark (').",
+        "[prefer_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (').",
     correctionMessage:
         "Replace Right Single Quotation Mark with straight apostrophe or escape it.",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3025,8 +3308,8 @@ class _ReplaceCurlyApostropheFix extends DartFix {
 /// /// It's a beautiful day.  // Right Single Quotation Mark (U+2019)
 /// String greeting = 'Hello';
 /// ```
-class PreferCurlyApostropheRule extends SaropaLintRule {
-  const PreferCurlyApostropheRule() : super(code: _code);
+class PreferDocCurlyApostropheRule extends SaropaLintRule {
+  const PreferDocCurlyApostropheRule() : super(code: _code);
 
   /// Stylistic rule - style/consistency issues are acceptable in legacy code.
   @override
@@ -3036,9 +3319,9 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_curly_apostrophe',
+    name: 'prefer_doc_curly_apostrophe',
     problemMessage:
-        "Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation.",
+        "[prefer_doc_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in documentation.",
     correctionMessage:
         "Replace straight apostrophe with Right Single Quotation Mark (U+2019).",
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3119,71 +3402,80 @@ class _ReplaceStraightApostropheFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
-      Token? token = unit.beginToken;
-
-      while (token != null && !token.isEof) {
-        Token? comment = token.precedingComments;
-        while (comment != null) {
-          final SourceRange commentRange =
-              SourceRange(comment.offset, comment.length);
-          if (!analysisError.sourceRange.intersects(commentRange)) {
-            comment = comment.next;
-            continue;
-          }
-
-          if (!comment.lexeme.startsWith('///')) {
-            comment = comment.next;
-            continue;
-          }
-
-          final String lexeme = comment.lexeme;
-          if (!lexeme.contains("'")) {
-            comment = comment.next;
-            continue;
-          }
-
-          // cspell:ignore shouldn wouldn aren hasn wasn weren
-          // Replace straight apostrophes with curly ones in contractions
-          final String fixed = lexeme
-              .replaceAll("don't", 'don\u2019t')
-              .replaceAll("won't", 'won\u2019t')
-              .replaceAll("can't", 'can\u2019t')
-              .replaceAll("shouldn't", 'shouldn\u2019t')
-              .replaceAll("wouldn't", 'wouldn\u2019t')
-              .replaceAll("isn't", 'isn\u2019t')
-              .replaceAll("aren't", 'aren\u2019t')
-              .replaceAll("hasn't", 'hasn\u2019t')
-              .replaceAll("haven't", 'haven\u2019t')
-              .replaceAll("wasn't", 'wasn\u2019t')
-              .replaceAll("weren't", 'weren\u2019t')
-              .replaceAll("let's", 'let\u2019s')
-              .replaceAll("it's", 'it\u2019s')
-              .replaceAll("there's", 'there\u2019s')
-              .replaceAll("here's", 'here\u2019s')
-              .replaceAll("we'll", 'we\u2019ll')
-              .replaceAll("I've", 'I\u2019ve')
-              .replaceAll("I'm", 'I\u2019m')
-              .replaceAll("you're", 'you\u2019re')
-              .replaceAll("they're", 'they\u2019re')
-              .replaceAll("that's", 'that\u2019s');
-
-          if (fixed != lexeme) {
-            final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-              message: 'Use stylized apostrophe',
-              priority: 1,
-            );
-
-            changeBuilder.addDartFileEdit((builder) {
-              builder.addSimpleReplacement(commentRange, fixed);
-            });
-          }
-
-          comment = comment.next;
-        }
-        token = token.next;
-      }
+    // Doc comments are stored on declaration nodes, not as precedingComments
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
     });
+
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+    });
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+    });
+
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+    });
+
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      _checkAndFixDocComment(node.documentationComment, analysisError, reporter);
+    });
+  }
+
+  void _checkAndFixDocComment(
+    Comment? comment,
+    AnalysisError analysisError,
+    ChangeReporter reporter,
+  ) {
+    if (comment == null) return;
+
+    for (final Token token in comment.tokens) {
+      final SourceRange tokenRange = SourceRange(token.offset, token.length);
+      if (!analysisError.sourceRange.intersects(tokenRange)) continue;
+
+      final String lexeme = token.lexeme;
+      if (!lexeme.startsWith('///')) continue;
+      if (!lexeme.contains("'")) continue;
+
+      // cspell:ignore shouldn wouldn aren hasn wasn weren
+      // Replace straight apostrophes with curly ones in contractions
+      final String fixed = lexeme
+          .replaceAll("don't", 'don\u2019t')
+          .replaceAll("won't", 'won\u2019t')
+          .replaceAll("can't", 'can\u2019t')
+          .replaceAll("shouldn't", 'shouldn\u2019t')
+          .replaceAll("wouldn't", 'wouldn\u2019t')
+          .replaceAll("isn't", 'isn\u2019t')
+          .replaceAll("aren't", 'aren\u2019t')
+          .replaceAll("hasn't", 'hasn\u2019t')
+          .replaceAll("haven't", 'haven\u2019t')
+          .replaceAll("wasn't", 'wasn\u2019t')
+          .replaceAll("weren't", 'weren\u2019t')
+          .replaceAll("let's", 'let\u2019s')
+          .replaceAll("it's", 'it\u2019s')
+          .replaceAll("there's", 'there\u2019s')
+          .replaceAll("here's", 'here\u2019s')
+          .replaceAll("we'll", 'we\u2019ll')
+          .replaceAll("I've", 'I\u2019ve')
+          .replaceAll("I'm", 'I\u2019m')
+          .replaceAll("you're", 'you\u2019re')
+          .replaceAll("they're", 'they\u2019re')
+          .replaceAll("that's", 'that\u2019s');
+
+      if (fixed != lexeme) {
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Use stylized apostrophe',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(tokenRange, fixed);
+        });
+      }
+    }
   }
 }
 

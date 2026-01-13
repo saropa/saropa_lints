@@ -404,7 +404,7 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale',
-    problemMessage: "Hardcoded locale ignores user's device settings.",
+    problemMessage: "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings.",
     correctionMessage:
         'Use Localizations.localeOf(context).toString() to get device locale.',
     errorSeverity: DiagnosticSeverity.INFO,

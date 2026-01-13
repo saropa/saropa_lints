@@ -225,7 +225,7 @@ class AvoidLateKeywordRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_late_keyword',
-    problemMessage: "Avoid using 'late' keyword.",
+    problemMessage: "[avoid_late_keyword] Avoid using 'late' keyword.",
     correctionMessage:
         'Use nullable type with null check, or initialize in constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
