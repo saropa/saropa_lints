@@ -18,6 +18,8 @@
 ///         - "**/generated/"
 ///         - "*.g.dart"
 /// ```
+library;
+
 class BaselinePaths {
   BaselinePaths(List<String> patterns) : _patterns = _compilePatterns(patterns);
 
