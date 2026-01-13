@@ -192,8 +192,8 @@ class BaselineManager {
 
     final lines = file.readAsLinesSync();
     for (var i = 1; i <= lines.length; i++) {
-      final isOld =
-          await baselineDate.isOlderThanBaseline(filePath, i, projectRoot: _projectRoot);
+      final isOld = await baselineDate.isOlderThanBaseline(filePath, i,
+          projectRoot: _projectRoot);
       fileCache[i] = isOld;
     }
   }
@@ -320,5 +320,6 @@ class BaselineManager {
   static String? get projectRoot => _projectRoot;
 
   /// Find the project root (public accessor).
-  static String? findProjectRoot(String startPath) => _findProjectRoot(startPath);
+  static String? findProjectRoot(String startPath) =>
+      _findProjectRoot(startPath);
 }

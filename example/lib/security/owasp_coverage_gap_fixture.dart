@@ -16,8 +16,7 @@ void testAvoidIgnoringSslErrors() {
 
   // BAD: Arrow function returning true
   // expect_lint: avoid_ignoring_ssl_errors
-  final client2 = HttpClient()
-    ..badCertificateCallback = (_, __, ___) => true;
+  final client2 = HttpClient()..badCertificateCallback = (_, __, ___) => true;
 
   // GOOD: Proper certificate validation
   final goodClient = HttpClient()
