@@ -323,6 +323,46 @@ class _GoodNestedContextMountedCheckState
   Widget build(BuildContext context) => Container();
 }
 
+// GOOD: Mounted-guarded ternary pattern (context.mounted ? context : null)
+class GoodMountedTernaryInInstanceMethod extends StatefulWidget {
+  const GoodMountedTernaryInInstanceMethod({super.key});
+
+  @override
+  State<GoodMountedTernaryInInstanceMethod> createState() =>
+      _GoodMountedTernaryInInstanceMethodState();
+}
+
+class _GoodMountedTernaryInInstanceMethodState
+    extends State<GoodMountedTernaryInInstanceMethod> {
+  Future<void> handleError() async {
+    try {
+      await Future.value('data');
+    } catch (e) {
+      // This ternary pattern should NOT trigger avoid_context_across_async
+      // context.mounted ? context : null is a safe guard pattern
+      debugException(e, context: context.mounted ? context : null);
+    }
+  }
+
+  Future<void> doSomething() async {
+    await Future.value('data');
+    // Another common pattern: using ternary inline
+    final ctx = context.mounted ? context : null;
+    if (ctx != null) Navigator.of(ctx).pop();
+  }
+
+  Future<void> passToFunction() async {
+    await Future.value('data');
+    // Safe: context only used if mounted
+    someHelper(context: context.mounted ? context : null);
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+void someHelper({BuildContext? context}) {}
+
 // =========================================================================
 // avoid_context_after_await_in_static (Essential/ERROR)
 // =========================================================================

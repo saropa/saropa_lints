@@ -91,7 +91,7 @@ bool isNegatedMountedGuard(Statement stmt) {
   if (!checksNotMounted(stmt.expression)) return false;
 
   // Then branch must contain early exit (return or throw)
-  return _containsEarlyExit(stmt.thenStatement);
+  return containsEarlyExit(stmt.thenStatement);
 }
 
 /// Checks if statement is a positive mounted guard: `if (mounted) { ... }`
@@ -136,6 +136,69 @@ bool hasAncestorMountedCheck(AstNode node) {
 }
 
 // ---------------------------------------------------------------------------
+// Early Exit Detection
+// ---------------------------------------------------------------------------
+
+/// Checks if a statement contains an early exit (return or throw).
+///
+/// Used by mounted guard detection to verify that negated guards
+/// (`if (!mounted) return;`) actually exit the function.
+bool containsEarlyExit(Statement stmt) {
+  if (stmt is ReturnStatement) return true;
+  if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
+    return true;
+  }
+  // Handle block with single return/throw
+  if (stmt is Block && stmt.statements.length == 1) {
+    return containsEarlyExit(stmt.statements.first);
+  }
+  return false;
+}
+
+// ---------------------------------------------------------------------------
+// BuildContext Parameter Helpers
+// ---------------------------------------------------------------------------
+
+/// Checks if a formal parameter is a BuildContext type.
+///
+/// Handles both simple parameters and default parameters (with default values).
+/// Returns true for `BuildContext`, `BuildContext?`, or any type containing
+/// `BuildContext` (e.g., generic types).
+bool isBuildContextParam(FormalParameter param) {
+  if (param is SimpleFormalParameter) {
+    final typeSource = param.type?.toSource();
+    if (typeSource == null) return false;
+    return typeSource == 'BuildContext' ||
+        typeSource == 'BuildContext?' ||
+        typeSource.contains('BuildContext');
+  }
+  if (param is DefaultFormalParameter) {
+    return isBuildContextParam(param.parameter);
+  }
+  return false;
+}
+
+/// Gets the parameter name if it's a BuildContext type, null otherwise.
+///
+/// Useful for tracking context parameter names in static methods where
+/// the parameter might not be named 'context'.
+String? getBuildContextParamName(FormalParameter param) {
+  if (param is SimpleFormalParameter) {
+    final typeSource = param.type?.toSource();
+    if (typeSource == null) return null;
+    if (typeSource == 'BuildContext' ||
+        typeSource == 'BuildContext?' ||
+        typeSource.contains('BuildContext')) {
+      return param.name?.lexeme;
+    }
+  }
+  if (param is DefaultFormalParameter) {
+    return getBuildContextParamName(param.parameter);
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Private helpers
 // ---------------------------------------------------------------------------
 
@@ -144,19 +207,6 @@ bool _isTrueLiteral(Expression expr) =>
 
 bool _isFalseLiteral(Expression expr) =>
     expr is BooleanLiteral && expr.value == false;
-
-/// Checks if a statement contains an early exit (return or throw).
-bool _containsEarlyExit(Statement stmt) {
-  if (stmt is ReturnStatement) return true;
-  if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
-    return true;
-  }
-  // Handle block with single return/throw
-  if (stmt is Block && stmt.statements.length == 1) {
-    return _containsEarlyExit(stmt.statements.first);
-  }
-  return false;
-}
 
 // ---------------------------------------------------------------------------
 // Visitor classes
@@ -217,9 +267,63 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
         return;
       }
 
+      // Skip if in then-branch of mounted-guarded ternary:
+      // `context.mounted ? context : null` is safe
+      if (_isInMountedGuardedTernary(node)) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
       onContextFound(node);
     }
     super.visitSimpleIdentifier(node);
+  }
+
+  /// Checks if node is in the then-branch of a mounted-guarded ternary.
+  ///
+  /// Pattern: `context.mounted ? context : null`
+  /// The context in the then-expression is safe because it's guarded.
+  bool _isInMountedGuardedTernary(SimpleIdentifier node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ConditionalExpression) {
+        // Check if this node is in the then-expression
+        if (_isDescendantOf(node, current.thenExpression)) {
+          // Check if condition is a mounted check
+          if (_isMountedCheck(current.condition)) {
+            return true;
+          }
+        }
+        return false;
+      }
+      // Stop at statement boundaries
+      if (current is Statement) break;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Checks if expression is context.mounted or mounted.
+  bool _isMountedCheck(Expression expr) {
+    // context.mounted
+    if (expr is PrefixedIdentifier && expr.identifier.name == 'mounted') {
+      return true;
+    }
+    // mounted (bare identifier in State class)
+    if (expr is SimpleIdentifier && expr.name == 'mounted') {
+      return true;
+    }
+    return false;
+  }
+
+  /// Checks if child is a descendant of parent.
+  bool _isDescendantOf(AstNode child, AstNode parent) {
+    AstNode? current = child;
+    while (current != null) {
+      if (current == parent) return true;
+      current = current.parent;
+    }
+    return false;
   }
 
   @override

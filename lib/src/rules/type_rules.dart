@@ -221,7 +221,7 @@ class AvoidDynamicRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic',
-    problemMessage: "Avoid using 'dynamic' type.",
+    problemMessage: "[avoid_dynamic] Avoid using 'dynamic' type.",
     correctionMessage:
         'Use a specific type, Object, or a generic type instead.',
     errorSeverity: DiagnosticSeverity.INFO,

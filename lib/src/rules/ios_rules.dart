@@ -1764,7 +1764,7 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
     return LintCode(
       name: 'require_ios_permission_description',
       problemMessage:
-          'Permission-requiring API used. Missing Info.plist key(s): '
+          '[require_ios_permission_description] Permission-requiring API used. Missing Info.plist key(s): '
           '${missingKeys.join(", ")}',
       correctionMessage:
           'Add ${missingKeys.join(" and ")} to ios/Runner/Info.plist.',
@@ -2844,6 +2844,15 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    // Get the Info.plist checker for this file's project.
+    final filePath = resolver.source.fullName;
+    final plistChecker = InfoPlistChecker.forFile(filePath);
+
+    // Skip if NSFaceIDUsageDescription is already in Info.plist.
+    if (plistChecker?.hasKey('NSFaceIDUsageDescription') ?? false) {
+      return;
+    }
+
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
