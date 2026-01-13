@@ -64,7 +64,8 @@ class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_in_initstate_dispose',
-    problemMessage: "[avoid_context_in_initstate_dispose] Avoid using 'context' in initState or dispose. "
+    problemMessage:
+        "[avoid_context_in_initstate_dispose] Avoid using 'context' in initState or dispose. "
         'The widget may not be mounted.',
     correctionMessage:
         'Use WidgetsBinding.instance.addPostFrameCallback to defer '
@@ -994,7 +995,8 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_in_lists',
-    problemMessage: "[avoid_shrink_wrap_in_lists] Avoid 'shrinkWrap: true' in nested scrollables.",
+    problemMessage:
+        "[avoid_shrink_wrap_in_lists] Avoid 'shrinkWrap: true' in nested scrollables.",
     correctionMessage: 'Use a fixed height or Expanded instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2760,7 +2762,8 @@ class PreferWidgetPrivateMembersRule extends SaropaLintRule {
 
   static const LintCode _codeField = LintCode(
     name: 'prefer_widget_private_members',
-    problemMessage: '[prefer_widget_private_members] Widget field should be final.',
+    problemMessage:
+        '[prefer_widget_private_members] Widget field should be final.',
     correctionMessage: 'Make the field final or private.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
