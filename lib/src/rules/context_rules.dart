@@ -645,7 +645,6 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
       ),
     );
   }
-
 }
 
 /// Visitor that finds context usage in static methods by parameter name.
