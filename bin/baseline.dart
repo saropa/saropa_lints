@@ -76,7 +76,8 @@ Future<void> main(List<String> args) async {
   if (update) {
     existingBaseline = BaselineFile.load(outputPath);
     if (existingBaseline != null) {
-      print('Updating existing baseline (${existingBaseline.totalViolations} violations)');
+      print(
+          'Updating existing baseline (${existingBaseline.totalViolations} violations)');
     } else {
       print('No existing baseline found, creating new one');
     }
@@ -276,7 +277,8 @@ Future<bool> _updateAnalysisOptions(String baselinePath) async {
   if (match != null) {
     // Add baseline config after tier
     final indent = _detectIndent(content, match.start);
-    final baselineConfig = '\n$indent  baseline:\n$indent    file: "$baselinePath"';
+    final baselineConfig =
+        '\n$indent  baseline:\n$indent    file: "$baselinePath"';
     content = content.replaceFirst(
       match.group(0)!,
       '${match.group(0)}$baselineConfig',
@@ -342,9 +344,12 @@ void _printUsage() {
   print('overwhelmed by legacy issues.');
   print('');
   print('Options:');
-  print('  -o, --output <path>   Output file path (default: saropa_baseline.json)');
-  print('  --update              Update existing baseline, removing fixed violations');
-  print('  --dry-run             Show what would be done without making changes');
+  print(
+      '  -o, --output <path>   Output file path (default: saropa_baseline.json)');
+  print(
+      '  --update              Update existing baseline, removing fixed violations');
+  print(
+      '  --dry-run             Show what would be done without making changes');
   print('  --skip-config         Skip updating analysis_options.yaml');
   print('  -h, --help            Show this help message');
   print('');

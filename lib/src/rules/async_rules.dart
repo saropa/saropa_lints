@@ -1543,8 +1543,7 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
     problemMessage:
         '[avoid_dialog_context_after_async] Navigator.pop() after await without mounted check. '
         'BuildContext may be deactivated during async gap, causing "Looking up deactivated widget" crash.',
-    correctionMessage:
-        'Add if (context.mounted) check before Navigator.pop().',
+    correctionMessage: 'Add if (context.mounted) check before Navigator.pop().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1690,8 +1689,7 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
     problemMessage:
         '[check_mounted_after_async] setState() after await without mounted check. '
         'State may be disposed during async gap, causing "setState() called after dispose()" crash.',
-    correctionMessage:
-        'Add if (mounted) { setState(...) } after the await.',
+    correctionMessage: 'Add if (mounted) { setState(...) } after the await.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

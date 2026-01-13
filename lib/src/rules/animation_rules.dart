@@ -170,8 +170,7 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
     name: 'avoid_animation_in_build',
     problemMessage:
         '[avoid_animation_in_build] AnimationController in build(). Memory leak - new controller created on every rebuild, old ones never disposed.',
-    correctionMessage:
-        'Create in initState() as field; dispose in dispose().',
+    correctionMessage: 'Create in initState() as field; dispose in dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
