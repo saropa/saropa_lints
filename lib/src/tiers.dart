@@ -2129,7 +2129,8 @@ class _TierCache {
       _recommended ??= <String>{...essentialRules, ...recommendedOnlyRules};
 
   /// Stylistic rules only (cached).
-  static Set<String> get stylistic => _stylistic ??= <String>{...stylisticRules};
+  static Set<String> get stylistic =>
+      _stylistic ??= <String>{...stylisticRules};
 
   /// Essential + Recommended + Professional rules (cached).
   static Set<String> get professional => _professional ??= <String>{
