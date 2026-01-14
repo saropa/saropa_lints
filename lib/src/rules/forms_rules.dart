@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -60,7 +61,8 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
     name: 'prefer_autovalidate_on_interaction',
     problemMessage:
         '[prefer_autovalidate_on_interaction] AutovalidateMode.always validates every keystroke. Consequence: This leads to poor user experience, input lag, and frustration.',
-    correctionMessage: 'Use AutovalidateMode.onUserInteraction for better user experience.',
+    correctionMessage:
+        'Use AutovalidateMode.onUserInteraction for better user experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -71,7 +73,8 @@ class PreferAutovalidateOnInteractionRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
-      if (node.prefix.name == 'AutovalidateMode' && node.identifier.name == 'always') {
+      if (node.prefix.name == 'AutovalidateMode' &&
+          node.identifier.name == 'always') {
         reporter.atNode(node, code);
       }
     });
@@ -150,7 +153,8 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
     name: 'require_keyboard_type',
     problemMessage:
         '[require_keyboard_type] Text field appears to be email/phone but lacks appropriate keyboardType. Consequence: Users may struggle to enter data efficiently, leading to errors and poor accessibility.',
-    correctionMessage: 'Add keyboardType: TextInputType.emailAddress or TextInputType.phone.',
+    correctionMessage:
+        'Add keyboardType: TextInputType.emailAddress or TextInputType.phone.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -182,7 +186,8 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'TextFormField' && constructorName != 'TextField') {
+      if (constructorName != 'TextFormField' &&
+          constructorName != 'TextField') {
         return;
       }
 
@@ -202,7 +207,8 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
             // Extract label/hint from InputDecoration
             final Expression decorationExpr = arg.expression;
             if (decorationExpr is InstanceCreationExpression) {
-              for (final Expression decorArg in decorationExpr.argumentList.arguments) {
+              for (final Expression decorArg
+                  in decorationExpr.argumentList.arguments) {
                 if (decorArg is NamedExpression) {
                   final String decorName = decorArg.name.label.name;
                   if (decorName == 'labelText') {
@@ -228,8 +234,10 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 
       final String combined = '${labelText ?? ''} ${hintText ?? ''}';
 
-      bool isEmailField = _emailPatterns.any((String p) => combined.contains(p));
-      bool isPhoneField = _phonePatterns.any((String p) => combined.contains(p));
+      bool isEmailField =
+          _emailPatterns.any((String p) => combined.contains(p));
+      bool isPhoneField =
+          _phonePatterns.any((String p) => combined.contains(p));
 
       if (isEmailField || isPhoneField) {
         reporter.atNode(node.constructorName, code);
@@ -280,7 +288,8 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
     name: 'require_text_overflow_in_row',
     problemMessage:
         '[require_text_overflow_in_row] Text in Row without overflow handling shows yellow/black overflow stripes on long content. Consequence: This results in unreadable UI and a poor user experience.',
-    correctionMessage: 'Add overflow: TextOverflow.ellipsis or wrap in Expanded/Flexible.',
+    correctionMessage:
+        'Add overflow: TextOverflow.ellipsis or wrap in Expanded/Flexible.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -392,7 +401,8 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'TextFormField' && constructorName != 'TextField') {
+      if (constructorName != 'TextFormField' &&
+          constructorName != 'TextField') {
         return;
       }
 
@@ -411,7 +421,8 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
           if (name == 'decoration') {
             final Expression decorationExpr = arg.expression;
             if (decorationExpr is InstanceCreationExpression) {
-              for (final Expression decorArg in decorationExpr.argumentList.arguments) {
+              for (final Expression decorArg
+                  in decorationExpr.argumentList.arguments) {
                 if (decorArg is NamedExpression) {
                   final String decorName = decorArg.name.label.name;
                   if (decorName == 'labelText') {
@@ -437,7 +448,8 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
 
       final String combined = '${labelText ?? ''} ${hintText ?? ''}';
 
-      bool isPasswordField = _passwordPatterns.any((String p) => combined.contains(p));
+      bool isPasswordField =
+          _passwordPatterns.any((String p) => combined.contains(p));
 
       if (isPasswordField) {
         reporter.atNode(node.constructorName, code);
@@ -621,9 +633,11 @@ class RequireFormKeyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_form_key',
-    problemMessage: '[require_form_key] Without GlobalKey, validate() and save() calls '
+    problemMessage:
+        '[require_form_key] Without GlobalKey, validate() and save() calls '
         'fail because FormState cannot be accessed.',
-    correctionMessage: 'Add key: _formKey where _formKey = GlobalKey<FormState>()',
+    correctionMessage:
+        'Add key: _formKey where _formKey = GlobalKey<FormState>()',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -858,7 +872,8 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
     name: 'avoid_form_without_unfocus',
     problemMessage:
         '[avoid_form_without_unfocus] Form submission without unfocus() leaves keyboard open, blocking success feedback.',
-    correctionMessage: 'Add FocusScope.of(context).unfocus() at start of submit handler.',
+    correctionMessage:
+        'Add FocusScope.of(context).unfocus() at start of submit handler.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -871,7 +886,9 @@ class AvoidFormWithoutUnfocusRule extends SaropaLintRule {
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       final String name = node.name.lexeme.toLowerCase();
       // Look for submit-related methods
-      if (!name.contains('submit') && !name.contains('save') && !name.contains('send')) {
+      if (!name.contains('submit') &&
+          !name.contains('save') &&
+          !name.contains('send')) {
         return;
       }
 
@@ -1018,7 +1035,8 @@ class AvoidClearingFormOnErrorRule extends SaropaLintRule {
     name: 'avoid_clearing_form_on_error',
     problemMessage:
         '[avoid_clearing_form_on_error] Clearing form fields on validation error loses user input.',
-    correctionMessage: 'Preserve input when validation fails; only highlight errors.',
+    correctionMessage:
+        'Preserve input when validation fails; only highlight errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1228,7 +1246,8 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
     name: 'require_keyboard_action_type',
     problemMessage:
         '[require_keyboard_action_type] Text field should have textInputAction for better UX.',
-    correctionMessage: 'Add textInputAction: TextInputAction.next or TextInputAction.done.',
+    correctionMessage:
+        'Add textInputAction: TextInputAction.next or TextInputAction.done.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1252,7 +1271,8 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
       // Check for textInputAction parameter
       bool hasTextInputAction = false;
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'textInputAction') {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'textInputAction') {
           hasTextInputAction = true;
           break;
         }
@@ -1299,7 +1319,8 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
     name: 'require_keyboard_dismiss_on_scroll',
     problemMessage:
         '[require_keyboard_dismiss_on_scroll] Scroll view should have keyboardDismissBehavior for form UX.',
-    correctionMessage: 'Add keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag.',
+    correctionMessage:
+        'Add keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1325,7 +1346,8 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
       // Check for keyboardDismissBehavior parameter
       bool hasKeyboardDismissBehavior = false;
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'keyboardDismissBehavior') {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'keyboardDismissBehavior') {
           hasKeyboardDismissBehavior = true;
           break;
         }
@@ -1395,7 +1417,8 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
     name: 'avoid_keyboard_overlap',
     problemMessage:
         '[avoid_keyboard_overlap] TextField may be hidden by keyboard. No viewInsets handling found.',
-    correctionMessage: 'Use SingleChildScrollView or handle MediaQuery.viewInsets.bottom.',
+    correctionMessage:
+        'Use SingleChildScrollView or handle MediaQuery.viewInsets.bottom.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1436,7 +1459,8 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
           // ExpansionTiles are collapsible sections that can appear anywhere
           // in a screen. The PARENT screen must handle viewInsets - the linter
           // should still warn so developers fix the parent, not suppress here.
-          if (parentType.contains('Dialog') || parentType.contains('BottomSheet')) {
+          if (parentType.contains('Dialog') ||
+              parentType.contains('BottomSheet')) {
             return;
           }
         }
@@ -1483,7 +1507,8 @@ class AvoidKeyboardOverlapRule extends SaropaLintRule {
           // Skip if file contains showDialog calls - widgets in such files
           // are likely designed as dialog content. This handles cases where
           // a widget class is defined alongside its showDialog wrapper function.
-          if (fileSource.contains('showdialog') || fileSource.contains('showdialogcommon')) {
+          if (fileSource.contains('showdialog') ||
+              fileSource.contains('showdialogcommon')) {
             return;
           }
 
@@ -1573,7 +1598,8 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
     name: 'require_form_auto_validate_mode',
     problemMessage:
         '[require_form_auto_validate_mode] Form should specify autovalidateMode for consistent UX.',
-    correctionMessage: 'Add autovalidateMode: AutovalidateMode.onUserInteraction.',
+    correctionMessage:
+        'Add autovalidateMode: AutovalidateMode.onUserInteraction.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1592,7 +1618,8 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
       // Check if autovalidateMode argument exists
       bool hasAutovalidateMode = false;
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'autovalidateMode') {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'autovalidateMode') {
           hasAutovalidateMode = true;
           break;
         }
@@ -1681,7 +1708,8 @@ class RequireAutofillHintsRule extends SaropaLintRule {
     name: 'require_autofill_hints',
     problemMessage:
         '[require_autofill_hints] Form field should have autofillHints for better user experience.',
-    correctionMessage: 'Add autofillHints: [AutofillHints.email] or appropriate hint.',
+    correctionMessage:
+        'Add autofillHints: [AutofillHints.email] or appropriate hint.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1756,7 +1784,8 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
     name: 'prefer_on_field_submitted',
     problemMessage:
         '[prefer_on_field_submitted] Form field should have onFieldSubmitted to handle keyboard action.',
-    correctionMessage: 'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit.',
+    correctionMessage:
+        'Add onFieldSubmitted: (_) => nextFocusNode.requestFocus() or submit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1831,7 +1860,8 @@ class RequireTextInputTypeRule extends SaropaLintRule {
     name: 'require_text_input_type',
     problemMessage:
         '[require_text_input_type] TextField without keyboardType. Users may see wrong keyboard.',
-    correctionMessage: 'Add keyboardType parameter for appropriate keyboard layout.',
+    correctionMessage:
+        'Add keyboardType parameter for appropriate keyboard layout.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1888,7 +1918,8 @@ class PreferTextInputActionRule extends SaropaLintRule {
     name: 'prefer_text_input_action',
     problemMessage:
         '[prefer_text_input_action] TextField without textInputAction. Keyboard action button unclear.',
-    correctionMessage: 'Add textInputAction (e.g., TextInputAction.next or .done).',
+    correctionMessage:
+        'Add textInputAction (e.g., TextInputAction.next or .done).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1952,7 +1983,8 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
     name: 'require_form_key_in_stateful_widget',
     problemMessage:
         '[require_form_key_in_stateful_widget] GlobalKey created in build(). Key changes every rebuild, losing state.',
-    correctionMessage: 'Move GlobalKey to a State class field to preserve form state.',
+    correctionMessage:
+        'Move GlobalKey to a State class field to preserve form state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
