@@ -23,7 +23,6 @@ custom_lint:
     avoid_stateful_widget_in_list: true
     prefer_cached_network_image: true
     avoid_controller_in_build: true
-    avoid_setstate_in_build: true
     avoid_regex_in_loop: true
     prefer_const_string_list: true
     prefer_const_widgets_in_lists: true

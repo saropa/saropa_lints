@@ -25,7 +25,15 @@ const Set<String> stylisticRules = <String>{
   'saropa',
   'save',
   'tag_name',
-  'user_clicked_button'
+  'user_clicked_button',
+
+  // Added stylistic rules from user request
+  'avoid_setstate_in_build',
+  'prefer_kebab_tag_name',
+  'prefer_rethrow_over_throw_e',
+  'prefer_sorted_members',
+  'prefer_sorted_parameters',
+  'prefer_single_exit_point'
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -506,7 +514,12 @@ const Set<String> essentialRules = <String>{
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 const Set<String> recommendedOnlyRules = <String>{
+  'prefer_single_exit_point',
   // BuildContext Safety (Recommended)
+  'prefer_kebab_tag_name',
+  'prefer_rethrow_over_throw_e',
+  'prefer_sorted_members',
+  'prefer_sorted_parameters',
   'avoid_context_in_async_static', // WARNING - async static with context
 
   // Memory Management Best Practices
