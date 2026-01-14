@@ -1030,7 +1030,6 @@ These rules are **not included in any tier** by default. They represent team pre
 | `prefer_foreach` | Planned | INFO | Prefer forEach over for-in for readability. |
 | `prefer_if_elements_to_conditional_expressions` | Planned | INFO | Prefer if elements in collections to conditional expressions. |
 | `prefer_inlined_adds` | Planned | INFO | Prefer inlined adds in collection literals. |
-| `prefer_single_exit_point` | Planned | INFO | Prefer a single exit point in functions. |
 
 #### Import & File Organization
 
@@ -1164,6 +1163,7 @@ class RequireDisposeRule extends SaropaLintRule {
     'require_animation_controller_dispose',
   ];
 }
+
 ```
 
 ##### 3.0.3 Suppression Tracking
