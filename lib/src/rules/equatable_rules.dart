@@ -80,8 +80,9 @@ class ExtendEquatableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'extend_equatable',
-    problemMessage: '[extend_equatable] Class overrides operator == but does not extend Equatable.',
+    name: 'require_extend_equatable',
+    problemMessage:
+        '[require_extend_equatable] Class overrides operator == but does not extend Equatable.',
     correctionMessage: 'Consider extending Equatable for cleaner equality implementation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

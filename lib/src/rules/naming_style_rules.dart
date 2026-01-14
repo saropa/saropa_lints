@@ -3,8 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -23,8 +22,7 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getter_prefix',
-    problemMessage:
-        "[avoid_getter_prefix] Getter name should not start with 'get'.",
+    problemMessage: "[avoid_getter_prefix] Getter name should not start with 'get'.",
     correctionMessage: "Remove the 'get' prefix from the getter name.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -80,8 +78,7 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_ascii_symbols',
-    problemMessage:
-        '[avoid_non_ascii_symbols] String contains non-ASCII characters.',
+    problemMessage: '[avoid_non_ascii_symbols] String contains non-ASCII characters.',
     correctionMessage: 'Use only ASCII characters or escape sequences.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -136,9 +133,8 @@ class FormatCommentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'capitalize_comment',
-    problemMessage:
-        '[capitalize_comment] Comment should start with capital letter.',
+    name: 'capitalize_comment_start',
+    problemMessage: '[capitalize_comment_start] Comment should start with capital letter.',
     correctionMessage: 'Capitalize the first letter of the comment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -216,8 +212,7 @@ class MatchClassNamePatternRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'match_class_name_pattern',
-    problemMessage:
-        '[match_class_name_pattern] Class name does not follow expected pattern.',
+    problemMessage: '[match_class_name_pattern] Class name does not follow expected pattern.',
     correctionMessage: 'Ensure class name follows naming conventions.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -348,8 +343,7 @@ class MatchGetterSetterFieldNamesRule extends SaropaLintRule {
               if (fieldName.startsWith('_')) {
                 // Expected getter name is field without underscore
                 final String expectedName = fieldName.substring(1);
-                if (getterName != expectedName &&
-                    privateFields.contains(fieldName)) {
+                if (getterName != expectedName && privateFields.contains(fieldName)) {
                   reporter.atToken(member.name, code);
                 }
               }
@@ -440,8 +434,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
     name: 'match_positional_field_names_on_assignment',
     problemMessage:
         '[match_positional_field_names_on_assignment] Positional field name should match the variable being assigned.',
-    correctionMessage:
-        'Rename the positional field to match the assignment target.',
+    correctionMessage: 'Rename the positional field to match the assignment target.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -458,8 +451,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
       }
     });
 
-    context.registry
-        .addPatternVariableDeclaration((PatternVariableDeclaration node) {
+    context.registry.addPatternVariableDeclaration((PatternVariableDeclaration node) {
       final DartPattern pattern = node.pattern;
       if (pattern is RecordPattern) {
         _checkRecordPattern(pattern, reporter);
@@ -467,8 +459,7 @@ class MatchPositionalFieldNamesOnAssignmentRule extends SaropaLintRule {
     });
   }
 
-  void _checkRecordPattern(
-      RecordPattern pattern, SaropaDiagnosticReporter reporter) {
+  void _checkRecordPattern(RecordPattern pattern, SaropaDiagnosticReporter reporter) {
     for (final PatternField field in pattern.fields) {
       final PatternFieldName? fieldName = field.name;
       if (fieldName == null) continue;
@@ -526,8 +517,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     name: 'prefer_boolean_prefixes',
     problemMessage:
         '[prefer_boolean_prefixes] Boolean variable should have a prefix (is/has/can/should/will/did).',
-    correctionMessage:
-        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+    correctionMessage: 'Rename to use a boolean prefix like isEnabled, hasData, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -618,8 +608,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.fields.variables) {
         final String name = variable.name.lexeme;
         // Strip leading underscore for checking
-        final String checkName =
-            name.startsWith('_') ? name.substring(1) : name;
+        final String checkName = name.startsWith('_') ? name.substring(1) : name;
 
         if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable, code);
@@ -628,16 +617,14 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
     });
 
     // Also check top-level variables
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       final TypeAnnotation? type = node.variables.type;
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
 
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
-        final String checkName =
-            name.startsWith('_') ? name.substring(1) : name;
+        final String checkName = name.startsWith('_') ? name.substring(1) : name;
 
         if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable, code);
@@ -656,9 +643,7 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
   };
 
   bool _hasValidBooleanName(String name) {
-    return _allowedExactNames.contains(name) ||
-        _hasValidPrefix(name) ||
-        _hasValidSuffix(name);
+    return _allowedExactNames.contains(name) || _hasValidPrefix(name) || _hasValidSuffix(name);
   }
 
   bool _hasValidPrefix(String name) {
@@ -723,8 +708,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
     name: 'prefer_boolean_prefixes_for_locals',
     problemMessage:
         '[prefer_boolean_prefixes_for_locals] Local boolean variable should have a prefix (is/has/can/should/will/did).',
-    correctionMessage:
-        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+    correctionMessage: 'Rename to use a boolean prefix like isEnabled, hasData, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -806,8 +790,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addVariableDeclarationStatement((VariableDeclarationStatement node) {
+    context.registry.addVariableDeclarationStatement((VariableDeclarationStatement node) {
       final TypeAnnotation? type = node.variables.type;
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
@@ -815,8 +798,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
       for (final VariableDeclaration variable in node.variables.variables) {
         final String name = variable.name.lexeme;
         // Strip leading underscore for checking
-        final String checkName =
-            name.startsWith('_') ? name.substring(1) : name;
+        final String checkName = name.startsWith('_') ? name.substring(1) : name;
 
         if (!_hasValidBooleanName(checkName)) {
           reporter.atNode(variable, code);
@@ -835,9 +817,7 @@ class PreferBooleanPrefixesForLocalsRule extends SaropaLintRule {
   };
 
   bool _hasValidBooleanName(String name) {
-    return _allowedExactNames.contains(name) ||
-        _hasValidPrefix(name) ||
-        _hasValidSuffix(name);
+    return _allowedExactNames.contains(name) || _hasValidPrefix(name) || _hasValidSuffix(name);
   }
 
   bool _hasValidPrefix(String name) {
@@ -895,8 +875,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     name: 'prefer_boolean_prefixes_for_params',
     problemMessage:
         '[prefer_boolean_prefixes_for_params] Boolean parameter should have a prefix (is/has/can/should/will/did).',
-    correctionMessage:
-        'Rename to use a boolean prefix like isEnabled, hasData, etc.',
+    correctionMessage: 'Rename to use a boolean prefix like isEnabled, hasData, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -994,8 +973,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     });
   }
 
-  void _checkParameters(
-      FormalParameterList? parameters, SaropaDiagnosticReporter reporter) {
+  void _checkParameters(FormalParameterList? parameters, SaropaDiagnosticReporter reporter) {
     if (parameters == null) return;
 
     for (final FormalParameter param in parameters.parameters) {
@@ -1003,8 +981,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     }
   }
 
-  void _checkParameter(
-      FormalParameter param, SaropaDiagnosticReporter reporter) {
+  void _checkParameter(FormalParameter param, SaropaDiagnosticReporter reporter) {
     TypeAnnotation? typeAnnotation;
     String? paramName;
     Token? nameToken;
@@ -1039,8 +1016,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     if (typeAnnotation is! NamedType) return;
     if (typeAnnotation.name.lexeme != 'bool') return;
 
-    final String checkName =
-        paramName.startsWith('_') ? paramName.substring(1) : paramName;
+    final String checkName = paramName.startsWith('_') ? paramName.substring(1) : paramName;
 
     if (!_hasValidBooleanName(checkName)) {
       reporter.atToken(nameToken, code);
@@ -1057,9 +1033,7 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
   };
 
   bool _hasValidBooleanName(String name) {
-    return _allowedExactNames.contains(name) ||
-        _hasValidPrefix(name) ||
-        _hasValidSuffix(name);
+    return _allowedExactNames.contains(name) || _hasValidPrefix(name) || _hasValidSuffix(name);
   }
 
   bool _hasValidPrefix(String name) {
@@ -1228,8 +1202,7 @@ class PreferCorrectErrorNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_error_name',
-    problemMessage:
-        '[prefer_correct_error_name] Catch parameter should be named "e" or "error".',
+    problemMessage: '[prefer_correct_error_name] Catch parameter should be named "e" or "error".',
     correctionMessage: 'Rename to "e" or "error".',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1282,8 +1255,7 @@ class PreferCorrectHandlerNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_handler_name',
-    problemMessage:
-        '[prefer_correct_handler_name] Event handler should start with "on" or "_on".',
+    problemMessage: '[prefer_correct_handler_name] Event handler should start with "on" or "_on".',
     correctionMessage: 'Rename to follow handler naming convention.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1361,10 +1333,8 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_identifier_length',
-    problemMessage:
-        '[prefer_correct_identifier_length] Identifier name length is not ideal.',
-    correctionMessage:
-        'Use names between 2-30 characters (except common short names).',
+    problemMessage: '[prefer_correct_identifier_length] Identifier name length is not ideal.',
+    correctionMessage: 'Use names between 2-30 characters (except common short names).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1411,16 +1381,14 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
     });
   }
 
-  void _checkIdentifier(
-      String name, AstNode node, SaropaDiagnosticReporter reporter) {
+  void _checkIdentifier(String name, AstNode node, SaropaDiagnosticReporter reporter) {
     // Skip private names (start with _)
     final String publicName = name.startsWith('_') ? name.substring(1) : name;
 
     if (publicName.isEmpty) return;
 
     // Check minimum length
-    if (publicName.length < _minLength &&
-        !_allowedShortNames.contains(publicName)) {
+    if (publicName.length < _minLength && !_allowedShortNames.contains(publicName)) {
       reporter.atNode(node, code);
       return;
     }
@@ -1525,8 +1493,7 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_parameter_names',
-    problemMessage:
-        '[prefer_explicit_parameter_names] Function type parameters should have names.',
+    problemMessage: '[prefer_explicit_parameter_names] Function type parameters should have names.',
     correctionMessage: 'Add parameter names for better documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1568,8 +1535,7 @@ class PreferMatchFileNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_match_file_name',
-    problemMessage:
-        '[prefer_match_file_name] File name should match the primary class name.',
+    problemMessage: '[prefer_match_file_name] File name should match the primary class name.',
     correctionMessage: 'Rename the file or class to match.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1637,8 +1603,7 @@ class PreferPrefixedGlobalConstantsRule extends SaropaLintRule {
     name: 'prefer_prefixed_global_constants',
     problemMessage:
         '[prefer_prefixed_global_constants] Global constant should have a descriptive prefix.',
-    correctionMessage:
-        'Consider prefixing with "k" or using a descriptive name.',
+    correctionMessage: 'Consider prefixing with "k" or using a descriptive name.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1702,8 +1667,7 @@ class TagNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_kebab_tag_name',
-    problemMessage:
-        '[prefer_kebab_tag_name] Tag name should follow naming conventions.',
+    problemMessage: '[prefer_kebab_tag_name] Tag name should follow naming conventions.',
     correctionMessage: 'Use kebab-case for tag names.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1768,10 +1732,8 @@ class PreferNamedExtensionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_extensions',
-    problemMessage:
-        '[prefer_named_extensions] Anonymous extension should be named.',
-    correctionMessage:
-        'Add a name to the extension for better debugging and documentation.',
+    problemMessage: '[prefer_named_extensions] Anonymous extension should be named.',
+    correctionMessage: 'Add a name to the extension for better debugging and documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1820,8 +1782,7 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
     name: 'prefer_typedef_for_callbacks',
     problemMessage:
         '[prefer_typedef_for_callbacks] Consider using typedef for repeated function types.',
-    correctionMessage:
-        'Create a typedef for this function type to improve readability.',
+    correctionMessage: 'Create a typedef for this function type to improve readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1832,20 +1793,16 @@ class PreferTypedefForCallbacksRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Track function type signatures to find repeats
-    final Map<String, List<GenericFunctionType>> signatures =
-        <String, List<GenericFunctionType>>{};
+    final Map<String, List<GenericFunctionType>> signatures = <String, List<GenericFunctionType>>{};
 
     context.registry.addGenericFunctionType((GenericFunctionType node) {
       final String signature = node.toSource();
-      signatures
-          .putIfAbsent(signature, () => <GenericFunctionType>[])
-          .add(node);
+      signatures.putIfAbsent(signature, () => <GenericFunctionType>[]).add(node);
     });
 
     // After traversal, check for repeats (using compilation unit end)
     context.registry.addCompilationUnit((CompilationUnit unit) {
-      for (final MapEntry<String, List<GenericFunctionType>> entry
-          in signatures.entries) {
+      for (final MapEntry<String, List<GenericFunctionType>> entry in signatures.entries) {
         if (entry.value.length >= 3) {
           // Report on the third and subsequent occurrences
           for (int i = 2; i < entry.value.length; i++) {
@@ -1891,8 +1848,7 @@ class PreferEnhancedEnumsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_enhanced_enums',
-    problemMessage:
-        '[prefer_enhanced_enums] Consider using enhanced enum instead of extension.',
+    problemMessage: '[prefer_enhanced_enums] Consider using enhanced enum instead of extension.',
     correctionMessage: 'Move extension members into the enum itself.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1955,8 +1911,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
     name: 'prefer_wildcard_for_unused_param',
     problemMessage:
         '[prefer_wildcard_for_unused_param] Parameter is unused. Consider using _ wildcard (Dart 3.7+).',
-    correctionMessage:
-        'Replace with _ to indicate the parameter is intentionally unused.',
+    correctionMessage: 'Replace with _ to indicate the parameter is intentionally unused.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2007,8 +1962,7 @@ class PreferWildcardForUnusedParamRule extends SaropaLintRule {
       final String name = nameToken.lexeme;
 
       // Skip if already a wildcard pattern
-      if (name == '_' ||
-          name.startsWith('_') && name.replaceAll('_', '').isEmpty) {
+      if (name == '_' || name.startsWith('_') && name.replaceAll('_', '').isEmpty) {
         continue;
       }
 
@@ -2049,8 +2003,7 @@ class _ReplaceWithWildcardFix extends DartFix {
     void handleParam(FormalParameter param) {
       final Token? nameToken = param.name;
       if (nameToken == null) return;
-      if (!SourceRange(nameToken.offset, nameToken.length)
-          .intersects(analysisError.sourceRange)) {
+      if (!SourceRange(nameToken.offset, nameToken.length).intersects(analysisError.sourceRange)) {
         return;
       }
 
@@ -2075,8 +2028,7 @@ class _ReplaceWithWildcardFix extends DartFix {
       handleParam(node.parameter);
     });
 
-    context.registry
-        .addFunctionTypedFormalParameter((FunctionTypedFormalParameter node) {
+    context.registry.addFunctionTypedFormalParameter((FunctionTypedFormalParameter node) {
       handleParam(node);
     });
   }
