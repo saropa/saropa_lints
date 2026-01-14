@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
 
+## [4.1.2] - 2026-01-13
+
+### Fixed
+
+- Removed a stray change log entry from the readme
+
 ## [4.1.1] - 2026-01-13
 
 ### Added
