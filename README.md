@@ -6,6 +6,7 @@
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
 [![rules](https://img.shields.io/badge/rules-1500%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+<!-- Rule count updated: deduplication in progress, see CHANGELOG.md for details. -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -650,7 +651,7 @@ If you think a rule is:
 - **Too lenient** - maybe it should be stricter or have options
 - **Missing** - propose it, or better yet, implement it
 
-We don't have all the answers. If you've shipped production Flutter apps and have opinions, we want to hear them.
+We don't have all the answers. If you've shipped production Flutter apps and have opinions, we want to hear from you.
 
 ### How to contribute
 
