@@ -5,6 +5,7 @@ import '../flutter_mocks.dart';
 
 void testPreferCenterOverAlign() {
   // BAD: Align with Alignment.center
+  // BAD: Align with Alignment.center, should trigger lint
   // expect_lint: prefer_center_over_align
   final bad1 = Align(
     alignment: Alignment.center,
@@ -43,6 +44,7 @@ class TestWidget extends StatelessWidget {
     return Column(
       children: [
         // BAD: In widget tree
+        // BAD: Align with Alignment.center in widget tree, should trigger lint
         // expect_lint: prefer_center_over_align
         Align(
           alignment: Alignment.center,

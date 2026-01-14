@@ -989,6 +989,19 @@ These rules are **not included in any tier** by default. They represent team pre
 
 **Planned:**
 
+| Rule Name | Description |
+|-----------|-------------|
+| `prefer_grouped_related_statements` | Prefer grouping related statements for readability. |
+| `prefer_ungrouped_statements` | Prefer ungrouped statements for certain logic flows. |
+| `prefer_blank_line_between_members` | Blank line between class members. |
+| `prefer_compact_members` | Compact class member declarations. |
+| `prefer_named_constructor_parameters` | Prefer named parameters in constructors for clarity. |
+| `prefer_positional_constructor_parameters` | Prefer positional parameters in constructors for brevity. |
+| `prefer_explicit_parameter_assignment` | Prefer explicit parameter assignment in constructors. |
+| `prefer_const_constructor_declarations` | Prefer declaring constructors as const when possible. |
+| `prefer_non_const_constructors` | Prefer non-const constructors when mutation is required. |
+| `prefer_factory_constructor` | Prefer factory constructors for object creation patterns. |
+
 ### Miscellaneous Rules
 
 | Rule Name | Tier | Severity | Description |
@@ -1030,6 +1043,28 @@ These rules are **not included in any tier** by default. They represent team pre
 | `prefer_foreach` | Planned | INFO | Prefer forEach over for-in for readability. |
 | `prefer_if_elements_to_conditional_expressions` | Planned | INFO | Prefer if elements in collections to conditional expressions. |
 | `prefer_inlined_adds` | Planned | INFO | Prefer inlined adds in collection literals. |
+
+| `fold` | Planned | INFO | (Stylistic) Use fold for collection reduction where appropriate. |
+| `prefer_asmap_over_indexed_iteration` | Planned | INFO | Prefer asMap().entries for indexed iteration over manual index. |
+| `prefer_cascade_assignments` | Planned | INFO | Prefer using cascade (..) for assignments to the same object. |
+| `prefer_const_constructor_declarations` | Planned | INFO | Prefer declaring constructors as const when possible. |
+| `prefer_constructor_over_literals` | Planned | INFO | Prefer List()/Map() constructors over literals in certain contexts. |
+| `prefer_explicit_null_checks` | Planned | INFO | Prefer explicit null checks for clarity. |
+| `prefer_explicit_parameter_assignment` | Planned | INFO | Prefer explicit parameter assignment in constructors. |
+| `prefer_factory_constructor` | Planned | INFO | Prefer factory constructors for object creation patterns. |
+| `prefer_fire_and_forget` | Planned | INFO | Prefer fire-and-forget async calls where result is not needed. |
+| `prefer_fold_over_reduce` | Planned | INFO | Prefer fold over reduce for collections when initial value is needed. |
+| `prefer_foreach_over_map_entries` | Planned | INFO | Prefer forEach for map iteration over map.entries. |
+| `prefer_grouped_related_statements` | Planned | INFO | Prefer grouping related statements for readability. |
+| `prefer_if_else_over_guards` | Planned | INFO | Prefer if-else over guard clauses for certain logic. |
+| `prefer_literal_apostrophe` | Planned | INFO | Prefer straight apostrophe (') over curly in code. |
+| `prefer_named_constructor_parameters` | Planned | INFO | Prefer named parameters in constructors for clarity. |
+| `prefer_non_const_constructors` | Planned | INFO | Prefer non-const constructors when mutation is required. |
+| `prefer_null_aware_method_calls` | Planned | INFO | Prefer null-aware method calls (?.) for nullable objects. |
+| `prefer_positional_constructor_parameters` | Planned | INFO | Prefer positional parameters in constructors for brevity. |
+| `prefer_separate_assignments` | Planned | INFO | Prefer separate assignments over chained or compound assignments. |
+| `prefer_then_catcherror` | Planned | INFO | Prefer then().catchError() over try/catch for async error handling. |
+| `prefer_ungrouped_statements` | Planned | INFO | Prefer ungrouped statements for certain logic flows. |
 
 #### Import & File Organization
 

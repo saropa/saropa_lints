@@ -7,8 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -56,8 +55,7 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
     name: 'require_google_signin_error_handling',
     problemMessage:
         '[require_google_signin_error_handling] Google Sign-In calls should be wrapped in try-catch.',
-    correctionMessage:
-        'Wrap the signIn() call in try-catch to handle failures gracefully.',
+    correctionMessage: 'Wrap the signIn() call in try-catch to handle failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -127,10 +125,8 @@ class _AddTryCatchTodoFix extends DartFix {
       while (lineStart > 0 && sourceCode[lineStart - 1] != '\n') {
         lineStart--;
       }
-      final String leadingWhitespace =
-          sourceCode.substring(lineStart, statementOffset);
-      final String indent =
-          leadingWhitespace.isEmpty ? '  ' : leadingWhitespace;
+      final String leadingWhitespace = sourceCode.substring(lineStart, statementOffset);
+      final String indent = leadingWhitespace.isEmpty ? '  ' : leadingWhitespace;
 
       final String statementSource = statementNode.toSource();
 
@@ -211,8 +207,7 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
     name: 'require_apple_signin_nonce',
     problemMessage:
         '[require_apple_signin_nonce] Apple Sign-In should include nonce parameter for security.',
-    correctionMessage:
-        'Add nonce parameter to getAppleIDCredential() to prevent replay attacks.',
+    correctionMessage: 'Add nonce parameter to getAppleIDCredential() to prevent replay attacks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -312,8 +307,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
     name: 'require_supabase_error_handling',
     problemMessage:
         '[require_supabase_error_handling] Supabase calls should be wrapped in try-catch.',
-    correctionMessage:
-        'Wrap Supabase operations in try-catch to handle failures gracefully.',
+    correctionMessage: 'Wrap Supabase operations in try-catch to handle failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -383,11 +377,9 @@ class AvoidSupabaseAnonKeyInCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_supabase_anon_key_in_code',
-    problemMessage:
-        '[avoid_supabase_anon_key_in_code] Hardcoded keys can be extracted '
+    problemMessage: '[avoid_supabase_anon_key_in_code] Hardcoded keys can be extracted '
         'from app binary. Attackers gain direct access to your Supabase project.',
-    correctionMessage:
-        'Use environment variables or secure configuration for API keys.',
+    correctionMessage: 'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -503,11 +495,9 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_supabase_realtime_unsubscribe',
-    problemMessage:
-        '[require_supabase_realtime_unsubscribe] Unsubscribed channel keeps '
+    problemMessage: '[require_supabase_realtime_unsubscribe] Unsubscribed channel keeps '
         'WebSocket open, leaking connections and receiving stale updates.',
-    correctionMessage:
-        'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
+    correctionMessage: 'Add channel.unsubscribe() in dispose() to prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -530,8 +520,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && typeName.contains('RealtimeChannel')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               channelNames.add(variable.name.lexeme);
             }
           }
@@ -559,8 +548,7 @@ class RequireSupabaseRealtimeUnsubscribeRule extends SaropaLintRule {
         if (!isUnsubscribed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -684,8 +672,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
 
       // Check for legacy WebView/InAppWebView constructors
@@ -693,8 +680,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
         final bool hasOnSslError = node.argumentList.arguments.any((arg) {
           if (arg is NamedExpression) {
             final String name = arg.name.label.name;
-            return name == 'onSslError' ||
-                name == 'onReceivedServerTrustAuthRequest';
+            return name == 'onSslError' || name == 'onReceivedServerTrustAuthRequest';
           }
           return false;
         });
@@ -738,8 +724,7 @@ class _AddSslHandlerTodoFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
@@ -791,8 +776,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
     name: 'avoid_webview_file_access',
     problemMessage:
         '[avoid_webview_file_access] WebView file access should be disabled for security.',
-    correctionMessage:
-        'Remove allowFileAccess: true or set it to false explicitly.',
+    correctionMessage: 'Remove allowFileAccess: true or set it to false explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -806,8 +790,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for allowFileAccess method call
-      if (methodName == 'allowFileAccess' ||
-          methodName == 'setAllowFileAccess') {
+      if (methodName == 'allowFileAccess' || methodName == 'setAllowFileAccess') {
         final ArgumentList args = node.argumentList;
         if (args.arguments.isNotEmpty) {
           final String argValue = args.arguments.first.toSource();
@@ -819,8 +802,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
     });
 
     // Also check named parameters
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (!typeName.contains('WebView') && !typeName.contains('Settings')) {
         return;
@@ -829,8 +811,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String name = arg.name.label.name;
-          if (name == 'allowFileAccess' ||
-              name == 'allowFileAccessFromFileURLs') {
+          if (name == 'allowFileAccess' || name == 'allowFileAccessFromFileURLs') {
             final String value = arg.expression.toSource();
             if (value == 'true') {
               reporter.atNode(arg, code);
@@ -931,8 +912,7 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
     name: 'require_workmanager_constraints',
     problemMessage:
         '[require_workmanager_constraints] WorkManager tasks should specify constraints.',
-    correctionMessage:
-        'Add constraints parameter to prevent unwanted battery/data usage.',
+    correctionMessage: 'Add constraints parameter to prevent unwanted battery/data usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -954,14 +934,12 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
       // Check if it's a Workmanager call
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
-      if (!targetSource.contains('Workmanager') &&
-          !targetSource.contains('workmanager')) {
+      if (!targetSource.contains('Workmanager') && !targetSource.contains('workmanager')) {
         return;
       }
 
       // Check for constraints parameter
-      final bool hasConstraints =
-          node.argumentList.arguments.any((Expression arg) {
+      final bool hasConstraints = node.argumentList.arguments.any((Expression arg) {
         if (arg is NamedExpression) {
           return arg.name.label.name == 'constraints';
         }
@@ -1043,11 +1021,9 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_workmanager_result_return',
-    problemMessage:
-        '[require_workmanager_result_return] Missing return value makes '
+    problemMessage: '[require_workmanager_result_return] Missing return value makes '
         'WorkManager assume failure, triggering unnecessary retries.',
-    correctionMessage:
-        'Return true/false from the executeTask callback to indicate success.',
+    correctionMessage: 'Return true/false from the executeTask callback to indicate success.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1063,8 +1039,7 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
       // Check if it's a Workmanager call
       final String? targetSource = node.target?.toSource();
       if (targetSource == null) return;
-      if (!targetSource.contains('Workmanager') &&
-          !targetSource.contains('workmanager')) {
+      if (!targetSource.contains('Workmanager') && !targetSource.contains('workmanager')) {
         return;
       }
 
@@ -1165,8 +1140,9 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_calendar_timezone_handling',
     problemMessage:
-        '[require_calendar_timezone_handling] device_calendar Event should specify time zone explicitly.',
-    correctionMessage: 'Add timeZone parameter to handle cross-timezone usage.',
+        '[require_calendar_timezone_handling] device_calendar Event is missing an explicit timeZone. This can cause events to appear at the wrong time for users in different time zones, leading to missed or misaligned appointments.',
+    correctionMessage:
+        'Add the timeZone parameter to device_calendar Event to ensure events are scheduled and displayed correctly across different time zones. This prevents confusion and missed appointments for users in other regions.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1176,8 +1152,7 @@ class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'Event') return;
 
@@ -1225,8 +1200,7 @@ class _AddTimezoneParameterFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
@@ -1304,8 +1278,7 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_keyboard_visibility_dispose',
-    problemMessage:
-        '[require_keyboard_visibility_dispose] Uncancelled subscription keeps '
+    problemMessage: '[require_keyboard_visibility_dispose] Uncancelled subscription keeps '
         'firing callbacks after dispose, causing setState errors.',
     correctionMessage: 'Store and cancel the stream subscription in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1411,11 +1384,9 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_speech_stop_on_dispose',
-    problemMessage:
-        '[require_speech_stop_on_dispose] Unreleased SpeechToText keeps '
+    problemMessage: '[require_speech_stop_on_dispose] Unreleased SpeechToText keeps '
         'microphone active, draining battery and blocking other apps.',
-    correctionMessage:
-        'Add _speech.stop() in dispose() to release microphone resources.',
+    correctionMessage: 'Add _speech.stop() in dispose() to release microphone resources.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1438,8 +1409,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && typeName.contains('SpeechToText')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               speechFieldNames.add(variable.name.lexeme);
             }
           }
@@ -1467,8 +1437,7 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
         if (!isStopped) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -1518,11 +1487,9 @@ class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_app_links_sensitive_params',
-    problemMessage:
-        '[avoid_app_links_sensitive_params] Deep link params are logged by '
+    problemMessage: '[avoid_app_links_sensitive_params] Deep link params are logged by '
         'OS and analytics, exposing tokens in crash reports and logs.',
-    correctionMessage:
-        'Use one-time codes instead of tokens or passwords in URLs.',
+    correctionMessage: 'Use one-time codes instead of tokens or passwords in URLs.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1666,8 +1633,7 @@ class RequireEnviedObfuscationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_envied_obfuscation',
-    problemMessage:
-        '[require_envied_obfuscation] Envied should use obfuscation for security.',
+    problemMessage: '[require_envied_obfuscation] Envied should use obfuscation for security.',
     correctionMessage: 'Add obfuscate: true to @Envied or @EnviedField.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1766,11 +1732,9 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_openai_key_in_code',
-    problemMessage:
-        '[avoid_openai_key_in_code] Hardcoded OpenAI keys are extractable '
+    problemMessage: '[avoid_openai_key_in_code] Hardcoded OpenAI keys are extractable '
         'from binaries, enabling API abuse charged to your account.',
-    correctionMessage:
-        'Use environment variables or secure configuration for API keys.',
+    correctionMessage: 'Use environment variables or secure configuration for API keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1837,8 +1801,7 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
     name: 'require_openai_error_handling',
     problemMessage:
         '[require_openai_error_handling] OpenAI API calls should be wrapped in try-catch.',
-    correctionMessage:
-        'Wrap OpenAI calls in try-catch to handle rate limits and failures.',
+    correctionMessage: 'Wrap OpenAI calls in try-catch to handle rate limits and failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1928,8 +1891,7 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_svg_error_handler',
-    problemMessage:
-        '[require_svg_error_handler] SvgPicture should have an errorBuilder callback.',
+    problemMessage: '[require_svg_error_handler] SvgPicture should have an errorBuilder callback.',
     correctionMessage: 'Add errorBuilder to handle SVG loading failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1954,8 +1916,7 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
       }
 
       // Check for errorBuilder parameter
-      final bool hasErrorBuilder =
-          node.argumentList.arguments.any((Expression arg) {
+      final bool hasErrorBuilder = node.argumentList.arguments.any((Expression arg) {
         if (arg is NamedExpression) {
           return arg.name.label.name == 'errorBuilder';
         }
@@ -2038,8 +1999,7 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
     name: 'require_google_fonts_fallback',
     problemMessage:
         '[require_google_fonts_fallback] GoogleFonts should specify fontFamilyFallback.',
-    correctionMessage:
-        'Add fontFamilyFallback to handle font loading failures.',
+    correctionMessage: 'Add fontFamilyFallback to handle font loading failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2055,8 +2015,7 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
       if (target != 'GoogleFonts') return;
 
       // Check for fontFamilyFallback parameter
-      final bool hasFallback =
-          node.argumentList.arguments.any((Expression arg) {
+      final bool hasFallback = node.argumentList.arguments.any((Expression arg) {
         if (arg is NamedExpression) {
           return arg.name.label.name == 'fontFamilyFallback';
         }
@@ -2131,8 +2090,7 @@ class PreferUuidV4Rule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_uuid_v4',
-    problemMessage:
-        '[prefer_uuid_v4] Prefer UUID v4 over v1 for better randomness and privacy.',
+    problemMessage: '[prefer_uuid_v4] Prefer UUID v4 over v1 for better randomness and privacy.',
     correctionMessage: 'Use Uuid().v4() instead of Uuid().v1().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2250,8 +2208,7 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
     name: 'prefer_image_picker_max_dimensions',
     problemMessage:
         '[prefer_image_picker_max_dimensions] pickImage() without maxWidth/maxHeight can cause OOM on high-res cameras.',
-    correctionMessage:
-        'Add maxWidth and maxHeight parameters to limit image size.',
+    correctionMessage: 'Add maxWidth and maxHeight parameters to limit image size.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2456,8 +2413,7 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
     name: 'prefer_geolocator_distance_filter',
     problemMessage:
         '[prefer_geolocator_distance_filter] Location stream without distanceFilter causes excessive updates and battery drain.',
-    correctionMessage:
-        'Add distanceFilter to LocationSettings to reduce unnecessary updates.',
+    correctionMessage: 'Add distanceFilter to LocationSettings to reduce unnecessary updates.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2476,16 +2432,14 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Geolocator') &&
-          targetSource != 'Geolocator') {
+      if (!targetSource.contains('Geolocator') && targetSource != 'Geolocator') {
         return;
       }
 
       // Look for locationSettings parameter
       Expression? locationSettingsArg;
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'locationSettings') {
+        if (arg is NamedExpression && arg.name.label.name == 'locationSettings') {
           locationSettingsArg = arg.expression;
           break;
         }
@@ -2499,8 +2453,7 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
 
       // Check if LocationSettings has distanceFilter
       if (locationSettingsArg is InstanceCreationExpression) {
-        final bool hasDistanceFilter =
-            locationSettingsArg.argumentList.arguments.any((arg) {
+        final bool hasDistanceFilter = locationSettingsArg.argumentList.arguments.any((arg) {
           if (arg is NamedExpression) {
             return arg.name.label.name == 'distanceFilter';
           }

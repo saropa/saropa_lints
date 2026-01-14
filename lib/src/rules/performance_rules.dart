@@ -10,8 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -57,11 +56,9 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_keys_in_animated_lists',
-    problemMessage:
-        '[require_keys_in_animated_lists] Without keys, AnimatedList animations '
+    problemMessage: '[require_keys_in_animated_lists] Without keys, AnimatedList animations '
         'target wrong items after insert/remove operations.',
-    correctionMessage:
-        'Add a Key to the returned widget for correct animations.',
+    correctionMessage: 'Add a Key to the returned widget for correct animations.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -96,8 +93,7 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
     });
   }
 
-  void _checkBuilderForKey(
-      FunctionBody body, SaropaDiagnosticReporter reporter) {
+  void _checkBuilderForKey(FunctionBody body, SaropaDiagnosticReporter reporter) {
     // Find the returned widget
     if (body is ExpressionFunctionBody) {
       _checkExpressionForKey(body.expression, reporter, body);
@@ -210,8 +206,7 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_build',
-    problemMessage:
-        '[avoid_expensive_build] Expensive operations in build() run on every '
+    problemMessage: '[avoid_expensive_build] Expensive operations in build() run on every '
         'frame, causing jank and dropped frames during animations.',
     correctionMessage:
         'Move expensive operations to initState, didChangeDependencies, or cache the result.',
@@ -246,8 +241,7 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
       if (node.name.lexeme != 'build') return;
 
       // Check if this is a widget build method
-      final ClassDeclaration? classDecl =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -331,11 +325,9 @@ class PreferConstChildWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_const_child_widgets',
-    problemMessage:
-        '[prefer_const_child_widgets] Non-const child list recreates widget '
+    problemMessage: '[prefer_const_child_widgets] Non-const child list recreates widget '
         'instances on every build, preventing Flutter rebuild optimizations.',
-    correctionMessage:
-        'Add const to the list literal to prevent unnecessary rebuilds.',
+    correctionMessage: 'Add const to the list literal to prevent unnecessary rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -447,8 +439,7 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_synchronous_file_io',
-    problemMessage:
-        '[avoid_synchronous_file_io] Synchronous file I/O blocks the main '
+    problemMessage: '[avoid_synchronous_file_io] Synchronous file I/O blocks the main '
         'thread, causing UI freezes and dropped frames during disk access.',
     correctionMessage: 'Use async file operations to avoid blocking the UI.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -510,9 +501,9 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_compute_for_heavy_work',
     problemMessage:
-        '[prefer_compute_for_heavy_work] Heavy computation should use compute() or Isolate.',
+        '[prefer_compute_for_heavy_work] Heavy computation is performed on the main thread. This can block the UI, causing jank, slow animations, or unresponsive app behavior.',
     correctionMessage:
-        'Move heavy work to a separate isolate using compute() or Isolate.run().',
+        'Move heavy work to a separate isolate using compute() or Isolate.run(). This keeps the UI responsive and prevents dropped frames or slow user interactions, especially on lower-end devices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -550,9 +541,7 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
           while (current != null) {
             if (current is MethodInvocation) {
               final String parentMethod = current.methodName.name;
-              if (parentMethod == 'compute' ||
-                  parentMethod == 'run' ||
-                  parentMethod == 'spawn') {
+              if (parentMethod == 'compute' || parentMethod == 'run' || parentMethod == 'spawn') {
                 insideIsolate = true;
                 break;
               }
@@ -631,8 +620,7 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
     context.registry.addForElement((ForElement node) {
       // For elements in list comprehensions
       if (node.body is InstanceCreationExpression) {
-        final InstanceCreationExpression creation =
-            node.body as InstanceCreationExpression;
+        final InstanceCreationExpression creation = node.body as InstanceCreationExpression;
         _checkCreation(creation, reporter);
       }
     });
@@ -646,8 +634,7 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
     });
   }
 
-  void _checkBodyForCreation(
-      Statement body, SaropaDiagnosticReporter reporter) {
+  void _checkBodyForCreation(Statement body, SaropaDiagnosticReporter reporter) {
     body.visitChildren(_CreationInLoopVisitor(reporter, code, _expensiveTypes));
   }
 
@@ -709,11 +696,9 @@ class PreferCachedGetterRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_cached_getter',
-    problemMessage:
-        '[prefer_cached_getter] Repeated getter calls recompute expensive values '
+    problemMessage: '[prefer_cached_getter] Repeated getter calls recompute expensive values '
         'each time, wasting CPU cycles when caching would suffice.',
-    correctionMessage:
-        'Store the getter result in a local variable if called multiple times.',
+    correctionMessage: 'Store the getter result in a local variable if called multiple times.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -818,8 +803,7 @@ class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_excessive_widget_depth',
-    problemMessage:
-        '[avoid_excessive_widget_depth] Deep widget nesting rebuilds entire '
+    problemMessage: '[avoid_excessive_widget_depth] Deep widget nesting rebuilds entire '
         'subtree on changes, hurting performance and making code hard to maintain.',
     correctionMessage:
         'Extract nested widgets into separate widget classes for better performance.',
@@ -913,8 +897,7 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
     name: 'require_item_extent_for_large_lists',
     problemMessage:
         '[require_item_extent_for_large_lists] Large list should specify itemExtent for performance.',
-    correctionMessage:
-        'Add itemExtent or prototypeItem for better scrolling performance.',
+    correctionMessage: 'Add itemExtent or prototypeItem for better scrolling performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -998,11 +981,9 @@ class PreferImagePrecacheRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_image_precache',
-    problemMessage:
-        '[prefer_image_precache] Large images without precaching cause visible '
+    problemMessage: '[prefer_image_precache] Large images without precaching cause visible '
         'loading delays and layout shifts when they appear on screen.',
-    correctionMessage:
-        'Use precacheImage() in didChangeDependencies for smoother UX.',
+    correctionMessage: 'Use precacheImage() in didChangeDependencies for smoother UX.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1031,8 +1012,7 @@ class PreferImagePrecacheRule extends SaropaLintRule {
       if (namedConstructor != 'asset' && namedConstructor != 'network') return;
 
       // Check if in build method
-      final MethodDeclaration? method =
-          node.thisOrAncestorOfType<MethodDeclaration>();
+      final MethodDeclaration? method = node.thisOrAncestorOfType<MethodDeclaration>();
       if (method == null || method.name.lexeme != 'build') return;
 
       // Check if image name suggests it's a hero/important image
@@ -1303,8 +1283,7 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_loop',
-    problemMessage:
-        '[avoid_string_concatenation_loop] Each += creates new String object, '
+    problemMessage: '[avoid_string_concatenation_loop] Each += creates new String object, '
         'causing O(n²) memory allocations in loops.',
     correctionMessage: 'Use StringBuffer for building strings in loops.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1430,8 +1409,7 @@ class AvoidScrollListenerInBuildRule extends SaropaLintRule {
     name: 'avoid_scroll_listener_in_build',
     problemMessage:
         '[avoid_scroll_listener_in_build] Adding scroll listener in build() causes multiple subscriptions.',
-    correctionMessage:
-        'Move listener registration to initState() and remove in dispose().',
+    correctionMessage: 'Move listener registration to initState() and remove in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1545,9 +1523,7 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
 
       // Suggest ValueListenableBuilder if state is very simple
       // (1 field with few setState calls)
-      if (stateFieldCount == 1 &&
-          setStateCallCount >= 1 &&
-          setStateCallCount <= 3) {
+      if (stateFieldCount == 1 && setStateCallCount >= 1 && setStateCallCount <= 3) {
         reporter.atToken(node.name, code);
       }
     });
@@ -1606,8 +1582,7 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
     name: 'avoid_global_key_misuse',
     problemMessage:
         '[avoid_global_key_misuse] Multiple GlobalKeys in a class may indicate overuse. GlobalKeys are expensive.',
-    correctionMessage:
-        'Use ValueKey or ObjectKey for list items. Reserve GlobalKey for Form, '
+    correctionMessage: 'Use ValueKey or ObjectKey for list items. Reserve GlobalKey for Form, '
         'accessing widget state, or navigator operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1756,10 +1731,8 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
         AstNode? parent = node.parent;
         while (parent != null) {
           if (parent is InstanceCreationExpression) {
-            final String? parentType =
-                parent.constructorName.type.element?.name;
-            if (parentType == 'Stack' ||
-                parentType == 'CustomMultiChildLayout') {
+            final String? parentType = parent.constructorName.type.element?.name;
+            if (parentType == 'Stack' || parentType == 'CustomMultiChildLayout') {
               reporter.atNode(node.constructorName, code);
               return;
             }
@@ -1818,8 +1791,7 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
     name: 'avoid_text_span_in_build',
     problemMessage:
         '[avoid_text_span_in_build] TextSpan created in build() prevents text layout caching.',
-    correctionMessage:
-        'Cache TextSpan as a static const or class field for better performance.',
+    correctionMessage: 'Cache TextSpan as a static const or class field for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1850,8 +1822,7 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
       // Check if it's a const creation (which is fine)
       if (!node.isConst) {
         // Check if it has children (complex TextSpan worth caching)
-        final bool hasChildren =
-            node.argumentList.arguments.any((Expression arg) {
+        final bool hasChildren = node.argumentList.arguments.any((Expression arg) {
           if (arg is NamedExpression) {
             return arg.name.label.name == 'children';
           }
@@ -1898,9 +1869,9 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_list_copy',
     problemMessage:
-        '[avoid_large_list_copy] List.from() and toList() copy all elements.',
+        '[avoid_large_list_copy] List.from() and toList() create a full copy of all elements, which can use excessive memory and slow down your app when working with large lists.',
     correctionMessage:
-        'Consider lazy Iterable operations or document intentional copies.',
+        'Use lazy Iterable operations (like map, where, or take) instead of copying large lists, unless a full copy is required. If you must copy, document why to help maintainers understand the performance tradeoff.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1911,8 +1882,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Check for List.from()
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'List') return;
 
@@ -2110,8 +2080,7 @@ class _ExpensiveMethodVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (AvoidExpensiveComputationInBuildRule._expensiveMethods
-        .contains(node.methodName.name)) {
+    if (AvoidExpensiveComputationInBuildRule._expensiveMethods.contains(node.methodName.name)) {
       reporter.atNode(node, code);
     }
     super.visitMethodInvocation(node);
@@ -2158,8 +2127,7 @@ class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
     name: 'avoid_widget_creation_in_loop',
     problemMessage:
         '[avoid_widget_creation_in_loop] Creating widgets in .map() creates new instances every rebuild.',
-    correctionMessage:
-        'Use ListView.builder for lazy construction or extract to method.',
+    correctionMessage: 'Use ListView.builder for lazy construction or extract to method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2229,8 +2197,7 @@ class RequireBuildContextScopeRule extends SaropaLintRule {
     name: 'require_build_context_scope',
     problemMessage:
         '[require_build_context_scope] BuildContext used after await may be invalid (widget disposed).',
-    correctionMessage:
-        'Cache context-dependent values before await or check mounted.',
+    correctionMessage: 'Cache context-dependent values before await or check mounted.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2249,8 +2216,7 @@ class RequireBuildContextScopeRule extends SaropaLintRule {
 
       String? contextParamName;
       for (final FormalParameter param in params.parameters) {
-        final String? typeName =
-            param.declaredFragment?.element.type.toString();
+        final String? typeName = param.declaredFragment?.element.type.toString();
         if (typeName != null && typeName.contains('BuildContext')) {
           contextParamName = param.name?.lexeme;
           break;
@@ -2258,8 +2224,7 @@ class RequireBuildContextScopeRule extends SaropaLintRule {
       }
 
       if (contextParamName != null) {
-        node.body.visitChildren(
-            _ContextAfterAwaitVisitor(reporter, code, contextParamName));
+        node.body.visitChildren(_ContextAfterAwaitVisitor(reporter, code, contextParamName));
       }
     });
   }
@@ -2330,8 +2295,7 @@ class AvoidCallingOfInBuildRule extends SaropaLintRule {
     name: 'avoid_calling_of_in_build',
     problemMessage:
         '[avoid_calling_of_in_build] Multiple .of(context) calls traverse widget tree repeatedly.',
-    correctionMessage:
-        'Cache the result in a local variable for better performance.',
+    correctionMessage: 'Cache the result in a local variable for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2427,8 +2391,7 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
     name: 'require_image_cache_management',
     problemMessage:
         '[require_image_cache_management] Class loads many images but never clears imageCache.',
-    correctionMessage:
-        'Call imageCache.clear() or imageCache.evict() in dispose().',
+    correctionMessage: 'Call imageCache.clear() or imageCache.evict() in dispose().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2449,8 +2412,7 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
             source.contains('CachedNetworkImage')) {
           imageCount++;
         }
-        if (source.contains('imageCache.clear') ||
-            source.contains('imageCache.evict')) {
+        if (source.contains('imageCache.clear') || source.contains('imageCache.evict')) {
           hasImageCacheClear = true;
         }
       }
@@ -2593,8 +2555,7 @@ class AvoidClosureMemoryLeakRule extends SaropaLintRule {
     name: 'avoid_closure_memory_leak',
     problemMessage:
         '[avoid_closure_memory_leak] Closure with setState may keep widget alive after disposal.',
-    correctionMessage:
-        'Store subscription and cancel in dispose(), check mounted before setState.',
+    correctionMessage: 'Store subscription and cancel in dispose(), check mounted before setState.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2626,8 +2587,7 @@ class _StreamListenVisitor extends RecursiveAstVisitor<void> {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String bodySource = arg.body.toSource();
-          if (bodySource.contains('setState') &&
-              !bodySource.contains('mounted')) {
+          if (bodySource.contains('setState') && !bodySource.contains('mounted')) {
             reporter.atNode(node, code);
           }
         }
@@ -2670,8 +2630,7 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_static_const_widgets',
-    problemMessage:
-        '[prefer_static_const_widgets] Non-static const field is created per '
+    problemMessage: '[prefer_static_const_widgets] Non-static const field is created per '
         'instance instead of sharing single compile-time object.',
     correctionMessage: 'Add static modifier: static const widget = Widget();',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2690,8 +2649,7 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
       if (node.fields.isConst) {
         for (final VariableDeclaration variable in node.fields.variables) {
           final Expression? initializer = variable.initializer;
-          if (initializer is InstanceCreationExpression &&
-              initializer.isConst) {
+          if (initializer is InstanceCreationExpression && initializer.isConst) {
             reporter.atNode(variable, code);
           }
         }
@@ -2960,8 +2918,7 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
     name: 'prefer_builder_for_conditional',
     problemMessage:
         '[prefer_builder_for_conditional] Complex widget in ternary conditional. Consider if/return for readability.',
-    correctionMessage:
-        'Use if/return pattern for cleaner code: if (cond) return A(); return B();',
+    correctionMessage: 'Use if/return pattern for cleaner code: if (cond) return A(); return B();',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2986,8 +2943,7 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
   ) {
     context.registry.addConditionalExpression((ConditionalExpression node) {
       // Check if inside a build method
-      final MethodDeclaration? method =
-          node.thisOrAncestorOfType<MethodDeclaration>();
+      final MethodDeclaration? method = node.thisOrAncestorOfType<MethodDeclaration>();
       if (method == null || method.name.lexeme != 'build') return;
 
       // Check thenExpression and elseExpression for expensive widgets
@@ -3059,8 +3015,7 @@ class RequireWidgetKeyStrategyRule extends SaropaLintRule {
     name: 'require_widget_key_strategy',
     problemMessage:
         '[require_widget_key_strategy] Inconsistent key usage in itemBuilder - some returns have keys, others do not.',
-    correctionMessage:
-        'Apply consistent key strategy: either all items have keys or none do.',
+    correctionMessage: 'Apply consistent key strategy: either all items have keys or none do.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3250,10 +3205,8 @@ class RequireCorsHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cors_handling',
-    problemMessage:
-        '[require_cors_handling] HTTP calls on web may require CORS handling.',
-    correctionMessage:
-        'Ensure server returns CORS headers or use appropriate configuration.',
+    problemMessage: '[require_cors_handling] HTTP calls on web may require CORS handling.',
+    correctionMessage: 'Ensure server returns CORS headers or use appropriate configuration.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3410,8 +3363,7 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_menu_bar_for_desktop',
-    problemMessage:
-        '[require_menu_bar_for_desktop] Desktop app should have a PlatformMenuBar.',
+    problemMessage: '[require_menu_bar_for_desktop] Desktop app should have a PlatformMenuBar.',
     correctionMessage: 'Add PlatformMenuBar for standard desktop experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3574,10 +3526,8 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_native_file_dialogs',
-    problemMessage:
-        '[prefer_native_file_dialogs] Consider using native file dialogs on desktop.',
-    correctionMessage:
-        'Use file_picker or file_selector for native experience.',
+    problemMessage: '[prefer_native_file_dialogs] Consider using native file dialogs on desktop.',
+    correctionMessage: 'Use file_picker or file_selector for native experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3655,8 +3605,7 @@ class PreferInheritedWidgetCacheRule extends SaropaLintRule {
     name: 'prefer_inherited_widget_cache',
     problemMessage:
         '[prefer_inherited_widget_cache] Multiple .of(context) calls for same type. Cache in local variable.',
-    correctionMessage:
-        'Extract to: final theme = Theme.of(context); then use theme.',
+    correctionMessage: 'Extract to: final theme = Theme.of(context); then use theme.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3743,8 +3692,7 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
     name: 'prefer_layout_builder_over_media_query',
     problemMessage:
         '[prefer_layout_builder_over_media_query] MediaQuery.of in list item builder. Causes unnecessary rebuilds.',
-    correctionMessage:
-        'Use LayoutBuilder above the list or pass dimensions from parent.',
+    correctionMessage: 'Use LayoutBuilder above the list or pass dimensions from parent.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3841,8 +3789,7 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
     name: 'avoid_blocking_database_ui',
     problemMessage:
         '[avoid_blocking_database_ui] Database operation in build method may block UI thread.',
-    correctionMessage:
-        'Load data in initState or use FutureBuilder/StreamBuilder.',
+    correctionMessage: 'Load data in initState or use FutureBuilder/StreamBuilder.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3958,14 +3905,12 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
       bool isMoney = false;
 
       if (node.leftOperand is SimpleIdentifier) {
-        final String name =
-            (node.leftOperand as SimpleIdentifier).name.toLowerCase();
+        final String name = (node.leftOperand as SimpleIdentifier).name.toLowerCase();
         isMoney = _moneyPatterns.any((pattern) => name.contains(pattern));
       }
 
       if (!isMoney && node.rightOperand is SimpleIdentifier) {
-        final String name =
-            (node.rightOperand as SimpleIdentifier).name.toLowerCase();
+        final String name = (node.rightOperand as SimpleIdentifier).name.toLowerCase();
         isMoney = _moneyPatterns.any((pattern) => name.contains(pattern));
       }
 
@@ -4041,8 +3986,7 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('scroll') &&
-          !targetSource.contains('controller')) {
+      if (!targetSource.contains('scroll') && !targetSource.contains('controller')) {
         return;
       }
 

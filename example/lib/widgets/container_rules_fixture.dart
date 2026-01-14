@@ -5,6 +5,7 @@ import '../flutter_mocks.dart';
 
 void testPreferAlignOverContainer() {
   // BAD: Container with only alignment
+  // BAD: Container with only alignment, should trigger lint
   // expect_lint: prefer_align_over_container
   final bad1 = Container(
     alignment: Alignment.topLeft,
@@ -27,6 +28,7 @@ void testPreferAlignOverContainer() {
 
 void testPreferPaddingOverContainer() {
   // BAD: Container with only padding
+  // BAD: Container with only padding, should trigger lint
   // expect_lint: prefer_padding_over_container
   final bad1 = Container(
     padding: EdgeInsets.all(16),
@@ -49,6 +51,7 @@ void testPreferPaddingOverContainer() {
 
 void testPreferConstrainedBoxOverContainer() {
   // BAD: Container with only constraints
+  // BAD: Container with only constraints, should trigger lint
   // expect_lint: prefer_constrained_box_over_container
   final bad1 = Container(
     constraints: BoxConstraints(maxWidth: 200),
@@ -77,6 +80,7 @@ class TestWidget extends StatelessWidget {
     return Column(
       children: [
         // BAD: Container with only alignment in widget tree
+        // BAD: Container with only alignment in widget tree, should trigger lint
         // expect_lint: prefer_align_over_container
         Container(
           alignment: Alignment.bottomRight,
@@ -84,6 +88,7 @@ class TestWidget extends StatelessWidget {
         ),
 
         // BAD: Container with only padding in widget tree
+        // BAD: Container with only padding in widget tree, should trigger lint
         // expect_lint: prefer_padding_over_container
         Container(
           padding: EdgeInsets.symmetric(horizontal: 20),
@@ -91,6 +96,7 @@ class TestWidget extends StatelessWidget {
         ),
 
         // BAD: Container with only constraints in widget tree
+        // BAD: Container with only constraints in widget tree, should trigger lint
         // expect_lint: prefer_constrained_box_over_container
         Container(
           constraints: BoxConstraints.tightFor(width: 100),

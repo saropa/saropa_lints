@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
 
+## [4.1.3] - 2026-01-14
+
+- Migrated all single/double-word lint rules to three-word convention for clarity and discoverability. Notable migrations include:
+  - `require_update_should_notify` → `require_update_should_notify_context`
+  - `prefer_consumer_widget` → `prefer_consumer_widget_pattern`
+  - `avoid_provider_of_in_build` → `avoid_provider_of_in_build_method`
+  - `avoid_get_find_in_build` → `avoid_get_find_in_build_method`
+  - `prefer_cubit_for_simple` → `prefer_cubit_for_simple_state`
+  - `require_bloc_observer` → `require_bloc_observer_instance`
+  - `prefer_select_for_partial` → `prefer_select_for_partial_state`
+  - `prefer_family_for_params` → `prefer_family_for_params_pattern`
+  - `extend_equatable` → `require_equatable_extension`
+  - `prefer_equatable_mixin` → `prefer_equatable_mixin_pattern`
+  - `prefer_void_callback` → `prefer_void_callback_type`
+  - `prefer_symbol_over_key` → `prefer_symbol_over_key_pattern`
+  - `avoid_notifier_constructors` → `avoid_notifier_constructors_usage`
+  - `prefer_immutable_provider_arguments` → `prefer_immutable_provider_arguments_type`
+  - `prefer_nullable_provider_types` → `prefer_nullable_provider_types_pattern`
+  - `prefer_immutable_bloc_events` → `prefer_immutable_bloc_events_pattern`
+  - `prefer_immutable_bloc_state` → `prefer_immutable_bloc_state_pattern`
+  - `prefer_sealed_bloc_events` → `prefer_sealed_bloc_events_pattern`
+  - `prefer_sealed_bloc_state` → `prefer_sealed_bloc_state_pattern`
+  - `require_bloc_repository_abstraction` → `require_bloc_repository_abstraction_layer`
+  - `prefer_bloc_transform` → `prefer_bloc_transform_pattern`
+  - `prefer_selector_widget` → `prefer_selector_widget_pattern`
+  - `require_error_state` → `require_error_state_context`
+  - `avoid_bloc_in_bloc` → `avoid_bloc_in_bloc_pattern`
+  - `prefer_sealed_events` → `prefer_sealed_events_pattern`
+
 ## [4.1.2] - 2026-01-13
 
 ### Fixed

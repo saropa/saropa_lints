@@ -13,6 +13,7 @@ class BadAvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // BAD: Missing semanticLabel, should trigger lint
     // expect_lint: require_avatar_alt_text
     return CircleAvatar(
       backgroundImage: NetworkImage('https://example.com/avatar.jpg'),

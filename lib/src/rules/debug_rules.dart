@@ -2,8 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -21,8 +20,8 @@ class AlwaysFailRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'always_fail',
-    problemMessage: '[always_fail] This custom lint always fails (test hook).',
+    name: 'always_fail_test_case',
+    problemMessage: '[always_fail_test_case] This custom lint always fails (test hook).',
     correctionMessage: 'Disable the rule or remove the test lint trigger.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -58,8 +57,7 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_commented_out_code',
     problemMessage: '[avoid_commented_out_code] Avoid commented-out code.',
-    correctionMessage:
-        'Remove commented-out code. Use version control to preserve history.',
+    correctionMessage: 'Remove commented-out code. Use version control to preserve history.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -264,8 +262,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unguarded_debug',
-    problemMessage:
-        '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
+    problemMessage: '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
     correctionMessage: 'Wrap in if (kDebugMode), if (DebugType.*.isDebug), '
         'or add level: DebugLevels.Warning/Error parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -282,8 +279,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Check for debug() function calls
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'debug') {
         if (!_isGuarded(node) && !_hasDebugLevel(node.argumentList)) {
@@ -440,16 +436,14 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
     name: 'prefer_commenting_analyzer_ignores',
     problemMessage:
         '[prefer_commenting_analyzer_ignores] Analyzer ignore comment should have a preceding explanatory comment.',
-    correctionMessage:
-        'Add a comment on the line above explaining why this rule is ignored.',
+    correctionMessage: 'Add a comment on the line above explaining why this rule is ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   /// Pre-compiled patterns for performance
   static final RegExp _ignorePattern = RegExp(r'^//\s*ignore:');
   static final RegExp _ignoreForFilePattern = RegExp(r'^//\s*ignore_for_file:');
-  static final RegExp _ignoreDirectivePattern =
-      RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+');
+  static final RegExp _ignoreDirectivePattern = RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+');
 
   @override
   void runWithReporter(
@@ -497,8 +491,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   bool _isIgnoreComment(String line) {
     // Match // ignore: or // ignore_for_file:
     // But not lines that are already explanatory comments followed by ignore
-    return _ignorePattern.hasMatch(line) ||
-        _ignoreForFilePattern.hasMatch(line);
+    return _ignorePattern.hasMatch(line) || _ignoreForFilePattern.hasMatch(line);
   }
 
   /// Check if the line before has an explanatory comment
@@ -579,8 +572,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
     name: 'prefer_debugPrint',
     problemMessage:
         '[prefer_debugPrint] print() should use debugPrint() for throttled console output.',
-    correctionMessage:
-        'Replace print() with debugPrint() to prevent console buffer overflow.',
+    correctionMessage: 'Replace print() with debugPrint() to prevent console buffer overflow.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -605,8 +597,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
     });
 
     // Also check for function expression invocations of print
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'print') {
         reporter.atNode(node, code);
