@@ -3,8 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -41,10 +40,8 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_barrel_files',
-    problemMessage:
-        '[avoid_barrel_files] File contains only export statements (barrel file).',
-    correctionMessage:
-        'Import specific files where needed instead of using barrel files.',
+    problemMessage: '[avoid_barrel_files] File contains only export statements (barrel file).',
+    correctionMessage: 'Import specific files where needed instead of using barrel files.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -108,8 +105,7 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_slash_imports',
-    problemMessage:
-        '[avoid_double_slash_imports] Import path contains double slashes.',
+    problemMessage: '[avoid_double_slash_imports] Import path contains double slashes.',
     correctionMessage: 'Remove the extra slash from the import path.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -171,8 +167,7 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_exports',
-    problemMessage:
-        '[avoid_duplicate_exports] File is exported multiple times.',
+    problemMessage: '[avoid_duplicate_exports] File is exported multiple times.',
     correctionMessage: 'Remove the duplicate export directive.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -432,8 +427,7 @@ class PreferSmallFilesRule extends SaropaLintRule {
     name: 'prefer_small_files',
     problemMessage: '[prefer_small_files] File has more than $_maxLines lines. '
         'Smaller files are easier to understand and maintain.',
-    correctionMessage:
-        'Split this file into focused modules with single responsibilities. '
+    correctionMessage: 'Split this file into focused modules with single responsibilities. '
         'For data/enum files, disable with: // ignore_for_file: prefer_small_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -477,8 +471,7 @@ class AvoidMediumFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_medium_files',
     problemMessage: '[avoid_medium_files] File exceeds $_maxLines lines.',
-    correctionMessage:
-        'Consider splitting into smaller modules, or disable this rule '
+    correctionMessage: 'Consider splitting into smaller modules, or disable this rule '
         'for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -522,8 +515,7 @@ class AvoidLongFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_long_files',
     problemMessage: '[avoid_long_files] File exceeds $_maxLines lines.',
-    correctionMessage:
-        'Consider splitting into smaller modules, or disable this rule '
+    correctionMessage: 'Consider splitting into smaller modules, or disable this rule '
         'for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -569,8 +561,7 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_very_long_files',
     problemMessage: '[avoid_very_long_files] File exceeds $_maxLines lines.',
-    correctionMessage:
-        'Consider splitting into smaller modules, or disable this rule '
+    correctionMessage: 'Consider splitting into smaller modules, or disable this rule '
         'for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -613,8 +604,7 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_functions',
-    problemMessage:
-        '[avoid_long_functions] Function body exceeds $_maxLines lines.',
+    problemMessage: '[avoid_long_functions] Function body exceeds $_maxLines lines.',
     correctionMessage: 'Consider extracting parts into smaller functions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -675,10 +665,8 @@ class AvoidLongParameterListRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_parameter_list',
-    problemMessage:
-        '[avoid_long_parameter_list] Function has too many parameters (max 5).',
-    correctionMessage:
-        'Consider using a configuration object or named parameters.',
+    problemMessage: '[avoid_long_parameter_list] Function has too many parameters (max 5).',
+    correctionMessage: 'Consider using a configuration object or named parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -748,8 +736,7 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
+    context.registry.addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
       reporter.atNode(node.functionDeclaration, code);
     });
   }
@@ -774,8 +761,8 @@ class MaxImportsRule extends SaropaLintRule {
   static const int _maxImports = 20;
 
   static const LintCode _code = LintCode(
-    name: 'max_imports',
-    problemMessage: '[max_imports] File has more than $_maxImports imports.',
+    name: 'limit_max_imports',
+    problemMessage: '[limit_max_imports] File has more than $_maxImports imports.',
     correctionMessage: 'Consider splitting the file or reducing dependencies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -815,8 +802,7 @@ class MemberOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_members',
-    problemMessage:
-        '[prefer_sorted_members] Consider reordering class members.',
+    problemMessage: '[prefer_sorted_members] Consider reordering class members.',
     correctionMessage:
         'Order: static fields, instance fields, constructors, static methods, instance methods.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -886,8 +872,7 @@ class PreferSortedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
-    problemMessage:
-        '[prefer_sorted_parameters] Named parameters should be in alphabetical order.',
+    problemMessage: '[prefer_sorted_parameters] Named parameters should be in alphabetical order.',
     correctionMessage: 'Reorder parameters alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -977,13 +962,11 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
         if (param.isNamed) continue;
 
         // Check if the parameter type is bool
-        final SimpleFormalParameter? simpleParam =
-            param is SimpleFormalParameter
-                ? param
-                : (param is DefaultFormalParameter &&
-                        param.parameter is SimpleFormalParameter
-                    ? param.parameter as SimpleFormalParameter
-                    : null);
+        final SimpleFormalParameter? simpleParam = param is SimpleFormalParameter
+            ? param
+            : (param is DefaultFormalParameter && param.parameter is SimpleFormalParameter
+                ? param.parameter as SimpleFormalParameter
+                : null);
 
         if (simpleParam == null) continue;
 
@@ -1002,8 +985,7 @@ class PreferNamedImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_imports',
-    problemMessage:
-        '[prefer_named_imports] Consider using named imports (show/hide) for clarity.',
+    problemMessage: '[prefer_named_imports] Consider using named imports (show/hide) for clarity.',
     correctionMessage: 'Use "show" to explicitly list imported symbols.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1065,10 +1047,8 @@ class PreferNamedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_parameters',
-    problemMessage:
-        '[prefer_named_parameters] Function has too many positional parameters.',
-    correctionMessage:
-        'Consider using named parameters for better readability.',
+    problemMessage: '[prefer_named_parameters] Function has too many positional parameters.',
+    correctionMessage: 'Consider using named parameters for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1106,8 +1086,7 @@ class PreferStaticClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_static_class',
     problemMessage: '[prefer_static_class] Class only has static members.',
-    correctionMessage:
-        'Consider using top-level functions and constants instead.',
+    correctionMessage: 'Consider using top-level functions and constants instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1491,8 +1470,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_colors',
     problemMessage: '[avoid_hardcoded_colors] Avoid hardcoded color values.',
-    correctionMessage:
-        'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
+    correctionMessage: 'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1502,8 +1480,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for Color constructor
@@ -1554,10 +1531,8 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_generics',
-    problemMessage:
-        '[avoid_unused_generics] Type parameter is declared but never used.',
-    correctionMessage:
-        'Remove unused type parameter or use it in the declaration.',
+    problemMessage: '[avoid_unused_generics] Type parameter is declared but never used.',
+    correctionMessage: 'Remove unused type parameter or use it in the declaration.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1592,8 +1567,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     });
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      final TypeParameterList? typeParams =
-          node.functionExpression.typeParameters;
+      final TypeParameterList? typeParams = node.functionExpression.typeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {
@@ -1620,8 +1594,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
       if (found) return true;
     }
     // Check parameters and body
-    node.parameters
-        ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.parameters?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
     node.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
@@ -1637,8 +1610,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     node.functionExpression.parameters
         ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
-    node.functionExpression.body
-        .visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.functionExpression.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
   }
 }
@@ -1752,8 +1724,7 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
-    problemMessage:
-        '[avoid_unnecessary_futures] Async function has no await expressions.',
+    problemMessage: '[avoid_unnecessary_futures] Async function has no await expressions.',
     correctionMessage: 'Remove async keyword or add await expressions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1953,8 +1924,7 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
 }
 
 class _NullReturnFinder extends RecursiveAstVisitor<void> {
-  _NullReturnFinder(
-      {required this.onNullReturn, required this.onImplicitReturn});
+  _NullReturnFinder({required this.onNullReturn, required this.onImplicitReturn});
   final void Function() onNullReturn;
   final void Function() onImplicitReturn;
 
@@ -2091,8 +2061,7 @@ class _AddHackForGlobalStateFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
