@@ -9,7 +9,8 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart' show Token;
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -292,7 +293,8 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_generic_exceptions',
-    problemMessage: '[avoid_generic_exceptions] Generic Exception prevents callers from '
+    problemMessage:
+        '[avoid_generic_exceptions] Generic Exception prevents callers from '
         'handling specific error cases, forcing catch-all blocks.',
     correctionMessage: 'Create and throw a specific exception type.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -346,7 +348,8 @@ class RequireErrorContextRule extends SaropaLintRule {
     name: 'require_error_context',
     problemMessage:
         '[require_error_context] Error message without IDs or state makes debugging production issues extremely difficult.',
-    correctionMessage: 'Include relevant context like IDs, state, or operation details.',
+    correctionMessage:
+        'Include relevant context like IDs, state, or operation details.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -421,7 +424,8 @@ class PreferResultPatternRule extends SaropaLintRule {
     name: 'prefer_result_pattern',
     problemMessage:
         '[prefer_result_pattern] Throwing for validation errors forces try-catch everywhere and obscures control flow.',
-    correctionMessage: 'Return Result<T, E> instead of throwing for recoverable errors.',
+    correctionMessage:
+        'Return Result<T, E> instead of throwing for recoverable errors.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -506,7 +510,8 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
     name: 'require_async_error_documentation',
     problemMessage:
         '[require_async_error_documentation] Async function with await should document or handle errors.',
-    correctionMessage: 'Add try/catch or document thrown exceptions with /// Throws.',
+    correctionMessage:
+        'Add try/catch or document thrown exceptions with /// Throws.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -614,7 +619,8 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_try_statements',
-    problemMessage: '[avoid_nested_try_statements] Avoid nested try statements.',
+    problemMessage:
+        '[avoid_nested_try_statements] Avoid nested try statements.',
     correctionMessage: 'Extract inner try-catch into a separate function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -675,7 +681,8 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
-    problemMessage: '[require_error_boundary] Unhandled widget errors crash the entire '
+    problemMessage:
+        '[require_error_boundary] Unhandled widget errors crash the entire '
         'app instead of showing a fallback UI.',
     correctionMessage:
         'Wrap app content in an ErrorBoundary widget or use builder with error handling.',
@@ -692,7 +699,8 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'MaterialApp' && constructorName != 'CupertinoApp') {
+      if (constructorName != 'MaterialApp' &&
+          constructorName != 'CupertinoApp') {
         return;
       }
 
@@ -794,8 +802,10 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_uncaught_future_errors',
-    problemMessage: '[avoid_uncaught_future_errors] Future without error handling may crash app.',
-    correctionMessage: 'Add try-catch to the function, use .ignore(), or add .catchError().',
+    problemMessage:
+        '[avoid_uncaught_future_errors] Future without error handling may crash app.',
+    correctionMessage:
+        'Add try-catch to the function, use .ignore(), or add .catchError().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1071,7 +1081,8 @@ class AvoidPrintErrorRule extends SaropaLintRule {
     name: 'avoid_print_error',
     problemMessage:
         '[avoid_print_error] Using print() for error logging. Errors may be lost in production.',
-    correctionMessage: 'Use a proper logging framework like logger, crashlytics, or sentry.',
+    correctionMessage:
+        'Use a proper logging framework like logger, crashlytics, or sentry.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1143,7 +1154,8 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
       }
     }
     if (expr is BinaryExpression) {
-      return _usesException(expr.leftOperand) || _usesException(expr.rightOperand);
+      return _usesException(expr.leftOperand) ||
+          _usesException(expr.rightOperand);
     }
     if (expr is MethodInvocation && expr.target != null) {
       return _usesException(expr.target!);
@@ -1218,7 +1230,8 @@ class AvoidCatchAllRule extends SaropaLintRule {
     name: 'avoid_catch_all',
     problemMessage:
         '[avoid_catch_all] Bare catch hides error types, silently swallowing OutOfMemoryError and other critical failures.',
-    correctionMessage: 'Use "on Object catch" for comprehensive handling, or specific types '
+    correctionMessage:
+        'Use "on Object catch" for comprehensive handling, or specific types '
         'like HttpException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1340,7 +1353,8 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
     name: 'avoid_catch_exception_alone',
     problemMessage:
         '[avoid_catch_exception_alone] on Exception catch misses Error types (StateError, TypeError, etc.).',
-    correctionMessage: 'Use "on Object catch" to catch all throwables, or add an '
+    correctionMessage:
+        'Use "on Object catch" to catch all throwables, or add an '
         '"on Object catch" fallback to handle Error types.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1477,7 +1491,8 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
     name: 'avoid_exception_in_constructor',
     problemMessage:
         '[avoid_exception_in_constructor] Throwing in constructor. Use factory or static method for fallible operations.',
-    correctionMessage: 'Use factory constructor, static method, or return null for invalid input.',
+    correctionMessage:
+        'Use factory constructor, static method, or return null for invalid input.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1572,7 +1587,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     name: 'require_cache_key_determinism',
     problemMessage:
         '[require_cache_key_determinism] Cache key using DateTime.now/Random causes cache misses and duplicated data on every access. Consequence: This leads to wasted resources, poor performance, and unpredictable app behavior.',
-    correctionMessage: 'Use deterministic values like IDs or stable hashes for cache keys.',
+    correctionMessage:
+        'Use deterministic values like IDs or stable hashes for cache keys.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1714,7 +1730,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
   /// Returns true for generic method names that need receiver context validation.
   bool _isGenericMethodName(String methodName) {
-    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}.contains(methodName);
+    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}
+        .contains(methodName);
   }
 
   /// Checks if the method receiver suggests a caching context.
@@ -1818,7 +1835,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
+  List<Fix> getFixes() =>
+      <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
 }
 
 class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
@@ -1901,7 +1919,8 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
     name: 'require_permission_permanent_denial_handling',
     problemMessage:
         '[require_permission_permanent_denial_handling] Permission request without permanent denial handling.',
-    correctionMessage: 'Check isPermanentlyDenied and call openAppSettings() to guide users.',
+    correctionMessage:
+        'Check isPermanentlyDenied and call openAppSettings() to guide users.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1936,7 +1955,8 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('isPermanentlyDenied') && !bodySource.contains('openAppSettings')) {
+      if (!bodySource.contains('isPermanentlyDenied') &&
+          !bodySource.contains('openAppSettings')) {
         reporter.atNode(node, code);
       }
     });
@@ -1985,7 +2005,8 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
     name: 'require_notification_action_handling',
     problemMessage:
         '[require_notification_action_handling] Notification actions without handler cause button taps to do nothing, frustrating users.',
-    correctionMessage: 'Ensure onDidReceiveNotificationResponse handles action IDs.',
+    correctionMessage:
+        'Ensure onDidReceiveNotificationResponse handles action IDs.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1999,7 +2020,8 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'AndroidNotificationDetails' && typeName != 'DarwinNotificationDetails') {
+      if (typeName != 'AndroidNotificationDetails' &&
+          typeName != 'DarwinNotificationDetails') {
         return;
       }
 
@@ -2095,7 +2117,8 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
       for (final CatchClause catchClause in node.catchClauses) {
         final String catchSource = catchClause.body.toSource();
         for (final String method in _cleanupMethods) {
-          if (catchSource.contains('.$method(') || catchSource.contains('.$method;')) {
+          if (catchSource.contains('.$method(') ||
+              catchSource.contains('.$method;')) {
             reporter.atNode(catchClause, code);
             return;
           }
