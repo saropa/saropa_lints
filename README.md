@@ -6,16 +6,6 @@
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
 [![rules](https://img.shields.io/badge/rules-1500%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
-
-> **New in 4.1.3:**
-> - **Isar:** Added `avoid_cached_isar_stream` rule (professional tier) to prevent caching Isar query streams. Includes a quick fix to inline the stream expression at usage sites.
-
-# Saropa Lints
-
-[![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
-[![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
-[![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
-[![rules](https://img.shields.io/badge/rules-1500%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
