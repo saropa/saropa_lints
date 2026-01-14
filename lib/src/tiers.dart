@@ -12,61 +12,64 @@ library;
 
 /// Stylistic tier rules - rules focused on code style, formatting, and opinionated patterns.
 const Set<String> stylisticRules = <String>{
-  'always_fail', // test rule
+  'always_fail_test_case', // test rule
   'arguments_ordering',
-  'capitalize_comment',
-  'firebase_custom',
-  'greeting',
-  'prefer_arrow_functions',
-
-  'purchase_completed',
-  'purchase',
-  'saropa_lints',
-  'saropa',
-  'save',
-  'tag_name',
-  'user_clicked_button',
-
-  // Added stylistic rules from user request
+  'avoid_generic_greeting_text',
   'avoid_setstate_in_build',
-  'prefer_kebab_tag_name',
-  'prefer_rethrow_over_throw_e',
-  'prefer_sorted_members',
-  'prefer_sorted_parameters',
-  'prefer_single_exit_point'
+  'capitalize_comment',
+  'prefer_argument_ordering',
+  'prefer_catch_over_on',
+  'prefer_error_suffix',
+  'prefer_exception_suffix',
+  'prefer_generic_exception_type',
+  'prefer_initializing_formal',
+  'prefer_kebab_tag',
+  'prefer_on_catch',
+  'prefer_rethrow_throw_e',
+  'prefer_single_exit',
+  'prefer_sorted_member',
+  'prefer_sorted_parameter',
+  'prefer_specific_exception',
+  'prefer_static_method_type',
+  'require_comment_capitalization_text',
+  'require_custom_firebase',
+  'require_purchase_complete',
+  'require_purchase_verification',
+  'require_save_confirm',
+  'saropa_lints',
+  'tag_name_text',
+  'user_clicked_btn',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
 const Set<String> essentialRules = <String>{
   // Memory Leaks - Controllers (dispose)
-  'require_dispose',
-  'dispose_fields',
+  'require_dispose_method',
+  'require_field_dispose',
   'require_animation_disposal',
   'avoid_undisposed_instances',
   'require_value_notifier_dispose',
-  'require_scroll_controller_dispose',
   'require_focus_node_dispose',
-  'require_text_editing_controller_dispose',
   'require_page_controller_dispose',
-  'require_bloc_close',
+  'prefer_first_method_usage',
   'require_media_player_dispose',
-  'require_tab_controller_dispose',
+  'avoid_dynamic_typing',
   // Memory Leaks - Timers & Subscriptions (cancel)
-  'require_timer_cancellation',
+  'avoid_variable_shadowing',
   'avoid_unassigned_stream_subscriptions',
-  // Memory Leaks - Streams (close)
+  'prefer_last_method_usage',
   'require_stream_controller_dispose',
-  // Memory Leaks - Listeners
+  'prefer_member_ordering',
   'always_remove_listener',
-
+  'avoid_substring_usage',
   // Flutter Lifecycle
-  'avoid_context_in_initstate_dispose',
+  'prefer_container_widget',
   'avoid_inherited_widget_in_initstate',
-  'avoid_build_context_in_providers',
+  'require_comment_formatting',
   'avoid_unsafe_setstate',
-  'use_setstate_synchronously',
+  'prefer_pagination_pattern', // INFO - memory efficiency
   'avoid_recursive_widget_calls',
-  'require_mounted_check',
+  'avoid_continue_statement',
   'avoid_global_key_in_build',
   'pass_existing_future_to_future_builder',
   'pass_existing_stream_to_stream_builder',
@@ -104,7 +107,7 @@ const Set<String> essentialRules = <String>{
   'avoid_instantiating_in_bloc_value_provider', // Memory leak
   'avoid_existing_instances_in_bloc_provider', // Unexpected closure
   'avoid_instantiating_in_value_provider', // Memory leak (Provider package)
-  'dispose_providers', // Resource cleanup
+  'require_provider_dispose', // Resource cleanup
   'proper_getx_super_calls', // Broken lifecycle
   'always_remove_getx_listener', // Memory leak
   'avoid_getx_context_outside_widget', // Unsafe context access outside widgets
@@ -532,14 +535,13 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_listview_without_item_extent',
   'avoid_shrink_wrap_in_lists',
   'avoid_mediaquery_in_build',
-  'prefer_dedicated_media_query_method',
-  'avoid_singlechildscrollview_with_column',
-  'avoid_stateful_widget_in_list',
-  'prefer_cached_network_image',
-  'avoid_controller_in_build',
-
-  'avoid_regex_in_loop',
-  'prefer_const_string_list',
+  'prefer_static_method',
+  'require_comment_capitalization',
+  'require_custom_firebase_usage',
+  'require_purchase_verification',
+  'require_save_confirmation',
+  'tag_name',
+  'user_clicked_button',
   'prefer_const_widgets_in_lists',
   'prefer_value_listenable_builder',
 
@@ -681,9 +683,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_collection_equality_checks',
   'avoid_missing_enum_constant_in_map',
   'avoid_enum_values_by_index',
-  'prefer_contains',
-  'prefer_first',
-  'prefer_last',
+  'prefer_contains_method_usage',
+  'prefer_first_method_usage',
+  'prefer_last_method_usage',
   'prefer_where_or_null', // Prefer whereOrNull for idiomatic Dart
 
   'require_test_assertions',
@@ -1242,53 +1244,45 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_selector_widget', // INFO - targeted rebuilds vs full Consumer
 
   // State Management (Batch 10)
-  'require_error_state',
-  'avoid_bloc_in_bloc',
-  'prefer_sealed_events',
-  // State Management (New assignment)
-  'prefer_copy_with_for_state', // Ensures state classes have copyWith for immutability
-
-  // Performance (Batch 11)
-  'prefer_const_widgets',
+  'require_update_should_notify_context',
+  'prefer_consumer_widget_pattern',
+  'avoid_provider_of_in_build_method',
+  'avoid_get_find_in_build_method',
+  'prefer_cubit_for_simple_state',
+  'require_bloc_observer_instance',
+  'prefer_select_for_partial_state',
+  'prefer_family_for_params_pattern',
   'avoid_expensive_computation_in_build',
-  'avoid_widget_creation_in_loop',
-  'avoid_calling_of_in_build',
+  'require_equatable_extension',
+  'prefer_equatable_mixin_pattern',
   'require_image_cache_management',
-  'prefer_static_const_widgets',
+  'prefer_void_callback_type',
 
-  // Forms (Batch 12)
+  'prefer_symbol_over_key_pattern',
   'require_submit_button_state',
-  'avoid_form_without_unfocus',
-  'require_form_restoration',
+  'avoid_notifier_constructors_usage',
+  'prefer_immutable_provider_arguments_type',
   'require_form_field_controller',
-  'avoid_form_in_alert_dialog',
+  'prefer_nullable_provider_types_pattern',
 
-  // Platform/Storage
-  'require_prefs_key_constants',
-  'avoid_secure_storage_on_web',
-
-  // Testing
-  'avoid_vague_test_descriptions',
-  'require_pump_after_interaction',
+  'prefer_immutable_bloc_events_pattern',
+  'prefer_immutable_bloc_state_pattern',
+  'prefer_sealed_bloc_events_pattern',
+  'prefer_sealed_bloc_state_pattern',
+  'require_bloc_repository_abstraction_layer', // INFO - abstract deps for testability
+  'prefer_bloc_transform_pattern', // INFO - debounce/throttle for search events
+  'prefer_selector_widget_pattern', // INFO - targeted rebuilds vs full Consumer
   'avoid_production_config_in_tests',
-  'avoid_empty_test_groups',
-  'prefer_correct_test_file_name',
-  'avoid_top_level_members_in_tests',
+  'require_error_state_context',
+  'avoid_bloc_in_bloc_pattern',
+  'prefer_sealed_events_pattern',
   'require_test_setup_teardown',
-
+  'prefer_copy_with_for_state_class', // Ensures state classes have copyWith for immutability
   'prefer_unique_test_names',
   'prefer_test_structure',
   'prefer_test_matchers',
   'prefer_pump_and_settle',
   'require_test_groups',
-  'require_scroll_tests',
-  'require_text_input_tests',
-  'prefer_single_assertion',
-  'avoid_find_all',
-  'require_integration_test_setup',
-  'prefer_descriptive_test_name',
-  'prefer_descriptive_bool_names', // INFO - lenient bool naming (allows action verbs)
-  'prefer_fake_over_mock',
   'require_edge_case_tests',
   'avoid_test_implementation_details',
   'avoid_find_by_text', // INFO - prefer find.byKey for interactions
@@ -2129,8 +2123,7 @@ class _TierCache {
       _recommended ??= <String>{...essentialRules, ...recommendedOnlyRules};
 
   /// Stylistic rules only (cached).
-  static Set<String> get stylistic =>
-      _stylistic ??= <String>{...stylisticRules};
+  static Set<String> get stylistic => _stylistic ??= <String>{...stylisticRules};
 
   /// Essential + Recommended + Professional rules (cached).
   static Set<String> get professional => _professional ??= <String>{

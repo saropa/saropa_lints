@@ -33,7 +33,7 @@ custom_lint:
     # Rules for testing utilities and debug-only code.
     # =========================================================================
 
-    always_fail: false  # Test hook rule that always fails. [LOW]
+    always_fail_test_case: false  # Test hook rule that always fails. [LOW]
 
     # =========================================================================
     # SECURITY

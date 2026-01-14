@@ -99,4 +99,4 @@ custom_lint:
     # =========================================================================
     # ALWAYS FAIL (for testing the linter itself)
     # =========================================================================
-    # always_fail: true  # Uncomment only for testing
+    # always_fail_test_case: true  # Uncomment only for testing
