@@ -7,8 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -53,9 +52,9 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_channel_android',
     problemMessage:
-        '[require_notification_channel_android] Android notification should specify channel ID and description.',
+        '[require_notification_channel_android] Android notification is missing a channel ID or description. Without these, notifications may not appear or may be grouped incorrectly on Android 8.0+ devices, reducing reliability and user engagement.',
     correctionMessage:
-        'Add channelId and channelDescription for Android 8.0+ compatibility.',
+        'Add a channelId and channelDescription to your AndroidNotificationDetails to ensure notifications are delivered and categorized correctly on Android 8.0+ devices. This improves reliability and user experience.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -180,8 +179,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
     name: 'avoid_notification_payload_sensitive',
     problemMessage:
         '[avoid_notification_payload_sensitive] Notification may contain sensitive data visible on lock screen.',
-    correctionMessage:
-        'Remove sensitive info from notifications. Use generic messages instead.',
+    correctionMessage: 'Remove sensitive info from notifications. Use generic messages instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -275,9 +273,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
         if (arg is! NamedExpression) continue;
 
         final String paramName = arg.name.label.name.toLowerCase();
-        if (paramName != 'body' &&
-            paramName != 'subtitle' &&
-            paramName != 'ticker') {
+        if (paramName != 'body' && paramName != 'subtitle' && paramName != 'ticker') {
           continue;
         }
 
@@ -479,11 +475,9 @@ class _AddPlatformSettingsTodoFix extends DartFix {
       changeBuilder.addDartFileEdit((builder) {
         String todoText = '// HACK: Add ';
         if (!hasAndroid && !hasIOS) {
-          todoText +=
-              'both android: and iOS: parameters for cross-platform support\n';
+          todoText += 'both android: and iOS: parameters for cross-platform support\n';
         } else if (!hasAndroid) {
-          todoText +=
-              'android: AndroidInitializationSettings for Android support\n';
+          todoText += 'android: AndroidInitializationSettings for Android support\n';
         } else {
           todoText += 'iOS: DarwinInitializationSettings for iOS support\n';
         }
@@ -574,8 +568,7 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
       if (target != null) {
         final String targetSource = target.toSource().toLowerCase();
         // Only check notification plugin calls
-        if (!targetSource.contains('notification') &&
-            !targetSource.contains('plugin')) {
+        if (!targetSource.contains('notification') && !targetSource.contains('plugin')) {
           return;
         }
       }
@@ -736,8 +729,7 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
     name: 'avoid_notification_same_id',
     problemMessage:
         '[avoid_notification_same_id] Static notification ID. Different notifications will overwrite each other.',
-    correctionMessage:
-        'Use unique IDs for each notification (e.g., incrementing counter).',
+    correctionMessage: 'Use unique IDs for each notification (e.g., incrementing counter).',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

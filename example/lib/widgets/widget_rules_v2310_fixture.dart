@@ -17,6 +17,7 @@ class BadExpandedInStack extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // BAD: Expanded outside Flex, should trigger lint
         // expect_lint: avoid_expanded_outside_flex
         Expanded(child: Container()),
       ],
@@ -31,6 +32,7 @@ class BadFlexibleInCenter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
+      // BAD: Flexible outside Flex, should trigger lint
       // expect_lint: avoid_expanded_outside_flex
       child: Flexible(child: Container()),
     );
@@ -78,6 +80,7 @@ class BadStackWithoutPositioned extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // BAD: Stack with non-Positioned children, should trigger lint
     // expect_lint: avoid_stack_without_positioned
     return Stack(
       children: [
@@ -132,6 +135,7 @@ class BadExpandedInBuild extends StatelessWidget {
   const BadExpandedInBuild({super.key});
 
   @override
+  // BAD: Returning Expanded from build(), should trigger lint
   // expect_lint: prefer_expanded_at_call_site
   Widget build(BuildContext context) => Expanded(
         child: Column(children: const []),
@@ -144,6 +148,7 @@ class BadFlexibleInBuild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // BAD: Returning Flexible from build(), should trigger lint
     // expect_lint: prefer_expanded_at_call_site
     return Flexible(child: Container());
   }
@@ -182,6 +187,7 @@ class BadExpandedInTernary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // BAD: Returning Expanded from conditional, should trigger lint
     // expect_lint: prefer_expanded_at_call_site
     return useExpanded ? Expanded(child: Container()) : Container();
   }
@@ -197,6 +203,7 @@ class BadExpandedInElseBranch extends StatelessWidget {
     if (showLoading) {
       return Container();
     } else {
+      // BAD: Returning Flexible from else branch, should trigger lint
       // expect_lint: prefer_expanded_at_call_site
       return Flexible(child: Container());
     }
@@ -211,6 +218,7 @@ class BadExpandedInBranch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isActive) {
+      // BAD: Expanded in branch, should trigger lint
       // expect_lint: prefer_expanded_at_call_site
       return Expanded(child: Container());
     }

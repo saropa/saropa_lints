@@ -1939,9 +1939,9 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_privacy_manifest',
     problemMessage:
-        '[require_ios_privacy_manifest] API requires iOS Privacy Manifest entry (iOS 17+).',
+      '[require_ios_privacy_manifest] API requires iOS Privacy Manifest entry (iOS 17+). Consequence: Missing manifest entries can cause App Store rejection or runtime errors on iOS.',
     correctionMessage:
-        'Add PrivacyInfo.xcprivacy with required reason API declarations.',
+      'Add PrivacyInfo.xcprivacy with required reason API declarations. This is required for App Store approval and proper app functioning.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -5511,9 +5511,9 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_callkit_integration',
     problemMessage:
-        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit for native call UI.',
+      '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit for native call UI. Consequence: Without CallKit, calls may not appear as expected and can violate App Store policies.',
     correctionMessage:
-        'Implement CallKit using flutter_callkit_incoming or similar package.',
+      'Implement CallKit using flutter_callkit_incoming or similar package. This ensures compliance and a native call experience.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

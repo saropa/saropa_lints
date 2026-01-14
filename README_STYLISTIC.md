@@ -61,14 +61,14 @@ Core stylistic preferences for imports, functions, formatting, naming, and comme
 | [`arguments_ordering`](#arguments_ordering) | Named arguments should be in alphabetical order | Yes |
 | [`capitalize_comment`](#capitalize_comment) | Comments should start with a capital letter | Yes |
 | [`firebase_custom`](#firebase_custom) | Custom Firebase usage should follow team conventions | |
-| [`greeting`](#greeting) | Greeting messages should follow team style conventions | |
+| [`avoid_generic_greeting_text`](#avoid_generic_greeting_text) | Greeting messages should follow team style conventions | |
 | [`prefer_kebab_tag_name`](#prefer_kebab_tag_name) | Tag names should use kebab-case | |
 | [`prefer_rethrow_over_throw_e`](#prefer_rethrow_over_throw_e) | Prefer 'rethrow' over 'throw e' in catch blocks | |
 | [`prefer_sorted_members`](#prefer_sorted_members) | Class members should be sorted by team convention | |
 | [`prefer_sorted_parameters`](#prefer_sorted_parameters) | Function parameters should be sorted by team convention | |
-| [`purchase`](#purchase) | Purchase logic should follow team style conventions | |
+| [`require_purchase_verification`](#require_purchase_verification) | Purchase logic should follow team style conventions | |
 | [`purchase_completed`](#purchase_completed) | Purchase completion logic should follow team style conventions | |
-| [`save`](#save) | Save logic should follow team style conventions | |
+| [`require_save_confirmation`](#require_save_confirmation) | Save logic should follow team style conventions | |
 | [`user_clicked_button`](#user_clicked_button) | Button click logic should follow team style conventions | |
 
 ---
@@ -110,16 +110,8 @@ Preferences for null-aware operators and collection manipulation patterns.
 | Rule | Description | Opposing Rule |
 |------|-------------|---------------|
 | `prefer_addall_over_spread` | Use addAll method | `prefer_spread_over_addall` |
-| `prefer_asmap_over_indexed_iteration` | Use `.asMap().entries` for indexed access | |
-| `prefer_cascade_over_multiple_calls` | Use `..` cascade notation | `prefer_multiple_calls_over_cascade` |
-| `prefer_collection_literals` | Use `[]`, `{}` over constructors | `prefer_constructor_over_literals` |
-| `prefer_constructor_over_literals` | Use `List()`, `Map()` constructors | `prefer_collection_literals` |
-| `prefer_fold_over_reduce` | Use fold with initial value | `prefer_reduce_over_fold` |
-| `prefer_foreach_over_map_entries` | Use forEach for map iteration | `prefer_map_entries_over_foreach` |
 | `prefer_ifnull_over_ternary` | Use `??` instead of ternary for null defaults | `prefer_ternary_over_ifnull` |
 | `prefer_map_entries_over_foreach` | Use map.entries instead of forEach | `prefer_foreach_over_map_entries` |
-| `prefer_multiple_calls_over_cascade` | Use separate method calls | `prefer_cascade_over_multiple_calls` |
-| `prefer_reduce_over_fold` | Use reduce when no initial value needed | `prefer_fold_over_reduce` |
 | `prefer_spread_over_addall` | Use `...` spread operator | `prefer_addall_over_spread` |
 | `prefer_ternary_over_ifnull` | Use explicit ternary for null checks | `prefer_ifnull_over_ternary` |
 | `prefer_wherecast_over_wheretype` | Use `.where().cast<T>()` pattern | `prefer_wheretype_over_wherecast` |
@@ -151,17 +143,10 @@ Preferences for control flow patterns, guard clauses, and async/await style.
 | `prefer_early_return` | Return early to reduce nesting | `prefer_single_exit` |
 | `prefer_single_exit` | Single return at end of function | `prefer_early_return` |
 | `prefer_guard_clauses` | Use guard clauses for preconditions | `prefer_if_else_over_guards` |
-| `prefer_if_else_over_guards` | Use if-else for all conditions | `prefer_guard_clauses` |
 | `prefer_switch_expression` | Use switch expressions (Dart 3) | `prefer_switch_statement` |
 | `prefer_switch_statement` | Use switch statements | `prefer_switch_expression` |
-| `prefer_null_aware_method_calls` | Use `?.` for null-safe calls | `prefer_explicit_null_checks` |
-| `prefer_explicit_null_checks` | Use explicit `if (x != null)` | `prefer_null_aware_method_calls` |
-| `prefer_cascade_assignments` | Use cascades for multiple assignments | `prefer_separate_assignments` |
-| `prefer_separate_assignments` | Use separate assignment statements | `prefer_cascade_assignments` |
 | `prefer_async_await` | Use async/await pattern | `prefer_then_catcherror` |
-| `prefer_then_catcherror` | Use .then()/.catchError() pattern | `prefer_async_await` |
-| `prefer_await_completion` | Always await async operations | `prefer_fire_and_forget` |
-| `prefer_fire_and_forget` | Allow unawaited async for side effects | `prefer_await_completion` |
+| `prefer_assigning_await_expressions` | Always await async operations | `prefer_fire_and_forget` |
 
 ### Example: Early Return vs Single Exit
 
@@ -191,19 +176,7 @@ Preferences for blank lines, member ordering, and constructor patterns.
 |------|-------------|---------------|
 | `prefer_blank_line_before_return` | Blank line before return statements | `prefer_no_blank_line_before_return` |
 | `prefer_no_blank_line_before_return` | No blank line before return | `prefer_blank_line_before_return` |
-| `prefer_blank_line_after_declarations` | Blank line after variable declarations | `prefer_compact_declarations` |
-| `prefer_compact_declarations` | No blank lines between declarations | `prefer_blank_line_after_declarations` |
-| `prefer_grouped_related_statements` | Group related code with blank lines | `prefer_ungrouped_statements` |
-| `prefer_ungrouped_statements` | Minimal blank lines in code | `prefer_grouped_related_statements` |
-| `prefer_blank_line_between_members` | Blank lines between class members | `prefer_compact_members` |
-| `prefer_compact_members` | No blank lines between members | `prefer_blank_line_between_members` |
-| `prefer_named_constructor_parameters` | Use named parameters in constructors | `prefer_positional_constructor_parameters` |
-| `prefer_positional_constructor_parameters` | Use positional parameters | `prefer_named_constructor_parameters` |
 | `prefer_initializing_formals` | Use `this.param` shorthand | `prefer_explicit_parameter_assignment` |
-| `prefer_explicit_parameter_assignment` | Explicit `param = param` assignment | `prefer_initializing_formals` |
-| `prefer_const_constructor_declarations` | Mark constructors as const when possible | `prefer_non_const_constructors` |
-| `prefer_non_const_constructors` | Avoid const constructors | `prefer_const_constructor_declarations` |
-| `prefer_factory_constructor` | Use factory for non-trivial construction | `prefer_static_method` |
 | `prefer_static_method` | Use static methods over factories | `prefer_factory_constructor` |
 
 ### Example: Initializing Formals
@@ -346,7 +319,7 @@ Many stylistic rules have valid opposites. This table helps you choose which rul
 | `??` operator | `prefer_ifnull_over_ternary` | | `prefer_ternary_over_ifnull` | Ternary |
 | Cascades | `prefer_cascade_over_multiple_calls` | | `prefer_multiple_calls_over_cascade` | Separate calls |
 | Spread operator | `prefer_spread_over_addall` | | `prefer_addall_over_spread` | addAll |
-| Collection literals | `prefer_collection_literals` | | `prefer_constructor_over_literals` | Constructors |
+| Collection literals | `avoid_unnecessary_collections` | | `prefer_constructor_over_literals` | Constructors |
 | whereType | `prefer_wheretype_over_wherecast` | | `prefer_wherecast_over_wheretype` | where+cast |
 | fold | `prefer_fold_over_reduce` | | `prefer_reduce_over_fold` | reduce |
 | Early return | `prefer_early_return` | | `prefer_single_exit` | Single exit |
@@ -357,15 +330,7 @@ Many stylistic rules have valid opposites. This table helps you choose which rul
 | await completion | `prefer_await_completion` | | `prefer_fire_and_forget` | Fire and forget |
 | Blank before return | `prefer_blank_line_before_return` | | `prefer_no_blank_line_before_return` | No blank |
 | Spaced declarations | `prefer_blank_line_after_declarations` | | `prefer_compact_declarations` | Compact |
-| Grouped statements | `prefer_grouped_related_statements` | | `prefer_ungrouped_statements` | Ungrouped |
-| Spaced members | `prefer_blank_line_between_members` | | `prefer_compact_members` | Compact |
-| Named params | `prefer_named_constructor_parameters` | | `prefer_positional_constructor_parameters` | Positional |
-| `this.param` | `prefer_initializing_formals` | | `prefer_explicit_parameter_assignment` | Explicit |
-| const constructors | `prefer_const_constructor_declarations` | | `prefer_non_const_constructors` | Non-const |
-| Factory | `prefer_factory_constructor` | | `prefer_static_method` | Static method |
-| Specific exceptions | `prefer_specific_exceptions` | | `prefer_generic_exception` | Generic |
-| Exception suffix | `prefer_exception_suffix` | | `prefer_error_suffix` | Error suffix |
-| `on Type` catch | `prefer_on_over_catch` | | `prefer_catch_over_on` | Bare catch |
+// ...existing code...
 | AAA comments | `prefer_given_when_then_comments` | | `prefer_self_documenting_tests` | No comments |
 | Single assertion | `prefer_single_expectation_per_test` | | `prefer_grouped_expectations` | Grouped |
 | should/when names | `prefer_test_name_should_when` | | `prefer_test_name_descriptive` | Descriptive |
