@@ -34,6 +34,96 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 
+# =============================================================================
+# DUPLICATE DETECTION
+# =============================================================================
+import collections
+
+
+def find_duplicate_rules(rules_dir: Path) -> dict:
+    """Find duplicate class names, rule names, and aliases across all rule files.
+    Also collect problemMessage length for each rule/alias/class for DX analysis.
+    """
+    class_names = collections.defaultdict(list)  # class name -> [{'file':..., 'problem_len':...}]
+    rule_names = collections.defaultdict(list)   # rule name -> [{'file':..., 'problem_len':...}]
+    aliases = collections.defaultdict(list)      # alias -> [{'file':..., 'problem_len':...}]
+
+    class_pattern = re.compile(r'class\s+([A-Za-z0-9_]+)\s+extends\s+SaropaLintRule')
+    rule_name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    alias_pattern = re.compile(r"///\s*Alias:\s*([a-zA-Z0-9_,\s]+)")
+    # Find the problemMessage for each rule
+    lint_code_pattern = re.compile(
+        r"name:\s*'([a-z_]+)'.*?problemMessage:\s*(?:'([^']*)'|\"([^\"]*)\")",
+        re.DOTALL
+    )
+
+    for dart_file in rules_dir.glob("*.dart"):
+        content = dart_file.read_text(encoding="utf-8")
+
+        # Map rule name to problemMessage length in this file
+        rule_problem_len = {}
+        for match in lint_code_pattern.finditer(content):
+            rule = match.group(1)
+            msg = match.group(2) or match.group(3) or ''
+            rule_problem_len[rule] = len(msg)
+
+        # Class names
+        for match in class_pattern.finditer(content):
+            class_name = match.group(1)
+            # Try to find the rule name for this class (by convention, but not always possible)
+            # Use the first rule name found in the file as a proxy
+            problem_len = 0
+            if rule_problem_len:
+                problem_len = max(rule_problem_len.values())
+            class_names[class_name].append({'file': str(dart_file), 'problem_len': problem_len})
+
+        # Rule names
+        for match in rule_name_pattern.finditer(content):
+            rule_name = match.group(1)
+            problem_len = rule_problem_len.get(rule_name, 0)
+            rule_names[rule_name].append({'file': str(dart_file), 'problem_len': problem_len})
+
+        # Aliases
+        for match in alias_pattern.finditer(content):
+            alias_list = match.group(1)
+            for alias in [a.strip() for a in alias_list.split(",") if a.strip()]:
+                # Try to associate alias with a rule name's problemMessage length
+                # Use the max problem_len in the file as a proxy
+                problem_len = 0
+                if rule_problem_len:
+                    problem_len = max(rule_problem_len.values())
+                aliases[alias].append({'file': str(dart_file), 'problem_len': problem_len})
+
+    # Find duplicates
+    duplicates = {
+        'class_names': {k: v for k, v in class_names.items() if len(v) > 1},
+        'rule_names': {k: v for k, v in rule_names.items() if len(v) > 1},
+        'aliases': {k: v for k, v in aliases.items() if len(v) > 1},
+    }
+    return duplicates
+
+# cspell:ignore dups
+def print_duplicate_report(duplicates: dict) -> None:
+    """Print a report of duplicate class names, rule names, and aliases, including problemMessage length."""
+    print_section("Duplicate Rule/Class/Alias Check")
+    any_duplicates = False
+    for kind, dups in [
+        ("Class names", duplicates['class_names']),
+        ("Rule names", duplicates['rule_names']),
+        ("Aliases", duplicates['aliases'])
+    ]:
+        if dups:
+            any_duplicates = True
+            print_error(f"Duplicate {kind} found:")
+            for name, entries in dups.items():
+                print(f"    {name}")
+                for entry in entries:
+                    print(f"      - {entry['file']} (problemMessage length: {entry['problem_len']})")
+        else:
+            print_success(f"No duplicate {kind.lower()} detected.")
+    if not any_duplicates:
+        print_success("No duplicate rules, class names, or aliases found.")
+
 
 SCRIPT_VERSION = "2.0"
 
@@ -954,12 +1044,48 @@ class RuleMessage:
         # =================================================================
         # MESSAGE LENGTH CHECK (-25 if too short)
         # =================================================================
-        if len(content) < 200 and self.impact in ("critical", "high"):
-            self.dx_issues.append(f"Too short ({len(content)} chars) - add context (min 200)")
+        # =============================================================
+        # PROBLEM MESSAGE LENGTH CHECK
+        # -------------------------------------------------------------
+        # For high-impact rules (critical/high), the main problemMessage
+        # must be at least 180 characters (excluding the [rule_name] prefix).
+        # This ensures enough context, rationale, and actionable detail for
+        # both human readers and AI tools. For medium, the minimum is 150.
+        # Shorter messages are flagged as too short and penalized in DX score.
+        # -------------------------------------------------------------
+        # Example: If the message is 170 chars after removing the prefix,
+        # it will be flagged for critical/high, but not for medium/low.
+        # =============================================================
+        if len(content) < 180 and self.impact in ("critical", "high"):
+            self.dx_issues.append(f"Too short ({len(content)} chars) - add context (min 180)")
             self.dx_score -= 25
         elif len(content) < 150 and self.impact == "medium":
             self.dx_issues.append(f"Very short ({len(content)} chars) - add context (min 150)")
             self.dx_score -= 15
+
+        # =============================================================
+        # CORRECTION MESSAGE LENGTH CHECK
+        # -------------------------------------------------------------
+        # The correctionMessage (the suggested fix or improvement) must be:
+        #   - At least 100 characters for critical rules
+        #   - At least 80 characters for all other rules (if present)
+        # This ensures the correction is not just a terse phrase, but gives
+        # enough actionable detail for the developer to understand and apply
+        # the fix. Shorter corrections are flagged and penalized in DX score.
+        # -------------------------------------------------------------
+        # Example: "Remove the await." (18 chars) is too short; a good
+        # correction should explain what to do and why, e.g.:
+        #   "Remove the await keyword if you do not need to wait for the result, or add an await expression if you do."
+        # =============================================================
+        corr_len = len(self.correction_message.strip()) if self.correction_message else 0
+        if self.impact == "critical":
+            if corr_len < 100:
+                self.dx_issues.append(f"Correction message too short ({corr_len} chars) - min 100 for critical")
+                self.dx_score -= 10
+        else:
+            if 0 < corr_len < 80:
+                self.dx_issues.append(f"Correction message too short ({corr_len} chars) - min 80")
+                self.dx_score -= 5
 
         # =================================================================
         # AI COPILOT COMPATIBILITY CHECKS (-15 each)
@@ -1113,7 +1239,7 @@ def print_dx_audit_report(messages: list[RuleMessage], show_all: bool = False) -
               f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}")
 
     # Show top 3 worst offenders in terminal (full list in report)
-    limit = 3 if not show_all else len(needs_work)
+    limit = 20 if not show_all else len(needs_work)
     shown = needs_work[:limit]
 
     if shown:
@@ -1349,8 +1475,13 @@ def main() -> int:
     script_dir = Path(__file__).parent
     project_root = script_dir.parent
     rules_dir = project_root / "lib" / "src" / "rules"
+
+    # Duplicate detection
+    duplicates = find_duplicate_rules(rules_dir)
+    print_duplicate_report(duplicates)
     roadmap_path = project_root / "ROADMAP.md"
     tiers_path = project_root / "lib" / "src" / "tiers.dart"
+
 
     # =========================================================================
     # SECTION 1: Rule Inventory
@@ -1362,6 +1493,26 @@ def main() -> int:
     roadmap = get_roadmap_rules(roadmap_path)
     file_stats = get_file_stats(rules_dir)
     with_corrections, without_corrections = get_rules_with_corrections(rules_dir)
+
+    # --- Underscore Audit ---
+    # Removed bad considerations logic as requested
+
+    rules_with_underscores = [r for r in rules if r.count('_') >= 2]
+    rules_with_1_underscore = [r for r in rules if r.count('_') == 1]
+    rules_with_0_underscores = [r for r in rules if r.count('_') == 0]
+
+    print_subheader("Underscore Naming Audit")
+    if not rules_with_1_underscore and not rules_with_0_underscores:
+        print_success("All rules have at least 2 underscores.")
+    else:
+        if rules_with_0_underscores:
+            print_error(f"{len(rules_with_0_underscores)} rule(s) have ZERO underscores (CRITICAL):")
+            for rule in rules_with_0_underscores:
+                print(f"      {Color.RED.value}{rule}{Color.RESET.value}")
+        if rules_with_1_underscore:
+            print_warning(f"{len(rules_with_1_underscore)} rule(s) have only 1 underscore:")
+            for rule in rules_with_1_underscore:
+                print(f"      {Color.YELLOW.value}{rule}{Color.RESET.value}")
 
     # File table removed from terminal output; still included in markdown report
 

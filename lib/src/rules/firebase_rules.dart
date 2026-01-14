@@ -8,8 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -48,9 +47,9 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_unbounded_query',
     problemMessage:
-        '[avoid_firestore_unbounded_query] Firestore query without limit() could return excessive data.',
+        '[avoid_firestore_unbounded_query] Firestore query without limit() could return excessive data. Consequence: This can cause high costs, slow performance, and app crashes.',
     correctionMessage:
-        'Add .limit(n) to prevent unbounded queries and control costs.',
+        'Add .limit(n) to prevent unbounded queries and control costs. Unbounded queries can result in high bills, slow apps, and even out-of-memory errors.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -144,9 +143,8 @@ class AvoidDatabaseInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_database_in_build',
     problemMessage:
-        '[avoid_database_in_build] Database query in build() runs on every rebuild. Cache the query.',
-    correctionMessage:
-        'Move database queries to initState() or use cached futures.',
+        '[avoid_database_in_build] Database query in build() runs on every rebuild. Cache the query. Consequence: This can lead to repeated database hits, slow UI, and increased backend load.',
+    correctionMessage: 'Move database queries to initState() or use cached futures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -207,11 +205,9 @@ class _DatabaseInBuildVisitor extends RecursiveAstVisitor<void> {
 
     if (target != null) {
       final String targetSource = target.toSource().toLowerCase();
-      bool looksLikeDatabase =
-          _databasePatterns.any((String p) => targetSource.contains(p));
+      bool looksLikeDatabase = _databasePatterns.any((String p) => targetSource.contains(p));
 
-      if (looksLikeDatabase &&
-          (methodName == 'get' || methodName == 'snapshots')) {
+      if (looksLikeDatabase && (methodName == 'get' || methodName == 'snapshots')) {
         reporter.atNode(node, code);
       }
     }
@@ -255,11 +251,9 @@ class RequirePrefsKeyConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_prefs_key_constants',
-    problemMessage:
-        '[require_prefs_key_constants] String literal keys cause silent bugs '
+    problemMessage: '[require_prefs_key_constants] String literal keys cause silent bugs '
         'when misspelled and make searching/refactoring keys impossible.',
-    correctionMessage:
-        'Define preference keys as constants to avoid typos and enable refactoring.',
+    correctionMessage: 'Define preference keys as constants to avoid typos and enable refactoring.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -346,9 +340,8 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_secure_storage_on_web',
     problemMessage:
-        '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web (not secure).',
-    correctionMessage:
-        'Check kIsWeb and use alternative storage for web platform.',
+        '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web (not secure). Consequence: Sensitive data may be exposed to attackers or browser extensions.',
+    correctionMessage: 'Check kIsWeb and use alternative storage for web platform.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -434,7 +427,7 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_prefs_for_large_data',
     problemMessage:
-        '[avoid_prefs_for_large_data] SharedPreferences is not suitable for large data. Use a database.',
+        '[avoid_prefs_for_large_data] SharedPreferences is not suitable for large data. Use a database. Consequence: Storing large data can cause app slowdowns, crashes, and data corruption.',
     correctionMessage:
         'Use Hive, Isar, or SQLite for collections. SharedPreferences is for small settings only.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -533,11 +526,9 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_firebase_init_before_use',
-    problemMessage:
-        '[require_firebase_init_before_use] Firebase services crash if accessed '
+    problemMessage: '[require_firebase_init_before_use] Firebase services crash if accessed '
         'before initializeApp() completes. App fails on startup.',
-    correctionMessage:
-        'Ensure Firebase.initializeApp() completes in main() before runApp().',
+    correctionMessage: 'Ensure Firebase.initializeApp() completes in main() before runApp().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -572,8 +563,7 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
 
       // Check if main uses any Firebase service
       for (final String service in _firebaseServices) {
-        if (mainSource.contains('$service.instance') ||
-            mainSource.contains('$service(')) {
+        if (mainSource.contains('$service.instance') || mainSource.contains('$service(')) {
           reporter.atToken(node.name, code);
           return;
         }
@@ -663,8 +653,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
     name: 'require_database_migration',
     problemMessage:
         '[require_database_migration] Database model without migration support. Schema changes may break data.',
-    correctionMessage:
-        'Implement versioned migrations for database schema changes.',
+    correctionMessage: 'Implement versioned migrations for database schema changes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -678,8 +667,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Check for Hive model patterns
-      if (classSource.contains('@HiveType') ||
-          classSource.contains('@HiveField')) {
+      if (classSource.contains('@HiveType') || classSource.contains('@HiveField')) {
         // Check if project has migration infrastructure
         // (This is a heuristic - real check would need project context)
 
@@ -691,8 +679,7 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
             !classSource.contains('schema') &&
             !classSource.contains('Schema')) {
           // Count HiveFields to estimate complexity
-          final int fieldCount =
-              RegExp(r'@HiveField\(\d+\)').allMatches(classSource).length;
+          final int fieldCount = RegExp(r'@HiveField\(\d+\)').allMatches(classSource).length;
 
           // If many fields, more likely to evolve and need migrations
           if (fieldCount >= 5) {
@@ -702,15 +689,13 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
       }
 
       // Check for Isar model patterns
-      if (classSource.contains('@collection') ||
-          classSource.contains('@Collection')) {
+      if (classSource.contains('@collection') || classSource.contains('@Collection')) {
         if (!classSource.contains('migration') &&
             !classSource.contains('Migration') &&
             !classSource.contains('schema') &&
             !classSource.contains('version')) {
           final String className = node.name.lexeme;
-          if (!className.contains('Migration') &&
-              !className.contains('Version')) {
+          if (!className.contains('Migration') && !className.contains('Version')) {
             reporter.atNode(node, code);
           }
         }
@@ -768,8 +753,7 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
     name: 'require_database_index',
     problemMessage:
         '[require_database_index] Database query on non-indexed field. Add @Index for better performance.',
-    correctionMessage:
-        'Add @Index() annotation to fields used in queries and filters.',
+    correctionMessage: 'Add @Index() annotation to fields used in queries and filters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -866,8 +850,7 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
     name: 'prefer_transaction_for_batch',
     problemMessage:
         '[prefer_transaction_for_batch] Multiple sequential database writes. Use transaction for atomicity.',
-    correctionMessage:
-        'Wrap related writes in a transaction or use batch operations.',
+    correctionMessage: 'Wrap related writes in a transaction or use batch operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -885,22 +868,17 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
       final int putCount = '.put('.allMatches(bodySource).length -
           '.putIfAbsent('.allMatches(bodySource).length -
           '.putAll('.allMatches(bodySource).length;
-      final int addCount = '.add('.allMatches(bodySource).length -
-          '.addAll('.allMatches(bodySource).length;
-      final int insertCount = '.insert('.allMatches(bodySource).length -
-          '.insertAll('.allMatches(bodySource).length;
-      final int deleteCount = '.delete('.allMatches(bodySource).length -
-          '.deleteAll('.allMatches(bodySource).length;
-      final int updateCount = '.update('.allMatches(bodySource).length -
-          '.updateAll('.allMatches(bodySource).length;
+      final int addCount =
+          '.add('.allMatches(bodySource).length - '.addAll('.allMatches(bodySource).length;
+      final int insertCount =
+          '.insert('.allMatches(bodySource).length - '.insertAll('.allMatches(bodySource).length;
+      final int deleteCount =
+          '.delete('.allMatches(bodySource).length - '.deleteAll('.allMatches(bodySource).length;
+      final int updateCount =
+          '.update('.allMatches(bodySource).length - '.updateAll('.allMatches(bodySource).length;
       final int setCount = '.set('.allMatches(bodySource).length;
 
-      final int writeOps = putCount +
-          addCount +
-          insertCount +
-          deleteCount +
-          updateCount +
-          setCount;
+      final int writeOps = putCount + addCount + insertCount + deleteCount + updateCount + setCount;
 
       // If few writes, not a concern
       if (writeOps < 3) return;
@@ -1040,8 +1018,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
     name: 'require_type_adapter_registration',
     problemMessage:
         '[require_type_adapter_registration] Hive box opened with custom type but adapter may not be registered.',
-    correctionMessage:
-        'Ensure Hive.registerAdapter() is called before opening typed boxes.',
+    correctionMessage: 'Ensure Hive.registerAdapter() is called before opening typed boxes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1092,8 +1069,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
       final String scopeSource = current.toSource();
       final String adapterName = '${typeArg}Adapter';
 
-      if (!scopeSource.contains('registerAdapter') ||
-          !scopeSource.contains(adapterName)) {
+      if (!scopeSource.contains('registerAdapter') || !scopeSource.contains(adapterName)) {
         reporter.atNode(node, code);
       }
     });
@@ -1133,8 +1109,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
     name: 'prefer_lazy_box_for_large',
     problemMessage:
         '[prefer_lazy_box_for_large] Large collection uses regular Hive box. Consider openLazyBox for memory.',
-    correctionMessage:
-        'Use Hive.openLazyBox() for collections that may grow large.',
+    correctionMessage: 'Use Hive.openLazyBox() for collections that may grow large.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1238,11 +1213,9 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_event_name',
-    problemMessage:
-        '[incorrect_firebase_event_name] Invalid event name is silently dropped '
+    problemMessage: '[incorrect_firebase_event_name] Invalid event name is silently dropped '
         'by Firebase Analytics. Your analytics data will be incomplete.',
-    correctionMessage:
-        'Event names must: start with a letter, contain only alphanumeric '
+    correctionMessage: 'Event names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1339,11 +1312,9 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'incorrect_firebase_parameter_name',
-    problemMessage:
-        '[incorrect_firebase_parameter_name] Invalid parameter names are '
+    problemMessage: '[incorrect_firebase_parameter_name] Invalid parameter names are '
         'silently dropped by Firebase. Event data will be missing fields.',
-    correctionMessage:
-        'Parameter names must: start with a letter, contain only alphanumeric '
+    correctionMessage: 'Parameter names must: start with a letter, contain only alphanumeric '
         'and underscores, be 1-40 chars, and not use reserved prefixes.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1465,9 +1436,7 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
             final Expression awaited = expr.expression;
             if (awaited is MethodInvocation) {
               final String methodName = awaited.methodName.name;
-              if (methodName == 'set' ||
-                  methodName == 'update' ||
-                  methodName == 'delete') {
+              if (methodName == 'set' || methodName == 'update' || methodName == 'delete') {
                 // Check if it's a Firestore operation
                 final String source = awaited.toSource();
                 if (source.contains('.doc(') ||
@@ -1530,7 +1499,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_firestore_in_widget_build',
     problemMessage:
-        '[avoid_firestore_in_widget_build] Firestore operation in build() causes queries on rebuild.',
+        '[avoid_firestore_in_widget_build] Firestore operation in build() causes queries on rebuild. Consequence: This can lead to excessive database reads, slow UI, and increased costs.',
     correctionMessage: 'Use StreamBuilder/FutureBuilder or state management.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1544,9 +1513,7 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for Firestore get or collection operations
       final String methodName = node.methodName.name;
-      if (methodName != 'get' &&
-          methodName != 'collection' &&
-          methodName != 'doc') {
+      if (methodName != 'get' && methodName != 'collection' && methodName != 'doc') {
         return;
       }
 
@@ -1622,8 +1589,7 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_firebase_remote_config_defaults',
-    problemMessage:
-        '[prefer_firebase_remote_config_defaults] Missing defaults cause '
+    problemMessage: '[prefer_firebase_remote_config_defaults] Missing defaults cause '
         'null/zero values when fetch fails, breaking app behavior.',
     correctionMessage: 'Call setDefaults() with fallback values.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1656,8 +1622,7 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
         if (target == null) return;
 
         final String targetSource = target.toSource();
-        if (!targetSource.contains('remoteConfig') &&
-            !targetSource.contains('RemoteConfig')) {
+        if (!targetSource.contains('remoteConfig') && !targetSource.contains('RemoteConfig')) {
           return;
         }
 
@@ -1702,11 +1667,9 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_fcm_token_refresh_handler',
-    problemMessage:
-        '[require_fcm_token_refresh_handler] FCM tokens expire periodically. '
+    problemMessage: '[require_fcm_token_refresh_handler] FCM tokens expire periodically. '
         'Without onTokenRefresh handling, push notifications will stop working.',
-    correctionMessage:
-        'Listen to onTokenRefresh to update server with new tokens.',
+    correctionMessage: 'Listen to onTokenRefresh to update server with new tokens.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1784,11 +1747,9 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_background_message_handler',
-    problemMessage:
-        '[require_background_message_handler] Push notifications received when '
+    problemMessage: '[require_background_message_handler] Push notifications received when '
         'app is terminated are silently dropped without handler.',
-    correctionMessage:
-        'Add onBackgroundMessage with a top-level handler function.',
+    correctionMessage: 'Add onBackgroundMessage with a top-level handler function.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1942,7 +1903,7 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_map_idle_callback',
     problemMessage:
-        '[require_map_idle_callback] Data fetching should use onCameraIdle, not onCameraMove.',
+        '[require_map_idle_callback] Data fetching should use onCameraIdle, not onCameraMove. Consequence: Fetching on every move can spam APIs, slow the app, and waste bandwidth.',
     correctionMessage: 'Move data fetching to onCameraIdle to prevent spam.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2076,8 +2037,7 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
     name: 'require_crashlytics_user_id',
     problemMessage:
         '[require_crashlytics_user_id] Crashlytics setup without setUserIdentifier. Crashes will be anonymous.',
-    correctionMessage:
-        'Add FirebaseCrashlytics.instance.setUserIdentifier(userId).',
+    correctionMessage: 'Add FirebaseCrashlytics.instance.setUserIdentifier(userId).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2168,8 +2128,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
     name: 'require_firebase_app_check',
     problemMessage:
         '[require_firebase_app_check] Firebase initialization without App Check activation.',
-    correctionMessage:
-        'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp().',
+    correctionMessage: 'Add FirebaseAppCheck.instance.activate() after Firebase.initializeApp().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2202,8 +2161,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
         if (current is FunctionDeclaration) {
           // Check function body
           final funcSource = current.toSource();
-          if (funcSource.contains('FirebaseAppCheck') &&
-              funcSource.contains('activate')) {
+          if (funcSource.contains('FirebaseAppCheck') && funcSource.contains('activate')) {
             return;
           }
           reporter.atNode(node, code);
@@ -2219,8 +2177,7 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
       final methodSource = enclosingMethod.toSource();
 
       // Check if App Check is activated
-      if (!methodSource.contains('FirebaseAppCheck') ||
-          !methodSource.contains('activate')) {
+      if (!methodSource.contains('FirebaseAppCheck') || !methodSource.contains('activate')) {
         reporter.atNode(node, code);
       }
     });
@@ -2288,8 +2245,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
     context.registry.addMethodInvocation((node) {
       final methodName = node.methodName.name;
 
-      if (methodName != 'setCustomUserClaims' &&
-          methodName != 'setCustomClaims') {
+      if (methodName != 'setCustomUserClaims' && methodName != 'setCustomClaims') {
         return;
       }
 
@@ -2300,8 +2256,7 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
           for (final element in arg.elements) {
             if (element is MapLiteralEntry) {
               final keySource = element.key.toSource().toLowerCase();
-              final hasDataKey =
-                  _dataTerms.any((term) => keySource.contains(term));
+              final hasDataKey = _dataTerms.any((term) => keySource.contains(term));
 
               if (hasDataKey) {
                 reporter.atNode(arg, code);

@@ -10,6 +10,7 @@
 
 // BAD: If/else with single returns
 bool badConditionalReturn(bool condition) {
+  // BAD: If/else with single returns, should trigger lint
   // expect_lint: prefer_returning_conditional_expressions
   if (condition) {
     return true;

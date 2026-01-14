@@ -5,15 +5,18 @@ import '../flutter_mocks.dart';
 
 void testPreferSizedBoxSquare() {
   // BAD: SizedBox with identical width and height
+  // BAD: SizedBox with identical width and height, should trigger lint
   // expect_lint: prefer_sized_box_square
   final bad1 = SizedBox(width: 50, height: 50);
 
   // BAD: SizedBox with identical variable values
   const size = 100.0;
+  // BAD: SizedBox with identical variable values, should trigger lint
   // expect_lint: prefer_sized_box_square
   final bad2 = SizedBox(width: size, height: size);
 
   // BAD: SizedBox with identical expressions
+  // BAD: SizedBox with identical expressions, should trigger lint
   // expect_lint: prefer_sized_box_square
   final bad3 = SizedBox(width: 20.0, height: 20.0);
 
@@ -44,6 +47,7 @@ class TestWidget extends StatelessWidget {
     return Column(
       children: [
         // BAD: In widget tree
+        // BAD: SizedBox with identical width and height in widget tree, should trigger lint
         // expect_lint: prefer_sized_box_square
         SizedBox(width: 16, height: 16),
 
