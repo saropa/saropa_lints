@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -141,7 +142,8 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   }
 
   /// Check a field declaration for enum type usage
-  void _checkFieldDeclaration(FieldDeclaration node, SaropaDiagnosticReporter reporter) {
+  void _checkFieldDeclaration(
+      FieldDeclaration node, SaropaDiagnosticReporter reporter) {
     // Skip if field has @ignore annotation
     if (_hasIgnoreAnnotation(node)) {
       return;
@@ -213,8 +215,9 @@ class _AvoidIsarEnumFieldFix extends DartFix {
       if (type is! NamedType) return;
 
       final VariableDeclaration variable = node.fields.variables.first;
-      final ClassDeclaration? clazz =
-          node.parent is ClassDeclaration ? node.parent as ClassDeclaration : null;
+      final ClassDeclaration? clazz = node.parent is ClassDeclaration
+          ? node.parent as ClassDeclaration
+          : null;
       if (clazz == null || !_hasCollectionAnnotation(clazz)) return;
 
       final bool isNullable = type.question != null;
@@ -267,8 +270,8 @@ class _AvoidIsarEnumFieldFix extends DartFix {
         if (isNullable) {
           buffer.writeln('$indent  if (value == null) return $cacheFieldName;');
           buffer.writeln('$indent  try {');
-          buffer
-              .writeln('$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
+          buffer.writeln(
+              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
           buffer.writeln('$indent  } on ArgumentError {');
           buffer.writeln('$indent    return null;');
           buffer.writeln('$indent  }');
@@ -280,10 +283,11 @@ class _AvoidIsarEnumFieldFix extends DartFix {
               "$indent    throw StateError('$stringFieldName is null for $variableName');");
           buffer.writeln('$indent  }');
           buffer.writeln('$indent  try {');
-          buffer
-              .writeln('$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
+          buffer.writeln(
+              '$indent    return $cacheFieldName ??= $enumTypeBase.values.byName(value);');
           buffer.writeln('$indent  } on ArgumentError {');
-          buffer.writeln("$indent    throw StateError('Invalid $enumTypeBase value: \$value');");
+          buffer.writeln(
+              "$indent    throw StateError('Invalid $enumTypeBase value: \$value');");
           buffer.writeln('$indent  }');
         }
         buffer.writeln('$indent}');
@@ -607,7 +611,8 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
 
       final disposeBody = disposeMethod.body.toSource();
       for (final field in isarFields) {
-        if (!disposeBody.contains('$field.close()') && !disposeBody.contains('$field?.close()')) {
+        if (!disposeBody.contains('$field.close()') &&
+            !disposeBody.contains('$field?.close()')) {
           reporter.atNode(disposeMethod, code);
         }
       }
@@ -748,7 +753,8 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
             final invocation = funcParent.parent;
             if (invocation is MethodInvocation) {
               final invokeMethod = invocation.methodName.name;
-              if (invokeMethod == 'writeTxn' || invokeMethod == 'writeTxnSync') {
+              if (invokeMethod == 'writeTxn' ||
+                  invokeMethod == 'writeTxnSync') {
                 // We're inside a writeTxn callback, now check if node is also writeTxn
                 if (node != invocation) {
                   reporter.atNode(node.methodName, code);
@@ -815,7 +821,9 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
       // Check if we're inside a for loop
       AstNode? parent = node.parent;
       while (parent != null) {
-        if (parent is ForStatement || parent is ForElement || parent is ForEachParts) {
+        if (parent is ForStatement ||
+            parent is ForElement ||
+            parent is ForEachParts) {
           reporter.atNode(node.methodName, code);
           return;
         }
@@ -999,7 +1007,8 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
       while (parent != null) {
         if (parent is IfStatement) {
           final condition = parent.expression.toSource();
-          if (condition.contains('kDebugMode') || condition.contains('kReleaseMode')) {
+          if (condition.contains('kDebugMode') ||
+              condition.contains('kReleaseMode')) {
             return; // Properly guarded
           }
         }
@@ -1133,7 +1142,8 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       // Check for Timer.periodic
       final constructorName = node.constructorName.toString();
       if (!constructorName.contains('Timer.periodic')) return;
@@ -1352,7 +1362,8 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
       if (type is NamedType) {
         final typeName = type.name.lexeme;
         // Skip simple types
-        if (!{'String', 'int', 'double', 'bool', 'DateTime'}.contains(typeName)) {
+        if (!{'String', 'int', 'double', 'bool', 'DateTime'}
+            .contains(typeName)) {
           reporter.atNode(node.fields, code);
         }
       }
@@ -1402,7 +1413,8 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final type = node.constructorName.type;
       final typeName = type.name2.lexeme;
       if (typeName != 'IsarLinks') return;
@@ -1604,7 +1616,8 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for chained filter conditions
       final methodName = node.methodName.name;
-      if (!methodName.endsWith('EqualTo') && !methodName.endsWith('StartsWith')) {
+      if (!methodName.endsWith('EqualTo') &&
+          !methodName.endsWith('StartsWith')) {
         return;
       }
 
@@ -1612,7 +1625,8 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
       final parent = node.parent;
       if (parent is MethodInvocation) {
         final parentMethod = parent.methodName.name;
-        if (parentMethod.endsWith('EqualTo') || parentMethod.endsWith('StartsWith')) {
+        if (parentMethod.endsWith('EqualTo') ||
+            parentMethod.endsWith('StartsWith')) {
           reporter.atNode(node.methodName, code);
         }
       }
@@ -1674,7 +1688,8 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
           methodName == 'contains') {
         // Check if this is in a filter context
         final targetSource = node.target?.toSource() ?? '';
-        if (targetSource.contains('filter()') || targetSource.contains('.filter')) {
+        if (targetSource.contains('filter()') ||
+            targetSource.contains('.filter')) {
           reporter.atNode(node.methodName, code);
         }
       }
