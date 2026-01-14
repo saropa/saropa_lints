@@ -10,31 +10,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.1.3] - 2026-01-14
 
 - Migrated all single/double-word lint rules to three-word convention for clarity and discoverability. Notable migrations include:
-  - `require_update_should_notify` → `require_update_should_notify_context`
-  - `prefer_consumer_widget` → `prefer_consumer_widget_pattern`
-  - `avoid_provider_of_in_build` → `avoid_provider_of_in_build_method`
-  - `avoid_get_find_in_build` → `avoid_get_find_in_build_method`
-  - `prefer_cubit_for_simple` → `prefer_cubit_for_simple_state`
-  - `require_bloc_observer` → `require_bloc_observer_instance`
-  - `prefer_select_for_partial` → `prefer_select_for_partial_state`
-  - `prefer_family_for_params` → `prefer_family_for_params_pattern`
-  - `extend_equatable` → `require_equatable_extension`
-  - `prefer_equatable_mixin` → `prefer_equatable_mixin_pattern`
-  - `prefer_void_callback` → `prefer_void_callback_type`
-  - `prefer_symbol_over_key` → `prefer_symbol_over_key_pattern`
-  - `avoid_notifier_constructors` → `avoid_notifier_constructors_usage`
-  - `prefer_immutable_provider_arguments` → `prefer_immutable_provider_arguments_type`
-  - `prefer_nullable_provider_types` → `prefer_nullable_provider_types_pattern`
-  - `prefer_immutable_bloc_events` → `prefer_immutable_bloc_events_pattern`
-  - `prefer_immutable_bloc_state` → `prefer_immutable_bloc_state_pattern`
-  - `prefer_sealed_bloc_events` → `prefer_sealed_bloc_events_pattern`
-  - `prefer_sealed_bloc_state` → `prefer_sealed_bloc_state_pattern`
-  - `require_bloc_repository_abstraction` → `require_bloc_repository_abstraction_layer`
-  - `prefer_bloc_transform` → `prefer_bloc_transform_pattern`
-  - `prefer_selector_widget` → `prefer_selector_widget_pattern`
-  - `require_error_state` → `require_error_state_context`
-  - `avoid_bloc_in_bloc` → `avoid_bloc_in_bloc_pattern`
-  - `prefer_sealed_events` → `prefer_sealed_events_pattern`
+  - `arguments_ordering` → `enforce_arguments_ordering`
+  - `capitalize_comment` → `capitalize_comment_start`
+  - `prefer_first_method_usage` → `prefer_list_first`
+  - `prefer_last_method_usage` → `prefer_list_last`
+  - `prefer_member_ordering` → `enforce_member_ordering`
+  - `prefer_container_widget` → `prefer_single_container`
+  - `prefer_pagination_pattern` → `prefer_api_pagination`
+  - `prefer_contains_method_usage` → `prefer_list_contains`
+  - `avoid_dynamic_typing` → `avoid_dynamic_type`
+  - `avoid_substring_usage` → `avoid_string_substring`
+  - `avoid_continue_statement` → `avoid_continue_statement`
+  - `extend_equatable` → `require_extend_equatable`
+  - `require_dispose_method` → `require_field_dispose`
+  - `dispose_fields` → `dispose_widget_fields`
+  - `parameters_ordering` → `enforce_parameters_ordering`
+  - `format_comment` → `format_comment_style`
+  - `max_imports` → `limit_max_imports`
+  - `avoid_shadowing` → `avoid_variable_shadowing`
+  - `prefer_selector` → `prefer_context_selector`
+  - `dispose_providers` → `dispose_provider_instances`
+  - `prefer_first` → `prefer_list_first`
+  - `prefer_last` → `prefer_list_last`
+  - `prefer_contains` → `prefer_list_contains`
+  - `prefer_container` → `prefer_single_container`
+  - `prefer_pagination` → `prefer_api_pagination`
+  - `avoid_dynamic` → `avoid_dynamic_type`
+  - `avoid_substring` → `avoid_string_substring`
+  - `member_ordering` → `enforce_member_ordering`
+  - `parameters_ordering` → `enforce_parameters_ordering`
+  - `format_comment` → `format_comment_style`
+  - `require_dispose` → `require_field_dispose`
+  - `dispose_fields` → `dispose_widget_fields`
+  - `avoid_continue` → `avoid_continue_statement`
+  - `extend_equatable` → `require_extend_equatable`
+  - `avoid_shadowing` → `avoid_variable_shadowing`
 
 ## [4.1.2] - 2026-01-13
 

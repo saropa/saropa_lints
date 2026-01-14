@@ -1,3 +1,4 @@
+
 /// Tier-based rule configuration for saropa_lints.
 ///
 /// Each tier builds on the previous one:
@@ -8,15 +9,19 @@
 /// - insanity: Everything (~475+ rules) - greenfield projects
 library;
 
+export 'tiers.dart' show getRulesForTier;
+
 // cspell:ignore require_sqflite_whereargs getit futureor shouldrepaint itemextent singlechildscrollview
 
 /// Stylistic tier rules - rules focused on code style, formatting, and opinionated patterns.
 const Set<String> stylisticRules = <String>{
   'always_fail_test_case', // test rule
-  'arguments_ordering',
+  'enforce_arguments_ordering',
   'avoid_generic_greeting_text',
   'avoid_setstate_in_build',
-  'capitalize_comment',
+  'capitalize_comment_start',
+  'prefer_arguments_ordering',
+  'require_capitalize_comment',
   'prefer_argument_ordering',
   'prefer_catch_over_on',
   'prefer_error_suffix',
@@ -37,7 +42,7 @@ const Set<String> stylisticRules = <String>{
   'require_purchase_verification',
   'require_save_confirm',
   'saropa_lints',
-  'tag_name_text',
+  'require_tag_name_text',
   'user_clicked_btn',
 };
 
@@ -51,23 +56,23 @@ const Set<String> essentialRules = <String>{
   'require_value_notifier_dispose',
   'require_focus_node_dispose',
   'require_page_controller_dispose',
-  'prefer_first_method_usage',
+  'prefer_list_first',
   'require_media_player_dispose',
-  'avoid_dynamic_typing',
+  'avoid_dynamic_type',
   // Memory Leaks - Timers & Subscriptions (cancel)
   'avoid_variable_shadowing',
   'avoid_unassigned_stream_subscriptions',
-  'prefer_last_method_usage',
+  'prefer_list_last',
   'require_stream_controller_dispose',
-  'prefer_member_ordering',
+  'enforce_member_ordering',
   'always_remove_listener',
-  'avoid_substring_usage',
+  'avoid_string_substring',
   // Flutter Lifecycle
-  'prefer_container_widget',
+  'prefer_single_container',
   'avoid_inherited_widget_in_initstate',
   'require_comment_formatting',
   'avoid_unsafe_setstate',
-  'prefer_pagination_pattern', // INFO - memory efficiency
+  'prefer_api_pagination', // INFO - memory efficiency
   'avoid_recursive_widget_calls',
   'avoid_continue_statement',
   'avoid_global_key_in_build',
@@ -540,7 +545,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_custom_firebase_usage',
   'require_purchase_verification',
   'require_save_confirmation',
-  'tag_name',
+  'require_tag_name_text',
   'user_clicked_button',
   'prefer_const_widgets_in_lists',
   'prefer_value_listenable_builder',
@@ -1726,542 +1731,39 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_unmodifiable_collections', // INFO - immutability
 };
 
-/// Comprehensive tier rules - Professional + more code quality, style, and edge cases.
+/// Rules that are only included in the comprehensive tier (not in professional).
 const Set<String> comprehensiveOnlyRules = <String>{
-  // BuildContext Safety (Comprehensive - sync static methods)
-  'avoid_context_in_static_methods', // INFO - sync static with context discouraged
-
-  // Architecture
-  'avoid_singleton_pattern',
-  'avoid_service_locator_overuse',
-
-  // State Management - Provider Dependencies (Comprehensive)
-  'prefer_proxy_provider', // INFO - proper provider dependency declaration
-  'require_update_callback', // INFO - handle ProxyProvider previous value
-
-  // Theming & Styling (Comprehensive - design consistency)
-  'avoid_fixed_dimensions',
-  'require_theme_color_from_scheme',
-  'prefer_color_scheme_from_seed',
-  'prefer_rich_text_for_complex',
-
-  // Flutter Widgets
-  'avoid_border_all',
-  'avoid_fitted_box_for_text',
-  'avoid_icon_size_override',
-  'avoid_image_repeat',
-  'avoid_incorrect_image_opacity',
-  'avoid_image_without_cache',
-  'avoid_missing_image_alt',
-  'avoid_raw_keyboard_listener',
-  'avoid_sized_box_expand',
-  'prefer_const_border_radius',
-  'prefer_correct_edge_insets_constructor',
-  'prefer_define_hero_tag',
-  'prefer_selectable_text',
-  'prefer_sliver_prefix',
-  'prefer_text_rich',
-  'prefer_widget_private_members',
-  'avoid_text_span_in_build',
-  'require_overflow_box_rationale',
-  'avoid_excessive_bottom_nav_items',
-
-  // Code Quality - Feature Flags
-  'avoid_hardcoded_feature_flags',
-
-  // Media/Audio
-  'avoid_autoplay_audio',
-
-  // Network Performance
-  'prefer_streaming_response',
-  'require_response_caching', // Opinionated - depends on data freshness needs
-  'avoid_over_fetching', // Opinionated - may require backend changes
-
-  // Async
-  'avoid_nullable_tostring',
-
-  // Code Quality - Thorough
-  'avoid_long_files',
-  'avoid_local_functions',
-  'avoid_declaring_call_method',
-  'avoid_immediately_invoked_functions',
-  'avoid_always_null_parameters',
-  'avoid_mutating_parameters',
-  'avoid_unused_callback_parameters',
-  'function_always_returns_null',
-  'function_always_returns_same_value',
-  'avoid_unused_assignment',
-  'avoid_unused_instances',
-  'avoid_unused_after_null_check',
-  'avoid_unused_generics',
-  'avoid_unnecessary_local_variable',
-  'avoid_unnecessary_reassignment',
-  'avoid_complex_loop_conditions',
-  'avoid_duplicate_switch_case_conditions',
-  'avoid_wildcard_cases_with_enums',
-  'avoid_wildcard_cases_with_sealed_classes',
-  'no_equal_conditions',
-  'no_equal_nested_conditions',
-  'no_equal_switch_case',
-  'no_equal_switch_expression_cases',
-  'prefer_correct_switch_length',
-  'prefer_specific_cases_first',
-  'avoid_non_empty_constructor_bodies',
-  'avoid_unnecessary_constructor',
-  'avoid_unnecessary_super',
-  'avoid_unnecessary_overrides',
-  'avoid_assigning_to_static_field',
-  'avoid_default_tostring',
-  'avoid_incomplete_copy_with',
-  'avoid_duplicate_mixins',
-  'avoid_contradictory_expressions',
-
-  // Control Flow
-  'avoid_constant_assert_conditions',
-  'avoid_constant_switches',
-  'avoid_inverted_boolean_checks',
-  'avoid_negated_conditions',
-  'avoid_negations_in_equality_checks',
-  'avoid_unnecessary_negations',
-  'avoid_collapsible_if',
-  'avoid_if_with_many_branches',
-  'avoid_nested_switch_expressions',
-  'avoid_nested_switches',
-  'avoid_nested_try',
-  'avoid_redundant_else',
-  'avoid_unconditional_break',
-  'avoid_continue',
-  'avoid_unnecessary_continue',
-  'prefer_when_guard_over_if',
-
-  // Naming
-  'prefer_correct_identifier_length',
-  'prefer_correct_type_name',
-  'prefer_correct_error_name',
-  'prefer_correct_setter_parameter_name',
-  'prefer_correct_callback_field_name',
-  'prefer_correct_handler_name',
-  'prefer_prefixed_global_constants',
-  'prefer_trailing_underscore_for_unused',
-  'match_getter_setter_field_names',
-
-  // Records & Patterns
-  'avoid_one_field_records',
-  'avoid_long_records',
-  'avoid_nested_records',
-  'avoid_mixing_named_and_positional_fields',
-  'avoid_function_type_in_records',
-  'avoid_bottom_type_in_records',
-  'avoid_extensions_on_records',
-  'avoid_positional_record_field_access',
-  'avoid_redundant_positional_field_name',
-  'avoid_bottom_type_in_patterns',
-  'avoid_duplicate_patterns',
-  'avoid_explicit_pattern_field_name',
-  'avoid_keywords_in_wildcard_pattern',
-  'avoid_unnecessary_patterns',
-  'avoid_single_field_destructuring',
-  'avoid_nested_shorthands',
-  'prefer_wildcard_pattern',
-  'prefer_simpler_patterns_null_check',
-  'move_records_to_typedefs',
-  'match_positional_field_names_on_assignment',
-  'use_existing_destructuring',
-  'prefer_pattern_destructuring',
-
-  // Formatting
-  'format_comment',
-  'prefer_commenting_analyzer_ignores',
-  'prefer_commenting_future_delayed',
-  'prefer_trailing_comma',
-  'unnecessary_trailing_comma',
-
-  // Imports
-  'avoid_barrel_files',
-  'avoid_double_slash_imports',
-  'avoid_duplicate_exports',
-  'avoid_duplicate_named_imports',
-  'max_imports',
-  'prefer_named_imports',
-
-  // Collections
-  'avoid_duplicate_collection_elements',
-  'avoid_accessing_collections_by_constant_index',
-  'avoid_slow_collection_methods',
-  'prefer_add_all',
-  'prefer_any_or_every',
-  'prefer_for_in',
-  'prefer_iterable_of',
-  'prefer_set_for_lookup',
-  'map_keys_ordering',
-  'avoid_unnecessary_collections',
-
-  // Exception
-  'avoid_only_rethrow',
-  'avoid_throw_in_catch_block',
-  'avoid_throw_objects_without_tostring',
-  'avoid_identical_exception_handling_blocks',
-  'avoid_missing_completer_stack_trace',
-  'avoid_non_final_exception_class_fields',
-  'prefer_public_exception_classes',
-
-  // Strings & Numbers
-  'avoid_adjacent_strings',
-  'avoid_non_ascii_symbols',
-  'avoid_substring',
-  'avoid_incorrect_uri',
-  'no_magic_string',
-  'avoid_duplicate_string_literals_pair', // Stricter version of professional rule
-  'avoid_complex_arithmetic_expressions',
-  'avoid_bitwise_operators_with_booleans',
-  'avoid_inconsistent_digit_separators',
-  'avoid_unnecessary_digit_separators',
-  'prefer_digit_separators',
-  'prefer_addition_subtraction_assignments',
-  'prefer_compound_assignment_operators',
-
-  // Expressions
-  'avoid_excessive_expressions',
-  'avoid_cascade_after_if_null',
-  'prefer_parentheses_with_if_null',
-  'prefer_null_aware_spread',
-  'prefer_null_aware_elements',
-
-  // Unnecessary Code
-  'avoid_unnecessary_block',
-  'avoid_unnecessary_call',
-  'avoid_unnecessary_extends',
-  'avoid_unnecessary_getter',
-  'avoid_unnecessary_statements',
-  'avoid_unnecessary_length_check',
-  'avoid_referencing_discarded_variables',
-  'avoid_empty_spread',
-  'avoid_duplicate_constant_values',
-  'avoid_duplicate_initializers',
-  'missing_use_result_annotation',
-
-  // Variables
-  'avoid_global_state',
-  'avoid_multi_assignment',
-  'avoid_nested_assignments',
-  'move_variable_closer_to_its_usage',
-  'move_variable_outside_iteration',
-  'use_existing_variable',
-  'prefer_type_over_var',
-
-  // Equality
-  'no_equal_arguments',
-  'avoid_unnecessary_compare_to',
-  'prefer_overriding_parent_equality',
-
-  // Testing
-  'prefer_visible_for_testing_on_members',
-
-  // Pragmas
-  'avoid_redundant_pragma_inline',
-  'avoid_unknown_pragma',
-  'prefer_both_inlining_annotations',
-
-  // Advanced Rules
-  'no_object_declaration',
-  'avoid_casting_to_extension_type',
-  'avoid_collection_methods_with_unrelated_types',
-  'avoid_nullable_interpolation',
-  'avoid_nullable_parameters_with_default_values',
-  'avoid_unnecessary_nullable_fields',
-  'avoid_unnecessary_nullable_parameters',
-  'avoid_unnecessary_nullable_return_type',
-  'avoid_hardcoded_colors',
-  'avoid_debug_print',
-  'avoid_unguarded_debug',
-  'match_lib_folder_structure',
-  'prefer_utc_datetimes',
-
-  // Naming & Style
-  'prefer_boolean_prefixes_for_locals',
-
-  // Platform (Batch 14 - opinionated)
-  'prefer_cupertino_for_ios_feel',
-  'prefer_keyboard_shortcuts',
-
-  // Part 6 - Media Rules (Comprehensive)
-  'prefer_camera_resolution_selection',
-  'prefer_audio_session_config',
-
-  // Part 8 - Package-specific rules (Comprehensive - stylistic)
-  'prefer_uuid_v4', // Stylistic - prefer v4 over v1 for uniqueness
-
-  'prefer_ios_haptic_feedback', // INFO - tactile feedback for iOS
-  'prefer_macos_menu_bar_integration', // INFO - native macOS menus
-  'prefer_macos_keyboard_shortcuts', // INFO - keyboard shortcuts
-  'prefer_cupertino_for_ios', // INFO - native iOS widgets
-
-  'prefer_ios_storekit2', // INFO - StoreKit 2 recommendation
-  'require_ios_accessibility_labels', // INFO - VoiceOver accessibility
-  'require_ios_promotion_display_support', // INFO - ProMotion 120Hz displays
-
-  'prefer_ios_app_intents_framework', // INFO - modern Siri integration
-  'require_ios_age_rating_consideration', // INFO - App Store age rating
-  'avoid_ios_debug_code_in_release', // INFO - release build hygiene
-
-  'prefer_ios_context_menu', // INFO - CupertinoContextMenu for iOS
-  'prefer_ios_spotlight_indexing', // INFO - Core Spotlight integration
-  'prefer_ios_handoff_support', // INFO - Handoff/Continuity support
-  'require_ios_voiceover_gesture_compatibility', // INFO - VoiceOver accessibility
-
-  // =========================================================================
-  // Orphan Rule Assignment (v4.1.0) - Previously untiered low/stylistic rules
-  // =========================================================================
-
-  // Code Style (Low - comprehensive for thorough coverage)
-  'avoid_digit_separators', // INFO - digit separator style
-  'avoid_nested_try_statements', // INFO - nested try style
-  'avoid_type_casts', // INFO - cast warning
-
-  // Documentation/Naming (Low)
-  'prefer_concise_variable_names', // INFO - naming brevity
-  'prefer_descriptive_variable_names', // INFO - naming clarity
-  'prefer_doc_comments_over_regular', // INFO - doc comments
-  'prefer_error_suffix', // INFO - Error suffix convention
-  'prefer_exception_suffix', // INFO - Exception suffix convention
-  'prefer_private_underscore_prefix', // INFO - private naming
-
-  // Pattern/Record (Low)
-  'prefer_class_over_record_return', // INFO - return type style
-  'prefer_record_over_equatable', // INFO - record vs Equatable
-
-  // Constructor/Factory (Low)
-  'prefer_constructor_assertion', // INFO - constructor asserts
-  'prefer_constructor_body_assignment', // INFO - constructor style
-  'prefer_factory_for_validation', // INFO - factory pattern
-  'prefer_initializing_formals', // INFO - initializing formals
-  'prefer_super_parameters', // INFO - super parameters
-
-  // Enum/Switch (Low)
-  'prefer_default_enum_case', // INFO - default case style
-  'prefer_exhaustive_enums', // INFO - exhaustive switches
-
-  // Async (Low)
-  'prefer_async_only_when_awaiting', // INFO - async usage
-  'prefer_await_over_then', // INFO - await vs then
-  'prefer_future_void_function_over_async_callback', // INFO - callback types
-  'prefer_sync_over_async_where_possible', // INFO - sync preference
-  'prefer_then_over_await', // INFO - then vs await (opposite preference)
-
-  // Collections (Low)
-  'prefer_keys_with_lookup', // INFO - map lookup pattern
-  'prefer_map_entries_iteration', // INFO - map iteration
-  'prefer_mutable_collections', // INFO - collection mutability
-  'prefer_wheretype_over_where_is', // INFO - whereType usage
-
-  // Testing (Low)
-  'prefer_expect_over_assert_in_tests', // INFO - test assertions
-  'prefer_single_expectation_per_test', // INFO - test style
-
-  // Control Flow (Low)
-  'prefer_guard_clauses', // INFO - guard clause style
-  'prefer_positive_conditions_first', // INFO - condition ordering
-
-  // Callbacks (Low)
-  'prefer_inline_callbacks', // INFO - callback style
-
-  // Formatting (Low)
-  'prefer_single_blank_line_max', // INFO - blank line limit
-
-  // Required/Optional (Low)
-  'prefer_all_named_parameters', // INFO - named params
-  'prefer_required_before_optional', // INFO - parameter ordering
-
-  // Exceptions (Low)
-  'prefer_generic_exception', // INFO - exception hierarchy
-  'prefer_specific_exceptions', // INFO - exception specificity
-
-  // Widgets (Low)
-  'prefer_one_widget_per_file', // INFO - file organization
-  'prefer_widget_methods_over_classes', // INFO - widget extraction
-
-  // EdgeInsets (Low)
-  'prefer_edgeinsets_only', // INFO - EdgeInsets.only
-  'prefer_edgeinsets_symmetric', // INFO - EdgeInsets.symmetric
-  'prefer_borderradius_circular', // INFO - BorderRadius.circular
-
-  // Misc (Low)
-  'prefer_equatable_stringify', // INFO - Equatable stringify
-  'prefer_freezed_default_values', // INFO - Freezed defaults
-  'prefer_immutable_annotation', // INFO - @immutable annotation
-  'prefer_native_file_dialogs', // INFO - native dialogs
-  'prefer_physics_simulation', // INFO - physics animations
-  'require_multi_provider', // INFO - MultiProvider pattern
+  // Add rules here that are not in essential, recommended, or professional, but are in comprehensive.
+  // If you add a new set for comprehensive, list them here.
 };
 
-// =============================================================================
-// CACHED TIER SETS (Performance Optimization)
-// =============================================================================
-//
-// These sets are computed ONCE on first access, then cached for all subsequent
-// calls. Previously, getRulesForTier() was rebuilding these sets on EVERY
-// analysis run, which caused significant overhead with 1400+ rules.
-//
-// Why not const? Dart doesn't allow duplicate elements in const sets, and
-// some rule names appear in multiple tier definitions for documentation.
-//
-// Impact: ~5-10x faster tier filtering after first access.
-// =============================================================================
-
-/// Cached tier sets - computed once, reused forever.
-class _TierCache {
-  _TierCache._();
-
-  static Set<String>? _recommended;
-  static Set<String>? _professional;
-  static Set<String>? _comprehensive;
-  static Set<String>? _insanity;
-  static Set<String>? _stylistic;
-
-  /// Essential + Recommended rules (cached).
-  static Set<String> get recommended =>
-      _recommended ??= <String>{...essentialRules, ...recommendedOnlyRules};
-
-  /// Stylistic rules only (cached).
-  static Set<String> get stylistic => _stylistic ??= <String>{...stylisticRules};
-
-  /// Essential + Recommended + Professional rules (cached).
-  static Set<String> get professional => _professional ??= <String>{
-        ...essentialRules,
-        ...recommendedOnlyRules,
-        ...professionalOnlyRules,
-      };
-
-  /// Essential + Recommended + Professional + Comprehensive rules (cached).
-  static Set<String> get comprehensive => _comprehensive ??= <String>{
-        ...essentialRules,
-        ...recommendedOnlyRules,
-        ...professionalOnlyRules,
-        ...comprehensiveOnlyRules,
-      };
-
-  /// All rules from all tiers (cached).
-  static Set<String> get insanity => _insanity ??= <String>{
-        ...essentialRules,
-        ...recommendedOnlyRules,
-        ...professionalOnlyRules,
-        ...comprehensiveOnlyRules,
-        ...insanityOnlyRules,
-      };
-}
-
-/// Insanity tier rules - Everything including noisy/opinionated rules.
+/// Rules that are only included in the insanity tier (not in comprehensive).
 const Set<String> insanityOnlyRules = <String>{
-  // Security - high false positive rates
-  'avoid_generic_key_in_url',
-
-  // Noisy but valuable
-  'prefer_blank_line_before_case',
-  'prefer_blank_line_before_method',
-  'prefer_blank_line_before_constructor',
-  'enum_constants_ordering',
-  'avoid_commented_out_code',
-  'avoid_dynamic',
-  'avoid_late_keyword',
-  'avoid_nested_conditional_expressions',
-  'avoid_passing_async_when_sync_expected',
-  'binary_expression_operand_order',
-  'double_literal_format',
-  'member_ordering',
-  'prefer_blank_line_before_return',
-  'no_magic_number',
-  'prefer_async_await',
-  'prefer_conditional_expressions',
-  'prefer_match_file_name',
-  'prefer_moving_to_variable',
-  'prefer_static_class',
-  'prefer_extracting_callbacks',
-  'prefer_single_widget_per_file',
-  'prefer_small_files', // 200 lines - ideal for single responsibility
-
-  // Style Preferences
-  'prefer_getter_over_method',
-  'prefer_static_method',
-  'prefer_named_parameters',
-  'prefer_named_boolean_parameters',
-  'prefer_descriptive_bool_names_strict', // INFO - strict bool naming (no action verbs)
-  'avoid_font_weight_as_number',
-  'prefer_explicit_function_type',
-  'prefer_explicit_parameter_names',
-  'prefer_typedef_for_callbacks',
-  'prefer_extracting_function_callbacks',
-  'avoid_returning_cascades',
-  'avoid_returning_void',
-  'prefer_returning_shorthands',
-  'avoid_unnecessary_return',
-  'prefer_immediate_return',
-  'prefer_declaring_const_constructor',
-  'prefer_abstract_final_static_class',
-  'match_class_name_pattern',
-  'match_base_class_default_value',
-  'parameters_ordering',
-
-  // Advanced Patterns
-  'prefer_enhanced_enums',
-  'prefer_enums_by_name',
-  'avoid_unnecessary_enum_prefix',
-  'avoid_unnecessary_enum_arguments',
-  'prefer_shorthands_with_enums',
-  'prefer_named_extensions',
-  'avoid_nested_extension_types',
-  'avoid_implicitly_nullable_extension_types',
-  'prefer_private_extension_type_field',
-  'avoid_shadowed_extension_methods',
-
-  // Advanced Code Quality
-  'avoid_unassigned_fields',
-  'avoid_unassigned_late_fields',
-  'avoid_unnecessary_late_fields',
-  'avoid_unnecessary_local_late',
-  'prefer_returning_condition',
-  'prefer_returning_conditionals',
-  'prefer_switch_expression',
-  'prefer_switch_with_enums',
-  'prefer_switch_with_sealed_classes',
-  'prefer_pushing_conditional_expressions',
-  'avoid_unnecessary_if',
-  'pass_correct_accepted_type',
-  'pass_optional_argument',
-  'prefer_shorthands_with_constructors',
-  'prefer_shorthands_with_static_fields',
-  'avoid_inferrable_type_arguments',
-  'avoid_passing_default_values',
-  'prefer_single_declaration_per_file',
-  'prefer_bytes_builder',
-
-  // Testing
-  'tag_name',
-
-  // v2.6.0 rules (ROADMAP_NEXT)
-  'prefer_dio_transformer', // INFO - background JSON parsing
+  // Add rules here that are not in essential, recommended, professional, or comprehensive, but are in insanity.
+  // If you add a new set for insanity, list them here.
 };
 
-/// Get all rules for a specific tier.
-///
-/// Uses cached sets for performance - sets are computed once on first access,
-/// then reused for all subsequent calls. This is critical for performance
-/// since this function is called on every file analysis.
+/// Returns the set of rule names for a given tier.
 Set<String> getRulesForTier(String tier) {
-  switch (tier.toLowerCase()) {
+  switch (tier) {
+    case 'stylistic':
+      return stylisticRules;
     case 'essential':
       return essentialRules;
     case 'recommended':
-      return _TierCache.recommended;
+      // recommended = essential + recommendedOnly
+      return essentialRules.union(recommendedOnlyRules);
     case 'professional':
-      return _TierCache.professional;
+      // professional = recommended + professionalOnly
+      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules);
     case 'comprehensive':
-      return _TierCache.comprehensive;
-    case 'stylistic':
-      return _TierCache.stylistic;
+      // comprehensive = professional + comprehensiveOnly
+      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules).union(comprehensiveOnlyRules);
     case 'insanity':
-    case 'all':
-      return _TierCache.insanity;
+      // insanity = all rules
+      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules).union(comprehensiveOnlyRules).union(insanityOnlyRules);
     default:
+      // fallback to essential
       return essentialRules;
   }
 }

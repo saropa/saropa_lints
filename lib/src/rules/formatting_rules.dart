@@ -2,8 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -70,10 +69,8 @@ class NewlineBeforeCaseRule extends SaropaLintRule {
 
         // Check if there's a blank line before current case
         final CompilationUnit unit = node.root as CompilationUnit;
-        final int prevEndLine =
-            unit.lineInfo.getLocation(previous.end).lineNumber;
-        final int currStartLine =
-            unit.lineInfo.getLocation(current.offset).lineNumber;
+        final int prevEndLine = unit.lineInfo.getLocation(previous.end).lineNumber;
+        final int currStartLine = unit.lineInfo.getLocation(current.offset).lineNumber;
 
         if (currStartLine - prevEndLine < 2) {
           // Use beginToken to handle SwitchCase, SwitchDefault, and SwitchPatternCase
@@ -150,10 +147,8 @@ class NewlineBeforeConstructorRule extends SaropaLintRule {
       if (current is! ConstructorDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine =
-          unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine =
-          unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine = unit.lineInfo.getLocation(previous.end).lineNumber;
+      final int currStartLine = unit.lineInfo.getLocation(current.offset).lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -204,8 +199,7 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_blank_line_before_method',
-    problemMessage:
-        '[prefer_blank_line_before_method] Add a blank line before method declaration.',
+    problemMessage: '[prefer_blank_line_before_method] Add a blank line before method declaration.',
     correctionMessage: 'Add blank line for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -242,10 +236,8 @@ class NewlineBeforeMethodRule extends SaropaLintRule {
       if (current is! MethodDeclaration) continue;
 
       // Get line numbers
-      final int prevEndLine =
-          unit.lineInfo.getLocation(previous.end).lineNumber;
-      final int currStartLine =
-          unit.lineInfo.getLocation(current.offset).lineNumber;
+      final int prevEndLine = unit.lineInfo.getLocation(previous.end).lineNumber;
+      final int currStartLine = unit.lineInfo.getLocation(current.offset).lineNumber;
 
       // Should have at least one blank line
       if (currStartLine - prevEndLine < 2) {
@@ -297,10 +289,8 @@ class NewlineBeforeReturnRule extends SaropaLintRule {
 
       // Check if previous statement ends on the line immediately before
       final Statement previous = statements[index - 1];
-      final int prevEndLine =
-          resolver.lineInfo.getLocation(previous.end).lineNumber;
-      final int returnStartLine =
-          resolver.lineInfo.getLocation(node.offset).lineNumber;
+      final int prevEndLine = resolver.lineInfo.getLocation(previous.end).lineNumber;
+      final int returnStartLine = resolver.lineInfo.getLocation(node.offset).lineNumber;
 
       if (returnStartLine - prevEndLine < 2) {
         reporter.atNode(node, code);
@@ -373,8 +363,7 @@ class PreferTrailingCommaRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_trailing_comma',
-    problemMessage:
-        '[prefer_trailing_comma] Missing trailing comma in multi-line construct.',
+    problemMessage: '[prefer_trailing_comma] Missing trailing comma in multi-line construct.',
     correctionMessage: 'Add a trailing comma.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -652,9 +641,8 @@ class FormatCommentFormattingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'format_comment',
-    problemMessage:
-        '[format_comment] Comment does not follow formatting conventions.',
+    name: 'format_comment_style',
+    problemMessage: '[format_comment_style] Comment does not follow formatting conventions.',
     correctionMessage: 'Start with capital letter and end with punctuation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -755,11 +743,9 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'member_ordering',
-    problemMessage:
-        '[member_ordering] Class members are not in conventional order.',
-    correctionMessage:
-        'Order members: static fields, fields, constructors, methods.',
+    name: 'enforce_member_ordering',
+    problemMessage: '[enforce_member_ordering] Class members are not in conventional order.',
+    correctionMessage: 'Order members: static fields, fields, constructors, methods.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -827,11 +813,9 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'parameters_ordering',
-    problemMessage:
-        '[parameters_ordering] Parameters are not in conventional order.',
-    correctionMessage:
-        'Order: required positional, optional positional, named.',
+    name: 'enforce_parameters_ordering',
+    problemMessage: '[enforce_parameters_ordering] Parameters are not in conventional order.',
+    correctionMessage: 'Order: required positional, optional positional, named.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -850,8 +834,7 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
     });
   }
 
-  void _checkParameters(
-      FormalParameterList? params, SaropaDiagnosticReporter reporter) {
+  void _checkParameters(FormalParameterList? params, SaropaDiagnosticReporter reporter) {
     if (params == null) return;
 
     int lastCategory = -1;
@@ -916,8 +899,7 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'enum_constants_ordering',
-    problemMessage:
-        '[enum_constants_ordering] Enum constants are not in alphabetical order.',
+    problemMessage: '[enum_constants_ordering] Enum constants are not in alphabetical order.',
     correctionMessage: 'Consider ordering enum constants alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -937,8 +919,7 @@ class EnumConstantsOrderingRule extends SaropaLintRule {
       for (final EnumConstantDeclaration constant in constants) {
         final String currentName = constant.name.lexeme;
         if (previousName != null &&
-            currentName.toLowerCase().compareTo(previousName.toLowerCase()) <
-                0) {
+            currentName.toLowerCase().compareTo(previousName.toLowerCase()) < 0) {
           reporter.atNode(node, code);
           return; // Only report once per enum
         }

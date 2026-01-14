@@ -3497,8 +3497,8 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'arguments_ordering',
-    problemMessage: '[arguments_ordering] Named arguments should be in alphabetical order.',
+    name: 'enforce_arguments_ordering',
+    problemMessage: '[enforce_arguments_ordering] Named arguments should be in alphabetical order.',
     correctionMessage: 'Reorder named arguments alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

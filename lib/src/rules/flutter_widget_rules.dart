@@ -2833,8 +2833,8 @@ class RequireDisposeRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'require_dispose',
-    problemMessage: '[require_dispose] Disposable field may not be properly disposed.',
+    name: 'require_field_dispose',
+    problemMessage: '[require_field_dispose] Disposable field may not be properly disposed.',
     correctionMessage: 'Add a dispose() method that disposes this field, '
         'or ensure the existing dispose() method handles it.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6961,9 +6961,9 @@ class DisposeFieldsRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    name: 'dispose_fields',
+    name: 'dispose_widget_fields',
     problemMessage:
-        '[dispose_fields] Field requires disposal but dispose method is missing or incomplete.',
+        '[dispose_widget_fields] Field requires disposal but dispose method is missing or incomplete.',
     correctionMessage: 'Add dispose method and call dispose on this field.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

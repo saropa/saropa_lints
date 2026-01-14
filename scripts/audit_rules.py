@@ -57,6 +57,7 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
         re.DOTALL
     )
 
+
     for dart_file in rules_dir.glob("*.dart"):
         content = dart_file.read_text(encoding="utf-8")
 
@@ -70,35 +71,38 @@ def find_duplicate_rules(rules_dir: Path) -> dict:
         # Class names
         for match in class_pattern.finditer(content):
             class_name = match.group(1)
-            # Try to find the rule name for this class (by convention, but not always possible)
-            # Use the first rule name found in the file as a proxy
             problem_len = 0
             if rule_problem_len:
                 problem_len = max(rule_problem_len.values())
             class_names[class_name].append({'file': str(dart_file), 'problem_len': problem_len})
 
-        # Rule names
+        # Rule names: only count unique rule names per file
+        rule_names_in_file = set()
         for match in rule_name_pattern.finditer(content):
             rule_name = match.group(1)
+            rule_names_in_file.add(rule_name)
+        for rule_name in rule_names_in_file:
             problem_len = rule_problem_len.get(rule_name, 0)
             rule_names[rule_name].append({'file': str(dart_file), 'problem_len': problem_len})
 
-        # Aliases
+        # Aliases: only count unique aliases per file
+        aliases_in_file = set()
         for match in alias_pattern.finditer(content):
             alias_list = match.group(1)
             for alias in [a.strip() for a in alias_list.split(",") if a.strip()]:
-                # Try to associate alias with a rule name's problemMessage length
-                # Use the max problem_len in the file as a proxy
-                problem_len = 0
-                if rule_problem_len:
-                    problem_len = max(rule_problem_len.values())
-                aliases[alias].append({'file': str(dart_file), 'problem_len': problem_len})
+                aliases_in_file.add(alias)
+        for alias in aliases_in_file:
+            problem_len = 0
+            if rule_problem_len:
+                problem_len = max(rule_problem_len.values())
+            aliases[alias].append({'file': str(dart_file), 'problem_len': problem_len})
 
     # Find duplicates
+    # Only report as duplicate if the same name appears in more than one file
     duplicates = {
-        'class_names': {k: v for k, v in class_names.items() if len(v) > 1},
-        'rule_names': {k: v for k, v in rule_names.items() if len(v) > 1},
-        'aliases': {k: v for k, v in aliases.items() if len(v) > 1},
+        'class_names': {k: v for k, v in class_names.items() if len(set(entry['file'] for entry in v)) > 1},
+        'rule_names': {k: v for k, v in rule_names.items() if len(set(entry['file'] for entry in v)) > 1},
+        'aliases': {k: v for k, v in aliases.items() if len(set(entry['file'] for entry in v)) > 1},
     }
     return duplicates
 
@@ -397,15 +401,21 @@ def get_implemented_rules(rules_dir: Path) -> tuple[set[str], set[str], int]:
     aliases: set[str] = set()
     fix_count = 0
 
-    name_pattern = re.compile(r"name:\s*'([a-z_]+)'")
+    # Only match rule names in actual LintCode blocks, not in comments/examples
+    lintcode_pattern = re.compile(
+        r"static const (?:LintCode )?_code = LintCode\(\s*"
+        r"name:\s*'([a-z_]+)',",
+        re.DOTALL
+    )
     # Match: /// Alias: name1, name2, name3
-    alias_pattern = re.compile(r"///\s*Alias:\s*([a-z_,\s]+)")
+    alias_pattern = re.compile(r"^///\s*Alias:\s*([a-zA-Z0-9_,\s]+)", re.MULTILINE)
     # Match: class _SomeFix extends DartFix
     fix_pattern = re.compile(r"class \w+ extends DartFix")
 
     for dart_file in rules_dir.glob("*.dart"):
         content = dart_file.read_text(encoding="utf-8")
-        rules.update(name_pattern.findall(content))
+        # Only add rule names from LintCode blocks
+        rules.update(lintcode_pattern.findall(content))
         fix_count += len(fix_pattern.findall(content))
 
         # Extract aliases
