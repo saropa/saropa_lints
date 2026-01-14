@@ -2,7 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -35,7 +36,8 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
     name: 'avoid_assignments_as_conditions',
     problemMessage:
         '[avoid_assignments_as_conditions] Assignment in condition. Likely meant == comparison, not = assignment.',
-    correctionMessage: 'Use == for comparison, or move assignment before the condition.',
+    correctionMessage:
+        'Use == for comparison, or move assignment before the condition.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -77,7 +79,8 @@ class AvoidAssignmentsAsConditionsRule extends SaropaLintRule {
     });
   }
 
-  void _checkCondition(Expression condition, SaropaDiagnosticReporter reporter) {
+  void _checkCondition(
+      Expression condition, SaropaDiagnosticReporter reporter) {
     if (condition is AssignmentExpression) {
       reporter.atNode(condition, code);
     }
@@ -236,7 +239,8 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
     name: 'avoid_conditions_with_boolean_literals',
     problemMessage:
         '[avoid_conditions_with_boolean_literals] Avoid using boolean literals in logical expressions.',
-    correctionMessage: 'Simplify: x || true is always true, x && false is always false, '
+    correctionMessage:
+        'Simplify: x || true is always true, x && false is always false, '
         'x || false is x, x && true is x.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -253,8 +257,10 @@ class AvoidConditionsWithBooleanLiteralsRule extends SaropaLintRule {
       // Only check logical operators (&&, ||)
       // Equality comparisons (==, !=) are handled by no_boolean_literal_compare
       // which has proper nullable type checking
-      if (operator == TokenType.BAR_BAR || operator == TokenType.AMPERSAND_AMPERSAND) {
-        if (node.leftOperand is BooleanLiteral || node.rightOperand is BooleanLiteral) {
+      if (operator == TokenType.BAR_BAR ||
+          operator == TokenType.AMPERSAND_AMPERSAND) {
+        if (node.leftOperand is BooleanLiteral ||
+            node.rightOperand is BooleanLiteral) {
           reporter.atNode(node, code);
         }
       }
@@ -285,7 +291,8 @@ class _SimplifyBooleanComparisonFix extends DartFix {
       // x || false -> x
       // x && true  -> x
       // x && false -> false
-      if (operator == TokenType.BAR_BAR || operator == TokenType.AMPERSAND_AMPERSAND) {
+      if (operator == TokenType.BAR_BAR ||
+          operator == TokenType.AMPERSAND_AMPERSAND) {
         final bool isOr = operator == TokenType.BAR_BAR;
         final Expression left = node.leftOperand;
         final Expression right = node.rightOperand;
@@ -360,7 +367,8 @@ class AvoidConstantAssertConditionsRule extends SaropaLintRule {
     name: 'avoid_constant_assert_conditions',
     problemMessage:
         '[avoid_constant_assert_conditions] Assert has a constant condition that is always {0}.',
-    correctionMessage: 'Use a meaningful condition or remove the assert statement.',
+    correctionMessage:
+        'Use a meaningful condition or remove the assert statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -436,8 +444,10 @@ class AvoidConstantSwitchesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_constant_switches',
-    problemMessage: '[avoid_constant_switches] Switch expression is a constant value.',
-    correctionMessage: 'Use a variable or expression, or replace with if statement.',
+    problemMessage:
+        '[avoid_constant_switches] Switch expression is a constant value.',
+    correctionMessage:
+        'Use a variable or expression, or replace with if statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -499,7 +509,8 @@ class AvoidContinueRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_continue_statement',
-    problemMessage: '[avoid_continue_statement] Avoid using the continue statement.',
+    problemMessage:
+        '[avoid_continue_statement] Avoid using the continue statement.',
     correctionMessage: 'Restructure the loop logic to avoid continue.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -616,8 +627,10 @@ class AvoidIfWithManyBranchesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_if_with_many_branches',
-    problemMessage: '[avoid_if_with_many_branches] If statement has too many branches (max 4).',
-    correctionMessage: 'Consider using a switch statement or extracting to methods.',
+    problemMessage:
+        '[avoid_if_with_many_branches] If statement has too many branches (max 4).',
+    correctionMessage:
+        'Consider using a switch statement or extracting to methods.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -677,7 +690,8 @@ class AvoidInvertedBooleanChecksRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_inverted_boolean_checks',
-    problemMessage: '[avoid_inverted_boolean_checks] Inverted boolean check can be simplified.',
+    problemMessage:
+        '[avoid_inverted_boolean_checks] Inverted boolean check can be simplified.',
     correctionMessage: 'Use the opposite operator instead of negating.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -790,7 +804,8 @@ class AvoidNegatedConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_negated_conditions',
-    problemMessage: '[avoid_negated_conditions] Negated condition can be simplified.',
+    problemMessage:
+        '[avoid_negated_conditions] Negated condition can be simplified.',
     correctionMessage: 'Use the positive form (isNotEmpty, != null, etc.).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -918,7 +933,8 @@ class AvoidNestedAssignmentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_assignments',
-    problemMessage: '[avoid_nested_assignments] Avoid using assignment inside another expression.',
+    problemMessage:
+        '[avoid_nested_assignments] Avoid using assignment inside another expression.',
     correctionMessage: 'Extract the assignment to a separate statement.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -964,7 +980,8 @@ class AvoidNestedConditionalExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_conditional_expressions',
-    problemMessage: '[avoid_nested_conditional_expressions] Avoid nested conditional expressions.',
+    problemMessage:
+        '[avoid_nested_conditional_expressions] Avoid nested conditional expressions.',
     correctionMessage: 'Use if-else statements or extract to a method.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1091,7 +1108,8 @@ class AvoidNestedSwitchExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nested_switch_expressions',
-    problemMessage: '[avoid_nested_switch_expressions] Avoid nested switch expressions.',
+    problemMessage:
+        '[avoid_nested_switch_expressions] Avoid nested switch expressions.',
     correctionMessage: 'Extract the inner switch to a separate function.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1198,7 +1216,8 @@ class AvoidRedundantElseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_redundant_else',
-    problemMessage: '[avoid_redundant_else] Else is redundant after return/throw/break/continue.',
+    problemMessage:
+        '[avoid_redundant_else] Else is redundant after return/throw/break/continue.',
     correctionMessage: 'Remove the else clause and un-indent the code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1228,7 +1247,8 @@ class AvoidRedundantElseRule extends SaropaLintRule {
     }
 
     // Check for throw expression statement
-    if (statement is ExpressionStatement && statement.expression is ThrowExpression) {
+    if (statement is ExpressionStatement &&
+        statement.expression is ThrowExpression) {
       return true;
     }
 
@@ -1273,7 +1293,8 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
     name: 'avoid_unconditional_break',
     problemMessage:
         '[avoid_unconditional_break] Unconditional break/continue makes loop execute at most once.',
-    correctionMessage: 'Add a condition before break/continue or remove the loop.',
+    correctionMessage:
+        'Add a condition before break/continue or remove the loop.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1288,7 +1309,8 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
       _checkLoopBody(node.body, reporter);
     });
 
-    context.registry.addForEachPartsWithDeclaration((ForEachPartsWithDeclaration node) {
+    context.registry
+        .addForEachPartsWithDeclaration((ForEachPartsWithDeclaration node) {
       // The body is in the parent ForStatement
     });
 
@@ -1316,7 +1338,8 @@ class AvoidUnconditionalBreakRule extends SaropaLintRule {
     if (firstStatement == null) return;
 
     // Check if first statement is unconditional break/continue
-    if (firstStatement is BreakStatement || firstStatement is ContinueStatement) {
+    if (firstStatement is BreakStatement ||
+        firstStatement is ContinueStatement) {
       reporter.atNode(firstStatement, code);
     }
   }
@@ -1575,7 +1598,8 @@ class NoEqualConditionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_conditions',
-    problemMessage: '[no_equal_conditions] Duplicate condition in if-else chain.',
+    problemMessage:
+        '[no_equal_conditions] Duplicate condition in if-else chain.',
     correctionMessage: 'This condition was already checked above.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1644,7 +1668,8 @@ class NoEqualThenElseRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_equal_then_else',
-    problemMessage: '[no_equal_then_else] If and else branches have identical code.',
+    problemMessage:
+        '[no_equal_then_else] If and else branches have identical code.',
     correctionMessage: 'Remove the condition and keep only the common code.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1696,7 +1721,8 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_conditional_expressions',
-    problemMessage: '[prefer_conditional_expressions] Consider using a conditional expression.',
+    problemMessage:
+        '[prefer_conditional_expressions] Consider using a conditional expression.',
     correctionMessage: 'Use condition ? thenValue : elseValue.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1715,19 +1741,24 @@ class PreferConditionalExpressionsRule extends SaropaLintRule {
       if (elseStatement == null) return;
 
       // Check for simple return statements
-      if (thenStatement is ReturnStatement && elseStatement is ReturnStatement) {
-        if (thenStatement.expression != null && elseStatement.expression != null) {
+      if (thenStatement is ReturnStatement &&
+          elseStatement is ReturnStatement) {
+        if (thenStatement.expression != null &&
+            elseStatement.expression != null) {
           reporter.atNode(node, code);
         }
       }
 
       // Check for simple assignment to same variable
-      if (thenStatement is ExpressionStatement && elseStatement is ExpressionStatement) {
+      if (thenStatement is ExpressionStatement &&
+          elseStatement is ExpressionStatement) {
         final Expression thenExpr = thenStatement.expression;
         final Expression elseExpr = elseStatement.expression;
 
-        if (thenExpr is AssignmentExpression && elseExpr is AssignmentExpression) {
-          if (thenExpr.leftHandSide.toSource() == elseExpr.leftHandSide.toSource()) {
+        if (thenExpr is AssignmentExpression &&
+            elseExpr is AssignmentExpression) {
+          if (thenExpr.leftHandSide.toSource() ==
+              elseExpr.leftHandSide.toSource()) {
             reporter.atNode(node, code);
           }
         }
@@ -1775,8 +1806,10 @@ class PreferCorrectSwitchLengthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_switch_length',
-    problemMessage: '[prefer_correct_switch_length] Switch statement has too few cases.',
-    correctionMessage: 'Consider using an if-else statement for $_minCases or fewer cases.',
+    problemMessage:
+        '[prefer_correct_switch_length] Switch statement has too few cases.',
+    correctionMessage:
+        'Consider using an if-else statement for $_minCases or fewer cases.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1830,8 +1863,10 @@ class PreferEarlyReturnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_early_return',
-    problemMessage: '[prefer_early_return] Consider using early return to reduce nesting.',
-    correctionMessage: 'Invert the condition and return early instead of wrapping the body.',
+    problemMessage:
+        '[prefer_early_return] Consider using early return to reduce nesting.',
+    correctionMessage:
+        'Invert the condition and return early instead of wrapping the body.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1850,7 +1885,8 @@ class PreferEarlyReturnRule extends SaropaLintRule {
     });
   }
 
-  void _checkFunctionBody(FunctionBody body, SaropaDiagnosticReporter reporter) {
+  void _checkFunctionBody(
+      FunctionBody body, SaropaDiagnosticReporter reporter) {
     if (body is! BlockFunctionBody) return;
 
     final Block block = body.block;
@@ -2003,7 +2039,8 @@ class PreferReturningConditionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_returning_condition',
-    problemMessage: '[prefer_returning_condition] Prefer returning the condition directly.',
+    problemMessage:
+        '[prefer_returning_condition] Prefer returning the condition directly.',
     correctionMessage: 'Replace if-else with direct return of the condition.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2026,7 +2063,8 @@ class PreferReturningConditionRule extends SaropaLintRule {
       if (thenReturnsBool == null || elseReturnsBool == null) return;
 
       // Check if one returns true and the other returns false
-      if ((thenReturnsBool && !elseReturnsBool) || (!thenReturnsBool && elseReturnsBool)) {
+      if ((thenReturnsBool && !elseReturnsBool) ||
+          (!thenReturnsBool && elseReturnsBool)) {
         reporter.atNode(node, code);
       }
     });
@@ -2089,7 +2127,8 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
     name: 'prefer_when_guard_over_if',
     problemMessage:
         '[prefer_when_guard_over_if] Switch case with if statement could use a when guard.',
-    correctionMessage: 'Use "case pattern when condition:" instead of nested if.',
+    correctionMessage:
+        'Use "case pattern when condition:" instead of nested if.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2118,7 +2157,8 @@ class PreferWhenGuardOverIfRule extends SaropaLintRule {
       IfStatement? ifStmt;
       if (firstStatement is IfStatement) {
         ifStmt = firstStatement;
-      } else if (firstStatement is Block && firstStatement.statements.length == 1) {
+      } else if (firstStatement is Block &&
+          firstStatement.statements.length == 1) {
         final Statement inner = firstStatement.statements.first;
         if (inner is IfStatement) {
           ifStmt = inner;
@@ -2181,8 +2221,10 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_simpler_boolean_expressions',
-    problemMessage: '[prefer_simpler_boolean_expressions] Boolean expression can be simplified.',
-    correctionMessage: 'Apply De Morgan\'s law or remove double negation for clearer code.',
+    problemMessage:
+        '[prefer_simpler_boolean_expressions] Boolean expression can be simplified.',
+    correctionMessage:
+        'Apply De Morgan\'s law or remove double negation for clearer code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2198,7 +2240,8 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
       final Expression operand = node.operand;
 
       // Check for double negation: !!x
-      if (operand is PrefixExpression && operand.operator.type == TokenType.BANG) {
+      if (operand is PrefixExpression &&
+          operand.operator.type == TokenType.BANG) {
         reporter.atNode(node, _codeDoubleNegation);
         return;
       }
@@ -2211,7 +2254,8 @@ class PreferSimplerBooleanExpressionsRule extends SaropaLintRule {
           if (op == TokenType.AMPERSAND_AMPERSAND || op == TokenType.BAR_BAR) {
             // Check if both operands are simple enough that De Morgan's
             // would actually improve readability
-            if (_isSimpleExpression(inner.leftOperand) && _isSimpleExpression(inner.rightOperand)) {
+            if (_isSimpleExpression(inner.leftOperand) &&
+                _isSimpleExpression(inner.rightOperand)) {
               reporter.atNode(node, _codeDeMorgan);
             }
           }
@@ -2291,7 +2335,8 @@ class _SimplifyBooleanExpressionFix extends DartFix {
       final Expression operand = node.operand;
 
       // Handle double negation: !!x -> x
-      if (operand is PrefixExpression && operand.operator.type == TokenType.BANG) {
+      if (operand is PrefixExpression &&
+          operand.operator.type == TokenType.BANG) {
         final String innerExpr = operand.operand.toSource();
 
         final ChangeBuilder changeBuilder = reporter.createChangeBuilder(

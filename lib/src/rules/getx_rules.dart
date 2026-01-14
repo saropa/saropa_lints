@@ -8,7 +8,8 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -54,9 +55,11 @@ class RequireGetxControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_getx_controller_dispose',
-    problemMessage: '[require_getx_controller_dispose] Missing onClose() leaves resources '
+    problemMessage:
+        '[require_getx_controller_dispose] Missing onClose() leaves resources '
         'undisposed. Subscriptions and controllers leak memory when widget closes.',
-    correctionMessage: 'Override onClose() to dispose controllers, cancel subscriptions, etc.',
+    correctionMessage:
+        'Override onClose() to dispose controllers, cancel subscriptions, etc.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -195,7 +198,8 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
     name: 'avoid_obs_outside_controller',
     problemMessage:
         '[avoid_obs_outside_controller] .obs used outside GetxController causes memory leaks and lifecycle issues.',
-    correctionMessage: 'Move observable state to a GetxController for proper lifecycle management.',
+    correctionMessage:
+        'Move observable state to a GetxController for proper lifecycle management.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -216,7 +220,8 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   ) {
     // Check for .obs in field declarations (most common case)
     context.registry.addFieldDeclaration((FieldDeclaration node) {
-      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       // Check if this class extends a GetX controller type
@@ -283,9 +288,11 @@ class ProperGetxSuperCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'proper_getx_super_calls',
-    problemMessage: '[proper_getx_super_calls] GetxController lifecycle method must call super. '
+    problemMessage:
+        '[proper_getx_super_calls] GetxController lifecycle method must call super. '
         'Missing super call breaks controller lifecycle.',
-    correctionMessage: 'Add super.onInit() at the start or super.onClose() at the end.',
+    correctionMessage:
+        'Add super.onInit() at the start or super.onClose() at the end.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -396,7 +403,8 @@ class AlwaysRemoveGetxListenerRule extends SaropaLintRule {
     problemMessage:
         '[always_remove_getx_listener] GetX worker is not assigned to a variable for cleanup. '
         'This will cause a memory leak.',
-    correctionMessage: 'Assign the worker to a variable and call dispose() in onClose().',
+    correctionMessage:
+        'Assign the worker to a variable and call dispose() in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -463,7 +471,8 @@ class AvoidGetxRxInsideBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_rx_inside_build',
-    problemMessage: '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
+    problemMessage:
+        '[avoid_getx_rx_inside_build] Creating .obs in build() causes memory leaks.',
     correctionMessage: 'Move reactive variables to a GetxController.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -533,7 +542,8 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_mutable_rx_variables',
-    problemMessage: '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
+    problemMessage:
+        '[avoid_mutable_rx_variables] Reassigning Rx variable breaks reactivity.',
     correctionMessage: 'Use .value = or callable syntax to update.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -628,7 +638,8 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'dispose_getx_fields',
-    problemMessage: '[dispose_getx_fields] Undisposed Worker keeps timer running after '
+    problemMessage:
+        '[dispose_getx_fields] Undisposed Worker keeps timer running after '
         'GetxController closes, causing memory leaks and stale updates.',
     correctionMessage: 'Call dispose() on Worker fields in onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -654,7 +665,8 @@ class DisposeGetxFieldsRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName == 'Worker' || typeName == 'Worker?') {
-            for (final VariableDeclaration variable in member.fields.variables) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
               workerFields.add(variable.name.lexeme);
             }
           }
@@ -779,13 +791,17 @@ class PreferGetxBuilderRule extends SaropaLintRule {
         }
         if (current is MethodInvocation) {
           final String methodName = current.methodName.name;
-          if (methodName == 'Obx' || methodName == 'GetX' || methodName == 'GetBuilder') {
+          if (methodName == 'Obx' ||
+              methodName == 'GetX' ||
+              methodName == 'GetBuilder') {
             insideObx = true;
           }
         }
         if (current is InstanceCreationExpression) {
           final String typeName = current.constructorName.type.name.lexeme;
-          if (typeName == 'Obx' || typeName == 'GetX' || typeName == 'GetBuilder') {
+          if (typeName == 'Obx' ||
+              typeName == 'GetX' ||
+              typeName == 'GetBuilder') {
             insideObx = true;
           }
         }
@@ -840,7 +856,8 @@ class RequireGetxBindingRule extends SaropaLintRule {
     name: 'require_getx_binding',
     problemMessage:
         '[require_getx_binding] Get.put() in widget. Consider using Bindings for lifecycle management.',
-    correctionMessage: 'Create a Binding class and register via GetPage binding parameter.',
+    correctionMessage:
+        'Create a Binding class and register via GetPage binding parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -930,7 +947,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
     name: 'require_getx_worker_dispose',
     problemMessage:
         '[require_getx_worker_dispose] GetX Worker field is not disposed in onClose(). This causes memory leaks.',
-    correctionMessage: 'Call worker.dispose() in onClose() before super.onClose().',
+    correctionMessage:
+        'Call worker.dispose() in onClose() before super.onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -962,7 +980,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
               (typeName == 'Worker' ||
                   typeName == 'Worker?' ||
                   typeName.contains('List<Worker>'))) {
-            for (final VariableDeclaration variable in member.fields.variables) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
               workerFields.add(variable.name.lexeme);
             }
           }
@@ -989,7 +1008,8 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable in member.fields.variables) {
+              for (final VariableDeclaration variable
+                  in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }
@@ -1123,7 +1143,8 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
       final String classSource = enclosingClass.toSource();
       final bool hasDelete = classSource.contains('Get.delete') ||
           classSource.contains('Get.deleteAll') ||
-          (controllerType != null && classSource.contains('Get.delete<$controllerType>'));
+          (controllerType != null &&
+              classSource.contains('Get.delete<$controllerType>'));
 
       if (!hasDelete) {
         reporter.atNode(node, code);
@@ -1239,7 +1260,8 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (target.name != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass =
+          node.thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
@@ -1272,7 +1294,8 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (prefix != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass =
+          node.thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
@@ -1348,7 +1371,8 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
     name: 'avoid_getx_global_navigation',
     problemMessage:
         '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context.',
-    correctionMessage: 'Use Navigator.of(context) or a typed routing solution like GoRouter.',
+    correctionMessage:
+        'Use Navigator.of(context) or a typed routing solution like GoRouter.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1425,7 +1449,8 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_getx_binding_routes',
-    problemMessage: '[require_getx_binding_routes] GetPage without binding parameter.',
+    problemMessage:
+        '[require_getx_binding_routes] GetPage without binding parameter.',
     correctionMessage: 'Add binding: YourBinding() for proper DI lifecycle.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1448,7 +1473,8 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
       for (final Expression arg in args.arguments) {
         if (arg is NamedExpression) {
-          if (arg.name.label.name == 'binding' || arg.name.label.name == 'bindings') {
+          if (arg.name.label.name == 'binding' ||
+              arg.name.label.name == 'bindings') {
             hasBinding = true;
             break;
           }

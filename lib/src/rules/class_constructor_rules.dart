@@ -37,7 +37,8 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
     name: 'avoid_declaring_call_method',
     problemMessage:
         '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously.',
-    correctionMessage: 'Use descriptive method name: execute(), invoke(), or run() instead.',
+    correctionMessage:
+        'Use descriptive method name: execute(), invoke(), or run() instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -264,7 +265,8 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
     name: 'avoid_non_empty_constructor_bodies',
     problemMessage:
         '[avoid_non_empty_constructor_bodies] Constructor body has logic. Final fields cannot be set in body, only initializers.',
-    correctionMessage: 'Move logic to initializer list: MyClass(input) : name = input.trim();',
+    correctionMessage:
+        'Move logic to initializer list: MyClass(input) : name = input.trim();',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -355,7 +357,8 @@ class AvoidShadowingRule extends SaropaLintRule {
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
       final String functionName = node.name.lexeme;
-      final _ShadowingChecker checker = _ShadowingChecker(reporter, code, <String>{functionName});
+      final _ShadowingChecker checker =
+          _ShadowingChecker(reporter, code, <String>{functionName});
 
       // Collect parameter names
       final FormalParameterList? params = node.functionExpression.parameters;
@@ -373,7 +376,8 @@ class AvoidShadowingRule extends SaropaLintRule {
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
       final String methodName = node.name.lexeme;
-      final _ShadowingChecker checker = _ShadowingChecker(reporter, code, <String>{methodName});
+      final _ShadowingChecker checker =
+          _ShadowingChecker(reporter, code, <String>{methodName});
 
       // Collect parameter names
       final FormalParameterList? params = node.parameters;
@@ -503,13 +507,15 @@ class PreferConstStringListRule extends SaropaLintRule {
         return; // Empty lists are handled by other rules
       }
 
-      final bool allStringLiterals = elements.every((CollectionElement element) {
+      final bool allStringLiterals =
+          elements.every((CollectionElement element) {
         if (element is SimpleStringLiteral) {
           return true;
         }
         if (element is AdjacentStrings) {
           // Adjacent string literals like 'hello' 'world'
-          return element.strings.every((StringLiteral s) => s is SimpleStringLiteral);
+          return element.strings
+              .every((StringLiteral s) => s is SimpleStringLiteral);
         }
         return false;
       });
@@ -574,7 +580,8 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_declaring_const_constructor',
-    problemMessage: '[prefer_declaring_const_constructor] Class could have a const constructor.',
+    problemMessage:
+        '[prefer_declaring_const_constructor] Class could have a const constructor.',
     correctionMessage: 'Add const keyword to constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -675,7 +682,8 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry
+        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final RepresentationDeclaration representation = node.representation;
       final Token fieldName = representation.fieldName;
 
@@ -732,8 +740,10 @@ class ProperSuperCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'proper_super_calls',
-    problemMessage: '[proper_super_calls] Super lifecycle method called in wrong order.',
-    correctionMessage: 'super.initState() should be first; super.dispose() should be last.',
+    problemMessage:
+        '[proper_super_calls] Super lifecycle method called in wrong order.',
+    correctionMessage:
+        'super.initState() should be first; super.dispose() should be last.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -771,7 +781,8 @@ class ProperSuperCallsRule extends SaropaLintRule {
           final Expression expr = stmt.expression;
           if (expr is MethodInvocation) {
             final Expression? target = expr.target;
-            if (target is SuperExpression && expr.methodName.name == methodName) {
+            if (target is SuperExpression &&
+                expr.methodName.name == methodName) {
               superCallIndex = i;
               break;
             }
@@ -823,8 +834,10 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unmarked_public_class',
-    problemMessage: '[avoid_unmarked_public_class] Public class lacks an explicit class modifier.',
-    correctionMessage: 'Add base, final, interface, or sealed modifier (Dart 3.0+).',
+    problemMessage:
+        '[avoid_unmarked_public_class] Public class lacks an explicit class modifier.',
+    correctionMessage:
+        'Add base, final, interface, or sealed modifier (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -888,7 +901,8 @@ class PreferFinalClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_final_class',
-    problemMessage: '[prefer_final_class] Consider marking this class as final.',
+    problemMessage:
+        '[prefer_final_class] Consider marking this class as final.',
     correctionMessage:
         'Add final modifier if this class is not designed for extension (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -926,7 +940,8 @@ class PreferFinalClassRule extends SaropaLintRule {
         if (member is ConstructorDeclaration) {
           hasAnyConstructor = true;
           final Token? nameToken = member.name;
-          final bool isPrivate = nameToken != null && nameToken.lexeme.startsWith('_');
+          final bool isPrivate =
+              nameToken != null && nameToken.lexeme.startsWith('_');
           if (!isPrivate && member.factoryKeyword == null) {
             hasPublicConstructor = true;
           }
@@ -1081,8 +1096,10 @@ class PreferBaseClassRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_base_class',
-    problemMessage: '[prefer_base_class] Abstract class with shared implementation could be base.',
-    correctionMessage: 'Use abstract base class to prevent direct implementation (Dart 3.0+).',
+    problemMessage:
+        '[prefer_base_class] Abstract class with shared implementation could be base.',
+    correctionMessage:
+        'Use abstract base class to prevent direct implementation (Dart 3.0+).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1126,7 +1143,8 @@ class PreferBaseClassRule extends SaropaLintRule {
           }
         } else if (member is ConstructorDeclaration) {
           // Having a constructor with initializers is concrete
-          if (member.initializers.isNotEmpty || member.body is! EmptyFunctionBody) {
+          if (member.initializers.isNotEmpty ||
+              member.body is! EmptyFunctionBody) {
             hasConcreteImplementation = true;
           }
         }

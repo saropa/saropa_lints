@@ -143,7 +143,8 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pdf_error_handling',
-    problemMessage: '[require_pdf_error_handling] PDF loading should have error handling.',
+    problemMessage:
+        '[require_pdf_error_handling] PDF loading should have error handling.',
     correctionMessage: 'Wrap PDF loading in try-catch block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -244,7 +245,8 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
     name: 'require_graphql_error_handling',
     problemMessage:
         '[require_graphql_error_handling] GraphQL result should check hasException before accessing data.',
-    correctionMessage: 'Add if (result.hasException) check before result.data access.',
+    correctionMessage:
+        'Add if (result.hasException) check before result.data access.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -448,7 +450,8 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
     name: 'require_sqflite_transaction',
     problemMessage:
         '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity.',
-    correctionMessage: 'Wrap writes in db.transaction() for better performance.',
+    correctionMessage:
+        'Wrap writes in db.transaction() for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -485,7 +488,8 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
         bool insideTransaction = false;
         AstNode? current = node.parent;
         while (current != null) {
-          if (current is MethodInvocation && current.methodName.name == 'transaction') {
+          if (current is MethodInvocation &&
+              current.methodName.name == 'transaction') {
             insideTransaction = true;
             break;
           }
@@ -505,7 +509,8 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource().toLowerCase();
-          if (targetSource.contains('db') || targetSource.contains('database')) {
+          if (targetSource.contains('db') ||
+              targetSource.contains('database')) {
             onWrite(node);
           }
         }
@@ -675,7 +680,8 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
     });
   }
 
-  void _visitStatements(AstNode node, void Function(MethodInvocation) callback) {
+  void _visitStatements(
+      AstNode node, void Function(MethodInvocation) callback) {
     if (node is MethodInvocation) {
       callback(node);
     }
@@ -720,7 +726,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
     name: 'require_sqflite_close',
     problemMessage:
         '[require_sqflite_close] Database opened but not closed. Resource leak possible.',
-    correctionMessage: 'Ensure db.close() is called, preferably in a finally block or dispose().',
+    correctionMessage:
+        'Ensure db.close() is called, preferably in a finally block or dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -738,7 +745,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
-            final String typeStr = member.fields.type?.toSource().toLowerCase() ?? '';
+            final String typeStr =
+                member.fields.type?.toSource().toLowerCase() ?? '';
             final String nameStr = variable.name.lexeme.toLowerCase();
 
             if (typeStr.contains('database') ||
@@ -823,7 +831,8 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
     name: 'avoid_sqflite_reserved_words',
     problemMessage:
         '[avoid_sqflite_reserved_words] SQL statement may contain SQLite reserved word as column name. Consequence: This can cause SQL errors, failed migrations, and data loss.',
-    correctionMessage: 'Escape reserved words with double quotes or rename the column.',
+    correctionMessage:
+        'Escape reserved words with double quotes or rename the column.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1070,7 +1079,8 @@ class RequireHiveInitializationRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for openBox variants
-      if (!methodName.startsWith('openBox') && !methodName.startsWith('openLazyBox')) {
+      if (!methodName.startsWith('openBox') &&
+          !methodName.startsWith('openLazyBox')) {
         return;
       }
 
@@ -1118,7 +1128,8 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_type_adapter',
-    problemMessage: '[require_hive_type_adapter] Hive cannot serialize this object without '
+    problemMessage:
+        '[require_hive_type_adapter] Hive cannot serialize this object without '
         '@HiveType annotation. Storing will throw a HiveError at runtime.',
     correctionMessage:
         'Add @HiveType(typeId: X) annotation and generate adapter with build_runner.',
@@ -1135,7 +1146,9 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for put/add operations
-      if (methodName != 'put' && methodName != 'add' && methodName != 'addAll') {
+      if (methodName != 'put' &&
+          methodName != 'add' &&
+          methodName != 'addAll') {
         return;
       }
 
@@ -1151,7 +1164,8 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       if (args.isEmpty) return;
 
       // Get the value argument (2nd for put, 1st for add)
-      final Expression valueArg = methodName == 'put' && args.length > 1 ? args[1] : args.first;
+      final Expression valueArg =
+          methodName == 'put' && args.length > 1 ? args[1] : args.first;
 
       // Check if value is a user-defined class instance
       final String? typeName = valueArg.staticType?.element?.name;
@@ -1294,9 +1308,11 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
-    problemMessage: '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
+    problemMessage:
+        '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
         'Anyone with device access can read sensitive user data.',
-    correctionMessage: 'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
+    correctionMessage:
+        'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1374,9 +1390,11 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_encryption_key_secure',
-    problemMessage: '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
+    problemMessage:
+        '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
         'Anyone decompiling the app can decrypt all stored user data.',
-    correctionMessage: 'Store encryption key in flutter_secure_storage, not in code.',
+    correctionMessage:
+        'Store encryption key in flutter_secure_storage, not in code.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1466,7 +1484,8 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
     name: 'avoid_sqflite_read_all_columns',
     problemMessage:
         '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth.',
-    correctionMessage: 'Specify only the columns you need: SELECT id, name, email FROM ...',
+    correctionMessage:
+        'Specify only the columns you need: SELECT id, name, email FROM ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1705,11 +1724,13 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
 
       // Check if we're inside a non-singleton context
       // Look for common singleton patterns: static field, getter, or factory
-      final FunctionBody? enclosingBody = node.thisOrAncestorOfType<FunctionBody>();
+      final FunctionBody? enclosingBody =
+          node.thisOrAncestorOfType<FunctionBody>();
       if (enclosingBody == null) return;
 
       // Check if enclosing function/method is a static getter or uses null-aware
-      final MethodDeclaration? method = enclosingBody.parent as MethodDeclaration?;
+      final MethodDeclaration? method =
+          enclosingBody.parent as MethodDeclaration?;
       if (method != null) {
         // If it's a getter returning cached value, it's likely a singleton
         if (method.isGetter) return;
