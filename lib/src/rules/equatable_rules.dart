@@ -1,7 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -83,7 +84,8 @@ class ExtendEquatableRule extends SaropaLintRule {
     name: 'require_extend_equatable',
     problemMessage:
         '[require_extend_equatable] Class overrides operator == but does not extend Equatable.',
-    correctionMessage: 'Consider extending Equatable for cleaner equality implementation.',
+    correctionMessage:
+        'Consider extending Equatable for cleaner equality implementation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -103,7 +105,9 @@ class ExtendEquatableRule extends SaropaLintRule {
       // Check if class overrides operator ==
       bool hasEqualsOverride = false;
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == '==' && member.isOperator) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == '==' &&
+            member.isOperator) {
           hasEqualsOverride = true;
           break;
         }
@@ -214,7 +218,9 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
       // Find props getter
       MethodDeclaration? propsGetter;
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'props' && member.isGetter) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'props' &&
+            member.isGetter) {
           propsGetter = member;
           break;
         }
@@ -345,7 +351,8 @@ class PreferEquatableMixinRule extends SaropaLintRule {
     name: 'prefer_equatable_mixin',
     problemMessage:
         '[prefer_equatable_mixin] Consider using EquatableMixin instead of extending Equatable.',
-    correctionMessage: 'EquatableMixin allows you to extend other classes while keeping '
+    correctionMessage:
+        'EquatableMixin allows you to extend other classes while keeping '
         'Equatable functionality. Change to: class X with EquatableMixin',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -483,7 +490,8 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
     name: 'prefer_equatable_stringify',
     problemMessage:
         '[prefer_equatable_stringify] Equatable class does not override stringify to true.',
-    correctionMessage: 'Add: @override bool get stringify => true; for better debugging.',
+    correctionMessage:
+        'Add: @override bool get stringify => true; for better debugging.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -500,7 +508,9 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
       // Check if class already overrides stringify
       bool hasStringifyOverride = false;
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'stringify' && member.isGetter) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'stringify' &&
+            member.isGetter) {
           hasStringifyOverride = true;
           break;
         }
@@ -531,7 +541,9 @@ class _AddStringifyOverrideFix extends DartFix {
       // Find props getter to insert after it
       MethodDeclaration? propsGetter;
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'props' && member.isGetter) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'props' &&
+            member.isGetter) {
           propsGetter = member;
           break;
         }
@@ -599,7 +611,8 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
     name: 'prefer_immutable_annotation',
     problemMessage:
         '[prefer_immutable_annotation] Equatable class is not annotated with @immutable.',
-    correctionMessage: 'Add @immutable annotation to document immutability intent.',
+    correctionMessage:
+        'Add @immutable annotation to document immutability intent.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -705,7 +718,8 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
     name: 'require_freezed_explicit_json',
     problemMessage:
         '[require_freezed_explicit_json] Freezed class with nested objects may need explicit_to_json in build.yaml.',
-    correctionMessage: 'Add explicit_to_json: true to build.yaml under json_serializable options.',
+    correctionMessage:
+        'Add explicit_to_json: true to build.yaml under json_serializable options.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -979,7 +993,8 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
     name: 'prefer_record_over_equatable',
     problemMessage:
         '[prefer_record_over_equatable] Simple Equatable class could be replaced with a Dart 3 record.',
-    correctionMessage: 'Consider using a record type: typedef ClassName = ({Type field, ...});',
+    correctionMessage:
+        'Consider using a record type: typedef ClassName = ({Type field, ...});',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1119,7 +1134,8 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
           // Check if fields are final
           if (!member.fields.isFinal && !member.fields.isConst) {
             // Report each non-final field
-            for (final VariableDeclaration variable in member.fields.variables) {
+            for (final VariableDeclaration variable
+                in member.fields.variables) {
               reporter.atNode(variable, code);
             }
           }
@@ -1173,7 +1189,8 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_equatable_copy_with',
-    problemMessage: '[require_equatable_copy_with] Equatable class should have a copyWith method.',
+    problemMessage:
+        '[require_equatable_copy_with] Equatable class should have a copyWith method.',
     correctionMessage: 'Add copyWith method to easily create modified copies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1244,7 +1261,8 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
     name: 'require_copy_with_null_handling',
     problemMessage:
         '[require_copy_with_null_handling] copyWith with ?? operator cannot set nullable fields to null.',
-    correctionMessage: 'Use a wrapper type like Optional<T> or generated copyWith from freezed.',
+    correctionMessage:
+        'Use a wrapper type like Optional<T> or generated copyWith from freezed.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1284,7 +1302,9 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
         }
 
         // Check if type is nullable (ends with ?)
-        if (paramName != null && typeSource != null && typeSource.endsWith('?')) {
+        if (paramName != null &&
+            typeSource != null &&
+            typeSource.endsWith('?')) {
           nullableParams.add(paramName);
         }
       }
@@ -1295,7 +1315,8 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
       final String bodySource = body.toSource();
       for (final String paramName in nullableParams) {
         // Pattern: paramName ?? this.paramName
-        if (bodySource.contains('$paramName ??') || bodySource.contains('$paramName??')) {
+        if (bodySource.contains('$paramName ??') ||
+            bodySource.contains('$paramName??')) {
           reporter.atNode(node, code);
           return;
         }
@@ -1387,7 +1408,9 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
 
       // Find props getter
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'props' && member.isGetter) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'props' &&
+            member.isGetter) {
           final String propsSource = member.toSource();
 
           // Check if collections are used without DeepCollectionEquality
@@ -1444,7 +1467,8 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
     name: 'avoid_equatable_datetime',
     problemMessage:
         '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks.',
-    correctionMessage: 'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead.',
+    correctionMessage:
+        'Use timestamp.millisecondsSinceEpoch or toIso8601String() instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1482,7 +1506,9 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
 
       // Find props getter
       for (final ClassMember member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'props' && member.isGetter) {
+        if (member is MethodDeclaration &&
+            member.name.lexeme == 'props' &&
+            member.isGetter) {
           final String propsSource = member.toSource();
 
           // Check if DateTime fields are used directly
@@ -1541,7 +1567,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
     name: 'prefer_unmodifiable_collections',
     problemMessage:
         '[prefer_unmodifiable_collections] Collection field may be mutated externally. Consider making unmodifiable.',
-    correctionMessage: 'Use List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView().',
+    correctionMessage:
+        'Use List.unmodifiable(), Map.unmodifiable(), or UnmodifiableSetView().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1588,7 +1615,8 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
             for (final ClassMember constructor in node.members) {
               if (constructor is ConstructorDeclaration) {
-                final String? initSource = constructor.initializers.map((e) => e.toSource()).join();
+                final String? initSource =
+                    constructor.initializers.map((e) => e.toSource()).join();
                 if (initSource != null &&
                     (initSource.contains('List.unmodifiable') ||
                         initSource.contains('Map.unmodifiable') ||

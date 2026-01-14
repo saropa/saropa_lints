@@ -1,4 +1,3 @@
-
 /// Tier-based rule configuration for saropa_lints.
 ///
 /// Each tier builds on the previous one:
@@ -1755,13 +1754,22 @@ Set<String> getRulesForTier(String tier) {
       return essentialRules.union(recommendedOnlyRules);
     case 'professional':
       // professional = recommended + professionalOnly
-      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules);
+      return essentialRules
+          .union(recommendedOnlyRules)
+          .union(professionalOnlyRules);
     case 'comprehensive':
       // comprehensive = professional + comprehensiveOnly
-      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules).union(comprehensiveOnlyRules);
+      return essentialRules
+          .union(recommendedOnlyRules)
+          .union(professionalOnlyRules)
+          .union(comprehensiveOnlyRules);
     case 'insanity':
       // insanity = all rules
-      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules).union(comprehensiveOnlyRules).union(insanityOnlyRules);
+      return essentialRules
+          .union(recommendedOnlyRules)
+          .union(professionalOnlyRules)
+          .union(comprehensiveOnlyRules)
+          .union(insanityOnlyRules);
     default:
       // fallback to essential
       return essentialRules;

@@ -9,7 +9,8 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../import_utils.dart';
@@ -61,7 +62,8 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
     name: 'require_unknown_route_handler',
     problemMessage:
         '[require_unknown_route_handler] App has routes but no onUnknownRoute. Unknown routes will crash.',
-    correctionMessage: 'Add onUnknownRoute to handle undefined routes gracefully.',
+    correctionMessage:
+        'Add onUnknownRoute to handle undefined routes gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -75,7 +77,8 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'MaterialApp' && constructorName != 'CupertinoApp') {
+      if (constructorName != 'MaterialApp' &&
+          constructorName != 'CupertinoApp') {
         return;
       }
 
@@ -141,7 +144,8 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_after_navigation',
-    problemMessage: '[avoid_context_after_navigation] Context used after navigation may '
+    problemMessage:
+        '[avoid_context_after_navigation] Context used after navigation may '
         'reference disposed widget, throwing FlutterError.',
     correctionMessage: 'Add "if (!mounted) return;" before using context.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -157,7 +161,8 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
       if (!node.body.isAsynchronous) return;
 
       // Check if in a State class
-      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
 
       final ExtendsClause? extendsClause = classDecl.extendsClause;
@@ -227,7 +232,8 @@ class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource();
-          if (targetSource == 'context' || targetSource.contains('.of(context')) {
+          if (targetSource == 'context' ||
+              targetSource.contains('.of(context')) {
             reporter.atNode(node, code);
           }
         }
@@ -616,7 +622,8 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
               }
             } else if (body is BlockFunctionBody) {
               // Must have a return null somewhere
-              if (!bodySource.contains('return null') && !bodySource.contains('return;')) {
+              if (!bodySource.contains('return null') &&
+                  !bodySource.contains('return;')) {
                 reporter.atNode(arg.expression, code);
               }
             }
@@ -659,7 +666,8 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
     name: 'avoid_pop_without_result',
     problemMessage:
         '[avoid_pop_without_result] Navigator.push result may be null. Handle the case when user presses back.',
-    correctionMessage: 'Check if result is null before using it, or use type-safe routing.',
+    correctionMessage:
+        'Check if result is null before using it, or use type-safe routing.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -779,7 +787,8 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Track routes with bottomNavigationBar/drawer
-    final List<InstanceCreationExpression> routesWithPersistentUi = <InstanceCreationExpression>[];
+    final List<InstanceCreationExpression> routesWithPersistentUi =
+        <InstanceCreationExpression>[];
 
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
@@ -853,7 +862,8 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
     name: 'require_deep_link_fallback',
     problemMessage:
         '[require_deep_link_fallback] Deep link handler should handle missing/invalid content.',
-    correctionMessage: 'Add fallback for when linked content is not found or unavailable.',
+    correctionMessage:
+        'Add fallback for when linked content is not found or unavailable.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -925,9 +935,11 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_deep_link_sensitive_params',
-    problemMessage: '[avoid_deep_link_sensitive_params] Deep links appear in logs, browser '
+    problemMessage:
+        '[avoid_deep_link_sensitive_params] Deep links appear in logs, browser '
         'history, and referrer headers. Sensitive data will be exposed.',
-    correctionMessage: 'Do not pass passwords, tokens, or secrets via deep link.',
+    correctionMessage:
+        'Do not pass passwords, tokens, or secrets via deep link.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -959,7 +971,8 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
       if (target == null) return;
       final String targetSource = target.toSource();
 
-      if (!targetSource.contains('queryParameters') && !targetSource.contains('pathSegments')) {
+      if (!targetSource.contains('queryParameters') &&
+          !targetSource.contains('pathSegments')) {
         return;
       }
 
@@ -1011,8 +1024,10 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_typed_route_params',
-    problemMessage: '[prefer_typed_route_params] Route parameter used without type conversion.',
-    correctionMessage: 'Use int.tryParse/double.tryParse for numeric parameters.',
+    problemMessage:
+        '[prefer_typed_route_params] Route parameter used without type conversion.',
+    correctionMessage:
+        'Use int.tryParse/double.tryParse for numeric parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1027,7 +1042,8 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
       if (target == null) return;
       final String targetSource = target.toSource();
 
-      if (!targetSource.contains('pathParameters') && !targetSource.contains('queryParameters')) {
+      if (!targetSource.contains('pathParameters') &&
+          !targetSource.contains('queryParameters')) {
         return;
       }
 
@@ -1192,17 +1208,19 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check for multi-step patterns
-      final bool hasMultipleSteps = RegExp(r'step\s*==\s*\d').allMatches(bodySource).length >= 3;
+      final bool hasMultipleSteps =
+          RegExp(r'step\s*==\s*\d').allMatches(bodySource).length >= 3;
 
       if (!hasMultipleSteps) return;
 
       // Check for progress indicator
-      final bool hasProgressIndicator = bodySource.contains('ProgressIndicator') ||
-          bodySource.contains('Stepper') ||
-          bodySource.contains('Step ') ||
-          bodySource.contains('of \$') ||
-          bodySource.contains('totalSteps') ||
-          bodySource.contains('stepCount');
+      final bool hasProgressIndicator =
+          bodySource.contains('ProgressIndicator') ||
+              bodySource.contains('Stepper') ||
+              bodySource.contains('Step ') ||
+              bodySource.contains('of \$') ||
+              bodySource.contains('totalSteps') ||
+              bodySource.contains('stepCount');
 
       if (!hasProgressIndicator) {
         reporter.atToken(node.name, code);
@@ -1249,7 +1267,8 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
     name: 'avoid_go_router_inline_creation',
     problemMessage:
         '[avoid_go_router_inline_creation] GoRouter created in build(). Causes hot reload issues.',
-    correctionMessage: 'Create GoRouter as a field or in initState(), not in build().',
+    correctionMessage:
+        'Create GoRouter as a field or in initState(), not in build().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1382,7 +1401,8 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
     name: 'require_go_router_refresh_listenable',
     problemMessage:
         '[require_go_router_refresh_listenable] GoRouter with redirect but no refreshListenable. Auth changes won\'t refresh routes.',
-    correctionMessage: 'Add refreshListenable parameter to update routes on auth changes.',
+    correctionMessage:
+        'Add refreshListenable parameter to update routes on auth changes.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1448,7 +1468,8 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
     name: 'avoid_go_router_string_paths',
     problemMessage:
         '[avoid_go_router_string_paths] String literal in navigation. Use typed routes for type safety.',
-    correctionMessage: 'Consider using go_router_builder for type-safe navigation.',
+    correctionMessage:
+        'Consider using go_router_builder for type-safe navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1547,7 +1568,8 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
     name: 'prefer_go_router_redirect_auth',
     problemMessage:
         '[prefer_go_router_redirect_auth] Auth check in page builder. Use redirect callback instead.',
-    correctionMessage: 'Move authentication logic to GoRouter\'s redirect parameter.',
+    correctionMessage:
+        'Move authentication logic to GoRouter\'s redirect parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1557,7 +1579,8 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (typeName != 'GoRoute') return;
 
@@ -1629,7 +1652,8 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
     name: 'require_go_router_typed_params',
     problemMessage:
         '[require_go_router_typed_params] Path parameter used without type conversion. May cause runtime errors.',
-    correctionMessage: 'Use int.tryParse(), double.tryParse(), or other type conversion.',
+    correctionMessage:
+        'Use int.tryParse(), double.tryParse(), or other type conversion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1734,7 +1758,8 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
     name: 'prefer_go_router_extra_typed',
     problemMessage:
         '[prefer_go_router_extra_typed] go_router extra parameter should use a typed class instead of Map or dynamic.',
-    correctionMessage: 'Create a typed class for extra parameters to ensure type safety.',
+    correctionMessage:
+        'Create a typed class for extra parameters to ensure type safety.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2006,7 +2031,8 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
     name: 'prefer_url_launcher_uri_over_string',
     problemMessage:
         '[prefer_url_launcher_uri_over_string] launchUrl with Uri.parse. Prefer constructing Uri directly.',
-    correctionMessage: 'Use Uri.https() or Uri.http() for compile-time validation.',
+    correctionMessage:
+        'Use Uri.https() or Uri.http() for compile-time validation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2071,7 +2097,8 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
     name: 'avoid_go_router_push_replacement_confusion',
     problemMessage:
         '[avoid_go_router_push_replacement_confusion] Using go() replaces the navigation stack. Did you mean push()?',
-    correctionMessage: 'Use push() to add to stack (back button works), go() to replace.',
+    correctionMessage:
+        'Use push() to add to stack (back button works), go() to replace.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2208,7 +2235,8 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
         if (urlArg is StringInterpolation) {
           // Check if interpolation uses encodeComponent
           final String source = urlArg.toSource();
-          if (!source.contains('encodeComponent') && !source.contains('encodeQueryComponent')) {
+          if (!source.contains('encodeComponent') &&
+              !source.contains('encodeQueryComponent')) {
             reporter.atNode(urlArg, code);
           }
         }
@@ -2337,7 +2365,8 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
       final String path = pathArg.value;
 
       // Count path segments
-      final List<String> segments = path.split('/').where((s) => s.isNotEmpty).toList();
+      final List<String> segments =
+          path.split('/').where((s) => s.isNotEmpty).toList();
 
       // Warn if navigating to path with 3+ segments (deeply nested)
       if (segments.length >= 3) {
@@ -2386,7 +2415,8 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
     name: 'prefer_shell_route_shared_layout',
     problemMessage:
         '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code.',
-    correctionMessage: 'Consider using ShellRoute for shared AppBar/BottomNav layouts.',
+    correctionMessage:
+        'Consider using ShellRoute for shared AppBar/BottomNav layouts.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2461,7 +2491,8 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
     name: 'require_stateful_shell_route_tabs',
     problemMessage:
         '[require_stateful_shell_route_tabs] ShellRoute with tab-like navigation may lose state on tab switch.',
-    correctionMessage: 'Use StatefulShellRoute.indexedStack for preserving tab state.',
+    correctionMessage:
+        'Use StatefulShellRoute.indexedStack for preserving tab state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
