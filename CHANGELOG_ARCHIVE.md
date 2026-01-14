@@ -43,7 +43,6 @@ Archived releases 0.1.0 through 2.7.0. See [CHANGELOG.md](./CHANGELOG.md) for th
 
 **Control Flow & Async Rules (14 rules)** - `stylistic_control_flow_rules.dart`
 - **`prefer_early_return`**: Prefer early return over nested if-else. (INFO)
-- **`prefer_single_exit_point`**: Opposite - prefer structured single exit. (INFO)
 - **`prefer_switch_expression`**: Prefer switch expressions over statements. (INFO)
 - **`prefer_switch_statement_over_expression`**: Opposite - prefer statements. (INFO)
 - **`prefer_pattern_matching`**: Prefer pattern matching over manual type checks. (INFO)

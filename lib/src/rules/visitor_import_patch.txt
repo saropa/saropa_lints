@@ -1,0 +1,8 @@
+You must import 'package:analyzer/dart/ast/visitor.dart'; for RecursiveAstVisitor.
+Also, the correct usage is:
+- Remove the @override annotation from visitSimpleIdentifier in _UsageVisitor.
+- Use resolver.parsedUnit (not context or CustomLintResolver).
+- Ensure RecursiveAstVisitor is available from the import.
+- Remove super.visitSimpleIdentifier(node); if not extending a class with that method.
+- If extending RecursiveAstVisitor, ensure the import is present and the analyzer version supports it.
+- If resolver.parsedUnit is not available, use resolver.result.unit.

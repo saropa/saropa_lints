@@ -650,8 +650,9 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_async_writes',
     problemMessage:
-        '[prefer_isar_async_writes] Avoid writeTxnSync in build methods - it blocks the UI thread.',
-    correctionMessage: 'Use writeTxn (async) instead of writeTxnSync.',
+        '[prefer_isar_async_writes] Using writeTxnSync in build methods will block the UI thread, causing your app to freeze, stutter, or become unresponsive. This leads to poor user experience and can trigger platform watchdogs to kill your app.',
+    correctionMessage:
+        'Always use writeTxn (async) instead of writeTxnSync in build methods or UI code. Refactor any synchronous database writes to be asynchronous to keep your app responsive.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -795,8 +796,9 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_batch_operations',
     problemMessage:
-        '[prefer_isar_batch_operations] Use putAll() instead of put() in loops - batch operations are ~100x faster.',
-    correctionMessage: 'Collect items and use putAll() instead of individual put() calls.',
+        '[prefer_isar_batch_operations] Using put() in a loop for many records is extremely slow: each call triggers a separate database write. This can make your app hang or take minutes to save data. Batch operations like putAll() are up to 100x faster and prevent UI freezes.',
+    correctionMessage:
+        'Collect items into a list and use putAll() for batch writes instead of calling put() repeatedly. Refactor loops to use batch operations for better performance and user experience.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -853,8 +855,9 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_float_equality_queries',
     problemMessage:
-        '[avoid_isar_float_equality_queries] Float equality queries are imprecise. Use between() instead.',
-    correctionMessage: 'Use .between(value - epsilon, value + epsilon) for float comparisons.',
+        '[avoid_isar_float_equality_queries] Querying floats for exact equality is unreliable: due to rounding errors, you may miss matching records or get inconsistent results. This can break features that depend on accurate data retrieval.',
+    correctionMessage:
+        'Use .between(value - epsilon, value + epsilon) for float comparisons to ensure all relevant records are found and avoid subtle bugs.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -911,8 +914,9 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isar_inspector_debug_only',
     problemMessage:
-        '[require_isar_inspector_debug_only] Isar Inspector should only be enabled in debug mode.',
-    correctionMessage: 'Use inspector: kDebugMode instead of inspector: true.',
+        '[require_isar_inspector_debug_only] Enabling Isar Inspector in production exposes internal database details and can create security risks or performance issues. Inspector should only be enabled in debug mode to protect user data and app integrity.',
+    correctionMessage:
+        'Set inspector: kDebugMode to ensure Inspector is only active during development. Never use inspector: true in production builds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1117,8 +1121,9 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_query_stream',
     problemMessage:
-        '[prefer_isar_query_stream] Use Isar watch() instead of Timer-based polling for reactive queries.',
-    correctionMessage: 'Replace Timer.periodic with collection.where().watch().listen().',
+        '[prefer_isar_query_stream] Using Timer.periodic or manual polling for reactive queries is inefficient and can drain battery, waste CPU, and miss real-time updates. Isar watch() streams are event-driven and update instantly when data changes.',
+    correctionMessage:
+        'Replace Timer.periodic polling with collection.where().watch().listen() to get instant, efficient updates and avoid unnecessary resource usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1179,8 +1184,9 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_web_limitations',
     problemMessage:
-        '[avoid_isar_web_limitations] Isar sync APIs do not work on web. Use async methods.',
-    correctionMessage: 'Replace Sync methods with async equivalents for web compatibility.',
+        '[avoid_isar_web_limitations] Isar sync APIs (e.g., putSync, getSync) will throw runtime errors or silently fail on web platforms. This can break your app for web users and cause data loss or missing features.',
+    correctionMessage:
+        'Replace all sync methods with async equivalents (e.g., put, get) to ensure your app works reliably on web and avoids runtime failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1247,8 +1253,9 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_index_for_queries',
     problemMessage:
-        '[prefer_isar_index_for_queries] Consider adding @Index to frequently queried fields for better performance.',
-    correctionMessage: 'Add @Index() annotation to the field being queried.',
+        '[prefer_isar_index_for_queries] Querying fields without an @Index annotation forces Isar to scan the entire collection, resulting in slow queries and poor performance as your data grows. Indexed fields enable fast lookups and scalable apps.',
+    correctionMessage:
+        'Add @Index() annotation to any field you query frequently to ensure fast, indexed lookups and avoid performance bottlenecks.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1316,8 +1323,9 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_embedded_large_objects',
     problemMessage:
-        '[avoid_isar_embedded_large_objects] @embedded objects are duplicated in every record. Use IsarLink for large/shared objects.',
-    correctionMessage: 'Consider using IsarLink<T> instead of @embedded for large objects.',
+        '[avoid_isar_embedded_large_objects] Using @embedded for large objects will duplicate the data in every record, causing excessive storage use and slow queries. For shared or large objects, this can make your database unmanageable.',
+    correctionMessage:
+        'Use IsarLink<T> instead of @embedded for large or shared objects to avoid duplication and keep your database efficient.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1382,8 +1390,9 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_lazy_links',
     problemMessage:
-        '[prefer_isar_lazy_links] Consider using IsarLinks.lazy() for large linked collections.',
-    correctionMessage: 'Replace IsarLinks<T>() with IsarLinks<T>.lazy() for better performance.',
+        '[prefer_isar_lazy_links] Using IsarLinks<T>() for large linked collections loads all linked records at once, which can slow down your app and waste memory. IsarLinks.lazy() loads records on demand for better performance.',
+    correctionMessage:
+        'Replace IsarLinks<T>() with IsarLinks<T>.lazy() for large or frequently accessed collections to keep your app fast and efficient.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1580,9 +1589,9 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_isar_composite_index',
     problemMessage:
-        '[prefer_isar_composite_index] Querying multiple fields together without a composite index forces Isar to scan the entire collection, resulting in slow queries and poor performance as your data grows.',
+        '[prefer_isar_composite_index] Querying multiple fields together without a composite index will force Isar to scan every record, making queries slow and unscalable as your data grows. Composite indexes enable fast, efficient lookups for multi-field queries.',
     correctionMessage:
-        'Add @Index(composite: [...]) for any field combinations you frequently query together to ensure fast, indexed lookups.',
+        'Add @Index(composite: [...]) for any field combinations you frequently query together to ensure fast, indexed lookups and scalable performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1645,9 +1654,9 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_isar_string_contains_without_index',
     problemMessage:
-        '[avoid_isar_string_contains_without_index] Using contains or matches queries on string fields without a full-text index will trigger a full table scan. This can make queries extremely slow and degrade app performance, especially as your data grows.',
+        '[avoid_isar_string_contains_without_index] Running contains or matches queries on string fields without a full-text index will force Isar to scan every record, making queries extremely slow and potentially freezing your app as data grows.',
     correctionMessage:
-        'Add @Index(type: IndexType.value) to the field being searched to enable fast, indexed text queries and avoid performance bottlenecks.',
+        'Add @Index(type: IndexType.value) to the field being searched to enable fast, indexed text queries and prevent performance bottlenecks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1731,15 +1740,21 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
 /// ```
 
 class AvoidCachedIsarStreamRule extends SaropaLintRule {
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
   /// Prevents caching of Isar query streams (must be created inline).
   const AvoidCachedIsarStreamRule() : super(code: _code);
 
   static const LintCode _code = LintCode(
     name: 'avoid_cached_isar_stream',
     problemMessage:
-        '[avoid_cached_isar_stream] Isar/single-subscription streams must be created inline. Caching or reusing them causes runtime errors.',
+        '[avoid_cached_isar_stream] Caching or storing Isar/single-subscription streams in variables or fields will cause runtime errors: these streams can only be listened to once and must be created inline each time. If you cache them, your app will throw a StateError or fail to update as expected.',
     correctionMessage:
-        'Create Isar streams inline in StreamBuilder or listeners. Do not store in variables or fields.',
+        'Always create Isar streams directly inside StreamBuilder, listeners, or widgets that consume them. Do NOT assign Isar streams to variables, fields, or properties. Refactor any code that stores an Isar stream so it is created inline at the point of use.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

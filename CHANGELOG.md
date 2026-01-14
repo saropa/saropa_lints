@@ -1,25 +1,3 @@
-#
-# 4.1.3 - 2026-01-13
-
-### Added
-- **New Rule:** `avoid_cached_isar_stream` ([lib/src/rules/isar_rules.dart])
-  - Detects and prevents caching of Isar query streams (must be created inline).
-  - **Tier:** Professional
-  - **Quick Fix:** Inlines offending Isar stream expressions at usage sites and removes the cached variable.
-  - **Example:** [example/lib/isar/avoid_cached_isar_stream_fixture.dart]
-
-### Changed
-- **analysis_options_template.yaml:** Rule now available for override in the template.
-- **tiers.dart:** Rule assigned to professional tier.
-
-### Docs
-- **isar_rules.dart:** Added verbose doc header and developer comments for the rule.
-- **README.md:** Updated rule count, quick fix count, and Isar section.
-- **doc/guides/using_with_isar.md:** Documented new rule, rationale, and usage.
-- **ROADMAP.md:** Rule removed (now implemented).
-
-### Version
-- Patch release (not breaking)
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -29,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
 
-## [4.1.2] - 2026-01-13
+## [4.1.1] - 2026-01-13
+
+### Added
+- **New Rule:** `avoid_cached_isar_stream` ([lib/src/rules/isar_rules.dart])
+  - Detects and prevents caching of Isar query streams (must be created inline).
+  - **Tier:** Professional
+  - **Quick Fix:** Inlines offending Isar stream expressions at usage sites and removes the cached variable.
+  - **Example:** [example/lib/isar/avoid_cached_isar_stream_fixture.dart]
 
 ### Tier Assignment for Previously Unassigned Rules
 
