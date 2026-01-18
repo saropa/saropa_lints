@@ -1,5 +1,36 @@
 // ignore_for_file: always_specify_types
 
+import 'dart:io';
+import 'dart:isolate';
+import 'dart:typed_data';
+
+// =============================================================================
+// PATH UTILITIES
+// =============================================================================
+//
+// IMPORTANT: Always use [normalizePath] when using file paths as map keys!
+// Windows provides paths with backslashes (d:\src\file.dart) but disk caches
+// may store forward slashes (d:/src/file.dart). Without normalization, map
+// lookups fail silently on Windows.
+//
+// See: SAROPA_LINTS_INVESTIGATION.md Issue 6
+// =============================================================================
+
+/// Normalizes a file path for use as a map key.
+///
+/// Converts backslashes to forward slashes for cross-platform consistency.
+/// ALWAYS use this when storing or looking up file paths in maps/caches.
+///
+/// Example:
+/// ```dart
+/// // BAD - will fail on Windows:
+/// _cache[filePath] = value;
+///
+/// // GOOD - works everywhere:
+/// _cache[normalizePath(filePath)] = value;
+/// ```
+String normalizePath(String path) => path.replaceAll('\\', '/');
+
 // =============================================================================
 // PROJECT CONTEXT CACHE (Performance Optimization)
 // =============================================================================
@@ -15,10 +46,6 @@
 //
 // Impact: Reduces redundant file operations across 1400+ rules.
 // =============================================================================
-
-import 'dart:io';
-import 'dart:isolate';
-import 'dart:typed_data';
 
 // =============================================================================
 // BLOOM FILTER (Performance Optimization)
@@ -288,7 +315,7 @@ class ProjectContext {
   /// Walks up the directory tree from [filePath] looking for pubspec.yaml.
   /// Returns `null` if no project root is found.
   static String? findProjectRoot(String filePath) {
-    final normalized = filePath.replaceAll('\\', '/');
+    final normalized = normalizePath(filePath);
     var dir = Directory(normalized).parent;
 
     // Walk up the directory tree looking for pubspec.yaml
@@ -387,13 +414,14 @@ class FileContentCache {
   /// Returns `true` if the file is new or has changed.
   /// Returns `false` if the file content is identical to the cached version.
   static bool hasChanged(String filePath, String content) {
+    final normalizedPath = normalizePath(filePath);
     final newHash = content.hashCode;
-    final oldHash = _contentHashes[filePath];
+    final oldHash = _contentHashes[normalizedPath];
 
     if (oldHash == null || oldHash != newHash) {
       // File is new or changed - update cache and clear passed rules
-      _contentHashes[filePath] = newHash;
-      _passedRules.remove(filePath);
+      _contentHashes[normalizedPath] = newHash;
+      _passedRules.remove(normalizedPath);
       return true;
     }
 
@@ -404,20 +432,23 @@ class FileContentCache {
   ///
   /// Call this after a rule completes with no violations.
   static void recordRulePassed(String filePath, String ruleName) {
-    _passedRules.putIfAbsent(filePath, () => {}).add(ruleName);
+    final normalizedPath = normalizePath(filePath);
+    _passedRules.putIfAbsent(normalizedPath, () => {}).add(ruleName);
   }
 
   /// Check if a rule previously passed on an unchanged file.
   ///
   /// Returns `true` if the file is unchanged AND the rule passed before.
   static bool rulePreviouslyPassed(String filePath, String ruleName) {
-    return _passedRules[filePath]?.contains(ruleName) ?? false;
+    final normalizedPath = normalizePath(filePath);
+    return _passedRules[normalizedPath]?.contains(ruleName) ?? false;
   }
 
   /// Clear cache for a specific file.
   static void invalidate(String filePath) {
-    _contentHashes.remove(filePath);
-    _passedRules.remove(filePath);
+    final normalizedPath = normalizePath(filePath);
+    _contentHashes.remove(normalizedPath);
+    _passedRules.remove(normalizedPath);
   }
 
   /// Clear all cached data (useful for testing).
@@ -471,13 +502,14 @@ class FileTypeDetector {
   /// Returns a set of applicable file types (a file can be multiple types).
   /// Results are cached per file path.
   static Set<FileType> detect(String filePath, String content) {
+    final normalizedPath = normalizePath(filePath);
+
     // Check cache first
-    if (_cache.containsKey(filePath)) {
-      return _cache[filePath]!;
+    if (_cache.containsKey(normalizedPath)) {
+      return _cache[normalizedPath]!;
     }
 
     final types = <FileType>{};
-    final normalizedPath = filePath.replaceAll('\\', '/');
 
     // Path-based detection (fast)
     if (normalizedPath.endsWith('_test.dart') ||
@@ -514,7 +546,7 @@ class FileTypeDetector {
       types.add(FileType.general);
     }
 
-    _cache[filePath] = types;
+    _cache[normalizedPath] = types;
     return types;
   }
 
@@ -779,7 +811,8 @@ class FileMetricsCache {
 
   /// Get metrics for a file, computing if not cached.
   static FileMetrics get(String filePath, String content) {
-    return _cache.putIfAbsent(filePath, () => _compute(content));
+    final normalizedPath = normalizePath(filePath);
+    return _cache.putIfAbsent(normalizedPath, () => _compute(content));
   }
 
   /// Compute metrics from content (fast regex-based, not AST).
@@ -833,7 +866,8 @@ class FileMetricsCache {
 
   /// Invalidate cache for a file.
   static void invalidate(String filePath) {
-    _cache.remove(filePath);
+    final normalizedPath = normalizePath(filePath);
+    _cache.remove(normalizedPath);
   }
 
   /// Clear all cached metrics.
@@ -978,14 +1012,16 @@ class IncrementalAnalysisTracker {
   /// - The file's content hash matches the cached hash
   /// - The rule previously passed on this file
   static bool canSkipRule(String filePath, String content, String ruleName) {
-    final state = _state[filePath];
+    // Normalize path separators for cross-platform consistency
+    final normalizedPath = normalizePath(filePath);
+    final state = _state[normalizedPath];
     if (state == null) return false;
 
     // Check if file changed
     final currentHash = content.hashCode;
     if (state.contentHash != currentHash) {
       // File changed - invalidate
-      _state.remove(filePath);
+      _state.remove(normalizedPath);
       _isDirty = true;
       return false;
     }
@@ -999,9 +1035,11 @@ class IncrementalAnalysisTracker {
     String content,
     String ruleName,
   ) {
+    // Normalize path separators for cross-platform consistency
+    final normalizedPath = normalizePath(filePath);
     final hash = content.hashCode;
     final state = _state.putIfAbsent(
-      filePath,
+      normalizedPath,
       () => _FileAnalysisState(contentHash: hash),
     );
 
@@ -1025,7 +1063,8 @@ class IncrementalAnalysisTracker {
 
   /// Check if a file is completely clean (all rules passed).
   static bool isFileClean(String filePath, int totalRuleCount) {
-    final state = _state[filePath];
+    final normalizedPath = normalizePath(filePath);
+    final state = _state[normalizedPath];
     return state != null && state.passedRules.length >= totalRuleCount;
   }
 
@@ -1426,7 +1465,8 @@ class ContentRegionIndex {
 
   /// Get indexed regions for a file.
   static ContentRegions get(String filePath, String content) {
-    return _cache.putIfAbsent(filePath, () => _index(content));
+    final normalizedPath = normalizePath(filePath);
+    return _cache.putIfAbsent(normalizedPath, () => _index(content));
   }
 
   static ContentRegions _index(String content) {
@@ -2395,7 +2435,7 @@ class ParallelAnalyzer {
   /// Detect file types.
   static Set<FileType> _detectFileTypes(String filePath, String content) {
     final types = <FileType>{};
-    final normalizedPath = filePath.replaceAll('\\', '/');
+    final normalizedPath = normalizePath(filePath);
 
     // Path-based detection
     if (normalizedPath.endsWith('_test.dart') ||
@@ -2567,7 +2607,9 @@ class RuleBatchExecutor {
         }
       }
 
-      _fileToApplicableRules[analysis.filePath] = applicableRules;
+      // Normalize path separators for cross-platform consistency
+      final normalizedPath = normalizePath(analysis.filePath);
+      _fileToApplicableRules[normalizedPath] = applicableRules;
     }
 
     return Map.unmodifiable(_fileToApplicableRules);
@@ -2577,14 +2619,16 @@ class RuleBatchExecutor {
   ///
   /// Uses pre-computed plan from [planExecution].
   static bool shouldRuleRunOnFile(String ruleName, String filePath) {
-    final rules = _fileToApplicableRules[filePath];
+    final normalizedPath = normalizePath(filePath);
+    final rules = _fileToApplicableRules[normalizedPath];
     if (rules == null) return true; // No plan = run all rules
     return rules.contains(ruleName);
   }
 
   /// Get rules that should run on a file.
   static Set<String> getApplicableRules(String filePath) {
-    return _fileToApplicableRules[filePath] ?? {};
+    final normalizedPath = normalizePath(filePath);
+    return _fileToApplicableRules[normalizedPath] ?? {};
   }
 
   /// Get files that a rule should run on.
@@ -2756,8 +2800,9 @@ class BaselineAwareEarlyExit {
 
   /// Record that a violation is baselined.
   static void recordBaselinedViolation(String filePath, String ruleName) {
+    final normalizedPath = normalizePath(filePath);
     _baselinedViolationCounts
-        .putIfAbsent(filePath, () => {})
+        .putIfAbsent(normalizedPath, () => {})
         .update(ruleName, (c) => c + 1, ifAbsent: () => 1);
   }
 
@@ -2766,25 +2811,29 @@ class BaselineAwareEarlyExit {
   /// Call this when you determine that ALL violations of a rule in a file
   /// are covered by baseline (e.g., path-based baseline covers entire file).
   static void markFullyBaselined(String filePath, String ruleName) {
-    _fullyBaselinedRules.putIfAbsent(filePath, () => {}).add(ruleName);
+    final normalizedPath = normalizePath(filePath);
+    _fullyBaselinedRules.putIfAbsent(normalizedPath, () => {}).add(ruleName);
   }
 
   /// Check if a rule can be skipped for a file due to baseline.
   ///
   /// Returns true if the rule is fully baselined for this file.
   static bool canSkipRule(String filePath, String ruleName) {
-    return _fullyBaselinedRules[filePath]?.contains(ruleName) ?? false;
+    final normalizedPath = normalizePath(filePath);
+    return _fullyBaselinedRules[normalizedPath]?.contains(ruleName) ?? false;
   }
 
   /// Get count of baselined violations for a rule in a file.
   static int getBaselinedCount(String filePath, String ruleName) {
-    return _baselinedViolationCounts[filePath]?[ruleName] ?? 0;
+    final normalizedPath = normalizePath(filePath);
+    return _baselinedViolationCounts[normalizedPath]?[ruleName] ?? 0;
   }
 
   /// Invalidate cache for a file.
   static void invalidate(String filePath) {
-    _fullyBaselinedRules.remove(filePath);
-    _baselinedViolationCounts.remove(filePath);
+    final normalizedPath = normalizePath(filePath);
+    _fullyBaselinedRules.remove(normalizedPath);
+    _baselinedViolationCounts.remove(normalizedPath);
   }
 
   /// Clear all cached data.

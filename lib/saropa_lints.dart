@@ -2047,6 +2047,49 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Lifecycle rules (lifecycle_rules.dart)
   RequireLateInitializationInInitStateRule(),
+
+  // =========================================================================
+  // NEW RULES v4.1.7 (25 new rules)
+  // =========================================================================
+
+  // State management rules (v417_state_rules.dart)
+  AvoidRiverpodForNetworkOnlyRule(),
+  AvoidLargeBlocRule(),
+  AvoidOverengineeredBlocStatesRule(),
+  AvoidGetxStaticContextRule(),
+  AvoidTightCouplingWithGetxRule(),
+
+  // Performance rules (v417_performance_rules.dart)
+  PreferElementRebuildRule(),
+  RequireIsolateForHeavyRule(),
+  AvoidFinalizerMisuseRule(),
+  AvoidJsonInMainRule(),
+
+  // Security rules (v417_security_rules.dart)
+  AvoidSensitiveDataInClipboardRule(),
+  RequireClipboardPasteValidationRule(),
+  AvoidEncryptionKeyInMemoryRule(),
+
+  // Caching rules (v417_caching_rules.dart)
+  RequireCacheExpirationRule(),
+  AvoidUnboundedCacheGrowthRule(),
+  RequireCacheKeyUniquenessRule(),
+
+  // Testing rules (v417_testing_rules.dart)
+  RequireDialogTestsRule(),
+  PreferFakePlatformRule(),
+  RequireTestDocumentationRule(),
+
+  // Widget rules (v417_widget_rules.dart)
+  PreferCustomSingleChildLayoutRule(),
+  RequireLocaleForTextRule(),
+  RequireDialogBarrierConsiderationRule(),
+  PreferFeatureFolderStructureRule(),
+
+  // Misc rules (v417_misc_rules.dart)
+  RequireWebsocketReconnectionRule(),
+  RequireCurrencyCodeWithAmountRule(),
+  PreferLazySingletonRegistrationRule(),
 ];
 
 // =============================================================================
