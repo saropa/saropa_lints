@@ -264,6 +264,14 @@ const Set<String> essentialRules = <String>{
   // Async (roadmap_up_next - runtime crash)
   'avoid_dialog_context_after_async',
 
+  // ROADMAP ⭐ Rules - Essential
+  'avoid_shared_prefs_in_isolate', // ERROR - SharedPreferences doesn't work in isolates
+  'avoid_future_in_build', // ERROR - causes rebuilds and state issues
+  'require_mounted_check_after_await', // ERROR - setState after dispose
+  'provide_correct_intl_args', // ERROR - runtime crash from mismatched intl args
+  'dispose_class_fields', // WARNING - memory leaks from undisposed fields
+  'avoid_async_in_build', // ERROR - async build causes rendering issues
+
   // Package-specific rules (Essential - security/crash prevention)
   'require_apple_signin_nonce', // Security - replay attack prevention
   'avoid_supabase_anon_key_in_code', // Security - credential exposure
@@ -1141,6 +1149,40 @@ const Set<String> recommendedOnlyRules = <String>{
   // Additional orphans (missed in initial pass)
   'require_image_error_fallback', // INFO - image error handling
   'prefer_ignore_pointer', // INFO - IgnorePointer for non-interactive
+
+  // ROADMAP ⭐ Rules - Recommended
+  'avoid_passing_bloc_to_bloc', // WARNING - blocs should communicate via repository
+  'avoid_passing_build_context_to_blocs', // WARNING - blocs shouldn't hold context
+  'avoid_returning_value_from_cubit_methods', // WARNING - use state instead
+  'prefer_bloc_hydration', // INFO - persist state across restarts
+  'avoid_getx_dialog_snackbar_in_controller', // WARNING - UI logic in controller
+  'require_getx_lazy_put', // INFO - prefer lazyPut for efficiency
+  'prefer_hive_lazy_box', // INFO - better memory management
+  'avoid_hive_binary_storage', // WARNING - binary data integrity issues
+  'require_shared_prefs_prefix', // INFO - organized key namespacing
+  'prefer_shared_prefs_async_api', // INFO - async API for better performance
+  'prefer_stream_distinct', // INFO - prevent redundant emissions
+  'prefer_broadcast_stream', // INFO - prefer broadcast for multiple listeners
+  'prefer_async_init_state', // INFO - use dedicated async init patterns
+  'require_widgets_binding_callback', // WARNING - dialogs in initState need callback
+  'prefer_route_settings_name', // INFO - named routes for debugging
+  'prefer_number_format', // INFO - use NumberFormat for localized numbers
+  'prefer_change_notifier_proxy_provider', // INFO - ProxyProvider for dependent notifiers
+
+  // NEW v4.1.5 Rules - Recommended
+  'avoid_di_in_widgets', // WARNING - DI service locator shouldn't be in widgets
+  'prefer_abstraction_injection', // INFO - inject abstractions not implementations
+  'prefer_large_touch_targets', // INFO - WCAG touch target guidelines
+  'avoid_global_keys_in_state', // WARNING - GlobalKey in State causes issues
+  'require_flutter_riverpod_not_riverpod', // ERROR - Flutter apps need flutter_riverpod
+  'avoid_navigator_context_issue', // WARNING - GlobalKey context in navigation
+  'avoid_push_replacement_misuse', // WARNING - pushReplacement for detail pages
+  'avoid_string_concatenation_l10n', // WARNING - string concat breaks i18n
+  'avoid_time_limits', // INFO - short durations hurt accessibility
+  'require_network_status_check', // INFO - check connectivity before requests
+  'avoid_sync_on_every_change', // WARNING - debounce API calls in onChanged
+  'require_firebase_error_handling', // WARNING - Firebase calls need error handling
+  'require_secure_storage_error_handling', // WARNING - secure storage needs error handling
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1711,6 +1753,10 @@ const Set<String> professionalOnlyRules = <String>{
   'require_ios_quick_note_awareness', // INFO - NSUserActivity for Quick Note
   'require_macos_entitlements', // INFO - macOS entitlement detection
 
+  // ROADMAP ⭐ Rules - Professional
+  'require_bloc_repository_injection', // INFO - DI through constructor for testability
+  'avoid_freezed_for_logic_classes', // INFO - Freezed for data, not business logic
+
   // v2.6.0 rules (ROADMAP_NEXT)
   'prefer_riverpod_auto_dispose', // INFO - memory management
   'avoid_getx_global_navigation', // WARNING - testability
@@ -1728,6 +1774,19 @@ const Set<String> professionalOnlyRules = <String>{
   'require_deep_equality_collections', // WARNING - state comparison
   'avoid_equatable_datetime', // WARNING - flaky equality
   'prefer_unmodifiable_collections', // INFO - immutability
+
+  // NEW v4.1.5 Rules - Professional
+  'avoid_static_route_config', // WARNING - static route configs limit testability
+  'avoid_firebase_realtime_in_build', // WARNING - Firebase listeners in build
+  'avoid_secure_storage_large_data', // INFO - large data not suited for secure storage
+  'require_pop_result_type', // INFO - typed navigation results
+  'avoid_nested_navigators_misuse', // WARNING - nested navigators need WillPopScope
+  'require_deep_link_testing', // INFO - routes should support deep links
+  'prefer_intl_message_description', // INFO - Intl.message needs desc for translators
+  'avoid_hardcoded_locale_strings', // WARNING - hardcoded strings break i18n
+  'avoid_riverpod_navigation', // INFO - navigation belongs in widgets
+  'require_drag_alternatives', // INFO - provide buttons for drag operations
+  'require_pending_changes_indicator', // INFO - show sync status to users
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).

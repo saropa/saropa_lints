@@ -2385,3 +2385,120 @@ class _AddDisposeBeforeAssignmentFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Disposal Rules
+// =============================================================================
+
+/// Warns when class fields of disposable types are not disposed.
+///
+/// Classes with disposable fields (controllers, subscriptions, etc.) should
+/// implement disposal to prevent memory leaks.
+///
+/// **BAD:**
+/// ```dart
+/// class MyService {
+///   final _controller = StreamController<int>();
+///   // No close() called!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyService {
+///   final _controller = StreamController<int>();
+///
+///   void dispose() {
+///     _controller.close();
+///   }
+/// }
+/// ```
+class DisposeClassFieldsRule extends SaropaLintRule {
+  const DisposeClassFieldsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'dispose_class_fields',
+    problemMessage:
+        '[dispose_class_fields] Class has disposable fields but no dispose/close method. '
+        'This may cause memory leaks.',
+    correctionMessage:
+        'Add a dispose() or close() method that cleans up all disposable fields.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _disposableTypes = <String>{
+    'StreamController',
+    'StreamSubscription',
+    'TextEditingController',
+    'ScrollController',
+    'PageController',
+    'TabController',
+    'AnimationController',
+    'FocusNode',
+    'Timer',
+    'ValueNotifier',
+    'ChangeNotifier',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Skip State classes (they have their own disposal rules)
+      final extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final superName = extendsClause.superclass.name.lexeme;
+        if (superName == 'State' ||
+            superName == 'GetxController' ||
+            superName == 'ChangeNotifier') {
+          return; // Other rules handle these
+        }
+      }
+
+      // Find disposable fields
+      final List<String> disposableFields = <String>[];
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          final typeName = member.fields.type?.toSource();
+          if (typeName != null) {
+            for (final disposable in _disposableTypes) {
+              if (typeName.contains(disposable)) {
+                for (final variable in member.fields.variables) {
+                  disposableFields.add(variable.name.lexeme);
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      if (disposableFields.isEmpty) return;
+
+      // Check for dispose/close method
+      bool hasDisposeMethod = false;
+      for (final member in node.members) {
+        if (member is MethodDeclaration) {
+          final name = member.name.lexeme;
+          if (name == 'dispose' || name == 'close') {
+            hasDisposeMethod = true;
+            break;
+          }
+        }
+      }
+
+      if (!hasDisposeMethod) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}

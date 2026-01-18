@@ -7,6 +7,116 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
 
+## [4.1.5] - 2026-01-18
+
+### Added
+
+**24 new lint rules** focusing on architecture, accessibility, navigation, and internationalization:
+
+#### Dependency Injection Rules
+- `avoid_di_in_widgets` - Widgets shouldn't directly use GetIt/service locators
+- `prefer_abstraction_injection` - Inject abstract types, not concrete implementations
+
+#### Accessibility Rules
+- `prefer_large_touch_targets` - Touch targets should be at least 48dp for WCAG compliance
+- `avoid_time_limits` - Short durations (< 5s) disadvantage users needing more time
+- `require_drag_alternatives` - Provide button alternatives for drag gestures
+
+#### Flutter Widget Rules
+- `avoid_global_keys_in_state` - GlobalKey fields in StatefulWidget cause issues
+- `avoid_static_route_config` - Static final router configs limit testability
+
+#### State Management Rules
+- `require_flutter_riverpod_not_riverpod` - Flutter apps need flutter_riverpod, not base riverpod
+- `avoid_riverpod_navigation` - Navigation logic belongs in widgets, not providers
+
+#### Firebase Rules
+- `require_firebase_error_handling` - Firebase async calls need try-catch
+- `avoid_firebase_realtime_in_build` - Don't start Firebase listeners in build method
+
+#### Security Rules
+- `require_secure_storage_error_handling` - Secure storage needs error handling
+- `avoid_secure_storage_large_data` - Large data shouldn't use secure storage
+
+#### Navigation Rules
+- `avoid_navigator_context_issue` - Avoid GlobalKey.currentContext in navigation
+- `require_pop_result_type` - Navigator.push should specify result type parameter
+- `avoid_push_replacement_misuse` - Don't use pushReplacement for detail pages
+- `avoid_nested_navigators_misuse` - Nested Navigators need WillPopScope/PopScope
+- `require_deep_link_testing` - Routes should support deep links, not just object params
+
+#### Internationalization Rules
+- `avoid_string_concatenation_l10n` - String concatenation in Text breaks translations
+- `prefer_intl_message_description` - Intl.message needs desc parameter for translators
+- `avoid_hardcoded_locale_strings` - Don't hardcode strings that need localization
+
+#### Async Rules
+- `require_network_status_check` - Check connectivity before network requests
+- `avoid_sync_on_every_change` - Debounce API calls in onChanged callbacks
+- `require_pending_changes_indicator` - Notify users when changes haven't synced
+
+### Tier Assignments
+- **Recommended tier:** 14 rules for common best practices
+- **Professional tier:** 11 rules for stricter architecture/quality standards
+
+## [4.1.4] - 2026-01-18
+
+### Added
+
+**25 new lint rules** from ROADMAP star priorities:
+
+#### Bloc/Cubit Rules
+- `avoid_passing_bloc_to_bloc` - Detects Bloc depending on another Bloc (tight coupling)
+- `avoid_passing_build_context_to_blocs` - Warns when BuildContext is passed to Bloc/Cubit
+- `avoid_returning_value_from_cubit_methods` - Cubit methods should emit states, not return values
+- `require_bloc_repository_injection` - Blocs should receive repositories via constructor injection
+- `prefer_bloc_hydration` - Suggests HydratedBloc for persistent state instead of SharedPreferences
+
+#### GetX Rules
+- `avoid_getx_dialog_snackbar_in_controller` - UI dialogs shouldn't be called from controllers
+- `require_getx_lazy_put` - Prefer lazyPut for efficient GetX dependency injection
+
+#### Hive/SharedPreferences Rules
+- `prefer_hive_lazy_box` - Use LazyBox for potentially large collections
+- `avoid_hive_binary_storage` - Don't store large binary data in Hive
+- `require_shared_prefs_prefix` - Set prefix to avoid key conflicts
+- `prefer_shared_prefs_async_api` - Use SharedPreferencesAsync for new code
+- `avoid_shared_prefs_in_isolate` - SharedPreferences doesn't work in isolates
+
+#### Stream Rules
+- `prefer_stream_distinct` - Add .distinct() before .listen() for UI streams
+- `prefer_broadcast_stream` - Use broadcast streams when multiple listeners needed
+
+#### Async/Build Rules
+- `avoid_future_in_build` - Don't create Futures inside build() method
+- `require_mounted_check_after_await` - Check mounted before setState after await
+- `avoid_async_in_build` - Build methods must never be async
+- `prefer_async_init_state` - Use Future field + FutureBuilder pattern
+
+#### Widget Lifecycle Rules
+- `require_widgets_binding_callback` - Wrap showDialog in addPostFrameCallback in initState
+
+#### Navigation Rules
+- `prefer_route_settings_name` - Include RouteSettings with name for debugging
+
+#### Internationalization Rules
+- `prefer_number_format` - Use NumberFormat for locale-aware number formatting
+- `provide_correct_intl_args` - Intl.message args must match placeholders
+
+#### Package-specific Rules
+- `avoid_freezed_for_logic_classes` - Freezed is for data classes, not Blocs/Services
+
+#### Disposal Rules
+- `dispose_class_fields` - Classes with disposable fields need dispose/close methods
+
+#### State Management Rules
+- `prefer_change_notifier_proxy_provider` - Use ProxyProvider for dependent notifiers
+
+### Tier Assignments
+- **Essential tier:** avoid_shared_prefs_in_isolate, avoid_future_in_build, require_mounted_check_after_await, provide_correct_intl_args, dispose_class_fields, avoid_async_in_build
+- **Recommended tier:** 17 rules covering best practices
+- **Professional tier:** require_bloc_repository_injection, avoid_freezed_for_logic_classes
+
 ## [4.1.3] - 2026-01-14
 
 - Migrated all single/double-word lint rules to three-word convention for clarity and discoverability. Notable migrations include:

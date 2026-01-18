@@ -1487,3 +1487,186 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - GetX Rules
+// =============================================================================
+
+/// Warns when Get.snackbar or Get.dialog is called in GetxController.
+///
+/// Dialogs and snackbars in controllers can't be tested and couple
+/// UI concerns with business logic. Return state/events instead.
+///
+/// **BAD:**
+/// ```dart
+/// class UserController extends GetxController {
+///   Future<void> deleteUser() async {
+///     await repository.deleteUser();
+///     Get.snackbar('Success', 'User deleted'); // UI in controller!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserController extends GetxController {
+///   final message = Rx<String?>(null);
+///
+///   Future<void> deleteUser() async {
+///     await repository.deleteUser();
+///     message.value = 'User deleted'; // Let UI react to this
+///   }
+/// }
+/// ```
+class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
+  const AvoidGetxDialogSnackbarInControllerRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_getx_dialog_snackbar_in_controller',
+    problemMessage:
+        '[avoid_getx_dialog_snackbar_in_controller] Get.snackbar/dialog in '
+        'controller couples UI to business logic and prevents testing.',
+    correctionMessage:
+        'Use reactive state or events to trigger UI feedback instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _uiMethods = <String>{
+    'snackbar',
+    'dialog',
+    'bottomSheet',
+    'defaultDialog',
+    'generalDialog',
+    'rawSnackbar',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check if it's Get.snackbar, Get.dialog, etc.
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Get') return;
+
+      final String methodName = node.methodName.name;
+      if (!_uiMethods.contains(methodName)) return;
+
+      // Check if inside a GetxController
+      if (_isInsideGetxController(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideGetxController(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ClassDeclaration) {
+        final ExtendsClause? extendsClause = current.extendsClause;
+        if (extendsClause != null) {
+          final String superName = extendsClause.superclass.name.lexeme;
+          return superName == 'GetxController' ||
+              superName == 'GetXController' ||
+              superName == 'FullLifeCycleController' ||
+              superName == 'GetxService';
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when Get.put is used for controllers that might not be needed immediately.
+///
+/// Use Get.lazyPut for lazy initialization to improve startup performance
+/// and reduce memory usage for rarely-used controllers.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   Get.put(SettingsController()); // Initialized immediately
+///   Get.put(ProfileController());   // Even if user never visits profile
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() {
+///   Get.lazyPut(() => SettingsController());
+///   Get.lazyPut(() => ProfileController());
+/// }
+/// ```
+class RequireGetxLazyPutRule extends SaropaLintRule {
+  const RequireGetxLazyPutRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_getx_lazy_put',
+    problemMessage:
+        '[require_getx_lazy_put] Consider using Get.lazyPut() for controllers '
+        'that may not be needed immediately. This improves startup performance.',
+    correctionMessage:
+        'Use Get.lazyPut(() => Controller()) instead of Get.put(Controller()).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Get.put
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Get') return;
+
+      if (node.methodName.name != 'put') return;
+
+      // Check if this is in main() or a global initialization context
+      if (_isInGlobalContext(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInGlobalContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionDeclaration) {
+        // Check if it's main() or setup-like function
+        final String name = current.name.lexeme;
+        if (name == 'main' ||
+            name.contains('init') ||
+            name.contains('setup') ||
+            name.contains('configure')) {
+          return true;
+        }
+      }
+      if (current is ClassDeclaration) {
+        // Check if inside a Bindings class
+        final String className = current.name.lexeme;
+        if (className.contains('Binding') || className.contains('Module')) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}

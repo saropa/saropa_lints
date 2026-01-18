@@ -2603,3 +2603,510 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Navigation Rules
+// =============================================================================
+
+/// Warns when RouteSettings.name is not provided for analytics tracking.
+///
+/// Route names are essential for analytics, debugging, and deep linking.
+/// Always provide meaningful route names.
+///
+/// **BAD:**
+/// ```dart
+/// Navigator.push(
+///   context,
+///   MaterialPageRoute(builder: (_) => DetailsPage()),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Navigator.push(
+///   context,
+///   MaterialPageRoute(
+///     builder: (_) => DetailsPage(),
+///     settings: RouteSettings(name: '/details'),
+///   ),
+/// );
+/// ```
+class PreferRouteSettingsNameRule extends SaropaLintRule {
+  const PreferRouteSettingsNameRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_route_settings_name',
+    problemMessage:
+        '[prefer_route_settings_name] MaterialPageRoute without RouteSettings.name. '
+        'Analytics and debugging will be harder.',
+    correctionMessage:
+        'Add settings: RouteSettings(name: "/route_name") to the route.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _routeTypes = <String>{
+    'MaterialPageRoute',
+    'CupertinoPageRoute',
+    'PageRouteBuilder',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_routeTypes.contains(typeName)) return;
+
+      // Check for settings parameter
+      final ArgumentList args = node.argumentList;
+      bool hasSettings = false;
+
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'settings') {
+          hasSettings = true;
+          break;
+        }
+      }
+
+      if (!hasSettings) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_navigator_context_issue
+// =============================================================================
+
+/// Navigator.of() needs proper context from the widget tree.
+///
+/// Using context from a different part of the tree (like a GlobalKey's
+/// currentContext) can cause navigation failures or unexpected behavior.
+///
+/// **BAD:**
+/// ```dart
+/// Navigator.of(scaffoldKey.currentContext!).push(...);  // Fragile
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Navigator.of(context).push(...);  // Direct context
+/// ```
+class AvoidNavigatorContextIssueRule extends SaropaLintRule {
+  const AvoidNavigatorContextIssueRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_navigator_context_issue',
+    problemMessage:
+        '[avoid_navigator_context_issue] Using context from GlobalKey for '
+        'navigation can fail if widget is not in tree.',
+    correctionMessage:
+        'Use the BuildContext parameter directly instead of currentContext.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Navigator.of() or Navigator.push() etc.
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('Navigator')) return;
+
+      // Check arguments for currentContext
+      final ArgumentList args = node.argumentList;
+      for (final Expression arg in args.arguments) {
+        final String argSource = arg.toSource();
+        if (argSource.contains('currentContext') ||
+            argSource.contains('.context')) {
+          reporter.atNode(arg, code);
+          return;
+        }
+      }
+    });
+
+    // Also check Navigator.of() calls
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      for (final Expression arg in node.argumentList.arguments) {
+        final String argSource = arg.toSource();
+        if (argSource.contains('currentContext') ||
+            (argSource.contains('.context') &&
+                !argSource.contains('BuildContext'))) {
+          reporter.atNode(arg, code);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_pop_result_type
+// =============================================================================
+
+/// MaterialPageRoute should specify result type when expecting a return value.
+///
+/// When using Navigator.pop(context, result), the route should have
+/// a type parameter for type safety.
+///
+/// **BAD:**
+/// ```dart
+/// final result = await Navigator.push(
+///   context,
+///   MaterialPageRoute(builder: (_) => SelectionPage()),  // Untyped!
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final result = await Navigator.push<String>(
+///   context,
+///   MaterialPageRoute<String>(builder: (_) => SelectionPage()),
+/// );
+/// ```
+class RequirePopResultTypeRule extends SaropaLintRule {
+  const RequirePopResultTypeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_pop_result_type',
+    problemMessage:
+        '[require_pop_result_type] Awaited route push without type parameter. '
+        'Return type will be dynamic.',
+    correctionMessage:
+        'Add type parameter: Navigator.push<ReturnType>(...) and '
+        'MaterialPageRoute<ReturnType>(...).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAwaitExpression((AwaitExpression node) {
+      final Expression expr = node.expression;
+      if (expr is! MethodInvocation) return;
+
+      // Check for Navigator.push
+      final String methodName = expr.methodName.name;
+      if (methodName != 'push' &&
+          methodName != 'pushNamed' &&
+          methodName != 'pushReplacement') {
+        return;
+      }
+
+      final Expression? target = expr.target;
+      if (target == null) return;
+
+      // Check if it's a Navigator call
+      final String targetSource = target.toSource();
+      if (!targetSource.contains('Navigator')) return;
+
+      // Check if type argument is provided
+      final TypeArgumentList? typeArgs = expr.typeArguments;
+      if (typeArgs == null || typeArgs.arguments.isEmpty) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_push_replacement_misuse
+// =============================================================================
+
+/// Understand push vs pushReplacement vs pushAndRemoveUntil.
+///
+/// Using the wrong navigation method can cause unexpected back button
+/// behavior or memory issues.
+///
+/// **BAD:**
+/// ```dart
+/// // Using pushReplacement for a detail page that should allow going back
+/// Navigator.pushReplacement(context, route);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Use push for screens that should stack
+/// Navigator.push(context, route);
+///
+/// // Use pushReplacement only for login->home transitions
+/// Navigator.pushReplacement(context, homeRoute);
+/// ```
+class AvoidPushReplacementMisuseRule extends SaropaLintRule {
+  const AvoidPushReplacementMisuseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_push_replacement_misuse',
+    problemMessage:
+        '[avoid_push_replacement_misuse] `[HEURISTIC]` pushReplacement removes '
+        'current route from stack. User cannot go back.',
+    correctionMessage:
+        'Use Navigator.push() if user should be able to go back. Use '
+        'pushReplacement only for login->home or similar transitions.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Route names that typically shouldn't use pushReplacement
+  static const Set<String> _normalRouteIndicators = <String>{
+    'detail',
+    'details',
+    'view',
+    'edit',
+    'form',
+    'settings',
+    'profile',
+    'item',
+    'product',
+    'order',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'pushReplacement' &&
+          methodName != 'pushReplacementNamed') {
+        return;
+      }
+
+      // Get the route being pushed
+      final ArgumentList args = node.argumentList;
+      for (final Expression arg in args.arguments) {
+        final String argSource = arg.toSource().toLowerCase();
+
+        // Check if route name suggests it shouldn't use replacement
+        for (final String indicator in _normalRouteIndicators) {
+          if (argSource.contains(indicator)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_nested_navigators_misuse
+// =============================================================================
+
+/// Nested Navigators need careful WillPopScope handling.
+///
+/// When using nested Navigators (e.g., tabs with their own navigation stacks),
+/// the back button behavior can confuse users if not handled properly.
+///
+/// **BAD:**
+/// ```dart
+/// TabBarView(
+///   children: [
+///     Navigator(key: _tab1Key, ...),
+///     Navigator(key: _tab2Key, ...),
+///   ],
+/// )
+/// // No WillPopScope handling!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// WillPopScope(
+///   onWillPop: () async {
+///     final navigator = _getCurrentNavigator();
+///     if (navigator.canPop()) {
+///       navigator.pop();
+///       return false;
+///     }
+///     return true;
+///   },
+///   child: TabBarView(
+///     children: [
+///       Navigator(key: _tab1Key, ...),
+///       Navigator(key: _tab2Key, ...),
+///     ],
+///   ),
+/// )
+/// ```
+class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
+  const AvoidNestedNavigatorsMisuseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_nested_navigators_misuse',
+    problemMessage: '[avoid_nested_navigators_misuse] Nested Navigator without '
+        'WillPopScope/PopScope. Back button may behave unexpectedly.',
+    correctionMessage:
+        'Wrap with WillPopScope/PopScope to handle back navigation properly.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String constructorName = node.constructorName.type.name2.lexeme;
+      if (constructorName != 'Navigator') return;
+
+      // Check if this Navigator is inside TabBarView or similar
+      AstNode? current = node.parent;
+      bool isNested = false;
+      bool hasPopScope = false;
+
+      while (current != null) {
+        if (current is InstanceCreationExpression) {
+          final String parentType = current.constructorName.type.name2.lexeme;
+
+          if (parentType == 'TabBarView' ||
+              parentType == 'PageView' ||
+              parentType == 'IndexedStack') {
+            isNested = true;
+          }
+
+          if (parentType == 'WillPopScope' || parentType == 'PopScope') {
+            hasPopScope = true;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (isNested && !hasPopScope) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_deep_link_testing
+// =============================================================================
+
+/// Every route should be testable via deep link.
+///
+/// Routes only reachable through navigation chains break when users share
+/// links or use app shortcuts.
+///
+/// **BAD:**
+/// ```dart
+/// // Route only accessible through navigation
+/// Navigator.push(context, ProductDetailRoute(product));
+/// // No deep link support!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Route accessible via deep link
+/// GoRouter(
+///   routes: [
+///     GoRoute(
+///       path: '/product/:id',
+///       builder: (context, state) =>
+///         ProductDetailScreen(id: state.params['id']!),
+///     ),
+///   ],
+/// )
+/// ```
+class RequireDeepLinkTestingRule extends SaropaLintRule {
+  const RequireDeepLinkTestingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_deep_link_testing',
+    problemMessage:
+        '[require_deep_link_testing] `[HEURISTIC]` Route uses object parameter '
+        'instead of ID. Consider using path parameters for deep link support.',
+    correctionMessage:
+        'Use path/query parameters (e.g., /product/:id) instead of passing '
+        'full objects for better deep link support.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'push' && methodName != 'pushNamed') return;
+
+      // Check if passing complex objects instead of IDs
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'arguments') {
+          // Check if passing an object that's not a simple type
+          final value = arg.expression;
+          if (value is! SimpleStringLiteral &&
+              value is! IntegerLiteral &&
+              value is! DoubleLiteral &&
+              value is! BooleanLiteral) {
+            // Check if it looks like a model object
+            final valueSource = value.toSource();
+            if (!valueSource.contains('id:') && !valueSource.contains("'id'")) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}

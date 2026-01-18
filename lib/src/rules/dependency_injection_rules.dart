@@ -1386,3 +1386,226 @@ class RequireDiScopeAwarenessRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_di_in_widgets
+// =============================================================================
+
+/// Widgets should get dependencies via InheritedWidget/Provider, not GetIt.
+///
+/// Direct service locator calls in widgets:
+/// - Couple widgets tightly to DI container
+/// - Make widgets harder to test
+/// - Prevent proper dependency injection patterns
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     final service = GetIt.I<UserService>();  // Direct locator call
+///     return Text(service.userName);
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyWidget extends StatelessWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     final service = context.read<UserService>();  // Via Provider
+///     return Text(service.userName);
+///   }
+/// }
+/// ```
+class AvoidDiInWidgetsRule extends SaropaLintRule {
+  const AvoidDiInWidgetsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_di_in_widgets',
+    problemMessage:
+        '[avoid_di_in_widgets] Avoid GetIt.I in widgets. Use Provider or '
+        'InheritedWidget for dependency injection in UI.',
+    correctionMessage:
+        'Pass dependencies via constructor or use context.read<T>() instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check if inside a widget class
+      if (!_isInsideWidgetClass(node)) return;
+
+      // Check for GetIt access patterns
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      final String methodName = node.methodName.name;
+
+      // Match GetIt.I<T>(), GetIt.instance<T>(), sl<T>(), locator<T>()
+      if (_isServiceLocatorCall(targetSource, methodName)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Also check for GetIt.I.get<T>() patterns
+    context.registry.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (!_isInsideWidgetClass(node)) return;
+
+      final String source = node.toSource();
+      if (source == 'GetIt.I' ||
+          source == 'GetIt.instance' ||
+          source == 'GetIt.asNewInstance') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isInsideWidgetClass(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is ClassDeclaration) {
+        final ExtendsClause? extendsClause = current.extendsClause;
+        if (extendsClause != null) {
+          final String superclass = extendsClause.superclass.toSource();
+          return superclass.contains('Widget') || superclass.contains('State<');
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _isServiceLocatorCall(String targetSource, String methodName) {
+    // GetIt patterns
+    if (targetSource.contains('GetIt') && methodName == 'call') return true;
+    if (targetSource.contains('GetIt') && methodName == 'get') return true;
+
+    // Common service locator aliases
+    if ((targetSource == 'sl' || targetSource == 'locator') &&
+        methodName == 'call') {
+      return true;
+    }
+
+    return false;
+  }
+}
+
+// =============================================================================
+// prefer_abstraction_injection
+// =============================================================================
+
+/// Inject interfaces/abstract classes, not concrete implementations.
+///
+/// Injecting concrete types:
+/// - Prevents mocking in tests
+/// - Creates tight coupling
+/// - Makes it harder to swap implementations
+///
+/// **BAD:**
+/// ```dart
+/// class OrderService {
+///   OrderService(this._httpClient);  // Concrete type
+///   final HttpClient _httpClient;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class OrderService {
+///   OrderService(this._client);  // Abstract type
+///   final ApiClient _client;  // Where ApiClient is abstract
+/// }
+/// ```
+class PreferAbstractionInjectionRule extends SaropaLintRule {
+  const PreferAbstractionInjectionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_abstraction_injection',
+    problemMessage:
+        '[prefer_abstraction_injection] Injecting concrete implementation. '
+        'Prefer injecting abstract types for testability.',
+    correctionMessage:
+        'Create an abstract class or interface and inject that instead.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Concrete type patterns that suggest implementation injection.
+  static const Set<String> _concretePatterns = <String>{
+    'Impl',
+    'Implementation',
+    'Concrete',
+    'Default',
+    'Real',
+    'Actual',
+    'Http',
+    'Dio',
+    'Socket',
+    'Sql',
+    'Sqlite',
+    'Firebase',
+    'Supabase',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      final FormalParameterList? params = node.parameters;
+      if (params == null) return;
+
+      for (final FormalParameter param in params.parameters) {
+        String? typeStr;
+
+        if (param is SimpleFormalParameter) {
+          typeStr = param.type?.toSource();
+        } else if (param is DefaultFormalParameter) {
+          final innerParam = param.parameter;
+          if (innerParam is SimpleFormalParameter) {
+            typeStr = innerParam.type?.toSource();
+          }
+        } else if (param is FieldFormalParameter) {
+          typeStr = param.type?.toSource();
+        }
+
+        if (typeStr != null && _isLikelyConcrete(typeStr)) {
+          reporter.atNode(param, code);
+        }
+      }
+    });
+  }
+
+  bool _isLikelyConcrete(String typeName) {
+    for (final String pattern in _concretePatterns) {
+      if (typeName.contains(pattern)) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
