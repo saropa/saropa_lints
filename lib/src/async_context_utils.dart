@@ -333,6 +333,64 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Isolate/Compute Detection
+// ---------------------------------------------------------------------------
+
+/// Checks if the node is inside a `compute()` or `Isolate.run()` call.
+///
+/// Used by performance rules to skip warnings when heavy operations are
+/// already offloaded to a background isolate.
+///
+/// Recognizes:
+/// - `compute(fn, data)` - Flutter's compute helper
+/// - `Isolate.run(() => ...)` - Direct isolate usage
+///
+/// Returns true if the node is inside either construct.
+bool isInsideIsolate(AstNode node) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    if (current is MethodInvocation) {
+      final String name = current.methodName.name;
+      if (name == 'compute') {
+        // compute() is always safe (no target)
+        if (current.target == null) return true;
+      } else if (name == 'run') {
+        // Must be Isolate.run(), not any other .run()
+        final Expression? target = current.target;
+        if (target is SimpleIdentifier && target.name == 'Isolate') {
+          return true;
+        }
+      }
+    }
+    current = current.parent;
+  }
+  return false;
+}
+
+/// Checks if the node is inside an async function or method.
+///
+/// Used to detect if heavy operations are in async context (likely handling
+/// network responses or other IO-bound data).
+///
+/// Returns true if the containing function/method is marked `async`.
+bool isInAsyncContext(AstNode node) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    if (current is FunctionDeclaration) {
+      return current.functionExpression.body.isAsynchronous;
+    }
+    if (current is MethodDeclaration) {
+      return current.body.isAsynchronous;
+    }
+    if (current is FunctionExpression) {
+      return current.body.isAsynchronous;
+    }
+    current = current.parent;
+  }
+  return false;
+}
+
 /// Visitor that finds setState calls not protected by mounted checks.
 ///
 /// Traverses the AST and tracks whether we're inside an `if (mounted)` block.

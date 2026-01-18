@@ -96,3 +96,12 @@ export 'ios_rules.dart';
 export 'package_specific_rules.dart';
 export 'platform_rules.dart';
 export 'config_rules.dart';
+
+// v4.1.7 rule files
+export 'v417_state_rules.dart';
+export 'v417_performance_rules.dart';
+export 'v417_security_rules.dart';
+export 'v417_caching_rules.dart';
+export 'v417_testing_rules.dart';
+export 'v417_widget_rules.dart';
+export 'v417_misc_rules.dart';
