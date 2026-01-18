@@ -94,3 +94,5 @@ export 'unnecessary_code_rules.dart';
 export 'lifecycle_rules.dart';
 export 'ios_rules.dart';
 export 'package_specific_rules.dart';
+export 'platform_rules.dart';
+export 'config_rules.dart';

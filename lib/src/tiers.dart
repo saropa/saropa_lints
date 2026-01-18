@@ -525,6 +525,17 @@ const Set<String> essentialRules = <String>{
 
   // Network (High)
   'require_cors_handling', // WARNING - CORS on web
+
+  // NEW v4.1.6 Rules - Essential
+  'avoid_print_in_release', // ERROR - print() executes in release builds
+  'avoid_sensitive_in_logs', // ERROR - no sensitive data in logs
+  'prefer_platform_io_conditional', // ERROR - Platform checks crash on web
+  'avoid_web_only_dependencies', // ERROR - dart:html crashes on mobile
+  'require_date_format_specification', // WARNING - DateTime.parse may fail
+  'avoid_optional_field_crash', // ERROR - null JSON field access crashes
+  'avoid_hardcoded_config', // WARNING - hardcoded URLs and keys
+  'avoid_mixed_environments', // ERROR - prod/dev config mismatch
+  'require_late_initialization_in_init_state', // WARNING - late init in build()
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1183,6 +1194,10 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_sync_on_every_change', // WARNING - debounce API calls in onChanged
   'require_firebase_error_handling', // WARNING - Firebase calls need error handling
   'require_secure_storage_error_handling', // WARNING - secure storage needs error handling
+
+  // NEW v4.1.6 Rules - Recommended
+  'prefer_foundation_platform_check', // INFO - use defaultTargetPlatform in widgets
+  'prefer_explicit_json_keys', // INFO - use @JsonKey for field mapping
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1787,6 +1802,11 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_riverpod_navigation', // INFO - navigation belongs in widgets
   'require_drag_alternatives', // INFO - provide buttons for drag operations
   'require_pending_changes_indicator', // INFO - show sync status to users
+
+  // NEW v4.1.6 Rules - Professional
+  'require_platform_check', // INFO - platform-specific APIs need checks
+  'prefer_iso8601_dates', // INFO - standard date format for APIs
+  'require_structured_logging', // INFO - structured logs over concatenation
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
