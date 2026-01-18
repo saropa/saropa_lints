@@ -536,6 +536,11 @@ const Set<String> essentialRules = <String>{
   'avoid_hardcoded_config', // WARNING - hardcoded URLs and keys
   'avoid_mixed_environments', // ERROR - prod/dev config mismatch
   'require_late_initialization_in_init_state', // WARNING - late init in build()
+
+  // NEW v4.1.7 Rules - Essential
+  'require_websocket_reconnection', // WARNING - WebSocket needs reconnection
+  'avoid_sensitive_data_in_clipboard', // WARNING - clipboard accessible to other apps
+  'avoid_unbounded_cache_growth', // WARNING - caches without limits cause OOM
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1198,6 +1203,13 @@ const Set<String> recommendedOnlyRules = <String>{
   // NEW v4.1.6 Rules - Recommended
   'prefer_foundation_platform_check', // INFO - use defaultTargetPlatform in widgets
   'prefer_explicit_json_keys', // INFO - use @JsonKey for field mapping
+
+  // NEW v4.1.7 Rules - Recommended
+  'require_dialog_tests', // INFO - dialog tests need pumpAndSettle
+  'require_clipboard_paste_validation', // INFO - validate clipboard paste
+  'require_currency_code_with_amount', // INFO - amounts need currency
+  'require_cache_expiration', // WARNING - caches need TTL
+  'require_dialog_barrier_consideration', // INFO - destructive dialogs need barrierDismissible
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1807,18 +1819,35 @@ const Set<String> professionalOnlyRules = <String>{
   'require_platform_check', // INFO - platform-specific APIs need checks
   'prefer_iso8601_dates', // INFO - standard date format for APIs
   'require_structured_logging', // INFO - structured logs over concatenation
+
+  // NEW v4.1.7 Rules - Professional
+  'require_locale_for_text', // INFO - text formatting needs explicit locale
+  'avoid_riverpod_for_network_only', // INFO - overkill for simple network access
+  'avoid_large_bloc', // INFO - Blocs with too many handlers
+  'avoid_overengineered_bloc_states', // INFO - too many state subclasses
+  'avoid_getx_static_context', // WARNING - GetX static context untestable
+  'avoid_tight_coupling_with_getx', // INFO - heavy GetX usage
+  'require_isolate_for_heavy', // WARNING - heavy computation blocks UI
+  'avoid_json_in_main', // INFO - jsonDecode on main thread
+  'avoid_encryption_key_in_memory', // INFO - keys in memory can be extracted
+  'prefer_lazy_singleton_registration', // INFO - eager singletons slow startup
+  'require_cache_key_uniqueness', // INFO - cache keys need stable hashCode
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
 const Set<String> comprehensiveOnlyRules = <String>{
-  // Add rules here that are not in essential, recommended, or professional, but are in comprehensive.
-  // If you add a new set for comprehensive, list them here.
+  // NEW v4.1.7 Rules - Comprehensive
+  'prefer_feature_folder_structure', // INFO - feature-based folder organization
+  'prefer_element_rebuild', // INFO - conditional returns destroy Elements
+  'avoid_finalizer_misuse', // INFO - Finalizers add GC overhead
+  'prefer_fake_platform', // INFO - platform widgets need fakes in tests
+  'require_test_documentation', // INFO - complex tests need comments
 };
 
 /// Rules that are only included in the insanity tier (not in comprehensive).
 const Set<String> insanityOnlyRules = <String>{
-  // Add rules here that are not in essential, recommended, professional, or comprehensive, but are in insanity.
-  // If you add a new set for insanity, list them here.
+  // NEW v4.1.7 Rules - Insanity
+  'prefer_custom_single_child_layout', // INFO - CustomSingleChildLayout for complex positioning
 };
 
 /// Returns the set of rule names for a given tier.
