@@ -1666,15 +1666,11 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_platform_check` | Professional | INFO | Platform-specific code needs Platform check. Detect platform APIs without check. |
-| `prefer_platform_io_conditional` | Essential | ERROR | Use kIsWeb for web checks, not Platform. Detect Platform check in web context. |
 | `require_ios_info_plist_entries` | Essential | ERROR | `[CROSS-FILE]` iOS features need Info.plist entries. Detect feature without plist. |
 | `require_android_manifest_entries` | Essential | ERROR | `[CROSS-FILE]` Android features need manifest entries. Detect feature without manifest. |
 | `avoid_platform_specific_imports` | Recommended | WARNING | Use conditional imports for platform code. Detect dart:io in web code. |
 | `prefer_platform_widget_adaptive` | Recommended | INFO | Use platform-adaptive widgets. Detect Material widgets in iOS-only context. |
 | `require_desktop_window_setup` | Professional | INFO | `[CROSS-FILE]` Desktop apps need window configuration. Detect desktop target without setup. |
-| `avoid_web_only_dependencies` | Essential | ERROR | Don't use web-only packages in mobile. Detect dart:html in mobile code. |
-| `prefer_foundation_platform_check` | Recommended | INFO | Use foundation's defaultTargetPlatform. Detect Platform in widget context. |
 
 ### 5.36 API Response Handling Rules
 
@@ -1682,11 +1678,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `prefer_json_serializable` | Recommended | INFO | Use code generation for JSON parsing. Detect manual fromJson methods. |
 | `require_api_response_validation` | Professional | INFO | Validate API response structure. Detect direct field access without validation. |
-| `require_date_format_specification` | Essential | WARNING | Specify date format for parsing. Detect DateTime.parse with server dates. |
-| `prefer_iso8601_dates` | Professional | INFO | Use ISO 8601 for date serialization. Detect custom date formats. |
 | `require_api_version_handling` | Professional | INFO | Handle API version changes. Detect hardcoded response expectations. |
-| `avoid_optional_field_crash` | Essential | ERROR | Optional fields may be missing. Detect required field access without null check. |
-| `prefer_explicit_json_keys` | Recommended | INFO | Use @JsonKey for non-matching field names. Detect manual key mapping. |
 
 ### 5.37 Build Context Rules
 
@@ -1726,10 +1718,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_print_in_release` | Essential | ERROR | `[CONTEXT]` print() runs in release. Detect print without kDebugMode check. |
-| `prefer_debugPrint | Recommended | INFO | debugPrint throttles output. Prefer over print for large logs. |
-| `require_structured_logging` | Professional | INFO | Use structured logging. Detect string concatenation in logs. |
-| `avoid_sensitive_in_logs` | Essential | ERROR | `[HEURISTIC]` Don't log sensitive data. Detect password, token in log calls. |
 | `prefer_log_levels` | Professional | INFO | Use log levels appropriately. Detect single log level usage. |
 | `require_crash_reporting` | Professional | INFO | `[CROSS-FILE]` Production apps need crash reporting. Detect production without Crashlytics/Sentry. |
 | `avoid_excessive_logging` | Professional | WARNING | `[HEURISTIC]` Too much logging impacts performance. Detect high-frequency log calls. |
@@ -1741,13 +1729,11 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_hardcoded_config` | Essential | WARNING | Use environment variables for config. Detect hardcoded URLs, keys. |
 | `require_env_file_gitignore` | Essential | ERROR | `[CROSS-FILE]` .env files shouldn't be committed. Detect .env without gitignore entry. |
 | `prefer_flavor_configuration` | Professional | INFO | Use Flutter flavors for environments. Detect manual environment switching. |
 | `avoid_string_env_parsing` | Recommended | WARNING | Parse environment strings properly. Detect raw String.fromEnvironment usage. |
 | `prefer_compile_time_config` | Professional | INFO | Use const for compile-time config. Detect runtime config lookup for static values. |
 | `require_config_validation` | Professional | INFO | Validate configuration on startup. Detect config usage without validation. |
-| `avoid_mixed_environments` | Essential | ERROR | Don't mix production/development config. Detect environment mismatch. |
 
 ### 5.42 Dependency Injection Rules
 
@@ -1789,11 +1775,11 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_compatible_versions` | Essential | ERROR | Check for incompatible package versions. Detect known version conflicts. |
-| `prefer_latest_stable` | Recommended | INFO | Use latest stable versions. Detect outdated packages. |
-| `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |
-| `require_null_safe_packages` | Essential | ERROR | All packages should be null-safe. Detect pre-null-safety dependencies. |
-| `prefer_first_party_packages` | Recommended | INFO | Prefer official Flutter/Dart packages. Detect unofficial alternatives. |
+| ⭐ `require_compatible_versions` | Essential | ERROR | Check for incompatible package versions. Detect known version conflicts. |
+| ⭐ `prefer_latest_stable` | Recommended | INFO | Use latest stable versions. Detect outdated packages. |
+| ⭐ `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |
+| ⭐ `require_null_safe_packages` | Essential | ERROR | All packages should be null-safe. Detect pre-null-safety dependencies. |
+| ⭐ `prefer_first_party_packages` | Recommended | INFO | Prefer official Flutter/Dart packages. Detect unofficial alternatives. |
 
 ### 5.48 Widget Composition Rules
 
@@ -1819,7 +1805,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_late_initialization_in_init_state` | Essential | WARNING | late widget fields should init in initState. Detect late init in build. |
 | `prefer_late_lazy_initialization` | Professional | INFO | Use late for expensive lazy initialization. Detect eager init of rarely-used fields. |
 | `require_late_access_check` | Professional | WARNING | Check isInitialized before late access when uncertain. Detect late access without context guarantee. |
 

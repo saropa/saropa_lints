@@ -912,3 +912,358 @@ class RequireFreezedLintPackageRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// v4.1.6 Rules - API Response & Date Handling
+// =============================================================================
+
+/// Warns when DateTime.parse is used with server dates without format spec.
+///
+/// DateTime.parse assumes ISO 8601 format but servers often return custom
+/// formats. Using parse() without understanding the format causes crashes.
+///
+/// **BAD:**
+/// ```dart
+/// final date = DateTime.parse(json['created_at']); // May crash!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final date = DateFormat('yyyy-MM-dd HH:mm:ss').parse(json['created_at']);
+/// // Or use tryParse for safety:
+/// final date = DateTime.tryParse(json['created_at']);
+/// ```
+class RequireDateFormatSpecificationRule extends SaropaLintRule {
+  const RequireDateFormatSpecificationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_date_format_specification',
+    problemMessage:
+        '[require_date_format_specification] DateTime.parse may fail on server dates. Use tryParse or DateFormat.',
+    correctionMessage:
+        'Use DateTime.tryParse() for safety or DateFormat for specific formats.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for DateTime.parse()
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'DateTime') return;
+      if (node.methodName.name != 'parse') return;
+
+      // Check if the argument is from JSON or a variable (not a literal)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+      // If it's a string literal, it's probably fine (developer knows the format)
+      if (firstArg is StringLiteral) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_UseDateTimeTryParseFix()];
+}
+
+class _UseDateTimeTryParseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'parse') return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use DateTime.tryParse instead',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          node.methodName.sourceRange,
+          'tryParse',
+        );
+      });
+    });
+  }
+}
+
+/// Warns when non-ISO 8601 date formats are used for serialization.
+///
+/// ISO 8601 is the standard for date interchange. Custom formats cause
+/// parsing issues across different locales and systems.
+///
+/// **BAD:**
+/// ```dart
+/// DateFormat('MM/dd/yyyy').format(date); // US-specific
+/// DateFormat('dd.MM.yyyy').format(date); // European
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// date.toIso8601String(); // Standard: 2024-01-15T10:30:00.000Z
+/// DateFormat('yyyy-MM-dd').format(date); // ISO date only
+/// ```
+class PreferIso8601DatesRule extends SaropaLintRule {
+  const PreferIso8601DatesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_iso8601_dates',
+    problemMessage:
+        '[prefer_iso8601_dates] Use ISO 8601 format for date serialization.',
+    correctionMessage:
+        'Use toIso8601String() or yyyy-MM-dd format for interoperability.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // Non-ISO formats that are locale-specific
+  static final RegExp _nonIsoPattern = RegExp(
+    r'^(MM[/.-]dd|dd[/.-]MM|M[/.-]d|d[/.-]M)',
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String constructorName = node.constructorName.type.name2.lexeme;
+      if (constructorName != 'DateFormat') return;
+
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+      if (firstArg is! StringLiteral) return;
+
+      final String? format = firstArg.stringValue;
+      if (format == null) return;
+
+      if (_nonIsoPattern.hasMatch(format)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when JSON fields are accessed without null checks.
+///
+/// Optional JSON fields may be missing. Accessing them directly
+/// causes null pointer exceptions.
+///
+/// **BAD:**
+/// ```dart
+/// final name = json['user']['name']; // Crashes if user is null!
+/// final age = json['age'] as int;    // Crashes if age is null!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final name = json['user']?['name'];
+/// final age = json['age'] as int?;
+/// final age = json['age'] ?? 0;
+/// ```
+class AvoidOptionalFieldCrashRule extends SaropaLintRule {
+  const AvoidOptionalFieldCrashRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_optional_field_crash',
+    problemMessage:
+        '[avoid_optional_field_crash] JSON field access may crash if null. Use null-aware operators.',
+    correctionMessage:
+        'Use ?[] for optional access or provide default with ?? operator.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      // Check for chained index access: json['x']['y']
+      final Expression? target = node.target;
+      if (target is! IndexExpression) return;
+
+      // If already using null-aware (?[]), skip
+      if (node.question != null) return;
+      if (target.question != null) return;
+
+      // Check if this looks like JSON access
+      if (_looksLikeJsonAccess(target)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _looksLikeJsonAccess(IndexExpression expr) {
+    // Check if the index is a string literal (common for JSON)
+    final Expression index = expr.index;
+    if (index is! StringLiteral) return false;
+
+    // Check variable names that suggest JSON
+    final Expression? target = expr.target;
+    if (target is SimpleIdentifier) {
+      final String name = target.name.toLowerCase();
+      return name.contains('json') ||
+          name.contains('data') ||
+          name.contains('response') ||
+          name.contains('map') ||
+          name.contains('result');
+    }
+
+    return target != null; // Conservative: flag nested string access
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddNullAwareAccessFix()];
+}
+
+class _AddNullAwareAccessFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIndexExpression((IndexExpression node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Use null-aware access (?[])',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert ? before the [
+        builder.addSimpleInsertion(node.leftBracket.offset, '?');
+      });
+    });
+  }
+}
+
+/// Warns when manual JSON key mapping is used instead of @JsonKey.
+///
+/// Manual key mapping in fromJson is error-prone and verbose.
+/// Use @JsonKey annotation with json_serializable for clarity.
+///
+/// **BAD:**
+/// ```dart
+/// factory User.fromJson(Map<String, dynamic> json) => User(
+///   userName: json['user_name'],  // Manual mapping
+///   emailAddress: json['email'],   // Different name
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @JsonSerializable()
+/// class User {
+///   @JsonKey(name: 'user_name')
+///   final String userName;
+///
+///   @JsonKey(name: 'email')
+///   final String emailAddress;
+/// }
+/// ```
+class PreferExplicitJsonKeysRule extends SaropaLintRule {
+  const PreferExplicitJsonKeysRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_explicit_json_keys',
+    problemMessage:
+        '[prefer_explicit_json_keys] Consider using @JsonKey for field name mapping.',
+    correctionMessage:
+        'Use json_serializable with @JsonKey annotation for cleaner mapping.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addConstructorDeclaration((ConstructorDeclaration node) {
+      // Only check factory fromJson constructors
+      if (node.factoryKeyword == null) return;
+      if (node.name?.lexeme != 'fromJson') return;
+
+      // Check for manual key mapping pattern
+      final FunctionBody? body = node.body;
+      if (body is! ExpressionFunctionBody) return;
+
+      final Expression expr = body.expression;
+      if (expr is! InstanceCreationExpression) return;
+
+      // Count manual mappings (json['key'] patterns)
+      int manualMappings = 0;
+      for (final Expression arg in expr.argumentList.arguments) {
+        if (_isManualJsonAccess(arg)) {
+          manualMappings++;
+        }
+      }
+
+      // If there are multiple manual mappings, suggest @JsonKey
+      if (manualMappings >= 3) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _isManualJsonAccess(Expression expr) {
+    if (expr is NamedExpression) {
+      return _isManualJsonAccess(expr.expression);
+    }
+    if (expr is IndexExpression) {
+      final Expression? target = expr.target;
+      if (target is SimpleIdentifier && target.name == 'json') {
+        return true;
+      }
+    }
+    return false;
+  }
+}
