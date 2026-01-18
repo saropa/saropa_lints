@@ -295,7 +295,6 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_riverpod_override_in_tests` | Professional | INFO | `[CROSS-FILE]` Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
-| `avoid_riverpod_navigation` | Recommended | INFO | Riverpod shouldn't handle navigation via global navigator keys. Navigation belongs in widgets, not state management. |
 | `avoid_riverpod_for_network_only` | Professional | INFO | `[HEURISTIC]` Using Riverpod just to access network layer when direct injection would suffice adds unnecessary complexity. |
 
 #### Bloc/Cubit Rules
@@ -345,7 +344,6 @@ Before merging any fix:
 | `avoid_blocking_main_thread` | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
 | `avoid_json_in_main` | Professional | INFO | `[HEURISTIC]` `jsonDecode()` for large payloads (>100KB) blocks the main thread. Use `compute()` to parse JSON in a background isolate. |
 | `prefer_binary_format` | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
-| `require_network_status_check` | Recommended | INFO | Check connectivity before making requests that will obviously fail. Show appropriate offline UI instead of timeout errors. |
 
 ### 1.4 Testing Rules
 
@@ -429,8 +427,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_drag_alternatives` | Professional | INFO | Drag gestures are difficult for some users. Provide button alternatives for drag-to-reorder, swipe-to-delete, etc. |
-| `avoid_time_limits` | Recommended | INFO | Timed interactions (auto-logout, disappearing toasts) disadvantage users who need more time. Allow extension or disable timeouts. |
 | `prefer_external_keyboard` | Comprehensive | INFO | Support full keyboard navigation for users who can't use touch. Ensure all actions are reachable via Tab and Enter. |
 | `require_switch_control` | Comprehensive | INFO | Switch control users navigate sequentially. Ensure logical focus order and that all interactive elements are focusable. |
 
@@ -444,8 +440,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_nested_navigators_misuse` | Professional | WARNING | Nested Navigators (tabs with own stacks) need careful WillPopScope handling. Back button behavior confuses users when done wrong. |
-| `require_deep_link_testing` | Professional | INFO | Every route should be testable via deep link. Routes only reachable through navigation chains break when users share links. |
 | `prefer_go_router_redirect` | Professional | INFO | Auth checks in redirect() run before build, preventing flash of protected content. Checking in build shows then redirects. |
 
 #### Deep Linking
@@ -534,8 +528,6 @@ Before merging any fix:
 |-----------|------|----------|-------------|
 | `prefer_optimistic_updates` | Professional | INFO | Update local state immediately, sync to server in background. Waiting for server makes UI feel slow. |
 | `require_conflict_resolution_strategy` | Professional | WARNING | Offline edits that conflict with server need resolution: last-write-wins, merge, or user prompt. Define strategy upfront. |
-| `avoid_sync_on_every_change` | Professional | WARNING | Syncing each keystroke wastes battery and bandwidth. Batch changes and sync on intervals or app background. |
-| `require_pending_changes_indicator` | Recommended | INFO | Users should see when local changes haven't synced. Show "Saving..." or pending count to set expectations. |
 | `avoid_full_sync_on_every_launch` | Professional | WARNING | Downloading entire dataset on launch is slow and expensive. Use delta sync with timestamps or change feeds. |
 
 ### 1.14 Background Processing Rules
@@ -741,7 +733,6 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_rtl_layout_support` | Recommended | WARNING | RTL languages need directional awareness. Detect hardcoded left/right in layouts without Directionality check. |
-| `avoid_hardcoded_locale_strings` | Recommended | INFO | User-visible strings should be localized. Detect string literals in Text widgets not using l10n. |
 
 ### 1.45 Gradient & CustomPaint Rules
 
@@ -869,9 +860,6 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_cubits` | Stylistic | INFO | Prefer Bloc over Cubit for better event traceability. |
-| ⭐ `avoid_passing_bloc_to_bloc` | Professional | WARNING | Blocs should not directly depend on other Blocs - use streams or events. |
-| ⭐ `avoid_passing_build_context_to_blocs` | Essential | WARNING | BuildContext in Blocs couples UI to business logic. |
-| ⭐ `avoid_returning_value_from_cubit_methods` | Professional | INFO | Cubit methods should emit states, not return values. |
 | `handle_bloc_event_subclasses` | Professional | INFO | Ensure all event subclasses are handled in event handlers. |
 | `prefer_bloc_extensions` | Professional | INFO | Use Bloc extension methods for cleaner code. |
 
@@ -908,8 +896,6 @@ Before merging any fix:
 |-----------|------|----------|-------------|
 | `avoid_missing_tr` | Essential | WARNING | Detect strings that should be translated but aren't. |
 | `avoid_missing_tr_on_strings` | Essential | WARNING | User-visible strings should use translation methods. |
-| ⭐ `prefer_number_format` | Recommended | INFO | Use NumberFormat with locale for consistent number formatting. |
-| ⭐ `provide_correct_intl_args` | Essential | ERROR | Intl.message args must match placeholders in the message. |
 
 #### Testing Rules
 
@@ -953,7 +939,6 @@ Before merging any fix:
 | `avoid_collection_mutating_methods` | Professional | WARNING | Avoid methods that mutate collections in place. |
 | `avoid_missing_controller` | Essential | WARNING | Widgets requiring controllers should have them provided. |
 | `avoid_unnecessary_null_aware_elements` | Recommended | INFO | Null-aware elements in collections that can't be null. |
-| ⭐ `dispose_class_fields` | Essential | WARNING | Class fields that are disposable should be disposed. |
 | `prefer_spacing` | Recommended | INFO | Use Spacing widget (or SizedBox) for consistent spacing. |
 | `use_closest_build_context` | Professional | INFO | Use the closest available BuildContext for better performance. |
 
@@ -1390,9 +1375,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_provider_circular_dependency` | Essential | ERROR | `[CROSS-FILE]` Circular provider dependencies cause stack overflow. Detect A watches B watches A patterns. |
-| ⭐ `prefer_change_notifier_proxy_provider` | Professional | INFO | Providers depending on others should use ProxyProvider. Detect manual dependency passing. |
 | `avoid_provider_listen_false_in_build` | Recommended | INFO | `listen: false` in build prevents rebuilds but may show stale data. Detect inappropriate usage. |
-| ⭐ `prefer_selector_widget` | Professional | INFO | Selector limits rebuilds to specific fields. Detect Consumer rebuilding on unrelated changes. |
 | `require_provider_update_should_notify` | Professional | INFO | ChangeNotifiers should implement efficient notifyListeners. Detect notifying on every setter. |
 
 ### 5.4 Riverpod Advanced Rules
@@ -1411,10 +1394,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_bloc_one_per_feature` | Professional | INFO | `[HEURISTIC]` Each feature should have its own Bloc. Detect single Bloc handling unrelated events. |
-| ⭐ `require_bloc_event_sealed` | Professional | INFO | Events should be sealed classes for exhaustiveness. Detect non-sealed event hierarchies. |
-| ⭐ `require_bloc_repository_injection` | Professional | INFO | Blocs should receive repositories via constructor. Detect Bloc creating its own dependencies. |
-| ⭐ `prefer_bloc_transform_events` | Professional | INFO | Use transformer for event debouncing/throttling. Detect manual debounce in event handlers. |
-| ⭐ `prefer_bloc_hydration` | Professional | INFO | Persistent state should use HydratedBloc. Detect manual SharedPreferences in Bloc. |
 | `avoid_behavior_subject_last_value` | Professional | WARNING | BehaviorSubject retains value after close. Use PublishSubject when appropriate. |
 
 ### 5.6 GetX Anti-Pattern Rules
@@ -1422,10 +1401,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_getx_for_everything` | Professional | INFO | `[HEURISTIC]` GetX shouldn't be used for all patterns. Detect project over-reliance on GetX. |
-| ⭐ `avoid_getx_dialog_snackbar_in_controller` | Essential | WARNING | Dialogs/snackbars in controllers can't be tested. Detect Get.snackbar in GetxController. |
 | `prefer_getx_builder_over_obx` | Recommended | INFO | GetBuilder is more explicit than Obx for state. Detect mixed patterns. |
 | `avoid_getx_static_get` | Professional | WARNING | Get.find() is hard to test. Prefer constructor injection. Detect Get.find in methods. |
-| ⭐ `require_getx_lazy_put` | Professional | INFO | Use Get.lazyPut for lazy initialization. Detect Get.put for rarely-used controllers. |
 | `avoid_getx_rx_nested_obs` | Professional | WARNING | Nested .obs creates complex reactive trees. Detect Rx<List<Rx<Type>>>. |
 | `avoid_getx_build_context_bypass` | Essential | ERROR | Bypassing BuildContext hides Flutter fundamentals. Detect excessive Get.context usage. |
 
@@ -1433,8 +1410,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `prefer_hive_lazy_box` | Professional | INFO | Large boxes should use LazyBox to avoid memory issues. Detect Box with many entries. |
-| ⭐ `avoid_hive_binary_storage` | Professional | INFO | Store file paths, not binary data in Hive. Detect Uint8List fields in Hive types. |
 | `avoid_hive_type_modification` | Professional | WARNING | Modifying Hive type fields breaks existing data. Detect field type changes. |
 | `prefer_hive_compact` | Professional | INFO | Large boxes should be compacted periodically. Detect long-running box without compact. |
 | `require_hive_migration_strategy` | Professional | INFO | Schema changes need migration handling. Detect version field or migration logic. |
@@ -1446,11 +1421,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_shared_prefs_large_data` | Professional | WARNING | SharedPreferences isn't for large data. Detect storing >1KB values. |
-| ⭐ `require_shared_prefs_prefix` | Professional | INFO | Set prefix to avoid conflicts. Detect SharedPreferences without setPrefix call. |
-| ⭐ `prefer_shared_prefs_async_api` | Recommended | INFO | Use SharedPreferencesAsync for new code. Detect legacy SharedPreferences API. |
 | `avoid_shared_prefs_sync_race` | Professional | WARNING | Multiple writers can race. Detect concurrent SharedPreferences writes. |
 | `prefer_typed_prefs_wrapper` | Professional | INFO | Wrap SharedPreferences in typed class. Detect raw getString/setString calls. |
-| ⭐ `avoid_shared_prefs_in_isolate` | Essential | ERROR | SharedPreferences doesn't work in isolates. Detect isolate usage with prefs. |
 
 ### 5.9 sqflite Database Rules
 
@@ -1529,7 +1501,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `avoid_freezed_invalid_annotation_target` | Recommended | INFO | Disable invalid_annotation_target warning in analysis_options. |
 | `prefer_freezed_for_data_classes` | Recommended | INFO | Use Freezed for data classes with equality. Detect manual == override. |
-| ⭐ `avoid_freezed_for_logic_classes` | Professional | WARNING | Don't use Freezed for Blocs/services. Detect @freezed on non-data classes. |
 | `prefer_freezed_union_types` | Professional | INFO | Use Freezed unions for sealed state. Detect manual sealed class hierarchies. |
 | `avoid_freezed_any_map_issue` | Professional | WARNING | any_map in build.yaml not respected in .freezed.dart. Document workaround. |
 
@@ -1566,8 +1537,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `prefer_stream_distinct` | Professional | INFO | Use distinct() to skip duplicate events. Detect StreamBuilder rebuilding on same value. |
-| ⭐ `prefer_broadcast_stream` | Professional | INFO | Use asBroadcastStream() for multiple listeners. Detect single-listener stream with multiple uses. |
 | `avoid_stream_sync_events` | Professional | WARNING | Streams emitting synchronously can cause issues. Detect sync: true without reason. |
 | `prefer_stream_transformer` | Professional | INFO | Use transformers for complex operations. Detect manual stream manipulation. |
 | `require_stream_cancel_on_error | Professional | INFO | Consider cancelOnError for critical streams. Detect error-sensitive streams. |
@@ -1577,12 +1546,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `avoid_future_in_build` | Essential | WARNING | Create futures in initState. Detect Future creation in build triggering rebuilds. |
-| ⭐ `require_mounted_check_after_await` | Essential | WARNING | Check mounted after await in StatefulWidget. Detect setState after await without check. |
 | `avoid_sequential_awaits` | Professional | INFO | Await independent futures in parallel. Detect sequential awaits that could be parallel. |
-| ⭐ `prefer_future_wait` | Professional | INFO | Use Future.wait for parallel execution. Detect multiple sequential awaits. |
-| ⭐ `avoid_async_in_build` | Professional | WARNING | async operations shouldn't be in build. Detect async call in build method. |
-| ⭐ `prefer_async_init_state` | Professional | INFO | Use FutureBuilder for async initialization. Detect async call in initState. |
 | `require_cancellable_operations` | Professional | INFO | Long operations should be cancellable. Detect Completer without cancel mechanism. |
 
 ### 5.23 Widget Lifecycle Rules
@@ -1590,7 +1554,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_expensive_did_change_dependencies` | Professional | WARNING | didChangeDependencies runs often. Detect heavy work in didChangeDependencies. |
-| ⭐ `require_widgets_binding_callback` | Professional | INFO | Use addPostFrameCallback for post-build logic. Detect alternative patterns. |
 | `prefer_deactivate_for_cleanup` | Professional | INFO | Use deactivate for removable cleanup. Detect dispose-only cleanup that could be in deactivate. |
 
 ### 5.24 Form/TextFormField Rules
@@ -1616,11 +1579,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_navigator_context_issue` | Essential | ERROR | Navigator.of needs proper context. Detect navigation with isolated context. |
-| `require_pop_result_type` | Professional | INFO | MaterialPageRoute should have type for pop result. Detect untyped route with result. |
-| `avoid_push_replacement_misuse` | Recommended | WARNING | Understand push vs pushReplacement. Detect inappropriate replacement. |
 | `require_will_pop_scope | Professional | INFO | Handle back button appropriately. Detect navigation without back handling. |
-| ⭐ `prefer_route_settings_name` | Professional | INFO | Use RouteSettings.name for analytics. Detect routes without names. |
 | `require_navigation_result_handling` | Professional | INFO | Handle pushed route's result. Detect push without await or then. |
 | `prefer_named_routes_for_deep_links` | Professional | INFO | Named routes enable deep linking. Detect anonymous route construction. |
 
@@ -1641,10 +1600,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_string_concatenation_l10n` | Essential | WARNING | String concatenation breaks word order. Detect string + in l10n context. |
-| `prefer_intl_message_description` | Professional | INFO | Provide description for translators. Detect Intl.message without desc. |
 | `prefer_l10n_yaml_config` | Recommended | INFO | Use l10n.yaml for configuration. Detect missing configuration file. |
-| `avoid_hardcoded_locale_strings` | Recommended | WARNING | User-visible strings need l10n. Detect string literals in Text widgets. |
 | `require_rtl_support` | Professional | INFO | Support RTL layouts. Detect hardcoded left/right in layouts. |
 
 ### 5.29 Firebase Advanced Rules
@@ -1660,8 +1616,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_firebase_offline_persistence` | Recommended | INFO | Configure Firestore offline persistence. Detect Firestore without persistence settings. |
 | `require_firebase_composite_index` | Essential | ERROR | Compound queries need indexes. Detect complex queries without index. |
 | `prefer_firebase_transaction_for_counters` | Professional | INFO | Use transactions for counters. Detect read-then-write pattern. |
-| `require_firebase_error_handling` | Essential | WARNING | Firebase calls can fail. Detect Firebase without try-catch. |
-| `avoid_firebase_realtime_in_build` | Essential | WARNING | Don't create Firebase listeners in build. Cache stream reference. |
 | `require_firebase_app_check_production` | Professional | WARNING | Enable App Check for production. Detect production without App Check. |
 
 ### 5.30 WebView Security Rules
@@ -1801,10 +1755,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `prefer_injectable_package` | Professional | INFO | Use code generation for DI. Detect manual registration boilerplate. |
 | `avoid_service_locator_abuse` | Professional | WARNING | `[HEURISTIC]` Don't use GetIt everywhere. Detect GetIt.I in business logic. |
-| ⭐ `prefer_constructor_injection` | Essential | INFO | Inject via constructor, not locator. Detect GetIt.I in constructor body. |
-| ⭐ `avoid_di_in_widgets` | Recommended | WARNING | Use InheritedWidget/Provider in widgets. Detect GetIt.I in widget. |
 | `require_di_module_separation` | Professional | INFO | Separate DI configuration into modules. Detect monolithic registration. |
-| ⭐ `prefer_abstraction_injection` | Professional | INFO | Inject interfaces, not implementations. Detect concrete type injection. |
 
 ### 5.43 Accessibility Advanced Rules
 
@@ -1813,7 +1764,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_text_scale_factor_awareness` | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
 | `avoid_insufficient_contrast` | Essential | WARNING | `[HEURISTIC]` Text needs sufficient contrast. Detect low contrast color combinations. |
 | `require_focus_order` | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
-| ⭐ `prefer_large_touch_targets` | Essential | WARNING | Touch targets should be ≥48px. Detect small interactive widgets. |
 | `require_reduced_motion_support` | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
 | `prefer_readable_line_length` | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
 | `require_heading_hierarchy` | Professional | INFO | Use proper heading structure. Detect inconsistent heading levels. |
@@ -1834,14 +1784,11 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_init_state_idempotent` | Essential | WARNING | initState may run multiple times. Detect non-idempotent initialization. |
-| ⭐ `avoid_global_keys_in_state` | Professional | WARNING | GlobalKeys persist across hot reload. Detect GlobalKey field in StatefulWidget. |
-| ⭐ `avoid_static_route_config` | Essential | WARNING | Static GoRouter causes hot reload issues. Detect static final router. |
 
 ### 5.47 Package Version Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `require_flutter_riverpod_not_riverpod` | Essential | ERROR | Flutter apps need flutter_riverpod. Detect riverpod without flutter_riverpod. |
 | `require_compatible_versions` | Essential | ERROR | Check for incompatible package versions. Detect known version conflicts. |
 | `prefer_latest_stable` | Recommended | INFO | Use latest stable versions. Detect outdated packages. |
 | `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |
@@ -1864,8 +1811,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_secure_storage_large_data` | Professional | WARNING | Secure storage isn't for large data. Detect >1KB in secure storage. |
-| `require_secure_storage_error_handling` | Essential | WARNING | Secure storage can fail on some devices. Detect read/write without try-catch. |
 | `prefer_biometric_protection` | Professional | INFO | Use biometric protection for sensitive data. Detect authenticationRequired option. |
 | `require_secure_key_generation` | Essential | ERROR | Encryption keys need secure generation. Detect hardcoded or predictable keys. |
 | `avoid_secure_storage_in_background` | Professional | WARNING | Secure storage may fail in background. Detect background access without handling. |

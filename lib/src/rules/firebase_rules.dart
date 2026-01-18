@@ -2437,3 +2437,224 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_firebase_error_handling
+// =============================================================================
+
+/// Firebase calls can fail and should have error handling.
+///
+/// Firebase operations are network calls that can fail for many reasons:
+/// - No network connection
+/// - Permission denied
+/// - Quota exceeded
+/// - Invalid data
+///
+/// **BAD:**
+/// ```dart
+/// final doc = await FirebaseFirestore.instance.doc('users/123').get();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   final doc = await FirebaseFirestore.instance.doc('users/123').get();
+/// } on FirebaseException catch (e) {
+///   // Handle error
+/// }
+/// ```
+class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
+  const RequireFirebaseErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_firebase_error_handling',
+    problemMessage:
+        '[require_firebase_error_handling] Firebase operation without '
+        'error handling. Firebase calls can fail.',
+    correctionMessage:
+        'Wrap in try-catch or add .catchError() to handle Firebase errors.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _firebaseClasses = <String>{
+    'FirebaseFirestore',
+    'FirebaseAuth',
+    'FirebaseStorage',
+    'FirebaseMessaging',
+    'FirebaseAnalytics',
+    'FirebaseCrashlytics',
+    'FirebaseDatabase',
+    'FirebaseFunctions',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAwaitExpression((AwaitExpression node) {
+      final Expression expr = node.expression;
+      if (expr is! MethodInvocation) return;
+
+      // Check if this is a Firebase call
+      if (!_isFirebaseCall(expr)) return;
+
+      // Check if inside try-catch
+      if (_isInsideTryCatch(node)) return;
+
+      // Check if has .catchError
+      if (_hasCatchError(expr)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _isFirebaseCall(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target == null) return false;
+
+    final String targetSource = target.toSource();
+    for (final String firebaseClass in _firebaseClasses) {
+      if (targetSource.contains(firebaseClass)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool _isInsideTryCatch(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is TryStatement) {
+        return true;
+      }
+      if (current is FunctionBody ||
+          current is MethodDeclaration ||
+          current is FunctionDeclaration) {
+        break;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  bool _hasCatchError(MethodInvocation node) {
+    // Check if the parent is a cascaded .catchError
+    AstNode? parent = node.parent;
+    while (parent != null) {
+      if (parent is MethodInvocation) {
+        if (parent.methodName.name == 'catchError' ||
+            parent.methodName.name == 'onError') {
+          return true;
+        }
+      }
+      if (parent is! CascadeExpression && parent is! MethodInvocation) {
+        break;
+      }
+      parent = parent.parent;
+    }
+    return false;
+  }
+}
+
+// =============================================================================
+// avoid_firebase_realtime_in_build
+// =============================================================================
+
+/// Don't create Firebase listeners in build method.
+///
+/// Creating stream listeners in build() causes multiple subscriptions
+/// as build is called frequently. Cache stream references.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return StreamBuilder(
+///     stream: FirebaseFirestore.instance.collection('users').snapshots(),
+///     // Creates new listener on every rebuild!
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late final Stream<QuerySnapshot> _usersStream;
+///
+/// void initState() {
+///   super.initState();
+///   _usersStream = FirebaseFirestore.instance.collection('users').snapshots();
+/// }
+///
+/// Widget build(BuildContext context) {
+///   return StreamBuilder(stream: _usersStream, ...);
+/// }
+/// ```
+class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
+  const AvoidFirebaseRealtimeInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_firebase_realtime_in_build',
+    problemMessage:
+        '[avoid_firebase_realtime_in_build] Creating Firebase stream/listener '
+        'in build causes multiple subscriptions.',
+    correctionMessage:
+        'Cache the stream reference in a field and initialize in initState.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _realtimeMethods = <String>{
+    'snapshots',
+    'onValue',
+    'onChildAdded',
+    'onChildChanged',
+    'onChildRemoved',
+    'onAuthStateChanged',
+    'authStateChanges',
+    'idTokenChanges',
+    'userChanges',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_realtimeMethods.contains(methodName)) return;
+
+      // Check if inside build method
+      if (!_isInsideBuildMethod(node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _isInsideBuildMethod(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        return current.name.lexeme == 'build';
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}

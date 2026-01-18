@@ -18179,3 +18179,269 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
 
   // No quick fix - bounds checking requires knowing variable names and fallback widgets
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Widget Lifecycle Rules
+// =============================================================================
+
+/// Warns when WidgetsBinding.instance.addPostFrameCallback is not used properly.
+///
+/// Use addPostFrameCallback for operations that need to run after the frame
+/// is rendered, like showing dialogs or measuring widgets.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState();
+///   showDialog(context: context, ...); // Context not ready!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// void initState() {
+///   super.initState();
+///   WidgetsBinding.instance.addPostFrameCallback((_) {
+///     showDialog(context: context, ...);
+///   });
+/// }
+/// ```
+class RequireWidgetsBindingCallbackRule extends SaropaLintRule {
+  const RequireWidgetsBindingCallbackRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_widgets_binding_callback',
+    problemMessage:
+        '[require_widgets_binding_callback] showDialog/showModalBottomSheet in '
+        'initState without addPostFrameCallback may fail.',
+    correctionMessage:
+        'Wrap in WidgetsBinding.instance.addPostFrameCallback((_) { ... }).',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'initState') return;
+
+      // Look for dialog methods called directly (not in addPostFrameCallback)
+      node.body.visitChildren(_DialogInInitStateVisitor((dialogNode) {
+        reporter.atNode(dialogNode, code);
+      }));
+    });
+  }
+}
+
+class _DialogInInitStateVisitor extends RecursiveAstVisitor<void> {
+  _DialogInInitStateVisitor(this.onFound);
+
+  final void Function(AstNode) onFound;
+  bool _insidePostFrameCallback = false;
+
+  static const Set<String> _dialogMethods = <String>{
+    'showDialog',
+    'showModalBottomSheet',
+    'showBottomSheet',
+    'showSnackBar',
+    'showDatePicker',
+    'showTimePicker',
+    'showMenu',
+    'showGeneralDialog',
+    'showCupertinoDialog',
+    'showCupertinoModalPopup',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Track if we're inside addPostFrameCallback
+    if (node.methodName.name == 'addPostFrameCallback') {
+      final oldValue = _insidePostFrameCallback;
+      _insidePostFrameCallback = true;
+      super.visitMethodInvocation(node);
+      _insidePostFrameCallback = oldValue;
+      return;
+    }
+
+    // Check for dialog methods outside of addPostFrameCallback
+    if (_dialogMethods.contains(node.methodName.name) &&
+        !_insidePostFrameCallback) {
+      onFound(node);
+    }
+
+    super.visitMethodInvocation(node);
+  }
+}
+
+// =============================================================================
+// avoid_global_keys_in_state
+// =============================================================================
+
+/// GlobalKey fields in StatefulWidget persist across hot reload.
+///
+/// GlobalKeys are expensive and persist state across hot reloads, which can
+/// cause unexpected behavior during development.
+///
+/// **BAD:**
+/// ```dart
+/// class MyWidget extends StatefulWidget {
+///   final GlobalKey<FormState> formKey = GlobalKey<FormState>();  // Persists!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyWidgetState extends State<MyWidget> {
+///   final _formKey = GlobalKey<FormState>();  // Created in State
+/// }
+/// ```
+class AvoidGlobalKeysInStateRule extends SaropaLintRule {
+  const AvoidGlobalKeysInStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_global_keys_in_state',
+    problemMessage:
+        '[avoid_global_keys_in_state] GlobalKey in StatefulWidget persists '
+        'across hot reload. Move to State class instead.',
+    correctionMessage:
+        'Move this GlobalKey to the State class where it will be properly '
+        'managed during hot reload.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if this is a StatefulWidget
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclass = extendsClause.superclass.toSource();
+      if (!superclass.contains('StatefulWidget')) return;
+
+      // Check fields for GlobalKey
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          final TypeAnnotation? type = member.fields.type;
+          if (type != null && type.toSource().contains('GlobalKey')) {
+            reporter.atNode(member, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_static_route_config
+// =============================================================================
+
+/// Static GoRouter configuration causes hot reload issues.
+///
+/// Static final router instances don't update during hot reload,
+/// making route changes require a full restart.
+///
+/// **BAD:**
+/// ```dart
+/// class AppRouter {
+///   static final router = GoRouter(routes: [...]);  // Won't hot reload
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final router = GoRouter(routes: [...]);  // Top-level, will hot reload
+///
+/// // Or use a getter
+/// GoRouter get router => GoRouter(routes: [...]);
+/// ```
+class AvoidStaticRouteConfigRule extends SaropaLintRule {
+  const AvoidStaticRouteConfigRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_static_route_config',
+    problemMessage:
+        '[avoid_static_route_config] Static router configuration prevents '
+        'hot reload. Route changes require full restart.',
+    correctionMessage:
+        'Use a top-level final variable or a getter for the router instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _routerTypes = <String>{
+    'GoRouter',
+    'MaterialApp',
+    'CupertinoApp',
+    'AutoRouter',
+    'AppRouter',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      // Check if static
+      if (!node.isStatic) return;
+
+      // Check if final
+      if (node.fields.keyword?.keyword != Keyword.FINAL) return;
+
+      // Check the type
+      final TypeAnnotation? type = node.fields.type;
+      if (type != null) {
+        final String typeStr = type.toSource();
+        for (final String routerType in _routerTypes) {
+          if (typeStr.contains(routerType)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+
+      // Also check initializer for router creation
+      for (final VariableDeclaration variable in node.fields.variables) {
+        final Expression? initializer = variable.initializer;
+        if (initializer is InstanceCreationExpression) {
+          final String typeName = initializer.constructorName.type.name2.lexeme;
+          if (_routerTypes.contains(typeName)) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
