@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
 
+## [4.1.8] - 2026-01-18
+
+### Added
+
+**25 new lint rules** focusing on state management, performance, security, caching, testing, and widgets:
+
+#### State Management Rules (v417_state_rules.dart)
+- `avoid_riverpod_for_network_only` - `[HEURISTIC]` Riverpod just for network access is overkill
+- `avoid_large_bloc` - `[HEURISTIC]` Blocs with too many event handlers (>7) need splitting
+- `avoid_overengineered_bloc_states` - `[HEURISTIC]` Too many state subclasses; use single state
+- `avoid_getx_static_context` - Get.offNamed/Get.dialog use untestable static context
+- `avoid_tight_coupling_with_getx` - `[HEURISTIC]` Heavy GetX usage reduces testability
+
+#### Performance Rules (v417_performance_rules.dart)
+- `prefer_element_rebuild` - Conditional widget returns destroy Elements and state
+- `require_isolate_for_heavy` - Heavy computation blocks UI (jsonDecode, encrypt)
+- `avoid_finalizer_misuse` - Finalizers add GC overhead; prefer dispose()
+- `avoid_json_in_main` - `[HEURISTIC]` jsonDecode in async context should use compute()
+
+#### Security Rules (v417_security_rules.dart)
+- `avoid_sensitive_data_in_clipboard` - `[HEURISTIC]` Clipboard accessible to other apps
+- `require_clipboard_paste_validation` - Validate clipboard content before using
+- `avoid_encryption_key_in_memory` - `[HEURISTIC]` Keys as fields can be extracted from dumps
+
+#### Caching Rules (v417_caching_rules.dart)
+- `require_cache_expiration` - `[HEURISTIC]` Caches without TTL serve stale data forever
+- `avoid_unbounded_cache_growth` - `[HEURISTIC]` Caches without limits cause OOM
+- `require_cache_key_uniqueness` - Cache keys need stable hashCode
+
+#### Testing Rules (v417_testing_rules.dart)
+- `require_dialog_tests` - Dialogs need pumpAndSettle after showing
+- `prefer_fake_platform` - Platform widgets need fakes/mocks in tests
+- `require_test_documentation` - `[HEURISTIC]` Complex tests (>15 lines) need comments
+
+#### Widget Rules (v417_widget_rules.dart)
+- `prefer_custom_single_child_layout` - Deep positioning nesting should use delegate
+- `require_locale_for_text` - DateFormat/NumberFormat need explicit locale
+- `require_dialog_barrier_consideration` - `[HEURISTIC]` Destructive dialogs need explicit barrierDismissible
+- `prefer_feature_folder_structure` - `[HEURISTIC]` Type-based folders (/blocs/) should be feature-based
+
+#### Misc Rules (v417_misc_rules.dart)
+- `require_websocket_reconnection` - `[HEURISTIC]` WebSocket needs reconnection logic
+- `require_currency_code_with_amount` - `[HEURISTIC]` Money amounts need currency field
+- `prefer_lazy_singleton_registration` - `[HEURISTIC]` Expensive services should be lazy
+
+### Tier Assignments
+- **Essential tier:** 3 rules (websocket, clipboard security, cache limits)
+- **Recommended tier:** 5 rules (dialog tests, clipboard validation, currency, cache TTL, dialog barrier)
+- **Professional tier:** 11 rules (locale, state management, performance, security, caching)
+- **Comprehensive tier:** 5 rules (folder structure, element rebuild, finalizer, platform fakes, test docs)
+- **Insanity tier:** 1 rule (CustomSingleChildLayout preference)
+
+## [4.1.7] - 2026-01-18
+
+### Fixed
+
+**Critical Windows compatibility bugs** that caused rules to not fire on Windows:
+
+- **Cache key incomplete** - Rule filtering cache only checked `tier` and `enableAll`, ignoring individual rule overrides like `- always_fail_test_case: true`. Now includes hash of all rule configurations.
+
+- **Windows path normalization** - File paths used as map keys without normalizing backslashes. On Windows, analyzer provides `d:\src\file.dart` but caches may store `d:/src/file.dart`. Added `normalizePath()` utility and fixed 15+ locations:
+  - `IncrementalAnalysisTracker` - disk-persisted cache
+  - `RuleBatchExecutor` - batch execution plan
+  - `BaselineAwareEarlyExit` - baseline suppression
+  - `FileContentCache` - content change detection
+  - `FileTypeDetector` - file type classification
+  - `ProjectContext.findProjectRoot()` - project detection
+
+### Added
+
+- `normalizePath()` utility function with documentation to prevent future path issues
+
 ## [4.1.6] - 2026-01-18
 
 ### Added
