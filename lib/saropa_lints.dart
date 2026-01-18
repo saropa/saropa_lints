@@ -2019,6 +2019,34 @@ const List<LintRule> _allRules = <LintRule>[
   RequireNetworkStatusCheckRule(),
   AvoidSyncOnEveryChangeRule(),
   RequirePendingChangesIndicatorRule(),
+
+  // =========================================================================
+  // NEW RULES v4.1.6 (14 new rules)
+  // =========================================================================
+
+  // Logging rules (debug_rules.dart)
+  AvoidPrintInReleaseRule(),
+  RequireStructuredLoggingRule(),
+  AvoidSensitiveInLogsRule(),
+
+  // Platform rules (platform_rules.dart)
+  RequirePlatformCheckRule(),
+  PreferPlatformIoConditionalRule(),
+  AvoidWebOnlyDependenciesRule(),
+  PreferFoundationPlatformCheckRule(),
+
+  // JSON/API rules (json_datetime_rules.dart)
+  RequireDateFormatSpecificationRule(),
+  PreferIso8601DatesRule(),
+  AvoidOptionalFieldCrashRule(),
+  PreferExplicitJsonKeysRule(),
+
+  // Configuration rules (config_rules.dart)
+  AvoidHardcodedConfigRule(),
+  AvoidMixedEnvironmentsRule(),
+
+  // Lifecycle rules (lifecycle_rules.dart)
+  RequireLateInitializationInInitStateRule(),
 ];
 
 // =============================================================================

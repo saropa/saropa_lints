@@ -646,3 +646,315 @@ class _ReplaceWithDebugPrintFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// v4.1.6 Rules - Logging Best Practices
+// =============================================================================
+
+/// Warns when print() is used without kDebugMode check.
+///
+/// print() statements execute in release builds, potentially exposing
+/// sensitive information or impacting performance. Always guard print
+/// statements with kDebugMode.
+///
+/// `[CONTEXT]` - Requires understanding surrounding code context.
+///
+/// **BAD:**
+/// ```dart
+/// void processUser(User user) {
+///   print('Processing user: ${user.email}'); // Runs in release!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void processUser(User user) {
+///   if (kDebugMode) {
+///     print('Processing user: ${user.email}');
+///   }
+/// }
+/// ```
+class AvoidPrintInReleaseRule extends SaropaLintRule {
+  const AvoidPrintInReleaseRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_print_in_release',
+    problemMessage:
+        '[avoid_print_in_release] print() executes in release builds. Guard with kDebugMode.',
+    correctionMessage:
+        'Wrap print() in if (kDebugMode) or use a logging framework.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'print') return;
+      if (node.target != null) return; // Skip object.print()
+
+      if (!_isInsideDebugGuard(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+      final Expression function = node.function;
+      if (function is SimpleIdentifier && function.name == 'print') {
+        if (!_isInsideDebugGuard(node)) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  bool _isInsideDebugGuard(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        if (condition.contains('kDebugMode') ||
+            condition.contains('kReleaseMode') ||
+            condition.contains('kProfileMode')) {
+          return true;
+        }
+      }
+      if (current is AssertStatement) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_WrapInDebugModeFix()];
+}
+
+class _WrapInDebugModeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.methodName.name != 'print') return;
+
+      final AstNode? statement = _findStatement(node);
+      if (statement == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Wrap in if (kDebugMode)',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        final String original = statement.toSource();
+        builder.addSimpleReplacement(
+          SourceRange(statement.offset, statement.length),
+          'if (kDebugMode) {\n  $original\n}',
+        );
+      });
+    });
+  }
+
+  AstNode? _findStatement(AstNode node) {
+    AstNode? current = node;
+    while (current != null) {
+      if (current is ExpressionStatement) return current;
+      current = current.parent;
+    }
+    return null;
+  }
+}
+
+/// Warns when log calls use string concatenation instead of structured logging.
+///
+/// String concatenation in log messages wastes CPU cycles constructing
+/// strings even when logging is disabled. Use structured logging with
+/// placeholders or log levels.
+///
+/// **BAD:**
+/// ```dart
+/// log('User ' + user.name + ' logged in at ' + timestamp.toString());
+/// print('Error: ' + error.message + ' Stack: ' + stackTrace.toString());
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// log('User logged in', data: {'user': user.name, 'time': timestamp});
+/// logger.error('Error occurred', error: error, stackTrace: stackTrace);
+/// ```
+class RequireStructuredLoggingRule extends SaropaLintRule {
+  const RequireStructuredLoggingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_structured_logging',
+    problemMessage:
+        '[require_structured_logging] Use structured logging instead of string concatenation.',
+    correctionMessage:
+        'Pass data as named parameters or use string interpolation with log levels.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _logMethods = {
+    'log',
+    'print',
+    'debugPrint',
+    'info',
+    'warning',
+    'error',
+    'severe',
+    'fine',
+    'finer',
+    'finest',
+    'debug',
+    'trace',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_logMethods.contains(methodName)) return;
+
+      // Check if first argument uses string concatenation
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression firstArg = args.first;
+      if (firstArg is NamedExpression) return;
+
+      if (_usesConcatenation(firstArg)) {
+        reporter.atNode(firstArg, code);
+      }
+    });
+  }
+
+  bool _usesConcatenation(Expression expr) {
+    if (expr is BinaryExpression && expr.operator.lexeme == '+') {
+      // Check if either operand is a string
+      if (expr.leftOperand is StringLiteral ||
+          expr.rightOperand is StringLiteral) {
+        return true;
+      }
+      // Recursively check for nested concatenation
+      return _usesConcatenation(expr.leftOperand) ||
+          _usesConcatenation(expr.rightOperand);
+    }
+    return false;
+  }
+}
+
+/// Warns when sensitive data is logged.
+///
+/// `[HEURISTIC]` - Uses pattern matching to detect sensitive variable names.
+///
+/// Logging passwords, tokens, secrets, or other sensitive data is a security
+/// risk. This rule detects common sensitive variable patterns in log calls.
+///
+/// **BAD:**
+/// ```dart
+/// print('Login attempt with password: $password');
+/// log('Token: ${user.accessToken}');
+/// debugPrint('API key: $apiKey, secret: $secretKey');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// print('Login attempt for user: ${user.email}');
+/// log('Token refreshed', data: {'userId': user.id});
+/// debugPrint('API call completed');
+/// ```
+class AvoidSensitiveInLogsRule extends SaropaLintRule {
+  const AvoidSensitiveInLogsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_sensitive_in_logs',
+    problemMessage:
+        '[avoid_sensitive_in_logs] Potential sensitive data in log statement.',
+    correctionMessage:
+        'Remove sensitive data (passwords, tokens, secrets, keys) from logs.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _logMethods = {
+    'log',
+    'print',
+    'debugPrint',
+    'info',
+    'warning',
+    'error',
+    'severe',
+    'debug',
+    'trace',
+  };
+
+  // Note: Pattern excludes 'auth' alone as it's too broad (matches 'author',
+  // 'authority'). Uses authToken, authKey, authCode instead.
+  static final RegExp _sensitivePattern = RegExp(
+    r'\b(password|passwd|pwd|secret|token|apiKey|api_key|accessToken|'
+    r'access_token|refreshToken|refresh_token|privateKey|private_key|'
+    r'secretKey|secret_key|credential|authToken|authKey|authCode|'
+    r'bearer|jwt|session|cookie|ssn|creditCard|credit_card|cvv|pin|otp)\b',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (!_logMethods.contains(methodName)) return;
+
+      // Check all arguments for sensitive patterns
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (_containsSensitiveData(arg.expression)) {
+            reporter.atNode(arg, code);
+          }
+        } else if (_containsSensitiveData(arg)) {
+          reporter.atNode(arg, code);
+        }
+      }
+    });
+  }
+
+  bool _containsSensitiveData(Expression expr) {
+    final String source = expr.toSource();
+    return _sensitivePattern.hasMatch(source);
+  }
+}
