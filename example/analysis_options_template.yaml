@@ -448,6 +448,11 @@ custom_lint:
     - avoid_blocking_database_ui: false       # WARNING - UI jank (v2.3.11)
     - avoid_money_arithmetic_on_double: false # WARNING - precision issues (v2.3.11)
     - avoid_rebuild_on_scroll: false          # WARNING - memory leak (v2.3.11)
+    # v4.1.8 Performance rules
+    - prefer_element_rebuild: false           # INFO - conditional widget types destroy Elements (v4.1.8)
+    - require_isolate_for_heavy: false        # WARNING - heavy computation blocks UI (v4.1.8)
+    - avoid_finalizer_misuse: false           # INFO - prefer dispose() over Finalizer (v4.1.8)
+    - avoid_json_in_main: false               # INFO - jsonDecode in async should use compute() (v4.1.8)
 
     # =========================================================================
     # FLUTTER WIDGETS
@@ -510,6 +515,10 @@ custom_lint:
     - avoid_image_rebuild_on_scroll: false
     - require_avatar_fallback: false
     - prefer_video_loading_placeholder: false
+    # v4.1.8 Widget rules
+    - prefer_custom_single_child_layout: false  # INFO - use delegate for complex positioning (v4.1.8)
+    - require_locale_for_text: false            # INFO - DateFormat/NumberFormat need locale (v4.1.8)
+    - prefer_feature_folder_structure: false    # INFO - feature-based over type-based folders (v4.1.8)
 
     # =========================================================================
     # FLUTTER DIALOGS & SNACKBARS
@@ -518,6 +527,8 @@ custom_lint:
     - require_dialog_barrier_dismissible: false
     - require_dialog_result_handling: false
     - avoid_snackbar_queue_buildup: false
+    # v4.1.8 Dialog rules
+    - require_dialog_barrier_consideration: false  # INFO - destructive dialogs need explicit barrier (v4.1.8)
 
     # =========================================================================
     # FLUTTER UI/UX PATTERNS
@@ -796,6 +807,10 @@ custom_lint:
     - avoid_unsafe_deserialization: false        # WARNING - data integrity (OWASP M4, A08)
     - avoid_user_controlled_urls: false          # WARNING - SSRF prevention (OWASP M4, A10)
     - require_catch_logging: false               # WARNING - security event logging (OWASP M8, A09)
+    # v4.1.8 Security rules
+    - avoid_sensitive_data_in_clipboard: false   # ERROR - clipboard accessible to other apps (v4.1.8)
+    - require_clipboard_paste_validation: false  # WARNING - validate clipboard content (v4.1.8)
+    - avoid_encryption_key_in_memory: false      # WARNING - keys in fields can be extracted (v4.1.8)
 
     # =========================================================================
     # EQUATABLE (v2.3.9)
@@ -860,6 +875,19 @@ custom_lint:
     # GetX v2.6.0
     - avoid_getx_global_navigation: false        # WARNING - avoid Get.to/Get.off global nav (v2.6.0)
     - require_getx_binding_routes: false         # INFO - GetPage needs binding param (v2.6.0)
+    # v4.1.8 State Management rules
+    - avoid_riverpod_for_network_only: false     # INFO - Riverpod for network is overkill (v4.1.8)
+    - avoid_large_bloc: false                    # INFO - Blocs with >7 handlers need splitting (v4.1.8)
+    - avoid_overengineered_bloc_states: false    # INFO - too many state subclasses (v4.1.8)
+    - avoid_getx_static_context: false           # WARNING - Get.offNamed uses untestable context (v4.1.8)
+    - avoid_tight_coupling_with_getx: false      # INFO - heavy GetX usage reduces testability (v4.1.8)
+
+    # =========================================================================
+    # CACHING (v4.1.8)
+    # =========================================================================
+    - require_cache_expiration: false            # WARNING - caches without TTL serve stale data (v4.1.8)
+    - avoid_unbounded_cache_growth: false        # WARNING - caches without limits cause OOM (v4.1.8)
+    - require_cache_key_uniqueness: false        # INFO - cache keys need stable hashCode (v4.1.8)
 
     # =========================================================================
     # TESTING
@@ -919,6 +947,10 @@ custom_lint:
     - prefer_bloc_test_package: false            # INFO - use blocTest() for Bloc testing (v2.5.0)
     - prefer_mock_verify: false                  # INFO - verify mock interactions (v2.5.0)
     - require_error_logging: false               # INFO - log errors in catch blocks (v2.5.0)
+    # v4.1.8 Testing rules
+    - require_dialog_tests: false                # INFO - dialogs need pumpAndSettle tests (v4.1.8)
+    - prefer_fake_platform: false                # INFO - platform widgets need fakes in tests (v4.1.8)
+    - require_test_documentation: false          # INFO - complex tests need comments (v4.1.8)
 
     # =========================================================================
     # JSON & DATETIME
@@ -927,7 +959,9 @@ custom_lint:
     - avoid_datetime_parse_unvalidated: false
     - prefer_try_parse_for_dynamic_data: false  # CRITICAL: int/double/num/BigInt/Uri.parse
     - avoid_double_for_money: false
+    - require_currency_code_with_amount: false   # INFO - money amounts need currency field (v4.1.8)
     - require_websocket_error_handling: false
+    - require_websocket_reconnection: false      # WARNING - WebSocket needs reconnection logic (v4.1.8)
     - avoid_autoplay_audio: false
     - prefer_duration_constants: false
     - avoid_datetime_now_in_tests: false
@@ -943,6 +977,7 @@ custom_lint:
     - require_default_config: false              # WARNING - startup crash (v2.3.11)
     - prefer_constructor_injection: false        # INFO - constructor DI over setter injection (v2.5.0)
     - require_di_scope_awareness: false          # INFO - singleton vs factory scope (v2.6.0)
+    - prefer_lazy_singleton_registration: false  # INFO - expensive services should be lazy (v4.1.8)
 
     # =========================================================================
     # INTERNATIONALIZATION DATE/NUMBER FORMATTING (v2.3.9)

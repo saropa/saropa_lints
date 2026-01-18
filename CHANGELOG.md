@@ -59,6 +59,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Comprehensive tier:** 5 rules (folder structure, element rebuild, finalizer, platform fakes, test docs)
 - **Insanity tier:** 1 rule (CustomSingleChildLayout preference)
 
+### Changed
+
+- **Shared utilities extracted** - Added `isInsideIsolate()` and `isInAsyncContext()` to `async_context_utils.dart` to reduce code duplication across performance rules
+- **Performance file type filtering** - Added `applicableFileTypes` to `RequireDialogBarrierConsiderationRule` to skip non-widget files
+- **Template updated** - Added all 25 new rules to `analysis_options_template.yaml` with proper categorization
+
 ## [4.1.7] - 2026-01-18
 
 ### Fixed
