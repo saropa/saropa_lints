@@ -2555,3 +2555,94 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Package-Specific Rules
+// =============================================================================
+
+/// Warns when Freezed is used for logic classes like Blocs or Services.
+///
+/// Freezed is designed for immutable data classes. Using it for Blocs,
+/// Cubits, or Services adds unnecessary complexity.
+///
+/// **BAD:**
+/// ```dart
+/// @freezed
+/// class UserBloc with _$UserBloc {
+///   // Freezed on a Bloc - overkill!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   const factory User({required String name}) = _User;
+/// }
+///
+/// class UserBloc extends Bloc<UserEvent, UserState> {
+///   // Regular class for logic
+/// }
+/// ```
+class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
+  const AvoidFreezedForLogicClassesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_freezed_for_logic_classes',
+    problemMessage:
+        '[avoid_freezed_for_logic_classes] Freezed annotation on logic class. '
+        'Freezed is meant for data classes, not Blocs/Services.',
+    correctionMessage:
+        'Remove @freezed from logic classes. Use regular classes for Blocs/Services.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _logicClassSuffixes = <String>{
+    'Bloc',
+    'Cubit',
+    'Service',
+    'Repository',
+    'Controller',
+    'Provider',
+    'Notifier',
+    'Manager',
+    'UseCase',
+    'Interactor',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if has @freezed annotation
+      bool hasFreezed = false;
+      for (final annotation in node.metadata) {
+        final name = annotation.name.name;
+        if (name == 'freezed' || name == 'Freezed') {
+          hasFreezed = true;
+          break;
+        }
+      }
+
+      if (!hasFreezed) return;
+
+      // Check if class name suggests it's a logic class
+      final String className = node.name.lexeme;
+      for (final suffix in _logicClassSuffixes) {
+        if (className.endsWith(suffix)) {
+          reporter.atToken(node.name, code);
+          return;
+        }
+      }
+    });
+  }
+}

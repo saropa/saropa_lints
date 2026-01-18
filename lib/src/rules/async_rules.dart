@@ -3378,3 +3378,816 @@ class _VariableCollector extends RecursiveAstVisitor<void> {
     super.visitSimpleIdentifier(node);
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Stream & Async Rules
+// =============================================================================
+
+/// Warns when Stream is listened multiple times without .distinct().
+///
+/// Use .distinct() to skip consecutive duplicate values and avoid
+/// unnecessary processing or rebuilds.
+///
+/// **BAD:**
+/// ```dart
+/// stream.listen((value) {
+///   setState(() => _value = value); // Rebuilds even if value unchanged
+/// });
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// stream.distinct().listen((value) {
+///   setState(() => _value = value); // Only rebuilds on actual changes
+/// });
+/// ```
+class PreferStreamDistinctRule extends SaropaLintRule {
+  const PreferStreamDistinctRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_stream_distinct',
+    problemMessage:
+        '[prefer_stream_distinct] Stream.listen() without .distinct() may '
+        'process duplicate values unnecessarily.',
+    correctionMessage:
+        'Add .distinct() before .listen() to skip duplicate consecutive values.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'listen') return;
+
+      // Check if the stream type
+      final targetType = node.target?.staticType;
+      if (targetType == null) return;
+
+      final typeName = targetType.getDisplayString();
+      if (!typeName.contains('Stream')) return;
+
+      // Check if .distinct() is in the chain
+      final target = node.target;
+      if (target is MethodInvocation) {
+        if (target.methodName.name == 'distinct') {
+          return; // Already has distinct
+        }
+      }
+
+      // Check if this is inside a setState callback (UI context)
+      if (_hasSetStateInListener(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  bool _hasSetStateInListener(MethodInvocation listenNode) {
+    final args = listenNode.argumentList.arguments;
+    if (args.isEmpty) return false;
+
+    final callback = args.first;
+    if (callback is FunctionExpression) {
+      final body = callback.body.toSource();
+      return body.contains('setState');
+    }
+    return false;
+  }
+}
+
+/// Warns when single-subscription Stream needs multiple listeners.
+///
+/// Use .asBroadcastStream() when you need multiple listeners on a Stream.
+///
+/// **BAD:**
+/// ```dart
+/// final stream = controller.stream;
+/// stream.listen((data) => print(data));
+/// stream.listen((data) => log(data)); // Error: Stream already listened!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final stream = controller.stream.asBroadcastStream();
+/// stream.listen((data) => print(data));
+/// stream.listen((data) => log(data)); // Works!
+/// ```
+class PreferBroadcastStreamRule extends SaropaLintRule {
+  const PreferBroadcastStreamRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_broadcast_stream',
+    problemMessage:
+        '[prefer_broadcast_stream] Stream from StreamController is single-subscription. '
+        'Multiple listeners will cause an error.',
+    correctionMessage:
+        'Use .asBroadcastStream() or StreamController.broadcast().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Track streams that are accessed multiple times
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      final streamAccesses = <String, List<AstNode>>{};
+
+      unit.visitChildren(_StreamAccessVisitor((name, node) {
+        streamAccesses.putIfAbsent(name, () => []).add(node);
+      }));
+
+      // Report streams accessed more than once
+      for (final entry in streamAccesses.entries) {
+        if (entry.value.length > 1) {
+          // Only report if no asBroadcastStream in the chain
+          final hasConversion = entry.value.any((node) {
+            if (node is MethodInvocation) {
+              return node.toSource().contains('asBroadcastStream');
+            }
+            return false;
+          });
+
+          if (!hasConversion) {
+            reporter.atNode(entry.value.first, code);
+          }
+        }
+      }
+    });
+  }
+}
+
+class _StreamAccessVisitor extends RecursiveAstVisitor<void> {
+  _StreamAccessVisitor(this.onAccess);
+
+  final void Function(String name, AstNode node) onAccess;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'listen') {
+      final target = node.target;
+      if (target is SimpleIdentifier) {
+        onAccess(target.name, node);
+      } else if (target is PrefixedIdentifier) {
+        onAccess(target.toSource(), node);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when Future is created inside build() method.
+///
+/// Creating futures in build() can cause repeated async calls on every rebuild.
+/// Create futures in initState() and store the result.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final future = fetchData(); // Called on every rebuild!
+///   return FutureBuilder(future: future, ...);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late final Future<Data> _dataFuture;
+///
+/// @override
+/// void initState() {
+///   super.initState();
+///   _dataFuture = fetchData();
+/// }
+///
+/// Widget build(BuildContext context) {
+///   return FutureBuilder(future: _dataFuture, ...);
+/// }
+/// ```
+class AvoidFutureInBuildRule extends SaropaLintRule {
+  const AvoidFutureInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_future_in_build',
+    problemMessage:
+        '[avoid_future_in_build] Creating Future in build() causes repeated '
+        'async calls on every rebuild.',
+    correctionMessage:
+        'Create the Future in initState() and store it in a field.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      // Check if this is a widget's build method
+      final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+      if (!_isWidgetClass(classDecl)) return;
+
+      // Look for async function calls in build
+      node.body.visitChildren(_FutureCreationVisitor((asyncNode) {
+        reporter.atNode(asyncNode, code);
+      }));
+    });
+  }
+
+  bool _isWidgetClass(ClassDeclaration node) {
+    final extendsClause = node.extendsClause;
+    if (extendsClause == null) return false;
+
+    final superName = extendsClause.superclass.name.lexeme;
+    return superName == 'StatelessWidget' ||
+        superName == 'StatefulWidget' ||
+        superName.contains('State');
+  }
+}
+
+class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
+  _FutureCreationVisitor(this.onFutureCreated);
+
+  final void Function(AstNode) onFutureCreated;
+
+  static const Set<String> _asyncMethodPrefixes = <String>{
+    'fetch',
+    'load',
+    'get',
+    'retrieve',
+    'download',
+    'upload',
+    'request',
+  };
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Check for common async method patterns
+    final methodName = node.methodName.name.toLowerCase();
+    if (_asyncMethodPrefixes.any((p) => methodName.startsWith(p))) {
+      // Check if this is assigned to a FutureBuilder
+      final parent = node.parent;
+      if (parent is NamedExpression && parent.name.label.name == 'future') {
+        onFutureCreated(node);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when setState is called after await without mounted check.
+///
+/// After an await, the widget may have been disposed. Always check mounted
+/// before calling setState.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final data = await fetchData();
+///   setState(() => _data = data); // Widget may be disposed!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final data = await fetchData();
+///   if (!mounted) return;
+///   setState(() => _data = data);
+/// }
+/// ```
+class RequireMountedCheckAfterAwaitRule extends SaropaLintRule {
+  const RequireMountedCheckAfterAwaitRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_mounted_check_after_await',
+    problemMessage:
+        '[require_mounted_check_after_await] setState called after await '
+        'without mounted check. Widget may have been disposed.',
+    correctionMessage:
+        'Add "if (!mounted) return;" before setState after await.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (!node.body.isAsynchronous) return;
+
+      // Check if in a State class
+      final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+
+      final extendsClause = classDecl.extendsClause;
+      if (extendsClause == null) return;
+
+      final superclass = extendsClause.superclass;
+      if (superclass.name.lexeme != 'State') return;
+      if (superclass.typeArguments == null) return;
+
+      // Analyze the method body
+      node.body.visitChildren(_MountedCheckVisitor(reporter, code));
+    });
+  }
+}
+
+class _MountedCheckVisitor extends RecursiveAstVisitor<void> {
+  _MountedCheckVisitor(this.reporter, this.code);
+
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  bool _sawAwait = false;
+  bool _hasMountedCheck = false;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    _sawAwait = true;
+    _hasMountedCheck = false;
+    super.visitAwaitExpression(node);
+  }
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    final condition = node.expression.toSource();
+    if (condition.contains('mounted')) {
+      _hasMountedCheck = true;
+    }
+    super.visitIfStatement(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState' && _sawAwait && !_hasMountedCheck) {
+      if (!_hasAncestorMountedCheck(node)) {
+        reporter.atNode(node, code);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  bool _hasAncestorMountedCheck(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        if (current.expression.toSource().contains('mounted')) {
+          return true;
+        }
+      }
+      if (current is FunctionExpression || current is MethodDeclaration) break;
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when build() method is marked async.
+///
+/// Build methods should never be async. Use FutureBuilder or AsyncBuilder
+/// for async data.
+///
+/// **BAD:**
+/// ```dart
+/// @override
+/// Future<Widget> build(BuildContext context) async {
+///   final data = await fetchData();
+///   return Text(data);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @override
+/// Widget build(BuildContext context) {
+///   return FutureBuilder(
+///     future: _dataFuture,
+///     builder: (context, snapshot) => Text(snapshot.data ?? 'Loading'),
+///   );
+/// }
+/// ```
+class AvoidAsyncInBuildRule extends SaropaLintRule {
+  const AvoidAsyncInBuildRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_async_in_build',
+    problemMessage:
+        '[avoid_async_in_build] Build method should never be async. '
+        'This will cause rendering issues.',
+    correctionMessage: 'Use FutureBuilder or fetch data in initState instead.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      if (node.body.isAsynchronous) {
+        reporter.atToken(node.name, code);
+      }
+    });
+  }
+}
+
+/// Warns when async operations should use FutureBuilder in initState pattern.
+///
+/// For widgets that need async initialization, use the initState + FutureBuilder
+/// pattern for proper loading states.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   String? _data;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     fetchData().then((data) {
+///       setState(() => _data = data);
+///     });
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   late final Future<String> _dataFuture;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _dataFuture = fetchData();
+///   }
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return FutureBuilder(
+///       future: _dataFuture,
+///       builder: (context, snapshot) => ...
+///     );
+///   }
+/// }
+/// ```
+class PreferAsyncInitStateRule extends SaropaLintRule {
+  const PreferAsyncInitStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_async_init_state',
+    problemMessage:
+        '[prefer_async_init_state] Using .then().setState() pattern in initState. '
+        'Consider storing Future and using FutureBuilder for loading states.',
+    correctionMessage:
+        'Store the Future in a field and use FutureBuilder in build().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'initState') return;
+
+      // Look for .then() calls with setState
+      node.body.visitChildren(_ThenSetStateVisitor((thenNode) {
+        reporter.atNode(thenNode, code);
+      }));
+    });
+  }
+}
+
+class _ThenSetStateVisitor extends RecursiveAstVisitor<void> {
+  _ThenSetStateVisitor(this.onFound);
+
+  final void Function(AstNode) onFound;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'then') {
+      // Check if the callback contains setState
+      final args = node.argumentList.arguments;
+      if (args.isNotEmpty) {
+        final callback = args.first;
+        if (callback is FunctionExpression) {
+          if (callback.body.toSource().contains('setState')) {
+            onFound(node);
+          }
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+// =============================================================================
+// require_network_status_check
+// =============================================================================
+
+/// Check connectivity before making requests that will obviously fail.
+///
+/// Making network requests without checking connectivity results in
+/// confusing timeout errors instead of appropriate offline UI.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> fetchData() async {
+///   final response = await http.get(Uri.parse(url));
+///   // May timeout with confusing error if offline
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> fetchData() async {
+///   final connectivity = await Connectivity().checkConnectivity();
+///   if (connectivity == ConnectivityResult.none) {
+///     throw OfflineException('No internet connection');
+///   }
+///   final response = await http.get(Uri.parse(url));
+/// }
+/// ```
+class RequireNetworkStatusCheckRule extends SaropaLintRule {
+  const RequireNetworkStatusCheckRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_network_status_check',
+    problemMessage:
+        '[require_network_status_check] `[HEURISTIC]` Network call without '
+        'connectivity check. Consider checking network status first.',
+    correctionMessage:
+        'Check Connectivity().checkConnectivity() before making requests.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      // Only check async methods
+      if (!node.body.isAsynchronous) return;
+
+      final bodySource = node.body.toSource();
+
+      // Check for network calls
+      final hasNetworkCall = bodySource.contains('http.get') ||
+          bodySource.contains('http.post') ||
+          bodySource.contains('http.put') ||
+          bodySource.contains('http.delete') ||
+          bodySource.contains('Dio()') ||
+          bodySource.contains('.get(') ||
+          bodySource.contains('.post(') ||
+          bodySource.contains('ApiClient') ||
+          bodySource.contains('fetchData');
+
+      if (!hasNetworkCall) return;
+
+      // Check for connectivity check
+      final hasConnectivityCheck = bodySource.contains('Connectivity') ||
+          bodySource.contains('checkConnectivity') ||
+          bodySource.contains('ConnectivityResult') ||
+          bodySource.contains('isConnected') ||
+          bodySource.contains('hasConnection') ||
+          bodySource.contains('networkStatus');
+
+      if (!hasConnectivityCheck) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_sync_on_every_change
+// =============================================================================
+
+/// Syncing each keystroke wastes battery and bandwidth.
+///
+/// Batch changes and sync on intervals or app background instead of
+/// syncing after every small change.
+///
+/// **BAD:**
+/// ```dart
+/// TextField(
+///   onChanged: (value) async {
+///     await api.saveNote(value); // Syncs on every keystroke!
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextField(
+///   onChanged: (value) {
+///     _pendingValue = value;
+///     _debouncer.run(() => api.saveNote(_pendingValue));
+///   },
+/// )
+/// // Or sync when user stops typing or leaves screen
+/// ```
+class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
+  const AvoidSyncOnEveryChangeRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_sync_on_every_change',
+    problemMessage:
+        '[avoid_sync_on_every_change] `[HEURISTIC]` API call in onChanged '
+        'callback may fire on every keystroke. Consider debouncing.',
+    correctionMessage:
+        'Use a debouncer or batch changes before syncing to server.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String constructorName = node.constructorName.type.name2.lexeme;
+      if (constructorName != 'TextField' &&
+          constructorName != 'TextFormField') {
+        return;
+      }
+
+      // Check onChanged callback
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onChanged') {
+          final callback = arg.expression;
+          final callbackSource = callback.toSource();
+
+          // Check for API/network calls in onChanged
+          if (callbackSource.contains('await') ||
+              callbackSource.contains('.post') ||
+              callbackSource.contains('.put') ||
+              callbackSource.contains('.save') ||
+              callbackSource.contains('.update') ||
+              callbackSource.contains('api.') ||
+              callbackSource.contains('Api.')) {
+            // Check if debounced
+            if (!callbackSource.contains('debounce') &&
+                !callbackSource.contains('Debouncer') &&
+                !callbackSource.contains('throttle') &&
+                !callbackSource.contains('Timer')) {
+              reporter.atNode(arg, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_pending_changes_indicator
+// =============================================================================
+
+/// Users should see when local changes haven't synced.
+///
+/// Show "Saving..." or pending count to set user expectations about
+/// sync status.
+///
+/// **BAD:**
+/// ```dart
+/// // Silent save with no indication
+/// void save() {
+///   _pendingChanges.add(change);
+///   _syncLater();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void save() {
+///   _pendingChanges.add(change);
+///   notifyListeners(); // Shows pending indicator
+///   _syncLater();
+/// }
+///
+/// // In UI:
+/// if (pendingCount > 0) Text('Saving $pendingCount changes...')
+/// ```
+class RequirePendingChangesIndicatorRule extends SaropaLintRule {
+  const RequirePendingChangesIndicatorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_pending_changes_indicator',
+    problemMessage:
+        '[require_pending_changes_indicator] `[HEURISTIC]` Pending changes '
+        'collection without UI notification. Users cannot see sync status.',
+    correctionMessage:
+        'Call notifyListeners() or setState() when pending changes update.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      final bodySource = node.body.toSource();
+
+      // Check for pending changes pattern
+      final hasPendingPattern = bodySource.contains('_pending') ||
+          bodySource.contains('pending.add') ||
+          bodySource.contains('_queue.add') ||
+          bodySource.contains('_unsaved') ||
+          bodySource.contains('_dirty');
+
+      if (!hasPendingPattern) return;
+
+      // Check for notification
+      final hasNotification = bodySource.contains('notifyListeners') ||
+          bodySource.contains('setState') ||
+          bodySource.contains('emit(') ||
+          bodySource.contains('add(') || // Stream add
+          bodySource.contains('state =');
+
+      if (!hasNotification) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

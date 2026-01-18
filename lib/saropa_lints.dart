@@ -1925,6 +1925,100 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Hive rules
   PreferHiveValueListenableRule(),
+
+  // NEW ROADMAP STAR RULES
+  // Bloc/Cubit rules
+  AvoidPassingBlocToBlocRule(),
+  AvoidPassingBuildContextToBlocsRule(),
+  AvoidReturningValueFromCubitMethodsRule(),
+  RequireBlocRepositoryInjectionRule(),
+  PreferBlocHydrationRule(),
+
+  // GetX rules
+  AvoidGetxDialogSnackbarInControllerRule(),
+  RequireGetxLazyPutRule(),
+
+  // Hive/SharedPrefs rules
+  PreferHiveLazyBoxRule(),
+  AvoidHiveBinaryStorageRule(),
+  RequireSharedPrefsPrefixRule(),
+  PreferSharedPrefsAsyncApiRule(),
+  AvoidSharedPrefsInIsolateRule(),
+
+  // Stream rules
+  PreferStreamDistinctRule(),
+  PreferBroadcastStreamRule(),
+
+  // Async/Build rules
+  AvoidFutureInBuildRule(),
+  RequireMountedCheckAfterAwaitRule(),
+  AvoidAsyncInBuildRule(),
+  PreferAsyncInitStateRule(),
+
+  // Widget lifecycle rules
+  RequireWidgetsBindingCallbackRule(),
+
+  // Navigation rules
+  PreferRouteSettingsNameRule(),
+
+  // Internationalization rules
+  PreferNumberFormatRule(),
+  ProvideCorrectIntlArgsRule(),
+
+  // Package-specific rules
+  AvoidFreezedForLogicClassesRule(),
+
+  // Disposal rules
+  DisposeClassFieldsRule(),
+
+  // State management rules
+  PreferChangeNotifierProxyProviderRule(),
+
+  // =========================================================================
+  // NEW RULES v4.1.5 (24 new rules)
+  // =========================================================================
+
+  // Dependency Injection rules
+  AvoidDiInWidgetsRule(),
+  PreferAbstractionInjectionRule(),
+
+  // Accessibility rules
+  PreferLargeTouchTargetsRule(),
+  AvoidTimeLimitsRule(),
+  RequireDragAlternativesRule(),
+
+  // Flutter widget rules
+  AvoidGlobalKeysInStateRule(),
+  AvoidStaticRouteConfigRule(),
+
+  // State management rules
+  RequireFlutterRiverpodNotRiverpodRule(),
+  AvoidRiverpodNavigationRule(),
+
+  // Firebase rules
+  RequireFirebaseErrorHandlingRule(),
+  AvoidFirebaseRealtimeInBuildRule(),
+
+  // Security rules
+  RequireSecureStorageErrorHandlingRule(),
+  AvoidSecureStorageLargeDataRule(),
+
+  // Navigation rules
+  AvoidNavigatorContextIssueRule(),
+  RequirePopResultTypeRule(),
+  AvoidPushReplacementMisuseRule(),
+  AvoidNestedNavigatorsMisuseRule(),
+  RequireDeepLinkTestingRule(),
+
+  // Internationalization rules
+  AvoidStringConcatenationL10nRule(),
+  PreferIntlMessageDescriptionRule(),
+  AvoidHardcodedLocaleStringsRule(),
+
+  // Async rules
+  RequireNetworkStatusCheckRule(),
+  AvoidSyncOnEveryChangeRule(),
+  RequirePendingChangesIndicatorRule(),
 ];
 
 // =============================================================================
@@ -1948,6 +2042,10 @@ String? _cachedTier;
 
 /// Whether enableAllLintRules was set when cache was computed.
 bool? _cachedEnableAll;
+
+/// Hash of individual rule overrides when cache was computed.
+/// This ensures cache invalidation when explicit rule configs change.
+int? _cachedRulesHash;
 
 class _SaropaLints extends PluginBase {
   @override
@@ -1998,13 +2096,21 @@ class _SaropaLints extends PluginBase {
     }
 
     // =========================================================================
-    // PERFORMANCE: Return cached rules if tier hasn't changed
+    // PERFORMANCE: Return cached rules if config hasn't changed
     // =========================================================================
     // This avoids re-filtering 1400+ rules for every single file.
     // The filter is computed ONCE per analysis session, not per file.
+    // IMPORTANT: Hash includes individual rule overrides to ensure cache
+    // invalidation when explicit rules are enabled/disabled.
+    final int rulesHash = Object.hashAll(
+      configs.rules.entries
+          .where((e) => e.key != 'saropa_lints') // Exclude meta-config
+          .map((e) => '${e.key}:${e.value.enabled}'),
+    );
     if (_cachedFilteredRules != null &&
         _cachedTier == tier &&
-        _cachedEnableAll == enableAll) {
+        _cachedEnableAll == enableAll &&
+        _cachedRulesHash == rulesHash) {
       return _cachedFilteredRules!;
     }
 
@@ -2072,6 +2178,7 @@ class _SaropaLints extends PluginBase {
     _cachedFilteredRules = filteredRules;
     _cachedTier = tier;
     _cachedEnableAll = enableAll;
+    _cachedRulesHash = rulesHash;
 
     return filteredRules;
   }

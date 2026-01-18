@@ -5963,3 +5963,179 @@ class RequireCatchLoggingRule extends SaropaLintRule {
     return true;
   }
 }
+
+// =============================================================================
+// require_secure_storage_error_handling
+// =============================================================================
+
+/// Secure storage operations can fail and need error handling.
+///
+/// Secure storage may fail on some devices due to:
+/// - Biometric unavailable
+/// - Device not secure
+/// - Storage corrupted
+/// - Permission issues
+///
+/// **BAD:**
+/// ```dart
+/// final value = await secureStorage.read(key: 'token');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   final value = await secureStorage.read(key: 'token');
+/// } on PlatformException catch (e) {
+///   // Handle storage failure
+/// }
+/// ```
+class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
+  const RequireSecureStorageErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_secure_storage_error_handling',
+    problemMessage:
+        '[require_secure_storage_error_handling] Secure storage operation '
+        'without error handling. May fail on some devices.',
+    correctionMessage: 'Wrap in try-catch to handle PlatformException.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _secureStorageMethods = <String>{
+    'read',
+    'write',
+    'delete',
+    'deleteAll',
+    'readAll',
+    'containsKey',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAwaitExpression((AwaitExpression node) {
+      final Expression expr = node.expression;
+      if (expr is! MethodInvocation) return;
+
+      // Check if this is a secure storage call
+      final String methodName = expr.methodName.name;
+      if (!_secureStorageMethods.contains(methodName)) return;
+
+      // Check if target looks like secure storage
+      final Expression? target = expr.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('securestorage') &&
+          !targetSource.contains('flutter_secure_storage') &&
+          !targetSource.contains('_storage') &&
+          !targetSource.contains('keychain')) {
+        return;
+      }
+
+      // Check if inside try-catch
+      if (_isInsideTryCatch(node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  bool _isInsideTryCatch(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is TryStatement) return true;
+      if (current is FunctionBody) break;
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+// =============================================================================
+// avoid_secure_storage_large_data
+// =============================================================================
+
+/// Secure storage isn't designed for large data (>1KB).
+///
+/// Secure storage is slow and has size limits. For large data,
+/// use regular encrypted file storage.
+///
+/// **BAD:**
+/// ```dart
+/// await secureStorage.write(key: 'userData', value: largeJsonString);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Store large data in encrypted file
+/// await encryptedFile.writeAsString(largeJsonString);
+/// // Only store small tokens/keys in secure storage
+/// await secureStorage.write(key: 'token', value: token);
+/// ```
+class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
+  const AvoidSecureStorageLargeDataRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_secure_storage_large_data',
+    problemMessage:
+        '[avoid_secure_storage_large_data] `[HEURISTIC]` Storing large data in '
+        'secure storage. It\'s designed for small secrets like tokens.',
+    correctionMessage:
+        'Use encrypted file storage for large data. Secure storage is slow '
+        'and has size limits.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'write') return;
+
+      // Check if target is secure storage
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('securestorage') &&
+          !targetSource.contains('_storage')) {
+        return;
+      }
+
+      // Check the value being written
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          final Expression value = arg.expression;
+
+          // Check for indicators of large data
+          final String valueSource = value.toSource().toLowerCase();
+          if (valueSource.contains('jsonencode') ||
+              valueSource.contains('jsonfile') ||
+              valueSource.contains('imagedata') ||
+              valueSource.contains('bytes') ||
+              valueSource.contains('base64')) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+}

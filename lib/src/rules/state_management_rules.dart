@@ -11193,3 +11193,819 @@ class PreferBlocTransformRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Bloc/Cubit Rules
+// =============================================================================
+
+/// Warns when Bloc constructor receives another Bloc as dependency.
+///
+/// Blocs should not directly depend on other Blocs. This creates tight coupling
+/// and makes testing difficult. Use streams or events for inter-Bloc communication.
+///
+/// **BAD:**
+/// ```dart
+/// class CartBloc extends Bloc<CartEvent, CartState> {
+///   CartBloc(this.userBloc) : super(CartInitial());
+///   final UserBloc userBloc; // Direct Bloc dependency!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class CartBloc extends Bloc<CartEvent, CartState> {
+///   CartBloc({required Stream<User> userStream}) : super(CartInitial()) {
+///     userStream.listen((user) => add(UserChanged(user)));
+///   }
+/// }
+/// ```
+class AvoidPassingBlocToBlocRule extends SaropaLintRule {
+  const AvoidPassingBlocToBlocRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_passing_bloc_to_bloc',
+    problemMessage:
+        '[avoid_passing_bloc_to_bloc] Bloc should not depend on another Bloc. '
+        'This creates tight coupling and makes testing difficult.',
+    correctionMessage:
+        'Use streams or events for inter-Bloc communication instead.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check constructor parameters for Bloc types
+      for (final member in node.members) {
+        if (member is ConstructorDeclaration) {
+          _checkConstructorParams(member, reporter);
+        }
+        // Also check field types
+        if (member is FieldDeclaration) {
+          _checkFieldTypes(member, reporter);
+        }
+      }
+    });
+  }
+
+  void _checkConstructorParams(
+    ConstructorDeclaration constructor,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final params = constructor.parameters;
+    for (final param in params.parameters) {
+      final String? typeName = _getParameterTypeName(param);
+      if (typeName != null && _isBlocType(typeName)) {
+        reporter.atNode(param, code);
+      }
+    }
+  }
+
+  void _checkFieldTypes(
+    FieldDeclaration field,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final typeName = field.fields.type?.toSource();
+    if (typeName != null && _isBlocType(typeName)) {
+      for (final variable in field.fields.variables) {
+        reporter.atNode(variable, code);
+      }
+    }
+  }
+
+  String? _getParameterTypeName(FormalParameter param) {
+    if (param is SimpleFormalParameter) {
+      return param.type?.toSource();
+    } else if (param is DefaultFormalParameter) {
+      final inner = param.parameter;
+      if (inner is SimpleFormalParameter) {
+        return inner.type?.toSource();
+      }
+    }
+    return null;
+  }
+
+  bool _isBlocType(String typeName) {
+    return typeName.endsWith('Bloc') || typeName.endsWith('Cubit');
+  }
+}
+
+/// Warns when BuildContext is passed to Bloc or Cubit.
+///
+/// BuildContext in Blocs couples UI to business logic and makes testing
+/// difficult. Blocs should be context-agnostic.
+///
+/// **BAD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc(this.context) : super(MyInitial());
+///   final BuildContext context; // Context in Bloc!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class MyBloc extends Bloc<MyEvent, MyState> {
+///   MyBloc({required this.repository}) : super(MyInitial());
+///   final MyRepository repository;
+/// }
+/// ```
+class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
+  const AvoidPassingBuildContextToBlocsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_passing_build_context_to_blocs',
+    problemMessage:
+        '[avoid_passing_build_context_to_blocs] BuildContext in Bloc couples '
+        'UI to business logic and makes testing difficult.',
+    correctionMessage:
+        'Remove BuildContext parameter. Extract needed values before passing to Bloc.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check constructor parameters
+      for (final member in node.members) {
+        if (member is ConstructorDeclaration) {
+          _checkForBuildContext(member, reporter);
+        }
+        // Also check field types
+        if (member is FieldDeclaration) {
+          final typeName = member.fields.type?.toSource();
+          if (typeName == 'BuildContext') {
+            for (final variable in member.fields.variables) {
+              reporter.atNode(variable, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  void _checkForBuildContext(
+    ConstructorDeclaration constructor,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final param in constructor.parameters.parameters) {
+      String? typeName;
+      if (param is SimpleFormalParameter) {
+        typeName = param.type?.toSource();
+      } else if (param is DefaultFormalParameter) {
+        final inner = param.parameter;
+        if (inner is SimpleFormalParameter) {
+          typeName = inner.type?.toSource();
+        }
+      }
+      if (typeName == 'BuildContext') {
+        reporter.atNode(param, code);
+      }
+    }
+  }
+}
+
+/// Warns when Cubit methods return values instead of emitting states.
+///
+/// Cubit methods should emit states, not return values. Returning values
+/// bypasses the reactive state management pattern.
+///
+/// **BAD:**
+/// ```dart
+/// class CounterCubit extends Cubit<int> {
+///   CounterCubit() : super(0);
+///   int increment() {
+///     emit(state + 1);
+///     return state; // Don't return values!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class CounterCubit extends Cubit<int> {
+///   CounterCubit() : super(0);
+///   void increment() {
+///     emit(state + 1);
+///   }
+/// }
+/// ```
+class AvoidReturningValueFromCubitMethodsRule extends SaropaLintRule {
+  const AvoidReturningValueFromCubitMethodsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_returning_value_from_cubit_methods',
+    problemMessage:
+        '[avoid_returning_value_from_cubit_methods] Cubit methods should emit '
+        'states, not return values. This bypasses reactive state management.',
+    correctionMessage:
+        'Change return type to void and use emit() to update state.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Cubit') return;
+
+      // Check methods
+      for (final member in node.members) {
+        if (member is MethodDeclaration) {
+          _checkMethod(member, reporter);
+        }
+      }
+    });
+  }
+
+  void _checkMethod(
+      MethodDeclaration method, SaropaDiagnosticReporter reporter) {
+    // Skip getters, setters, and special methods
+    if (method.isGetter || method.isSetter || method.isStatic) return;
+    if (method.name.lexeme == 'close' || method.name.lexeme == 'emit') return;
+
+    // Check return type
+    final returnType = method.returnType?.toSource();
+    if (returnType == null) return;
+
+    // void, Future<void>, and FutureOr<void> are acceptable
+    if (returnType == 'void' ||
+        returnType == 'Future<void>' ||
+        returnType == 'FutureOr<void>') {
+      return;
+    }
+
+    // Check if method calls emit()
+    bool hasEmit = false;
+    method.body.visitChildren(_EmitCallVisitor(() => hasEmit = true));
+
+    if (hasEmit) {
+      // Method both emits and returns a value - warn
+      reporter.atNode(method.returnType!, code);
+    }
+  }
+}
+
+class _EmitCallVisitor extends RecursiveAstVisitor<void> {
+  _EmitCallVisitor(this.onEmit);
+  final void Function() onEmit;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'emit') {
+      onEmit();
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when Bloc creates its own repository instead of receiving via constructor.
+///
+/// Blocs should receive repositories via constructor injection for testability.
+///
+/// **BAD:**
+/// ```dart
+/// class UserBloc extends Bloc<UserEvent, UserState> {
+///   UserBloc() : super(UserInitial()) {
+///     _repository = UserRepository(); // Creating dependency internally!
+///   }
+///   late final UserRepository _repository;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserBloc extends Bloc<UserEvent, UserState> {
+///   UserBloc({required this.repository}) : super(UserInitial());
+///   final UserRepository repository;
+/// }
+/// ```
+class RequireBlocRepositoryInjectionRule extends SaropaLintRule {
+  const RequireBlocRepositoryInjectionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_bloc_repository_injection',
+    problemMessage:
+        '[require_bloc_repository_injection] Bloc creates its own repository. '
+        'This makes testing difficult and violates dependency injection.',
+    correctionMessage:
+        'Inject the repository via constructor parameter instead.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _repositorySuffixes = <String>{
+    'Repository',
+    'Service',
+    'DataSource',
+    'Api',
+    'Client',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final superName = extendsClause.superclass.name.lexeme;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check for repository creation inside constructors or field initializers
+      for (final member in node.members) {
+        if (member is ConstructorDeclaration) {
+          _checkConstructor(member, reporter);
+        }
+        if (member is FieldDeclaration) {
+          _checkFieldInitializer(member, reporter);
+        }
+      }
+    });
+  }
+
+  void _checkConstructor(
+    ConstructorDeclaration constructor,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    constructor.body.visitChildren(
+      _RepositoryCreationVisitor((node) => reporter.atNode(node, code)),
+    );
+  }
+
+  void _checkFieldInitializer(
+    FieldDeclaration field,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final variable in field.fields.variables) {
+      final initializer = variable.initializer;
+      if (initializer is InstanceCreationExpression) {
+        final typeName = initializer.constructorName.type.name2.lexeme;
+        if (_repositorySuffixes.any((s) => typeName.endsWith(s))) {
+          reporter.atNode(initializer, code);
+        }
+      }
+    }
+  }
+}
+
+class _RepositoryCreationVisitor extends RecursiveAstVisitor<void> {
+  _RepositoryCreationVisitor(this.onCreation);
+  final void Function(AstNode) onCreation;
+
+  static const Set<String> _repositorySuffixes = <String>{
+    'Repository',
+    'Service',
+    'DataSource',
+    'Api',
+    'Client',
+  };
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final typeName = node.constructorName.type.name2.lexeme;
+    if (_repositorySuffixes.any((s) => typeName.endsWith(s))) {
+      onCreation(node);
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+}
+
+/// Warns when Bloc uses SharedPreferences instead of HydratedBloc for persistence.
+///
+/// Persistent state should use HydratedBloc for automatic persistence.
+/// Manual SharedPreferences in Bloc is error-prone and creates coupling.
+///
+/// **BAD:**
+/// ```dart
+/// class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
+///   SettingsBloc(this.prefs) : super(SettingsInitial());
+///   final SharedPreferences prefs;
+///
+///   Future<void> _saveTheme(ThemeMode mode) async {
+///     await prefs.setString('theme', mode.name);
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
+///   SettingsBloc() : super(SettingsInitial());
+///
+///   @override
+///   SettingsState? fromJson(Map<String, dynamic> json) => SettingsState.fromJson(json);
+///
+///   @override
+///   Map<String, dynamic>? toJson(SettingsState state) => state.toJson();
+/// }
+/// ```
+class PreferBlocHydrationRule extends SaropaLintRule {
+  const PreferBlocHydrationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_bloc_hydration',
+    problemMessage:
+        '[prefer_bloc_hydration] Bloc uses SharedPreferences for persistence. '
+        'Consider using HydratedBloc for automatic state persistence.',
+    correctionMessage:
+        'Extend HydratedBloc instead and implement fromJson/toJson.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final superName = extendsClause.superclass.name.lexeme;
+      // Skip if already using HydratedBloc
+      if (superName == 'HydratedBloc' || superName == 'HydratedCubit') return;
+      if (superName != 'Bloc' && superName != 'Cubit') return;
+
+      // Check for SharedPreferences usage
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          final typeName = member.fields.type?.toSource();
+          if (typeName == 'SharedPreferences') {
+            reporter.atToken(node.name, code);
+            return;
+          }
+        }
+      }
+
+      // Also check method bodies for SharedPreferences calls
+      for (final member in node.members) {
+        if (member is MethodDeclaration) {
+          bool hasSharedPrefs = false;
+          member.body.visitChildren(
+            _SharedPrefsUsageVisitor(() => hasSharedPrefs = true),
+          );
+          if (hasSharedPrefs) {
+            reporter.atToken(node.name, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+class _SharedPrefsUsageVisitor extends RecursiveAstVisitor<void> {
+  _SharedPrefsUsageVisitor(this.onFound);
+  final void Function() onFound;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final target = node.target;
+    if (target is SimpleIdentifier) {
+      final name = target.name.toLowerCase();
+      if (name.contains('prefs') || name.contains('preferences')) {
+        final method = node.methodName.name;
+        if (method.startsWith('get') || method.startsWith('set')) {
+          onFound();
+        }
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Warns when ChangeNotifierProvider update accesses another provider directly.
+///
+/// Use ChangeNotifierProxyProvider when a ChangeNotifier depends on another
+/// provider's value to avoid stale data and proper dependency management.
+///
+/// **BAD:**
+/// ```dart
+/// ChangeNotifierProvider(
+///   create: (context) {
+///     final auth = context.read<AuthService>();
+///     return UserNotifier(auth); // auth won't update!
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ChangeNotifierProxyProvider<AuthService, UserNotifier>(
+///   create: (_) => UserNotifier(),
+///   update: (_, auth, previous) => previous!..updateAuth(auth),
+/// )
+/// ```
+class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
+  const PreferChangeNotifierProxyProviderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_change_notifier_proxy_provider',
+    problemMessage:
+        '[prefer_change_notifier_proxy_provider] ChangeNotifierProvider.create '
+        'accesses another provider. Use ChangeNotifierProxyProvider instead.',
+    correctionMessage:
+        'Use ChangeNotifierProxyProvider for proper dependency tracking.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'ChangeNotifierProvider') return;
+
+      // Find create parameter
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final createExpr = arg.expression;
+          if (createExpr is FunctionExpression) {
+            // Check if body contains context.read or context.watch
+            final body = createExpr.body.toSource();
+            if (body.contains('context.read') ||
+                body.contains('context.watch') ||
+                body.contains('Provider.of')) {
+              reporter.atNode(node, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_flutter_riverpod_not_riverpod
+// =============================================================================
+
+/// Flutter apps need flutter_riverpod, not just riverpod.
+///
+/// The base `riverpod` package doesn't include Flutter-specific widgets
+/// like `ConsumerWidget` and `ProviderScope`. Flutter apps need
+/// `flutter_riverpod` or `hooks_riverpod`.
+///
+/// **BAD:**
+/// ```dart
+/// import 'package:riverpod/riverpod.dart';  // Missing Flutter bindings!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// import 'package:flutter_riverpod/flutter_riverpod.dart';
+/// // or
+/// import 'package:hooks_riverpod/hooks_riverpod.dart';
+/// ```
+class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
+  const RequireFlutterRiverpodNotRiverpodRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_flutter_riverpod_not_riverpod',
+    problemMessage:
+        '[require_flutter_riverpod_not_riverpod] Flutter apps should use '
+        'flutter_riverpod, not riverpod package directly.',
+    correctionMessage: 'Replace "package:riverpod/riverpod.dart" with '
+        '"package:flutter_riverpod/flutter_riverpod.dart".',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+
+      // Check for base riverpod import
+      if (uri == 'package:riverpod/riverpod.dart') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_riverpod_navigation
+// =============================================================================
+
+/// Riverpod shouldn't handle navigation via global navigator keys.
+///
+/// Navigation belongs in widgets, not state management. Using Riverpod
+/// to control navigation creates tight coupling and makes testing harder.
+///
+/// **BAD:**
+/// ```dart
+/// final navigatorKeyProvider = Provider((ref) => GlobalKey<NavigatorState>());
+///
+/// class MyNotifier extends StateNotifier<MyState> {
+///   final GlobalKey<NavigatorState> navigatorKey;
+///
+///   void goToDetails() {
+///     navigatorKey.currentState?.pushNamed('/details');
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Navigate in widgets instead
+/// class MyWidget extends ConsumerWidget {
+///   @override
+///   Widget build(BuildContext context, WidgetRef ref) {
+///     return ElevatedButton(
+///       onPressed: () => Navigator.of(context).pushNamed('/details'),
+///       child: Text('Details'),
+///     );
+///   }
+/// }
+/// ```
+class AvoidRiverpodNavigationRule extends SaropaLintRule {
+  const AvoidRiverpodNavigationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_riverpod_navigation',
+    problemMessage:
+        '[avoid_riverpod_navigation] Riverpod provider managing navigation. '
+        'Navigation belongs in widgets, not state management.',
+    correctionMessage:
+        'Move navigation logic to widgets using Navigator.of(context).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check for GlobalKey<NavigatorState> in providers
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      final String? typeName = node.parent is VariableDeclarationList
+          ? (node.parent as VariableDeclarationList).type?.toSource()
+          : null;
+
+      if (typeName == null) return;
+
+      // Check for GlobalKey<NavigatorState> in provider context
+      if (typeName.contains('GlobalKey<NavigatorState>')) {
+        // Check if this is inside a Provider
+        AstNode? current = node.parent;
+        while (current != null) {
+          if (current is MethodInvocation) {
+            final String methodName = current.methodName.name;
+            if (methodName == 'Provider' ||
+                methodName == 'StateProvider' ||
+                methodName == 'FutureProvider' ||
+                methodName == 'StreamProvider') {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+          if (current is FunctionExpression) {
+            final AstNode? funcParent = current.parent;
+            if (funcParent is ArgumentList) {
+              final AstNode? invocation = funcParent.parent;
+              if (invocation is MethodInvocation) {
+                final target = invocation.target;
+                if (target is SimpleIdentifier &&
+                    (target.name == 'Provider' ||
+                        target.name == 'StateProvider')) {
+                  reporter.atNode(node, code);
+                  return;
+                }
+              }
+            }
+          }
+          current = current.parent;
+        }
+      }
+    });
+
+    // Check for navigation calls in StateNotifier/Notifier classes
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Navigation methods
+      if (methodName != 'push' &&
+          methodName != 'pushNamed' &&
+          methodName != 'pushReplacement' &&
+          methodName != 'pop') {
+        return;
+      }
+
+      // Check if called on navigatorKey or globalKey
+      final target = node.target;
+      if (target is PrefixedIdentifier) {
+        final prefix = target.prefix.name;
+        final identifier = target.identifier.name;
+        if (identifier == 'currentState' &&
+            (prefix.contains('navigator') || prefix.contains('Navigator'))) {
+          // Check if inside Notifier/StateNotifier class
+          AstNode? current = node.parent;
+          while (current != null) {
+            if (current is ClassDeclaration) {
+              final extendsClause = current.extendsClause;
+              if (extendsClause != null) {
+                final superName = extendsClause.superclass.toSource();
+                if (superName.contains('StateNotifier') ||
+                    superName.contains('Notifier') ||
+                    superName.contains('AsyncNotifier')) {
+                  reporter.atNode(node, code);
+                  return;
+                }
+              }
+            }
+            current = current.parent;
+          }
+        }
+      }
+    });
+  }
+}

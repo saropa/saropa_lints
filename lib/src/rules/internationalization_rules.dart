@@ -1813,3 +1813,450 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Internationalization Rules
+// =============================================================================
+
+/// Warns when numbers are displayed without proper formatting.
+///
+/// Use NumberFormat for locale-aware number display. Raw numbers
+/// don't respect locale-specific decimal separators and grouping.
+///
+/// **BAD:**
+/// ```dart
+/// Text('${price.toStringAsFixed(2)}'); // 1234.56 in all locales
+/// Text('$count items'); // No thousand separators
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(NumberFormat.currency(locale: locale).format(price)); // $1,234.56
+/// Text(NumberFormat.decimalPattern(locale).format(count)); // 1,234
+/// ```
+class PreferNumberFormatRule extends SaropaLintRule {
+  const PreferNumberFormatRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_number_format',
+    problemMessage:
+        '[prefer_number_format] Number displayed without locale formatting. '
+        'Different locales use different decimal/grouping separators.',
+    correctionMessage:
+        'Use NumberFormat.decimalPattern(locale).format(number) for i18n.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for toStringAsFixed, toString on numbers in UI context
+      final String methodName = node.methodName.name;
+      if (methodName != 'toStringAsFixed' && methodName != 'toString') return;
+
+      // Check if target is a numeric type
+      final targetType = node.target?.staticType;
+      if (targetType == null) return;
+
+      final typeName = targetType.getDisplayString();
+      if (typeName != 'double' && typeName != 'int' && typeName != 'num') {
+        return;
+      }
+
+      // Check if inside a Text widget
+      if (_isInsideTextWidget(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Also check for string interpolation of numbers
+    context.registry.addInterpolationExpression((InterpolationExpression node) {
+      final Expression expr = node.expression;
+      final exprType = expr.staticType;
+      if (exprType == null) return;
+
+      final typeName = exprType.getDisplayString();
+      if (typeName == 'double' || typeName == 'int' || typeName == 'num') {
+        if (_isInsideTextWidget(node)) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  bool _isInsideTextWidget(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is InstanceCreationExpression) {
+        final String typeName = current.constructorName.type.name2.lexeme;
+        if (typeName == 'Text' ||
+            typeName == 'RichText' ||
+            typeName == 'SelectableText') {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+/// Warns when Intl.message arguments don't match placeholders.
+///
+/// Intl.message placeholders like {name} must have matching args.
+/// Mismatched arguments cause runtime errors.
+///
+/// **BAD:**
+/// ```dart
+/// Intl.message(
+///   'Hello {name}, you have {count} messages',
+///   args: [name], // Missing 'count' argument!
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Intl.message(
+///   'Hello {name}, you have {count} messages',
+///   args: [name, count],
+/// )
+/// ```
+class ProvideCorrectIntlArgsRule extends SaropaLintRule {
+  const ProvideCorrectIntlArgsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'provide_correct_intl_args',
+    problemMessage:
+        '[provide_correct_intl_args] Intl.message args count does not match '
+        'placeholders. This will cause runtime errors.',
+    correctionMessage:
+        'Ensure args list matches all {placeholder} names in the message.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Intl.message or Intl.plural
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Intl') return;
+
+      final String methodName = node.methodName.name;
+      if (methodName != 'message' && methodName != 'plural') return;
+
+      // Get the message string
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final firstArg = args.first;
+      String? messageText;
+      if (firstArg is SimpleStringLiteral) {
+        messageText = firstArg.value;
+      } else if (firstArg is AdjacentStrings) {
+        messageText = firstArg.strings
+            .whereType<SimpleStringLiteral>()
+            .map((s) => s.value)
+            .join();
+      }
+
+      if (messageText == null) return;
+
+      // Count placeholders in message
+      final placeholderPattern = RegExp(r'\{(\w+)\}');
+      final placeholders = placeholderPattern
+          .allMatches(messageText)
+          .map((m) => m.group(1)!)
+          .toSet();
+
+      // Find args parameter
+      for (final arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'args') {
+          final argsExpr = arg.expression;
+          if (argsExpr is ListLiteral) {
+            final argsCount = argsExpr.elements.length;
+            if (argsCount != placeholders.length) {
+              reporter.atNode(arg, code);
+            }
+          }
+          break;
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_string_concatenation_l10n
+// =============================================================================
+
+/// String concatenation breaks word order in translations.
+///
+/// Different languages have different word orders. Concatenating strings
+/// makes proper translation impossible.
+///
+/// **BAD:**
+/// ```dart
+/// Text('Hello ' + userName + '!');  // Word order is fixed
+/// Text('$greeting $name');  // Same problem with interpolation
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(AppLocalizations.of(context).greeting(name));  // Proper l10n
+/// Text(Intl.message('Hello {name}!', args: [name]));
+/// ```
+class AvoidStringConcatenationL10nRule extends SaropaLintRule {
+  const AvoidStringConcatenationL10nRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_string_concatenation_l10n',
+    problemMessage:
+        '[avoid_string_concatenation_l10n] String concatenation in UI breaks '
+        'word order for translations.',
+    correctionMessage:
+        'Use Intl.message with placeholders or a localization solution that '
+        'supports proper word order.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'Text') return;
+
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final firstArg = args.first;
+
+      // Check for binary expression (string concatenation)
+      if (firstArg is BinaryExpression) {
+        if (firstArg.operator.lexeme == '+') {
+          reporter.atNode(firstArg, code);
+        }
+      }
+
+      // Check for string interpolation with variables
+      if (firstArg is StringInterpolation) {
+        // Count interpolation elements
+        int interpolationCount = 0;
+        for (final element in firstArg.elements) {
+          if (element is InterpolationExpression) {
+            interpolationCount++;
+          }
+        }
+        // If there are multiple interpolations, likely needs l10n
+        if (interpolationCount >= 2) {
+          reporter.atNode(firstArg, code);
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_intl_message_description
+// =============================================================================
+
+/// Intl.message should include description for translators.
+///
+/// Translators need context to translate correctly. The desc parameter
+/// explains when and how the string is used.
+///
+/// **BAD:**
+/// ```dart
+/// Intl.message('Submit');  // No context for translator
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Intl.message(
+///   'Submit',
+///   desc: 'Button text to submit the registration form',
+/// );
+/// ```
+class PreferIntlMessageDescriptionRule extends SaropaLintRule {
+  const PreferIntlMessageDescriptionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_intl_message_description',
+    problemMessage:
+        '[prefer_intl_message_description] Intl.message without description. '
+        'Translators need context to translate correctly.',
+    correctionMessage: 'Add desc parameter explaining when this text is shown.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Intl.message
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Intl') return;
+
+      if (node.methodName.name != 'message') return;
+
+      // Check for desc parameter
+      bool hasDesc = false;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'desc') {
+          hasDesc = true;
+          break;
+        }
+      }
+
+      if (!hasDesc) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_hardcoded_locale_strings
+// =============================================================================
+
+/// User-visible strings should use localization.
+///
+/// Hardcoded strings in Text widgets can't be translated.
+///
+/// **BAD:**
+/// ```dart
+/// Text('Welcome back!');  // Hardcoded English
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Text(AppLocalizations.of(context).welcomeBack);
+/// ```
+class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
+  const AvoidHardcodedLocaleStringsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hardcoded_locale_strings',
+    problemMessage:
+        '[avoid_hardcoded_locale_strings] `[HEURISTIC]` Hardcoded string in '
+        'Text widget. Use localization for user-visible text.',
+    correctionMessage:
+        'Replace with AppLocalizations.of(context).yourString or Intl.message.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Strings that are likely not user-visible or don't need translation
+  static const Set<String> _ignoredPatterns = <String>{
+    'http',
+    'https',
+    'mailto:',
+    'tel:',
+    '.com',
+    '.org',
+    '.net',
+    '@',
+    '©',
+    '®',
+    '™',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (typeName != 'Text') return;
+
+      final args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final firstArg = args.first;
+
+      // Check for string literal
+      String? stringValue;
+      if (firstArg is SimpleStringLiteral) {
+        stringValue = firstArg.value;
+      } else if (firstArg is AdjacentStrings) {
+        stringValue = firstArg.strings
+            .whereType<SimpleStringLiteral>()
+            .map((s) => s.value)
+            .join();
+      }
+
+      if (stringValue == null) return;
+
+      // Ignore empty strings and single characters
+      if (stringValue.length <= 1) return;
+
+      // Ignore strings that look like URLs, emails, etc.
+      for (final pattern in _ignoredPatterns) {
+        if (stringValue.toLowerCase().contains(pattern)) return;
+      }
+
+      // Ignore strings that are just numbers or punctuation
+      if (RegExp(r'^[\d\s\.,!?]+$').hasMatch(stringValue)) return;
+
+      // Ignore strings that look like identifiers
+      if (RegExp(r'^[a-z_][a-z0-9_]*$').hasMatch(stringValue)) return;
+
+      reporter.atNode(firstArg, code);
+    });
+  }
+}

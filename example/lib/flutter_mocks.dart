@@ -506,3 +506,119 @@ class MultiBlocProvider extends Widget {
 extension ReadContext on BuildContext {
   T read<T>() => throw UnimplementedError();
 }
+
+// ============================================================================
+// Cubit (mock for v4.1.4 rules)
+// ============================================================================
+
+abstract class Cubit<State> {
+  Cubit(State initialState);
+  State get state => throw UnimplementedError();
+  void emit(State state) {}
+}
+
+class UserBloc extends Bloc<Object, Object> {
+  UserBloc() : super(Object());
+}
+
+// ============================================================================
+// GetX (mock for v4.1.4 rules)
+// ============================================================================
+
+abstract class GetxController {
+  void onInit() {}
+  void onClose() {}
+}
+
+class Get {
+  static void put<T>(T instance) {}
+  static void lazyPut<T>(T Function() builder) {}
+  static void snackbar(String title, String message) {}
+}
+
+// ============================================================================
+// Hive (mock for v4.1.4 rules)
+// ============================================================================
+
+class Box<T> {}
+
+class LazyBox<T> {}
+
+class HiveType {
+  const HiveType({required int typeId});
+}
+
+class Hive {
+  static Future<Box<T>> openBox<T>(String name) async => Box<T>();
+  static Future<LazyBox<T>> openLazyBox<T>(String name) async => LazyBox<T>();
+}
+
+class Uint8List {
+  Uint8List(int length);
+}
+
+// ============================================================================
+// SharedPreferences (mock for v4.1.4 rules)
+// ============================================================================
+
+class SharedPreferences {
+  static Future<SharedPreferences> getInstance() async => SharedPreferences();
+  static void setPrefix(String prefix) {}
+}
+
+class SendPort {}
+
+// ============================================================================
+// Intl (mock for v4.1.4 rules)
+// ============================================================================
+
+class Intl {
+  static String message(String message, {List<Object>? args}) => message;
+}
+
+// ============================================================================
+// Navigation (mock for v4.1.4 rules)
+// ============================================================================
+
+class MaterialPageRoute<T> {
+  MaterialPageRoute({
+    required Widget Function(BuildContext) builder,
+    RouteSettings? settings,
+  });
+}
+
+class RouteSettings {
+  const RouteSettings({String? name});
+}
+
+// ============================================================================
+// ChangeNotifierProxyProvider (mock for v4.1.4 rules)
+// ============================================================================
+
+class ChangeNotifierProxyProvider<T, R extends ChangeNotifier> extends Widget {
+  const ChangeNotifierProxyProvider({
+    super.key,
+    required R Function(BuildContext) create,
+    required R Function(BuildContext, T, R?) update,
+    Widget? child,
+  });
+}
+
+// ============================================================================
+// freezed annotation (mock for v4.1.4 rules)
+// ============================================================================
+
+const freezed = _Freezed();
+
+class _Freezed {
+  const _Freezed();
+}
+
+// ============================================================================
+// WidgetsBinding (mock for v4.1.4 rules)
+// ============================================================================
+
+class WidgetsBinding {
+  static WidgetsBinding get instance => WidgetsBinding();
+  void addPostFrameCallback(void Function(Duration) callback) {}
+}

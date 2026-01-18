@@ -1390,3 +1390,404 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// NEW ROADMAP STAR RULES - Hive/SharedPrefs Rules
+// =============================================================================
+
+/// Warns when Box is used instead of LazyBox for potentially large collections.
+///
+/// LazyBox loads entries on-demand, avoiding memory issues with large datasets.
+/// Regular Box loads all entries into memory at once.
+///
+/// **BAD:**
+/// ```dart
+/// late Box<Message> messagesBox;
+/// // If messagesBox has 100,000 entries, all are loaded into memory!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// late LazyBox<Message> messagesBox;
+/// // Entries loaded on-demand, memory-efficient
+/// ```
+class PreferHiveLazyBoxRule extends SaropaLintRule {
+  const PreferHiveLazyBoxRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_hive_lazy_box',
+    problemMessage:
+        '[prefer_hive_lazy_box] Consider using LazyBox for potentially large '
+        'collections. Regular Box loads all entries into memory.',
+    correctionMessage:
+        'Use Hive.openLazyBox() instead of Hive.openBox() for large datasets.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check for field declarations with Box<T> type
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      final String? typeName = node.fields.type?.toSource();
+      if (typeName == null) return;
+
+      // Check for Box<T> but not LazyBox<T>
+      if (typeName.startsWith('Box<') && !typeName.contains('Lazy')) {
+        // Heuristic: warn if the type suggests a collection
+        // (messages, items, logs, history, etc.)
+        for (final variable in node.fields.variables) {
+          final name = variable.name.lexeme.toLowerCase();
+          if (_suggestsLargeCollection(name)) {
+            reporter.atNode(variable, code);
+          }
+        }
+      }
+    });
+
+    // Also check for Hive.openBox calls
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Hive') return;
+
+      if (node.methodName.name != 'openBox') return;
+
+      // Check the box name argument
+      final args = node.argumentList.arguments;
+      if (args.isNotEmpty) {
+        final firstArg = args.first;
+        if (firstArg is StringLiteral) {
+          final boxName = firstArg.stringValue?.toLowerCase() ?? '';
+          if (_suggestsLargeCollection(boxName)) {
+            reporter.atNode(node, code);
+          }
+        }
+      }
+    });
+  }
+
+  bool _suggestsLargeCollection(String name) {
+    const largeCollectionHints = <String>[
+      'message',
+      'chat',
+      'log',
+      'history',
+      'event',
+      'notification',
+      'item',
+      'record',
+      'cache',
+      'data',
+      'entry',
+      'transaction',
+    ];
+    return largeCollectionHints.any((hint) => name.contains(hint));
+  }
+}
+
+/// Warns when Uint8List or binary data is stored in Hive.
+///
+/// Hive is not optimized for large binary data. Store file paths instead
+/// and keep binary data in the file system.
+///
+/// **BAD:**
+/// ```dart
+/// @HiveType(typeId: 0)
+/// class Photo {
+///   @HiveField(0)
+///   Uint8List imageBytes; // Large binary data in Hive!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @HiveType(typeId: 0)
+/// class Photo {
+///   @HiveField(0)
+///   String imagePath; // Store path, not bytes
+/// }
+/// ```
+class AvoidHiveBinaryStorageRule extends SaropaLintRule {
+  const AvoidHiveBinaryStorageRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hive_binary_storage',
+    problemMessage:
+        '[avoid_hive_binary_storage] Storing Uint8List/binary data in Hive. '
+        'This degrades performance for large files.',
+    correctionMessage:
+        'Store file paths instead and keep binary data in the file system.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _binaryTypes = <String>{
+    'Uint8List',
+    'List<int>',
+    'ByteData',
+    'ByteBuffer',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class has @HiveType annotation
+      bool isHiveType = false;
+      for (final annotation in node.metadata) {
+        if (annotation.name.name == 'HiveType') {
+          isHiveType = true;
+          break;
+        }
+      }
+
+      if (!isHiveType) return;
+
+      // Check fields for binary types
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          final typeName = member.fields.type?.toSource();
+          if (typeName != null &&
+              _binaryTypes.any((t) => typeName.contains(t))) {
+            for (final variable in member.fields.variables) {
+              reporter.atNode(variable, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+/// Warns when SharedPreferences.setPrefix is not called for app isolation.
+///
+/// Setting a prefix avoids key conflicts between different apps or plugins
+/// that use SharedPreferences.
+///
+/// **BAD:**
+/// ```dart
+/// final prefs = await SharedPreferences.getInstance();
+/// prefs.setString('theme', 'dark'); // Could conflict with plugins
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SharedPreferences.setPrefix('myapp_');
+/// final prefs = await SharedPreferences.getInstance();
+/// prefs.setString('theme', 'dark'); // Now prefixed as 'myapp_theme'
+/// ```
+class RequireSharedPrefsPrefixRule extends SaropaLintRule {
+  const RequireSharedPrefsPrefixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'require_shared_prefs_prefix',
+    problemMessage:
+        '[require_shared_prefs_prefix] SharedPreferences usage detected. '
+        'Consider calling SharedPreferences.setPrefix() to avoid key conflicts.',
+    correctionMessage:
+        'Call SharedPreferences.setPrefix("myapp_") at app startup.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'SharedPreferences') return;
+
+      // Check for getInstance() without setPrefix
+      if (node.methodName.name == 'getInstance') {
+        // This is an INFO-level reminder
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when legacy SharedPreferences API is used instead of SharedPreferencesAsync.
+///
+/// SharedPreferencesAsync provides better error handling and is the recommended
+/// API for new code.
+///
+/// **BAD:**
+/// ```dart
+/// final prefs = await SharedPreferences.getInstance();
+/// await prefs.setString('key', 'value');
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final prefs = SharedPreferencesAsync();
+/// await prefs.setString('key', 'value');
+/// ```
+class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
+  const PreferSharedPrefsAsyncApiRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_shared_prefs_async_api',
+    problemMessage:
+        '[prefer_shared_prefs_async_api] Legacy SharedPreferences.getInstance() '
+        'detected. Consider using SharedPreferencesAsync for new code.',
+    correctionMessage:
+        'Use SharedPreferencesAsync() instead of SharedPreferences.getInstance().',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'SharedPreferences') return;
+
+      if (node.methodName.name == 'getInstance') {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Warns when SharedPreferences is used inside an isolate.
+///
+/// SharedPreferences doesn't work in isolates. Use alternative storage
+/// or pass data through ports.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> backgroundTask(SendPort sendPort) async {
+///   final prefs = await SharedPreferences.getInstance(); // Won't work!
+///   final value = prefs.getString('key');
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> backgroundTask(Map<String, dynamic> data) async {
+///   final key = data['key']; // Pass data instead of using prefs
+/// }
+/// ```
+class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
+  const AvoidSharedPrefsInIsolateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_shared_prefs_in_isolate',
+    problemMessage:
+        '[avoid_shared_prefs_in_isolate] SharedPreferences used in isolate context. '
+        'SharedPreferences does not work in isolates.',
+    correctionMessage:
+        'Pass required data through SendPort/ReceivePort instead.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final target = node.target;
+      if (target is! SimpleIdentifier) return;
+      if (target.name != 'SharedPreferences') return;
+
+      if (node.methodName.name == 'getInstance') {
+        // Check if inside an isolate context
+        if (_isInsideIsolateContext(node)) {
+          reporter.atNode(node, code);
+        }
+      }
+    });
+  }
+
+  bool _isInsideIsolateContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionDeclaration) {
+        // Check for common isolate entry point patterns
+        final params = current.functionExpression.parameters;
+        if (params != null) {
+          for (final param in params.parameters) {
+            final typeName = _getParameterTypeName(param);
+            if (typeName == 'SendPort' ||
+                typeName == 'ReceivePort' ||
+                typeName == 'IsolateStartRequest') {
+              return true;
+            }
+          }
+        }
+        // Check function name for isolate hints
+        final name = current.name.lexeme.toLowerCase();
+        if (name.contains('isolate') ||
+            name.contains('background') ||
+            name.contains('worker')) {
+          return true;
+        }
+      }
+      // Check for Isolate.spawn or compute context
+      if (current is MethodInvocation) {
+        final methodName = current.methodName.name;
+        if (methodName == 'spawn' || methodName == 'compute') {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  String? _getParameterTypeName(FormalParameter param) {
+    if (param is SimpleFormalParameter) {
+      return param.type?.toSource();
+    } else if (param is DefaultFormalParameter) {
+      final inner = param.parameter;
+      if (inner is SimpleFormalParameter) {
+        return inner.type?.toSource();
+      }
+    }
+    return null;
+  }
+}
