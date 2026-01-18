@@ -3156,3 +3156,406 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_large_touch_targets
+// =============================================================================
+
+/// Touch targets should be at least 48x48 logical pixels for accessibility.
+///
+/// Small touch targets are difficult for users with motor impairments
+/// or when using the app in challenging conditions.
+///
+/// **BAD:**
+/// ```dart
+/// GestureDetector(
+///   child: Container(
+///     width: 24,  // Too small!
+///     height: 24,
+///     child: Icon(Icons.close),
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// GestureDetector(
+///   child: Container(
+///     width: 48,  // Minimum accessible size
+///     height: 48,
+///     child: Icon(Icons.close),
+///   ),
+/// )
+/// ```
+class PreferLargeTouchTargetsRule extends SaropaLintRule {
+  const PreferLargeTouchTargetsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_large_touch_targets',
+    problemMessage:
+        '[prefer_large_touch_targets] Touch target is smaller than 48px. '
+        'This makes it difficult for users with motor impairments.',
+    correctionMessage: 'Increase the touch target size to at least 48x48 '
+        'logical pixels, or wrap in a larger touchable area.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Minimum recommended touch target size in logical pixels.
+  static const double _minTouchSize = 48.0;
+
+  /// Interactive widgets that need adequate touch targets.
+  static const Set<String> _interactiveWidgets = <String>{
+    'GestureDetector',
+    'InkWell',
+    'InkResponse',
+    'IconButton',
+    'TextButton',
+    'ElevatedButton',
+    'OutlinedButton',
+    'FloatingActionButton',
+    'Checkbox',
+    'Radio',
+    'Switch',
+    'Slider',
+    'Chip',
+    'ActionChip',
+    'FilterChip',
+    'ChoiceChip',
+    'InputChip',
+    'PopupMenuButton',
+    'DropdownButton',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name2.lexeme;
+      if (!_interactiveWidgets.contains(typeName)) return;
+
+      // Check for explicit small size constraints
+      double? width;
+      double? height;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+
+        final String paramName = arg.name.label.name;
+        final Expression value = arg.expression;
+
+        if (paramName == 'width' && value is DoubleLiteral) {
+          width = value.value;
+        } else if (paramName == 'height' && value is DoubleLiteral) {
+          height = value.value;
+        } else if (paramName == 'width' && value is IntegerLiteral) {
+          width = value.value?.toDouble();
+        } else if (paramName == 'height' && value is IntegerLiteral) {
+          height = value.value?.toDouble();
+        } else if (paramName == 'iconSize' && value is DoubleLiteral) {
+          // IconButton uses iconSize
+          if (value.value < _minTouchSize) {
+            reporter.atNode(arg, code);
+          }
+        } else if (paramName == 'iconSize' && value is IntegerLiteral) {
+          if ((value.value ?? 0) < _minTouchSize) {
+            reporter.atNode(arg, code);
+          }
+        } else if (paramName == 'constraints') {
+          // Check BoxConstraints
+          _checkBoxConstraints(arg.expression, reporter);
+        }
+      }
+
+      // Report if explicit dimensions are too small
+      if (width != null && width < _minTouchSize) {
+        reporter.atNode(node, code);
+      } else if (height != null && height < _minTouchSize) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  void _checkBoxConstraints(
+    Expression expr,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (expr is! InstanceCreationExpression) return;
+
+    final String typeName = expr.constructorName.type.name2.lexeme;
+    if (typeName != 'BoxConstraints') return;
+
+    for (final Expression arg in expr.argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+
+      final String paramName = arg.name.label.name;
+      final Expression value = arg.expression;
+
+      double? size;
+      if (value is DoubleLiteral) {
+        size = value.value;
+      } else if (value is IntegerLiteral) {
+        size = value.value?.toDouble();
+      }
+
+      if (size != null && size < _minTouchSize) {
+        if (paramName == 'maxWidth' ||
+            paramName == 'maxHeight' ||
+            paramName == 'minWidth' ||
+            paramName == 'minHeight') {
+          reporter.atNode(arg, code);
+        }
+      }
+    }
+  }
+}
+
+// =============================================================================
+// avoid_time_limits
+// =============================================================================
+
+/// Warns when timed interactions disadvantage users who need more time.
+///
+/// Auto-logout, disappearing toasts, and timed actions can be problematic
+/// for users with cognitive or motor disabilities who need more time.
+///
+/// **BAD:**
+/// ```dart
+/// Timer(Duration(seconds: 3), () {
+///   Navigator.of(context).pop(); // Auto-dismiss after 3 seconds
+/// });
+///
+/// ScaffoldMessenger.of(context).showSnackBar(
+///   SnackBar(
+///     content: Text('Action completed'),
+///     duration: Duration(seconds: 2), // Too short!
+///   ),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Allow user to dismiss manually, or use longer duration
+/// ScaffoldMessenger.of(context).showSnackBar(
+///   SnackBar(
+///     content: Text('Action completed'),
+///     duration: Duration(seconds: 10),
+///     action: SnackBarAction(label: 'Dismiss', onPressed: () {}),
+///   ),
+/// );
+/// ```
+class AvoidTimeLimitsRule extends SaropaLintRule {
+  const AvoidTimeLimitsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_time_limits',
+    problemMessage:
+        '[avoid_time_limits] Short duration may disadvantage users who need '
+        'more time. Consider longer durations or manual dismissal.',
+    correctionMessage:
+        'Use duration >= 10 seconds or provide manual dismiss option.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // Minimum duration in seconds for accessibility
+  static const int _minDurationSeconds = 5;
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String constructorName = node.constructorName.type.name2.lexeme;
+      if (constructorName != 'SnackBar' && constructorName != 'Toast') return;
+
+      // Check for duration parameter
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'duration') {
+          final durationValue = _extractDurationSeconds(arg.expression);
+          if (durationValue != null && durationValue < _minDurationSeconds) {
+            reporter.atNode(arg, code);
+          }
+        }
+      }
+    });
+
+    // Also check Timer with auto-dismiss patterns
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Timer') return;
+
+      // Check for short timers that might auto-dismiss
+      if (node.argumentList.arguments.isNotEmpty) {
+        final firstArg = node.argumentList.arguments.first;
+        final durationValue = _extractDurationSeconds(firstArg);
+        if (durationValue != null && durationValue < _minDurationSeconds) {
+          // Check if callback contains navigation or dismiss
+          if (node.argumentList.arguments.length >= 2) {
+            final callback = node.argumentList.arguments[1];
+            final callbackSource = callback.toSource();
+            if (callbackSource.contains('pop') ||
+                callbackSource.contains('dismiss') ||
+                callbackSource.contains('hide') ||
+                callbackSource.contains('close')) {
+              reporter.atNode(node, code);
+            }
+          }
+        }
+      }
+    });
+  }
+
+  int? _extractDurationSeconds(Expression expr) {
+    if (expr is! InstanceCreationExpression) return null;
+
+    final typeName = expr.constructorName.type.name2.lexeme;
+    if (typeName != 'Duration') return null;
+
+    final constructorNameNode = expr.constructorName.name;
+    if (constructorNameNode != null) {
+      // Named constructor like Duration.seconds(5)
+      for (final arg in expr.argumentList.arguments) {
+        if (arg is IntegerLiteral) {
+          if (constructorNameNode.name == 'seconds') {
+            return arg.value;
+          } else if (constructorNameNode.name == 'milliseconds') {
+            return (arg.value ?? 0) ~/ 1000;
+          }
+        }
+      }
+    } else {
+      // Positional constructor Duration(seconds: 5)
+      for (final arg in expr.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final name = arg.name.label.name;
+          final value = arg.expression;
+          if (value is IntegerLiteral) {
+            if (name == 'seconds') {
+              return value.value;
+            } else if (name == 'milliseconds') {
+              return (value.value ?? 0) ~/ 1000;
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+}
+
+// =============================================================================
+// require_drag_alternatives
+// =============================================================================
+
+/// Warns when drag gestures lack button alternatives.
+///
+/// Drag gestures are difficult for users with motor disabilities.
+/// Provide button alternatives for drag-to-reorder, swipe-to-delete, etc.
+///
+/// **BAD:**
+/// ```dart
+/// ReorderableListView(
+///   children: items.map((item) => ListTile(key: Key(item.id))).toList(),
+///   onReorder: (oldIndex, newIndex) => reorder(oldIndex, newIndex),
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ReorderableListView(
+///   children: items.map((item) => ListTile(
+///     key: Key(item.id),
+///     trailing: ReorderableDragStartListener(
+///       index: items.indexOf(item),
+///       child: IconButton(
+///         icon: Icon(Icons.drag_handle),
+///         onPressed: () => showReorderDialog(item),
+///       ),
+///     ),
+///   )).toList(),
+///   onReorder: (oldIndex, newIndex) => reorder(oldIndex, newIndex),
+/// )
+/// ```
+class RequireDragAlternativesRule extends SaropaLintRule {
+  const RequireDragAlternativesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'require_drag_alternatives',
+    problemMessage:
+        '[require_drag_alternatives] `[HEURISTIC]` Drag-based widget without '
+        'obvious button alternative. Some users cannot perform drag gestures.',
+    correctionMessage: 'Provide button-based alternatives for drag operations.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String? constructorName = node.constructorName.type.element?.name;
+
+      // Check for drag-based widgets
+      if (constructorName != 'ReorderableListView' &&
+          constructorName != 'Dismissible' &&
+          constructorName != 'LongPressDraggable' &&
+          constructorName != 'Draggable') {
+        return;
+      }
+
+      // Check if there's an alternative mechanism nearby
+      final parentSource = node.parent?.toSource() ?? '';
+
+      // Look for button alternatives in nearby code
+      final hasButtonAlternative = parentSource.contains('IconButton') ||
+          parentSource.contains('ElevatedButton') ||
+          parentSource.contains('TextButton') ||
+          parentSource.contains('PopupMenuButton') ||
+          parentSource.contains('showDialog') ||
+          parentSource.contains('showModalBottomSheet');
+
+      if (!hasButtonAlternative) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}
