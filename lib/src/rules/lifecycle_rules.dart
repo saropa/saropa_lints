@@ -327,3 +327,129 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// v4.1.6 Rules - Late Initialization
+// =============================================================================
+
+/// Warns when late widget fields are initialized in build() instead of initState().
+///
+/// Late fields in StatefulWidget State classes should be initialized in
+/// initState(), not build(). build() can be called multiple times, causing
+/// redundant initialization or state loss.
+///
+/// **BAD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   late TextEditingController _controller;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     _controller = TextEditingController(); // Wrong! Recreated on every build!
+///     return TextField(controller: _controller);
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   late TextEditingController _controller;
+///
+///   @override
+///   void initState() {
+///     super.initState();
+///     _controller = TextEditingController(); // Correct!
+///   }
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return TextField(controller: _controller);
+///   }
+/// }
+/// ```
+class RequireLateInitializationInInitStateRule extends SaropaLintRule {
+  const RequireLateInitializationInInitStateRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'require_late_initialization_in_init_state',
+    problemMessage:
+        '[require_late_initialization_in_init_state] Late field should be initialized in initState(), not build().',
+    correctionMessage:
+        'Move initialization to initState() to avoid redundant recreation.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Only check State classes
+      final ExtendsClause? extendsClause = node.extendsClause;
+      if (extendsClause == null) return;
+
+      final String superclass = extendsClause.superclass.toSource();
+      if (!superclass.startsWith('State<')) return;
+
+      // Collect late fields
+      final Set<String> lateFields = <String>{};
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration && member.fields.isLate) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            // Only track uninitialized late fields
+            if (variable.initializer == null) {
+              lateFields.add(variable.name.lexeme);
+            }
+          }
+        }
+      }
+
+      if (lateFields.isEmpty) return;
+
+      // Find build method and check for late field assignments
+      for (final ClassMember member in node.members) {
+        if (member is MethodDeclaration && member.name.lexeme == 'build') {
+          _checkBuildMethodForLateAssignments(member, lateFields, reporter);
+        }
+      }
+    });
+  }
+
+  void _checkBuildMethodForLateAssignments(
+    MethodDeclaration buildMethod,
+    Set<String> lateFields,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final FunctionBody? body = buildMethod.body;
+    if (body == null) return;
+
+    // Find all assignment expressions in the build method
+    final String bodySource = body.toSource();
+
+    for (final String fieldName in lateFields) {
+      // Check for direct assignment: fieldName =
+      // or this.fieldName =
+      final RegExp assignmentPattern = RegExp(
+        '(?:^|[^\\w])(?:this\\.)?$fieldName\\s*=\\s*[^=]',
+      );
+
+      if (assignmentPattern.hasMatch(bodySource)) {
+        // Report at the build method level
+        reporter.atNode(buildMethod, code);
+        return; // Only report once per build method
+      }
+    }
+  }
+}

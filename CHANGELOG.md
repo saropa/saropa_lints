@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
 
+## [4.1.6] - 2026-01-18
+
+### Added
+
+**14 new lint rules** focusing on logging, platform safety, JSON/API handling, and configuration:
+
+#### Logging Rules (debug_rules.dart)
+- `avoid_print_in_release` - print() executes in release builds; guard with kDebugMode
+- `require_structured_logging` - Use structured logging instead of string concatenation
+- `avoid_sensitive_in_logs` - Detect passwords, tokens, secrets in log calls
+
+#### Platform Rules (platform_rules.dart)
+- `require_platform_check` - Platform-specific APIs need Platform/kIsWeb guards
+- `prefer_platform_io_conditional` - Platform.isX crashes on web; use kIsWeb first
+- `avoid_web_only_dependencies` - dart:html and web-only imports crash on mobile
+- `prefer_foundation_platform_check` - Use defaultTargetPlatform in widget code
+
+#### JSON/API Rules (json_datetime_rules.dart)
+- `require_date_format_specification` - DateTime.parse may fail on server dates
+- `prefer_iso8601_dates` - Use ISO 8601 format for date serialization
+- `avoid_optional_field_crash` - JSON field chaining needs null-aware operators
+- `prefer_explicit_json_keys` - Use @JsonKey instead of manual mapping
+
+#### Configuration Rules (config_rules.dart)
+- `avoid_hardcoded_config` - Hardcoded URLs/keys should use environment variables
+- `avoid_mixed_environments` - Don't mix production and development config
+
+#### Lifecycle Rules (lifecycle_rules.dart)
+- `require_late_initialization_in_init_state` - Late fields should init in initState(), not build()
+
+### Tier Assignments
+- **Essential tier:** 9 rules for critical safety (print in release, platform crashes, etc.)
+- **Recommended tier:** 2 rules for best practices
+- **Professional tier:** 3 rules for code quality
+
 ## [4.1.5] - 2026-01-18
 
 ### Added
