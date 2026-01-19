@@ -248,7 +248,7 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hive_box_close',
     problemMessage:
-        '[require_hive_box_close] Hive box opened but not closed in dispose. Resource leak.',
+        '[require_hive_box_close] Hive database box opened but not closed in dispose. The file handle remains open, preventing database compaction and causing memory leaks over time.',
     correctionMessage: 'Call box.close() in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1788,6 +1788,135 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
         return inner.type?.toSource();
       }
     }
+    return null;
+  }
+}
+
+// =============================================================================
+// require_hive_migration_strategy
+// =============================================================================
+
+/// Warns when @HiveType class is modified without migration strategy.
+///
+/// Alias: hive_migration, hive_schema_change
+///
+/// Adding/removing/reordering @HiveField annotations breaks existing data.
+/// Document migration strategy or use defaultValue for new fields.
+///
+/// **BAD:**
+/// ```dart
+/// // Version 2 - removed email, renamed name to fullName
+/// @HiveType(typeId: 0)
+/// class User {
+///   @HiveField(0) // Was 'name', now 'fullName' - data corrupted!
+///   final String fullName;
+///   // email field removed - existing data orphaned
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Version 2 - properly migrated
+/// @HiveType(typeId: 0)
+/// class User {
+///   @HiveField(0) // Keep original index for 'name'
+///   final String name;
+///
+///   @HiveField(2, defaultValue: '') // New field with default
+///   final String fullName;
+///
+///   @HiveField(1) // Keep email field index even if not used
+///   @Deprecated('Use newEmail instead')
+///   final String? email;
+/// }
+///
+/// // Or create a new type with migration
+/// @HiveType(typeId: 1) // New typeId for breaking changes
+/// class UserV2 { ... }
+/// ```
+class RequireHiveMigrationStrategyRule extends SaropaLintRule {
+  const RequireHiveMigrationStrategyRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_hive_migration_strategy',
+    problemMessage:
+        '[require_hive_migration_strategy] @HiveType with gaps in @HiveField '
+        'indices. This suggests fields were removed without migration.',
+    correctionMessage:
+        'Keep all @HiveField indices even for removed fields, or create new typeId for breaking changes.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if this is a HiveType class
+      bool isHiveType = false;
+      for (final annotation in node.metadata) {
+        if (annotation.name.name == 'HiveType') {
+          isHiveType = true;
+          break;
+        }
+      }
+
+      if (!isHiveType) return;
+
+      // Collect all @HiveField indices
+      final List<int> indices = <int>[];
+
+      for (final member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final annotation in member.metadata) {
+            if (annotation.name.name == 'HiveField') {
+              final index = _extractHiveFieldIndex(annotation);
+              if (index != null) {
+                indices.add(index);
+              }
+            }
+          }
+        }
+      }
+
+      if (indices.isEmpty) return;
+
+      // Sort and check for gaps
+      indices.sort();
+
+      // Check for gaps in indices (suggests removed fields)
+      for (int i = 0; i < indices.length - 1; i++) {
+        if (indices[i + 1] - indices[i] > 1) {
+          // Gap found - might indicate removed field without migration
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+
+      // Check if indices don't start at 0 (suggests early fields removed)
+      if (indices.isNotEmpty && indices.first > 0) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  int? _extractHiveFieldIndex(Annotation annotation) {
+    final args = annotation.arguments;
+    if (args == null || args.arguments.isEmpty) return null;
+
+    final firstArg = args.arguments.first;
+    if (firstArg is IntegerLiteral) {
+      return firstArg.value;
+    }
+
     return null;
   }
 }

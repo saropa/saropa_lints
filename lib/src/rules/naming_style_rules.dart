@@ -106,26 +106,39 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when comments don't follow proper formatting.
+/// Warns when single-line comments don't start with a capital letter.
 ///
-/// Comments should start with a capital letter and end with proper punctuation.
+/// Prose comments should start with a capital letter for readability.
+/// Commented-out code is automatically detected and skipped to avoid false
+/// positives on patterns like `// foo.bar()` or `// return x;`.
 ///
-/// ### Example
+/// **Detection heuristics for commented-out code:**
+/// - Identifier followed by code punctuation: `// foo.bar`, `// x = 5`
+/// - Dart keywords at start: `// return`, `// if (`, `// final x`
+/// - Type declarations: `// int value`, `// String name`
+/// - Function/method calls: `// doSomething()`, `// list.add(item)`
+/// - Ends with semicolon: `// statement;`
+/// - Starts with annotation: `// @override`
 ///
-/// #### BAD:
+/// **BAD:**
 /// ```dart
 /// // this is a bad comment
-/// /// returns the value
+/// // the user can click here
 /// ```
 ///
-/// #### GOOD:
+/// **GOOD:**
 /// ```dart
 /// // This is a good comment.
-/// /// Returns the value.
+/// // The user can click here.
+/// // foo.bar()  ← Skipped (code)
+/// // return x;  ← Skipped (code)
+/// // TODO: fix this  ← Skipped (special marker)
 /// ```
+///
+/// **Quick fix available:** Capitalizes the first letter of the comment.
+///
+/// See also: [CommentPatterns] for shared detection heuristics.
 class FormatCommentRule extends SaropaLintRule {
-  /// Pre-compiled pattern for performance
-  static final RegExp _lowercaseStartPattern = RegExp(r'^[a-z]');
   const FormatCommentRule() : super(code: _code);
 
   /// Style/consistency. Large counts acceptable in legacy code.
@@ -175,9 +188,82 @@ class FormatCommentRule extends SaropaLintRule {
             if (content.isNotEmpty && content[0].toLowerCase() == content[0]) {
               // First char is lowercase
               if (_lowercaseStartPattern.hasMatch(content)) {
+                // Skip if this looks like commented-out code
+                if (_codePattern.hasMatch(content)) {
+                  commentToken = commentToken.next;
+                  continue;
+                }
                 reporter.atToken(commentToken, code);
               }
             }
+          }
+
+          commentToken = commentToken.next;
+        }
+
+        token = token.next;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CapitalizeCommentFix()];
+}
+
+/// Quick fix that capitalizes the first letter of a comment.
+class _CapitalizeCommentFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        Token? commentToken = token.precedingComments;
+
+        while (commentToken != null) {
+          // Check if this comment matches the error location
+          if (commentToken.offset == analysisError.offset) {
+            final String lexeme = commentToken.lexeme;
+
+            // Find the first letter position after //
+            final int slashEnd = lexeme.indexOf('//') + 2;
+            int firstLetterIndex = slashEnd;
+
+            // Skip whitespace after //
+            while (firstLetterIndex < lexeme.length &&
+                lexeme[firstLetterIndex] == ' ') {
+              firstLetterIndex++;
+            }
+
+            if (firstLetterIndex < lexeme.length) {
+              final String firstChar = lexeme[firstLetterIndex];
+              final String capitalizedChar = firstChar.toUpperCase();
+
+              if (firstChar != capitalizedChar) {
+                final ChangeBuilder changeBuilder =
+                    reporter.createChangeBuilder(
+                  message: 'Capitalize comment',
+                  priority: 1,
+                );
+
+                changeBuilder.addDartFileEdit((builder) {
+                  builder.addSimpleReplacement(
+                    SourceRange(
+                      commentToken!.offset + firstLetterIndex,
+                      1,
+                    ),
+                    capitalizedChar,
+                  );
+                });
+              }
+            }
+            return;
           }
 
           commentToken = commentToken.next;

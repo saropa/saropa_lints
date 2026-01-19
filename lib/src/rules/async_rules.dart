@@ -80,7 +80,7 @@ class AvoidFutureToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_future_tostring',
     problemMessage:
-        "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Consequence: This leads to confusing logs, makes debugging async code harder, and can hide real issues in production.",
+        "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Logs show useless output, error messages fail to include actual data, and debugging async code becomes nearly impossible.",
     correctionMessage:
         'Use await to get the value first: (await future).toString().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2005,18 +2005,28 @@ class PreferUtcForStorageRule extends SaropaLintRule {
       }
 
       // Check if inside a storage-related context
+      // Use word boundary patterns to avoid false positives like 'edgeInsets'
+      final storagePatterns = <RegExp>[
+        RegExp(r'\binsert\w*\s*\(', caseSensitive: false),
+        RegExp(r'\bupdate\w*\s*\(', caseSensitive: false),
+        RegExp(r'\bsave\w*\s*\(', caseSensitive: false),
+        RegExp(r'\bstore\w*\s*\(', caseSensitive: false),
+        RegExp(r'\bwrite\w*\s*\(', caseSensitive: false),
+        RegExp(r'\bput\w*\s*\(', caseSensitive: false),
+        // 'set' needs careful matching to avoid 'edgeInsets', 'offset', etc.
+        RegExp(r'\.set\w*\s*\(',
+            caseSensitive: false), // .setItem(, .setString(
+        RegExp(r'\bsetState\s*\(', caseSensitive: false), // setState(
+      ];
+
       AstNode? current = node.parent;
       while (current != null) {
-        final String source = current.toSource().toLowerCase();
-        if (source.contains('insert') ||
-            source.contains('update') ||
-            source.contains('save') ||
-            source.contains('store') ||
-            source.contains('write') ||
-            source.contains('put') ||
-            source.contains('set')) {
-          reporter.atNode(node, code);
-          return;
+        final String source = current.toSource();
+        for (final pattern in storagePatterns) {
+          if (pattern.hasMatch(source)) {
+            reporter.atNode(node, code);
+            return;
+          }
         }
         current = current.parent;
       }
@@ -2205,7 +2215,7 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_close',
     problemMessage:
-        '[require_stream_controller_close] If you do not call close() on your StreamController in dispose(), your app will leak memory and system resources. This can cause slowdowns, crashes, and unpredictable bugs.',
+        '[require_stream_controller_close] StreamController without close() in dispose() keeps the stream open indefinitely. Listeners accumulate in memory, causing memory leaks that slow the app and eventually crash it when memory is exhausted.',
     correctionMessage:
         'Always call controller.close() in dispose() to safely release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -4189,5 +4199,294 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+}
+
+// =============================================================================
+// avoid_stream_sync_events
+// =============================================================================
+
+/// Warns when synchronous events are added to a stream.
+///
+/// Alias: stream_sync_add, async_stream_events
+///
+/// Adding events synchronously to a stream can cause issues if listeners
+/// aren't yet attached or if the stream is paused. Use scheduleMicrotask
+/// or Future.microtask for the first event.
+///
+/// **BAD:**
+/// ```dart
+/// StreamController<int> _controller;
+///
+/// void init() {
+///   _controller = StreamController<int>();
+///   _controller.add(0); // Sync add - listeners may miss this!
+///   return _controller.stream;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// StreamController<int> _controller;
+///
+/// void init() {
+///   _controller = StreamController<int>();
+///   // Give listeners time to attach
+///   scheduleMicrotask(() => _controller.add(0));
+///   return _controller.stream;
+/// }
+///
+/// // Or use sync: true if you intend synchronous delivery
+/// _controller = StreamController<int>.broadcast(sync: true);
+/// ```
+class AvoidStreamSyncEventsRule extends SaropaLintRule {
+  const AvoidStreamSyncEventsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_stream_sync_events',
+    problemMessage:
+        '[avoid_stream_sync_events] Stream event added synchronously right '
+        'after controller creation. Listeners may not be attached yet.',
+    correctionMessage:
+        'Use scheduleMicrotask() or Future.microtask() to delay first event, '
+        'or use StreamController(sync: true) if synchronous delivery is intended.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for stream add methods
+      if (methodName != 'add' && methodName != 'addError') return;
+
+      // Check if target is a StreamController
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('controller') &&
+          !targetSource.contains('stream')) {
+        return;
+      }
+
+      // Check if this is immediately after controller creation
+      AstNode? current = node.parent;
+      FunctionBody? functionBody;
+
+      while (current != null) {
+        if (current is FunctionBody) {
+          functionBody = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (functionBody == null) return;
+
+      final String bodySource = functionBody.toSource();
+      final int nodeOffset = node.offset;
+      final int bodyOffset = functionBody.offset;
+
+      // Check if StreamController is created in this function
+      if (!bodySource.contains('StreamController')) return;
+
+      // Check if the add is close to the controller creation (within a few statements)
+      final String beforeAdd = bodySource.substring(0, nodeOffset - bodyOffset);
+
+      // Check for microtask wrapping
+      if (beforeAdd.contains('scheduleMicrotask') ||
+          beforeAdd.contains('Future.microtask') ||
+          beforeAdd.contains('Timer.run') ||
+          bodySource.contains('sync: true')) {
+        return; // Properly handled
+      }
+
+      // Check if StreamController creation is within last 200 chars (rough heuristic)
+      final int controllerIndex = beforeAdd.lastIndexOf('StreamController');
+      if (controllerIndex != -1 && (beforeAdd.length - controllerIndex) < 200) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_sequential_awaits
+// =============================================================================
+
+/// Warns when multiple independent awaits are performed sequentially.
+///
+/// Alias: parallel_await, concurrent_futures
+///
+/// Sequential awaits for independent operations waste time. Use Future.wait
+/// for concurrent execution when operations don't depend on each other.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final users = await fetchUsers();      // Takes 2 seconds
+///   final products = await fetchProducts(); // Takes 2 seconds
+///   final orders = await fetchOrders();     // Takes 2 seconds
+///   // Total: 6 seconds
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> loadData() async {
+///   final results = await Future.wait([
+///     fetchUsers(),
+///     fetchProducts(),
+///     fetchOrders(),
+///   ]);
+///   final users = results[0];
+///   final products = results[1];
+///   final orders = results[2];
+///   // Total: 2 seconds (max of all three)
+/// }
+///
+/// // Or with record destructuring (Dart 3+):
+/// final (users, products, orders) = await (
+///   fetchUsers(),
+///   fetchProducts(),
+///   fetchOrders(),
+/// ).wait;
+/// ```
+class AvoidSequentialAwaitsRule extends SaropaLintRule {
+  const AvoidSequentialAwaitsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_sequential_awaits',
+    problemMessage:
+        '[avoid_sequential_awaits] Multiple sequential awaits on independent '
+        'operations. Total time is sum of all; could run in parallel.',
+    correctionMessage:
+        'Use Future.wait([...]) to run independent futures concurrently.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionBody((FunctionBody body) {
+      if (body is! BlockFunctionBody) return;
+
+      // Find all await expressions in the body
+      final List<AwaitExpression> awaits = <AwaitExpression>[];
+      body.accept(_AwaitCollector(awaits));
+
+      if (awaits.length < 3) return; // Need at least 3 sequential awaits
+
+      // Check for sequential awaits that don't depend on each other
+      for (int i = 0; i < awaits.length - 2; i++) {
+        final AwaitExpression first = awaits[i];
+        final AwaitExpression second = awaits[i + 1];
+        final AwaitExpression third = awaits[i + 2];
+
+        // Check if they are in sequential statements
+        if (!_areSequentialStatements(first, second, third)) continue;
+
+        // Check if they look independent (don't use each other's results)
+        if (_areIndependentAwaits(first, second, third, body)) {
+          reporter.atNode(second, code);
+          break; // Only report once per function
+        }
+      }
+    });
+  }
+
+  bool _areSequentialStatements(
+    AwaitExpression first,
+    AwaitExpression second,
+    AwaitExpression third,
+  ) {
+    // Check if all three are direct children of expression statements
+    // in the same block
+    final firstStmt = first.thisOrAncestorOfType<Statement>();
+    final secondStmt = second.thisOrAncestorOfType<Statement>();
+    final thirdStmt = third.thisOrAncestorOfType<Statement>();
+
+    if (firstStmt == null || secondStmt == null || thirdStmt == null) {
+      return false;
+    }
+
+    // Check they're in the same block
+    final firstBlock = firstStmt.parent;
+    final secondBlock = secondStmt.parent;
+    final thirdBlock = thirdStmt.parent;
+
+    return firstBlock == secondBlock && secondBlock == thirdBlock;
+  }
+
+  bool _areIndependentAwaits(
+    AwaitExpression first,
+    AwaitExpression second,
+    AwaitExpression third,
+    FunctionBody body,
+  ) {
+    // Get variable names assigned from first two awaits
+    final Set<String> assignedVars = <String>{};
+
+    for (final await in [first, second]) {
+      AstNode? parent = await.parent;
+      while (parent != null) {
+        if (parent is VariableDeclaration) {
+          assignedVars.add(parent.name.lexeme);
+          break;
+        }
+        if (parent is AssignmentExpression &&
+            parent.leftHandSide is SimpleIdentifier) {
+          assignedVars.add((parent.leftHandSide as SimpleIdentifier).name);
+          break;
+        }
+        if (parent is Statement) break;
+        parent = parent.parent;
+      }
+    }
+
+    // Check if second and third await expressions use first's result
+    final String secondSource = second.expression.toSource();
+    final String thirdSource = third.expression.toSource();
+
+    for (final varName in assignedVars) {
+      if (secondSource.contains(varName) || thirdSource.contains(varName)) {
+        return false; // Not independent - uses result of previous await
+      }
+    }
+
+    return true;
+  }
+}
+
+class _AwaitCollector extends RecursiveAstVisitor<void> {
+  _AwaitCollector(this.awaits);
+
+  final List<AwaitExpression> awaits;
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    awaits.add(node);
+    super.visitAwaitExpression(node);
   }
 }

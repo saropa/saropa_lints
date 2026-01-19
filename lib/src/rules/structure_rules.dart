@@ -387,20 +387,66 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 // Large files are often necessary and completely valid for:
 // - Data files, enums, constants, lookup tables
 // - Generated code
+// - Test files (which have separate rules with higher thresholds)
 // - Configuration/theme files
 // - Localization/translation files
-// - Test fixtures with many test cases
 //
 // All rules use INFO severity. Enable only if your team prefers smaller files.
 // Disable for files where large size is intentional (use ignore comments).
 //
-// | Threshold | Rule                    | Tier          |
-// |-----------|-------------------------|---------------|
-// | 200 lines | prefer_small_files      | insanity      |
-// | 300 lines | avoid_medium_files      | professional  |
-// | 500 lines | avoid_long_files        | comprehensive |
-// | 1000 lines| avoid_very_long_files   | recommended   |
+// Production rules (non-test files):
+// | Threshold  | Rule                    | Tier          |
+// |------------|-------------------------|---------------|
+// | 200 lines  | prefer_small_files      | insanity      |
+// | 300 lines  | avoid_medium_files      | professional  |
+// | 500 lines  | avoid_long_files        | comprehensive |
+// | 1000 lines | avoid_very_long_files   | recommended   |
+//
+// Test file rules (files in test/, test_driver/, integration_test/):
+// | Threshold  | Rule                         | Tier          |
+// |------------|------------------------------|---------------|
+// | 400 lines  | prefer_small_test_files      | insanity      |
+// | 600 lines  | avoid_medium_test_files      | professional  |
+// | 1000 lines | avoid_long_test_files        | comprehensive |
+// | 2000 lines | avoid_very_long_test_files   | recommended   |
 // =============================================================================
+
+/// Checks if a file is a test file based on its path.
+///
+/// A file is considered a test file if it is located in a recognized test
+/// directory: `/test/`, `/test_driver/`, or `/integration_test/`.
+bool _isTestFile(String filePath) {
+  final String normalizedPath = filePath.replaceAll('\\', '/');
+  return normalizedPath.contains('/test/') ||
+      normalizedPath.contains('/test_driver/') ||
+      normalizedPath.contains('/integration_test/');
+}
+
+/// Shared implementation for file length rules.
+///
+/// Checks if the file exceeds [maxLines] and reports a diagnostic if so.
+/// The [forTestFiles] parameter determines whether the rule applies to
+/// test files (true) or production files (false).
+void _checkFileLength({
+  required CustomLintResolver resolver,
+  required SaropaDiagnosticReporter reporter,
+  required CustomLintContext context,
+  required LintCode code,
+  required int maxLines,
+  required bool forTestFiles,
+}) {
+  final bool isTest = _isTestFile(resolver.path);
+  if (forTestFiles != isTest) return;
+
+  context.registry.addCompilationUnit((CompilationUnit unit) {
+    final Token endToken = unit.endToken;
+    final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
+
+    if (lineCount > maxLines) {
+      reporter.atToken(unit.beginToken, code);
+    }
+  });
+}
 
 /// **OPINIONATED**: Suggests keeping files under 200 lines for maximum
 /// maintainability.
@@ -444,14 +490,14 @@ class PreferSmallFilesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
-      final Token endToken = unit.endToken;
-      final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
-
-      if (lineCount > _maxLines) {
-        reporter.atToken(unit.beginToken, code);
-      }
-    });
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: false,
+    );
   }
 }
 
@@ -489,14 +535,14 @@ class AvoidMediumFilesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
-      final Token endToken = unit.endToken;
-      final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
-
-      if (lineCount > _maxLines) {
-        reporter.atToken(unit.beginToken, code);
-      }
-    });
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: false,
+    );
   }
 }
 
@@ -534,14 +580,14 @@ class AvoidLongFilesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
-      final Token endToken = unit.endToken;
-      final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
-
-      if (lineCount > _maxLines) {
-        reporter.atToken(unit.beginToken, code);
-      }
-    });
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: false,
+    );
   }
 }
 
@@ -581,14 +627,247 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addCompilationUnit((CompilationUnit unit) {
-      final Token endToken = unit.endToken;
-      final int lineCount = unit.lineInfo.getLocation(endToken.end).lineNumber;
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: false,
+    );
+  }
+}
 
-      if (lineCount > _maxLines) {
-        reporter.atToken(unit.beginToken, code);
-      }
-    });
+// =============================================================================
+// TEST FILE LENGTH RULES (Tiered) - Higher thresholds for test files
+// =============================================================================
+//
+// Test files often legitimately have more lines because:
+// - Many test cases are needed for thorough coverage
+// - Test fixtures and setup can be verbose
+// - Tests are often self-contained with repeated boilerplate
+// - Good testing requires covering edge cases, which adds lines
+//
+// These rules apply only to files in test/, test_driver/, or integration_test/
+// directories. They use double the threshold of their production counterparts.
+// =============================================================================
+
+/// **OPINIONATED**: Suggests keeping test files under 400 lines.
+///
+/// While test files typically need more room than production code, very large
+/// test files can still indicate poor organization. Consider splitting by
+/// feature, scenario, or test category.
+///
+/// This rule only applies to files in `test/`, `test_driver/`, or
+/// `integration_test/` directories. Production files use `prefer_small_files`
+/// with a 200-line threshold instead.
+///
+/// **BAD:** A single test file testing multiple unrelated features:
+/// ```
+/// test/
+///   everything_test.dart  (500+ lines - tests user, cart, checkout)
+/// ```
+///
+/// **GOOD:** Focused test files organized by feature:
+/// ```
+/// test/
+///   user_test.dart        (150 lines)
+///   cart_test.dart        (200 lines)
+///   checkout_test.dart    (180 lines)
+/// ```
+///
+/// Disable for comprehensive test suites:
+/// ```dart
+/// // ignore_for_file: prefer_small_test_files
+/// ```
+class PreferSmallTestFilesRule extends SaropaLintRule {
+  const PreferSmallTestFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const int _maxLines = 400;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_small_test_files',
+    problemMessage:
+        '[prefer_small_test_files] Test file has more than $_maxLines lines.',
+    correctionMessage:
+        'Split tests by feature or scenario for better organization. '
+        'Disable with: // ignore_for_file: prefer_small_test_files',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: true,
+    );
+  }
+}
+
+/// **OPINIONATED**: Flags test files exceeding 600 lines.
+///
+/// At 600+ lines, a test file may be covering too many scenarios or features.
+/// Consider splitting tests by domain, widget, or use case for better
+/// maintainability and faster test runs.
+///
+/// This rule only applies to files in `test/`, `test_driver/`, or
+/// `integration_test/` directories. Production files use `avoid_medium_files`
+/// with a 300-line threshold instead.
+///
+/// Disable for comprehensive test suites:
+/// ```dart
+/// // ignore_for_file: avoid_medium_test_files
+/// ```
+class AvoidMediumTestFilesRule extends SaropaLintRule {
+  const AvoidMediumTestFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const int _maxLines = 600;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_medium_test_files',
+    problemMessage:
+        '[avoid_medium_test_files] Test file exceeds $_maxLines lines.',
+    correctionMessage: 'Consider splitting tests by feature or scenario. '
+        'Disable with: // ignore_for_file: avoid_medium_test_files',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: true,
+    );
+  }
+}
+
+/// **OPINIONATED**: Flags test files exceeding 1000 lines.
+///
+/// A 1000+ line test file is difficult to navigate and likely tests multiple
+/// distinct features. Consider extracting test groups into separate files
+/// organized by feature area.
+///
+/// This rule only applies to files in `test/`, `test_driver/`, or
+/// `integration_test/` directories. Production files use `avoid_long_files`
+/// with a 500-line threshold instead.
+///
+/// Disable for comprehensive test suites:
+/// ```dart
+/// // ignore_for_file: avoid_long_test_files
+/// ```
+class AvoidLongTestFilesRule extends SaropaLintRule {
+  const AvoidLongTestFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const int _maxLines = 1000;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_long_test_files',
+    problemMessage:
+        '[avoid_long_test_files] Test file exceeds $_maxLines lines.',
+    correctionMessage: 'Consider splitting tests by feature or scenario. '
+        'Disable with: // ignore_for_file: avoid_long_test_files',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: true,
+    );
+  }
+}
+
+/// **OPINIONATED**: Flags test files exceeding 2000 lines.
+///
+/// Even with test files' higher tolerance for length, 2000+ lines indicates
+/// the file is testing too much. Consider splitting into separate test files
+/// organized by feature, screen, or use case.
+///
+/// This rule only applies to files in `test/`, `test_driver/`, or
+/// `integration_test/` directories. Production files use `avoid_very_long_files`
+/// with a 1000-line threshold instead.
+///
+/// Disable for comprehensive test suites:
+/// ```dart
+/// // ignore_for_file: avoid_very_long_test_files
+/// ```
+class AvoidVeryLongTestFilesRule extends SaropaLintRule {
+  const AvoidVeryLongTestFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  static const int _maxLines = 2000;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_very_long_test_files',
+    problemMessage:
+        '[avoid_very_long_test_files] Test file exceeds $_maxLines lines.',
+    correctionMessage: 'Consider splitting tests by feature or scenario. '
+        'Disable with: // ignore_for_file: avoid_very_long_test_files',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    _checkFileLength(
+      resolver: resolver,
+      reporter: reporter,
+      context: context,
+      code: code,
+      maxLines: _maxLines,
+      forTestFiles: true,
+    );
   }
 }
 

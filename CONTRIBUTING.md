@@ -212,7 +212,19 @@ rules:
   avoid_my_anti_pattern: true
 ```
 
-### 6. Add quick fixes (optional but recommended)
+### 6. Add config aliases (optional)
+
+If your rule name has a prefix (like `enforce_` or `require_`) that users might commonly omit, add a config alias:
+
+```dart
+/// Alias: my_anti_pattern
+@override
+List<String> get configAliases => const <String>['my_anti_pattern'];
+```
+
+This allows users to use either `avoid_my_anti_pattern: false` or `my_anti_pattern: false` in their config. Only add aliases when there's genuine ambiguity - most rules don't need them.
+
+### 7. Add quick fixes (optional but recommended)
 
 Quick fixes provide IDE code actions that help developers resolve lint issues.
 
@@ -299,7 +311,7 @@ When adding fixes, prioritize by impact:
 4. **Remove fixes**: Comment out problematic code (preserves history)
 5. **Last resort**: Skip the fix entirely — document why in the rule's doc comment
 
-### 7. Add tests
+### 8. Add tests
 
 Create a fixture file in `example/lib/<category>/`:
 

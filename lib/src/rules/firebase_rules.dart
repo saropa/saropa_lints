@@ -2379,3 +2379,141 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// require_firestore_index
+// =============================================================================
+
+/// Warns when compound Firestore query may need a composite index.
+///
+/// Alias: firestore_index, composite_index
+///
+/// Firestore compound queries (multiple where clauses or where + orderBy on
+/// different fields) require composite indexes. Without an index, the query
+/// fails at runtime with an error.
+///
+/// **BAD:**
+/// ```dart
+/// // This query needs a composite index
+/// final query = FirebaseFirestore.instance
+///     .collection('products')
+///     .where('category', isEqualTo: 'electronics')
+///     .where('price', isLessThan: 100)
+///     .orderBy('rating', descending: true)
+///     .get(); // Fails if index doesn't exist!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Ensure composite index exists in firestore.indexes.json:
+/// // { "collectionGroup": "products",
+/// //   "queryScope": "COLLECTION",
+/// //   "fields": [
+/// //     { "fieldPath": "category", "order": "ASCENDING" },
+/// //     { "fieldPath": "price", "order": "ASCENDING" },
+/// //     { "fieldPath": "rating", "order": "DESCENDING" }
+/// //   ]
+/// // }
+/// final query = FirebaseFirestore.instance
+///     .collection('products')
+///     .where('category', isEqualTo: 'electronics')
+///     .where('price', isLessThan: 100)
+///     .orderBy('rating', descending: true)
+///     .get();
+/// ```
+class RequireFirestoreIndexRule extends SaropaLintRule {
+  const RequireFirestoreIndexRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_firestore_index',
+    problemMessage:
+        '[require_firestore_index] Compound Firestore query may need a composite '
+        'index. Query will fail at runtime without the required index.',
+    correctionMessage:
+        'Create a composite index in Firebase Console or firestore.indexes.json.',
+    errorSeverity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for get(), snapshots(), or getDocuments() on query
+      if (methodName != 'get' &&
+          methodName != 'snapshots' &&
+          methodName != 'getDocuments') {
+        return;
+      }
+
+      // Count where clauses and orderBy in the chain
+      int whereCount = 0;
+      int orderByCount = 0;
+      final Set<String> whereFields = <String>{};
+      final Set<String> orderByFields = <String>{};
+
+      AstNode? current = node;
+      while (current != null) {
+        if (current is MethodInvocation) {
+          final String method = current.methodName.name;
+
+          if (method == 'where') {
+            whereCount++;
+            // Try to extract field name from first argument
+            final NodeList<Expression> args = current.argumentList.arguments;
+            if (args.isNotEmpty) {
+              final String fieldArg = args.first.toSource();
+              whereFields.add(fieldArg);
+            }
+          } else if (method == 'orderBy') {
+            orderByCount++;
+            final NodeList<Expression> args = current.argumentList.arguments;
+            if (args.isNotEmpty) {
+              final String fieldArg = args.first.toSource();
+              orderByFields.add(fieldArg);
+            }
+          } else if (method == 'collection' ||
+              method == 'collectionGroup' ||
+              method == 'doc') {
+            break; // Reached the start of the query
+          }
+        }
+        current = current.parent;
+      }
+
+      // Check if composite index is likely needed:
+      // 1. Multiple where clauses on different fields
+      // 2. where + orderBy on different fields
+      // 3. Range query (<, >, <=, >=) + orderBy on different field
+      bool needsIndex = false;
+
+      if (whereCount >= 2) {
+        needsIndex = true;
+      }
+
+      if (whereCount >= 1 && orderByCount >= 1) {
+        // Check if orderBy is on a field not in where
+        for (final String orderField in orderByFields) {
+          if (!whereFields.contains(orderField)) {
+            needsIndex = true;
+            break;
+          }
+        }
+      }
+
+      if (needsIndex) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

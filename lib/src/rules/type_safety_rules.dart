@@ -7,7 +7,9 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/dart/element/type.dart';
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -613,6 +615,109 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
           typeArgs == null) {
         reporter.atNode(node.constructorName, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_PreferExplicitTypeArgumentsFix()];
+}
+
+/// Quick fix for [PreferExplicitTypeArgumentsRule].
+///
+/// Adds explicit type arguments to empty collection literals and generic
+/// constructor calls. The fix infers the correct type from the static type
+/// analysis and inserts the appropriate type annotation.
+///
+/// Handles:
+/// - Empty list literals: `[]` → `<String>[]`
+/// - Empty set/map literals: `{}` → `<String, int>{}`
+/// - Generic constructors: `Future.value(1)` → `Future<int>.value(1)`
+class _PreferExplicitTypeArgumentsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Fix for empty list literals
+    context.registry.addListLiteral((ListLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.typeArguments != null) return;
+
+      final DartType? listType = node.staticType;
+      if (listType is! InterfaceType) return;
+
+      final List<DartType> typeArgs = listType.typeArguments;
+      if (typeArgs.isEmpty) return;
+
+      final String typeArgStr =
+          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add <$typeArgStr>',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.leftBracket.offset, '<$typeArgStr>');
+      });
+    });
+
+    // Fix for empty set/map literals
+    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+      if (node.typeArguments != null) return;
+
+      final DartType? type = node.staticType;
+      if (type is! InterfaceType) return;
+
+      final List<DartType> typeArgs = type.typeArguments;
+      if (typeArgs.isEmpty) return;
+
+      final String typeArgStr =
+          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add <$typeArgStr>',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(node.leftBracket.offset, '<$typeArgStr>');
+      });
+    });
+
+    // Fix for generic constructor calls
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final TypeArgumentList? existingTypeArgs =
+          node.constructorName.type.typeArguments;
+      if (existingTypeArgs != null) return;
+
+      final DartType? staticType = node.staticType;
+      if (staticType is! InterfaceType) return;
+
+      final List<DartType> typeArgs = staticType.typeArguments;
+      if (typeArgs.isEmpty) return;
+
+      final String typeArgStr =
+          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add <$typeArgStr>',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert after the type name
+        final NamedType namedType = node.constructorName.type;
+        builder.addSimpleInsertion(namedType.name2.end, '<$typeArgStr>');
+      });
     });
   }
 }

@@ -2421,29 +2421,57 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
 
 /// Warns when function parameters are reassigned.
 ///
-/// Example of **bad** code:
+/// Alias: avoid_mutating_parameters (deprecated)
+///
+/// Parameter reassignment changes what the local variable points to, but does
+/// NOT affect the caller's variable. This is purely a code clarity issue - it
+/// makes it harder to track what a parameter's value is at any point in the
+/// function. The original input value is lost for debugging.
+///
+/// **BAD:**
 /// ```dart
 /// void process(int value) {
-///   value = value * 2;  // Mutating parameter
+///   value = value * 2;  // Reassigning parameter
+/// }
+///
+/// void count(int n) {
+///   n++;  // Postfix reassignment
+///   ++n;  // Prefix reassignment
 /// }
 /// ```
-class AvoidMutatingParametersRule extends SaropaLintRule {
-  const AvoidMutatingParametersRule() : super(code: _code);
+///
+/// **GOOD:**
+/// ```dart
+/// void process(int value) {
+///   final doubled = value * 2;  // Use local variable
+/// }
+/// ```
+///
+/// **Alternative:** Use `final` parameters (Dart 2.17+) to get compile-time
+/// enforcement:
+/// ```dart
+/// void process(final int value) {
+///   value = value * 2;  // Compile error!
+/// }
+/// ```
+class AvoidParameterReassignmentRule extends SaropaLintRule {
+  const AvoidParameterReassignmentRule() : super(code: _code);
 
-  /// Code quality issue. Review when count exceeds 100.
+  /// Style issue - low impact.
   @override
-  LintImpact get impact => LintImpact.medium;
+  LintImpact get impact => LintImpact.low;
 
   @override
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_mutating_parameters',
+    name: 'avoid_parameter_reassignment',
     problemMessage:
-        '[avoid_mutating_parameters] Parameter is being reassigned.',
+        '[avoid_parameter_reassignment] Parameter is being reassigned. '
+        'This hides the original input value.',
     correctionMessage:
-        'Create a local variable instead of mutating the parameter.',
-    errorSeverity: DiagnosticSeverity.WARNING,
+        'Create a local variable instead of reassigning the parameter.',
+    errorSeverity: DiagnosticSeverity.INFO,
   );
 
   @override
@@ -2465,7 +2493,7 @@ class AvoidMutatingParametersRule extends SaropaLintRule {
       if (paramNames.isEmpty) return;
 
       node.functionExpression.body.visitChildren(
-        _ParameterMutationVisitor(paramNames, reporter, _code),
+        _ParameterReassignmentVisitor(paramNames, reporter, _code),
       );
     });
 
@@ -2482,14 +2510,17 @@ class AvoidMutatingParametersRule extends SaropaLintRule {
       if (paramNames.isEmpty) return;
 
       node.body.visitChildren(
-        _ParameterMutationVisitor(paramNames, reporter, _code),
+        _ParameterReassignmentVisitor(paramNames, reporter, _code),
       );
     });
   }
 }
 
-class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
-  _ParameterMutationVisitor(this.paramNames, this.reporter, this.code);
+/// Visitor that detects direct reassignment of parameter variables.
+///
+/// Checks for: `param = value`, `param++`, `param--`, `++param`, `--param`.
+class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
+  _ParameterReassignmentVisitor(this.paramNames, this.reporter, this.code);
 
   final Set<String> paramNames;
   final SaropaDiagnosticReporter reporter;
@@ -2523,6 +2554,216 @@ class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
       }
     }
     super.visitPrefixExpression(node);
+  }
+}
+
+/// Warns when function parameters are mutated (object state modified).
+///
+/// Mutating a parameter modifies the caller's object, which is a hidden
+/// side effect that can cause bugs. The caller may not expect their data
+/// to change. This is different from parameter reassignment (which only
+/// affects the local reference).
+///
+/// Detects:
+/// - Collection mutations: `param.add()`, `param.clear()`, `param.sort()`
+/// - Field assignments: `param.field = value`
+/// - Index assignments: `param[i] = value`
+/// - Cascade mutations: `param..add()..remove()`
+///
+/// **BAD:**
+/// ```dart
+/// void process(List<String> items) {
+///   items.add('new');     // Mutates caller's list
+///   items.clear();        // Mutates caller's list
+/// }
+///
+/// void updateUser(User user) {
+///   user.name = 'changed';  // Mutates caller's object
+/// }
+///
+/// void modify(Map<String, int> map) {
+///   map['key'] = 42;  // Index assignment mutation
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void process(List<String> items) {
+///   final newItems = [...items, 'new'];  // Create new list
+/// }
+///
+/// User updateUser(User user) {
+///   return user.copyWith(name: 'changed');  // Return new instance
+/// }
+/// ```
+class AvoidParameterMutationRule extends SaropaLintRule {
+  const AvoidParameterMutationRule() : super(code: _code);
+
+  /// High impact - can cause bugs in calling code.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_parameter_mutation',
+    problemMessage:
+        '[avoid_parameter_mutation] Parameter object is being mutated. '
+        'This modifies the caller\'s data.',
+    correctionMessage:
+        'Create a copy of the data instead of mutating the parameter.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Known mutating methods for collection types.
+  static const Set<String> _mutatingMethods = <String>{
+    // List
+    'add',
+    'addAll',
+    'insert',
+    'insertAll',
+    'remove',
+    'removeAt',
+    'removeLast',
+    'removeRange',
+    'removeWhere',
+    'retainWhere',
+    'clear',
+    'sort',
+    'shuffle',
+    'setAll',
+    'setRange',
+    'fillRange',
+    'replaceRange',
+    // Set
+    'removeAll',
+    'retainAll',
+    // Map
+    'addEntries',
+    'putIfAbsent',
+    'update',
+    'updateAll',
+    // Queue
+    'addFirst',
+    'addLast',
+    'removeFirst',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkFunction(
+        node.functionExpression.parameters,
+        node.functionExpression.body,
+        reporter,
+      );
+    });
+
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkFunction(node.parameters, node.body, reporter);
+    });
+  }
+
+  void _checkFunction(
+    FormalParameterList? params,
+    FunctionBody body,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    if (params == null) return;
+
+    final Set<String> paramNames = <String>{};
+    for (final FormalParameter param in params.parameters) {
+      final Token? name = param.name;
+      if (name != null) paramNames.add(name.lexeme);
+    }
+
+    if (paramNames.isEmpty) return;
+
+    body.visitChildren(
+      _ParameterMutationVisitor(paramNames, reporter, _code, _mutatingMethods),
+    );
+  }
+}
+
+/// Visitor that detects mutations of parameter objects.
+///
+/// Checks for: mutating method calls on collections, field assignments,
+/// index assignments, and cascade mutations.
+class _ParameterMutationVisitor extends RecursiveAstVisitor<void> {
+  _ParameterMutationVisitor(
+    this.paramNames,
+    this.reporter,
+    this.code,
+    this.mutatingMethods,
+  );
+
+  final Set<String> paramNames;
+  final SaropaDiagnosticReporter reporter;
+  final LintCode code;
+  final Set<String> mutatingMethods;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Check for param.mutatingMethod() pattern (e.g., list.add())
+    final Expression? target = node.target;
+    if (target is SimpleIdentifier && paramNames.contains(target.name)) {
+      final String methodName = node.methodName.name;
+      if (mutatingMethods.contains(methodName)) {
+        reporter.atNode(node, code);
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression left = node.leftHandSide;
+
+    // Check for param.field = value pattern
+    if (left is PrefixedIdentifier) {
+      final SimpleIdentifier prefix = left.prefix;
+      if (paramNames.contains(prefix.name)) {
+        reporter.atNode(node, code);
+      }
+    }
+
+    // Check for param[index] = value pattern
+    if (left is IndexExpression) {
+      final Expression? target = left.target;
+      if (target is SimpleIdentifier && paramNames.contains(target.name)) {
+        reporter.atNode(node, code);
+      }
+    }
+
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitCascadeExpression(CascadeExpression node) {
+    // Check for param..add()..remove() pattern
+    final Expression target = node.target;
+    if (target is SimpleIdentifier && paramNames.contains(target.name)) {
+      // Check if any cascade section is a mutation
+      for (final Expression section in node.cascadeSections) {
+        if (section is MethodInvocation) {
+          final String methodName = section.methodName.name;
+          if (mutatingMethods.contains(methodName)) {
+            reporter.atNode(node, code);
+            return; // Report once per cascade
+          }
+        }
+        if (section is AssignmentExpression) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+    }
+    super.visitCascadeExpression(node);
   }
 }
 
@@ -2739,16 +2980,28 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      _checkFunctionBody(node.functionExpression.body, node.name, reporter);
+      _checkFunctionBody(
+        node.functionExpression.body,
+        node.returnType,
+        node.name,
+        reporter,
+      );
     });
 
     context.registry.addMethodDeclaration((MethodDeclaration node) {
-      _checkFunctionBody(node.body, node.name, reporter);
+      _checkFunctionBody(node.body, node.returnType, node.name, reporter);
     });
   }
 
   void _checkFunctionBody(
-      FunctionBody body, Token nameToken, SaropaDiagnosticReporter reporter) {
+    FunctionBody body,
+    TypeAnnotation? returnType,
+    Token nameToken,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    // Skip void functions - bare return statements are valid
+    if (_isVoidType(returnType)) return;
+
     if (body is ExpressionFunctionBody) {
       if (body.expression is NullLiteral) {
         reporter.atToken(nameToken, code);
@@ -2772,6 +3025,27 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
         reporter.atToken(nameToken, code);
       }
     }
+  }
+
+  /// Returns true if [returnType] is void, Future<void>, or FutureOr<void>.
+  /// These return types make bare `return;` statements valid.
+  bool _isVoidType(TypeAnnotation? returnType) {
+    if (returnType is! NamedType) return false;
+
+    final String typeName = returnType.name.lexeme;
+
+    if (typeName == 'void') return true;
+
+    // Check for Future<void> or FutureOr<void>
+    if (typeName == 'Future' || typeName == 'FutureOr') {
+      final TypeArgumentList? typeArgs = returnType.typeArguments;
+      if (typeArgs == null || typeArgs.arguments.length != 1) return false;
+
+      final TypeAnnotation arg = typeArgs.arguments.first;
+      return arg is NamedType && arg.name.lexeme == 'void';
+    }
+
+    return false;
   }
 }
 
