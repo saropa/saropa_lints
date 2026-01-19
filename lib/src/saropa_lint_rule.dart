@@ -1,4 +1,4 @@
-// ignore_for_file: always_specify_types, depend_on_referenced_packages
+// ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element
 
 import 'dart:developer' as developer;
 
@@ -985,7 +985,8 @@ abstract class SaropaLintRule extends DartLintRule {
     // =========================================================================
     // Skip if we just analyzed this exact content. This prevents redundant
     // analysis during rapid saves while still analyzing changed content.
-    final analysisKey = '$path:${content.hashCode}';
+    // BUG FIX: Include rule name in key so different rules don't share throttle
+    final analysisKey = '$path:${content.hashCode}:${code.name}';
     final now = DateTime.now();
     final lastAnalysis = _recentAnalysis[analysisKey];
     if (lastAnalysis != null &&
@@ -1111,10 +1112,13 @@ abstract class SaropaLintRule extends DartLintRule {
     // =========================================================================
     // During rapid editing (same file analyzed 3+ times in 2 seconds), only
     // run essential-tier rules. Full analysis runs after editing settles.
-    if (_isRapidEditMode(path) && !_isEssentialTierRule()) {
-      // Skip non-essential rules during rapid editing for faster feedback
-      return;
-    }
+    // BUG FIX: Disable during CLI runs - this was incorrectly triggering when
+    // multiple rules analyze the same file within a single custom_lint run.
+    // TODO: Re-enable only for IDE/interactive analysis mode
+    // if (_isRapidEditMode(path) && !_isEssentialTierRule()) {
+    //   // Skip non-essential rules during rapid editing for faster feedback
+    //   return;
+    // }
 
     // =========================================================================
     // EARLY EXIT BY FILE TYPE (Performance Optimization)
