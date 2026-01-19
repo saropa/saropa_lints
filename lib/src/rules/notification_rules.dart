@@ -179,9 +179,9 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_payload_sensitive',
     problemMessage:
-        '[avoid_notification_payload_sensitive] Notification may contain sensitive data visible on lock screen.',
+        '[avoid_notification_payload_sensitive] Sensitive data in notifications is visible on lock screen, exposing credentials to anyone nearby.',
     correctionMessage:
-        'Remove sensitive info from notifications. Use generic messages instead.',
+        'Use generic messages like "New message received" instead of actual content.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -735,9 +735,9 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_same_id',
     problemMessage:
-        '[avoid_notification_same_id] Static notification ID. Different notifications will overwrite each other.',
+        '[avoid_notification_same_id] Static notification ID causes newer notifications to silently replace older ones, losing important alerts.',
     correctionMessage:
-        'Use unique IDs for each notification (e.g., incrementing counter).',
+        'Generate unique IDs per notification: DateTime.now().millisecondsSinceEpoch.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
