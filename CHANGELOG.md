@@ -4,8 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-> **Looking for older changes?**  \
+> **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 3.4.0.
+
+## [4.2.1] - 2026-01-19
+
+### Changed
+
+- **Rule renamed**: `avoid_mutating_parameters` → `avoid_parameter_reassignment` (old name kept as deprecated alias in doc header). Tier changed from Recommended to Stylistic to reflect that reassignment is a style preference, not a correctness issue.
+- **Heuristics improved** - `require_android_backup_rules` now uses word-boundary matching to avoid false positives on keys like "authentication_method"
+- **File reorganization** - Consolidated v4.1.7 rules from separate `v417_*.dart` files into their appropriate category files:
+  - Caching rules → `memory_management_rules.dart`
+  - WebSocket reconnection → `api_network_rules.dart`
+  - Currency code rule → `money_rules.dart`
+  - Lazy singleton rule → `dependency_injection_rules.dart`
+  - Performance rules → `performance_rules.dart`
+  - Clipboard/encryption security → `security_rules.dart`
+  - State management rules → `state_management_rules.dart`
+  - Testing rules → `testing_best_practices_rules.dart`
+  - Widget rules → `flutter_widget_rules.dart`
 
 ## [4.2.0] - 2026-01-19
 
@@ -16,11 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```yaml
 rules:
   # Both work now:
-  - enforce_arguments_ordering: false  # canonical name
-  - arguments_ordering: false          # alias
+  - enforce_arguments_ordering: false # canonical name
+  - arguments_ordering: false # alias
 ```
 
 Added aliases for:
+
 - `enforce_arguments_ordering` → `arguments_ordering`
 - `enforce_member_ordering` → `member_ordering`
 - `enforce_parameters_ordering` → `parameters_ordering`
@@ -28,6 +46,7 @@ Added aliases for:
 **41 new lint rules** covering Android platform, in-app purchases, URL launching, permissions, connectivity, geolocation, SQLite, test file handling, and more:
 
 #### Android Platform Rules (android_rules.dart) - 6 rules
+
 - `require_android_permission_request` - Runtime permission not requested before using permission-gated API
 - `avoid_android_task_affinity_default` - Multiple activities with default taskAffinity cause back stack issues
 - `require_android_12_splash` - Flutter splash may cause double-splash on Android 12+
@@ -36,30 +55,37 @@ Added aliases for:
 - `require_android_backup_rules` - Sensitive data in SharedPreferences may be backed up
 
 #### In-App Purchase Rules (iap_rules.dart) - 3 rules
+
 - `avoid_purchase_in_sandbox_production` - Hardcoded IAP environment URL causes receipt validation failures
 - `require_subscription_status_check` - Premium content shown without verifying subscription status
 - `require_price_localization` - Hardcoded prices instead of store-provided localized prices
 
 #### URL Launcher Rules (url_launcher_rules.dart) - 3 rules
+
 - `require_url_launcher_can_launch_check` - launchUrl without canLaunchUrl check
 - `avoid_url_launcher_simulator_tests` - URL launcher tests with tel:/mailto: fail on simulator
 - `prefer_url_launcher_fallback` - launchUrl without fallback for unsupported schemes
 
 #### Permission Rules (permission_rules.dart) - 3 rules
+
 - `require_location_permission_rationale` - Location permission requested without showing rationale
 - `require_camera_permission_check` - Camera initialized without permission check
 - `prefer_image_cropping` - Profile image picked without cropping option
 
 #### Connectivity Rules (connectivity_rules.dart) - 1 rule
+
 - `require_connectivity_error_handling` - Connectivity check without error handling
 
 #### Geolocator Rules (geolocator_rules.dart) - 1 rule
+
 - `require_geolocator_battery_awareness` - High-accuracy continuous location tracking without battery consideration
 
 #### SQLite Rules (sqflite_rules.dart) - 1 rule
+
 - `avoid_sqflite_type_mismatch` - SQLite type may not match Dart type (bool vs INTEGER, DateTime vs TEXT)
 
 #### Rules Added to Existing Files - 19 rules
+
 - **firebase_rules.dart**: `require_firestore_index` - Firestore query requires composite index
 - **notification_rules.dart**: `prefer_notification_grouping`, `avoid_notification_silent_failure`
 - **hive_rules.dart**: `require_hive_migration_strategy`
@@ -74,7 +100,9 @@ Added aliases for:
 - **package_specific_rules.dart**: `prefer_typed_prefs_wrapper`, `prefer_freezed_for_data_classes`
 
 #### Test File Length Rules (structure_rules.dart) - 4 rules
+
 Separate file length rules for test files with higher thresholds, allowing comprehensive test suites without triggering production file length warnings:
+
 - `prefer_small_test_files` - Test files over 400 lines (insanity tier)
 - `avoid_medium_test_files` - Test files over 600 lines (professional tier)
 - `avoid_long_test_files` - Test files over 1000 lines (comprehensive tier)
@@ -83,6 +111,7 @@ Separate file length rules for test files with higher thresholds, allowing compr
 Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid_long_files`, `avoid_very_long_files`) now skip test files automatically.
 
 ### Tier Assignments
+
 - **Essential tier:** 14 rules (permissions, security, crashes)
 - **Recommended tier:** 10 rules (best practices, UX improvements)
 - **Professional tier:** 13 rules (architecture, performance, maintainability)
@@ -95,10 +124,12 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 **Quick fix for `prefer_explicit_type_arguments`** - Adds explicit type arguments to empty collection literals and generic constructor calls.
 
 **Conflicting rule detection** - Warns at analysis startup when mutually exclusive stylistic rules are both enabled:
+
 - `avoid_inferrable_type_arguments` ↔ `prefer_explicit_type_arguments`
 - `prefer_relative_imports` ↔ `always_use_package_imports`
 
 **Stylistic rule tier changes** - Removed opposing stylistic rules from Comprehensive tier (now opt-in only):
+
 - `avoid_inferrable_type_arguments` - conflicts with `prefer_explicit_type_arguments`
 - `prefer_explicit_type_arguments` - conflicts with `avoid_inferrable_type_arguments`
 
@@ -137,15 +168,17 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 ### Improved
 
 **`prefer_utc_for_storage` rule enhanced:**
+
 - Added 6 new serialization patterns: `toJson`, `toMap`, `serialize`, `encode`, `cache`, `persist`
 - Removed `toString()` from method check (reduces false positives from logging/debugging)
 - Patterns moved to `static final` class member (compiled once at class load, not per invocation)
 - Added comprehensive doc header with multiple BAD/GOOD examples
 - **Quick fix added**: Inserts `.toUtc()` before the serialization call
 
-**DX message quality for 60+ lint rules** - Added clear consequences to problem messages explaining *why* issues matter. Messages now follow the pattern: "[What's wrong]. [Why it matters]." Extended short messages to meet 180-character minimum for critical/high impact rules.
+**DX message quality for 60+ lint rules** - Added clear consequences to problem messages explaining _why_ issues matter. Messages now follow the pattern: "[What's wrong]. [Why it matters]." Extended short messages to meet 180-character minimum for critical/high impact rules.
 
 #### Security Rules (11 rules)
+
 - `avoid_sensitive_data_in_clipboard` - "Malicious apps can silently read clipboard contents, stealing passwords, tokens, or API keys"
 - `require_certificate_pinning` - "Attackers on the same network can intercept and modify traffic"
 - `avoid_generic_key_in_url` - "Exposes credentials in access logs and browser history"
@@ -159,6 +192,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `avoid_notification_payload_sensitive` - "Anyone nearby can see passwords, tokens, or PII without unlocking"
 
 #### Performance Rules (7 rules)
+
 - `prefer_const_widgets` - "Wastes CPU cycles and battery, slowing down UI rendering"
 - `avoid_widget_creation_in_loop` - "Causes jank and high memory usage for long lists"
 - `avoid_calling_of_in_build` - "Adds unnecessary overhead that slows down frame rendering"
@@ -168,6 +202,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `avoid_money_arithmetic_on_double` - "Users may be charged incorrect amounts or see wrong totals"
 
 #### State Management Rules (7 rules)
+
 - `avoid_bloc_in_bloc` - "Makes testing difficult and breaks unidirectional data flow"
 - `avoid_static_state` - "Causes flaky tests, unexpected state retention, and hard-to-reproduce bugs"
 - `require_bloc_manual_dispose` - "Memory leaks that accumulate over time, eventually crashing the app"
@@ -177,11 +212,13 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `avoid_ref_watch_outside_build` - "Causes missed updates, stale data, and hard-to-debug state inconsistencies"
 
 #### Notification Rules (3 rules)
+
 - `avoid_notification_same_id` - "Users will miss important alerts and messages without any indication"
 - `require_notification_initialize_per_platform` - "Users on unsupported platform will never receive notifications"
 - `avoid_refresh_without_await` - "Spinner dismisses immediately while data is still loading"
 
 #### Other Rules (7 rules)
+
 - `avoid_image_picker_without_source` - "Users will see an empty dialog and be unable to select images"
 - `avoid_unbounded_cache_growth` - "Eventually exhausts device memory and crashes the app"
 - `require_websocket_reconnection` - "Users will see stale data or miss real-time updates"
@@ -191,6 +228,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `require_google_signin_error_handling` / `require_supabase_error_handling` - "Users will see unexpected crashes instead of friendly error messages"
 
 #### Disposal & Memory Rules (10 rules)
+
 - `require_stream_controller_close` - "Listeners accumulate in memory, eventually crashing the app"
 - `require_video_player_controller_dispose` - "Video decoder stays active, audio continues, battery drains"
 - `require_change_notifier_dispose` - "Disposed widgets remain referenced, crashes on notification"
@@ -203,6 +241,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `require_getx_permanent_cleanup` - "GetxController remains in memory forever"
 
 #### Additional Security Rules (8 rules)
+
 - `avoid_dynamic_sql` - "Attackers can read, modify, or delete database contents"
 - `avoid_ignoring_ssl_errors` - "Man-in-the-middle attackers can intercept all HTTPS traffic"
 - `avoid_user_controlled_urls` - "SSRF vulnerability allows attackers to access internal services"
@@ -213,6 +252,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `avoid_webview_file_access` - "Malicious content can read local files, exposing data"
 
 #### Platform & Context Rules (6 rules)
+
 - `avoid_mixed_environments` - "Debug APIs expose data, development endpoints corrupt production"
 - `avoid_storing_context` - "Stored context crashes when widget disposed"
 - `avoid_web_only_dependencies` - "Web-only imports crash on mobile and desktop"
@@ -221,6 +261,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `avoid_navigator_push_unnamed` - "Deep linking fails, users can't share screens"
 
 #### Widget & State Rules (7 rules)
+
 - `avoid_obs_outside_controller` - "Observables leak memory without lifecycle management"
 - `pass_existing_future_to_future_builder` - "Duplicate network calls, slow UI with visible loading"
 - `require_late_initialization_in_init_state` - "Objects recreated on every setState"
@@ -252,6 +293,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 **25 new lint rules** focusing on state management, performance, security, caching, testing, and widgets:
 
 #### State Management Rules (v417_state_rules.dart)
+
 - `avoid_riverpod_for_network_only` - `[HEURISTIC]` Riverpod just for network access is overkill
 - `avoid_large_bloc` - `[HEURISTIC]` Blocs with too many event handlers (>7) need splitting
 - `avoid_overengineered_bloc_states` - `[HEURISTIC]` Too many state subclasses; use single state
@@ -259,38 +301,45 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `avoid_tight_coupling_with_getx` - `[HEURISTIC]` Heavy GetX usage reduces testability
 
 #### Performance Rules (v417_performance_rules.dart)
+
 - `prefer_element_rebuild` - Conditional widget returns destroy Elements and state
 - `require_isolate_for_heavy` - Heavy computation blocks UI (jsonDecode, encrypt)
 - `avoid_finalizer_misuse` - Finalizers add GC overhead; prefer dispose()
 - `avoid_json_in_main` - `[HEURISTIC]` jsonDecode in async context should use compute()
 
 #### Security Rules (v417_security_rules.dart)
+
 - `avoid_sensitive_data_in_clipboard` - `[HEURISTIC]` Clipboard accessible to other apps
 - `require_clipboard_paste_validation` - Validate clipboard content before using
 - `avoid_encryption_key_in_memory` - `[HEURISTIC]` Keys as fields can be extracted from dumps
 
 #### Caching Rules (v417_caching_rules.dart)
+
 - `require_cache_expiration` - `[HEURISTIC]` Caches without TTL serve stale data forever
 - `avoid_unbounded_cache_growth` - `[HEURISTIC]` Caches without limits cause OOM
 - `require_cache_key_uniqueness` - Cache keys need stable hashCode
 
 #### Testing Rules (v417_testing_rules.dart)
+
 - `require_dialog_tests` - Dialogs need pumpAndSettle after showing
 - `prefer_fake_platform` - Platform widgets need fakes/mocks in tests
 - `require_test_documentation` - `[HEURISTIC]` Complex tests (>15 lines) need comments
 
 #### Widget Rules (v417_widget_rules.dart)
+
 - `prefer_custom_single_child_layout` - Deep positioning nesting should use delegate
 - `require_locale_for_text` - DateFormat/NumberFormat need explicit locale
 - `require_dialog_barrier_consideration` - `[HEURISTIC]` Destructive dialogs need explicit barrierDismissible
 - `prefer_feature_folder_structure` - `[HEURISTIC]` Type-based folders (/blocs/) should be feature-based
 
 #### Misc Rules (v417_misc_rules.dart)
+
 - `require_websocket_reconnection` - `[HEURISTIC]` WebSocket needs reconnection logic
 - `require_currency_code_with_amount` - `[HEURISTIC]` Money amounts need currency field
 - `prefer_lazy_singleton_registration` - `[HEURISTIC]` Expensive services should be lazy
 
 ### Tier Assignments
+
 - **Essential tier:** 3 rules (websocket, clipboard security, cache limits)
 - **Recommended tier:** 5 rules (dialog tests, clipboard validation, currency, cache TTL, dialog barrier)
 - **Professional tier:** 11 rules (locale, state management, performance, security, caching)
@@ -330,30 +379,36 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 **14 new lint rules** focusing on logging, platform safety, JSON/API handling, and configuration:
 
 #### Logging Rules (debug_rules.dart)
+
 - `avoid_print_in_release` - print() executes in release builds; guard with kDebugMode
 - `require_structured_logging` - Use structured logging instead of string concatenation
 - `avoid_sensitive_in_logs` - Detect passwords, tokens, secrets in log calls
 
 #### Platform Rules (platform_rules.dart)
+
 - `require_platform_check` - Platform-specific APIs need Platform/kIsWeb guards
 - `prefer_platform_io_conditional` - Platform.isX crashes on web; use kIsWeb first
 - `avoid_web_only_dependencies` - dart:html and web-only imports crash on mobile
 - `prefer_foundation_platform_check` - Use defaultTargetPlatform in widget code
 
 #### JSON/API Rules (json_datetime_rules.dart)
+
 - `require_date_format_specification` - DateTime.parse may fail on server dates
 - `prefer_iso8601_dates` - Use ISO 8601 format for date serialization
 - `avoid_optional_field_crash` - JSON field chaining needs null-aware operators
 - `prefer_explicit_json_keys` - Use @JsonKey instead of manual mapping
 
 #### Configuration Rules (config_rules.dart)
+
 - `avoid_hardcoded_config` - Hardcoded URLs/keys should use environment variables
 - `avoid_mixed_environments` - Don't mix production and development config
 
 #### Lifecycle Rules (lifecycle_rules.dart)
+
 - `require_late_initialization_in_init_state` - Late fields should init in initState(), not build()
 
 ### Tier Assignments
+
 - **Essential tier:** 9 rules for critical safety (print in release, platform crashes, etc.)
 - **Recommended tier:** 2 rules for best practices
 - **Professional tier:** 3 rules for code quality
@@ -365,31 +420,38 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 **24 new lint rules** focusing on architecture, accessibility, navigation, and internationalization:
 
 #### Dependency Injection Rules
+
 - `avoid_di_in_widgets` - Widgets shouldn't directly use GetIt/service locators
 - `prefer_abstraction_injection` - Inject abstract types, not concrete implementations
 
 #### Accessibility Rules
+
 - `prefer_large_touch_targets` - Touch targets should be at least 48dp for WCAG compliance
 - `avoid_time_limits` - Short durations (< 5s) disadvantage users needing more time
 - `require_drag_alternatives` - Provide button alternatives for drag gestures
 
 #### Flutter Widget Rules
+
 - `avoid_global_keys_in_state` - GlobalKey fields in StatefulWidget cause issues
 - `avoid_static_route_config` - Static final router configs limit testability
 
 #### State Management Rules
+
 - `require_flutter_riverpod_not_riverpod` - Flutter apps need flutter_riverpod, not base riverpod
 - `avoid_riverpod_navigation` - Navigation logic belongs in widgets, not providers
 
 #### Firebase Rules
+
 - `require_firebase_error_handling` - Firebase async calls need try-catch
 - `avoid_firebase_realtime_in_build` - Don't start Firebase listeners in build method
 
 #### Security Rules
+
 - `require_secure_storage_error_handling` - Secure storage needs error handling
 - `avoid_secure_storage_large_data` - Large data shouldn't use secure storage
 
 #### Navigation Rules
+
 - `avoid_navigator_context_issue` - Avoid GlobalKey.currentContext in navigation
 - `require_pop_result_type` - Navigator.push should specify result type parameter
 - `avoid_push_replacement_misuse` - Don't use pushReplacement for detail pages
@@ -397,16 +459,19 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `require_deep_link_testing` - Routes should support deep links, not just object params
 
 #### Internationalization Rules
+
 - `avoid_string_concatenation_l10n` - String concatenation in Text breaks translations
 - `prefer_intl_message_description` - Intl.message needs desc parameter for translators
 - `avoid_hardcoded_locale_strings` - Don't hardcode strings that need localization
 
 #### Async Rules
+
 - `require_network_status_check` - Check connectivity before network requests
 - `avoid_sync_on_every_change` - Debounce API calls in onChanged callbacks
 - `require_pending_changes_indicator` - Notify users when changes haven't synced
 
 ### Tier Assignments
+
 - **Recommended tier:** 14 rules for common best practices
 - **Professional tier:** 11 rules for stricter architecture/quality standards
 
@@ -417,6 +482,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 **25 new lint rules** from ROADMAP star priorities:
 
 #### Bloc/Cubit Rules
+
 - `avoid_passing_bloc_to_bloc` - Detects Bloc depending on another Bloc (tight coupling)
 - `avoid_passing_build_context_to_blocs` - Warns when BuildContext is passed to Bloc/Cubit
 - `avoid_returning_value_from_cubit_methods` - Cubit methods should emit states, not return values
@@ -424,10 +490,12 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `prefer_bloc_hydration` - Suggests HydratedBloc for persistent state instead of SharedPreferences
 
 #### GetX Rules
+
 - `avoid_getx_dialog_snackbar_in_controller` - UI dialogs shouldn't be called from controllers
 - `require_getx_lazy_put` - Prefer lazyPut for efficient GetX dependency injection
 
 #### Hive/SharedPreferences Rules
+
 - `prefer_hive_lazy_box` - Use LazyBox for potentially large collections
 - `avoid_hive_binary_storage` - Don't store large binary data in Hive
 - `require_shared_prefs_prefix` - Set prefix to avoid key conflicts
@@ -435,35 +503,44 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 - `avoid_shared_prefs_in_isolate` - SharedPreferences doesn't work in isolates
 
 #### Stream Rules
+
 - `prefer_stream_distinct` - Add .distinct() before .listen() for UI streams
 - `prefer_broadcast_stream` - Use broadcast streams when multiple listeners needed
 
 #### Async/Build Rules
+
 - `avoid_future_in_build` - Don't create Futures inside build() method
 - `require_mounted_check_after_await` - Check mounted before setState after await
 - `avoid_async_in_build` - Build methods must never be async
 - `prefer_async_init_state` - Use Future field + FutureBuilder pattern
 
 #### Widget Lifecycle Rules
+
 - `require_widgets_binding_callback` - Wrap showDialog in addPostFrameCallback in initState
 
 #### Navigation Rules
+
 - `prefer_route_settings_name` - Include RouteSettings with name for debugging
 
 #### Internationalization Rules
+
 - `prefer_number_format` - Use NumberFormat for locale-aware number formatting
 - `provide_correct_intl_args` - Intl.message args must match placeholders
 
 #### Package-specific Rules
+
 - `avoid_freezed_for_logic_classes` - Freezed is for data classes, not Blocs/Services
 
 #### Disposal Rules
+
 - `dispose_class_fields` - Classes with disposable fields need dispose/close methods
 
 #### State Management Rules
+
 - `prefer_change_notifier_proxy_provider` - Use ProxyProvider for dependent notifiers
 
 ### Tier Assignments
+
 - **Essential tier:** avoid_shared_prefs_in_isolate, avoid_future_in_build, require_mounted_check_after_await, provide_correct_intl_args, dispose_class_fields, avoid_async_in_build
 - **Recommended tier:** 17 rules covering best practices
 - **Professional tier:** require_bloc_repository_injection, avoid_freezed_for_logic_classes
@@ -516,6 +593,7 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 ## [4.1.1] - 2026-01-13
 
 ### Added
+
 - **New Rule:** `avoid_cached_isar_stream` ([lib/src/rules/isar_rules.dart])
   - Detects and prevents caching of Isar query streams (must be created inline).
   - **Tier:** Professional
@@ -563,34 +641,34 @@ This ensures all implemented rules are available through tiered configuration an
 
 Critical and high-impact rules now included in the essential tier:
 
-| Category | Rules Added |
-|----------|-------------|
-| **Security** | `avoid_deep_link_sensitive_params`, `avoid_path_traversal`, `avoid_webview_insecure_content`, `require_data_encryption`, `require_secure_password_field`, `prefer_html_escape` |
-| **JSON/Type Safety** | `avoid_dynamic_json_access`, `avoid_dynamic_json_chains`, `avoid_unrelated_type_casts`, `require_null_safe_json_access` |
-| **Platform Permissions** | `avoid_platform_channel_on_web`, `require_image_picker_permission_android`, `require_image_picker_permission_ios`, `require_permission_manifest_android`, `require_permission_plist_ios`, `require_url_launcher_queries_android`, `require_url_launcher_schemes_ios` |
-| **Memory/Resource Leaks** | `avoid_stream_subscription_in_field`, `avoid_websocket_memory_leak`, `prefer_dispose_before_new_instance`, `require_dispose_implementation`, `require_video_player_controller_dispose` |
-| **Widget Lifecycle** | `check_mounted_after_async`, `avoid_ref_in_build_body`, `avoid_flashing_content` |
-| **Animation** | `avoid_animation_rebuild_waste`, `avoid_overlapping_animations` |
-| **Navigation** | `prefer_maybe_pop`, `require_deep_link_fallback`, `require_stepper_validation` |
-| **Firebase/Backend** | `prefer_firebase_remote_config_defaults`, `require_background_message_handler`, `require_fcm_token_refresh_handler` |
-| **Forms/WebView** | `require_validator_return_null`, `avoid_image_picker_large_files`, `prefer_webview_javascript_disabled`, `require_webview_error_handling`, `require_webview_navigation_delegate`, `require_websocket_message_validation` |
-| **Data/Storage** | `prefer_utc_for_storage`, `require_database_migration`, `require_enum_unknown_value` |
-| **State/UI** | `require_error_widget`, `require_feature_flag_default`, `require_immutable_bloc_state`, `require_map_idle_callback`, `require_media_loading_state`, `prefer_bloc_listener_for_side_effects`, `require_cors_handling` |
+| Category                  | Rules Added                                                                                                                                                                                                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Security**              | `avoid_deep_link_sensitive_params`, `avoid_path_traversal`, `avoid_webview_insecure_content`, `require_data_encryption`, `require_secure_password_field`, `prefer_html_escape`                                                                                       |
+| **JSON/Type Safety**      | `avoid_dynamic_json_access`, `avoid_dynamic_json_chains`, `avoid_unrelated_type_casts`, `require_null_safe_json_access`                                                                                                                                              |
+| **Platform Permissions**  | `avoid_platform_channel_on_web`, `require_image_picker_permission_android`, `require_image_picker_permission_ios`, `require_permission_manifest_android`, `require_permission_plist_ios`, `require_url_launcher_queries_android`, `require_url_launcher_schemes_ios` |
+| **Memory/Resource Leaks** | `avoid_stream_subscription_in_field`, `avoid_websocket_memory_leak`, `prefer_dispose_before_new_instance`, `require_dispose_implementation`, `require_video_player_controller_dispose`                                                                               |
+| **Widget Lifecycle**      | `check_mounted_after_async`, `avoid_ref_in_build_body`, `avoid_flashing_content`                                                                                                                                                                                     |
+| **Animation**             | `avoid_animation_rebuild_waste`, `avoid_overlapping_animations`                                                                                                                                                                                                      |
+| **Navigation**            | `prefer_maybe_pop`, `require_deep_link_fallback`, `require_stepper_validation`                                                                                                                                                                                       |
+| **Firebase/Backend**      | `prefer_firebase_remote_config_defaults`, `require_background_message_handler`, `require_fcm_token_refresh_handler`                                                                                                                                                  |
+| **Forms/WebView**         | `require_validator_return_null`, `avoid_image_picker_large_files`, `prefer_webview_javascript_disabled`, `require_webview_error_handling`, `require_webview_navigation_delegate`, `require_websocket_message_validation`                                             |
+| **Data/Storage**          | `prefer_utc_for_storage`, `require_database_migration`, `require_enum_unknown_value`                                                                                                                                                                                 |
+| **State/UI**              | `require_error_widget`, `require_feature_flag_default`, `require_immutable_bloc_state`, `require_map_idle_callback`, `require_media_loading_state`, `prefer_bloc_listener_for_side_effects`, `require_cors_handling`                                                 |
 
 #### Recommended Tier (+83 rules)
 
 Medium-impact rules for better code quality:
 
-| Category | Rules Added |
-|----------|-------------|
-| **Widget Structure** | `avoid_deep_widget_nesting`, `avoid_find_child_in_build`, `avoid_layout_builder_in_scrollable`, `avoid_nested_providers`, `avoid_opacity_misuse`, `avoid_shrink_wrap_in_scroll`, `avoid_unbounded_constraints`, `avoid_unconstrained_box_misuse` |
-| **Gesture/Input** | `avoid_double_tap_submit`, `avoid_gesture_conflict`, `avoid_gesture_without_behavior`, `prefer_actions_and_shortcuts`, `prefer_cursor_for_buttons`, `require_disabled_state`, `require_drag_feedback`, `require_focus_indicator`, `require_hover_states`, `require_long_press_callback` |
-| **Forms/Testing** | `require_button_loading_state`, `require_form_validation`, `avoid_flaky_tests`, `avoid_real_timer_in_widget_test`, `avoid_stateful_test_setup`, `prefer_matcher_over_equals`, `prefer_mock_http`, `require_golden_test`, `require_mock_verification` |
-| **Performance** | `avoid_hardcoded_layout_values`, `avoid_hardcoded_text_styles`, `avoid_large_images_in_memory`, `avoid_map_markers_in_build`, `avoid_stack_overflow`, `prefer_clip_behavior`, `prefer_deferred_loading_web`, `prefer_keep_alive`, `prefer_sliver_app_bar`, `prefer_sliver_list` |
-| **State Management** | `avoid_late_context`, `prefer_cubit_for_simple_state`, `prefer_selector_over_consumer`, `require_bloc_consumer_when_both` |
-| **Accessibility** | `avoid_screenshot_sensitive`, `avoid_semantics_exclusion`, `prefer_merge_semantics`, `avoid_small_text` |
-| **Database/Navigation** | `require_database_index`, `prefer_transaction_for_batch`, `prefer_typed_route_params`, `require_refresh_indicator`, `require_scroll_controller`, `require_scroll_physics` |
-| **Desktop/i18n** | `require_menu_bar_for_desktop`, `require_window_close_confirmation`, `require_intl_locale_initialization`, `require_notification_timezone_awareness` |
+| Category                | Rules Added                                                                                                                                                                                                                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Widget Structure**    | `avoid_deep_widget_nesting`, `avoid_find_child_in_build`, `avoid_layout_builder_in_scrollable`, `avoid_nested_providers`, `avoid_opacity_misuse`, `avoid_shrink_wrap_in_scroll`, `avoid_unbounded_constraints`, `avoid_unconstrained_box_misuse`                                        |
+| **Gesture/Input**       | `avoid_double_tap_submit`, `avoid_gesture_conflict`, `avoid_gesture_without_behavior`, `prefer_actions_and_shortcuts`, `prefer_cursor_for_buttons`, `require_disabled_state`, `require_drag_feedback`, `require_focus_indicator`, `require_hover_states`, `require_long_press_callback` |
+| **Forms/Testing**       | `require_button_loading_state`, `require_form_validation`, `avoid_flaky_tests`, `avoid_real_timer_in_widget_test`, `avoid_stateful_test_setup`, `prefer_matcher_over_equals`, `prefer_mock_http`, `require_golden_test`, `require_mock_verification`                                    |
+| **Performance**         | `avoid_hardcoded_layout_values`, `avoid_hardcoded_text_styles`, `avoid_large_images_in_memory`, `avoid_map_markers_in_build`, `avoid_stack_overflow`, `prefer_clip_behavior`, `prefer_deferred_loading_web`, `prefer_keep_alive`, `prefer_sliver_app_bar`, `prefer_sliver_list`         |
+| **State Management**    | `avoid_late_context`, `prefer_cubit_for_simple_state`, `prefer_selector_over_consumer`, `require_bloc_consumer_when_both`                                                                                                                                                               |
+| **Accessibility**       | `avoid_screenshot_sensitive`, `avoid_semantics_exclusion`, `prefer_merge_semantics`, `avoid_small_text`                                                                                                                                                                                 |
+| **Database/Navigation** | `require_database_index`, `prefer_transaction_for_batch`, `prefer_typed_route_params`, `require_refresh_indicator`, `require_scroll_controller`, `require_scroll_physics`                                                                                                               |
+| **Desktop/i18n**        | `require_menu_bar_for_desktop`, `require_window_close_confirmation`, `require_intl_locale_initialization`, `require_notification_timezone_awareness`                                                                                                                                    |
 
 #### Comprehensive Tier (+48 rules)
 
@@ -621,13 +699,13 @@ Stylistic/opinionated rules remain untiered for team-specific configuration:
 
 Activated 5 previously unregistered testing best practices rules:
 
-| Rule | Tier | Description |
-|------|------|-------------|
-| `prefer_test_find_by_key` | Recommended | Suggests `find.byKey()` over `find.byType()` for reliable widget testing |
-| `prefer_setup_teardown` | Recommended | Detects duplicated test setup code (3+ occurrences) |
-| `require_test_description_convention` | Recommended | Ensures test names include descriptive words |
-| `prefer_bloc_test_package` | Professional | Suggests `blocTest()` when detecting Bloc testing patterns |
-| `prefer_mock_verify` | Professional | Warns when `when()` is used without `verify()` |
+| Rule                                  | Tier         | Description                                                              |
+| ------------------------------------- | ------------ | ------------------------------------------------------------------------ |
+| `prefer_test_find_by_key`             | Recommended  | Suggests `find.byKey()` over `find.byType()` for reliable widget testing |
+| `prefer_setup_teardown`               | Recommended  | Detects duplicated test setup code (3+ occurrences)                      |
+| `require_test_description_convention` | Recommended  | Ensures test names include descriptive words                             |
+| `prefer_bloc_test_package`            | Professional | Suggests `blocTest()` when detecting Bloc testing patterns               |
+| `prefer_mock_verify`                  | Professional | Warns when `when()` is used without `verify()`                           |
 
 **Note:** `avoid_test_sleep` was already registered.
 
@@ -637,15 +715,15 @@ Activated 5 previously unregistered testing best practices rules:
 
 Improved problem messages for 7 critical-impact rules to provide specific consequences instead of generic descriptions:
 
-| Rule | Improvement |
-|------|-------------|
-| `require_secure_storage` | Now explains XML storage exposure enables credential extraction |
-| `avoid_storing_sensitive_unencrypted` | Added backup extraction and identity theft consequence |
-| `check_mounted_after_async` | Specifies State disposal during async gap |
-| `avoid_stream_subscription_in_field` | Clarifies callbacks fire after State disposal |
-| `require_stream_subscription_cancel` | Specifies State disposal context |
-| `require_interval_timer_cancel` | Specifies State disposal context |
-| `avoid_dialog_context_after_async` | Clarifies BuildContext deactivation during async gap |
+| Rule                                  | Improvement                                                     |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `require_secure_storage`              | Now explains XML storage exposure enables credential extraction |
+| `avoid_storing_sensitive_unencrypted` | Added backup extraction and identity theft consequence          |
+| `check_mounted_after_async`           | Specifies State disposal during async gap                       |
+| `avoid_stream_subscription_in_field`  | Clarifies callbacks fire after State disposal                   |
+| `require_stream_subscription_cancel`  | Specifies State disposal context                                |
+| `require_interval_timer_cancel`       | Specifies State disposal context                                |
+| `avoid_dialog_context_after_async`    | Clarifies BuildContext deactivation during async gap            |
 
 **Result**: Critical impact rules now at 100% DX compliance (40/40 passing).
 
@@ -663,16 +741,16 @@ Security rules are now mapped to **OWASP Mobile Top 10 (2024)** and **OWASP Top 
 
 #### Coverage
 
-| OWASP Mobile | Rules | OWASP Web | Rules |
-|--------------|-------|-----------|-------|
-| M1 Credential Usage | 5+ | A01 Broken Access Control | 4+ |
-| M3 Authentication | 5+ | A02 Cryptographic Failures | 10+ |
-| M4 Input Validation | 6+ | A03 Injection | 6+ |
-| M5 Communication | 2+ | A05 Misconfiguration | 4+ |
-| M6 Privacy Controls | 5+ | A07 Authentication Failures | 8+ |
-| M8 Misconfiguration | 4+ | A09 Logging Failures | 2+ |
-| M9 Data Storage | 7+ | | |
-| M10 Cryptography | 4+ | | |
+| OWASP Mobile        | Rules | OWASP Web                   | Rules |
+| ------------------- | ----- | --------------------------- | ----- |
+| M1 Credential Usage | 5+    | A01 Broken Access Control   | 4+    |
+| M3 Authentication   | 5+    | A02 Cryptographic Failures  | 10+   |
+| M4 Input Validation | 6+    | A03 Injection               | 6+    |
+| M5 Communication    | 2+    | A05 Misconfiguration        | 4+    |
+| M6 Privacy Controls | 5+    | A07 Authentication Failures | 8+    |
+| M8 Misconfiguration | 4+    | A09 Logging Failures        | 2+    |
+| M9 Data Storage     | 7+    |                             |       |
+| M10 Cryptography    | 4+    |                             |       |
 
 **Gaps**: M2 (Supply Chain), M7 (Binary Protection), and A06 (Outdated Components) require separate tooling — dependency scanners and build-time protections.
 
@@ -719,11 +797,11 @@ This command creates `saropa_baseline.json` and updates your `analysis_options.y
 
 #### Three Combinable Baseline Types
 
-| Type | Config | Description |
-|------|--------|-------------|
-| **File-based** | `baseline.file` | JSON file listing specific violations to ignore |
+| Type           | Config           | Description                                         |
+| -------------- | ---------------- | --------------------------------------------------- |
+| **File-based** | `baseline.file`  | JSON file listing specific violations to ignore     |
 | **Path-based** | `baseline.paths` | Glob patterns for directories (e.g., `lib/legacy/`) |
-| **Date-based** | `baseline.date` | Git blame - ignore code unchanged since a date |
+| **Date-based** | `baseline.date`  | Git blame - ignore code unchanged since a date      |
 
 All three types are combinable - any match suppresses the violation.
 
@@ -734,13 +812,13 @@ custom_lint:
   saropa_lints:
     tier: recommended
     baseline:
-      file: "saropa_baseline.json"    # Specific violations
-      date: "2025-01-15"              # Code unchanged since this date
-      paths:                           # Directories/patterns
+      file: "saropa_baseline.json" # Specific violations
+      date: "2025-01-15" # Code unchanged since this date
+      paths: # Directories/patterns
         - "lib/legacy/"
         - "lib/deprecated/"
         - "**/generated/"
-      only_impacts: [low, medium]     # Only baseline these severities
+      only_impacts: [low, medium] # Only baseline these severities
 ```
 
 #### CLI Commands
@@ -769,13 +847,14 @@ See [README.md](README.md#baseline-for-brownfield-projects) for full documentati
 
 Five new rules to fill gaps in OWASP coverage:
 
-| Rule | OWASP | Severity | Description |
-|------|-------|----------|-------------|
-| `avoid_ignoring_ssl_errors` | M5, A05 | ERROR | Detects `badCertificateCallback = (...) => true` that bypasses SSL validation |
-| `require_https_only` | M5, A05 | WARNING | Flags `http://` URLs (except localhost). Has quick fix to replace with HTTPS |
-| `avoid_unsafe_deserialization` | M4, A08 | WARNING | Detects `jsonDecode` results used in dangerous operations without type validation |
-| `avoid_user_controlled_urls` | M4, A10 | WARNING | Flags user input (text controllers) passed directly to HTTP methods without URL validation |
-| `require_catch_logging` | M8, A09 | WARNING | Catch blocks that silently swallow exceptions without logging or rethrowing |
+| Rule                           | OWASP   | Severity | Description                                                                                |
+| ------------------------------ | ------- | -------- | ------------------------------------------------------------------------------------------ |
+| `avoid_ignoring_ssl_errors`    | M5, A05 | ERROR    | Detects `badCertificateCallback = (...) => true` that bypasses SSL validation              |
+| `require_https_only`           | M5, A05 | WARNING  | Flags `http://` URLs (except localhost). Has quick fix to replace with HTTPS               |
+| `avoid_unsafe_deserialization` | M4, A08 | WARNING  | Detects `jsonDecode` results used in dangerous operations without type validation          |
+| `avoid_user_controlled_urls`   | M4, A10 | WARNING  | Flags user input (text controllers) passed directly to HTTP methods without URL validation |
+| `require_catch_logging`        | M8, A09 | WARNING  | Catch blocks that silently swallow exceptions without logging or rethrowing                |
 
 ## [3.4.0] and Earlier
+
 For details on the initial release and versions 0.1.0 through 3.4.0, please refer to [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md).
