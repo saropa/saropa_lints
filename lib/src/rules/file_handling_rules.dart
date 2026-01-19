@@ -1028,6 +1028,7 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
     });
   }
 }
+
 /// Warns when SELECT * is used in sqflite rawQuery() calls.
 ///
 /// Alias: sqflite_select_columns, avoid_select_star
