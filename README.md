@@ -139,7 +139,7 @@ analyzer:
 # analysis_options.yaml
 custom_lint:
   saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+    tier: recommended  # Options: essential, recommended, professional, comprehensive, insanity
 ```
 
 ### 4. Run the linter
@@ -157,17 +157,23 @@ dart run custom_lint
 
 ## The 5 Tiers
 
-Pick the tier that matches your team:
+Pick the tier that matches your team's needs. Each tier builds on the previous one.
 
-| Tier | Best For |
-|------|----------|
-| **Essential** | Every project. Prevents crashes, memory leaks, security holes. |
-| **Recommended** | Most teams. Adds performance, accessibility, null safety, collection bounds. |
-| **Professional** | Enterprise. Adds architecture, documentation, comprehensive testing. |
-| **Comprehensive** | Quality obsessed. Best practices everywhere. |
-| **Insanity** | Greenfield projects. Every single rule. |
+| Tier | Purpose | Target User | Example Rules |
+|------|---------|-------------|---------------|
+| **Essential** | **Prevents crashes, data loss, security breaches, and memory leaks.** These are rules where a single violation can cause real harm - app crashes, user data exposed, resources never released. If your app violates these, something bad *will* happen. | Every project, every team. Non-negotiable baseline. | `require_dispose` (memory leak), `avoid_hardcoded_credentials` (security breach), `check_mounted_after_async` (crash), `avoid_null_assertion` (runtime exception), `require_firebase_init_before_use` (crash) |
+| **Recommended** | **Catches common bugs, basic performance issues, and accessibility fundamentals.** These are mistakes that cause real problems but may not immediately crash your app - poor UX, sluggish performance, inaccessible interfaces, silent failures. | Most teams. The sensible default for production apps. | `require_semantics_label` (accessibility), `avoid_expensive_build` (performance), `require_json_decode_try_catch` (error handling), `avoid_shrinkwrap_in_scrollview` (performance), `require_image_error_builder` (UX) |
+| **Professional** | **Enforces architecture, testability, maintainability, and documentation standards.** Code that works but is hard to test, hard to change, or hard to understand. Technical debt that slows teams down over time. | Enterprise teams, long-lived codebases, teams with multiple developers. | `avoid_god_class` (architecture), `require_public_api_documentation` (docs), `prefer_result_pattern` (error handling), `require_test_cleanup` (testing), `avoid_hardcoded_strings_in_ui` (i18n) |
+| **Comprehensive** | **Stricter patterns, optimization hints, and thorough edge case coverage.** Rules that catch subtle issues, enforce consistency, and push toward optimal patterns. Helpful but not critical. | Quality-obsessed teams, libraries/packages, teams that want maximum coverage. | `prefer_element_rebuild` (subtle perf), `prefer_feature_folder_structure` (architecture), `require_test_documentation` (maintainability), `prefer_fake_platform` (test quality) |
+| **Insanity** | **Everything, including pedantic and highly opinionated rules.** Rules that most teams would find excessive but are valuable for greenfield projects or teams that want zero compromise. | New projects starting fresh, teams that want maximum strictness from day one. | `prefer_custom_single_child_layout` (micro-optimization) |
 
-**Plus 200+ optional [stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** — team preferences, not in any tier.
+### Stylistic Rules (Separate Track)
+
+**[200+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions. These are **not included in any tier** - enable them individually based on your team's preferences.
+
+Stylistic rules are orthogonal to correctness. Your code can be perfectly correct while violating every stylistic rule, or perfectly formatted while crashing on every screen. That's why they're separate.
+
+Examples: `enforce_member_ordering`, `prefer_single_quotes`, `prefer_trailing_comma_always`, `capitalize_comment_start`
 
 ### Configuration template
 
@@ -268,7 +274,6 @@ This command:
 | Type | Config | Description | Best For |
 |------|--------|-------------|----------|
 | **File-based** | `baseline.file` | JSON listing specific violations | "Fix nothing yet" |
-| **Path-based** | `baseline.paths` | Glob patterns for directories | "Ignore legacy folders" |
 | **Date-based** | `baseline.date` | Git blame - ignore old code | "Fix gradually by age" |
 
 All three types are combinable - any match suppresses the violation.
@@ -302,7 +307,6 @@ custom_lint:
 | Pattern | Matches |
 |---------|---------|
 | `lib/legacy/` | All files under `lib/legacy/` |
-| `**/generated/` | Any `generated/` folder at any depth |
 | `*.g.dart` | All files ending in `.g.dart` |
 | `lib/**/old_*.dart` | Files like `lib/foo/old_widget.dart` |
 

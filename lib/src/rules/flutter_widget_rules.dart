@@ -15917,6 +15917,7 @@ class PreferVoidCallbackRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  /// Alias: prefer_void_callback_type
   static const LintCode _code = LintCode(
     name: 'prefer_void_callback',
     problemMessage:
@@ -16982,7 +16983,7 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
 
 /// Warns when `throw e` is used instead of `rethrow`.
 ///
-/// Alias: preserve_stack_trace, use_rethrow
+/// Alias: use_rethrow
 ///
 /// `throw e` loses the original stack trace. Use `rethrow` to preserve it.
 ///

@@ -2401,6 +2401,7 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
+  /// Alias: prefer_symbol_over_key_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_symbol_over_key',
     problemMessage:

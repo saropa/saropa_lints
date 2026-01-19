@@ -111,6 +111,7 @@ class PreferGenericExceptionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_generic_exception_type
   static const LintCode _code = LintCode(
     name: 'prefer_generic_exception',
     problemMessage:

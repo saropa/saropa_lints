@@ -951,6 +951,7 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: require_update_should_notify_context
   static const LintCode _code = LintCode(
     name: 'require_update_should_notify',
     problemMessage:
@@ -1538,6 +1539,7 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  /// Alias: prefer_consumer_widget_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_consumer_widget',
     problemMessage:
@@ -2016,6 +2018,7 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
+  /// Alias: avoid_provider_of_in_build_method
   static const LintCode _code = LintCode(
     name: 'avoid_provider_of_in_build',
     problemMessage:
@@ -2114,6 +2117,7 @@ class AvoidGetFindInBuildRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: avoid_get_find_in_build_method
   static const LintCode _code = LintCode(
     name: 'avoid_get_find_in_build',
     problemMessage:
@@ -2534,6 +2538,7 @@ class PreferSelectForPartialRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_select_for_partial_state
   static const LintCode _code = LintCode(
     name: 'prefer_select_for_partial',
     problemMessage:
@@ -2760,6 +2765,7 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  /// Alias: prefer_family_for_params_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_family_for_params',
     problemMessage:
@@ -2853,6 +2859,7 @@ class RequireBlocObserverRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: require_bloc_observer_instance
   static const LintCode _code = LintCode(
     name: 'require_bloc_observer',
     problemMessage:
@@ -2984,6 +2991,7 @@ class PreferCopyWithForStateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_copy_with_for_state_class
   static const LintCode _code = LintCode(
     name: 'prefer_copy_with_for_state',
     problemMessage:
@@ -3203,6 +3211,7 @@ class RequireErrorStateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: require_error_state_context
   static const LintCode _code = LintCode(
     name: 'require_error_state',
     problemMessage:
@@ -3291,6 +3300,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: avoid_bloc_in_bloc_pattern
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_in_bloc',
     problemMessage:
@@ -3384,6 +3394,7 @@ class PreferSealedEventsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_sealed_events_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_events',
     problemMessage:
@@ -6276,6 +6287,7 @@ class PreferImmutableBlocEventsRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: prefer_immutable_bloc_events_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_events',
     problemMessage:
@@ -6344,6 +6356,7 @@ class PreferImmutableBlocStateRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: prefer_immutable_bloc_state_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_bloc_state',
     problemMessage:
@@ -6415,6 +6428,7 @@ class PreferSealedBlocEventsRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: prefer_sealed_bloc_events_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_events',
     problemMessage:
@@ -6483,6 +6497,7 @@ class PreferSealedBlocStateRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: prefer_sealed_bloc_state_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_sealed_bloc_state',
     problemMessage:
@@ -7195,6 +7210,7 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
+  /// Alias: prefer_nullable_provider_types_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_nullable_provider_types',
     problemMessage:
@@ -8661,7 +8677,7 @@ class RequireFreezedPrivateConstructorRule extends SaropaLintRule {
 
 /// Warns when Equatable class has non-final fields.
 ///
-/// Alias: equatable_mutable_field, immutable_equatable
+/// Alias: equatable_mutable_field
 ///
 /// Equatable classes must be immutable for equality to work correctly.
 ///
@@ -10752,6 +10768,7 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  /// Alias: prefer_selector_widget_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_selector_widget',
     problemMessage:
@@ -10932,6 +10949,7 @@ class RequireBlocRepositoryAbstractionRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: require_bloc_repository_abstraction_layer
   static const LintCode _code = LintCode(
     name: 'require_bloc_repository_abstraction',
     problemMessage:
@@ -11117,6 +11135,7 @@ class PreferBlocTransformRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Alias: prefer_bloc_transform_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_transform',
     problemMessage:

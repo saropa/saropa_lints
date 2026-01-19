@@ -80,6 +80,7 @@ class ExtendEquatableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: extend_equatable
   static const LintCode _code = LintCode(
     name: 'require_extend_equatable',
     problemMessage:
@@ -347,6 +348,7 @@ class PreferEquatableMixinRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_equatable_mixin_pattern
   static const LintCode _code = LintCode(
     name: 'prefer_equatable_mixin',
     problemMessage:
