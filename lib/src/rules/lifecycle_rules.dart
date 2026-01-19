@@ -188,9 +188,9 @@ class RequireResumeStateRefreshRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_resume_state_refresh',
     problemMessage:
-        '[require_resume_state_refresh] didChangeAppLifecycleState handles paused but not resumed.',
+        '[require_resume_state_refresh] App handles paused state but not resumed, leaving UI stale after returning from background.',
     correctionMessage:
-        'Add handling for AppLifecycleState.resumed to refresh data.',
+        'Handle AppLifecycleState.resumed to refresh data when app returns to foreground.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -269,9 +269,9 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_did_update_widget_check',
     problemMessage:
-        '[require_did_update_widget_check] didUpdateWidget should compare oldWidget properties before updating.',
+        '[require_did_update_widget_check] didUpdateWidget triggers updates without checking if properties changed, causing unnecessary rebuilds.',
     correctionMessage:
-        'Compare oldWidget.property != widget.property before state updates.',
+        'Compare oldWidget.property != widget.property before updating state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -383,9 +383,8 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_late_initialization_in_init_state',
     problemMessage:
-        '[require_late_initialization_in_init_state] Late field should be initialized in initState(), not build().',
-    correctionMessage:
-        'Move initialization to initState() to avoid redundant recreation.',
+        '[require_late_initialization_in_init_state] Late field initialized in build() is recreated on every rebuild, wasting resources and losing state.',
+    correctionMessage: 'Move initialization to initState() which runs once.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

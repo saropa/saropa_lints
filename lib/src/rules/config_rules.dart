@@ -42,9 +42,9 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_config',
     problemMessage:
-        '[avoid_hardcoded_config] Hardcoded configuration detected. Use environment variables.',
+        '[avoid_hardcoded_config] Hardcoded configuration makes code inflexible and deployment-specific.',
     correctionMessage:
-        'Move to String.fromEnvironment, dotenv, or a config service.',
+        'Use String.fromEnvironment, dotenv, or a config service for environment-specific values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -146,9 +146,9 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mixed_environments',
     problemMessage:
-        '[avoid_mixed_environments] Mixed production/development configuration detected.',
+        '[avoid_mixed_environments] Mixed production/development configuration risks corrupting production data or leaking credentials.',
     correctionMessage:
-        'Use conditional config based on kReleaseMode or environment.',
+        'Use conditional config based on kReleaseMode or environment variables.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

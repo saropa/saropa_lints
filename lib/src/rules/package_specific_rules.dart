@@ -930,9 +930,9 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_workmanager_constraints',
     problemMessage:
-        '[require_workmanager_constraints] WorkManager tasks should specify constraints.',
+        '[require_workmanager_constraints] WorkManager task without constraints runs unconditionally, draining battery and using metered data.',
     correctionMessage:
-        'Add constraints parameter to prevent unwanted battery/data usage.',
+        'Add Constraints(networkType: NetworkType.connected) to control when tasks run.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2250,9 +2250,9 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_image_picker_max_dimensions',
     problemMessage:
-        '[prefer_image_picker_max_dimensions] pickImage() without maxWidth/maxHeight can cause OOM on high-res cameras.',
+        '[prefer_image_picker_max_dimensions] pickImage() without maxWidth/maxHeight loads full-resolution images (12+ MP), causing OutOfMemoryError.',
     correctionMessage:
-        'Add maxWidth and maxHeight parameters to limit image size.',
+        'Add maxWidth: 1920, maxHeight: 1080 or appropriate limits for your use case.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

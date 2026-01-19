@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?**  \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 2.7.0.
 
+## [4.1.9] - 2026-01-18
+
+### Changed
+
+**Tier rebalancing** - Redistributed rules across tiers to match tier philosophy:
+
+- **Essential**: Now strictly crash/security/memory-leak rules. Removed style preferences (`prefer_list_first`, `enforce_member_ordering`, `avoid_continue_statement`). Added crash-causing rules from Recommended (`require_getit_registration_order`, `require_default_config`, `avoid_builder_index_out_of_bounds`).
+
+- **Stylistic**: Expanded with ordering/naming rules that were incorrectly in Essential/Recommended. Now 129 rules for formatting, ordering, and naming conventions.
+
+- **Comprehensive**: Expanded from 5 to 51 rules. Added optimization hints and strict patterns from Professional (immutability patterns, type strictness, documentation extras, testing extras).
+
+- **Insanity**: Expanded from 1 to 10 rules. Added pedantic rules like `avoid_object_creation_in_hot_loops`, `prefer_feature_folder_structure`, `avoid_returning_widgets`.
+
+**Documentation**: Updated README tier table with detailed purpose, target user, and examples for each tier.
+
 ## [4.1.8] - 2026-01-18
 
 ### Added

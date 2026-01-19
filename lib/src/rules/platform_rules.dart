@@ -45,8 +45,9 @@ class RequirePlatformCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_platform_check',
     problemMessage:
-        '[require_platform_check] Platform-specific API used without platform check.',
-    correctionMessage: 'Guard with Platform.isAndroid/isIOS or kIsWeb check.',
+        '[require_platform_check] Platform-specific API crashes on web where dart:io is unavailable.',
+    correctionMessage:
+        'Guard with if (!kIsWeb) or Platform.isAndroid/isIOS check.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -134,9 +135,9 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_platform_io_conditional',
     problemMessage:
-        '[prefer_platform_io_conditional] Platform checks crash on web. Use kIsWeb first.',
+        '[prefer_platform_io_conditional] Platform from dart:io throws at runtime on web.',
     correctionMessage:
-        'Guard Platform checks with kIsWeb or use defaultTargetPlatform.',
+        'Check kIsWeb first: if (!kIsWeb && Platform.isAndroid).',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

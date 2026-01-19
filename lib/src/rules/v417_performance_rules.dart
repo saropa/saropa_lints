@@ -136,9 +136,9 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_isolate_for_heavy',
     problemMessage:
-        '[require_isolate_for_heavy] Heavy computation on main thread. Consider using compute() or Isolate.run().',
+        '[require_isolate_for_heavy] Heavy computation blocks the main thread, causing UI jank and dropped frames.',
     correctionMessage:
-        'Move to background isolate: compute(_parse, data) or Isolate.run(() => _parse(data)).',
+        'Use compute(_parse, data) or Isolate.run(() => _parse(data)) to run in background.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -297,9 +297,9 @@ class AvoidJsonInMainRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_json_in_main',
     problemMessage:
-        '[avoid_json_in_main] jsonDecode on main thread. Use compute() for large payloads.',
+        '[avoid_json_in_main] jsonDecode on main thread blocks UI for large payloads (100KB+).',
     correctionMessage:
-        'Wrap in compute(jsonDecode, data) or Isolate.run(() => jsonDecode(data)).',
+        'Use compute(jsonDecode, data) or Isolate.run(() => jsonDecode(data)).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
