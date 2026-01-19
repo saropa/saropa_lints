@@ -109,6 +109,11 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 
 ### Fixed
 
+- **`function_always_returns_null` false positives on void functions** - The rule was incorrectly flagging void functions that use bare `return;` statements for early exit. Now correctly skips:
+  - Functions with explicit `void` return type
+  - Functions with `Future<void>` or `FutureOr<void>` return types (including type aliases via resolved type checking)
+  - Functions with no explicit return type that only use bare `return;` statements (inferred void)
+
 - **`capitalize_comment_start` code detection overhauled** - The previous regex pattern `[:\.\(\)\[\]\{\};,=>]` was too broad, matching ANY comment containing punctuation (periods, colons, commas). This caused massive false negatives where legitimate prose comments like `// this is important.` were incorrectly skipped as "code". The new pattern specifically detects:
   - Identifier followed by code punctuation: `foo.bar`, `x = 5`
   - Dart keywords at start: `return`, `if (`, `final x`

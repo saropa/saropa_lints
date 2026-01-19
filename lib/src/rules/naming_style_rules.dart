@@ -182,7 +182,7 @@ class FormatCommentRule extends SaropaLintRule {
               continue;
             }
 
-            // Skip special markers (TODO, FIXME, ignore, etc)
+            // Skip special task markers and ignore directives
             if (CommentPatterns.isSpecialMarker(content)) {
               commentToken = commentToken.next;
               continue;
