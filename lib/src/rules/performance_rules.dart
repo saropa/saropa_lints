@@ -1505,7 +1505,7 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_value_listenable_builder',
     problemMessage:
-        '[prefer_value_listenable_builder] Simple single-value state could use ValueListenableBuilder for better performance.',
+        '[prefer_value_listenable_builder] Simple single-value state using setState causes expensive full-widget rebuilds. ValueListenableBuilder isolates rebuilds to only the affected subtree, reducing jank.',
     correctionMessage:
         'Consider using ValueNotifier + ValueListenableBuilder for isolated rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1817,7 +1817,7 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
     problemMessage:
-        '[avoid_text_span_in_build] TextSpan recreated in build() forces text layout recalculation on every rebuild.',
+        '[avoid_text_span_in_build] TextSpan recreated in build() forces expensive text layout recalculation on every rebuild. This causes visible jank when scrolling or animating.',
     correctionMessage:
         'Cache TextSpan as a final field or extract to a method that returns cached spans.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1981,7 +1981,7 @@ class PreferConstWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets',
     problemMessage:
-        '[prefer_const_widgets] Widget could be const but is recreated on every rebuild, wasting CPU cycles.',
+        '[prefer_const_widgets] Widget could be const but is recreated on every rebuild. This wastes CPU cycles and battery, causing unnecessary widget comparisons that slow down UI rendering.',
     correctionMessage:
         'Add const keyword to skip unnecessary widget tree comparisons.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2158,7 +2158,7 @@ class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_widget_creation_in_loop',
     problemMessage:
-        '[avoid_widget_creation_in_loop] Widgets created in .map() are all instantiated eagerly on every rebuild, even if off-screen.',
+        '[avoid_widget_creation_in_loop] Widgets created in .map() are all instantiated eagerly on every rebuild, even if off-screen. This causes jank and high memory usage for long lists.',
     correctionMessage:
         'Use ListView.builder for lazy construction of large lists.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2330,7 +2330,7 @@ class AvoidCallingOfInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_calling_of_in_build',
     problemMessage:
-        '[avoid_calling_of_in_build] Multiple .of(context) calls walk the widget tree repeatedly on every rebuild.',
+        '[avoid_calling_of_in_build] Multiple .of(context) calls walk the widget tree repeatedly on every rebuild. This adds unnecessary overhead that slows down frame rendering.',
     correctionMessage:
         'Cache result in a local variable: final theme = Theme.of(context);',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2593,7 +2593,7 @@ class AvoidClosureMemoryLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_closure_memory_leak',
     problemMessage:
-        '[avoid_closure_memory_leak] Closure with setState may keep widget alive after disposal.',
+        '[avoid_closure_memory_leak] Closure capturing setState keeps the StatefulWidget in memory after disposal. The parent widget tree leaks memory, and setState on unmounted widgets crashes the app.',
     correctionMessage:
         'Store subscription and cancel in dispose(), check mounted before setState.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2730,7 +2730,7 @@ class RequireDisposePatternRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_dispose_pattern',
     problemMessage:
-        '[require_dispose_pattern] Class has disposable resources but no dispose/close method.',
+        '[require_dispose_pattern] Class has StreamController, AnimationController, or other disposable fields but no cleanup method. These controllers leak memory and can crash when accessed after disposal.',
     correctionMessage: 'Add dispose() or close() method to clean up resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -3916,7 +3916,7 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_money_arithmetic_on_double',
     problemMessage:
-        '[avoid_money_arithmetic_on_double] Arithmetic on money-like double. Floating point has precision issues.',
+        '[avoid_money_arithmetic_on_double] Floating point arithmetic causes precision errors in financial calculations. Users may be charged incorrect amounts or see wrong totals.',
     correctionMessage:
         'Use int for cents, Decimal package, or money package for financial calculations.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4023,7 +4023,7 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_rebuild_on_scroll',
     problemMessage:
-        '[avoid_rebuild_on_scroll] Scroll listener in build() is added on every rebuild, causing duplicate callback executions.',
+        '[avoid_rebuild_on_scroll] Scroll listener in build() is added on every rebuild. This causes memory leaks and duplicate callbacks that compound over time, leading to jank and crashes.',
     correctionMessage:
         'Register listener once in initState() and remove in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4056,6 +4056,234 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
           return;
         }
         current = current.parent;
+      }
+    });
+  }
+}
+
+// =============================================================================
+// avoid_animation_in_large_list
+// =============================================================================
+
+/// Warns when animations are used inside list item builders.
+///
+/// Alias: list_item_animation, listview_animation
+///
+/// Animations inside ListView.builder cause performance issues because
+/// they run even for off-screen items and can cause jank during scrolling.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemCount: 1000,
+///   itemBuilder: (context, index) {
+///     return FadeInAnimation( // 1000 animations!
+///       child: ListTile(title: Text(items[index].name)),
+///     );
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Option 1: Use AnimatedList for add/remove animations
+/// AnimatedList(
+///   itemBuilder: (context, index, animation) {
+///     return SizeTransition(
+///       sizeFactor: animation,
+///       child: ListTile(title: Text(items[index].name)),
+///     );
+///   },
+/// )
+///
+/// // Option 2: Animate only visible items
+/// ListView.builder(
+///   itemBuilder: (context, index) {
+///     return VisibilityDetector(
+///       onVisibilityChanged: (info) {
+///         if (info.visibleFraction > 0.5) startAnimation();
+///       },
+///       child: ListTile(...),
+///     );
+///   },
+/// )
+/// ```
+class AvoidAnimationInLargeListRule extends SaropaLintRule {
+  const AvoidAnimationInLargeListRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_animation_in_large_list',
+    problemMessage:
+        '[avoid_animation_in_large_list] Animation widget inside ListView builder. '
+        'All items run animations even when off-screen, causing performance issues.',
+    correctionMessage:
+        'Use AnimatedList for enter/exit animations, or animate only visible items.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _animationWidgets = <String>{
+    'AnimatedContainer',
+    'AnimatedOpacity',
+    'AnimatedPositioned',
+    'AnimatedPadding',
+    'AnimatedAlign',
+    'AnimatedScale',
+    'AnimatedRotation',
+    'AnimatedSlide',
+    'FadeTransition',
+    'ScaleTransition',
+    'SlideTransition',
+    'RotationTransition',
+    'TweenAnimationBuilder',
+    'Lottie',
+    'Hero',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check if this is ListView.builder or similar
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier) return;
+
+      final String targetName = target.name;
+      if (targetName != 'ListView' &&
+          targetName != 'GridView' &&
+          targetName != 'CustomScrollView') {
+        return;
+      }
+
+      final String methodName = node.methodName.name;
+      if (methodName != 'builder' && methodName != 'separated') return;
+
+      // Check itemBuilder for animation widgets
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
+          if (paramName == 'itemBuilder') {
+            final String builderSource = arg.expression.toSource();
+
+            for (final String animWidget in _animationWidgets) {
+              if (builderSource.contains(animWidget)) {
+                reporter.atNode(node, code);
+                return;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_lazy_loading_images
+// =============================================================================
+
+/// Warns when images are loaded without lazy loading in scrollable views.
+///
+/// Alias: lazy_load_images, image_preload
+///
+/// Loading all images immediately in a scrollable list wastes bandwidth and
+/// memory. Use lazy loading to fetch images only when they become visible.
+///
+/// **BAD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) {
+///     return Image.network(imageUrls[index]); // Loads all images immediately
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// ListView.builder(
+///   itemBuilder: (context, index) {
+///     return CachedNetworkImage(
+///       imageUrl: imageUrls[index],
+///       placeholder: (context, url) => CircularProgressIndicator(),
+///       errorWidget: (context, url, error) => Icon(Icons.error),
+///     );
+///   },
+/// )
+///
+/// // Or use FadeInImage for built-in placeholder support
+/// FadeInImage.memoryNetwork(
+///   placeholder: kTransparentImage,
+///   image: imageUrls[index],
+/// )
+/// ```
+class PreferLazyLoadingImagesRule extends SaropaLintRule {
+  const PreferLazyLoadingImagesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_lazy_loading_images',
+    problemMessage:
+        '[prefer_lazy_loading_images] Image.network in ListView builder without '
+        'lazy loading. All images load immediately, wasting bandwidth and memory.',
+    correctionMessage:
+        'Use CachedNetworkImage or FadeInImage for lazy loading with placeholders.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for Image.network inside itemBuilder
+      if (node.methodName.name != 'network') return;
+
+      final Expression? target = node.target;
+      if (target is! SimpleIdentifier || target.name != 'Image') return;
+
+      // Check if inside an itemBuilder
+      bool isInsideBuilder = false;
+      AstNode? current = node.parent;
+
+      while (current != null) {
+        if (current is NamedExpression) {
+          final String paramName = current.name.label.name;
+          if (paramName == 'itemBuilder' ||
+              paramName == 'builder' ||
+              paramName == 'separatorBuilder') {
+            isInsideBuilder = true;
+            break;
+          }
+        }
+        if (current is FunctionDeclaration || current is MethodDeclaration) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (isInsideBuilder) {
+        reporter.atNode(node, code);
       }
     });
   }

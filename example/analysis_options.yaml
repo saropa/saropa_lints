@@ -68,3 +68,5 @@ custom_lint:
     - require_google_fonts_fallback: true
     # Explicitly enable security rules for testing
     - avoid_redirect_injection: true
+    # Explicitly enable type safety rules for testing
+    - prefer_explicit_type_arguments: true

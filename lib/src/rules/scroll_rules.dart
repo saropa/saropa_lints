@@ -52,7 +52,7 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrinkwrap_in_scrollview',
     problemMessage:
-        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true in scrollable disables virtualization.',
+        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true disables virtualization. This forces all items to render immediately, causing jank and high memory usage with large lists.',
     correctionMessage:
         'Use CustomScrollView with slivers, or add NeverScrollableScrollPhysics.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -580,7 +580,7 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_refresh_without_await',
     problemMessage:
-        '[avoid_refresh_without_await] RefreshIndicator onRefresh should return Future for proper timing.',
+        '[avoid_refresh_without_await] RefreshIndicator onRefresh must return Future. Without await, the spinner dismisses immediately while data is still loading, confusing users.',
     correctionMessage: 'Make onRefresh async and await async operations.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );

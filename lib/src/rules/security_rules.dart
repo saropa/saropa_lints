@@ -914,7 +914,7 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_certificate_pinning',
     problemMessage:
-        '[require_certificate_pinning] HttpClient should implement certificate pinning.',
+        '[require_certificate_pinning] HttpClient without certificate pinning is vulnerable to man-in-the-middle attacks. Attackers on the same network can intercept and modify traffic.',
     correctionMessage:
         'Set badCertificateCallback to validate server certificates.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1222,7 +1222,7 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_sql',
     problemMessage:
-        '[avoid_dynamic_sql] SQL query built with string interpolation is vulnerable to SQL injection.',
+        '[avoid_dynamic_sql] SQL query built with string interpolation is vulnerable to injection attacks. Attackers can manipulate user input to read, modify, or delete database contents, potentially exposing all user data.',
     correctionMessage:
         'Use parameterized queries with ? placeholders and arguments list.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1349,7 +1349,7 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_generic_key_in_url',
     problemMessage:
-        '[avoid_generic_key_in_url] Generic key/auth parameter in URL may contain sensitive data.',
+        '[avoid_generic_key_in_url] Sensitive data in URL query parameters is logged by servers, proxies, and browsers. This exposes credentials in access logs and browser history.',
     correctionMessage:
         'Consider using Authorization header instead of URL parameters.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1919,7 +1919,7 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_jwt_decode_client',
     problemMessage:
-        '[avoid_jwt_decode_client] Decoding JWT on client for authorization is insecure.',
+        '[avoid_jwt_decode_client] Decoding JWT on client for authorization is insecure. Attackers can manipulate decoded claims to bypass permissions and access restricted features.',
     correctionMessage:
         'Verify JWT claims on the server. Client-decoded JWTs can be manipulated.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2021,7 +2021,7 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_logout_cleanup',
     problemMessage:
-        '[require_logout_cleanup] Logout may not clear all sensitive data.',
+        '[require_logout_cleanup] Incomplete logout cleanup leaves sensitive data accessible. The next user on a shared device could access previous user data and session tokens.',
     correctionMessage:
         'Ensure logout clears tokens, cached user data, and resets auth state.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2475,7 +2475,7 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deep_link_validation',
     problemMessage:
-        '[require_deep_link_validation] Deep link parameter used without validation. Validate before use.',
+        '[require_deep_link_validation] Deep link parameter used without validation. Malicious links can inject arbitrary data, leading to crashes, unauthorized access, or code execution.',
     correctionMessage:
         'Add null check and format validation for deep link parameters.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3752,7 +3752,7 @@ class RequireSharedPrefsNullHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_null_handling',
     problemMessage:
-        '[require_shared_prefs_null_handling] SharedPreferences getter used with null assertion. Returns null if key missing.',
+        '[require_shared_prefs_null_handling] SharedPreferences getter with null assertion crashes if key is missing. This is a common source of production crashes on first launch or after app updates.',
     correctionMessage:
         'Use null-aware operator (??) with a default value, or handle nullable type.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -3915,7 +3915,7 @@ class RequireUrlValidationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_validation',
     problemMessage:
-        '[require_url_validation] Uri.parse on variable without scheme validation. Potential SSRF risk.',
+        '[require_url_validation] Uri.parse on user input without scheme validation enables SSRF attacks. Attackers can make your app connect to internal servers, databases, or use malicious protocols to exfiltrate data.',
     correctionMessage:
         'Validate url.scheme is https/http before making requests.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4559,7 +4559,7 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_webview_javascript_disabled',
     problemMessage:
-        '[prefer_webview_javascript_disabled] WebView without explicit JavaScript setting. Disable JS if not needed.',
+        '[prefer_webview_javascript_disabled] WebView with JavaScript enabled expands attack surface. Malicious scripts can steal data, access device APIs, or execute arbitrary code.',
     correctionMessage:
         'Add javascriptMode: JavascriptMode.disabled or javaScriptEnabled: false.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5154,7 +5154,7 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ignoring_ssl_errors',
     problemMessage:
-        '[avoid_ignoring_ssl_errors] SSL certificate errors are being ignored. This enables man-in-the-middle attacks.',
+        '[avoid_ignoring_ssl_errors] Ignoring SSL certificate errors allows man-in-the-middle attackers to intercept all HTTPS traffic. User credentials, tokens, and personal data can be stolen silently without any warning.',
     correctionMessage:
         'Properly validate certificates or use certificate pinning. Never return true unconditionally.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -5429,7 +5429,7 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_deserialization',
     problemMessage:
-        '[avoid_unsafe_deserialization] JSON deserialized without type validation. Data integrity risk from untrusted sources.',
+        '[avoid_unsafe_deserialization] Unvalidated JSON from untrusted sources can crash the app or inject malicious data. Attackers can exploit this to corrupt state or trigger unexpected behavior.',
     correctionMessage:
         'Validate JSON structure with pattern matching or deserialize into typed model classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -5613,7 +5613,7 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_user_controlled_urls',
     problemMessage:
-        '[avoid_user_controlled_urls] User input used directly in HTTP request. SSRF vulnerability risk.',
+        '[avoid_user_controlled_urls] User input used directly in HTTP request creates SSRF (Server-Side Request Forgery) vulnerability. Attackers can force your app to make requests to internal services, exposing sensitive data.',
     correctionMessage:
         'Validate URL scheme and host against an allowlist before making requests.',
     errorSeverity: DiagnosticSeverity.WARNING,

@@ -754,6 +754,10 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: member_ordering
+  @override
+  List<String> get configAliases => const <String>['member_ordering'];
+
   static const LintCode _code = LintCode(
     name: 'enforce_member_ordering',
     problemMessage:
@@ -825,6 +829,10 @@ class ParametersOrderingConventionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  /// Alias: parameters_ordering
+  @override
+  List<String> get configAliases => const <String>['parameters_ordering'];
 
   static const LintCode _code = LintCode(
     name: 'enforce_parameters_ordering',

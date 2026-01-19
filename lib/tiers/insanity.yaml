@@ -13,7 +13,7 @@ custom_lint:
     # =========================================================================
     # NOISY BUT VALUABLE - Style preferences that may generate many warnings
     # =========================================================================
-    avoid_commented_out_code: true
+    # avoid_commented_out_code: moved to stylistic tier (v4.2.0)
     avoid_dynamic: true
     avoid_late_keyword: true
     avoid_nested_conditional_expressions: true

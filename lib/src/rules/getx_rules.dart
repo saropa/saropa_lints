@@ -199,7 +199,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_permanent_cleanup',
     problemMessage:
-        '[require_getx_permanent_cleanup] Get.put(permanent: true) requires manual Get.delete() call for cleanup. Consequence: Not cleaning up permanent controllers can cause memory leaks and unexpected behavior.',
+        '[require_getx_permanent_cleanup] Get.put(permanent: true) bypasses automatic GetxController disposal. Without explicit Get.delete(), the GetxController remains in memory forever, causing memory leaks.',
     correctionMessage:
         'Add Get.delete<T>() when the controller is no longer needed, or document why permanent is required. Otherwise, unused controllers may accumulate and waste resources.',
     errorSeverity: DiagnosticSeverity.WARNING,

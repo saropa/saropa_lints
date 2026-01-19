@@ -179,7 +179,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_payload_sensitive',
     problemMessage:
-        '[avoid_notification_payload_sensitive] Sensitive data in notifications is visible on lock screen, exposing credentials to anyone nearby.',
+        '[avoid_notification_payload_sensitive] Sensitive data in notifications exposes passwords, tokens, or PII on the lock screen. Anyone nearby can read this information without unlocking the device, creating a security vulnerability.',
     correctionMessage:
         'Use generic messages like "New message received" instead of actual content.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -394,7 +394,7 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_notification_initialize_per_platform',
     problemMessage:
-        '[require_notification_initialize_per_platform] InitializationSettings should include both android and iOS settings.',
+        '[require_notification_initialize_per_platform] Missing platform settings causes notifications to fail silently. Users on the unsupported platform will never receive notifications.',
     correctionMessage:
         'Add both android: and iOS: parameters to ensure notifications work on all platforms.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -735,7 +735,7 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_notification_same_id',
     problemMessage:
-        '[avoid_notification_same_id] Static notification ID causes newer notifications to silently replace older ones, losing important alerts.',
+        '[avoid_notification_same_id] Static notification ID causes newer notifications to silently replace older ones. Users will miss important alerts and messages without any indication.',
     correctionMessage:
         'Generate unique IDs per notification: DateTime.now().millisecondsSinceEpoch.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -775,6 +775,250 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_notification_grouping
+// =============================================================================
+
+/// Warns when multiple notifications are shown without grouping.
+///
+/// Alias: notification_grouping, group_notifications
+///
+/// Multiple notifications from the same app should be grouped. On Android,
+/// use setGroup() to visually group related notifications. This provides
+/// a better user experience and reduces notification clutter.
+///
+/// **BAD:**
+/// ```dart
+/// // Multiple notifications without grouping
+/// for (final message in messages) {
+///   await flutterLocalNotificationsPlugin.show(
+///     message.id,
+///     'New Message',
+///     message.text,
+///     NotificationDetails(android: AndroidNotificationDetails(...)),
+///   );
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// const String groupKey = 'com.example.messages';
+///
+/// for (final message in messages) {
+///   await flutterLocalNotificationsPlugin.show(
+///     message.id,
+///     'New Message',
+///     message.text,
+///     NotificationDetails(
+///       android: AndroidNotificationDetails(
+///         'channel_id',
+///         'Channel Name',
+///         groupKey: groupKey, // Group related notifications
+///       ),
+///     ),
+///   );
+/// }
+///
+/// // Show summary notification
+/// await flutterLocalNotificationsPlugin.show(
+///   0,
+///   '${messages.length} new messages',
+///   '',
+///   NotificationDetails(
+///     android: AndroidNotificationDetails(
+///       'channel_id',
+///       'Channel Name',
+///       groupKey: groupKey,
+///       setAsGroupSummary: true,
+///     ),
+///   ),
+/// );
+/// ```
+class PreferNotificationGroupingRule extends SaropaLintRule {
+  const PreferNotificationGroupingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_notification_grouping',
+    problemMessage:
+        '[prefer_notification_grouping] Multiple notifications shown in loop '
+        'without groupKey. Notifications will clutter the notification shade.',
+    correctionMessage:
+        'Add groupKey to AndroidNotificationDetails to group related notifications.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for notification show methods
+      if (methodName != 'show' &&
+          methodName != 'zonedSchedule' &&
+          methodName != 'periodicallyShow') {
+        return;
+      }
+
+      // Check if this is inside a loop
+      bool isInsideLoop = false;
+      AstNode? current = node.parent;
+
+      while (current != null) {
+        if (current is ForStatement ||
+            current is ForElement ||
+            current is WhileStatement ||
+            current is DoStatement) {
+          isInsideLoop = true;
+          break;
+        }
+        if (current is MethodInvocation) {
+          final String method = current.methodName.name;
+          if (method == 'forEach' || method == 'map') {
+            isInsideLoop = true;
+            break;
+          }
+        }
+        current = current.parent;
+      }
+
+      if (!isInsideLoop) return;
+
+      // Check if groupKey is specified
+      final String nodeSource = node.toSource();
+      if (nodeSource.contains('groupKey')) {
+        return; // Has grouping
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// avoid_notification_silent_failure
+// =============================================================================
+
+/// Warns when notification show/schedule is called without error handling.
+///
+/// Alias: notification_error_handling, handle_notification_failure
+///
+/// Notification operations can fail silently (permission denied, channel
+/// doesn't exist, etc.). Always handle errors to provide user feedback.
+///
+/// **BAD:**
+/// ```dart
+/// await flutterLocalNotificationsPlugin.show(0, 'Title', 'Body', details);
+/// // If this fails, user gets no feedback
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await flutterLocalNotificationsPlugin.show(0, 'Title', 'Body', details);
+/// } catch (e) {
+///   // Handle error - maybe permissions were revoked
+///   debugPrint('Failed to show notification: $e');
+///   // Optionally show in-app message instead
+/// }
+/// ```
+class AvoidNotificationSilentFailureRule extends SaropaLintRule {
+  const AvoidNotificationSilentFailureRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_notification_silent_failure',
+    problemMessage:
+        '[avoid_notification_silent_failure] Notification operation without '
+        'error handling. Failures will be silent and hard to debug.',
+    correctionMessage:
+        'Wrap notification calls in try-catch to handle permission or platform errors.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _notificationMethods = <String>{
+    'show',
+    'zonedSchedule',
+    'schedule',
+    'periodicallyShow',
+    'showDailyAtTime',
+    'showWeeklyAtDayAndTime',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      if (!_notificationMethods.contains(methodName)) return;
+
+      // Check if target looks like a notification plugin
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('notification') &&
+          !targetSource.contains('plugin')) {
+        return;
+      }
+
+      // Check if inside try-catch
+      bool isInsideTryCatch = false;
+      AstNode? current = node.parent;
+
+      while (current != null) {
+        if (current is TryStatement) {
+          isInsideTryCatch = true;
+          break;
+        }
+        if (current is FunctionBody) {
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (isInsideTryCatch) return;
+
+      // Check for .catchError
+      AstNode? parent = node.parent;
+      while (parent != null) {
+        if (parent is MethodInvocation) {
+          final String parentMethod = parent.methodName.name;
+          if (parentMethod == 'catchError' || parentMethod == 'onError') {
+            return; // Has error handling
+          }
+        }
+        if (parent is! MethodInvocation &&
+            parent is! CascadeExpression &&
+            parent is! AwaitExpression) {
+          break;
+        }
+        parent = parent.parent;
+      }
+
+      reporter.atNode(node, code);
     });
   }
 }

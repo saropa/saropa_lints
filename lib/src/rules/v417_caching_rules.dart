@@ -137,7 +137,7 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unbounded_cache_growth',
     problemMessage:
-        '[avoid_unbounded_cache_growth] Cache can grow without bounds. Risk of OOM.',
+        '[avoid_unbounded_cache_growth] Cache without size limit grows indefinitely. This will eventually exhaust device memory and crash the app with an out-of-memory error.',
     correctionMessage:
         'Add size limit with LRU eviction or use a bounded cache implementation.',
     errorSeverity: DiagnosticSeverity.WARNING,

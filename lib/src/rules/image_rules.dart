@@ -142,7 +142,7 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_avatar_fallback',
     problemMessage:
-        '[require_avatar_fallback] CircleAvatar with NetworkImage should have onBackgroundImageError.',
+        '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error.',
     correctionMessage:
         'Add onBackgroundImageError callback or use Image with ClipOval.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -389,7 +389,7 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_error_fallback',
     problemMessage:
-        '[require_image_error_fallback] Image.network should have an errorBuilder for failed loads.',
+        '[require_image_error_fallback] Image.network without errorBuilder shows broken image icon when load fails. Users see an ugly error state instead of a graceful fallback.',
     correctionMessage: 'Add errorBuilder callback to handle network failures.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -534,7 +534,7 @@ class RequireMediaLoadingStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_media_loading_state',
     problemMessage:
-        '[require_media_loading_state] VideoPlayer should check isInitialized before displaying. Consequence: Not checking can cause runtime errors or blank widgets if the video is not ready.',
+        '[require_media_loading_state] VideoPlayer displayed without checking isInitialized shows a black rectangle or crashes. The video player needs time to load the video before the build method can render it properly.',
     correctionMessage:
         'Wrap VideoPlayer in a conditional checking controller.value.isInitialized. This prevents errors and ensures the video is ready before display.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -234,7 +234,7 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random_for_crypto',
     problemMessage:
-        '[prefer_secure_random_for_crypto] Random() is predictable. Use Random.secure() for security.',
+        '[prefer_secure_random_for_crypto] Random() uses a predictable seed based on system time. Attackers can reproduce the exact sequence to guess cryptographic keys, nonces, or tokens, completely breaking your security.',
     correctionMessage:
         'Replace Random() with Random.secure() for cryptographic use.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -470,7 +470,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',
     problemMessage:
-        '[require_unique_iv_per_encryption] Static or reused IV breaks encryption security.',
+        '[require_unique_iv_per_encryption] Reusing IV (initialization vector) allows attackers to detect patterns in encrypted data. The same key+IV combination always encrypts identical plaintexts to identical ciphertexts, breaking confidentiality.',
     correctionMessage:
         'Generate a new random IV for each encryption operation.',
     errorSeverity: DiagnosticSeverity.ERROR,

@@ -114,7 +114,7 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_watch_outside_build',
     problemMessage:
-        '[avoid_ref_watch_outside_build] ref.watch() should only be used inside build().',
+        '[avoid_ref_watch_outside_build] ref.watch() used outside build() breaks Riverpod lifecycle. This causes missed updates, stale data, and hard-to-debug state inconsistencies.',
     correctionMessage: 'Move ref.watch() calls into build().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

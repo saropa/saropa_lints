@@ -93,3 +93,12 @@ export 'v417_caching_rules.dart';
 export 'v417_testing_rules.dart';
 export 'v417_widget_rules.dart';
 export 'v417_misc_rules.dart';
+
+// v4.2.0 rule files
+export 'android_rules.dart';
+export 'iap_rules.dart';
+export 'url_launcher_rules.dart';
+export 'permission_rules.dart';
+export 'connectivity_rules.dart';
+export 'geolocator_rules.dart';
+export 'sqflite_rules.dart';

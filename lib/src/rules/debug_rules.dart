@@ -41,83 +41,8 @@ class AlwaysFailRule extends SaropaLintRule {
   }
 }
 
-/// Warns when commented-out code is detected.
-///
-/// Commented-out code can clutter the codebase and make it harder to read.
-/// It's usually better to delete unused code (it can be retrieved from version
-/// control if needed).
-class AvoidCommentedOutCodeRule extends SaropaLintRule {
-  const AvoidCommentedOutCodeRule() : super(code: _code);
-
-  /// Style/consistency. Large counts acceptable in legacy code.
-  @override
-  LintImpact get impact => LintImpact.low;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'avoid_commented_out_code',
-    problemMessage:
-        '[avoid_commented_out_code] Commented-out code clutters the codebase and creates confusion about intent.',
-    correctionMessage:
-        'Delete unused code. Git preserves history if you need to restore it later.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  // Common code patterns that indicate commented-out code
-  static final RegExp _codePattern = RegExp(
-    r'^\s*//\s*('
-    r'(if|else|for|while|switch|case|return|break|continue|throw|try|catch|finally)\s*[\(\{]|'
-    r'(var|final|const|int|double|String|bool|List|Map|Set|void|Future|Stream)\s+\w+|'
-    r'\w+\s*[=<>!]+|'
-    r'\w+\s*\([^)]*\)\s*[;{]|'
-    r'\w+\.\w+\s*[\(;]|'
-    r'@\w+|'
-    r'import\s+|'
-    r'class\s+\w+|'
-    r'}\s*$|'
-    r'{\s*$'
-    r')',
-    multiLine: true,
-  );
-
-  /// Annotation markers that should not be treated as commented-out code.
-  static final RegExp _annotationMarker = RegExp(
-    r'^\s*//\s*(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK)\b',
-    caseSensitive: false,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addCompilationUnit((CompilationUnit node) {
-      final String content = node.toSource();
-      final List<String> lines = content.split('\n');
-
-      for (int i = 0; i < lines.length; i++) {
-        final String line = lines[i];
-        // Skip annotation markers (see _annotationMarker pattern)
-        if (_annotationMarker.hasMatch(line)) {
-          continue;
-        }
-        if (_codePattern.hasMatch(line)) {
-          // This is a heuristic - we report at the compilation unit level
-          // In practice, you'd want more sophisticated detection
-          reporter.atOffset(
-            offset: node.offset,
-            length: 1,
-            errorCode: code,
-          );
-          return; // Only report once per file
-        }
-      }
-    });
-  }
-}
+// NOTE: AvoidCommentedOutCodeRule moved to stylistic_rules.dart (v4.2.0)
+// The rule now reports at actual comment locations and has a quick fix.
 
 /// Warns when debugPrint is used.
 ///

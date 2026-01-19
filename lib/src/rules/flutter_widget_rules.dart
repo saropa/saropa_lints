@@ -7221,7 +7221,7 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'pass_existing_future_to_future_builder',
     problemMessage:
-        '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder causes restart on every rebuild. Consequence: This leads to unnecessary network requests, wasted resources, and poor app performance.',
+        '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states.',
     correctionMessage:
         'Cache the Future in initState() or a field and pass it to the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,

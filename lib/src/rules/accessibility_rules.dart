@@ -3559,3 +3559,107 @@ class RequireDragAlternativesRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_focus_traversal_order
+// =============================================================================
+
+/// Warns when complex forms don't specify focus traversal order.
+///
+/// Alias: focus_order, keyboard_navigation
+///
+/// For keyboard navigation, FocusTraversalOrder should be specified for
+/// non-linear layouts. Without it, Tab key navigation may be confusing.
+///
+/// **BAD:**
+/// ```dart
+/// Row(
+///   children: [
+///     TextField(decoration: InputDecoration(labelText: 'City')),
+///     TextField(decoration: InputDecoration(labelText: 'State')),
+///     TextField(decoration: InputDecoration(labelText: 'ZIP')),
+///   ],
+/// )
+/// // User tabs through in rendering order, which might not match visual order
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// FocusTraversalGroup(
+///   policy: OrderedTraversalPolicy(),
+///   child: Row(
+///     children: [
+///       FocusTraversalOrder(
+///         order: NumericFocusOrder(1),
+///         child: TextField(decoration: InputDecoration(labelText: 'City')),
+///       ),
+///       FocusTraversalOrder(
+///         order: NumericFocusOrder(2),
+///         child: TextField(decoration: InputDecoration(labelText: 'State')),
+///       ),
+///       FocusTraversalOrder(
+///         order: NumericFocusOrder(3),
+///         child: TextField(decoration: InputDecoration(labelText: 'ZIP')),
+///       ),
+///     ],
+///   ),
+/// )
+/// ```
+class PreferFocusTraversalOrderRule extends SaropaLintRule {
+  const PreferFocusTraversalOrderRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_focus_traversal_order',
+    problemMessage:
+        '[prefer_focus_traversal_order] Form with multiple inputs in Row/Wrap '
+        'layout without FocusTraversalOrder. Keyboard navigation may be confusing.',
+    correctionMessage:
+        'Wrap in FocusTraversalGroup and use FocusTraversalOrder for each input.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check for Row or Wrap containing multiple focusable widgets
+      if (typeName != 'Row' && typeName != 'Wrap') return;
+
+      // Count focusable children
+      int focusableCount = 0;
+      final String nodeSource = node.toSource();
+
+      // Count common focusable widgets
+      focusableCount += 'TextField'.allMatches(nodeSource).length;
+      focusableCount += 'TextFormField'.allMatches(nodeSource).length;
+      focusableCount += 'DropdownButton'.allMatches(nodeSource).length;
+      focusableCount += 'Checkbox'.allMatches(nodeSource).length;
+      focusableCount += 'Radio'.allMatches(nodeSource).length;
+      focusableCount += 'Switch'.allMatches(nodeSource).length;
+
+      // If 3+ focusable widgets and no FocusTraversalOrder, warn
+      if (focusableCount >= 3) {
+        if (!nodeSource.contains('FocusTraversalOrder') &&
+            !nodeSource.contains('FocusTraversalGroup')) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    });
+  }
+}

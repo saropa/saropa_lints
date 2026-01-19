@@ -381,7 +381,8 @@ custom_lint:
     avoid_missed_calls: false  # Function reference passed, not called. [HIGH]
     avoid_passing_self_as_argument: false  # Object passed as argument to itself. [HIGH]
     avoid_always_null_parameters: false  # Parameter is always passed as null. [HIGH]
-    avoid_mutating_parameters: false  # Parameter is being reassigned. [MEDIUM]
+    avoid_parameter_reassignment: false  # Parameter is being reassigned. [LOW]
+    avoid_parameter_mutation: false  # Parameter object is being mutated. [HIGH]
     avoid_unused_parameters: false  # Parameter is never used. [HIGH]
     avoid_unused_callback_parameters: false  # Callback parameter is not used. [MEDIUM]
     function_always_returns_null: false  # Function always returns null. [HIGH]
@@ -619,9 +620,30 @@ custom_lint:
     # FILE & CODE STRUCTURE
     # =========================================================================
     # Rules for file organization and code structure.
+    # Production file length rules (non-test files):
+    # - prefer_small_files: 200 lines (insanity)
+    # - avoid_medium_files: 300 lines (professional)
+    # - avoid_long_files: 500 lines (comprehensive)
+    # - avoid_very_long_files: 1000 lines (recommended)
+    # Test file length rules (test/, test_driver/, integration_test/):
+    # - prefer_small_test_files: 400 lines (insanity)
+    # - avoid_medium_test_files: 600 lines (professional)
+    # - avoid_long_test_files: 1000 lines (comprehensive)
+    # - avoid_very_long_test_files: 2000 lines (recommended)
     # =========================================================================
 
-    avoid_long_files: false  # File exceeds maximum lines. [MEDIUM]
+    # Production file length rules
+    prefer_small_files: false  # File exceeds 200 lines. [LOW] Tier: insanity
+    avoid_medium_files: false  # File exceeds 300 lines. [LOW] Tier: professional
+    avoid_long_files: false  # File exceeds 500 lines. [LOW] Tier: comprehensive
+    avoid_very_long_files: false  # File exceeds 1000 lines. [LOW] Tier: recommended
+
+    # Test file length rules (higher thresholds for test files)
+    prefer_small_test_files: false  # Test file exceeds 400 lines. [LOW] Tier: insanity
+    avoid_medium_test_files: false  # Test file exceeds 600 lines. [LOW] Tier: professional
+    avoid_long_test_files: false  # Test file exceeds 1000 lines. [LOW] Tier: comprehensive
+    avoid_very_long_test_files: false  # Test file exceeds 2000 lines. [LOW] Tier: recommended
+
     prefer_single_declaration_per_file: false  # File has multiple top-level declarations. [LOW]
     prefer_match_file_name: false  # File name should match primary class. [NOISY]
     match_lib_folder_structure: false  # Test file should mirror lib structure. [LOW]
