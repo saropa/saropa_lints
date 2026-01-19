@@ -468,6 +468,36 @@ abstract class SaropaLintRule extends DartLintRule {
   LintImpact get impact => LintImpact.medium;
 
   // ============================================================
+  // Config Key Aliases
+  // ============================================================
+
+  /// Alternate config keys that can be used to reference this rule.
+  ///
+  /// Override to provide aliases that users can use in `custom_lint.yaml`
+  /// instead of the canonical rule name (`code.name`).
+  ///
+  /// This is useful when:
+  /// - Rule name has a prefix like `enforce_` or `require_` that users omit
+  /// - Rule was renamed but old config should still work
+  /// - Common variations or abbreviations should be supported
+  ///
+  /// Example:
+  /// ```dart
+  /// @override
+  /// List<String> get configAliases => const ['arguments_ordering'];
+  /// ```
+  ///
+  /// Then both of these work in custom_lint.yaml:
+  /// ```yaml
+  /// rules:
+  ///   enforce_arguments_ordering: false  # canonical name
+  ///   arguments_ordering: false           # alias
+  /// ```
+  ///
+  /// Default: empty list (no aliases)
+  List<String> get configAliases => const <String>[];
+
+  // ============================================================
   // Rule Cost Classification (Performance Optimization)
   // ============================================================
 

@@ -614,7 +614,7 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_lifecycle_observer',
     problemMessage:
-        '[require_lifecycle_observer] Timer.periodic should pause when app is backgrounded. Not pausing can waste resources and cause unexpected behavior when the app resumes.',
+        '[require_lifecycle_observer] Timer.periodic continues running when app is backgrounded, draining battery and consuming CPU. When the app resumes, stale timer callbacks execute causing inconsistent state.',
     correctionMessage:
         'Add WidgetsBindingObserver and handle didChangeAppLifecycleState.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -830,7 +830,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_video_player_controller_dispose',
     problemMessage:
-        '[require_video_player_controller_dispose] VideoPlayerController without dispose(). Video keeps playing in background - drains battery and blocks audio focus.',
+        '[require_video_player_controller_dispose] VideoPlayerController without dispose() keeps the native video decoder running. Audio continues playing in background, battery drains rapidly, and other media apps cannot acquire audio focus.',
     correctionMessage:
         'Add _controller.dispose() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1326,7 +1326,7 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_change_notifier_dispose',
     problemMessage:
-        '[require_change_notifier_dispose] ChangeNotifier must be disposed to clear listeners.',
+        '[require_change_notifier_dispose] ChangeNotifier without dispose() retains all listeners in the widget tree. The StatefulWidget remains in memory, causing memory leaks and crashes when notifications are sent to unmounted widgets.',
     correctionMessage: 'Add notifier.dispose() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1428,7 +1428,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_receive_port_close',
     problemMessage:
-        '[require_receive_port_close] ReceivePort must be closed to release isolate resources.',
+        '[require_receive_port_close] ReceivePort without close() keeps the isolate communication channel open. Pending messages queue indefinitely, the isolate cannot terminate, and memory leaks accumulate with each widget rebuild.',
     correctionMessage: 'Add _receivePort.close() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -1534,7 +1534,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_socket_close',
     problemMessage:
-        '[require_socket_close] Socket must be closed to release network resources.',
+        '[require_socket_close] Socket without close() keeps the TCP connection open indefinitely. The server connection slot remains occupied, file descriptors leak, and the OS may refuse new network connections.',
     correctionMessage: 'Add _socket?.close() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

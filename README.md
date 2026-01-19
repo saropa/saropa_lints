@@ -5,7 +5,7 @@
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
-[![rules](https://img.shields.io/badge/rules-1600%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+[![rules](https://img.shields.io/badge/rules-1658%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 
 <!-- Rule count updated: deduplication in progress, see CHANGELOG.md for details. -->
 
@@ -111,7 +111,7 @@ print(rule.owasp); // Mobile: M1 | Web: A07
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1600+ when you're ready.
+The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1637+ when you're ready.
 
 ---
 
@@ -179,7 +179,7 @@ Stylistic rules are orthogonal to correctness. Your code can be perfectly correc
 
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1600+ rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1637+ rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
@@ -227,6 +227,46 @@ rules:
 rules:
   - avoid_hardcoded_strings_in_ui: false # DASH = PARSED!
 ```
+
+### Config key names and aliases
+
+Rule config keys match the rule name shown in lint messages (the part in `[brackets]`):
+
+```
+lib/my_file.dart:42 - [enforce_arguments_ordering] Named arguments should be in alphabetical order.
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^ This is the config key
+```
+
+To disable this rule: `- enforce_arguments_ordering: false`
+
+**Aliases**: Some rules support shorter aliases for convenience. For example, `enforce_arguments_ordering` also accepts `arguments_ordering`:
+
+```yaml
+rules:
+  # Both of these work:
+  - enforce_arguments_ordering: false  # canonical name
+  - arguments_ordering: false          # alias
+```
+
+Aliases are provided for rules where the prefix (`enforce_`, `require_`) might be commonly omitted.
+
+### enable_all_lint_rules
+
+The `enable_all_lint_rules: true` setting enables ALL rules, including opinionated stylistic rules:
+
+```yaml
+custom_lint:
+  saropa_lints:
+    enable_all_lint_rules: true
+```
+
+**This is intentional.** It forces teams to explicitly review and disable rules they disagree with, ensuring:
+
+- No rule is accidentally overlooked
+- Your `custom_lint.yaml` becomes a complete record of team style decisions
+- Mutually exclusive rules (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) require explicit choice
+
+If you enable all rules, you will need to disable one rule from each conflicting pair.
 
 ### Severity levels
 
@@ -383,7 +423,7 @@ Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_funct
 
 ## Performance
 
-Running all 1600+ rules uses significant memory. The tier system helps:
+Running all 1637+ rules uses significant memory. The tier system helps:
 
 - Rules set to `false` are not loaded
 - Start with `essential` or `recommended`
@@ -426,7 +466,7 @@ The tier you choose has a direct impact on analysis speed:
 - `essential`: ~400 rules → **fastest** (memory leaks, security, crashes)
 - `recommended`: ~900 rules → moderate (+ accessibility, performance)
 - `professional`: ~1400 rules → slower (+ architecture, documentation)
-- `comprehensive`/`insanity`: 1600+ rules → **slowest** (everything)
+- `comprehensive`/`insanity`: 1637+ rules → **slowest** (everything)
 
 ## Adoption Strategy
 
@@ -779,7 +819,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1600+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1637+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

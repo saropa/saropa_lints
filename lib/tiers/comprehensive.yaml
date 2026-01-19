@@ -39,11 +39,13 @@ custom_lint:
     # CODE QUALITY - Thorough
     # =========================================================================
     avoid_long_files: true
+    avoid_long_test_files: true
     avoid_local_functions: true
     avoid_declaring_call_method: true
     avoid_immediately_invoked_functions: true
     avoid_always_null_parameters: true
-    avoid_mutating_parameters: true
+    avoid_parameter_reassignment: true
+    avoid_parameter_mutation: true
     avoid_unused_callback_parameters: true
     function_always_returns_null: true
     function_always_returns_same_value: true

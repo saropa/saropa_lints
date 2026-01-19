@@ -62,7 +62,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_websocket_reconnection',
     problemMessage:
-        '[require_websocket_reconnection] WebSocket without reconnection logic.',
+        '[require_websocket_reconnection] WebSocket without reconnection logic will stay disconnected after network interruptions. Users will see stale data or miss real-time updates.',
     correctionMessage:
         'Implement automatic reconnection with exponential backoff for WebSocket connections.',
     errorSeverity: DiagnosticSeverity.WARNING,

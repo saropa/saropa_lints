@@ -273,9 +273,13 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidLongFilesRule(),
   AvoidLongFunctionsRule(),
   AvoidLongRecordsRule(),
+  AvoidLongTestFilesRule(),
   AvoidMediumFilesRule(),
+  AvoidMediumTestFilesRule(),
   AvoidVeryLongFilesRule(),
+  AvoidVeryLongTestFilesRule(),
   PreferSmallFilesRule(),
+  PreferSmallTestFilesRule(),
   AvoidComplexArithmeticExpressionsRule(),
   AvoidComplexConditionsRule(),
   AvoidNonAsciiSymbolsRule(),
@@ -468,7 +472,8 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidLateFinalReassignmentRule(),
   AvoidMissingCompleterStackTraceRule(),
   AvoidMissingEnumConstantInMapRule(),
-  AvoidMutatingParametersRule(),
+  AvoidParameterReassignmentRule(),
+  AvoidParameterMutationRule(),
   AvoidSimilarNamesRule(),
   AvoidUnnecessaryNullableParametersRule(),
   FunctionAlwaysReturnsNullRule(),
@@ -2091,6 +2096,85 @@ const List<LintRule> _allRules = <LintRule>[
   RequireWebsocketReconnectionRule(),
   RequireCurrencyCodeWithAmountRule(),
   PreferLazySingletonRegistrationRule(),
+
+  // =========================================================================
+  // v4.2.0 ROADMAP ⭐ Rules
+  // =========================================================================
+
+  // Android rules (android_rules.dart)
+  RequireAndroidPermissionRequestRule(),
+  AvoidAndroidTaskAffinityDefaultRule(),
+  RequireAndroid12SplashRule(),
+  PreferPendingIntentFlagsRule(),
+  AvoidAndroidCleartextTrafficRule(),
+  RequireAndroidBackupRulesRule(),
+
+  // IAP rules (iap_rules.dart)
+  AvoidPurchaseInSandboxProductionRule(),
+  RequireSubscriptionStatusCheckRule(),
+  RequirePriceLocalizationRule(),
+
+  // URL Launcher rules (url_launcher_rules.dart)
+  RequireUrlLauncherCanLaunchCheckRule(),
+  AvoidUrlLauncherSimulatorTestsRule(),
+  PreferUrlLauncherFallbackRule(),
+
+  // Permission rules (permission_rules.dart)
+  RequireLocationPermissionRationaleRule(),
+  RequireCameraPermissionCheckRule(),
+  PreferImageCroppingRule(),
+
+  // Connectivity rules (connectivity_rules.dart)
+  RequireConnectivityErrorHandlingRule(),
+
+  // Geolocator rules (geolocator_rules.dart)
+  RequireGeolocatorBatteryAwarenessRule(),
+
+  // SQLite rules (sqflite_rules.dart)
+  AvoidSqfliteTypeMismatchRule(),
+
+  // Firebase rules (firebase_rules.dart)
+  RequireFirestoreIndexRule(),
+
+  // Notification rules (notification_rules.dart)
+  PreferNotificationGroupingRule(),
+  AvoidNotificationSilentFailureRule(),
+
+  // Hive rules (hive_rules.dart)
+  RequireHiveMigrationStrategyRule(),
+
+  // Async rules (async_rules.dart)
+  AvoidStreamSyncEventsRule(),
+  AvoidSequentialAwaitsRule(),
+
+  // File handling rules (file_handling_rules.dart)
+  PreferStreamingForLargeFilesRule(),
+  RequireFilePathSanitizationRule(),
+
+  // Error handling rules (error_handling_rules.dart)
+  RequireAppStartupErrorHandlingRule(),
+  AvoidAssertInProductionRule(),
+
+  // Accessibility rules (accessibility_rules.dart)
+  PreferFocusTraversalOrderRule(),
+
+  // UI/UX rules (ui_ux_rules.dart)
+  AvoidLoadingFlashRule(),
+
+  // Performance rules (performance_rules.dart)
+  AvoidAnimationInLargeListRule(),
+  PreferLazyLoadingImagesRule(),
+
+  // JSON/DateTime rules (json_datetime_rules.dart)
+  RequireJsonSchemaValidationRule(),
+  PreferJsonSerializableRule(),
+
+  // Forms rules (forms_rules.dart)
+  PreferRegexValidationRule(),
+
+  // Package-specific rules (package_specific_rules.dart)
+  PreferTypedPrefsWrapperRule(),
+  PreferFreezedForDataClassesRule(),
 ];
 
 // =============================================================================
@@ -2192,7 +2276,17 @@ class _SaropaLints extends PluginBase {
     // Filter rules based on tier and explicit overrides
     final List<LintRule> filteredRules = _allRules.where((LintRule rule) {
       final String ruleName = rule.code.name;
-      final LintOptions? options = configs.rules[ruleName];
+
+      // Check canonical name first
+      LintOptions? options = configs.rules[ruleName];
+
+      // If not found, check aliases (for SaropaLintRule instances)
+      if (options == null && rule is SaropaLintRule) {
+        for (final String alias in rule.configAliases) {
+          options = configs.rules[alias];
+          if (options != null) break;
+        }
+      }
 
       // If explicitly configured in custom_lint.yaml, use that setting
       if (options != null) {
@@ -2246,6 +2340,13 @@ class _SaropaLints extends PluginBase {
     ]);
     IncrementalAnalysisTracker.setRuleConfig(configHash);
 
+    // =========================================================================
+    // CONFLICTING RULE DETECTION
+    // =========================================================================
+    // Warn when mutually exclusive stylistic rules are both enabled.
+    // These rule pairs have opposite effects and should not be used together.
+    _checkConflictingRules(filteredRules);
+
     // Cache the result for subsequent files
     _cachedFilteredRules = filteredRules;
     _cachedTier = tier;
@@ -2253,6 +2354,41 @@ class _SaropaLints extends PluginBase {
     _cachedRulesHash = rulesHash;
 
     return filteredRules;
+  }
+}
+
+/// Conflicting rule pairs that should not be enabled together.
+///
+/// These are stylistic choices where enabling both makes no sense.
+/// Each pair contains two mutually exclusive rules.
+const List<List<String>> _conflictingRulePairs = <List<String>>[
+  // Type inference vs explicit types
+  <String>['avoid_inferrable_type_arguments', 'prefer_explicit_type_arguments'],
+  // Import style preferences
+  <String>['prefer_relative_imports', 'always_use_package_imports'],
+];
+
+/// Check for conflicting rules and print a warning if both are enabled.
+///
+/// This helps users catch configuration mistakes where they've enabled
+/// two mutually exclusive stylistic rules.
+void _checkConflictingRules(List<LintRule> enabledRules) {
+  final Set<String> enabledNames =
+      enabledRules.map((LintRule rule) => rule.code.name).toSet();
+
+  for (final List<String> pair in _conflictingRulePairs) {
+    final String rule1 = pair[0];
+    final String rule2 = pair[1];
+
+    if (enabledNames.contains(rule1) && enabledNames.contains(rule2)) {
+      // Use stderr to output warning without breaking analysis
+      // ignore: avoid_print
+      print(
+        '[saropa_lints] WARNING: Conflicting rules enabled: '
+        '$rule1 and $rule2. '
+        'These rules have opposite effects - disable one.',
+      );
+    }
   }
 }
 

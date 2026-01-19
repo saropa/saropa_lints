@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 4.1.8)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 4.2.0)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -139,6 +139,8 @@ custom_lint:
     - avoid_future_then_in_async: false          # WARNING - use await instead (v2.3.10)
     - avoid_unawaited_future: false              # ERROR - unawaited futures lose errors (v2.3.10)
     - prefer_future_wait: false                  # INFO - use Future.wait for independent awaits (v2.5.0)
+    - avoid_stream_sync_events: false            # WARNING - stream event added before listeners attached (v4.2.0)
+    - avoid_sequential_awaits: false             # INFO - use Future.wait for independent operations (v4.2.0)
 
     # =========================================================================
     # ACCESSIBILITY
@@ -160,6 +162,7 @@ custom_lint:
     - require_avatar_alt_text: false
     - require_badge_semantics: false
     - require_badge_count_limit: false
+    - prefer_focus_traversal_order: false        # INFO - define focus traversal order for keyboard navigation (v4.2.0)
 
     # =========================================================================
     # COLLECTIONS
@@ -569,6 +572,22 @@ custom_lint:
     - require_lifecycle_observer: false
 
     # =========================================================================
+    # FILE LENGTH (Opinionated)
+    # Production files: prefer_small_files (200), avoid_medium_files (300),
+    #                   avoid_long_files (500), avoid_very_long_files (1000)
+    # Test files:       prefer_small_test_files (400), avoid_medium_test_files (600),
+    #                   avoid_long_test_files (1000), avoid_very_long_test_files (2000)
+    # =========================================================================
+    - prefer_small_files: false           # 200 lines [LOW] Tier: insanity
+    - avoid_medium_files: false           # 300 lines [LOW] Tier: professional
+    - avoid_long_files: false             # 500 lines [LOW] Tier: comprehensive
+    - avoid_very_long_files: false        # 1000 lines [LOW] Tier: recommended
+    - prefer_small_test_files: false      # 400 lines [LOW] Tier: insanity (test files)
+    - avoid_medium_test_files: false      # 600 lines [LOW] Tier: professional (test files)
+    - avoid_long_test_files: false        # 1000 lines [LOW] Tier: comprehensive (test files)
+    - avoid_very_long_test_files: false   # 2000 lines [LOW] Tier: recommended (test files)
+
+    # =========================================================================
     # FUNCTIONS
     # =========================================================================
     - prefer_named_parameters: true
@@ -582,7 +601,8 @@ custom_lint:
     - avoid_missed_calls: false
     - avoid_passing_self_as_argument: false
     - avoid_always_null_parameters: false
-    - avoid_mutating_parameters: false
+    - avoid_parameter_reassignment: false
+    - avoid_parameter_mutation: false
     - avoid_unused_parameters: false
     - avoid_unused_callback_parameters: false
     - function_always_returns_null: false
@@ -1118,6 +1138,8 @@ custom_lint:
     - prefer_todo_format: false
     - prefer_fixme_format: false
     - prefer_sentence_case_comments: false
+    - capitalize_comment_start: false            # Comment capitalization (v4.2.0 fix)
+    - avoid_commented_out_code: false           # Delete dead code (v4.2.0 overhaul)
     - prefer_period_after_doc: false
     - prefer_screaming_case_constants: false
     - prefer_descriptive_bool_names: false       # Lenient - allows action verbs
@@ -1231,3 +1253,55 @@ custom_lint:
     - prefer_explicit_this: false                # explicit this. for fields
     - prefer_implicit_boolean_comparison: false  # if (isValid) over == true
     - prefer_explicit_boolean_comparison: false  # Opposite - explicit for nullable
+
+    # =========================================================================
+    # V4.2.0 RULES - Android, IAP, Permissions, Storage
+    # =========================================================================
+
+    # --- Android Platform Rules ---
+    - require_android_permission_request: false  # ERROR - runtime permission not requested (v4.2.0)
+    - avoid_android_task_affinity_default: false # INFO - taskAffinity should be explicit (v4.2.0)
+    - require_android_12_splash: false           # INFO - Flutter splash may cause double-splash on Android 12+ (v4.2.0)
+    - prefer_pending_intent_flags: false         # ERROR - PendingIntent without FLAG_IMMUTABLE crashes on Android 12+ (v4.2.0)
+    - avoid_android_cleartext_traffic: false     # WARNING - HTTP URLs blocked on Android 9+ (v4.2.0)
+    - require_android_backup_rules: false        # INFO - sensitive data in SharedPreferences may be backed up (v4.2.0)
+
+    # --- In-App Purchase Rules ---
+    - avoid_purchase_in_sandbox_production: false  # ERROR - hardcoded IAP environment URL (v4.2.0)
+    - require_subscription_status_check: false     # WARNING - premium content without status check (v4.2.0)
+    - require_price_localization: false            # INFO - hardcoded prices instead of store prices (v4.2.0)
+
+    # --- URL Launcher Rules ---
+    - require_url_launcher_can_launch_check: false # INFO - launchUrl without canLaunchUrl check (v4.2.0)
+    - avoid_url_launcher_simulator_tests: false    # INFO - URL launcher tests fail on simulator (v4.2.0)
+    - prefer_url_launcher_fallback: false          # INFO - launchUrl without fallback (v4.2.0)
+
+    # --- Permission Rules ---
+    - require_location_permission_rationale: false # WARNING - location permission without rationale (v4.2.0)
+    - require_camera_permission_check: false       # ERROR - camera without permission check (v4.2.0)
+    - prefer_image_cropping: false                 # INFO - profile image without cropping option (v4.2.0)
+
+    # --- Connectivity & Geolocator Rules ---
+    - require_connectivity_error_handling: false   # INFO - connectivity check without error handling (v4.2.0)
+    - require_geolocator_battery_awareness: false  # WARNING - high-accuracy location without battery consideration (v4.2.0)
+
+    # --- SQLite Rules ---
+    - avoid_sqflite_type_mismatch: false           # ERROR - SQLite type may not match Dart type (v4.2.0)
+
+    # --- Additional v4.2.0 Rules (added to existing files) ---
+    - require_firestore_index: false               # ERROR - Firestore query requires composite index (v4.2.0)
+    - prefer_notification_grouping: false          # INFO - notifications should be grouped (v4.2.0)
+    - avoid_notification_silent_failure: false     # WARNING - notification failures should be handled (v4.2.0)
+    - require_hive_migration_strategy: false       # INFO - Hive migrations need strategy (v4.2.0)
+    - prefer_streaming_for_large_files: false      # INFO - stream large files instead of loading all (v4.2.0)
+    - require_file_path_sanitization: false        # WARNING - file paths need sanitization (v4.2.0)
+    - require_app_startup_error_handling: false    # WARNING - app startup needs error handling (v4.2.0)
+    - avoid_assert_in_production: false            # WARNING - asserts don't run in production (v4.2.0)
+    - avoid_loading_flash: false                   # INFO - avoid flash of loading content (v4.2.0)
+    - avoid_animation_in_large_list: false         # WARNING - animations in large lists hurt performance (v4.2.0)
+    - prefer_lazy_loading_images: false            # WARNING - large images should be lazy loaded (v4.2.0)
+    - require_json_schema_validation: false        # INFO - validate JSON against schema (v4.2.0)
+    - prefer_json_serializable: false              # INFO - prefer json_serializable over manual parsing (v4.2.0)
+    - prefer_regex_validation: false               # INFO - use regex for input validation patterns (v4.2.0)
+    - prefer_typed_prefs_wrapper: false            # INFO - wrap SharedPreferences with typed accessor (v4.2.0)
+    - prefer_freezed_for_data_classes: false       # INFO - Freezed for immutable data classes (v4.2.0)

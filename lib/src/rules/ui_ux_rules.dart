@@ -1374,3 +1374,116 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_loading_flash
+// =============================================================================
+
+/// Warns when loading states may cause a visible flash.
+///
+/// Alias: loading_flash, shimmer_delay
+///
+/// Immediate loading indicator flash is jarring. Show content immediately for
+/// fast loads, or delay showing spinner/shimmer by ~200ms.
+///
+/// **BAD:**
+/// ```dart
+/// FutureBuilder<Data>(
+///   future: fetchData(),
+///   builder: (context, snapshot) {
+///     if (snapshot.connectionState == ConnectionState.waiting) {
+///       return CircularProgressIndicator(); // Flashes for fast loads!
+///     }
+///     return DataWidget(snapshot.data!);
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Option 1: Use shimmer with minimum display time
+/// Shimmer.fromColors(
+///   baseColor: Colors.grey[300]!,
+///   highlightColor: Colors.grey[100]!,
+///   child: PlaceholderWidget(),
+/// )
+///
+/// // Option 2: Delay showing loading indicator
+/// FutureBuilder<Data>(
+///   future: fetchData(),
+///   builder: (context, snapshot) {
+///     if (snapshot.connectionState == ConnectionState.waiting) {
+///       return DelayedLoader(delay: Duration(milliseconds: 200));
+///     }
+///     return DataWidget(snapshot.data!);
+///   },
+/// )
+/// ```
+class AvoidLoadingFlashRule extends SaropaLintRule {
+  const AvoidLoadingFlashRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_loading_flash',
+    problemMessage:
+        '[avoid_loading_flash] Loading indicator shown without delay. Fast '
+        'responses will cause jarring visual flash.',
+    correctionMessage:
+        'Add a small delay (~200ms) before showing loading indicator, '
+        'or use skeleton/shimmer placeholders.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for FutureBuilder or StreamBuilder
+      final Expression? target = node.target;
+      if (target != null) return; // Method on object, not constructor
+
+      // Look for builder pattern that immediately shows loading
+      if (node.methodName.name != 'builder') return;
+    });
+
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check for FutureBuilder or StreamBuilder
+      if (typeName != 'FutureBuilder' && typeName != 'StreamBuilder') return;
+
+      // Check if the builder immediately shows loading indicator
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
+
+          // Check for immediate loading indicator without delay
+          if (builderSource.contains('CircularProgressIndicator') ||
+              builderSource.contains('LinearProgressIndicator')) {
+            // Check if there's a delay mechanism
+            if (!builderSource.contains('delay') &&
+                !builderSource.contains('Future.delayed') &&
+                !builderSource.contains('Timer') &&
+                !builderSource.contains('Shimmer') &&
+                !builderSource.contains('Skeleton')) {
+              reporter.atNode(node.constructorName, code);
+            }
+          }
+        }
+      }
+    });
+  }
+}

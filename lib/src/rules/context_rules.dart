@@ -65,7 +65,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_context',
     problemMessage:
-        '[avoid_storing_context] BuildContext should not be stored in fields. It may become invalid.',
+        '[avoid_storing_context] Storing BuildContext in fields causes crashes when the widget is disposed. The stored context points to a removed widget tree, and using it throws exceptions or shows dialogs on invalid screens.',
     correctionMessage:
         'Use context directly where needed and check mounted before use.',
     errorSeverity: DiagnosticSeverity.ERROR,

@@ -3304,7 +3304,7 @@ class AvoidBlocInBlocRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_in_bloc',
     problemMessage:
-        '[avoid_bloc_in_bloc] BLoC should not directly call another BLoC. This creates tight coupling.',
+        '[avoid_bloc_in_bloc] BLoC directly calling another BLoC creates tight coupling. This makes testing difficult, causes circular dependencies, and breaks the unidirectional data flow pattern.',
     correctionMessage:
         'Coordinate between BLoCs at the widget layer or use streams.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -4375,7 +4375,7 @@ class AvoidObsOutsideControllerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_obs_outside_controller',
     problemMessage:
-        '[avoid_obs_outside_controller] .obs used outside GetxController causes memory leaks and lifecycle issues.',
+        '[avoid_obs_outside_controller] .obs used outside GetxController creates observables without proper lifecycle management. These observables cause memory leaks because they are never disposed when the widget tree rebuilds.',
     correctionMessage:
         'Move observable state to a GetxController for proper lifecycle management.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -6731,7 +6731,7 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
 
 /// Warns when long Provider access chains are used.
 ///
-/// Long chains like context.read<A>().read<B>().value are hard to read.
+/// Long chains like `context.read<A>().read<B>().value` are hard to read.
 /// Consider using extension methods.
 ///
 /// **BAD:**
@@ -7973,7 +7973,7 @@ class _StateAccessCounter extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when context.watch<T>() is used without select().
+/// Warns when `context.watch<T>()` is used without `select()`.
 ///
 /// watch() rebuilds on any change to the provider. Using select()
 /// limits rebuilds to specific property changes.
@@ -9084,7 +9084,7 @@ class AvoidStaticStateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_static_state',
     problemMessage:
-        '[avoid_static_state] Static mutable state can cause testing and hot-reload issues.',
+        '[avoid_static_state] Static mutable state persists across hot-reloads and tests, causing stale data and inconsistent behavior. Tests fail unpredictably and production bugs become hard to reproduce.',
     correctionMessage:
         'Use proper state management (Provider, Riverpod, Bloc) instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -9370,7 +9370,7 @@ class RequireBlocManualDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bloc_manual_dispose',
     problemMessage:
-        '[require_bloc_manual_dispose] Bloc/Cubit has StreamController/Timer but no close() override to dispose them.',
+        '[require_bloc_manual_dispose] Bloc/Cubit has StreamController/Timer but no close() override. Undisposed resources cause memory leaks that accumulate over time, eventually crashing the app.',
     correctionMessage:
         'Override close() to dispose controllers and close streams.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -9988,7 +9988,7 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_bloc_listener_for_side_effects',
     problemMessage:
-        '[prefer_bloc_listener_for_side_effects] Side effect in BlocBuilder. Use BlocListener for navigation/snackbars.',
+        '[prefer_bloc_listener_for_side_effects] Side effect in BlocBuilder executes on every rebuild, causing user-facing errors like duplicate navigation, multiple snackbars, or repeated API calls that waste bandwidth.',
     correctionMessage: 'Move side effects to BlocListener or use BlocConsumer.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -10175,7 +10175,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_bloc_context_dependency',
     problemMessage:
-        '[avoid_bloc_context_dependency] Bloc should not depend on BuildContext. This couples Bloc to UI.',
+        '[avoid_bloc_context_dependency] Bloc depending on BuildContext couples business logic to UI. This makes the Bloc untestable in isolation and can cause crashes when context is invalid.',
     correctionMessage:
         'Inject dependencies through constructor instead of passing context.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -10267,7 +10267,7 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_provider_value_rebuild',
     problemMessage:
-        '[avoid_provider_value_rebuild] Provider.value with inline creation. Notifier recreated every build.',
+        '[avoid_provider_value_rebuild] Provider.value with inline creation recreates the notifier on every build. User data is lost, state becomes stale, and the app may hang in infinite rebuild loops.',
     correctionMessage:
         'Use existing instance with Provider.value or use Provider constructor.',
     errorSeverity: DiagnosticSeverity.WARNING,
