@@ -5,8 +5,10 @@
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
 [![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
-[![rules](https://img.shields.io/badge/rules-1500%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+[![rules](https://img.shields.io/badge/rules-1600%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
+
 <!-- Rule count updated: deduplication in progress, see CHANGELOG.md for details. -->
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: saropa lints](https://img.shields.io/badge/style-saropa__lints-4B0082.svg)](https://pub.dev/packages/saropa_lints)
 
@@ -20,9 +22,9 @@ Developed by [Saropa][saropa_link]. Making the world of Dart & Flutter better, o
 
 ### Linting vs static analysis
 
-`flutter analyze` checks syntax and style. Static analysis checks *behavior*.
+`flutter analyze` checks syntax and style. Static analysis checks _behavior_.
 
-Your linter catches unused variables and formatting issues. It doesn't catch undisposed controllers, hardcoded credentials, or `setState` after `dispose` — because these require understanding what the code *does*, not just how it's written.
+Your linter catches unused variables and formatting issues. It doesn't catch undisposed controllers, hardcoded credentials, or `setState` after `dispose` — because these require understanding what the code _does_, not just how it's written.
 
 In mature ecosystems, tools like [SonarQube](https://www.sonarsource.com/products/sonarqube/), [Coverity](https://www.synopsys.com/software-integrity/security-testing/static-analysis-sast.html), and [Checkmarx](https://checkmarx.com/) fill this gap. Flutter hasn't had an equivalent — until now.
 
@@ -58,15 +60,15 @@ Saropa Lints detects these patterns and hundreds more:
 
 If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, or **Firebase**, these audits are critical. These libraries are powerful but have patterns that fail silently at runtime:
 
-| Library | Common issues caught | Guide |
-|---------|---------------------|-------|
-| **GetX** | Undisposed controllers, memory leaks from workers, missing super calls | [Using with GetX](doc/guides/using_with_getx.md) |
-| **Riverpod** | Circular provider deps, ref.read() in build, missing ProviderScope | [Using with Riverpod](doc/guides/using_with_riverpod.md) |
-| **Provider** | Provider.of in build causing rebuilds, recreated providers losing state | [Using with Provider](doc/guides/using_with_provider.md) |
-| **Bloc** | Events in constructor, mutable state, unclosed Blocs, BlocListener in build | [Using with Bloc](doc/guides/using_with_bloc.md) |
-| **Isar** | Enum fields causing data corruption on schema changes; caching Isar streams (runtime crash risk) | [Using with Isar](doc/guides/using_with_isar.md) |
-| **Hive** | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues | [Using with Hive](doc/guides/using_with_hive.md) |
-| **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks | [Using with Firebase](doc/guides/using_with_firebase.md) |
+| Library      | Common issues caught                                                                             | Guide                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| **GetX**     | Undisposed controllers, memory leaks from workers, missing super calls                           | [Using with GetX](doc/guides/using_with_getx.md)         |
+| **Riverpod** | Circular provider deps, ref.read() in build, missing ProviderScope                               | [Using with Riverpod](doc/guides/using_with_riverpod.md) |
+| **Provider** | Provider.of in build causing rebuilds, recreated providers losing state                          | [Using with Provider](doc/guides/using_with_provider.md) |
+| **Bloc**     | Events in constructor, mutable state, unclosed Blocs, BlocListener in build                      | [Using with Bloc](doc/guides/using_with_bloc.md)         |
+| **Isar**     | Enum fields causing data corruption on schema changes; caching Isar streams (runtime crash risk) | [Using with Isar](doc/guides/using_with_isar.md)         |
+| **Hive**     | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues                     | [Using with Hive](doc/guides/using_with_hive.md)         |
+| **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
 Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
 
@@ -84,16 +86,16 @@ Security rules are mapped to **OWASP Mobile Top 10 (2024)** and **OWASP Top 10 (
 - **Risk categorization** aligned with industry standards
 - **Coverage analysis** across OWASP categories
 
-| OWASP Mobile | Coverage | OWASP Web | Coverage |
-|--------------|----------|-----------|----------|
-| M1 Credential Usage | 5+ rules | A01 Broken Access Control | 4+ rules |
-| M3 Authentication | 5+ rules | A02 Cryptographic Failures | 10+ rules |
-| M4 Input Validation | 6+ rules | A03 Injection | 6+ rules |
-| M5 Communication | 2+ rules | A05 Misconfiguration | 4+ rules |
-| M6 Privacy Controls | 5+ rules | A07 Authentication | 8+ rules |
-| M8 Misconfiguration | 4+ rules | A09 Logging Failures | 2+ rules |
-| M9 Data Storage | 7+ rules | | |
-| M10 Cryptography | 4+ rules | | |
+| OWASP Mobile        | Coverage | OWASP Web                  | Coverage  |
+| ------------------- | -------- | -------------------------- | --------- |
+| M1 Credential Usage | 5+ rules | A01 Broken Access Control  | 4+ rules  |
+| M3 Authentication   | 5+ rules | A02 Cryptographic Failures | 10+ rules |
+| M4 Input Validation | 6+ rules | A03 Injection              | 6+ rules  |
+| M5 Communication    | 2+ rules | A05 Misconfiguration       | 4+ rules  |
+| M6 Privacy Controls | 5+ rules | A07 Authentication         | 8+ rules  |
+| M8 Misconfiguration | 4+ rules | A09 Logging Failures       | 2+ rules  |
+| M9 Data Storage     | 7+ rules |                            |           |
+| M10 Cryptography    | 4+ rules |                            |           |
 
 **Gaps**: M2 (Supply Chain) and M7 (Binary Protection) require separate tooling — dependency scanners and build-time protections. A06 (Outdated Components) similarly requires dependency scanning.
 
@@ -109,7 +111,7 @@ print(rule.owasp); // Mobile: M1 | Web: A07
 
 Good options exist, but many are paid or closed-source. We believe these fundamentals should be free and open. A rising tide lifts all boats.
 
-The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1500+ when you're ready.
+The tier system lets you adopt gradually — start with ~100 critical rules, work up to 1600+ when you're ready.
 
 ---
 
@@ -139,7 +141,7 @@ analyzer:
 # analysis_options.yaml
 custom_lint:
   saropa_lints:
-    tier: recommended  # Options: essential, recommended, professional, comprehensive, insanity
+    tier: recommended # Options: essential, recommended, professional, comprehensive, insanity
 ```
 
 ### 4. Run the linter
@@ -159,25 +161,25 @@ dart run custom_lint
 
 Pick the tier that matches your team's needs. Each tier builds on the previous one.
 
-| Tier | Purpose | Target User | Example Rules |
-|------|---------|-------------|---------------|
-| **Essential** | **Prevents crashes, data loss, security breaches, and memory leaks.** These are rules where a single violation can cause real harm - app crashes, user data exposed, resources never released. If your app violates these, something bad *will* happen. | Every project, every team. Non-negotiable baseline. | `require_field_dispose` (memory leak), `avoid_hardcoded_credentials` (security breach), `check_mounted_after_async` (crash), `avoid_null_assertion` (runtime exception), `require_firebase_init_before_use` (crash) |
-| **Recommended** | **Catches common bugs, basic performance issues, and accessibility fundamentals.** These are mistakes that cause real problems but may not immediately crash your app - poor UX, sluggish performance, inaccessible interfaces, silent failures. | Most teams. The sensible default for production apps. | `require_semantics_label` (accessibility), `avoid_expensive_build` (performance), `require_json_decode_try_catch` (error handling), `avoid_shrinkwrap_in_scrollview` (performance), `require_image_error_builder` (UX) |
-| **Professional** | **Enforces architecture, testability, maintainability, and documentation standards.** Code that works but is hard to test, hard to change, or hard to understand. Technical debt that slows teams down over time. | Enterprise teams, long-lived codebases, teams with multiple developers. | `avoid_god_class` (architecture), `require_public_api_documentation` (docs), `prefer_result_pattern` (error handling), `require_test_cleanup` (testing), `avoid_hardcoded_strings_in_ui` (i18n) |
-| **Comprehensive** | **Stricter patterns, optimization hints, and thorough edge case coverage.** Rules that catch subtle issues, enforce consistency, and push toward optimal patterns. Helpful but not critical. | Quality-obsessed teams, libraries/packages, teams that want maximum coverage. | `prefer_element_rebuild` (subtle perf), `prefer_immutable_bloc_state` (strict pattern), `require_test_documentation` (maintainability), `prefer_fake_platform` (test quality) |
-| **Insanity** | **Everything, including pedantic and highly opinionated rules.** Rules that most teams would find excessive but are valuable for greenfield projects or teams that want zero compromise. | New projects starting fresh, teams that want maximum strictness from day one. | `prefer_custom_single_child_layout` (micro-optimization), `prefer_feature_folder_structure` (opinionated architecture), `avoid_returning_widgets` (pedantic) |
+| Tier              | Purpose                                                                                                                                                                                                                                                 | Target User                                                                   | Example Rules                                                                                                                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Essential**     | **Prevents crashes, data loss, security breaches, and memory leaks.** These are rules where a single violation can cause real harm - app crashes, user data exposed, resources never released. If your app violates these, something bad _will_ happen. | Every project, every team. Non-negotiable baseline.                           | `require_field_dispose` (memory leak), `avoid_hardcoded_credentials` (security breach), `check_mounted_after_async` (crash), `avoid_null_assertion` (runtime exception), `require_firebase_init_before_use` (crash)    |
+| **Recommended**   | **Catches common bugs, basic performance issues, and accessibility fundamentals.** These are mistakes that cause real problems but may not immediately crash your app - poor UX, sluggish performance, inaccessible interfaces, silent failures.        | Most teams. The sensible default for production apps.                         | `require_semantics_label` (accessibility), `avoid_expensive_build` (performance), `require_json_decode_try_catch` (error handling), `avoid_shrinkwrap_in_scrollview` (performance), `require_image_error_builder` (UX) |
+| **Professional**  | **Enforces architecture, testability, maintainability, and documentation standards.** Code that works but is hard to test, hard to change, or hard to understand. Technical debt that slows teams down over time.                                       | Enterprise teams, long-lived codebases, teams with multiple developers.       | `avoid_god_class` (architecture), `require_public_api_documentation` (docs), `prefer_result_pattern` (error handling), `require_test_cleanup` (testing), `avoid_hardcoded_strings_in_ui` (i18n)                        |
+| **Comprehensive** | **Stricter patterns, optimization hints, and thorough edge case coverage.** Rules that catch subtle issues, enforce consistency, and push toward optimal patterns. Helpful but not critical.                                                            | Quality-obsessed teams, libraries/packages, teams that want maximum coverage. | `prefer_element_rebuild` (subtle perf), `prefer_immutable_bloc_state` (strict pattern), `require_test_documentation` (maintainability), `prefer_fake_platform` (test quality)                                          |
+| **Insanity**      | **Everything, including pedantic and highly opinionated rules.** Rules that most teams would find excessive but are valuable for greenfield projects or teams that want zero compromise.                                                                | New projects starting fresh, teams that want maximum strictness from day one. | `prefer_custom_single_child_layout` (micro-optimization), `prefer_feature_folder_structure` (opinionated architecture), `avoid_returning_widgets` (pedantic)                                                           |
 
 ### Stylistic Rules (Separate Track)
 
-**[100+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions. These are **not included in any tier** - enable them individually based on your team's preferences.
+**[100+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions.
+
+Use `tier: stylistic` to enable **35 non-conflicting stylistic rules** (like `enforce_member_ordering`, `prefer_trailing_comma_always`). Conflicting pairs (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) must be enabled individually.
 
 Stylistic rules are orthogonal to correctness. Your code can be perfectly correct while violating every stylistic rule, or perfectly formatted while crashing on every screen. That's why they're separate.
 
-Examples: `enforce_member_ordering`, `prefer_single_quotes`, `prefer_trailing_comma_always`, `capitalize_comment_start`
-
 ### Configuration template
 
-See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1500+ rules organized by category, tier membership, and examples.
+See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_lints/blob/main/example/analysis_options_template.yaml) for a complete reference with all 1600+ rules organized by category, tier membership, and examples.
 
 ### Using a tier
 
@@ -185,10 +187,10 @@ See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_li
 # analysis_options.yaml
 custom_lint:
   saropa_lints:
-    tier: recommended  # Most teams start here
+    tier: recommended # Most teams start here
 ```
 
-Available tiers: `essential`, `recommended`, `professional`, `comprehensive`, `insanity`
+Available tiers: `essential`, `recommended`, `professional`, `comprehensive`, `insanity`, `stylistic`
 
 ### Customizing rules
 
@@ -213,15 +215,17 @@ custom_lint:
 ```
 
 **Wrong (map format - rules will be silently ignored):**
+
 ```yaml
 rules:
-  avoid_hardcoded_strings_in_ui: false  # NO DASH = NOT PARSED!
+  avoid_hardcoded_strings_in_ui: false # NO DASH = NOT PARSED!
 ```
 
 **Correct (list format):**
+
 ```yaml
 rules:
-  - avoid_hardcoded_strings_in_ui: false  # DASH = PARSED!
+  - avoid_hardcoded_strings_in_ui: false # DASH = PARSED!
 ```
 
 ### Severity levels
@@ -263,6 +267,7 @@ dart run saropa_lints:baseline
 ```
 
 This command:
+
 1. Runs analysis to find all current violations
 2. Creates `saropa_baseline.json` with those violations
 3. Updates your `analysis_options.yaml` automatically
@@ -271,10 +276,10 @@ This command:
 
 #### Three Combinable Baseline Types
 
-| Type | Config | Description | Best For |
-|------|--------|-------------|----------|
-| **File-based** | `baseline.file` | JSON listing specific violations | "Fix nothing yet" |
-| **Date-based** | `baseline.date` | Git blame - ignore old code | "Fix gradually by age" |
+| Type           | Config          | Description                      | Best For               |
+| -------------- | --------------- | -------------------------------- | ---------------------- |
+| **File-based** | `baseline.file` | JSON listing specific violations | "Fix nothing yet"      |
+| **Date-based** | `baseline.date` | Git blame - ignore old code      | "Fix gradually by age" |
 
 All three types are combinable - any match suppresses the violation.
 
@@ -304,10 +309,10 @@ custom_lint:
 
 #### Path Pattern Examples
 
-| Pattern | Matches |
-|---------|---------|
-| `lib/legacy/` | All files under `lib/legacy/` |
-| `*.g.dart` | All files ending in `.g.dart` |
+| Pattern             | Matches                              |
+| ------------------- | ------------------------------------ |
+| `lib/legacy/`       | All files under `lib/legacy/`        |
+| `*.g.dart`          | All files ending in `.g.dart`        |
 | `lib/**/old_*.dart` | Files like `lib/foo/old_widget.dart` |
 
 #### Priority Filtering
@@ -317,7 +322,7 @@ Use `only_impacts` to baseline only certain severity levels while still seeing c
 ```yaml
 baseline:
   file: "saropa_baseline.json"
-  only_impacts: [low, medium, opinionated]  # Still see critical and high
+  only_impacts: [low, medium, opinionated] # Still see critical and high
 ```
 
 #### Cleaning Up Over Time
@@ -329,6 +334,7 @@ dart run saropa_lints:baseline --update
 ```
 
 Output shows what was fixed:
+
 ```
 Baseline Update Summary:
   Previous: 150 violations
@@ -350,22 +356,22 @@ dart run saropa_lints:baseline --help        # See all options
 
 ## Rule Categories
 
-| Category | Description |
-|----------|-------------|
-| **Flutter Widgets** | Lifecycle, setState, keys, performance |
-| **Modern Dart 3.0+** | Class modifiers, patterns, records, when guards |
-| **Modern Flutter** | TapRegion, OverlayPortal, SearchAnchor, CarouselView |
-| **State Management** | Provider, Riverpod, Bloc patterns |
-| **Performance** | Build optimization, memory, caching |
-| **Security** | Credentials, encryption, input validation — [OWASP mapped](#owasp-compliance-mapping) |
-| **Accessibility** | Screen readers, touch targets, semantics |
-| **Testing** | Assertions, mocking, flaky test prevention |
-| **Architecture** | Clean architecture, DI, SOLID principles |
-| **Error Handling** | Exceptions, logging, recovery |
-| **Async** | Futures, Streams, cancellation |
-| **API & Network** | Timeouts, retries, caching |
-| **Internationalization** | Localization, RTL, plurals |
-| **Documentation** | Public API, examples, deprecation |
+| Category                 | Description                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------- |
+| **Flutter Widgets**      | Lifecycle, setState, keys, performance                                                |
+| **Modern Dart 3.0+**     | Class modifiers, patterns, records, when guards                                       |
+| **Modern Flutter**       | TapRegion, OverlayPortal, SearchAnchor, CarouselView                                  |
+| **State Management**     | Provider, Riverpod, Bloc patterns                                                     |
+| **Performance**          | Build optimization, memory, caching                                                   |
+| **Security**             | Credentials, encryption, input validation — [OWASP mapped](#owasp-compliance-mapping) |
+| **Accessibility**        | Screen readers, touch targets, semantics                                              |
+| **Testing**              | Assertions, mocking, flaky test prevention                                            |
+| **Architecture**         | Clean architecture, DI, SOLID principles                                              |
+| **Error Handling**       | Exceptions, logging, recovery                                                         |
+| **Async**                | Futures, Streams, cancellation                                                        |
+| **API & Network**        | Timeouts, retries, caching                                                            |
+| **Internationalization** | Localization, RTL, plurals                                                            |
+| **Documentation**        | Public API, examples, deprecation                                                     |
 
 ## Stylistic Rules
 
@@ -377,7 +383,8 @@ Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_funct
 
 ## Performance
 
-Running all 1500+ rules uses significant memory. The tier system helps:
+Running all 1600+ rules uses significant memory. The tier system helps:
+
 - Rules set to `false` are not loaded
 - Start with `essential` or `recommended`
 - Upgrade tiers as you fix warnings
@@ -415,10 +422,11 @@ custom_lint:
 ```
 
 The tier you choose has a direct impact on analysis speed:
+
 - `essential`: ~400 rules → **fastest** (memory leaks, security, crashes)
 - `recommended`: ~900 rules → moderate (+ accessibility, performance)
 - `professional`: ~1400 rules → slower (+ architecture, documentation)
-- `comprehensive`/`insanity`: 1500+ rules → **slowest** (everything)
+- `comprehensive`/`insanity`: 1600+ rules → **slowest** (everything)
 
 ## Adoption Strategy
 
@@ -456,12 +464,12 @@ Always add a comment explaining **why** you're suppressing.
 
 Rules automatically skip files that can't be manually fixed:
 
-| File Pattern | Skipped By Default |
-|--------------|-------------------|
-| `*.g.dart`, `*.freezed.dart`, `*.gen.dart` | Yes (generated code) |
-| `*_fixture.dart`, `fixture/**`, `fixtures/**` | Yes (test fixtures) |
-| `*_test.dart`, `test/**` | No (override with `skipTestFiles`) |
-| `example/**` | No (override with `skipExampleFiles`) |
+| File Pattern                                  | Skipped By Default                    |
+| --------------------------------------------- | ------------------------------------- |
+| `*.g.dart`, `*.freezed.dart`, `*.gen.dart`    | Yes (generated code)                  |
+| `*_fixture.dart`, `fixture/**`, `fixtures/**` | Yes (test fixtures)                   |
+| `*_test.dart`, `test/**`                      | No (override with `skipTestFiles`)    |
+| `example/**`                                  | No (override with `skipExampleFiles`) |
 
 This reduces noise from generated code and intentionally "bad" fixture files.
 
@@ -473,6 +481,7 @@ This reduces noise from generated code and intentionally "bad" fixture files.
 ## Running the Linter
 
 **Command line (recommended - always works):**
+
 ```bash
 dart run custom_lint
 ```
@@ -507,6 +516,7 @@ Total: 53 issues
 ```
 
 **Impact levels:**
+
 - `critical`: Each occurrence is serious — even 1-2 is unacceptable (memory leaks, security)
 - `high`: 10+ requires action (accessibility, performance anti-patterns)
 - `medium`: 100+ indicates tech debt (error handling, complexity)
@@ -524,6 +534,7 @@ custom_lint uses the Dart analyzer plugin system, which has known reliability is
 4. If still not working, use the CLI - it's reliable
 
 **For reliable workflows, use:**
+
 - Pre-commit hooks
 - CI/CD checks
 - VS Code tasks (see below)
@@ -567,6 +578,7 @@ Create `.vscode/tasks.json` in your project root:
 ```
 
 **Usage:**
+
 - Press **Ctrl+Shift+B** (or **Cmd+Shift+B** on Mac) to run custom_lint
 - Warnings appear in the **Problems** panel (Ctrl+Shift+M)
 - Click any warning to jump to that line in your code
@@ -604,12 +616,14 @@ If your IDE isn't automatically detecting lint issues:
 ### Out of Memory errors
 
 If you see errors like:
+
 ```
 ../../runtime/vm/zone.cc: 96: error: Out of memory.
 Crash occurred when compiling package:analyzer/... in optimizing JIT mode
 ```
 
 **Solution 1: Clear the pub cache** (most effective)
+
 ```bash
 dart pub cache clean
 dart pub get
@@ -617,12 +631,14 @@ dart run custom_lint
 ```
 
 **Solution 2: Increase Dart heap size** (PowerShell)
+
 ```powershell
 $env:DART_VM_OPTIONS="--old_gen_heap_size=4096"
 dart run custom_lint
 ```
 
 **Solution 3: Delete local build artifacts**
+
 ```bash
 # Windows
 rmdir /s /q .dart_tool && dart pub get
@@ -650,6 +666,7 @@ Then run `dart run custom_lint` again.
 We believe great tools are built by communities, not companies. Contributions and feedback are always welcome.
 
 If you think a rule is:
+
 - **Wrong** - tell us why, we'll fix it or remove it
 - **Too strict** - maybe it belongs in a higher tier
 - **Too lenient** - maybe it should be stricter or have options
@@ -662,12 +679,14 @@ We don't have all the answers. If you've shipped production Flutter apps and hav
 See [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) for detailed guidelines.
 
 **Adding a new rule:**
+
 1. Create rule in appropriate `lib/src/rules/*.dart` file
 2. Add to the appropriate tier(s) in `lib/tiers/*.yaml`
 3. Add tests in `test/rules/*_test.dart`
 4. Update CHANGELOG.md
 
 **Reporting issues:**
+
 - Include a minimal code sample that triggers (or should trigger) the rule
 - Explain what you expected vs what happened
 - If you disagree with a rule's premise, say so directly
@@ -680,47 +699,48 @@ Not sure if something is a bug or a design decision? Open a discussion issue. We
 
 Optional paid services for teams that want hands-on help. See [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md) for details.
 
-| Service | Description |
-|---------|-------------|
+| Service          | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
 | **New Projects** | Development scoped to your stage — MVP, Production, or Enterprise |
-| **Upgrade** | Move existing projects to higher tiers as they grow |
-| **Audit** | Assess codebases you inherited; remediation quoted separately |
-| **Custom Rules** | Rules specific to your architecture and compliance requirements |
+| **Upgrade**      | Move existing projects to higher tiers as they grow               |
+| **Audit**        | Assess codebases you inherited; remediation quoted separately     |
+| **Custom Rules** | Rules specific to your architecture and compliance requirements   |
 
 Contact: [saropa.com](https://saropa.com) | [services@saropa.com](mailto:services@saropa.com)
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md) | 200+ optional stylistic rules with examples |
-| [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md) | Performance optimization guide and profiling |
-| [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md) | Planned rules and project direction |
-| [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md) | How to contribute rules and report issues |
-| [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) | Version history and release notes |
-| [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md) | Security policy and reporting vulnerabilities |
-| [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md) | Professional services and custom rules |
+| Document                                                                                              | Description                                   |
+| ----------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| [README_STYLISTIC.md](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)           | 100+ optional stylistic rules with examples   |
+| [PERFORMANCE.md](https://github.com/saropa/saropa_lints/blob/main/PERFORMANCE.md)                     | Performance optimization guide and profiling  |
+| [ROADMAP.md](https://github.com/saropa/saropa_lints/blob/main/ROADMAP.md)                             | Planned rules and project direction           |
+| [CONTRIBUTING.md](https://github.com/saropa/saropa_lints/blob/main/CONTRIBUTING.md)                   | How to contribute rules and report issues     |
+| [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)                         | Version history and release notes             |
+| [SECURITY.md](https://github.com/saropa/saropa_lints/blob/main/SECURITY.md)                           | Security policy and reporting vulnerabilities |
+| [PROFESSIONAL_SERVICES.md](https://github.com/saropa/saropa_lints/blob/main/PROFESSIONAL_SERVICES.md) | Professional services and custom rules        |
 
 ### Package Integration Guides
 
 We provide specialized lint rules for popular Flutter packages. These catch library-specific anti-patterns that standard linters miss.
 
-| Category | Package | Guide |
-|----------|---------|-------|
-| **State Management** | Riverpod | [Using with Riverpod](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_riverpod.md) |
-| | Bloc | [Using with Bloc](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_bloc.md) |
-| | Provider | [Using with Provider](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_provider.md) |
-| | GetX | [Using with GetX](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_getx.md) |
-| **Databases** | Isar | [Using with Isar](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_isar.md) |
-| | Hive | [Using with Hive](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_hive.md) |
-| **Backend Services** | Firebase | [Using with Firebase](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_firebase.md) |
-| **Platform** | iOS/macOS | [Apple Platform Rules](https://github.com/saropa/saropa_lints/blob/main/doc/guides/apple_platform_rules.md) |
+| Category             | Package   | Guide                                                                                                       |
+| -------------------- | --------- | ----------------------------------------------------------------------------------------------------------- |
+| **State Management** | Riverpod  | [Using with Riverpod](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_riverpod.md)   |
+|                      | Bloc      | [Using with Bloc](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_bloc.md)           |
+|                      | Provider  | [Using with Provider](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_provider.md)   |
+|                      | GetX      | [Using with GetX](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_getx.md)           |
+| **Databases**        | Isar      | [Using with Isar](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_isar.md)           |
+|                      | Hive      | [Using with Hive](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_hive.md)           |
+| **Backend Services** | Firebase  | [Using with Firebase](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_firebase.md)   |
+| **Platform**         | iOS/macOS | [Apple Platform Rules](https://github.com/saropa/saropa_lints/blob/main/doc/guides/apple_platform_rules.md) |
 
 #### For Package Authors
 
 **Want lint rules for your package?** We'd love to collaborate with package maintainers to add rules that catch common gotchas and enforce best practices for your library.
 
 Benefits:
+
 - Help users avoid common mistakes with your package
 - Reduce support burden from preventable issues
 - Improve developer experience with your library
@@ -759,7 +779,7 @@ Built with care by the Flutter community. Questions? Ideas? We'd love to hear fr
 
 > "Quality is not an act, it is a habit." — Aristotle
 
-**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1500+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
+**saropa_lints** is a comprehensive static analysis package for Flutter and Dart applications. With 1600+ lint rules organized into 5 progressive tiers (and more planned), it catches memory leaks, security vulnerabilities, accessibility violations, and runtime crashes that standard linters miss. Whether you're building a startup MVP or enterprise software, saropa_lints helps you ship more stable, secure, and accessible apps.
 
 **Keywords:** Flutter linter, Dart static analysis, custom_lint rules, Flutter code quality, memory leak detection, security scanning, accessibility testing, WCAG compliance, European Accessibility Act, Flutter best practices, Dart analyzer plugin, code review automation, CI/CD linting, Flutter enterprise tools
 

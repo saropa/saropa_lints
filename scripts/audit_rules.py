@@ -402,8 +402,9 @@ def get_implemented_rules(rules_dir: Path) -> tuple[set[str], set[str], int]:
     fix_count = 0
 
     # Only match rule names in actual LintCode blocks, not in comments/examples
+    # Match _code, _codeField, _codeMethod, etc.
     lintcode_pattern = re.compile(
-        r"static const (?:LintCode )?_code = LintCode\(\s*"
+        r"static const (?:LintCode )?_code\w* = LintCode\(\s*"
         r"name:\s*'([a-z_]+)',",
         re.DOTALL
     )
@@ -729,7 +730,10 @@ def get_tier_stats(tiers_path: Path) -> TierStats:
             stats.counts[tier] = len(rule_names)
             stats.rules[tier] = set(rule_names)
 
-    # Stylistic rules: parse from tiers.dart stylisticRules set
+    # Stylistic rules: parse ONLY from tiers.dart stylisticRules set
+    # (Single source of truth - Option 2)
+    # Conflicting pairs (e.g., prefer_single_quotes vs prefer_double_quotes) are
+    # intentionally excluded from this set. See README_STYLISTIC.md for all rules.
     stylistic_pattern = r"const Set<String> stylisticRules = <String>\{([^}]*)\};"
     stylistic_rules = set()
     match = re.search(stylistic_pattern, content, re.DOTALL)
@@ -737,19 +741,6 @@ def get_tier_stats(tiers_path: Path) -> TierStats:
         set_content = match.group(1)
         stylistic_rules.update(re.findall(r"'([a-z_]+)'", set_content))
 
-    # Also add from README_STYLISTIC.md (for doc completeness)
-    stylistic_path = tiers_path.parent.parent.parent / "README_STYLISTIC.md"
-    if stylistic_path.exists():
-        md = stylistic_path.read_text(encoding="utf-8")
-        stylistic_rules.update(re.findall(r"\| [`]?([a-z_]+)[`]?\s*\|", md))
-    # Also add from README.md (for doc completeness)
-    readme_path = tiers_path.parent.parent.parent / "README.md"
-    if readme_path.exists():
-        md = readme_path.read_text(encoding="utf-8")
-        stylistic_rules.update(re.findall(r"\| [`]?([a-z_]+)[`]?\s*\|", md))
-    # Add all opinionated rules from Dart files
-    rules_dir = tiers_path.parent / "rules"
-    stylistic_rules.update(get_opinionated_rules(rules_dir))
     stats.counts["stylistic"] = len(stylistic_rules)
     stats.rules["stylistic"] = stylistic_rules
     stats.stylistic_rules = stylistic_rules
