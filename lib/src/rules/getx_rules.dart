@@ -14,7 +14,12 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
 
-/// Warns when GetxController has disposable resources without onClose().
+// =============================================================================
+// GetX Worker and Permanent Disposal Rules
+// =============================================================================
+
+/// Warns when GetX Workers (ever, debounce, interval, once) are stored
+/// in fields but not disposed in onClose().
 ///
 /// Alias: getx_dispose, getx_onclose
 ///
