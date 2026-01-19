@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 3.4.0.
 
+## [4.2.2] - 2026-01-19
+
+### Fixed
+
+**Critical bug fixes for rule execution** - Two bugs were causing rules to be silently skipped, resulting in "No issues found" or far fewer issues than expected:
+
+1. **Throttle key missing rule name** - The analysis throttle used `path:contentHash` as a cache key, but didn't include the rule name. When rule A analyzed a file, rules B through Z would see the cache entry and skip the file thinking it was "just analyzed" within the 300ms throttle window. Now uses `path:contentHash:ruleName` so each rule has its own throttle.
+
+2. **Rapid edit mode false triggering** - The adaptive tier switching feature (designed to show only essential rules during rapid IDE saves) was incorrectly triggering during CLI batch analysis. When `dart run custom_lint` ran 268 rules on a file, the edit counter hit 268 in under 2 seconds, triggering "rapid edit mode" and skipping non-essential rules. This check is now disabled for CLI runs.
+
+**Impact**: These bugs affected all users on all platforms. Windows users were additionally affected by path normalization issues fixed in earlier commits.
+
 ## [4.2.1] - 2026-01-19
 
 ### Changed
