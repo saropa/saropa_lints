@@ -52,14 +52,12 @@ This ROADMAP is for **planned/unimplemented rules only**.
 
 | Marker | Meaning | Example Pattern |
 |--------|---------|-----------------|
-| ⭐ | **TO DO NEXT**: Easiest 40 rules to implement | Exact API/parameter matching, low false-positive risk |
 | — | Safe: Exact API/parameter matching | `Image.network` without `errorBuilder` |
 | `[CONTEXT]` | Needs build/test context detection | Detect if inside `build()` method |
 | `[HEURISTIC]` | Variable name or string pattern matching | Detect "money" in variable names |
 | `[CROSS-FILE]` | Requires analysis across multiple files | Check if type is registered elsewhere |
 | `[TOO-COMPLEX]` | Pattern too abstract for reliable AST detection | Detect "loading state" or "user feedback" generically |
-
-> **⭐ TO DO NEXT**: Rules marked with ⭐ are the **40 easiest rules to implement** - they match exact API/method names, check specific named parameters, or detect missing required parameters with low false-positive risk. Start here!
+| `[PUBSPEC]` | Requires pubspec.yaml analysis (not Dart AST) | Check package versions, detect deprecated packages |
 
 ## Deferred: Cross-File Analysis Rules (2 rules)
 
@@ -280,13 +278,11 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_custom_single_child_layout` | Insanity | INFO | For complex single-child positioning logic, CustomSingleChildLayout is more efficient than nested Positioned/Align/Transform widgets. |
 
 #### Text & Typography
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_locale_for_text` | Professional | INFO | Some text operations (date formatting, number formatting, sorting) produce incorrect results without explicit Locale. |
 
 ### 1.2 State Management
 
@@ -295,16 +291,12 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_riverpod_override_in_tests` | Professional | INFO | `[CROSS-FILE]` Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
-| `avoid_riverpod_for_network_only` | Professional | INFO | `[HEURISTIC]` Using Riverpod just to access network layer when direct injection would suffice adds unnecessary complexity. |
 
 #### Bloc/Cubit Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_bloc_test_coverage` | Professional | INFO | `[CROSS-FILE]` Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
-| `avoid_large_bloc` | Professional | INFO | `[HEURISTIC]` Blocs handling too many responsibilities become hard to maintain. Keep Blocs focused on single domain. |
-| `avoid_overengineered_bloc_states` | Professional | INFO | `[HEURISTIC]` Separate states for "loading" and "idle" when a boolean would suffice. Simpler state machines are easier to reason about. |
-| `prefer_feature_folder_structure` | Comprehensive | INFO | `[HEURISTIC]` Group files by feature (/auth, /profile) instead of type (/bloc, /ui) for better scalability. |
 
 #### Provider Rules
 
@@ -315,8 +307,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_getx_static_context` | Professional | WARNING | `[HEURISTIC]` Get.offNamed and Get.dialog use static context internally - cannot be unit tested. Consider abstraction for testability. |
-| `avoid_tight_coupling_with_getx` | Professional | INFO | `[HEURISTIC]` Using GetX for everything leads to tight coupling and hard-to-test code. Use only necessary features. |
 
 ### 1.3 Performance Rules
 
@@ -324,14 +314,11 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_element_rebuild` | Comprehensive | INFO | Returning the same widget type with same key reuses Elements. Changing widget types or keys destroys Elements, losing state and causing expensive rebuilds. |
 
 #### Memory Optimization
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_isolate_for_heavy` | Professional | WARNING | Heavy computation on main isolate blocks UI (16ms budget per frame). Use `compute()` or `Isolate.run()` for JSON parsing, image processing, or data transforms. |
-| `avoid_finalizer_misuse` | Comprehensive | INFO | Dart Finalizers run non-deterministically and add GC overhead. Prefer explicit dispose() methods. Finalizers are only for native resource cleanup as a safety net. |
 | `prefer_pool_pattern` | Comprehensive | INFO | Frequently created/destroyed objects cause GC churn. Object pools reuse instances (e.g., for particles, bullet hell games, or recyclable list items). |
 | `require_expando_cleanup` | Comprehensive | INFO | Expando attaches data to objects without modifying them. Entries persist until the key object is GC'd. Remove entries explicitly when done. |
 
@@ -342,7 +329,6 @@ Before merging any fix:
 | `require_compression` | Comprehensive | INFO | Large JSON/text responses should use gzip compression. Reduces bandwidth 60-80% for typical API responses. |
 | `prefer_batch_requests` | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
 | `avoid_blocking_main_thread` | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
-| `avoid_json_in_main` | Professional | INFO | `[HEURISTIC]` `jsonDecode()` for large payloads (>100KB) blocks the main thread. Use `compute()` to parse JSON in a background isolate. |
 | `prefer_binary_format` | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
 
 ### 1.4 Testing Rules
@@ -353,8 +339,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_dialog_tests` | Recommended | INFO | Dialogs require special handling: tap to open, find within dialog context, test dismiss behavior. Don't forget barrier dismiss tests. |
-| `prefer_fake_platform` | Comprehensive | INFO | Platform channels (camera, GPS, storage) need fakes in tests. Use `TestDefaultBinaryMessengerBinding` to mock platform responses. |
 
 #### Integration Testing
 
@@ -369,7 +353,6 @@ Before merging any fix:
 | `require_performance_test` | Professional | INFO | Measure frame rendering time and startup latency in integration tests. Catch performance regressions before they reach production. |
 | `avoid_test_on_real_device` | Recommended | INFO | Real devices vary in performance and state. Use emulators/simulators in CI for consistent, reproducible results. |
 | `prefer_parallel_tests` | Comprehensive | INFO | Independent integration tests can run in parallel with `--concurrency`. Reduces total CI time significantly for large test suites. |
-| `require_test_documentation` | Comprehensive | INFO | `[HEURISTIC]` Complex integration tests with unusual setup or assertions need comments explaining the test scenario and why it matters. |
 
 ### 1.5 Security Rules
 
@@ -395,8 +378,8 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_regex_validation` | Recommended | INFO | Format validation (email, phone, postal code) should use regex patterns. String checks like `.contains('@')` miss invalid formats. |
-| `require_json_schema_validation` | Professional | INFO | API responses should be validated against expected schema. Malformed responses can crash the app or cause unexpected behavior. |
+| ⭐ `prefer_regex_validation` | Recommended | INFO | Format validation (email, phone, postal code) should use regex patterns. String checks like `.contains('@')` miss invalid formats. |
+| ⭐ `require_json_schema_validation` | Professional | INFO | API responses should be validated against expected schema. Malformed responses can crash the app or cause unexpected behavior. |
 | `prefer_whitelist_validation` | Professional | INFO | Validate input against known-good values (allowlist) rather than blocking known-bad values (blocklist). Blocklists miss novel attacks. |
 | `prefer_csrf_protection` | Professional | WARNING | State-changing requests need CSRF tokens. Without protection, malicious sites can trigger actions on behalf of logged-in users. |
 | `prefer_intent_filter_export` | Professional | INFO | Android intent filters should be exported only when necessary. Unexported components can't be invoked by malicious apps. |
@@ -467,7 +450,7 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_typed_prefs_wrapper` | Professional | INFO | Raw SharedPreferences returns dynamic. Wrap in typed class with getters/setters for type safety and documentation. |
+| ⭐ `prefer_typed_prefs_wrapper` | Professional | INFO | Raw SharedPreferences returns dynamic. Wrap in typed class with getters/setters for type safety and documentation. |
 
 ### 1.11 Platform-Specific Rules
 
@@ -498,12 +481,12 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_android_permission_request` | Essential | ERROR | Android 6+ requires runtime permission requests. Declaring in manifest isn't enough; call requestPermission(). |
-| `avoid_android_task_affinity_default` | Professional | INFO | Multiple activities with default taskAffinity can cause confusing back stack. Set explicit affinity for each activity. |
-| `require_android_12_splash` | Recommended | INFO | Android 12+ enforces system splash screen. Customize via themes to avoid double splash (system + Flutter). |
-| `prefer_pending_intent_flags` | Essential | ERROR | PendingIntent without FLAG_IMMUTABLE or FLAG_MUTABLE crashes on Android 12+. Specify flag explicitly. |
-| `avoid_android_cleartext_traffic` | Essential | WARNING | Android 9+ blocks HTTP by default. Enable cleartextTrafficPermitted only for specific debug domains, never production. |
-| `require_android_backup_rules` | Professional | INFO | Define backup_rules.xml to control what's backed up. Sensitive data in shared_prefs backs up by default. |
+| ⭐ `require_android_permission_request` | Essential | ERROR | Android 6+ requires runtime permission requests. Declaring in manifest isn't enough; call requestPermission(). |
+| ⭐ `avoid_android_task_affinity_default` | Professional | INFO | Multiple activities with default taskAffinity can cause confusing back stack. Set explicit affinity for each activity. |
+| ⭐ `require_android_12_splash` | Recommended | INFO | Android 12+ enforces system splash screen. Customize via themes to avoid double splash (system + Flutter). |
+| ⭐ `prefer_pending_intent_flags` | Essential | ERROR | PendingIntent without FLAG_IMMUTABLE or FLAG_MUTABLE crashes on Android 12+. Specify flag explicitly. |
+| ⭐ `avoid_android_cleartext_traffic` | Essential | WARNING | Android 9+ blocks HTTP by default. Enable cleartextTrafficPermitted only for specific debug domains, never production. |
+| ⭐ `require_android_backup_rules` | Professional | INFO | Define backup_rules.xml to control what's backed up. Sensitive data in shared_prefs backs up by default. |
 
 #### Web-Specific
 
@@ -520,7 +503,7 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_firestore_index` | Essential | ERROR | Compound queries need composite indexes. Firestore throws error with link to create index; don't ignore in dev. |
+| ⭐ `require_firestore_index` | Essential | ERROR | Compound queries need composite indexes. Firestore throws error with link to create index; don't ignore in dev. |
 
 ### 1.13 Offline-First & Sync Rules
 
@@ -546,17 +529,17 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_purchase_in_sandbox_production` | Essential | ERROR | Sandbox purchases in production or vice versa fail validation. Use correct environment configuration. |
-| `require_subscription_status_check` | Essential | WARNING | Subscriptions can be cancelled, refunded, or expired. Check status on app launch, not just after purchase. |
+| ⭐ `avoid_purchase_in_sandbox_production` | Essential | ERROR | Sandbox purchases in production or vice versa fail validation. Use correct environment configuration. |
+| ⭐ `require_subscription_status_check` | Essential | WARNING | Subscriptions can be cancelled, refunded, or expired. Check status on app launch, not just after purchase. |
 | `prefer_grace_period_handling` | Professional | INFO | Users with expired cards get billing grace period. Handle "grace period" status to avoid locking out paying customers. |
-| `require_price_localization` | Recommended | INFO | Show prices from store (with currency) not hardcoded. $4.99 in US might be €5.49 in EU. Use productDetails.price. |
+| ⭐ `require_price_localization` | Recommended | INFO | Show prices from store (with currency) not hardcoded. $4.99 in US might be €5.49 in EU. Use productDetails.price. |
 | `avoid_entitlement_without_server` | Professional | WARNING | Client-side entitlement checks can be bypassed. Verify subscription status server-side for valuable content. |
 
 ### 1.17 Maps & Location Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_location_permission_rationale` | Essential | WARNING | Explain why you need location before requesting. "Weather app needs location for local forecast." Improves grant rate. |
+| ⭐ `require_location_permission_rationale` | Essential | WARNING | Explain why you need location before requesting. "Weather app needs location for local forecast." Improves grant rate. |
 | `avoid_continuous_location_updates` | Professional | WARNING | GPS polling drains battery fast. Use significant location changes or geofencing when you don't need real-time updates. |
 | `prefer_geocoding_cache` | Professional | INFO | Reverse geocoding (coords to address) costs API calls. Cache results; coordinates rarely change for same address. |
 
@@ -564,8 +547,8 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_camera_permission_check` | Essential | ERROR | Camera access without permission crashes on iOS, throws on Android. Check and request permission before initializing. |
-| `prefer_image_cropping` | Recommended | INFO | Profile photos should be cropped to square. Offer cropping UI after selection rather than forcing users to pre-crop. |
+| ⭐ `require_camera_permission_check` | Essential | ERROR | Camera access without permission crashes on iOS, throws on Android. Check and request permission before initializing. |
+| ⭐ `prefer_image_cropping` | Recommended | INFO | Profile photos should be cropped to square. Offer cropping UI after selection rather than forcing users to pre-crop. |
 
 ### 1.19 Theming & Dark Mode Rules
 
@@ -585,7 +568,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_websocket_reconnection` | Essential | WARNING | `[HEURISTIC]` WebSocket connections drop unexpectedly. Implement automatic reconnection with exponential backoff. Detection: Find `WebSocketChannel` without reconnection logic (may have false positives if reconnection is in wrapper class). |
 
 ### 1.22 GraphQL Rules
 
@@ -617,8 +599,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_sensitive_data_in_clipboard` | Essential | WARNING | `[HEURISTIC]` Clipboard contents are accessible to other apps. Detect `Clipboard.setData` with variables named password, token, secret, apiKey, or similar. |
-| `require_clipboard_paste_validation` | Recommended | INFO | `[HEURISTIC]` Pasted content can be unexpected format. Detect `Clipboard.getData` usage in security-sensitive contexts without validation. |
 
 ### 1.28 Analytics & Tracking Rules
 
@@ -644,21 +624,19 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_currency_code_with_amount` | Recommended | INFO | `[HEURISTIC]` Amounts without currency are ambiguous. Detect money-related classes without currency field. |
 
 ### 1.32 File I/O Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_temp_file_cleanup` | Professional | INFO | `[CROSS-FILE]` Temp files accumulate over time. Detect temp file creation without corresponding delete. |
-| `prefer_streaming_for_large_files` | Professional | INFO | Reading large files into memory causes OOM. Detect readAsBytes on files without size check. |
-| `require_file_path_sanitization` | Essential | WARNING | User-provided file paths can escape app directory. Detect file operations with unsanitized path input. |
+| ⭐ `prefer_streaming_for_large_files` | Professional | INFO | Reading large files into memory causes OOM. Detect readAsBytes on files without size check. |
+| ⭐ `require_file_path_sanitization` | Essential | WARNING | User-provided file paths can escape app directory. Detect file operations with unsanitized path input. |
 
 ### 1.33 Encryption & Cryptography Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_encryption_key_in_memory` | Professional | INFO | `[HEURISTIC]` Keys kept in memory can be extracted from dumps. Detect encryption keys stored as class fields. |
 
 ### 1.34 JSON & Serialization Rules
 
@@ -671,7 +649,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_lazy_singleton_registration` | Professional | INFO | `[HEURISTIC]` Eager registration creates all singletons at startup. Detect registerSingleton with expensive constructors; suggest registerLazySingleton. |
 | `avoid_getit_unregistered_access` | Essential | ERROR | `[CROSS-FILE]` Accessing unregistered type crashes. Detect GetIt.I<T>() for types not registered in visible scope. |
 | `require_getit_dispose_registration` | Professional | INFO | Disposable singletons need dispose callbacks. Detect registerSingleton of Disposable types without dispose parameter. |
 
@@ -686,9 +663,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_cache_expiration` | Recommended | WARNING | `[HEURISTIC]` Caches without TTL serve stale data indefinitely. Detect cache implementations without expiration logic. |
-| `avoid_unbounded_cache_growth` | Essential | WARNING | `[HEURISTIC]` Caches without size limits cause OOM. Detect Map used as cache without size limiting or LRU eviction. |
-| `require_cache_key_uniqueness` | Professional | INFO | Cache keys must be deterministic. Detect Object used as cache key without stable hashCode/equality. |
 | `avoid_cache_in_build` | Essential | WARNING | `[CONTEXT]` Cache lookups in build() may be expensive. Detect cache operations inside build methods. |
 
 ### 1.38 Pagination Rules
@@ -709,7 +683,7 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_app_startup_error_handling` | Essential | WARNING | Startup failures should show error UI, not crash. Detect initialization code without error handling. |
+| ⭐ `require_app_startup_error_handling` | Essential | WARNING | Startup failures should show error UI, not crash. Detect initialization code without error handling. |
 
 ### 1.41 Image Loading & Optimization Rules
 
@@ -726,7 +700,7 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_focus_traversal_order` | Professional | INFO | Tab order should be logical. Detect forms without FocusTraversalGroup for complex layouts. |
+| ⭐ `prefer_focus_traversal_order` | Professional | INFO | Tab order should be logical. Detect forms without FocusTraversalGroup for complex layouts. |
 
 ### 1.44 Internationalization (L10n) Rules
 
@@ -743,7 +717,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_dialog_barrier_consideration` | Recommended | INFO | `[HEURISTIC]` Destructive confirmations shouldn't dismiss on barrier tap. Detect showDialog without explicit barrierDismissible for destructive actions. |
 
 ### 1.47 Snackbar & Toast Rules
 
@@ -778,7 +751,7 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_loading_timeout` | Essential | WARNING | `[TOO-COMPLEX]` Infinite loading states lose users. Cannot reliably detect "loading state" generically via AST - would need package-specific implementations (dio timeout, etc.). |
-| `avoid_loading_flash` | Professional | INFO | Brief loading flash looks glitchy. Detect loading indicator shown without minimum delay (150-200ms). |
+| ⭐ `avoid_loading_flash` | Professional | INFO | Brief loading flash looks glitchy. Detect loading indicator shown without minimum delay (150-200ms). |
 | `require_loading_state_distinction` | Recommended | INFO | `[TOO-COMPLEX]` Initial load vs refresh should differ. Cannot reliably distinguish "initial load" vs "refresh" states in static analysis. |
 
 ### 1.53 Pull-to-Refresh Rules
@@ -829,7 +802,6 @@ Before merging any fix:
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `avoid_not_encodable_in_to_json` | Professional | WARNING | Detect toJson methods that return non-encodable types. |
 | `prefer_correct_json_casts` | Professional | INFO | Use proper type casts when working with JSON data. |
 
 ### 1.60 Ordering & Pattern Rules
@@ -1412,7 +1384,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `avoid_hive_type_modification` | Professional | WARNING | Modifying Hive type fields breaks existing data. Detect field type changes. |
 | `prefer_hive_compact` | Professional | INFO | Large boxes should be compacted periodically. Detect long-running box without compact. |
-| `require_hive_migration_strategy` | Professional | INFO | Schema changes need migration handling. Detect version field or migration logic. |
+| ⭐ `require_hive_migration_strategy` | Professional | INFO | Schema changes need migration handling. Detect version field or migration logic. |
 | `avoid_hive_synchronous_in_ui` | Essential | WARNING | Hive operations can block UI. Use isolates for large operations. |
 | `prefer_hive_web_aware` | Recommended | INFO | Hive web has different behavior. Detect Hive usage without web considerations. |
 
@@ -1428,7 +1400,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_sqflite_type_mismatch` | Essential | ERROR | SQLite types must match Dart types. Detect type conversion issues. |
+| ⭐ `avoid_sqflite_type_mismatch` | Essential | ERROR | SQLite types must match Dart types. Detect type conversion issues. |
 | `require_sqflite_index_for_queries` | Professional | INFO | Frequently queried columns need indexes. Detect slow queries without index. |
 | `prefer_sqflite_encryption` | Professional | WARNING | Sensitive databases need encryption. Use sqlcipher_flutter_libs. |
 
@@ -1462,7 +1434,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `avoid_geolocator_background_without_config` | Essential | ERROR | `[CROSS-FILE]` Background location needs manifest/plist entries. Detect background usage without config. |
 | `prefer_geolocator_coarse_location` | Recommended | INFO | ACCESS_COARSE_LOCATION for city-level. Detect fine permission for coarse needs. |
-| `require_geolocator_battery_awareness` | Professional | WARNING | High-accuracy continuous tracking drains battery. Detect stream without accuracy consideration. |
+| ⭐ `require_geolocator_battery_awareness` | Professional | WARNING | High-accuracy continuous tracking drains battery. Detect stream without accuracy consideration. |
 
 ### 5.14 flutter_local_notifications Rules
 
@@ -1470,8 +1442,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `require_notification_icon_kept` | Essential | ERROR | `[CROSS-FILE]` ProGuard can remove notification icons. Check keep rules exist. |
 | `avoid_notification_overload` | Recommended | WARNING | `[HEURISTIC]` Too many notifications annoy users. Detect high-frequency notification calls. |
-| `prefer_notification_grouping` | Professional | INFO | Multiple notifications should be grouped. Detect many individual notifications. |
-| `avoid_notification_silent_failure` | Essential | WARNING | Wrap notification in try-catch. Detect show() without error handling. |
+| ⭐ `prefer_notification_grouping` | Professional | INFO | Multiple notifications should be grouped. Detect many individual notifications. |
+| ⭐ `avoid_notification_silent_failure` | Essential | WARNING | Wrap notification in try-catch. Detect show() without error handling. |
 | `prefer_notification_custom_sound | Professional | INFO | Important notifications may need custom sound. Document sound configuration. |
 
 ### 5.15 connectivity_plus Rules
@@ -1483,16 +1455,16 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `prefer_internet_connection_checker` | Professional | INFO | Use internet_connection_checker for actual internet verification. |
 | `require_connectivity_resume_check` | Professional | INFO | Re-check connectivity when app resumes. Android 8+ stops background updates. |
 | `avoid_connectivity_ui_decisions` | Professional | WARNING | Don't block UI based on connectivity alone. Detect conditional UI from connectivity. |
-| `require_connectivity_error_handling` | Recommended | INFO | Connectivity checks can fail. Detect checkConnectivity without try-catch. |
+| ⭐ `require_connectivity_error_handling` | Recommended | INFO | Connectivity checks can fail. Detect checkConnectivity without try-catch. |
 | `prefer_connectivity_debounce` | Professional | INFO | Debounce rapid connectivity changes. Detect status handler without debounce. |
 
 ### 5.16 url_launcher Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `require_url_launcher_can_launch_check` | Recommended | INFO | Check canLaunchUrl before launchUrl for better error messages. |
-| `avoid_url_launcher_simulator_tests` | Recommended | INFO | URL schemes fail on simulators. Skip tests on simulator. |
-| `prefer_url_launcher_fallback` | Recommended | INFO | Provide fallback for unsupported schemes. Detect launch without fallback. |
+| ⭐ `require_url_launcher_can_launch_check` | Recommended | INFO | Check canLaunchUrl before launchUrl for better error messages. |
+| ⭐ `avoid_url_launcher_simulator_tests` | Recommended | INFO | URL schemes fail on simulators. Skip tests on simulator. |
+| ⭐ `prefer_url_launcher_fallback` | Recommended | INFO | Provide fallback for unsupported schemes. Detect launch without fallback. |
 | `avoid_url_launcher_sandbox_issues` | Professional | WARNING | Launched apps run in Flutter sandbox. Document back navigation issues. |
 
 ### 5.17 freezed/json_serializable Rules
@@ -1500,7 +1472,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_freezed_invalid_annotation_target` | Recommended | INFO | Disable invalid_annotation_target warning in analysis_options. |
-| `prefer_freezed_for_data_classes` | Recommended | INFO | Use Freezed for data classes with equality. Detect manual == override. |
+| ⭐ `prefer_freezed_for_data_classes` | Recommended | INFO | Use Freezed for data classes with equality. Detect manual == override. |
 | `prefer_freezed_union_types` | Professional | INFO | Use Freezed unions for sealed state. Detect manual sealed class hierarchies. |
 | `avoid_freezed_any_map_issue` | Professional | WARNING | any_map in build.yaml not respected in .freezed.dart. Document workaround. |
 
@@ -1517,19 +1489,17 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_ssl_pinning_sensitive` | Professional | WARNING | Sensitive APIs need certificate pinning. Detect auth endpoints without pinning. |
 | `avoid_stack_trace_in_production` | Essential | WARNING | Don't show stack traces to users. Detect printStackTrace in error handlers. |
 | `require_input_validation` | Essential | WARNING | Validate user input before sending. Detect raw input in API calls. |
-| `avoid_sensitive_data_logging` | Essential | ERROR | Don't log passwords, tokens, PII. Detect sensitive fields in print/log calls. |
+| ⭐ `avoid_sensitive_data_logging` | Essential | ERROR | Don't log passwords, tokens, PII. Detect sensitive fields in print/log calls. |
 | `require_content_type_validation` | Professional | INFO | Verify response Content-Type. Detect JSON parsing without content-type check. |
 | `require_error_handling_graceful` | Essential | WARNING | Show friendly errors, not technical ones. Detect raw exception messages in UI. |
-| `avoid_storing_sensitive_in_prefs` | Essential | ERROR | Use flutter_secure_storage for sensitive data. Detect auth in SharedPreferences. |
 
 ### 5.20 Animation Performance Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_clip_during_animation` | Professional | WARNING | Pre-clip content before animating. Detect ClipRect in animated widget. |
-| `avoid_animation_in_large_list` | Professional | WARNING | Animations in ListView cause performance issues. Detect AnimatedWidget in list item. |
+| ⭐ `avoid_animation_in_large_list` | Professional | WARNING | Animations in ListView cause performance issues. Detect AnimatedWidget in list item. |
 | `avoid_excessive_rebuilds_animation` | Essential | WARNING | Don't wrap entire screen in AnimatedBuilder. Detect large subtree in builder. |
-| `prefer_animation_status_listener` | Professional | INFO | Use StatusListener for animation completion. Detect animation without status handling. |
 | `avoid_multiple_animation_controllers` | Professional | WARNING | Multiple controllers on same widget conflict. Detect multiple controllers without coordination. |
 | `prefer_spring_animation` | Recommended | INFO | SpringSimulation feels more natural. Suggest for drag/fling gestures. |
 
@@ -1537,7 +1507,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_stream_sync_events` | Professional | WARNING | Streams emitting synchronously can cause issues. Detect sync: true without reason. |
+| ⭐ `avoid_stream_sync_events` | Professional | WARNING | Streams emitting synchronously can cause issues. Detect sync: true without reason. |
 | `prefer_stream_transformer` | Professional | INFO | Use transformers for complex operations. Detect manual stream manipulation. |
 | `require_stream_cancel_on_error | Professional | INFO | Consider cancelOnError for critical streams. Detect error-sensitive streams. |
 | `prefer_rxdart_for_complex_streams` | Professional | INFO | RxDart provides better operators. Detect complex stream transformations. |
@@ -1546,7 +1516,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `avoid_sequential_awaits` | Professional | INFO | Await independent futures in parallel. Detect sequential awaits that could be parallel. |
+| ⭐ `avoid_sequential_awaits` | Professional | INFO | Await independent futures in parallel. Detect sequential awaits that could be parallel. |
 | `require_cancellable_operations` | Professional | INFO | Long operations should be cancellable. Detect Completer without cancel mechanism. |
 
 ### 5.23 Widget Lifecycle Rules
@@ -1570,9 +1540,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_const_list_items` | Professional | INFO | List items should be const when possible. Detect non-const static items. |
-| ⭐ `prefer_sliver_list` | Professional | INFO | Use SliverList for CustomScrollView. Detect ListView in CustomScrollView. |
 | `prefer_cache_extent` | Professional | INFO | Tune cacheExtent for performance. Detect default cacheExtent with issues. |
-| ⭐ `require_addAutomaticKeepAlives_off` | Professional | INFO | Disable for memory savings in long lists. Detect long list with default true. |
+| `require_addAutomaticKeepAlives_off` | Professional | INFO | Disable for memory savings in long lists. Detect long list with default true. ✅ |
 | `prefer_find_child_index_callback` | Professional | INFO | Use for custom child positioning. Detect custom index needs. |
 
 ### 5.26 Navigator Rules
@@ -1644,7 +1613,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_large_object_in_state` | Professional | WARNING | Large objects in widget state cause memory issues. Detect >1MB objects in state. |
-| `prefer_lazy_loading_images` | Essential | WARNING | Load images lazily in lists. Detect eager loading in ListView. |
+| ⭐ `prefer_lazy_loading_images` | Essential | WARNING | Load images lazily in lists. Detect eager loading in ListView. |
 | `require_image_memory_cache_limit` | Professional | INFO | Set PaintingBinding.imageCache limits. Detect default unlimited cache. |
 | `avoid_retaining_disposed_widgets` | Essential | ERROR | Don't store references to disposed widgets. Detect widget references in non-widget classes. |
 | `prefer_weak_references` | Comprehensive | INFO | Use Expando for optional associations. Detect strong refs where weak would work. |
@@ -1656,10 +1625,9 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `require_error_logging` | Professional | INFO | Caught errors should be logged. Detect catch without logging. |
 | `require_error_recovery` | Professional | INFO | Error handlers should enable recovery. Detect catch without user-recoverable action. |
 | `prefer_result_type` | Professional | INFO | Use Result/Either types for expected failures. Detect try-catch for business logic. |
-| `avoid_assert_in_production` | Essential | WARNING | Assert doesn't run in release mode. Detect assert for required checks. |
+| ⭐ `avoid_assert_in_production` | Essential | WARNING | Assert doesn't run in release mode. Detect assert for required checks. |
 | `prefer_zone_error_handler` | Comprehensive | INFO | Use Zone for unhandled async errors. Detect async without zone handling. |
 
 ### 5.35 Platform-Specific Rules
@@ -1676,7 +1644,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| `prefer_json_serializable` | Recommended | INFO | Use code generation for JSON parsing. Detect manual fromJson methods. |
+| ⭐ `prefer_json_serializable` | Recommended | INFO | Use code generation for JSON parsing. Detect manual fromJson methods. |
 | `require_api_response_validation` | Professional | INFO | Validate API response structure. Detect direct field access without validation. |
 | `require_api_version_handling` | Professional | INFO | Handle API version changes. Detect hardcoded response expectations. |
 
@@ -1773,13 +1741,23 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 
 ### 5.47 Package Version Rules
 
+> **Design Note**: These rules require **pubspec.yaml analysis**, not Dart AST analysis. The `custom_lint` package is designed for Dart source code analysis. Implementing these rules requires one of:
+> 1. A separate analyzer plugin that processes YAML files
+> 2. A standalone CLI tool that checks pubspec.yaml
+> 3. Integration with `dart pub` or custom pubspec parsing
+>
+> **External dependencies**:
+> - `prefer_latest_stable` requires pub.dev API calls to check latest versions
+> - `require_compatible_versions` needs a maintained database of known conflicts
+> - `require_null_safe_packages` needs SDK constraint parsing
+
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
-| ⭐ `require_compatible_versions` | Essential | ERROR | Check for incompatible package versions. Detect known version conflicts. |
-| ⭐ `prefer_latest_stable` | Recommended | INFO | Use latest stable versions. Detect outdated packages. |
-| ⭐ `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |
-| ⭐ `require_null_safe_packages` | Essential | ERROR | All packages should be null-safe. Detect pre-null-safety dependencies. |
-| ⭐ `prefer_first_party_packages` | Recommended | INFO | Prefer official Flutter/Dart packages. Detect unofficial alternatives. |
+| `[PUBSPEC]` `require_compatible_versions` | Essential | ERROR | Check for incompatible package versions. Detect known version conflicts. |
+| `[PUBSPEC]` `prefer_latest_stable` | Recommended | INFO | Use latest stable versions. Detect outdated packages. |
+| `[PUBSPEC]` `avoid_deprecated_packages` | Essential | WARNING | Don't use deprecated packages. Detect known deprecated packages. |
+| `[PUBSPEC]` `require_null_safe_packages` | Essential | ERROR | All packages should be null-safe. Detect pre-null-safety dependencies. |
+| `[PUBSPEC]` `prefer_first_party_packages` | Recommended | INFO | Prefer official Flutter/Dart packages. Detect unofficial alternatives. |
 
 ### 5.48 Widget Composition Rules
 
@@ -1884,31 +1862,23 @@ This section consolidates all rules that are deferred or marked as too complex f
 | Rule | Reason | Description |
 |------|--------|-------------|
 | `require_riverpod_override_in_tests` | CROSS-FILE | Test overrides may be in setup |
-| `avoid_riverpod_for_network_only` | HEURISTIC | "Only for network" is subjective |
 | `require_bloc_test_coverage` | CROSS-FILE | Test coverage requires test file analysis |
-| `avoid_large_bloc` | HEURISTIC | "Large" is subjective |
-| `avoid_overengineered_bloc_states` | HEURISTIC | "Overengineered" is subjective |
-| `prefer_feature_folder_structure` | HEURISTIC | Project structure detection varies |
 
 ### Deferred: GetX Rules (with markers)
 
 | Rule | Reason | Description |
 |------|--------|-------------|
-| `avoid_getx_static_context` | HEURISTIC | Static context usage varies |
-| `avoid_tight_coupling_with_getx` | HEURISTIC | "Tight coupling" is subjective |
 
 ### Deferred: Performance Rules (with markers)
 
 | Rule | Reason | Description |
 |------|--------|-------------|
-| `avoid_json_in_main` | HEURISTIC | "Large payload" threshold is arbitrary |
 
 ### Deferred: Code Quality Rules (with markers)
 
 | Rule | Reason | Description |
 |------|--------|-------------|
 | `require_e2e_coverage` | CROSS-FILE | Test coverage is cross-file |
-| `require_test_documentation` | HEURISTIC | "Complex test" is subjective |
 
 ### Deferred: Loading State Rules
 
@@ -1923,14 +1893,6 @@ This section consolidates all rules that are deferred or marked as too complex f
 
 | Rule | Reason | Description |
 |------|--------|-------------|
-| `require_currency_code_with_amount` | HEURISTIC | Money-related class detection varies |
-| `avoid_sensitive_data_in_clipboard` | HEURISTIC | "Sensitive" variable detection varies |
-| `require_clipboard_paste_validation` | HEURISTIC | "Security-sensitive" context is vague |
-| `require_cache_expiration` | HEURISTIC | "Cache" class detection varies |
-| `avoid_unbounded_cache_growth` | HEURISTIC | Cache map detection varies |
-| `prefer_lazy_singleton_registration` | HEURISTIC | "Expensive" constructor is subjective |
-| `avoid_encryption_key_in_memory` | HEURISTIC | "Encryption key" field detection varies |
-| `require_dialog_barrier_consideration` | HEURISTIC | "Destructive action" is subjective |
 | `require_snackbar_duration_consideration` | HEURISTIC | "Important content" is subjective |
 
 ### Deferred: Cross-File Analysis Required

@@ -3493,6 +3493,8 @@ class _CommentOutSensitiveLogFix extends DartFix {
 
 /// Warns when sensitive data is stored in SharedPreferences.
 ///
+/// Alias: avoid_storing_sensitive_in_prefs, no_sensitive_prefs, prefs_sensitive_data
+///
 /// SharedPreferences stores data unencrypted on disk, making it readable
 /// to anyone with device access or app data backup.
 ///

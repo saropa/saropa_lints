@@ -18,87 +18,6 @@ import '../saropa_lint_rule.dart';
 // WHITESPACE RULES
 // =============================================================================
 
-/// Warns when there is no blank line before the final return statement.
-///
-/// This is an **opinionated rule** - not included in any tier by default.
-///
-/// **Pros of blank line before return:**
-/// - Visual separation of return value
-/// - Easier to spot function output
-/// - More readable
-///
-/// **Cons (why some teams don't require it):**
-/// - Extra whitespace
-/// - Unnecessary for short functions
-///
-/// ### Example
-///
-/// #### BAD (with this rule enabled):
-/// ```dart
-/// int calculate(int a, int b) {
-///   final sum = a + b;
-///   final product = a * b;
-///   return sum + product;
-/// }
-/// ```
-///
-/// #### GOOD:
-/// ```dart
-/// int calculate(int a, int b) {
-///   final sum = a + b;
-///   final product = a * b;
-///
-///   return sum + product;
-/// }
-/// ```
-///
-/// Alias: prefer_blank_line_before_return
-class PreferBlankLineBeforeReturnRule extends SaropaLintRule {
-  const PreferBlankLineBeforeReturnRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.opinionated;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'prefer_blank_line_before_return',
-    problemMessage:
-        '[prefer_blank_line_before_return] Add a blank line before the return statement.',
-    correctionMessage: 'A blank line before return improves readability.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addBlock((node) {
-      final statements = node.statements;
-      if (statements.length < 2) return;
-
-      final lastStmt = statements.last;
-      if (lastStmt is! ReturnStatement) return;
-
-      final secondLastStmt = statements[statements.length - 2];
-
-      // Get line numbers
-      final lastLine =
-          resolver.lineInfo.getLocation(lastStmt.offset).lineNumber;
-      final prevLine =
-          resolver.lineInfo.getLocation(secondLastStmt.end).lineNumber;
-
-      // Should have at least one blank line between them
-      if (lastLine - prevLine < 2) {
-        reporter.atNode(lastStmt, code);
-      }
-    });
-  }
-}
-
 /// Warns when there IS a blank line before return (opposite rule).
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
@@ -759,6 +678,7 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_initializing_formal
   static const LintCode _code = LintCode(
     name: 'prefer_initializing_formals',
     problemMessage:
@@ -1208,6 +1128,7 @@ class PreferRethrowOverThrowERule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_rethrow_throw_e
   static const LintCode _code = LintCode(
     name: 'prefer_rethrow_over_throw_e',
     problemMessage:
