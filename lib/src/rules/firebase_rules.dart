@@ -618,7 +618,7 @@ class _AddFirebaseInitFix extends DartFix {
 
 /// Warns when database schema changes lack migration support.
 ///
-/// Alias: database_migration, schema_versioning
+/// Alias: schema_versioning
 ///
 /// Breaking schema changes without migrations corrupt existing user data.
 /// Use versioned migrations for schema evolution.

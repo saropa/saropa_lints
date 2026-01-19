@@ -2987,7 +2987,7 @@ class _TestCallCollector extends RecursiveAstVisitor<void> {
 
 /// Warns when test descriptions don't follow conventions.
 ///
-/// Alias: test_description, test_naming_convention, descriptive_test
+/// Alias: test_description, test_naming_convention
 ///
 /// Test descriptions should explain WHAT is being tested and WHAT the
 /// expected behavior is. This helps with test maintenance and debugging.
@@ -3232,109 +3232,6 @@ class PreferMockVerifyRule extends SaropaLintRule {
           !source.contains('verify(') &&
           !source.contains('verifyNever(') &&
           !source.contains('verifyInOrder(')) {
-        reporter.atNode(node, code);
-      }
-    });
-  }
-}
-
-/// Warns when catch blocks don't log errors.
-///
-/// Alias: error_logging, catch_logging, log_exceptions
-///
-/// Errors caught without logging are hard to debug. At minimum, log the
-/// error for debugging purposes.
-///
-/// **BAD:**
-/// ```dart
-/// try {
-///   await api.fetchData();
-/// } catch (e) {
-///   // Silent failure - no logging!
-///   return null;
-/// }
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// try {
-///   await api.fetchData();
-/// } catch (e, stackTrace) {
-///   log.error('Failed to fetch data', error: e, stackTrace: stackTrace);
-///   return null;
-/// }
-/// ```
-class RequireErrorLoggingRule extends SaropaLintRule {
-  const RequireErrorLoggingRule() : super(code: _code);
-
-  /// Error handling improvement.
-  @override
-  LintImpact get impact => LintImpact.medium;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  @override
-  Set<FileType>? get applicableFileTypes => {FileType.test};
-
-  static const LintCode _code = LintCode(
-    name: 'require_error_logging',
-    problemMessage:
-        '[require_error_logging] Caught error without logging. Silent failures are hard to debug.',
-    correctionMessage:
-        'Add logging: log.error(\'message\', error: e, stackTrace: s);',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  /// Patterns that indicate error logging.
-  static const Set<String> _loggingPatterns = <String>{
-    'log.',
-    'logger.',
-    'print(',
-    'debugPrint(',
-    'Log.',
-    'Logger.',
-    'logging.',
-    'crashlytics',
-    'Crashlytics',
-    'sentry',
-    'Sentry',
-    'FirebaseCrashlytics',
-    'recordError',
-    'reportError',
-    'captureException',
-  };
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addCatchClause((CatchClause node) {
-      final body = node.body;
-      final String bodySource = body.toSource();
-
-      // Check if the catch block has any logging
-      final hasLogging = _loggingPatterns.any(
-        (pattern) => bodySource.contains(pattern),
-      );
-
-      // Check if it's a rethrow (which is fine)
-      final hasRethrow =
-          bodySource.contains('rethrow') || bodySource.contains('throw ');
-
-      // Check if it's intentionally ignoring specific errors
-      final isIntentionalIgnore = bodySource.contains('// ignore') ||
-          bodySource.contains('// expected') ||
-          bodySource.contains('// intentional');
-
-      // Check if body is empty or just returns
-      final isMinimalBody = body.statements.isEmpty ||
-          (body.statements.length == 1 &&
-              body.statements.first is ReturnStatement);
-
-      if (!hasLogging && !hasRethrow && !isIntentionalIgnore && isMinimalBody) {
         reporter.atNode(node, code);
       }
     });

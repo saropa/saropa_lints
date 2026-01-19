@@ -1700,6 +1700,7 @@ class TagNameRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  /// Alias: prefer_kebab_tag
   static const LintCode _code = LintCode(
     name: 'prefer_kebab_tag_name',
     problemMessage:
