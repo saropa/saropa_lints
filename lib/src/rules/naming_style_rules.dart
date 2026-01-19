@@ -8,6 +8,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../comment_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when a getter name starts with 'get'.
@@ -171,30 +172,30 @@ class FormatCommentRule extends SaropaLintRule {
         while (commentToken != null) {
           final String lexeme = commentToken.lexeme;
 
-          // Skip file-level ignores and special comments
-          if (lexeme.contains('ignore:') ||
-              lexeme.contains('ignore_for_file:') ||
-              lexeme.contains('TODO') ||
-              lexeme.contains('FIXME') ||
-              lexeme.contains('cspell:') ||
-              lexeme.contains('@')) {
-            commentToken = commentToken.next;
-            continue;
-          }
-
-          // Check single-line comments
+          // Only check single-line comments (not doc comments)
           if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
             final String content = lexeme.substring(2).trim();
-            if (content.isNotEmpty && content[0].toLowerCase() == content[0]) {
-              // First char is lowercase
-              if (_lowercaseStartPattern.hasMatch(content)) {
-                // Skip if this looks like commented-out code
-                if (_codePattern.hasMatch(content)) {
-                  commentToken = commentToken.next;
-                  continue;
-                }
-                reporter.atToken(commentToken, code);
+
+            // Skip empty comments
+            if (content.isEmpty) {
+              commentToken = commentToken.next;
+              continue;
+            }
+
+            // Skip special markers (TODO, FIXME, ignore, etc)
+            if (CommentPatterns.isSpecialMarker(content)) {
+              commentToken = commentToken.next;
+              continue;
+            }
+
+            // Check if starts with lowercase letter
+            if (CommentPatterns.startsWithLowercase(content)) {
+              // Skip if this looks like commented-out code
+              if (CommentPatterns.isLikelyCode(content)) {
+                commentToken = commentToken.next;
+                continue;
               }
+              reporter.atToken(commentToken, code);
             }
           }
 

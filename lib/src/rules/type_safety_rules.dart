@@ -563,6 +563,11 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Performance note: No requiredPatterns override because empty collection
+  // literals (`[]`, `{}`) and generic constructors (`Future`, `Completer`) are
+  // ubiquitous in Dart code. Pattern-based filtering would not provide
+  // meaningful early-exit optimization for this rule.
+
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_type_arguments',
     problemMessage:
@@ -632,6 +637,11 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
 /// - Empty list literals: `[]` → `<String>[]`
 /// - Empty set/map literals: `{}` → `<String, int>{}`
 /// - Generic constructors: `Future.value(1)` → `Future<int>.value(1)`
+///
+/// Note: The three handlers have similar type-extraction logic but are kept
+/// separate because each has unique insertion logic (different AST node
+/// properties for the insertion point). Extracting a shared helper would
+/// require passing node-specific accessors, adding complexity without benefit.
 class _PreferExplicitTypeArgumentsFix extends DartFix {
   @override
   void run(
