@@ -37,13 +37,13 @@ custom_lint:
 
 **Speed comparison:**
 
-| Tier | Rule Count | Relative Speed |
-|------|-----------|----------------|
-| `essential` | ~400 | **Fastest** (baseline) |
-| `recommended` | ~900 | ~2x slower |
-| `professional` | ~1400 | ~3x slower |
-| `comprehensive` | ~1450 | ~3.5x slower |
-| `insanity` | ~1500 | **Slowest** |
+| Tier            | Rule Count | Relative Speed         |
+| --------------- | ---------- | ---------------------- |
+| `essential`     | ~400       | **Fastest** (baseline) |
+| `recommended`   | ~900       | ~2x slower             |
+| `professional`  | ~1400      | ~3x slower             |
+| `comprehensive` | ~1450      | ~3.5x slower           |
+| `insanity`      | ~1600      | **Slowest**            |
 
 ### 2. Exclude Generated Code
 
@@ -53,13 +53,13 @@ Add these excludes to your `analysis_options.yaml`:
 analyzer:
   exclude:
     # Generated code - cannot be manually fixed
-    - "**/*.g.dart"           # json_serializable, hive, built_value
-    - "**/*.freezed.dart"     # freezed immutable classes
-    - "**/*.gr.dart"          # auto_route generated routes
-    - "**/*.gen.dart"         # various generators
-    - "**/*.mocks.dart"       # mockito mocks
-    - "**/*.config.dart"      # injectable, get_it config
-    - "**/generated/**"       # catch-all for generated directories
+    - "**/*.g.dart" # json_serializable, hive, built_value
+    - "**/*.freezed.dart" # freezed immutable classes
+    - "**/*.gr.dart" # auto_route generated routes
+    - "**/*.gen.dart" # various generators
+    - "**/*.mocks.dart" # mockito mocks
+    - "**/*.config.dart" # injectable, get_it config
+    - "**/generated/**" # catch-all for generated directories
 
     # Build artifacts
     - build/**
@@ -213,7 +213,8 @@ Use different tiers for local development vs CI:
 # Local: analysis_options.yaml
 custom_lint:
   saropa_lints:
-    tier: essential  # Fast feedback loop
+    tier: essential # Fast feedback loop
+
 
 # CI: Override with comprehensive checking
 # Set via environment or separate config
@@ -277,11 +278,11 @@ dart run saropa_lints:baseline
 
 ### Three Baseline Types
 
-| Type | Config | Description | Performance |
-|------|--------|-------------|-------------|
-| **File-based** | `baseline.file` | JSON listing specific violations | O(1) lookup |
-| **Path-based** | `baseline.paths` | Glob patterns for directories | Pre-compiled regex |
-| **Date-based** | `baseline.date` | Git blame - ignore old code | Cached per-file |
+| Type           | Config           | Description                      | Performance        |
+| -------------- | ---------------- | -------------------------------- | ------------------ |
+| **File-based** | `baseline.file`  | JSON listing specific violations | O(1) lookup        |
+| **Path-based** | `baseline.paths` | Glob patterns for directories    | Pre-compiled regex |
+| **Date-based** | `baseline.date`  | Git blame - ignore old code      | Cached per-file    |
 
 ### Full Configuration
 
@@ -290,13 +291,13 @@ custom_lint:
   saropa_lints:
     tier: professional
     baseline:
-      file: "saropa_baseline.json"    # Specific violations
-      date: "2025-01-15"              # Code unchanged since date
-      paths:                           # Directories to ignore
+      file: "saropa_baseline.json" # Specific violations
+      date: "2025-01-15" # Code unchanged since date
+      paths: # Directories to ignore
         - "lib/legacy/"
         - "lib/deprecated/"
         - "**/generated/"
-      only_impacts: [low, medium]     # Keep seeing critical/high
+      only_impacts: [low, medium] # Keep seeing critical/high
 ```
 
 ### Workflow
@@ -310,12 +311,12 @@ custom_lint:
 
 The baseline feature has minimal performance impact:
 
-| Component | Implementation | Impact |
-|-----------|---------------|--------|
-| File baseline | Hash table lookup | O(1) per violation |
-| Path baseline | Pre-compiled regex | O(patterns) per file |
-| Date baseline | Cached git blame | First access: O(lines), subsequent: O(1) |
-| Impact filter | String comparison | Negligible |
+| Component     | Implementation     | Impact                                   |
+| ------------- | ------------------ | ---------------------------------------- |
+| File baseline | Hash table lookup  | O(1) per violation                       |
+| Path baseline | Pre-compiled regex | O(patterns) per file                     |
+| Date baseline | Cached git blame   | First access: O(lines), subsequent: O(1) |
+| Impact filter | String comparison  | Negligible                               |
 
 **Best practice**: Use file-based and path-based baselines for best performance. Date-based baseline involves git operations and is slower on first access (but cached afterwards).
 
@@ -340,14 +341,15 @@ time dart run custom_lint  # with tier: professional
 
 On a typical project (100 Dart files):
 
-| Tier | Expected Time |
-|------|--------------|
-| `essential` | 5-15 seconds |
-| `recommended` | 10-30 seconds |
+| Tier           | Expected Time |
+| -------------- | ------------- |
+| `essential`    | 5-15 seconds  |
+| `recommended`  | 10-30 seconds |
 | `professional` | 20-60 seconds |
-| `insanity` | 30-90 seconds |
+| `insanity`     | 30-90 seconds |
 
 Times vary based on:
+
 - File count and size
 - Rule complexity
 - Machine specs
@@ -395,12 +397,12 @@ These would require significant refactoring or upstream changes to custom_lint.
 
 ## Summary
 
-| Optimization | Where | Impact |
-|-------------|-------|--------|
-| Use lower tiers | `analysis_options.yaml` | 3-5x faster |
-| Exclude generated code | `analysis_options.yaml` | 2x faster |
-| Tier set caching | Built-in (v3.0.0) | 5-10x faster tier lookups |
-| Rule filtering cache | Built-in (v3.0.0) | O(1) vs O(n) per file |
-| Profiling | `SAROPA_LINTS_PROFILE=true` | Identify slow rules |
+| Optimization           | Where                       | Impact                    |
+| ---------------------- | --------------------------- | ------------------------- |
+| Use lower tiers        | `analysis_options.yaml`     | 3-5x faster               |
+| Exclude generated code | `analysis_options.yaml`     | 2x faster                 |
+| Tier set caching       | Built-in (v3.0.0)           | 5-10x faster tier lookups |
+| Rule filtering cache   | Built-in (v3.0.0)           | O(1) vs O(n) per file     |
+| Profiling              | `SAROPA_LINTS_PROFILE=true` | Identify slow rules       |
 
 **Best practice:** Start with `essential` tier locally, use `professional` in CI, and profile periodically to identify optimization opportunities.
