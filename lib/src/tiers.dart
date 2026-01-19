@@ -1,30 +1,39 @@
 /// Tier-based rule configuration for saropa_lints.
-///
-/// Each tier builds on the previous one:
-/// - essential: Critical rules (~45 rules) - prevents crashes, security issues
-/// - recommended: Essential + common mistakes (~150 rules) - default for most teams
-/// - professional: Recommended + architecture/testing (~350 rules) - enterprise teams
-/// - comprehensive: Professional + thorough coverage (~700 rules) - quality obsessed
-/// - insanity: Everything (~475+ rules) - greenfield projects
+/// See README.md "The 5 Tiers" section for tier definitions and philosophy.
 library;
 
 export 'tiers.dart' show getRulesForTier;
 
 // cspell:ignore require_sqflite_whereargs getit futureor shouldrepaint itemextent singlechildscrollview
 
-/// Stylistic tier rules - rules focused on code style, formatting, and opinionated patterns.
+/// Stylistic tier rules - formatting, ordering, naming conventions.
+/// Orthogonal to correctness - code can be correct while violating these.
 const Set<String> stylisticRules = <String>{
-  'always_fail_test_case', // test rule
+  // Ordering preferences
+  'enforce_member_ordering',
   'enforce_arguments_ordering',
-  'avoid_setstate_in_build',
+  'prefer_sorted_members',
+  'prefer_sorted_parameters',
+  'prefer_sorted_pattern_fields',
+  'prefer_sorted_record_fields',
+
+  // Naming conventions
+  'prefer_boolean_prefixes',
+  'avoid_getter_prefix',
+  'prefer_kebab_tag_name',
   'capitalize_comment_start',
-  'prefer_catch_over_on',
   'prefer_error_suffix',
   'prefer_exception_suffix',
-  'require_purchase_verification',
+
+  // Code style preferences
+  'avoid_continue_statement',
+  'prefer_single_exit_point',
+  'prefer_catch_over_on',
+  'prefer_wildcard_for_unused_param',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
+/// A single violation causes real harm: app crashes, data exposed, resources never released.
 const Set<String> essentialRules = <String>{
   // Memory Leaks - Controllers (dispose)
   'require_field_dispose',
@@ -33,24 +42,16 @@ const Set<String> essentialRules = <String>{
   'require_value_notifier_dispose',
   'require_focus_node_dispose',
   'require_page_controller_dispose',
-  'prefer_list_first',
   'require_media_player_dispose',
-  'avoid_dynamic_type',
   // Memory Leaks - Timers & Subscriptions (cancel)
-  'avoid_variable_shadowing',
   'avoid_unassigned_stream_subscriptions',
-  'prefer_list_last',
   'require_stream_controller_dispose',
-  'enforce_member_ordering',
   'always_remove_listener',
-  'avoid_string_substring',
-  // Flutter Lifecycle
-  'prefer_single_container',
+  // Flutter Lifecycle - causes crashes
+  'avoid_setstate_in_build', // Infinite loop/crash
   'avoid_inherited_widget_in_initstate',
   'avoid_unsafe_setstate',
-  'prefer_api_pagination', // INFO - memory efficiency
   'avoid_recursive_widget_calls',
-  'avoid_continue_statement',
   'avoid_global_key_in_build',
   'pass_existing_future_to_future_builder',
   'pass_existing_stream_to_stream_builder',
@@ -527,16 +528,28 @@ const Set<String> essentialRules = <String>{
   'require_scroll_controller_dispose',
   'require_tab_controller_dispose',
   'require_text_editing_controller_dispose',
+
+  // Moved from Recommended (cause crashes, not just poor UX)
+  'require_getit_registration_order', // startup crash
+  'require_default_config', // startup crash
+  'avoid_builder_index_out_of_bounds', // runtime crash
+  'require_ios_keychain_for_credentials', // security critical - credential exposure
+  // Note: require_purchase_verification already in Essential at line 421
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
+/// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
-  'prefer_single_exit_point',
+  // Moved from Essential (style/quality, not crash prevention)
+  'prefer_list_first',
+  'prefer_list_last',
+  'avoid_variable_shadowing',
+  'avoid_string_substring',
+  'prefer_single_container',
+  'prefer_api_pagination',
+
   // BuildContext Safety (Recommended)
-  'prefer_kebab_tag_name',
   'prefer_rethrow_over_throw_e',
-  'prefer_sorted_members',
-  'prefer_sorted_parameters',
   'avoid_context_in_async_static', // WARNING - async static with context
 
   // Memory Management Best Practices
@@ -550,7 +563,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_shrink_wrap_in_lists',
   'avoid_mediaquery_in_build',
   'prefer_static_method',
-  'require_purchase_verification',
   'prefer_const_widgets_in_lists',
   'prefer_value_listenable_builder',
 
@@ -733,10 +745,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_unnecessary_type_assertions',
   'avoid_unnecessary_type_casts',
 
-  // Naming & Style
-  'prefer_boolean_prefixes',
-  'avoid_getter_prefix',
-  'prefer_wildcard_for_unused_param',
+  // Note: prefer_boolean_prefixes, avoid_getter_prefix, prefer_wildcard_for_unused_param
+  // moved to Stylistic tier
 
   // Security (Batch 14)
   'avoid_auth_state_in_prefs',
@@ -748,7 +758,7 @@ const Set<String> recommendedOnlyRules = <String>{
   // State Management (Batch 14)
   'prefer_ref_watch_over_read',
   'avoid_change_notifier_in_widget',
-  'require_provider_dispose',
+  // Note: require_provider_dispose is in Essential tier
 
   // Notification (Batch 14)
   'avoid_notification_payload_sensitive',
@@ -919,8 +929,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_setup_teardown', // INFO - extract repeated test setup
   'require_test_description_convention', // INFO - descriptive test names
   // Test Quality (New assignments)
-  'avoid_duplicate_test_assertions', // Prevents redundant assertions in tests
   'avoid_real_network_calls_in_tests', // Ensures tests do not hit real network
+  // Note: avoid_duplicate_test_assertions moved to Insanity (pedantic)
   'require_error_case_tests', // Ensures error cases are tested
   'require_test_isolation', // Ensures tests do not share mutable state
 
@@ -963,9 +973,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_rebuild_on_scroll', // WARNING - memory leak
   'avoid_exception_in_constructor', // WARNING - error handling
   'require_permission_permanent_denial_handling', // WARNING - UX
-  'require_getit_registration_order', // WARNING - startup crash
-  'require_default_config', // WARNING - startup crash
-  'avoid_builder_index_out_of_bounds', // WARNING - runtime crash
+  // Note: require_getit_registration_order, require_default_config, avoid_builder_index_out_of_bounds
+  // moved to Essential (they cause crashes)
 
   'prefer_ios_safe_area', // INFO - iOS notch/Dynamic Island handling
   'avoid_ios_hardcoded_status_bar', // WARNING - device-specific issues
@@ -995,7 +1004,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_ios_force_unwrap_in_callbacks', // WARNING - crash prevention
   'require_ios_deployment_target_consistency', // WARNING - API compatibility
   'require_ios_dynamic_island_safe_zones', // WARNING - device layout
-  'require_ios_keychain_for_credentials', // ERROR - security critical
+  // Note: require_ios_keychain_for_credentials moved to Essential (security critical)
   'require_macos_sandbox_entitlements', // WARNING - App Store requirement
   'avoid_macos_full_disk_access', // WARNING - prefer scoped access
 
@@ -1084,7 +1093,7 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // State Management (Medium)
   'avoid_late_context', // INFO - late context access
-  'prefer_cubit_for_simple_state', // INFO - Cubit vs Bloc choice
+  // Note: prefer_cubit_for_simple_state is in Professional tier (architecture pattern)
   'prefer_selector_over_consumer', // INFO - targeted rebuilds
   'require_bloc_consumer_when_both', // INFO - BlocConsumer pattern
 
@@ -1137,8 +1146,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_default_text_style', // INFO - text style defaults
   'require_freezed_explicit_json', // INFO - Freezed JSON
   'require_webview_progress_indicator', // INFO - WebView progress
-  'prefer_sorted_pattern_fields', // INFO - pattern field ordering
-  'prefer_sorted_record_fields', // INFO - record field ordering
+  // Note: prefer_sorted_pattern_fields, prefer_sorted_record_fields moved to Stylistic
 
   // Additional orphans (missed in initial pass)
   'require_image_error_fallback', // INFO - image error handling
@@ -1304,35 +1312,30 @@ const Set<String> professionalOnlyRules = <String>{
   // Error Handling
   'require_error_context',
   'prefer_result_pattern',
-  'require_async_error_documentation',
   'require_error_boundary',
+  // Note: require_async_error_documentation moved to Comprehensive
 
   // Performance
   'require_keys_in_animated_lists',
   'avoid_synchronous_file_io',
   'prefer_compute_for_heavy_work',
-  'avoid_object_creation_in_hot_loops',
   'prefer_cached_getter',
+  // Note: avoid_object_creation_in_hot_loops moved to Insanity (micro-optimization)
   'require_item_extent_for_large_lists',
-  'require_image_cache_dimensions',
-  'prefer_image_precache',
-  'avoid_excessive_widget_depth',
-  'prefer_sliver_list_delegate',
+  // Note: require_image_cache_dimensions is in Essential (OOM prevention)
   'avoid_layout_builder_misuse',
   'avoid_repaint_boundary_misuse',
   'avoid_gesture_detector_in_scrollview',
   'prefer_opacity_widget',
   'avoid_layout_passes',
-  'prefer_typed_data',
   'avoid_unnecessary_to_list',
   'avoid_global_key_misuse',
-  'require_repaint_boundary',
   'avoid_unconstrained_images',
+  // Note: prefer_image_precache, avoid_excessive_widget_depth, prefer_sliver_list_delegate,
+  // require_repaint_boundary, prefer_typed_data moved to Comprehensive
 
-  // Scroll/List Performance (Professional - optimization hints)
-  'prefer_item_extent', // INFO - better scroll performance
-  'prefer_prototype_item', // INFO - consistent sizing optimization
-  'require_add_automatic_keep_alives_off', // INFO - memory efficiency
+  // Note: prefer_item_extent, prefer_prototype_item, require_add_automatic_keep_alives_off
+  // moved to Comprehensive (optimization hints)
 
   // Forms/UX
   'prefer_autovalidate_on_interaction',
@@ -1340,30 +1343,20 @@ const Set<String> professionalOnlyRules = <String>{
   'require_text_overflow_in_row',
   'require_error_message_context',
 
-  // Equatable (Professional - cleaner patterns)
-  'prefer_equatable_mixin',
-
-  // Types (Professional - cleaner patterns)
-  'prefer_void_callback',
-
-  // Testing (Professional - better test patterns)
-  'prefer_symbol_over_key',
-
   // Riverpod (Professional - cleaner patterns)
   'avoid_notifier_constructors',
-  'prefer_immutable_provider_arguments',
+  // Note: prefer_equatable_mixin, prefer_void_callback, prefer_symbol_over_key,
+  // prefer_immutable_provider_arguments moved to Comprehensive
 
   // Provider (Professional - type safety)
   'prefer_nullable_provider_types',
 
   // Bloc (Professional - cleaner patterns)
-  'prefer_immutable_bloc_events',
-  'prefer_immutable_bloc_state',
-  'prefer_sealed_bloc_events',
-  'prefer_sealed_bloc_state',
-  'require_bloc_repository_abstraction', // INFO - abstract deps for testability
   'prefer_bloc_transform', // INFO - debounce/throttle for search events
   'prefer_selector_widget', // INFO - targeted rebuilds vs full Consumer
+  // Note: prefer_immutable_bloc_events, prefer_immutable_bloc_state,
+  // prefer_sealed_bloc_events, prefer_sealed_bloc_state moved to Comprehensive
+  // require_bloc_repository_abstraction moved to Insanity
 
   // State Management (Batch 10)
   'prefer_cubit_for_simple_state',
@@ -1491,8 +1484,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_hardcoded_app_name',
   'prefer_date_format',
   'prefer_intl_name',
-  'prefer_providing_intl_description',
-  'prefer_providing_intl_examples',
+  // Note: prefer_providing_intl_description, prefer_providing_intl_examples moved to Insanity
 
   // API & Network
   'require_retry_logic',
@@ -1500,22 +1492,21 @@ const Set<String> professionalOnlyRules = <String>{
   'require_api_error_mapping',
   'require_connectivity_check',
   'require_offline_indicator',
-  'prefer_http_connection_reuse', // INFO - performance
-  'avoid_redundant_requests', // INFO - resource efficiency
   'require_cancel_token', // WARNING - cancel requests on dispose
+  // Note: prefer_http_connection_reuse, avoid_redundant_requests moved to Comprehensive
 
   // Resource Management
   'require_http_client_close',
   'require_platform_channel_cleanup',
   'require_isolate_kill',
   'require_image_compression',
-  'prefer_coarse_location_when_sufficient',
+  // Note: prefer_coarse_location_when_sufficient moved to Comprehensive
 
   // Animation (Professional - polish)
   'avoid_hardcoded_duration',
   'require_animation_curve',
   'prefer_implicit_animations',
-  'require_staggered_animation_delays',
+  // Note: require_staggered_animation_delays moved to Comprehensive
 
   // Navigation (Professional - consistency)
   'require_route_transition_consistency',
@@ -1523,11 +1514,9 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_shell_route_for_persistent_ui',
 
   // Type Safety
-  'prefer_constrained_generics',
-  'require_covariant_documentation',
-  'prefer_specific_numeric_types',
-  'require_futureor_documentation',
-  'prefer_explicit_type_arguments',
+  // Note: prefer_constrained_generics, prefer_explicit_type_arguments moved to Comprehensive
+  // Note: prefer_specific_numeric_types moved to Insanity
+  // Note: require_covariant_documentation, require_futureor_documentation moved to Comprehensive
 
   // Naming & Style
   'prefer_boolean_prefixes_for_params',
@@ -1549,40 +1538,38 @@ const Set<String> professionalOnlyRules = <String>{
   'require_window_size_constraints',
 
   // Gap Analysis Rules (Batch 15)
-  'avoid_returning_widgets',
-  'avoid_nullable_widget_methods',
   'avoid_duplicate_string_literals',
+  // Note: avoid_returning_widgets, avoid_nullable_widget_methods moved to Insanity
   'avoid_setstate_in_large_state_class',
 
   // State Management (Batch 17)
-  'prefer_notifier_over_state',
   'require_bloc_transformer',
+  // Note: prefer_notifier_over_state moved to Comprehensive
   'avoid_long_event_handlers',
 
   // Performance (Batch 17)
-  'require_list_preallocate',
   'prefer_builder_for_conditional',
+  // Note: require_list_preallocate moved to Comprehensive
   'require_widget_key_strategy',
 
   // Image & Media (Plan Group A)
-  'avoid_image_rebuild_on_scroll',
+  // Note: avoid_image_rebuild_on_scroll moved to Comprehensive
 
   // Dialog & Snackbar (Plan Group D)
   'require_dialog_result_handling',
   'avoid_snackbar_queue_buildup',
 
   // UI/UX (Plan Groups J, K)
-  'prefer_cached_paint_objects',
   'require_custom_painter_shouldrepaint',
   'require_number_formatting_locale',
   'avoid_badge_without_meaning',
   'prefer_logger_over_print',
-  'prefer_itemextent_when_known',
   'require_tab_state_preservation',
+  // Note: prefer_cached_paint_objects, prefer_itemextent_when_known moved to Comprehensive
 
   // Hardware (Plan Group H)
   'require_audio_focus_handling',
-  'prefer_ble_mtu_negotiation', // Performance - BLE data transfer efficiency
+  // Note: prefer_ble_mtu_negotiation moved to Comprehensive
 
   // QR Scanner (Plan Group I)
   'avoid_qr_scanner_always_active',
@@ -1594,21 +1581,18 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_image_size_constraints',
 
   // Phase 2 Rules - Widget Optimization
-  'prefer_compute_over_isolate_run',
   'prefer_for_loop_in_children',
-  'prefer_immutable_selector_value',
-  'prefer_provider_extensions',
+  // Note: prefer_compute_over_isolate_run moved to Comprehensive
+  // Note: prefer_immutable_selector_value, prefer_provider_extensions moved to Comprehensive
 
   // Phase 2 Rules - Code Quality
-  'prefer_typedefs_for_callbacks',
-  'prefer_redirecting_superclass_constructor',
+  // Note: prefer_typedefs_for_callbacks, prefer_redirecting_superclass_constructor moved to Comprehensive
 
   // Phase 2 Rules - Bloc Naming
-  'prefer_bloc_event_suffix',
-  'prefer_bloc_state_suffix',
+  // Note: prefer_bloc_event_suffix, prefer_bloc_state_suffix moved to Comprehensive
 
   // Phase 2 Rules - Hooks
-  'prefer_use_prefix',
+  // Note: prefer_use_prefix moved to Comprehensive
 
   // Firebase rules (roadmap_up_next)
   'prefer_firestore_batch_write',
@@ -1622,10 +1606,8 @@ const Set<String> professionalOnlyRules = <String>{
 
   // Test rules (roadmap_up_next)
   'require_test_cleanup',
-  'require_accessibility_tests',
-  'prefer_test_data_builder',
-  'prefer_test_variant',
-  'require_animation_tests',
+  // Note: require_accessibility_tests, prefer_test_data_builder, prefer_test_variant,
+  // require_animation_tests moved to Comprehensive
 
   // Part 5 - Database Rules (Professional)
   'require_sqflite_transaction',
@@ -1636,7 +1618,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_hive_box_close',
   'prefer_hive_encryption',
   'require_hive_database_close', // WARNING - database opened without close method
-  'prefer_lazy_box_for_large', // INFO - large collections should use openLazyBox
+  // Note: prefer_lazy_box_for_large moved to Comprehensive
 
   // Part 5 - Dio Rules (Professional)
   'require_dio_interceptor_error_handler',
@@ -1658,7 +1640,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_geolocator_service_enabled',
   'require_geolocator_stream_cancel',
   'require_geolocator_error_handling',
-  'prefer_geolocator_distance_filter', // INFO - battery optimization
+  // Note: prefer_geolocator_distance_filter moved to Comprehensive
 
   // Part 6 - State Management Rules (Professional)
   'avoid_bloc_public_methods',
@@ -1677,8 +1659,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_local_auth',
 
   // Part 6 - Performance Rules (Professional)
-  'prefer_inherited_widget_cache',
-  'prefer_layout_builder_over_media_query',
+  // Note: prefer_inherited_widget_cache, prefer_layout_builder_over_media_query moved to Comprehensive
 
   // Part 6 - Flutter Widget Rules (Professional)
   'require_should_rebuild',
@@ -2219,19 +2200,101 @@ const Set<String> professionalOnlyRules = <String>{
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
+/// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
+/// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
-  // NEW v4.1.7 Rules - Comprehensive
-  'prefer_feature_folder_structure', // INFO - feature-based folder organization
-  'prefer_element_rebuild', // INFO - conditional returns destroy Elements
-  'avoid_finalizer_misuse', // INFO - Finalizers add GC overhead
-  'prefer_fake_platform', // INFO - platform widgets need fakes in tests
-  'require_test_documentation', // INFO - complex tests need comments
+  // Performance micro-optimizations (moved from Professional)
+  'prefer_item_extent', // scroll performance hint
+  'prefer_prototype_item', // consistent sizing optimization
+  'require_add_automatic_keep_alives_off', // memory efficiency
+  'prefer_http_connection_reuse', // connection reuse
+  'avoid_redundant_requests', // resource efficiency
+  'prefer_coarse_location_when_sufficient', // battery/precision tradeoff
+  'prefer_image_precache', // image loading optimization
+  'prefer_sliver_list_delegate', // list optimization
+  'require_repaint_boundary', // paint optimization
+  'prefer_ble_mtu_negotiation', // BLE transfer efficiency
+  'prefer_lazy_box_for_large', // Hive lazy loading
+  'prefer_geolocator_distance_filter', // battery optimization
+  'prefer_inherited_widget_cache', // cache optimization
+  'prefer_layout_builder_over_media_query', // rebuild optimization
+  'require_list_preallocate', // list allocation
+  'prefer_compute_over_isolate_run', // isolate efficiency
+  'prefer_itemextent_when_known', // scroll optimization
+  'prefer_cached_paint_objects', // paint object reuse
+  'avoid_excessive_widget_depth', // widget tree depth
+  'avoid_image_rebuild_on_scroll', // scroll performance
+
+  // Strict immutability patterns (moved from Professional)
+  'prefer_immutable_provider_arguments',
+  'prefer_immutable_bloc_events',
+  'prefer_immutable_bloc_state',
+  'prefer_sealed_bloc_events',
+  'prefer_sealed_bloc_state',
+  'prefer_immutable_selector_value',
+
+  // Type strictness (moved from Professional)
+  'prefer_constrained_generics',
+  'prefer_explicit_type_arguments',
+  'prefer_typed_data',
+  'prefer_typedefs_for_callbacks',
+
+  // Naming suffix conventions (moved from Professional)
+  'prefer_bloc_event_suffix',
+  'prefer_bloc_state_suffix',
+  'prefer_use_prefix', // Hooks naming
+
+  // Documentation extras (moved from Professional)
+  'require_covariant_documentation',
+  'require_futureor_documentation',
+  'require_async_error_documentation',
+
+  // Testing extras (moved from Professional)
+  'require_animation_tests',
+  'prefer_test_data_builder',
+  'prefer_test_variant',
+  'require_accessibility_tests',
+  'prefer_fake_platform', // platform fakes in tests
+
+  // Animation polish (moved from Professional)
+  'require_staggered_animation_delays',
+
+  // Strict patterns (moved from Professional)
+  'prefer_equatable_mixin',
+  'prefer_void_callback',
+  'prefer_symbol_over_key',
+  'prefer_notifier_over_state',
+  'prefer_provider_extensions',
+  'prefer_redirecting_superclass_constructor',
+
+  // Kept from original Comprehensive
+  'prefer_element_rebuild', // conditional returns destroy Elements
+  'avoid_finalizer_misuse', // Finalizers add GC overhead
+  'require_test_documentation', // complex tests need comments
 };
 
-/// Rules that are only included in the insanity tier (not in comprehensive).
+/// Insanity tier rules - pedantic, highly opinionated rules.
+/// Rules most teams would find excessive. For greenfield projects.
 const Set<String> insanityOnlyRules = <String>{
-  // NEW v4.1.7 Rules - Insanity
-  'prefer_custom_single_child_layout', // INFO - CustomSingleChildLayout for complex positioning
+  // Architecture preferences (very opinionated)
+  'prefer_feature_folder_structure', // folder organization preference
+  'prefer_custom_single_child_layout', // CustomSingleChildLayout for positioning
+
+  // Micro-optimizations (diminishing returns)
+  'avoid_object_creation_in_hot_loops', // loop allocation pedantry
+  'prefer_specific_numeric_types', // int vs num pedantry
+
+  // Documentation pedantry
+  'prefer_providing_intl_description', // i18n descriptions
+  'prefer_providing_intl_examples', // i18n examples
+
+  // Very strict patterns
+  'require_bloc_repository_abstraction', // abstraction for everything
+  'avoid_returning_widgets', // no widget helper methods
+  'avoid_nullable_widget_methods', // no nullable widget returns
+
+  // Test pedantry
+  'avoid_duplicate_test_assertions', // no repeated assertions
 };
 
 /// Returns the set of rule names for a given tier.

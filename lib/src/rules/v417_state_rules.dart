@@ -43,9 +43,9 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_riverpod_for_network_only',
     problemMessage:
-        '[avoid_riverpod_for_network_only] Provider only wraps network client. Consider direct injection.',
+        '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug.',
     correctionMessage:
-        'For simple network access, direct dependency injection may be simpler than Riverpod.',
+        'Use direct dependency injection instead of wrapping in a Provider.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -124,9 +124,9 @@ class AvoidLargeBlocRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_large_bloc',
     problemMessage:
-        '[avoid_large_bloc] Bloc has too many event handlers. Consider splitting into smaller Blocs.',
+        '[avoid_large_bloc] Bloc with 7+ event handlers becomes difficult to test and reason about.',
     correctionMessage:
-        'Keep Blocs focused on a single domain. Split into UserBloc, OrderBloc, etc.',
+        'Split into smaller domain-focused Blocs: UserBloc, OrderBloc, etc.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -200,9 +200,9 @@ class AvoidOverengineeredBlocStatesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_overengineered_bloc_states',
     problemMessage:
-        '[avoid_overengineered_bloc_states] Too many state subclasses. Consider using a single state with properties.',
+        '[avoid_overengineered_bloc_states] More than 5 state subclasses adds complexity without benefit. Harder to maintain and test.',
     correctionMessage:
-        'Use a single state class with isLoading, error, data properties instead of many subclasses.',
+        'Use a single state class with isLoading, error, data properties.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -363,9 +363,9 @@ class AvoidTightCouplingWithGetxRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_tight_coupling_with_getx',
     problemMessage:
-        '[avoid_tight_coupling_with_getx] Heavy GetX usage detected. Consider reducing coupling.',
+        '[avoid_tight_coupling_with_getx] Class with 5+ GetX usages becomes tightly coupled and difficult to unit test.',
     correctionMessage:
-        'Use GetX selectively. Consider direct dependency injection for testability.',
+        'Use direct dependency injection for core logic. Reserve GetX for UI bindings.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
