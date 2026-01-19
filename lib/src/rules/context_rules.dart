@@ -203,8 +203,8 @@ class AvoidStoringContextRule extends SaropaLintRule {
 /// ```
 ///
 /// See also:
-/// - [use_setstate_synchronously] - Similar rule for setState calls
-/// - [avoid_scaffold_messenger_after_await] - Similar rule for ScaffoldMessenger
+/// - `use_setstate_synchronously` - Similar rule for setState calls
+/// - `avoid_scaffold_messenger_after_await` - Similar rule for ScaffoldMessenger
 class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   const AvoidContextAcrossAsyncRule() : super(code: _code);
 
