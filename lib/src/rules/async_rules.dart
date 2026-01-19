@@ -1940,19 +1940,43 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
   }
 }
 
-/// Warns when DateTime is stored without converting to UTC.
+/// Warns when DateTime is stored or serialized without converting to UTC.
 ///
-/// Storing local DateTime values causes inconsistency across time zones.
-/// Always convert to UTC before storage and back to local for display.
+/// Local DateTime values contain timezone offset information that becomes
+/// invalid when restored in a different timezone. A timestamp saved as
+/// "2024-01-15T14:30:00" in New York will be interpreted as 2:30 PM local
+/// time when read in London, causing a 5-hour discrepancy. This affects
+/// database storage, JSON serialization, SharedPreferences, and any
+/// persistence mechanism.
+///
+/// The rule detects DateTime serialization methods (`toIso8601String()`,
+/// `millisecondsSinceEpoch`, `microsecondsSinceEpoch`) when used inside
+/// storage contexts (database operations, JSON serialization, caching).
+///
+/// **Quick fix available:** Inserts `.toUtc()` before the serialization call.
 ///
 /// **BAD:**
 /// ```dart
+/// // Database storage
 /// await db.insert({'timestamp': DateTime.now().toIso8601String()});
+///
+/// // JSON serialization
+/// Map<String, dynamic> toJson() => {'created': createdAt.toIso8601String()};
+///
+/// // SharedPreferences
+/// prefs.setString('lastSync', DateTime.now().toIso8601String());
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
+/// // Database storage - UTC for consistency
 /// await db.insert({'timestamp': DateTime.now().toUtc().toIso8601String()});
+///
+/// // JSON serialization - UTC for API exchange
+/// Map<String, dynamic> toJson() => {'created': createdAt.toUtc().toIso8601String()};
+///
+/// // SharedPreferences - UTC for cross-device sync
+/// prefs.setString('lastSync', DateTime.now().toUtc().toIso8601String());
 /// ```
 class PreferUtcForStorageRule extends SaropaLintRule {
   const PreferUtcForStorageRule() : super(code: _code);
@@ -1963,6 +1987,10 @@ class PreferUtcForStorageRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  // No applicableFileTypes override: DateTime storage patterns appear in models,
+  // services, repositories, widgets, and utilities. Early-exit guards on method
+  // name and type provide efficient filtering without missing real violations.
+
   static const LintCode _code = LintCode(
     name: 'prefer_utc_for_storage',
     problemMessage:
@@ -1972,16 +2000,34 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
-  // Storage-related patterns with word boundaries to avoid false positives
-  // like 'edgeInsets', 'offset', 'subset', etc.
+  // Storage and serialization patterns that indicate DateTime persistence.
+  // Uses word boundaries (\b) to avoid false positives like 'edgeInsets',
+  // 'offset', 'subset', etc.
+  //
+  // Categories:
+  // - Database ops: insert, update, save, store, write, put
+  // - Serialization: toJson, toMap, serialize, encode
+  // - Caching: cache, persist
+  // - Key-value storage: .setItem, .setString, .setData (requires dot prefix
+  //   to avoid matching unrelated 'set' methods like setState)
   static final List<RegExp> _storagePatterns = <RegExp>[
+    // Database operations
     RegExp(r'\binsert\w*\s*\(', caseSensitive: false),
     RegExp(r'\bupdate\w*\s*\(', caseSensitive: false),
     RegExp(r'\bsave\w*\s*\(', caseSensitive: false),
     RegExp(r'\bstore\w*\s*\(', caseSensitive: false),
     RegExp(r'\bwrite\w*\s*\(', caseSensitive: false),
     RegExp(r'\bput\w*\s*\(', caseSensitive: false),
-    // 'set' needs careful matching: .setItem(, .setString(, .setData(
+    // Serialization methods
+    RegExp(r'\btoJson\w*\s*\(', caseSensitive: false),
+    RegExp(r'\btoMap\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bserialize\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bencode\w*\s*\(', caseSensitive: false),
+    // Caching and persistence
+    RegExp(r'\bcache\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bpersist\w*\s*\(', caseSensitive: false),
+    // Key-value storage APIs (SharedPreferences, localStorage, etc.)
+    // Requires dot prefix to avoid matching setState, setRange, etc.
     RegExp(r'\.set\w*\s*\(', caseSensitive: false),
   ];
 
@@ -1992,10 +2038,11 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
-      // Check for toIso8601String or millisecondsSinceEpoch
+      // Check for DateTime serialization methods commonly used for storage.
+      // Excludes toString() - it's rarely used for actual storage and mostly
+      // appears in logging/debugging, which would generate false positives.
       final String methodName = node.methodName.name;
       if (methodName != 'toIso8601String' &&
-          methodName != 'toString' &&
           !methodName.contains('milliseconds') &&
           !methodName.contains('microseconds')) {
         return;
@@ -2029,6 +2076,39 @@ class PreferUtcForStorageRule extends SaropaLintRule {
         }
         current = current.parent;
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddToUtcFix()];
+}
+
+/// Quick fix for [PreferUtcForStorageRule] that inserts `.toUtc()` before
+/// the serialization method call.
+class _AddToUtcFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add .toUtc() before serialization',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert .toUtc() after the DateTime expression, before the method call
+        builder.addSimpleInsertion(target.end, '.toUtc()');
+      });
     });
   }
 }

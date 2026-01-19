@@ -131,6 +131,13 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
 
 ### Improved
 
+**`prefer_utc_for_storage` rule enhanced:**
+- Added 6 new serialization patterns: `toJson`, `toMap`, `serialize`, `encode`, `cache`, `persist`
+- Removed `toString()` from method check (reduces false positives from logging/debugging)
+- Patterns moved to `static final` class member (compiled once at class load, not per invocation)
+- Added comprehensive doc header with multiple BAD/GOOD examples
+- **Quick fix added**: Inserts `.toUtc()` before the serialization call
+
 **DX message quality for 60+ lint rules** - Added clear consequences to problem messages explaining *why* issues matter. Messages now follow the pattern: "[What's wrong]. [Why it matters]." Extended short messages to meet 180-character minimum for critical/high impact rules.
 
 #### Security Rules (11 rules)

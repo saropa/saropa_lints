@@ -977,6 +977,7 @@ custom_lint:
     # =========================================================================
     - require_json_decode_try_catch: false
     - avoid_datetime_parse_unvalidated: false
+    - prefer_utc_for_storage: false            # WARNING - DateTime stored without UTC conversion (Essential tier, quick fix)
     - prefer_try_parse_for_dynamic_data: false  # CRITICAL: int/double/num/BigInt/Uri.parse
     - avoid_double_for_money: false
     - require_currency_code_with_amount: false   # INFO - money amounts need currency field (v4.1.8)
