@@ -46,9 +46,9 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_data_in_clipboard',
     problemMessage:
-        '[avoid_sensitive_data_in_clipboard] Sensitive data copied to clipboard. Accessible to other apps.',
+        '[avoid_sensitive_data_in_clipboard] Clipboard is shared system-wide. Other apps can read sensitive data copied here.',
     correctionMessage:
-        'Avoid copying passwords, tokens, secrets, or API keys to clipboard.',
+        'Never copy passwords, tokens, or API keys to clipboard. Use secure storage instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

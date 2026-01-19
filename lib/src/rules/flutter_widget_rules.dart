@@ -4916,8 +4916,8 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets_in_lists',
     problemMessage:
-        '[prefer_const_widgets_in_lists] Widget list could be const.',
-    correctionMessage: 'Add const keyword to the list literal.',
+        '[prefer_const_widgets_in_lists] Widget list recreated on every rebuild. If elements are constant, the entire list can be const.',
+    correctionMessage: 'Add const keyword: const [Text("a"), Text("b")].',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

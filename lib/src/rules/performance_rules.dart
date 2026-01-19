@@ -1429,9 +1429,9 @@ class AvoidScrollListenerInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_scroll_listener_in_build',
     problemMessage:
-        '[avoid_scroll_listener_in_build] Adding scroll listener in build() causes multiple subscriptions.',
+        '[avoid_scroll_listener_in_build] Scroll listener added in build() accumulates subscriptions on every rebuild, causing memory leaks and duplicate callbacks.',
     correctionMessage:
-        'Move listener registration to initState() and remove in dispose().',
+        'Register listener once in initState() and remove in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1817,9 +1817,9 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_span_in_build',
     problemMessage:
-        '[avoid_text_span_in_build] TextSpan created in build() prevents text layout caching.',
+        '[avoid_text_span_in_build] TextSpan recreated in build() forces text layout recalculation on every rebuild.',
     correctionMessage:
-        'Cache TextSpan as a static const or class field for better performance.',
+        'Cache TextSpan as a final field or extract to a method that returns cached spans.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1981,8 +1981,9 @@ class PreferConstWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets',
     problemMessage:
-        '[prefer_const_widgets] Widget could be const. Const widgets are reused across rebuilds.',
-    correctionMessage: 'Add const keyword if all arguments are constant.',
+        '[prefer_const_widgets] Widget could be const but is recreated on every rebuild, wasting CPU cycles.',
+    correctionMessage:
+        'Add const keyword to skip unnecessary widget tree comparisons.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2157,9 +2158,9 @@ class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_widget_creation_in_loop',
     problemMessage:
-        '[avoid_widget_creation_in_loop] Creating widgets in .map() creates new instances every rebuild.',
+        '[avoid_widget_creation_in_loop] Widgets created in .map() are all instantiated eagerly on every rebuild, even if off-screen.',
     correctionMessage:
-        'Use ListView.builder for lazy construction or extract to method.',
+        'Use ListView.builder for lazy construction of large lists.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2329,9 +2330,9 @@ class AvoidCallingOfInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_calling_of_in_build',
     problemMessage:
-        '[avoid_calling_of_in_build] Multiple .of(context) calls traverse widget tree repeatedly.',
+        '[avoid_calling_of_in_build] Multiple .of(context) calls walk the widget tree repeatedly on every rebuild.',
     correctionMessage:
-        'Cache the result in a local variable for better performance.',
+        'Cache result in a local variable: final theme = Theme.of(context);',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2426,9 +2427,9 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_image_cache_management',
     problemMessage:
-        '[require_image_cache_management] Class loads many images but never clears imageCache.',
+        '[require_image_cache_management] Loading many images without cache management causes unbounded memory growth.',
     correctionMessage:
-        'Call imageCache.clear() or imageCache.evict() in dispose().',
+        'Call PaintingBinding.instance.imageCache.evict(url) in dispose().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3251,9 +3252,9 @@ class RequireCorsHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cors_handling',
     problemMessage:
-        '[require_cors_handling] HTTP calls on web may require CORS handling.',
+        '[require_cors_handling] HTTP calls on web fail silently without CORS headers from the server.',
     correctionMessage:
-        'Ensure server returns CORS headers or use appropriate configuration.',
+        'Configure server to return Access-Control-Allow-Origin header or use a proxy.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -4022,8 +4023,9 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_rebuild_on_scroll',
     problemMessage:
-        '[avoid_rebuild_on_scroll] Scroll listener in build method. Will be added multiple times.',
-    correctionMessage: 'Add listener in initState and remove in dispose.',
+        '[avoid_rebuild_on_scroll] Scroll listener in build() is added on every rebuild, causing duplicate callback executions.',
+    correctionMessage:
+        'Register listener once in initState() and remove in dispose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

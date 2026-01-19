@@ -58,9 +58,10 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_commented_out_code',
-    problemMessage: '[avoid_commented_out_code] Avoid commented-out code.',
+    problemMessage:
+        '[avoid_commented_out_code] Commented-out code clutters the codebase and creates confusion about intent.',
     correctionMessage:
-        'Remove commented-out code. Use version control to preserve history.',
+        'Delete unused code. Git preserves history if you need to restore it later.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -686,9 +687,9 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_print_in_release',
     problemMessage:
-        '[avoid_print_in_release] print() executes in release builds. Guard with kDebugMode.',
+        '[avoid_print_in_release] print() runs in production, exposing debug info to users and impacting performance.',
     correctionMessage:
-        'Wrap print() in if (kDebugMode) or use a logging framework.',
+        'Wrap in if (kDebugMode) or use a logging framework with log levels.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -811,9 +812,9 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_structured_logging',
     problemMessage:
-        '[require_structured_logging] Use structured logging instead of string concatenation.',
+        '[require_structured_logging] String concatenation in logs wastes CPU building strings even when logging is disabled.',
     correctionMessage:
-        'Pass data as named parameters or use string interpolation with log levels.',
+        'Use structured logging with named parameters: log("event", data: {"key": value}).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -902,9 +903,9 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_in_logs',
     problemMessage:
-        '[avoid_sensitive_in_logs] Potential sensitive data in log statement.',
+        '[avoid_sensitive_in_logs] Sensitive data in logs exposes credentials and violates security compliance (OWASP A09).',
     correctionMessage:
-        'Remove sensitive data (passwords, tokens, secrets, keys) from logs.',
+        'Remove passwords, tokens, secrets, and keys from log statements.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

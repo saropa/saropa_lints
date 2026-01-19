@@ -1266,9 +1266,8 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_inline_creation',
     problemMessage:
-        '[avoid_go_router_inline_creation] GoRouter created in build(). Causes hot reload issues.',
-    correctionMessage:
-        'Create GoRouter as a field or in initState(), not in build().',
+        '[avoid_go_router_inline_creation] GoRouter created in build() is recreated on every rebuild, breaking navigation state and hot reload.',
+    correctionMessage: 'Create GoRouter as a final field or in initState().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

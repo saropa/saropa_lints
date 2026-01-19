@@ -24,8 +24,8 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_getter_prefix',
     problemMessage:
-        "[avoid_getter_prefix] Getter name should not start with 'get'.",
-    correctionMessage: "Remove the 'get' prefix from the getter name.",
+        "[avoid_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it.",
+    correctionMessage: "Rename: getName → name, getValue → value.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1101,8 +1101,8 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_callback_field_name',
     problemMessage:
-        "[prefer_correct_callback_field_name] Callback field should be named with 'on' prefix.",
-    correctionMessage: "Rename to 'onX' pattern (e.g., onPressed, onChanged).",
+        "[prefer_correct_callback_field_name] Callback field missing 'on' prefix. Flutter convention uses onPressed, onChanged.",
+    correctionMessage: "Rename: callback → onCallback, tapHandler → onTap.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
