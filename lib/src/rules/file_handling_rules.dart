@@ -556,7 +556,7 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sqflite_error_handling',
     problemMessage:
-        '[require_sqflite_error_handling] Database operation should have error handling.',
+        '[require_sqflite_error_handling] Unhandled database errors crash the app. Operations can fail due to disk full, corruption, or constraint violations.',
     correctionMessage: 'Wrap in try-catch to handle DatabaseException.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1433,5 +1433,260 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
         }
       }
     });
+  }
+}
+
+// =============================================================================
+// prefer_streaming_for_large_files
+// =============================================================================
+
+/// Warns when reading entire large files into memory instead of streaming.
+///
+/// Alias: stream_large_files, chunked_file_read
+///
+/// readAsBytes/readAsString loads entire file into memory. For large files
+/// (logs, media, data exports), use openRead() for streaming to avoid OOM.
+///
+/// **BAD:**
+/// ```dart
+/// // For a 500MB log file, this allocates 500MB!
+/// final content = await file.readAsString();
+/// for (final line in content.split('\n')) {
+///   processLine(line);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Process line by line, constant memory usage
+/// await file
+///     .openRead()
+///     .transform(utf8.decoder)
+///     .transform(LineSplitter())
+///     .forEach(processLine);
+/// ```
+class PreferStreamingForLargeFilesRule extends SaropaLintRule {
+  const PreferStreamingForLargeFilesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_streaming_for_large_files',
+    problemMessage:
+        '[prefer_streaming_for_large_files] Reading potentially large file '
+        'into memory. Consider streaming for logs, media, or data exports.',
+    correctionMessage:
+        'Use file.openRead() with stream transformers for memory-efficient processing.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// File name patterns that suggest large files
+  static const Set<String> _largeFilePatterns = <String>{
+    'log',
+    'export',
+    'backup',
+    'dump',
+    'data',
+    'csv',
+    'json',
+    'archive',
+    'report',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for full-file read methods
+      if (methodName != 'readAsBytes' &&
+          methodName != 'readAsString' &&
+          methodName != 'readAsBytesSync' &&
+          methodName != 'readAsStringSync') {
+        return;
+      }
+
+      // Check if the file path suggests a large file
+      AstNode? current = node;
+      while (current != null) {
+        if (current is MethodInvocation ||
+            current is InstanceCreationExpression) {
+          final String source = current.toSource().toLowerCase();
+
+          for (final String pattern in _largeFilePatterns) {
+            if (source.contains(pattern)) {
+              reporter.atNode(node, code);
+              return;
+            }
+          }
+        }
+        current = current.parent;
+      }
+
+      // Also check variable names in the context
+      final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+      if (body != null) {
+        final String bodySource = body.toSource().toLowerCase();
+        for (final String pattern in _largeFilePatterns) {
+          if (bodySource.contains('${pattern}file') ||
+              bodySource.contains('${pattern}_file')) {
+            reporter.atNode(node, code);
+            return;
+          }
+        }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// require_file_path_sanitization
+// =============================================================================
+
+/// Warns when file paths are constructed from user input without sanitization.
+///
+/// Alias: sanitize_file_path, path_traversal
+///
+/// User-provided paths can contain ../ to access files outside intended
+/// directory. Validate and sanitize paths before file operations.
+///
+/// **BAD:**
+/// ```dart
+/// Future<File> getUserFile(String filename) async {
+///   final dir = await getApplicationDocumentsDirectory();
+///   return File('${dir.path}/$filename'); // User could pass '../../../etc/passwd'!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<File> getUserFile(String filename) async {
+///   final dir = await getApplicationDocumentsDirectory();
+///
+///   // Sanitize: remove path separators and special sequences
+///   final sanitized = path.basename(filename).replaceAll(RegExp(r'[^\w.-]'), '');
+///
+///   // Verify result is within intended directory
+///   final file = File(path.join(dir.path, sanitized));
+///   if (!path.isWithin(dir.path, file.path)) {
+///     throw SecurityException('Invalid file path');
+///   }
+///
+///   return file;
+/// }
+/// ```
+class RequireFilePathSanitizationRule extends SaropaLintRule {
+  const RequireFilePathSanitizationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.critical;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m1},
+        web: <OwaspWeb>{OwaspWeb.a01},
+      );
+
+  static const LintCode _code = LintCode(
+    name: 'require_file_path_sanitization',
+    problemMessage:
+        '[require_file_path_sanitization] File path constructed from parameter '
+        'without sanitization. Path traversal attack possible with ../',
+    correctionMessage:
+        'Use path.basename() to extract filename and path.isWithin() to verify.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check for File or Directory creation
+      if (typeName != 'File' && typeName != 'Directory') return;
+
+      // Check if path is constructed with string interpolation using parameter
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression pathArg = args.first;
+      final String pathSource = pathArg.toSource();
+
+      // Check for string interpolation
+      if (pathArg is! StringInterpolation) {
+        // Check for string concatenation with variable
+        if (pathSource.contains(r'$') || pathSource.contains('+')) {
+          _checkForUnsanitizedPath(node, pathSource, reporter, context);
+        }
+        return;
+      }
+
+      _checkForUnsanitizedPath(node, pathSource, reporter, context);
+    });
+  }
+
+  void _checkForUnsanitizedPath(
+    InstanceCreationExpression node,
+    String pathSource,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Get the function this is in
+    final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+    if (body == null) return;
+
+    final String bodySource = body.toSource();
+
+    // Check for sanitization patterns
+    if (bodySource.contains('basename') ||
+        bodySource.contains('isWithin') ||
+        bodySource.contains('normalize') ||
+        bodySource.contains('sanitize') ||
+        bodySource.contains('replaceAll') ||
+        bodySource.contains('..')) {
+      return; // Has some sanitization
+    }
+
+    // Get function parameters
+    final FunctionDeclaration? funcDecl =
+        node.thisOrAncestorOfType<FunctionDeclaration>();
+    final MethodDeclaration? methodDecl =
+        node.thisOrAncestorOfType<MethodDeclaration>();
+
+    FormalParameterList? params;
+    if (funcDecl != null) {
+      params = funcDecl.functionExpression.parameters;
+    } else if (methodDecl != null) {
+      params = methodDecl.parameters;
+    }
+
+    if (params == null) return;
+
+    // Check if any parameter is used in the path
+    for (final FormalParameter param in params.parameters) {
+      final String paramName = param.name?.lexeme ?? '';
+      if (paramName.isNotEmpty && pathSource.contains(paramName)) {
+        // Parameter used in file path without sanitization
+        reporter.atNode(node, code);
+        return;
+      }
+    }
   }
 }

@@ -3536,6 +3536,10 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: arguments_ordering
+  @override
+  List<String> get configAliases => const <String>['arguments_ordering'];
+
   static const LintCode _code = LintCode(
     name: 'enforce_arguments_ordering',
     problemMessage:
@@ -3667,6 +3671,213 @@ class _SortArgumentsFix extends DartFix {
           newArgs.toString(),
         );
       });
+    });
+  }
+}
+
+// ============================================================================
+// COMMENTED-OUT CODE DETECTION
+// ============================================================================
+
+/// Warns when commented-out code is detected.
+///
+/// Commented-out code clutters the codebase and creates confusion about intent.
+/// It's better to delete unused code - version control preserves history if you
+/// need to restore it later.
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+/// Enable it for greenfield projects or teams that want clean codebases.
+///
+/// **Detection heuristics for commented-out code:**
+/// - Dart keywords at start: `// return`, `// if (`, `// final x`
+/// - Type declarations: `// int value`, `// String name`
+/// - Function/method calls: `// doSomething()`, `// list.add(item)`
+/// - Property access: `// foo.bar`, `// widget.build()`
+/// - Assignments: `// x = 5`, `// name = "test"`
+/// - Annotations: `// @override`, `// @deprecated`
+/// - Import/export statements: `// import 'package:...'`
+/// - Class/enum declarations: `// class Foo {`, `// enum Status {`
+/// - Block delimiters: `// }`, `// {`
+///
+/// **Skipped patterns (not flagged):**
+/// - TODO/FIXME/NOTE markers: `// TODO: implement this`
+/// - Lint ignores: `// ignore: unused_variable`
+/// - Documentation references: `// See: https://...`
+///
+/// **BAD:**
+/// ```dart
+/// void example() {
+///   // final oldValue = compute();
+///   // if (condition) {
+///   //   doSomething();
+///   // }
+///   final newValue = computeNew();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void example() {
+///   // Compute the new value using the updated algorithm
+///   final newValue = computeNew();
+/// }
+/// ```
+///
+/// **Quick fix available:** Deletes the commented-out code line.
+class AvoidCommentedOutCodeRule extends SaropaLintRule {
+  const AvoidCommentedOutCodeRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_commented_out_code',
+    problemMessage:
+        '[avoid_commented_out_code] Commented-out code clutters the codebase. '
+        'Delete it - git preserves history.',
+    correctionMessage:
+        'Delete the commented-out code. Use version control to retrieve it if needed.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Pattern to detect commented-out code.
+  ///
+  /// This pattern is intentionally aggressive - it's better to flag potential
+  /// code comments than to miss them, since the fix is simply to delete.
+  static final RegExp _codePattern = RegExp(
+    // Identifier immediately followed by code punctuation (no space)
+    r'^[a-zA-Z_$][a-zA-Z0-9_$]*[:\.\(\[\{]|'
+    // Assignment pattern: identifier = something
+    r'^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*\S|'
+    // Dart keywords at start of comment
+    r'^(return|if|else|for|while|switch|case|break|continue|final|const|var|late|await|async|throw|try|catch|finally|super|this|new|null|true|false|class|enum|extension|mixin|typedef|import|export|part|library|void|int|double|String|bool|List|Map|Set|Future|Stream|dynamic)\b|'
+    // Function/method call at end: foo() or foo();
+    r'\w+\([^)]*\)\s*[;,]?\s*$|'
+    // Ends with semicolon (statement)
+    r';\s*$|'
+    // Starts with annotation
+    r'^@\w+|'
+    // Contains arrow function
+    r'=>|'
+    // Block delimiters at boundaries
+    r'^[\{\}]|[\{\}]\s*$',
+  );
+
+  /// Markers that indicate intentional comments, not commented-out code.
+  static final RegExp _skipPattern = RegExp(
+    r'(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK|See:|ignore:|ignore_for_file:|cspell:)',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        Token? commentToken = token.precedingComments;
+
+        while (commentToken != null) {
+          final String lexeme = commentToken.lexeme;
+
+          // Only check single-line comments (not doc comments)
+          if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
+            final String content = lexeme.substring(2).trim();
+
+            // Skip empty comments
+            if (content.isEmpty) {
+              commentToken = commentToken.next;
+              continue;
+            }
+
+            // Skip intentional comment markers
+            if (_skipPattern.hasMatch(content)) {
+              commentToken = commentToken.next;
+              continue;
+            }
+
+            // Check if this looks like code
+            if (_codePattern.hasMatch(content)) {
+              reporter.atToken(commentToken, code);
+            }
+          }
+
+          commentToken = commentToken.next;
+        }
+
+        token = token.next;
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_DeleteCommentedCodeFix()];
+}
+
+/// Quick fix that deletes the commented-out code line.
+class _DeleteCommentedCodeFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        Token? commentToken = token.precedingComments;
+
+        while (commentToken != null) {
+          // Check if this comment matches the error location
+          if (commentToken.offset == analysisError.offset) {
+            final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+              message: 'Delete commented-out code',
+              priority: 1,
+            );
+
+            changeBuilder.addDartFileEdit((builder) {
+              // Delete the entire comment including any trailing newline
+              int deleteEnd = commentToken!.end;
+
+              // Check if there's a newline after the comment
+              final String source = unit.toSource();
+              if (deleteEnd < source.length && source[deleteEnd] == '\n') {
+                deleteEnd++;
+              }
+
+              // Also try to delete leading whitespace on the same line
+              int deleteStart = commentToken.offset;
+              while (deleteStart > 0 && source[deleteStart - 1] == ' ') {
+                deleteStart--;
+              }
+              // If we're at the start of a line (after newline), include the newline
+              if (deleteStart > 0 && source[deleteStart - 1] == '\n') {
+                deleteStart--;
+              }
+
+              builder.addDeletion(
+                SourceRange(deleteStart, deleteEnd - deleteStart),
+              );
+            });
+            return;
+          }
+
+          commentToken = commentToken.next;
+        }
+
+        token = token.next;
+      }
     });
   }
 }

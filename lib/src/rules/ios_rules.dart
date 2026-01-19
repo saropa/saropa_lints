@@ -5511,7 +5511,7 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ios_callkit_integration',
     problemMessage:
-        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit for native call UI. Consequence: Without CallKit, calls may not appear as expected and can violate App Store policies.',
+        '[require_ios_callkit_integration] VoIP call handling detected. iOS requires CallKit for native call UI. Without CallKit, incoming calls fail to show on lock screen and your app will be rejected from the App Store.',
     correctionMessage:
         'Implement CallKit using flutter_callkit_incoming or similar package. This ensures compliance and a native call experience.',
     errorSeverity: DiagnosticSeverity.WARNING,

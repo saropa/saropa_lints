@@ -4,6 +4,442 @@ Archived releases 0.1.0 through 2.7.0. See [CHANGELOG.md](./CHANGELOG.md) for th
 
 ---
 
+## [3.4.0] - 2026-01-12
+
+### Performance Optimizations
+
+Added comprehensive performance infrastructure to support 1400+ lint rules efficiently.
+
+#### Caching Infrastructure
+
+- **`SourceLocationCache`**: O(log n) offset-to-line lookups via binary search with cached line start offsets
+- **`SemanticTokenCache`**: Caches resolved type information and symbol metadata across rules
+- **`CompilationUnitCache`**: Caches expensive AST traversal results (class names, method names, imports)
+- **`ImportGraphCache`**: Caches project import graph for dependency queries and circular import detection
+
+#### IDE Integration (Infrastructure Only)
+
+- **`ThrottledAnalysis`**: Debounces analysis during rapid typing (requires IDE hooks not available in custom_lint)
+- **`SpeculativeAnalysis`**: Pre-analyzes files likely to be opened next (requires IDE hooks not available in custom_lint)
+- **Note**: These classes exist for future IDE integration but cannot be fully wired up without custom_lint framework changes
+
+#### Rule Execution Optimization
+
+- **`RuleGroupExecutor`**: Groups related rules to share setup/teardown costs and intermediate results
+- **`ConsolidatedVisitorDispatch`**: Single AST traversal for multiple rules (reduces O(rules × nodes) to O(nodes))
+- **`BaselineAwareEarlyExit`**: Skips rules when all violations are baselined
+- **`DiffBasedAnalysis`**: Only re-analyzes changed regions of files
+
+#### Memory Optimization
+
+- **`StringInterner`**: Interns common strings (StatelessWidget, BuildContext) to reduce memory allocation
+- Pre-interns 35+ common Dart/Flutter strings at startup
+- **`LruCache`**: Generic LRU cache with configurable size limits to prevent unbounded memory growth
+- **`MemoryPressureHandler`**: Monitors memory usage and auto-clears caches when threshold exceeded
+
+#### Profiling
+
+- **`HotPathProfiler`**: Instruments hot paths to identify slow rules and operations
+- Tracks execution times, slow operations (>50ms threshold), and provides statistical analysis
+- Enable via `HotPathProfiler.enable()` for development debugging
+
+#### Parallel Execution
+
+- **`ParallelAnalyzer`**: Now uses real `Isolate.run()` for true parallel file analysis
+- Distributes work across multiple CPU cores for 2-4x speedup on large projects
+- Automatic fallback to sequential processing when isolates unavailable
+
+#### Integration Wiring
+
+- **Startup initialization**: `initializeCacheManagement()` and `StringInterner.preInternCommon()` called at plugin startup
+- **Memory tracking**: `MemoryPressureHandler.recordFileProcessed()` called per-file to trigger auto-clearing
+- **Rule groups registered**: 6 groups defined (async, widget, context, dispose, test, security) for batch execution
+- **Rapid analysis throttle**: Content-hash-based throttle prevents duplicate analysis of identical content within 300ms
+- **Bloom filter pre-screening**: O(1) probabilistic membership testing in `PatternIndex` before expensive string searches
+- **Content region skipping**: Rules can declare `requiresClassDeclaration`, `requiresMainFunction`, `requiresImports` to skip irrelevant files
+- **Git-aware file priority**: `GitAwarePriority` tracks modified/staged files for prioritized analysis
+- **Import-based rule filtering**: `requiresFlutterImport` getter skips widget rules instantly for pure Dart files
+- **Adaptive tier switching**: Auto-switches to essential-tier rules during rapid editing (3+ analyses in 2 seconds)
+
+### New Rules
+
+- **`avoid_circular_imports`**: Detects circular import dependencies using `ImportGraphCache`
+  - Reports when files are part of an import cycle
+  - Suggests extracting shared types to break cycles
+
+---
+
+## [3.3.1] - 2026-01-12
+
+### Quick Fix Policy Update
+
+Updated contribution guidelines and roadmap with a plan to achieve 90% quick fix coverage.
+
+#### HACK Comment Fixes Discouraged
+
+`// HACK: fix this manually` fixes are now discouraged. They provide no real value. See [CONTRIBUTING.md](CONTRIBUTING.md#hack-comment-fixes-are-discouraged) for details.
+
+- Real fixes that transform code are required
+- If a fix can't be implemented safely, don't add one
+- Document "no fix possible" in the rule's doc comment
+
+#### Quick Fix Implementation Plan
+
+Added comprehensive plan to [ROADMAP.md](ROADMAP.md#quick-fix-implementation-plan) with:
+
+- **Category A**: Safe transformations (100% target) - ~200 rules
+- **Category B**: Contextual transformations (80% target) - ~400 rules
+- **Category C**: Multi-choice fixes (50% target) - ~300 rules
+- **Category D**: Human judgment required (0% fixes) - ~600 rules
+
+Safety checklist: no deleting code, no behavior changes, works in edge cases.
+
+### Tooling
+
+- **`scripts/audit_rules.py`**: Now displays per-file statistics table with line counts, rule counts, and fix counts for each rule file
+
+---
+
+## [3.3.0] - 2026-01-12
+
+### Audit Script v2.0
+
+The `scripts/audit_rules.py` has been completely redesigned with improved readability and comprehensive analysis.
+
+#### New Features
+
+- **OWASP Coverage Stats** - Visual progress bars showing Mobile (8/10) and Web (10/10) coverage with uncovered categories listed
+- **Tier Distribution** - Rule counts per tier (essential, recommended, professional, comprehensive, insanity) with cumulative totals and visual bars
+- **Severity Distribution** - Critical/high/medium/low breakdown with percentages
+- **Quality Metrics** - Quick fix coverage (13%), correction message coverage (99.6%), lines of code stats
+- **Orphan Rules Detection** - Identifies rules implemented but not assigned to any tier (262 found)
+- **File Health Analysis** - Largest files by rule count, files needing quick fixes
+- **DX Message Audit** - Now shows all impact levels with pass rates and percentages
+
+#### Improved Output
+
+- Organized into logical sections: Rule Inventory, Distribution Analysis, Security & Compliance, Quality Metrics, ROADMAP Sync, DX Message Audit
+- Visual progress bars for coverage metrics
+- Cleaner section headers with Unicode box-drawing characters
+- Compact mode (`--compact`) to skip the file table for faster runs
+- Top 3 worst offenders shown in terminal, full details in exported report
+
+#### Command Options
+
+```bash
+python scripts/audit_rules.py              # Full audit
+python scripts/audit_rules.py --compact    # Skip file table
+python scripts/audit_rules.py --dx-all     # Show all DX issues
+python scripts/audit_rules.py --no-dx      # Skip DX audit
+```
+
+---
+
+## [3.1.2] - 2026-01-12
+
+### New Rules
+
+#### Tiered File Length Rules (OPINIONATED)
+
+Opinionated style preferences for teams that prefer smaller files. **Not quality indicators** - large files are often necessary and valid for data, enums, constants, generated code, configs, and lookup tables.
+
+| Rule | Threshold | Tier | Severity |
+|------|-----------|------|----------|
+| `prefer_small_files` | 200 lines | insanity | INFO |
+| `avoid_medium_files` | 300 lines | professional | INFO |
+| `avoid_long_files` | 500 lines | comprehensive | INFO |
+| `avoid_very_long_files` | 1000 lines | recommended | INFO |
+
+All rules can be disabled per-file with `// ignore_for_file: rule_name`.
+
+### Performance Optimizations
+
+#### Combined Pattern Index
+
+- **Global pattern index**: Instead of each rule scanning for its patterns individually, we now build a combined index at startup and scan file content ONCE.
+- **O(patterns) instead of O(rules x patterns)**: For 1400+ rules with multiple patterns, this is a massive speedup in the pre-filtering phase.
+- **New `PatternIndex` class**: Automatically built when rules are loaded, transparent to rule authors.
+
+#### Incremental Analysis Tracking
+
+- **Skip unchanged files**: New `IncrementalAnalysisTracker` remembers which rules passed on which files.
+- **Content hash comparison**: Only re-runs rules when file content actually changes.
+- **Config-aware cache invalidation**: Cache automatically clears when tier or rule configuration changes.
+- **Per-rule tracking**: Individual rules that pass are recorded, so even partial re-analysis benefits.
+- **Disk persistence**: Cache survives IDE restarts! Saved to `.dart_tool/saropa_lints_cache.json`.
+- **Auto-save throttling**: Saves after every 50 changes to balance performance vs data safety.
+- **Atomic writes**: Uses temp file + rename to prevent corruption on crash.
+
+#### File Metrics Cache
+
+- **Cached file metrics**: New `FileMetricsCache` computes line count, class count, function count, etc. once per file.
+- **Shared across rules**: All rules accessing file metrics use the same cached values.
+- **Includes content indicators**: `hasAsyncCode`, `hasWidgets` for fast filtering.
+
+#### New Rule Optimization Hooks
+
+- **`requiresAsync` getter**: Skip rules on files without async/Future patterns.
+- **`requiresWidgets` getter**: Skip rules on files without Widget/State patterns.
+- **`maximumLineCount` getter**: (DANGEROUS - use sparingly) Skip rules on very large files. Only for O(n²) rules where analysis time is prohibitive. Off by default.
+
+#### Smart Content Filter
+
+- **New `SmartContentFilter` class**: Combines multiple heuristics in a single filter check.
+- **Supports patterns, line counts, keywords, async, widgets**: One call to check all constraints.
+
+#### Rule Priority Queue
+
+- **Cost-based rule ordering**: Rules sorted by cost so cheap rules run first.
+- **Fail-fast optimization**: Cheaper rules provide faster initial feedback.
+- **New `RulePriorityQueue` class**: Sorts rules by cost + pattern count for optimal execution order.
+
+#### Content Region Index
+
+- **Pre-indexed file regions**: Imports, class declarations, and top-level code indexed separately.
+- **Targeted scanning**: Rules checking imports don't need to scan function bodies.
+- **New `ContentRegionIndex` class**: Computes and caches structural regions per file.
+
+#### AST Node Type Registry
+
+- **Batch rules by node type**: Group rules that care about the same AST nodes.
+- **Reduced visitor overhead**: Instead of each rule registering callbacks, batch invocations.
+- **New `AstNodeTypeRegistry` class**: Tracks which rules care about which node categories.
+
+#### Content Fingerprinting
+
+- **Structural fingerprints**: Quick hash of file characteristics (imports, classes, async, widgets).
+- **Similarity detection**: Files with same fingerprint likely have same violations.
+- **New `ContentFingerprint` class**: Enables caching across similar files.
+
+#### Rule Dependency Graph
+
+- **Fail-fast chains**: If rule A finds violations, skip dependent rule B.
+- **Prerequisite tracking**: Declare rule dependencies for smarter execution.
+- **New `RuleDependencyGraph` class**: Track and query rule dependencies.
+
+#### Rule Execution Statistics
+
+- **Historical performance tracking**: Track execution time and violation rates per rule.
+- **Dynamic optimization**: Identify slow rules and rules that rarely find violations.
+- **New `RuleExecutionStats` class**: Records and queries rule performance data.
+
+#### Lazy Pattern Compilation
+
+- **Deferred regex compilation**: Patterns compiled only when actually needed.
+- **Skip compilation for filtered rules**: If early filtering skips a rule, its patterns are never compiled.
+- **New `LazyPattern` and `LazyPatternCache` classes**: Lazy regex infrastructure.
+
+#### Parallel Pre-Analysis
+
+- **Parallel file scanning**: Pre-analyze files in parallel to populate caches before rules execute.
+- **Async batch processing**: Files processed in batches with async gaps to avoid blocking.
+- **Unified cache warming**: Computes metrics, fingerprints, file types, and pattern matches in one pass.
+- **Batch execution planning**: Determines which rules should run on which files upfront.
+- **New `ParallelAnalyzer` class**: Manages parallel pre-analysis of files.
+- **New `ParallelAnalysisResult` class**: Contains all pre-computed analysis data for a file.
+- **New `RuleBatchExecutor` class**: Plans and tracks which rules apply to which files.
+- **New `BatchableRuleInfo` class**: Rule metadata for batch execution planning.
+
+#### Consolidated Visitor Dispatch
+
+- **Single-pass AST traversal**: Instead of each rule registering separate visitors, dispatch to all rules from one traversal.
+- **Reduced traversal overhead**: O(nodes) instead of O(rules × nodes) for visitor callbacks.
+- **Category-based registration**: Rules register for specific AST node categories (imports, classes, invocations, etc.).
+- **New `ConsolidatedVisitorDispatch` class**: Manages rule callbacks by node category.
+- **New `NodeVisitCallback` typedef**: Standard callback signature for consolidated visitors.
+
+#### Baseline-Aware Early Exit
+
+- **Skip fully-baselined rules**: If all violations of a rule in a file are baselined, skip the rule entirely.
+- **Path-based baseline detection**: Files covered by path-based baseline can skip matching rules.
+- **Violation counting**: Track baselined violation counts for optimization decisions.
+- **New `BaselineAwareEarlyExit` class**: Tracks and queries baseline coverage per file/rule.
+
+#### Diff-Based Analysis
+
+- **Changed region tracking**: Only re-analyze lines that changed since last analysis.
+- **Line range overlap detection**: Skip rules whose scope doesn't overlap with changes.
+- **Simple line-by-line diff**: Fast diff computation without external dependencies.
+- **Range merging**: Consolidate overlapping change regions for efficient queries.
+- **New `DiffBasedAnalysis` class**: Computes and caches changed regions per file.
+- **New `LineRange` class**: Represents line ranges with overlap/merge operations.
+
+#### Import Graph Cache
+
+- **Project-wide import graph**: Parse imports once and cache the dependency graph.
+- **Transitive dependency queries**: Check if file A transitively imports file B.
+- **Reverse graph**: Track which files import a given file.
+- **Circular import detection**: Find import cycles involving a specific file.
+- **New `ImportGraphCache` class**: Builds and queries the import graph.
+- **New `ImportNode` class**: Represents a file's import relationships.
+
+---
+
+## [3.1.1] - 2026-01-12
+
+### New Rules
+
+- **prefer_descriptive_bool_names_strict**: Strict version of bool naming rule for insanity tier. Requires traditional prefixes (`is`, `has`, `can`, `should`). Does not allow action verbs.
+
+### Enhancements
+
+- **prefer_descriptive_bool_names**: Now lenient (professional tier). Allows action verb prefixes (`process`, `sort`, `remove`, etc.) and `value` suffix.
+
+### Bug Fixes
+
+- **no_boolean_literal_compare**: Fixed rule not being registered in plugin. Was implemented but missing from `saropa_lints.dart`.
+- **avoid_conditions_with_boolean_literals**: Now only checks logical operators (`&&`, `||`). Equality comparisons (`==`, `!=`) are handled by `no_boolean_literal_compare` which has proper nullable type checking. This eliminates double-linting and false positives on `nullableBool == true`.
+- **require_ios_permission_description**: Fixed false positive on `ImagePicker()` constructor. The rule now only triggers on method calls (`pickImage`, `pickVideo`, etc.) where it can detect the actual source (gallery vs camera).
+- **require_ios_face_id_usage_description**: Now checks Info.plist before reporting. Previously always triggered on `LocalAuthentication` usage regardless of whether `NSFaceIDUsageDescription` was already present.
+- **AvoidContextAcrossAsyncRule**: Now recognizes mounted-guarded ternary pattern `context.mounted ? context : null` as safe.
+- **PreferDocCurlyApostropheRule**: Fixed quick fix not appearing - was searching `precedingComments` instead of `documentationComment`. Renamed from `PreferCurlyApostropheRule` to clarify it only applies to documentation.
+- **Missing rule name prefixes**: Fixed 17 rules that were missing the `[rule_name]` prefix in their `problemMessage`. Affected rules: `avoid_future_tostring`, `prefer_async_await`, `avoid_late_keyword`, `prefer_simpler_boolean_expressions`, `avoid_context_in_initstate_dispose`, `avoid_shrink_wrap_in_lists`, `prefer_widget_private_members`, `avoid_hardcoded_locale`, `require_ios_permission_description`, `avoid_getter_prefix`, `prefer_correct_callback_field_name`, `prefer_straight_apostrophe`, `prefer_curly_apostrophe`, `avoid_dynamic`, `no_empty_block`.
+
+---
+
+## [3.1.0] - 2026-01-12
+
+### Enhancements
+
+- **Rule name prefix in messages**: All 1536 rules now prefix `problemMessage` with `[rule_name]` for visibility in VS Code's Problems panel.
+
+### Bug Fixes
+
+- **AvoidContextAfterAwaitInStaticRule**: Now recognizes `context.mounted` guards to prevent false positives.
+- **AvoidStoringContextRule**: No longer flags function types that accept `BuildContext` as a parameter (callback signatures).
+- **RequireIntlPluralRulesRule**: Only flags `== 1` or `!= 1` patterns, not general int comparisons.
+- **AvoidLongRunningIsolatesRule**: Less aggressive on `compute()` - skips when comments indicate foreground use or in StreamTransformer patterns.
+
+---
+
+## [3.0.2] - 2026-01-12
+
+### Bug Fixes
+
+#### Async Context Utils
+
+- **Compound `&&` mounted checks**: Fixed detection of mounted checks in compound conditions. `if (mounted && otherCondition)` now correctly protects the then-branch since short-circuit evaluation guarantees `mounted` is true when the body executes.
+- **Nested mounted guards**: Fixed `ContextUsageFinder` to recognize context usage inside nested `if (mounted)` blocks. Previously, patterns like `if (someCondition) { if (context.mounted) context.doThing(); }` would incorrectly flag the inner usage.
+
+#### AvoidUnawaitedFutureRule
+
+- **Lifecycle method support**: Extended safe fire-and-forget detection to include `didUpdateWidget()` and `deactivate()` in addition to `dispose()`. These lifecycle methods are synchronous and subscription cleanup doesn't need to be awaited.
+- **onDone callback support**: Added support for `StreamController.close()` in `onDone` and `onError` callbacks. The `onDone` parameter of `Stream.listen()` is `void Function()`, so you cannot await inside it - closing the controller here is standard cleanup for transformed streams.
+
+#### PreferExplicitTypesRule
+
+- **No longer flags `dynamic`**: The rule now only flags `var` and `final` without explicit types. `dynamic` is an explicit type choice (commonly used for JSON handling), not implicit inference like `var`.
+
+#### PreferSnakeCaseFilesRule
+
+- **Multi-part extension support**: Added recognition of common multi-part file extensions used in Dart/Flutter projects: `.io.dart`, `.dto.dart`, `.model.dart`, `.entity.dart`, `.service.dart`, `.repository.dart`, `.controller.dart`, `.provider.dart`, `.bloc.dart`, `.cubit.dart`, `.state.dart`, `.event.dart`, `.notifier.dart`, `.view.dart`, `.widget.dart`, `.screen.dart`, `.page.dart`, `.dialog.dart`, `.utils.dart`, `.helper.dart`, `.extension.dart`, `.mixin.dart`, `.test.dart`, `.mock.dart`, `.stub.dart`, `.fake.dart`.
+
+#### SaropaDiagnosticReporter
+
+- **Fixed zero-width highlight in `atToken`**: The built-in `atToken` method had a bug where `endColumn` equaled `startColumn`, resulting in zero-width diagnostic highlights. Now uses `atOffset` with explicit length to ensure proper span highlighting.
+
+---
+
+## [3.0.1] - 2026-01-12
+
+### Performance Optimizations
+
+#### Content Pre-filtering
+
+- **New `requiredPatterns` getter**: Rules can specify string patterns that must be present for the rule to run.
+- **Fast string search**: Checks for patterns BEFORE AST parsing, skipping irrelevant files instantly.
+- **Example usage**: A rule checking `Timer.periodic` can return `{'Timer.periodic'}` to skip files without timers.
+
+#### Skip Small Files
+
+- **New `minimumLineCount` getter**: High-cost rules can skip files under a threshold line count.
+- **Efficient counting**: Uses fast character scan instead of splitting into lines.
+- **Example usage**: Complex nested callback rules can set `minimumLineCount => 50` to skip small files.
+
+#### File Content Caching
+
+- **New `FileContentCache` class**: Tracks file content hashes to detect unchanged files.
+- **Rule pass tracking**: Records which rules passed on unchanged files to skip redundant analysis.
+- **Impact**: Files that haven't changed between saves can skip re-running passing rules.
+
+### Documentation
+
+- **Updated ROADMAP.md**: Added "Future Optimizations" section with Batch AST Visitors and Lazy Rule Instantiation as planned major refactors.
+
+---
+
+## [3.0.0] - 2026-01-12
+
+### Performance Optimizations
+
+This release focuses on **significant performance improvements** for large codebases. custom_lint is notoriously slow with 1400+ rules, and these optimizations address the main bottlenecks.
+
+#### Tier Set Caching
+
+- **Cached tier rule sets**: Previously, `getRulesForTier()` was rebuilding Set unions on EVERY file analysis. Now tier sets are computed once on first access and cached for all subsequent calls.
+- **Impact**: ~5-10x faster tier filtering after first access.
+
+#### Rule Filtering Cache
+
+- **Cached filtered rule list**: Previously, the 1400+ rule list was filtering on every file. Now the filtered list is computed once per analysis session and reused.
+- **Impact**: Eliminates O(n) filtering on each of thousands of files.
+
+#### Analyzer Excludes
+
+- **Added comprehensive analyzer excludes** in `analysis_options.yaml`:
+  - Generated code (`*.g.dart`, `*.freezed.dart`, `*.gr.dart`, `*.gen.dart`, `*.mocks.dart`, `*.config.dart`)
+  - Build artifacts (`build/**`, `.dart_tool/**`)
+  - Example files (`example/**`)
+- **Impact**: Skips files that can't be manually fixed, reducing analysis time significantly.
+
+#### Rule Timing Instrumentation
+
+- **New `RuleTimingTracker`**: Tracks execution time of each rule to identify slow rules.
+- **Enable profiling**: Set `SAROPA_LINTS_PROFILE=true` environment variable.
+- **Slow rule logging**: Rules taking >10ms are logged immediately for investigation.
+- **Timing report**: Access `RuleTimingTracker.summary` for a report of the 20 slowest rules.
+
+#### Rule Cost Classification
+
+- **New `RuleCost` enum**: `trivial`, `low`, `medium`, `high`, `extreme`
+- **1483 rules tagged**: Every rule now has a `cost` getter indicating execution cost.
+- **Rule priority ordering**: Rules are sorted by cost so fast rules run first.
+- **Impact**: Expensive rules (type resolution, full AST traversal) run last, after quick wins.
+
+#### File Type Filtering
+
+- **New `FileType` enum**: `widget`, `test`, `bloc`, `provider`, `model`, `service`, `general`
+- **Early exit optimization**: Rules can declare `applicableFileTypes` to skip non-matching files entirely.
+- **377 rules with file type filtering**: Widget rules skip non-widget files, test rules skip non-test files, etc.
+- **`FileTypeDetector`**: Caches file type detection per file path for fast repeated access.
+- **Impact**: Widget-specific rules skip ~80% of files in typical projects.
+
+#### Project Context Caching
+
+- **New `ProjectContext` class**: Caches project root detection and pubspec parsing.
+- **One-time parsing**: Pubspec.yaml is parsed once per project, not per file.
+- **Impact**: Eliminates redundant file I/O across 1400+ rules.
+
+### Documentation
+
+- **Added performance tips to README**: Guidance on using lower tiers during development for faster iteration.
+- **Tier speed comparison**: Documented the performance impact of each tier level.
+- **Updated CONTRIBUTING.md**: Added rule author guidance for `cost` and `applicableFileTypes` getters.
+
+### New Rules
+
+- **`prefer_expanded_at_call_site`**: Warns when a widget's `build()` method returns `Expanded`/`Flexible` directly. Returning these widgets couples the widget to Flex parents; if later wrapped with Padding etc., it will crash. Better to let the caller add `Expanded` where needed. **Quick fix available:** Adds HACK comment to mark for manual refactoring. (WARNING, recommended tier)
+
+### Improved Rules
+
+- **`avoid_expanded_outside_flex`**: Enhanced documentation explaining false positive cases (widgets returning Expanded that are used directly in Flex) and design guidance for preferring Expanded at call sites.
+
+### Breaking Changes
+
+None. All changes are backwards-compatible performance improvements.
+
+---
+
 ## [2.7.0] - 2026-01-12
 
 ### Added

@@ -146,7 +146,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_mixed_environments',
     problemMessage:
-        '[avoid_mixed_environments] Mixed production/development configuration risks corrupting production data or leaking credentials.',
+        '[avoid_mixed_environments] Mixed production and development configuration creates security vulnerabilities. Debug APIs may expose sensitive data, development endpoints can corrupt production databases, and credentials may leak to unauthorized users.',
     correctionMessage:
         'Use conditional config based on kReleaseMode or environment variables.',
     errorSeverity: DiagnosticSeverity.ERROR,

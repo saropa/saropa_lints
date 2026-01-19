@@ -450,7 +450,7 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
 ///
 /// Alias: not_encodable_in_json, toJson_non_encodable, json_serialization_error
 ///
-/// JSON only supports: String, num, bool, null, List, and Map<String, dynamic>.
+/// JSON only supports: String, num, bool, null, List, and `Map<String, dynamic>`.
 /// Types like DateTime, Function, Widget, and custom classes without toJson
 /// will cause runtime errors when jsonEncode is called.
 ///
@@ -1265,5 +1265,237 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+}
+
+// =============================================================================
+// require_json_schema_validation
+// =============================================================================
+
+/// Warns when JSON API responses are used without schema validation.
+///
+/// Alias: validate_json_schema, api_response_validation
+///
+/// API responses should be validated against a schema before use. Malformed
+/// or unexpected data can crash the app or cause security issues.
+///
+/// **BAD:**
+/// ```dart
+/// final response = await http.get(Uri.parse('https://api.example.com/user'));
+/// final json = jsonDecode(response.body);
+/// final user = User(
+///   name: json['name'],      // What if null?
+///   email: json['email'],    // What if missing?
+///   age: json['age'],        // What if string instead of int?
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final response = await http.get(Uri.parse('https://api.example.com/user'));
+/// final json = jsonDecode(response.body);
+///
+/// // Option 1: Use json_serializable with error handling
+/// try {
+///   final user = User.fromJson(json);
+/// } on TypeError catch (e) {
+///   handleInvalidResponse(e);
+/// }
+///
+/// // Option 2: Validate required fields
+/// if (!_validateUserResponse(json)) {
+///   throw ApiException('Invalid user response');
+/// }
+/// final user = User.fromJson(json);
+/// ```
+class RequireJsonSchemaValidationRule extends SaropaLintRule {
+  const RequireJsonSchemaValidationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_json_schema_validation',
+    problemMessage:
+        '[require_json_schema_validation] JSON API response used without '
+        'validation. Malformed data may crash the app or cause unexpected behavior.',
+    correctionMessage:
+        'Validate JSON structure with fromJson in try-catch, or check required fields.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      // Check for jsonDecode
+      if (node.methodName.name != 'jsonDecode' &&
+          node.methodName.name != 'json.decode') {
+        return;
+      }
+
+      // Check if there's validation nearby
+      AstNode? functionBody;
+      AstNode? current = node.parent;
+
+      while (current != null) {
+        if (current is FunctionBody) {
+          functionBody = current;
+          break;
+        }
+        current = current.parent;
+      }
+
+      if (functionBody == null) return;
+
+      final String bodySource = functionBody.toSource();
+
+      // Check for validation patterns
+      if (bodySource.contains('try') ||
+          bodySource.contains('fromJson') ||
+          bodySource.contains('validate') ||
+          bodySource.contains('containsKey') ||
+          bodySource.contains('is Map') ||
+          bodySource.contains('is List') ||
+          bodySource.contains('?[') || // Safe access
+          bodySource.contains('??')) {
+        return; // Has some validation
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// prefer_json_serializable
+// =============================================================================
+
+/// Warns when data classes have manual JSON serialization.
+///
+/// Alias: use_json_serializable, json_codegen
+///
+/// Manual JSON parsing is error-prone and tedious. Use json_serializable
+/// or freezed for type-safe, maintainable serialization.
+///
+/// **BAD:**
+/// ```dart
+/// class User {
+///   final String name;
+///   final int age;
+///   final DateTime? createdAt;
+///
+///   User({required this.name, required this.age, this.createdAt});
+///
+///   factory User.fromJson(Map<String, dynamic> json) {
+///     return User(
+///       name: json['name'] as String,
+///       age: json['age'] as int,
+///       createdAt: json['created_at'] != null
+///           ? DateTime.parse(json['created_at'] as String)
+///           : null,
+///     );
+///   }
+///
+///   Map<String, dynamic> toJson() => {
+///     'name': name,
+///     'age': age,
+///     'created_at': createdAt?.toIso8601String(),
+///   };
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @JsonSerializable()
+/// class User {
+///   final String name;
+///   final int age;
+///   @JsonKey(name: 'created_at')
+///   final DateTime? createdAt;
+///
+///   User({required this.name, required this.age, this.createdAt});
+///
+///   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+///   Map<String, dynamic> toJson() => _$UserToJson(this);
+/// }
+/// ```
+class PreferJsonSerializableRule extends SaropaLintRule {
+  const PreferJsonSerializableRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_json_serializable',
+    problemMessage:
+        '[prefer_json_serializable] Data class with manual JSON serialization. '
+        'Manual parsing is error-prone and hard to maintain.',
+    correctionMessage:
+        'Use @JsonSerializable() or @freezed for type-safe serialization.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if class has both fromJson factory and toJson method
+      bool hasManualFromJson = false;
+      bool hasManualToJson = false;
+      bool hasCodegenAnnotation = false;
+
+      // Check for annotations
+      for (final annotation in node.metadata) {
+        final name = annotation.name.name;
+        if (name == 'JsonSerializable' ||
+            name == 'freezed' ||
+            name == 'Freezed') {
+          hasCodegenAnnotation = true;
+          break;
+        }
+      }
+
+      if (hasCodegenAnnotation) return;
+
+      // Check members
+      for (final ClassMember member in node.members) {
+        if (member is ConstructorDeclaration) {
+          if (member.factoryKeyword != null &&
+              member.name?.lexeme == 'fromJson') {
+            // Check if it's manual (not calling _$ClassName...)
+            final String bodySource = member.body.toSource();
+            if (!bodySource.contains(r'_$') &&
+                (bodySource.contains("json['") ||
+                    bodySource.contains('json["'))) {
+              hasManualFromJson = true;
+            }
+          }
+        }
+        if (member is MethodDeclaration && member.name.lexeme == 'toJson') {
+          final String bodySource = member.body.toSource();
+          if (!bodySource.contains(r'_$')) {
+            hasManualToJson = true;
+          }
+        }
+      }
+
+      // Warn if has manual serialization
+      if (hasManualFromJson && hasManualToJson) {
+        reporter.atToken(node.name, code);
+      }
+    });
   }
 }

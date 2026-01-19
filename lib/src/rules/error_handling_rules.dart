@@ -2342,3 +2342,199 @@ class _AddDebugPrintForErrorFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// require_app_startup_error_handling
+// =============================================================================
+
+/// Warns when main() or runApp() doesn't have error handling.
+///
+/// Alias: app_startup_errors, runapp_try_catch
+///
+/// Unhandled errors in app startup can cause silent crashes. Wrap runApp in
+/// runZonedGuarded or set FlutterError.onError for proper error reporting.
+///
+/// **BAD:**
+/// ```dart
+/// void main() {
+///   runApp(MyApp()); // Unhandled errors crash silently
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void main() {
+///   runZonedGuarded(
+///     () {
+///       WidgetsFlutterBinding.ensureInitialized();
+///       FlutterError.onError = (details) {
+///         FlutterError.presentError(details);
+///         reportToCrashlytics(details);
+///       };
+///       runApp(MyApp());
+///     },
+///     (error, stack) {
+///       reportToCrashlytics(error, stack);
+///     },
+///   );
+/// }
+/// ```
+class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
+  const RequireAppStartupErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresMainFunction => true;
+
+  static const LintCode _code = LintCode(
+    name: 'require_app_startup_error_handling',
+    problemMessage:
+        '[require_app_startup_error_handling] runApp() without error handling. '
+        'Uncaught errors will crash the app silently without reporting.',
+    correctionMessage:
+        'Wrap in runZonedGuarded and set FlutterError.onError for error reporting.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      // Only check main function
+      if (node.name.lexeme != 'main') return;
+
+      final FunctionBody body = node.functionExpression.body;
+      final String bodySource = body.toSource();
+
+      // Check for runApp call
+      if (!bodySource.contains('runApp(')) return;
+
+      // Check for error handling patterns
+      if (bodySource.contains('runZonedGuarded') ||
+          bodySource.contains('FlutterError.onError') ||
+          bodySource.contains('PlatformDispatcher.instance.onError') ||
+          bodySource.contains('try') ||
+          bodySource.contains('Zone.current.handleUncaughtError') ||
+          bodySource.contains('Isolate.current.addErrorListener')) {
+        return; // Has error handling
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+}
+
+// =============================================================================
+// avoid_assert_in_production
+// =============================================================================
+
+/// Warns when assert is used for validation that should work in production.
+///
+/// Alias: assert_production, no_assert_validation
+///
+/// assert() is removed in release builds. Don't use it for input validation
+/// or security checks that must run in production.
+///
+/// **BAD:**
+/// ```dart
+/// void processPayment(double amount) {
+///   assert(amount > 0); // Silently passes in release mode!
+///   processTransaction(amount);
+/// }
+///
+/// void setUserRole(String role) {
+///   assert(allowedRoles.contains(role)); // Security bypass in production!
+///   user.role = role;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void processPayment(double amount) {
+///   if (amount <= 0) {
+///     throw ArgumentError('Amount must be positive');
+///   }
+///   processTransaction(amount);
+/// }
+///
+/// void setUserRole(String role) {
+///   if (!allowedRoles.contains(role)) {
+///     throw SecurityException('Invalid role: $role');
+///   }
+///   user.role = role;
+/// }
+/// ```
+class AvoidAssertInProductionRule extends SaropaLintRule {
+  const AvoidAssertInProductionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_assert_in_production',
+    problemMessage:
+        '[avoid_assert_in_production] assert() is removed in release builds. '
+        'This validation will not run in production, potentially causing bugs.',
+    correctionMessage:
+        'Use if-throw for validation that must work in release mode.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Keywords that suggest the assert is doing important validation
+  static const Set<String> _validationKeywords = <String>{
+    'null',
+    'empty',
+    'valid',
+    'authorized',
+    'allowed',
+    'permission',
+    'role',
+    'admin',
+    'user',
+    'password',
+    'token',
+    'input',
+    'param',
+    'arg',
+    'length',
+    'size',
+    'count',
+    'amount',
+    'price',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addAssertStatement((AssertStatement node) {
+      final String condition = node.condition.toSource().toLowerCase();
+
+      // Check if this assert is doing important validation
+      for (final String keyword in _validationKeywords) {
+        if (condition.contains(keyword)) {
+          reporter.atNode(node, code);
+          return;
+        }
+      }
+
+      // Check for null checks that should be real validation
+      if (condition.contains('!= null') || condition.contains('is!')) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

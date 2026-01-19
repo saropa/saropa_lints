@@ -55,7 +55,7 @@ class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_google_signin_error_handling',
     problemMessage:
-        '[require_google_signin_error_handling] Google Sign-In calls should be wrapped in try-catch.',
+        '[require_google_signin_error_handling] Google Sign-In without error handling crashes when user cancels or network fails. Users will see an unexpected crash instead of a friendly error message.',
     correctionMessage:
         'Wrap the signIn() call in try-catch to handle failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -210,7 +210,7 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_apple_signin_nonce',
     problemMessage:
-        '[require_apple_signin_nonce] Apple Sign-In should include nonce parameter for security.',
+        '[require_apple_signin_nonce] Apple Sign-In without nonce is vulnerable to replay attacks. An attacker can intercept the authorization token and reuse it to impersonate the user, gaining full access to their account.',
     correctionMessage:
         'Add nonce parameter to getAppleIDCredential() to prevent replay attacks.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -311,7 +311,7 @@ class RequireSupabaseErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_supabase_error_handling',
     problemMessage:
-        '[require_supabase_error_handling] Supabase calls should be wrapped in try-catch.',
+        '[require_supabase_error_handling] Supabase calls without error handling crash on network failures or auth errors. Users will see unexpected crashes instead of friendly error messages.',
     correctionMessage:
         'Wrap Supabase operations in try-catch to handle failures gracefully.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -672,7 +672,7 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_ssl_error_handling',
     problemMessage:
-        '[require_webview_ssl_error_handling] WebView should handle SSL errors explicitly.',
+        '[require_webview_ssl_error_handling] WebView without SSL error handling silently accepts invalid certificates or fails without warning. This allows man-in-the-middle attacks where users unknowingly submit credentials to attackers.',
     correctionMessage:
         'Add onSslAuthError callback to NavigationDelegate to handle certificate errors.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -790,7 +790,7 @@ class AvoidWebviewFileAccessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_webview_file_access',
     problemMessage:
-        '[avoid_webview_file_access] WebView file access should be disabled for security.',
+        '[avoid_webview_file_access] WebView file access enabled creates a security vulnerability. Malicious web content can read local files, exposing user data, credentials, and app internals to attackers.',
     correctionMessage:
         'Remove allowFileAccess: true or set it to false explicitly.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1837,7 +1837,7 @@ class RequireOpenaiErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_openai_error_handling',
     problemMessage:
-        '[require_openai_error_handling] OpenAI API calls should be wrapped in try-catch.',
+        '[require_openai_error_handling] OpenAI API calls without error handling crash when rate limited or when the service is unavailable. Users see unhandled exceptions instead of graceful fallback behavior.',
     correctionMessage:
         'Wrap OpenAI calls in try-catch to handle rate limits and failures.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2642,6 +2642,230 @@ class AvoidFreezedForLogicClassesRule extends SaropaLintRule {
           reporter.atToken(node.name, code);
           return;
         }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_typed_prefs_wrapper
+// =============================================================================
+
+/// Warns when SharedPreferences is used directly without a typed wrapper.
+///
+/// Alias: typed_prefs, shared_preferences_wrapper
+///
+/// Direct SharedPreferences access scatters string keys throughout code and
+/// lacks type safety. Create a typed wrapper class for maintainability.
+///
+/// **BAD:**
+/// ```dart
+/// // Scattered throughout codebase
+/// final prefs = await SharedPreferences.getInstance();
+/// prefs.setString('user_name', name);  // Typo-prone key
+/// prefs.setInt('user-age', age);       // Inconsistent naming
+///
+/// // Elsewhere...
+/// final name = prefs.getString('userName'); // Wrong key, returns null!
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class UserPreferences {
+///   static const _keyName = 'user_name';
+///   static const _keyAge = 'user_age';
+///
+///   final SharedPreferences _prefs;
+///   UserPreferences(this._prefs);
+///
+///   String? get userName => _prefs.getString(_keyName);
+///   set userName(String? value) =>
+///       value == null ? _prefs.remove(_keyName) : _prefs.setString(_keyName, value);
+///
+///   int get userAge => _prefs.getInt(_keyAge) ?? 0;
+///   set userAge(int value) => _prefs.setInt(_keyAge, value);
+/// }
+/// ```
+class PreferTypedPrefsWrapperRule extends SaropaLintRule {
+  const PreferTypedPrefsWrapperRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_typed_prefs_wrapper',
+    problemMessage:
+        '[prefer_typed_prefs_wrapper] Direct SharedPreferences access with '
+        'string literal key. Scattered keys are error-prone.',
+    correctionMessage:
+        'Create a typed wrapper class with properties for each preference.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for SharedPreferences set/get methods
+      if (!methodName.startsWith('set') && !methodName.startsWith('get')) {
+        return;
+      }
+
+      // Check target for SharedPreferences
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource().toLowerCase();
+      if (!targetSource.contains('pref') && !targetSource.contains('shared')) {
+        return;
+      }
+
+      // Check if key is a string literal (not a constant)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final Expression keyArg = args.first;
+      if (keyArg is SimpleStringLiteral) {
+        // Direct string literal - suggests not using a wrapper
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// prefer_freezed_for_data_classes
+// =============================================================================
+
+/// Warns when data classes could benefit from using freezed.
+///
+/// Alias: use_freezed, immutable_data_class
+///
+/// Data classes with multiple fields benefit from freezed for immutability,
+/// copyWith, equality, and serialization. Pure data classes without freezed
+/// require manual boilerplate.
+///
+/// **BAD:**
+/// ```dart
+/// class User {
+///   final String name;
+///   final int age;
+///   final String? email;
+///
+///   User({required this.name, required this.age, this.email});
+///
+///   User copyWith({String? name, int? age, String? email}) {
+///     return User(
+///       name: name ?? this.name,
+///       age: age ?? this.age,
+///       email: email ?? this.email,
+///     );
+///   }
+///
+///   @override
+///   bool operator ==(Object other) =>
+///       identical(this, other) ||
+///       other is User &&
+///           name == other.name &&
+///           age == other.age &&
+///           email == other.email;
+///
+///   @override
+///   int get hashCode => name.hashCode ^ age.hashCode ^ email.hashCode;
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// @freezed
+/// class User with _$User {
+///   const factory User({
+///     required String name,
+///     required int age,
+///     String? email,
+///   }) = _User;
+///
+///   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+/// }
+/// ```
+class PreferFreezedForDataClassesRule extends SaropaLintRule {
+  const PreferFreezedForDataClassesRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_freezed_for_data_classes',
+    problemMessage:
+        '[prefer_freezed_for_data_classes] Data class with manual copyWith/equals. '
+        'Consider using @freezed to eliminate boilerplate.',
+    correctionMessage:
+        'Add @freezed annotation and let code generation handle copyWith, ==, hashCode.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      // Check if already using freezed/equatable
+      for (final annotation in node.metadata) {
+        final name = annotation.name.name;
+        if (name == 'freezed' ||
+            name == 'Freezed' ||
+            name == 'immutable' ||
+            name == 'JsonSerializable') {
+          return; // Already using code generation
+        }
+      }
+
+      // Check for extends Equatable
+      final extendsClause = node.extendsClause;
+      if (extendsClause != null) {
+        final superclass = extendsClause.superclass.name.lexeme;
+        if (superclass == 'Equatable') return;
+      }
+
+      // Count data class indicators
+      int finalFieldCount = 0;
+      bool hasCopyWith = false;
+      bool hasEqualsOverride = false;
+      bool hasHashCodeOverride = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          if (member.fields.isFinal) {
+            finalFieldCount += member.fields.variables.length;
+          }
+        }
+        if (member is MethodDeclaration) {
+          final name = member.name.lexeme;
+          if (name == 'copyWith') hasCopyWith = true;
+          if (name == '==') hasEqualsOverride = true;
+          if (name == 'hashCode') hasHashCodeOverride = true;
+        }
+      }
+
+      // Suggest freezed if:
+      // - Has 3+ final fields AND
+      // - Has manual copyWith OR manual equals/hashCode
+      if (finalFieldCount >= 3 &&
+          (hasCopyWith || (hasEqualsOverride && hasHashCodeOverride))) {
+        reporter.atToken(node.name, code);
       }
     });
   }

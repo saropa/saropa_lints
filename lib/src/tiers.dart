@@ -32,6 +32,11 @@ const Set<String> stylisticRules = <String>{
   'prefer_descriptive_bool_names',
   'prefer_snake_case_files',
   'prefer_camel_case_method_names',
+  'prefer_exception_suffix',
+  'prefer_error_suffix',
+
+  // === Error handling style ===
+  'prefer_catch_over_on',
 
   // === Code style preferences ===
   'avoid_continue_statement',
@@ -43,6 +48,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_arrow_functions',
   'prefer_all_named_parameters',
   'prefer_inline_callbacks',
+  'avoid_parameter_reassignment',
 
   // === Widget style ===
   'prefer_one_widget_per_file',
@@ -64,6 +70,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_sentence_case_comments',
   'prefer_period_after_doc',
   'prefer_doc_comments_over_regular',
+  'avoid_commented_out_code', // Moved from insanity (v4.2.0)
 
   // === Testing style ===
   'prefer_expect_over_assert_in_tests',
@@ -119,6 +126,9 @@ const Set<String> essentialRules = <String>{
   'avoid_unsafe_where_methods',
   'avoid_unsafe_reduce',
   'avoid_late_final_reassignment',
+
+  // Parameter Safety - Hidden side effects
+  'avoid_parameter_mutation', // Mutating parameters modifies caller's data
 
   // State Management - Critical (Batch 10)
   'avoid_bloc_event_mutation', // Immutability is critical
@@ -572,6 +582,24 @@ const Set<String> essentialRules = <String>{
   'avoid_builder_index_out_of_bounds', // runtime crash
   'require_ios_keychain_for_credentials', // security critical - credential exposure
   // Note: require_purchase_verification already in Essential at line 421
+
+  // =========================================================================
+  // v4.2.0 ROADMAP ⭐ Rules - Essential
+  // =========================================================================
+  'require_android_permission_request', // ERROR - permissions must be requested at runtime
+  'prefer_pending_intent_flags', // ERROR - PendingIntent needs FLAG_IMMUTABLE/MUTABLE
+  'avoid_android_cleartext_traffic', // WARNING - cleartext traffic blocked by default
+  'avoid_purchase_in_sandbox_production', // ERROR - sandbox/production environment mix
+  'require_subscription_status_check', // WARNING - must check subscription status
+  'require_location_permission_rationale', // WARNING - location permission needs rationale
+  'require_camera_permission_check', // ERROR - camera needs permission check
+  'require_firestore_index', // ERROR - Firestore queries need composite indexes
+  'avoid_notification_silent_failure', // WARNING - notification failures should be handled
+  'require_file_path_sanitization', // WARNING - file paths need sanitization
+  'require_app_startup_error_handling', // WARNING - app startup needs error handling
+  'avoid_assert_in_production', // WARNING - asserts don't run in production
+  'prefer_lazy_loading_images', // WARNING - large images should be lazy loaded
+  'avoid_sqflite_type_mismatch', // ERROR - SQLite type mismatches cause runtime errors
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -722,7 +750,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_future_wait', // INFO - parallel independent awaits
 
   // Code Quality
-  'avoid_very_long_files', // 1000 lines - code smell
+  'avoid_very_long_files', // 1000 lines - code smell (production files)
+  'avoid_very_long_test_files', // 2000 lines - code smell (test files)
   'avoid_self_assignment',
   'avoid_self_compare',
   'avoid_assignments_as_conditions',
@@ -1267,7 +1296,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_incorrect_uri',
   'avoid_keywords_in_wildcard_pattern',
   'avoid_missing_completer_stack_trace',
-  'avoid_mutating_parameters',
   'avoid_nested_assignments',
   'avoid_non_final_exception_class_fields',
   'avoid_nullable_interpolation',
@@ -1305,6 +1333,20 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_integration_test_setup',
   'require_timer_cancellation',
   'use_setstate_synchronously',
+
+  // =========================================================================
+  // v4.2.0 ROADMAP ⭐ Rules - Recommended
+  // =========================================================================
+  'require_android_12_splash', // INFO - Android 12+ requires SplashScreen API
+  'require_price_localization', // INFO - IAP prices should be localized
+  'require_url_launcher_can_launch_check', // INFO - check canLaunchUrl before launchUrl
+  'avoid_url_launcher_simulator_tests', // INFO - URL launcher doesn't work in simulator
+  'prefer_url_launcher_fallback', // INFO - provide fallback when URL can't be launched
+  'require_connectivity_error_handling', // INFO - connectivity checks need error handling
+  'prefer_image_cropping', // INFO - allow image cropping for user uploads
+  'prefer_json_serializable', // INFO - prefer json_serializable over manual parsing
+  'prefer_regex_validation', // INFO - use regex for input validation patterns
+  'prefer_freezed_for_data_classes', // INFO - Freezed for immutable data classes
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -1498,7 +1540,8 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_async_callback',
 
   // Code Quality
-  'avoid_medium_files', // 300 lines - starting to get complex
+  'avoid_medium_files', // 300 lines - starting to get complex (production files)
+  'avoid_medium_test_files', // 600 lines - starting to get complex (test files)
   'avoid_long_functions',
   'avoid_long_parameter_list',
   'avoid_generics_shadowing',
@@ -1881,7 +1924,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_border_all',
   'avoid_calling_of_in_build',
   'avoid_collapsible_if',
-  'avoid_commented_out_code',
+  // 'avoid_commented_out_code' moved to stylisticRules (v4.2.0)
   'avoid_complex_arithmetic_expressions',
   'avoid_complex_loop_conditions',
   'avoid_context_in_static_methods',
@@ -1912,12 +1955,13 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_immediately_invoked_functions',
   'avoid_incomplete_copy_with',
   'avoid_inconsistent_digit_separators',
-  'avoid_inferrable_type_arguments',
+  // Note: avoid_inferrable_type_arguments is stylistic (opt-in only, conflicts with prefer_explicit_type_arguments)
   'avoid_inverted_boolean_checks',
   'avoid_ios_debug_code_in_release',
   'avoid_late_keyword',
   'avoid_local_functions',
   'avoid_long_files',
+  'avoid_long_test_files',
   'avoid_long_records',
   'avoid_missing_image_alt',
   'avoid_mixing_named_and_positional_fields',
@@ -2188,6 +2232,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_sizedbox_over_container',
   'prefer_sliver_prefix',
   'prefer_small_files',
+  'prefer_small_test_files',
   'prefer_snake_case_files',
   'prefer_specific_exceptions',
   'prefer_spread_over_addall',
@@ -2240,6 +2285,23 @@ const Set<String> professionalOnlyRules = <String>{
   'unnecessary_trailing_comma',
   'use_existing_destructuring',
   'use_existing_variable',
+
+  // =========================================================================
+  // v4.2.0 ROADMAP ⭐ Rules - Professional
+  // =========================================================================
+  'avoid_android_task_affinity_default', // INFO - taskAffinity should be explicit
+  'require_android_backup_rules', // INFO - Android backup rules should be defined
+  'prefer_notification_grouping', // INFO - notifications should be grouped
+  'require_hive_migration_strategy', // INFO - Hive migrations need strategy
+  'avoid_stream_sync_events', // WARNING - streams shouldn't emit sync events
+  'avoid_sequential_awaits', // INFO - use Future.wait for parallel operations
+  'prefer_streaming_for_large_files', // INFO - stream large files instead of loading all
+  'prefer_focus_traversal_order', // INFO - define focus traversal order
+  'avoid_loading_flash', // INFO - avoid flash of loading content
+  'avoid_animation_in_large_list', // WARNING - animations in large lists hurt performance
+  'require_json_schema_validation', // INFO - validate JSON against schema
+  'prefer_typed_prefs_wrapper', // INFO - wrap SharedPreferences with typed accessor
+  'require_geolocator_battery_awareness', // WARNING - location tracking drains battery
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -2278,7 +2340,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // Type strictness (moved from Professional)
   'prefer_constrained_generics',
-  'prefer_explicit_type_arguments',
+  // Note: prefer_explicit_type_arguments is stylistic (opt-in only, conflicts with avoid_inferrable_type_arguments)
   'prefer_typed_data',
   'prefer_typedefs_for_callbacks',
 

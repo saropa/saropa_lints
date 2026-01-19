@@ -68,7 +68,7 @@ from pathlib import Path
 from typing import NoReturn
 
 
-SCRIPT_VERSION = "3.12"
+SCRIPT_VERSION = "3.13"
 
 
 # =============================================================================
@@ -860,24 +860,24 @@ def check_pubdev_lint_issues(project_dir: Path) -> list[str]:
                     continue
 
                 # Look for unescaped angle brackets in doc comments
-                # Pattern: word followed by <word> not wrapped in backticks
                 doc_content = stripped[3:].strip()  # Remove /// prefix
 
                 # Skip if line is a code fence marker
                 if doc_content.startswith("```"):
                     continue
 
-                # Find potential generic type patterns like List<int>, Future<void>
-                # that aren't wrapped in backticks
-                # Match Type<Type> patterns not inside backticks
-                # We look for patterns like "List<int>" that aren't preceded by ` or followed by `
-                angle_matches = list(re.finditer(r"(?<!`)\b[A-Z]\w*<\w+>(?!`)", doc_content))
+                # Find potential generic type patterns that aren't wrapped in backticks
+                # Patterns to catch:
+                # - Simple generics: List<int>, Future<void>, Type<T>
+                # - Complex generics: Map<String, dynamic>
+                # - Method generics: context.watch<T>(), Provider.of<T>()
+                # Match: word (possibly with dots) followed by <...> where ... contains word chars, commas, spaces
+                angle_matches = list(re.finditer(r"\b[\w.]+<[\w\s,]+>", doc_content))
 
                 for match in angle_matches:
                     # Check if this match is inside backticks
                     pos = match.start()
                     before = doc_content[:pos]
-                    after = doc_content[match.end():]
 
                     # Count backticks before - if odd, we're inside inline code
                     if before.count("`") % 2 == 1:

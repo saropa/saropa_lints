@@ -404,7 +404,7 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_navigator_push_unnamed',
     problemMessage:
-        '[avoid_navigator_push_unnamed] Navigator.push used without a named route. This can make navigation harder to maintain and may cause navigation bugs or inconsistencies, especially as your app grows.',
+        '[avoid_navigator_push_unnamed] Navigator.push used without a named route. Unnamed routes cause inconsistent navigation behavior and make deep linking fail. Users cannot share or bookmark specific screens.',
     correctionMessage:
         'Define named routes in MaterialApp.routes or use a router package such as go_router. This ensures navigation is maintainable, testable, and less error-prone as your app scales. Update all push calls to use named routes for clarity and reliability.',
     errorSeverity: DiagnosticSeverity.INFO,

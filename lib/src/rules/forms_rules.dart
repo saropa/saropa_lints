@@ -2009,3 +2009,141 @@ class RequireFormKeyInStatefulWidgetRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// prefer_regex_validation
+// =============================================================================
+
+/// Warns when form fields use basic validators instead of regex patterns.
+///
+/// Alias: regex_validator, pattern_validation
+///
+/// Basic isEmpty checks miss common validation patterns. Use regex for
+/// email, phone, URL, and other structured input validation.
+///
+/// **BAD:**
+/// ```dart
+/// TextFormField(
+///   decoration: InputDecoration(labelText: 'Email'),
+///   validator: (value) {
+///     if (value == null || value.isEmpty) {
+///       return 'Please enter an email';
+///     }
+///     return null; // Accepts "not an email"!
+///   },
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// TextFormField(
+///   decoration: InputDecoration(labelText: 'Email'),
+///   validator: (value) {
+///     if (value == null || value.isEmpty) {
+///       return 'Please enter an email';
+///     }
+///     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+///     if (!emailRegex.hasMatch(value)) {
+///       return 'Please enter a valid email';
+///     }
+///     return null;
+///   },
+/// )
+///
+/// // Or use a validation package
+/// import 'package:validators/validators.dart';
+/// validator: (value) => isEmail(value) ? null : 'Invalid email',
+/// ```
+class PreferRegexValidationRule extends SaropaLintRule {
+  const PreferRegexValidationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_regex_validation',
+    problemMessage:
+        '[prefer_regex_validation] Form field with basic empty check but label '
+        'suggests structured data (email/phone/url). Use regex validation.',
+    correctionMessage:
+        'Add regex pattern validation for the field type (email, phone, URL, etc.).',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Labels/hints that suggest structured data needing regex validation
+  static const Set<String> _structuredDataLabels = <String>{
+    'email',
+    'e-mail',
+    'phone',
+    'telephone',
+    'mobile',
+    'url',
+    'website',
+    'zip',
+    'postal',
+    'ssn',
+    'credit',
+    'card',
+    'cvv',
+    'cvc',
+    'iban',
+    'swift',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check for form fields
+      if (typeName != 'TextFormField' && typeName != 'TextField') return;
+
+      String? labelText;
+      String? validatorSource;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+
+        final String paramName = arg.name.label.name;
+
+        // Get label/hint text
+        if (paramName == 'decoration') {
+          final String decorationSource =
+              arg.expression.toSource().toLowerCase();
+          for (final String label in _structuredDataLabels) {
+            if (decorationSource.contains(label)) {
+              labelText = label;
+              break;
+            }
+          }
+        }
+
+        // Get validator
+        if (paramName == 'validator') {
+          validatorSource = arg.expression.toSource();
+        }
+      }
+
+      // If has structured label but validator doesn't use regex
+      if (labelText != null && validatorSource != null) {
+        if (!validatorSource.contains('RegExp') &&
+            !validatorSource.contains('hasMatch') &&
+            !validatorSource.contains('isEmail') &&
+            !validatorSource.contains('isPhone') &&
+            !validatorSource.contains('isURL') &&
+            !validatorSource.contains('validate')) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    });
+  }
+}
