@@ -193,3 +193,114 @@ class _AddMoneyHackCommentFix extends DartFix {
     });
   }
 }
+
+// =============================================================================
+// Currency Rules (from v4.1.7)
+// =============================================================================
+
+/// Warns when money amounts are stored without currency information.
+///
+/// `[HEURISTIC]` - Detects money-related classes without currency field.
+///
+/// Amounts without currency are ambiguous. Always pair amounts with
+/// currency codes.
+///
+/// **BAD:**
+/// ```dart
+/// class Price {
+///   final double amount; // USD? EUR? BTC?
+///
+///   Price(this.amount);
+/// }
+///
+/// class Order {
+///   final double total; // What currency?
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class Price {
+///   final double amount;
+///   final String currency; // 'USD', 'EUR', etc.
+///
+///   Price(this.amount, this.currency);
+/// }
+///
+/// class Order {
+///   final Money total; // Money class includes currency
+/// }
+/// ```
+class RequireCurrencyCodeWithAmountRule extends SaropaLintRule {
+  const RequireCurrencyCodeWithAmountRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_currency_code_with_amount',
+    problemMessage:
+        '[require_currency_code_with_amount] Money amount without currency information.',
+    correctionMessage:
+        'Add currency field (String currency or CurrencyCode enum) alongside amount.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static final RegExp _moneyFieldPattern = RegExp(
+    r'\b(price|amount|cost|total|balance|fee|charge|payment|salary|wage|rate)\b',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String className = node.name.lexeme.toLowerCase();
+
+      // Skip if class name suggests it already handles currency
+      if (className.contains('money') || className.contains('currency')) {
+        return;
+      }
+
+      // Check for money-related fields
+      bool hasMoneyField = false;
+      bool hasCurrencyField = false;
+
+      for (final ClassMember member in node.members) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            final String fieldName = variable.name.lexeme.toLowerCase();
+
+            if (_moneyFieldPattern.hasMatch(fieldName)) {
+              // Check if it's a numeric type
+              final TypeAnnotation? type = member.fields.type;
+              if (type != null) {
+                final String typeStr = type.toSource().toLowerCase();
+                if (typeStr.contains('double') ||
+                    typeStr.contains('int') ||
+                    typeStr.contains('num') ||
+                    typeStr.contains('decimal')) {
+                  hasMoneyField = true;
+                }
+              }
+            }
+
+            if (fieldName.contains('currency') || fieldName.contains('code')) {
+              hasCurrencyField = true;
+            }
+          }
+        }
+      }
+
+      if (hasMoneyField && !hasCurrencyField) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
