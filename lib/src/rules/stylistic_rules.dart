@@ -8,6 +8,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../comment_utils.dart';
 import '../saropa_lint_rule.dart';
 
 // ============================================================================
@@ -3724,6 +3725,8 @@ class _SortArgumentsFix extends DartFix {
 /// ```
 ///
 /// **Quick fix available:** Deletes the commented-out code line.
+///
+/// See also: [CommentPatterns] for shared detection heuristics.
 class AvoidCommentedOutCodeRule extends SaropaLintRule {
   const AvoidCommentedOutCodeRule() : super(code: _code);
 
@@ -3742,35 +3745,6 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
     correctionMessage:
         'Delete the commented-out code. Use version control to retrieve it if needed.',
     errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  /// Pattern to detect commented-out code.
-  ///
-  /// This pattern is intentionally aggressive - it's better to flag potential
-  /// code comments than to miss them, since the fix is simply to delete.
-  static final RegExp _codePattern = RegExp(
-    // Identifier immediately followed by code punctuation (no space)
-    r'^[a-zA-Z_$][a-zA-Z0-9_$]*[:\.\(\[\{]|'
-    // Assignment pattern: identifier = something
-    r'^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*\S|'
-    // Dart keywords at start of comment
-    r'^(return|if|else|for|while|switch|case|break|continue|final|const|var|late|await|async|throw|try|catch|finally|super|this|new|null|true|false|class|enum|extension|mixin|typedef|import|export|part|library|void|int|double|String|bool|List|Map|Set|Future|Stream|dynamic)\b|'
-    // Function/method call at end: foo() or foo();
-    r'\w+\([^)]*\)\s*[;,]?\s*$|'
-    // Ends with semicolon (statement)
-    r';\s*$|'
-    // Starts with annotation
-    r'^@\w+|'
-    // Contains arrow function
-    r'=>|'
-    // Block delimiters at boundaries
-    r'^[\{\}]|[\{\}]\s*$',
-  );
-
-  /// Markers that indicate intentional comments, not commented-out code.
-  static final RegExp _skipPattern = RegExp(
-    r'(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK|See:|ignore:|ignore_for_file:|cspell:)',
-    caseSensitive: false,
   );
 
   @override
@@ -3798,14 +3772,14 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
               continue;
             }
 
-            // Skip intentional comment markers
-            if (_skipPattern.hasMatch(content)) {
+            // Skip special markers (TODO, FIXME, ignore, etc)
+            if (CommentPatterns.isSpecialMarker(content)) {
               commentToken = commentToken.next;
               continue;
             }
 
-            // Check if this looks like code
-            if (_codePattern.hasMatch(content)) {
+            // Flag if this looks like commented-out code
+            if (CommentPatterns.isLikelyCode(content)) {
               reporter.atToken(commentToken, code);
             }
           }

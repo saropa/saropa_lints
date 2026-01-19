@@ -1972,6 +1972,19 @@ class PreferUtcForStorageRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // Storage-related patterns with word boundaries to avoid false positives
+  // like 'edgeInsets', 'offset', 'subset', etc.
+  static final List<RegExp> _storagePatterns = <RegExp>[
+    RegExp(r'\binsert\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bupdate\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bsave\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bstore\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bwrite\w*\s*\(', caseSensitive: false),
+    RegExp(r'\bput\w*\s*\(', caseSensitive: false),
+    // 'set' needs careful matching: .setItem(, .setString(, .setData(
+    RegExp(r'\.set\w*\s*\(', caseSensitive: false),
+  ];
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -2005,24 +2018,10 @@ class PreferUtcForStorageRule extends SaropaLintRule {
       }
 
       // Check if inside a storage-related context
-      // Use word boundary patterns to avoid false positives like 'edgeInsets'
-      final storagePatterns = <RegExp>[
-        RegExp(r'\binsert\w*\s*\(', caseSensitive: false),
-        RegExp(r'\bupdate\w*\s*\(', caseSensitive: false),
-        RegExp(r'\bsave\w*\s*\(', caseSensitive: false),
-        RegExp(r'\bstore\w*\s*\(', caseSensitive: false),
-        RegExp(r'\bwrite\w*\s*\(', caseSensitive: false),
-        RegExp(r'\bput\w*\s*\(', caseSensitive: false),
-        // 'set' needs careful matching to avoid 'edgeInsets', 'offset', etc.
-        RegExp(r'\.set\w*\s*\(',
-            caseSensitive: false), // .setItem(, .setString(
-        RegExp(r'\bsetState\s*\(', caseSensitive: false), // setState(
-      ];
-
       AstNode? current = node.parent;
       while (current != null) {
         final String source = current.toSource();
-        for (final pattern in storagePatterns) {
+        for (final pattern in _storagePatterns) {
           if (pattern.hasMatch(source)) {
             reporter.atNode(node, code);
             return;
