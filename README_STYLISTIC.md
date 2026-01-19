@@ -1,21 +1,22 @@
 <!-- cspell:ignore edgeinsets borderradius ifnull addall wheretype wherecast asmap catcherror richtext sizedbox -->
 # Stylistic Rules
 
-These rules are **not included in any tier**. They represent team preferences where there's no objectively "correct" answer — enable them individually based on your coding conventions.
+Stylistic rules represent team preferences where there's no objectively "correct" answer.
 
-**114 rules** organized into 7 categories:
+## Two Ways to Enable Stylistic Rules
 
-- [General Stylistic Rules](#general-stylistic-rules) (23 rules)
-- [Widget Preferences](#widget-preferences) (11 rules)
-- [Null & Collection Handling](#null--collection-handling) (15 rules)
-- [Control Flow & Async](#control-flow--async) (14 rules)
-- [Whitespace & Constructors](#whitespace--constructors) (16 rules)
-- [Error Handling & Testing](#error-handling--testing) (13 rules)
-- [Additional Style Rules](#additional-style-rules) (22 rules)
+### Option 1: Use `tier: stylistic` for Non-Conflicting Rules
 
----
+```yaml
+# analysis_options.yaml
+custom_lint:
+  saropa_lints:
+    tier: stylistic  # Enables 35 non-conflicting stylistic rules
+```
 
-## Enabling Stylistic Rules
+This enables rules like `enforce_member_ordering`, `prefer_trailing_comma_always`, and `prefer_arrow_functions` that don't have opposing alternatives.
+
+### Option 2: Enable Individual Rules
 
 ```yaml
 # analysis_options.yaml
@@ -24,10 +25,25 @@ custom_lint:
     tier: recommended
   rules:
     # Enable specific stylistic rules your team prefers
-    - prefer_relative_imports: true
-    - prefer_trailing_comma_always: true
-    - prefer_explicit_types: true
+    - prefer_single_quotes: true      # OR prefer_double_quotes
+    - prefer_relative_imports: true   # OR prefer_absolute_imports
 ```
+
+**Conflicting pairs** (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) are NOT included in `tier: stylistic`. You must explicitly enable one of the pair.
+
+---
+
+## All Stylistic Rules Reference
+
+This document lists **all** stylistic rules organized into 7 categories:
+
+- [General Stylistic Rules](#general-stylistic-rules)
+- [Widget Preferences](#widget-preferences)
+- [Null & Collection Handling](#null--collection-handling)
+- [Control Flow & Async](#control-flow--async)
+- [Whitespace & Constructors](#whitespace--constructors)
+- [Error Handling & Testing](#error-handling--testing)
+- [Additional Style Rules](#additional-style-rules)
 
 ---
 

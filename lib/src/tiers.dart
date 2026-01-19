@@ -8,8 +8,15 @@ export 'tiers.dart' show getRulesForTier;
 
 /// Stylistic tier rules - formatting, ordering, naming conventions.
 /// Orthogonal to correctness - code can be correct while violating these.
+///
+/// NOTE: Conflicting pairs (e.g., prefer_single_quotes vs prefer_double_quotes)
+/// are intentionally excluded. Users must explicitly enable one of the pair.
+/// See README_STYLISTIC.md for all available rules including conflicting pairs.
 const Set<String> stylisticRules = <String>{
-  // Ordering preferences
+  // === Debug/Test utility ===
+  'always_fail_test_case', // Test hook - always fails
+
+  // === Ordering & Sorting ===
   'enforce_member_ordering',
   'enforce_arguments_ordering',
   'prefer_sorted_members',
@@ -17,19 +24,49 @@ const Set<String> stylisticRules = <String>{
   'prefer_sorted_pattern_fields',
   'prefer_sorted_record_fields',
 
-  // Naming conventions
+  // === Naming conventions ===
   'prefer_boolean_prefixes',
   'avoid_getter_prefix',
   'prefer_kebab_tag_name',
   'capitalize_comment_start',
-  'prefer_error_suffix',
-  'prefer_exception_suffix',
+  'prefer_descriptive_bool_names',
+  'prefer_snake_case_files',
+  'prefer_camel_case_method_names',
 
-  // Code style preferences
+  // === Code style preferences ===
   'avoid_continue_statement',
   'prefer_single_exit_point',
-  'prefer_catch_over_on',
   'prefer_wildcard_for_unused_param',
+  'prefer_rethrow_over_throw_e',
+
+  // === Function & Parameter style ===
+  'prefer_arrow_functions',
+  'prefer_all_named_parameters',
+  'prefer_inline_callbacks',
+
+  // === Widget style ===
+  'prefer_one_widget_per_file',
+  'prefer_widget_methods_over_classes',
+  'prefer_borderradius_circular',
+  'avoid_small_text',
+
+  // === Class & Record style ===
+  'prefer_class_over_record_return',
+  'prefer_private_underscore_prefix',
+  'prefer_explicit_this',
+
+  // === Formatting ===
+  'prefer_trailing_comma_always',
+
+  // === Comments & Documentation ===
+  'prefer_todo_format',
+  'prefer_fixme_format',
+  'prefer_sentence_case_comments',
+  'prefer_period_after_doc',
+  'prefer_doc_comments_over_regular',
+
+  // === Testing style ===
+  'prefer_expect_over_assert_in_tests',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -1273,6 +1310,12 @@ const Set<String> recommendedOnlyRules = <String>{
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  // Type Safety (moved from Essential - not crash prevention)
+  'avoid_dynamic_type', // Type safety best practice
+
+  // Widget Best Practices
+  'prefer_widget_private_members', // Widget fields should be final/private
+
   // Architecture
   'avoid_direct_data_access_in_ui',
   'avoid_business_logic_in_ui',
