@@ -2947,11 +2947,34 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
 
 /// Warns when a function always returns null.
 ///
-/// Example of **bad** code:
+/// A function that always returns null likely has the wrong return type (should
+/// be `void`) or is missing meaningful implementation. This indicates dead code
+/// or an incomplete implementation that should be addressed.
+///
+/// Note: Void functions (`void`, `Future<void>`, `FutureOr<void>`) and functions
+/// with no explicit return type that only use bare `return;` statements are
+/// excluded since early-exit returns are valid in those contexts.
+///
+/// **BAD:**
 /// ```dart
 /// String? getValue() {
 ///   if (condition) return null;
-///   return null;  // Always null
+///   return null;  // Always null - should return meaningful value or be void
+/// }
+///
+/// int? getNumber() => null;  // Expression body always returns null
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void doSomething() {
+///   if (!ready) return;  // Early exit in void function is fine
+///   performAction();
+/// }
+///
+/// String? getValue() {
+///   if (condition) return cachedValue;
+///   return computeValue();  // Returns meaningful values
 /// }
 /// ```
 class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
@@ -3015,11 +3038,18 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
 
       if (returns.isEmpty) return;
 
-      // Check if all returns are null
+      // Check if all returns are bare (no expression) vs explicit null
+      final bool allBareReturns = returns.every(
+        (ReturnStatement ret) => ret.expression == null,
+      );
       final bool allNull = returns.every((ReturnStatement ret) {
         final Expression? expr = ret.expression;
         return expr == null || expr is NullLiteral;
       });
+
+      // If no explicit return type and all returns are bare `return;`,
+      // this is likely a void function with inferred type - don't flag
+      if (returnType == null && allBareReturns) return;
 
       if (allNull && returns.isNotEmpty) {
         reporter.atToken(nameToken, code);
@@ -3030,6 +3060,15 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
   /// Returns true if [returnType] is void, Future<void>, or FutureOr<void>.
   /// These return types make bare `return;` statements valid.
   bool _isVoidType(TypeAnnotation? returnType) {
+    if (returnType == null) return false;
+
+    // Try to use the resolved DartType first (handles type aliases)
+    final DartType? resolvedType = returnType.type;
+    if (resolvedType != null) {
+      return _isDartTypeVoid(resolvedType);
+    }
+
+    // Fall back to syntactic check if resolved type unavailable
     if (returnType is! NamedType) return false;
 
     final String typeName = returnType.name.lexeme;
@@ -3043,6 +3082,24 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
 
       final TypeAnnotation arg = typeArgs.arguments.first;
       return arg is NamedType && arg.name.lexeme == 'void';
+    }
+
+    return false;
+  }
+
+  /// Returns true if [type] is void, Future<void>, or FutureOr<void>.
+  bool _isDartTypeVoid(DartType type) {
+    if (type is VoidType) return true;
+
+    // Check for Future<void> or FutureOr<void>
+    if (type is InterfaceType) {
+      final String? name = type.element.name;
+      if (name == 'Future' || name == 'FutureOr') {
+        final List<DartType> typeArgs = type.typeArguments;
+        if (typeArgs.length == 1 && typeArgs.first is VoidType) {
+          return true;
+        }
+      }
     }
 
     return false;
