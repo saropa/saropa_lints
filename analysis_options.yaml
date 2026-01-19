@@ -12,6 +12,9 @@
 # =============================================================================
 
 analyzer:
+  errors:
+    # TODOs are developer notes, not actionable diagnostics for CI/IDE
+    todo: ignore
   exclude:
     # =========================================================================
     # GENERATED CODE - Cannot be manually fixed, regenerated on build
