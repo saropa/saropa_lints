@@ -107,7 +107,7 @@ def show_saropa_logo() -> None:
 \033[38;5;208m                               ....\033[0m
 \033[38;5;208m                       `-+shdmNMMMMNmdhs+-\033[0m
 \033[38;5;209m                    -odMMMNyo/-..````.++:+o+/-\033[0m
-\033[38;5;215m                 `/dMMMMMM/`           ``````````\033[0m
+\033[38;5;215m                 `/dMMMMMM/`          ``````````\033[0m
 \033[38;5;220m                `dMMMMMMMMNdhhhdddmmmNmmddhs+-\033[0m
 \033[38;5;226m                /MMMMMMMMMMMMMMMMMMMMMMMMMMMMMNh/\033[0m
 \033[38;5;190m              . :sdmNNNNMMMMMNNNMMMMMMMMMMMMMMMMm+\033[0m
@@ -296,6 +296,23 @@ def install_extension(source_dir: Path, extensions_dir: Path) -> bool:
         except Exception as e:
             print_error(f"Failed to create extensions directory: {e}")
             return False
+
+    # Remove duplicate menu entry from package.json before copying
+    pkg_path = source_dir / "package.json"
+    if pkg_path.exists():
+        try:
+            import json
+            with open(pkg_path, "r", encoding="utf-8") as f:
+                pkg = json.load(f)
+            menus = pkg.get("contributes", {}).get("menus", {})
+            if "editor/title/run" in menus:
+                del menus["editor/title/run"]
+                pkg["contributes"]["menus"] = menus
+                with open(pkg_path, "w", encoding="utf-8") as f:
+                    json.dump(pkg, f, indent=2)
+                print_success("Removed duplicate 'editor/title/run' menu from package.json")
+        except Exception as e:
+            print_warning(f"Could not clean up package.json: {e}")
 
     # Copy extension
     print_info(f"Copying extension to: {target_dir}")

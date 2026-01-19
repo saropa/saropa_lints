@@ -38,13 +38,6 @@
           "group": "navigation",
           "when": "resourceExtname == .dart"
         }
-      ],
-      "editor/title/run": [
-        {
-          "command": "saropa-lints.run",
-          "group": "navigation",
-          "when": "resourceExtname == .dart"
-        }
       ]
     }
   }
