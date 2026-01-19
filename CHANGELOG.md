@@ -124,8 +124,10 @@ Production file length rules (`prefer_small_files`, `avoid_medium_files`, `avoid
   - Reports at the **actual comment location** (previously reported at file start)
   - Reports **all instances** (previously only reported once per file)
   - Has a **quick fix** to delete the commented-out code
-  - Uses improved detection heuristics shared with `capitalize_comment_start`
+  - Uses shared `CommentPatterns` utility with `capitalize_comment_start`
   - **Tier changed**: Moved from Insanity tier to Stylistic tier (not enabled by default in any tier)
+
+- **New shared utility: `comment_utils.dart`** - Extracted common comment detection patterns into `CommentPatterns` class used by both `capitalize_comment_start` and `avoid_commented_out_code`. This ensures consistent behavior between the two complementary rules.
 
 ### Improved
 
