@@ -76,7 +76,7 @@ class CommentPatterns {
     return codePattern.hasMatch(content);
   }
 
-  /// Returns true if the comment contains special markers (TODO, FIXME, etc).
+  /// Returns true if the comment contains special task markers (like TO-DO or FIX-ME).
   ///
   /// [content] should be the comment text with the "//" prefix removed and trimmed.
   static bool isSpecialMarker(String content) {
