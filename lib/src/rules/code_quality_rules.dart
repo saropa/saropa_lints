@@ -3057,7 +3057,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     }
   }
 
-  /// Returns true if [returnType] is void, Future<void>, or FutureOr<void>.
+  /// Returns true if [returnType] is void, `Future<void>`, or `FutureOr<void>`.
   /// These return types make bare `return;` statements valid.
   bool _isVoidType(TypeAnnotation? returnType) {
     if (returnType == null) return false;
@@ -3087,7 +3087,7 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
     return false;
   }
 
-  /// Returns true if [type] is void, Future<void>, or FutureOr<void>.
+  /// Returns true if [type] is void, `Future<void>`, or `FutureOr<void>`.
   bool _isDartTypeVoid(DartType type) {
     if (type is VoidType) return true;
 
