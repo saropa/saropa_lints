@@ -341,6 +341,7 @@ class AvoidShadowingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: avoid_shadowing
   static const LintCode _code = LintCode(
     name: 'avoid_variable_shadowing',
     problemMessage:

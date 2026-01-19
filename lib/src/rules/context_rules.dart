@@ -147,7 +147,7 @@ class AvoidStoringContextRule extends SaropaLintRule {
 
 /// Warns when BuildContext is used after an await without a mounted check.
 ///
-/// Alias: context_after_await, async_context, stale_context,
+/// Alias: async_context, stale_context,
 ///        avoid_using_context_after_dispose
 ///
 /// ## Why This Matters

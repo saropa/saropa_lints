@@ -44,7 +44,6 @@ Core stylistic preferences for imports, functions, formatting, naming, and comme
 | [`prefer_trailing_comma_always`](#prefer_trailing_comma_always) | Trailing commas on all multi-line constructs | Yes |
 | [`prefer_private_underscore_prefix`](#prefer_private_underscore_prefix) | All instance fields should be private (`_name`) | |
 | [`prefer_widget_methods_over_classes`](#prefer_widget_methods_over_classes) | Small widgets as methods instead of classes | |
-| [`prefer_explicit_types`](#prefer_explicit_types) | Explicit types instead of `var`/`final` inference | |
 | [`prefer_class_over_record_return`](#prefer_class_over_record_return) | Return classes instead of records from methods | |
 | [`prefer_inline_callbacks`](#prefer_inline_callbacks) | Inline callbacks instead of method references | |
 | [`prefer_single_quotes`](#prefer_single_quotes) | Single quotes `'string'` instead of double quotes | Yes |
@@ -57,7 +56,6 @@ Core stylistic preferences for imports, functions, formatting, naming, and comme
 | [`prefer_snake_case_files`](#prefer_snake_case_files) | File names in `snake_case.dart` | |
 | [`avoid_small_text`](#avoid_small_text) | Font size at least 12 for accessibility | Yes |
 | [`prefer_doc_comments_over_regular`](#prefer_doc_comments_over_regular) | Use `///` instead of `//` for public API docs | Yes |
-| [`prefer_literal_apostrophe`](#prefer_literal_apostrophe) | Use `'` instead of `\'` by switching to double quotes | Yes |
 | [`arguments_ordering`](#arguments_ordering) | Named arguments should be in alphabetical order | Yes |
 | [`capitalize_comment`](#capitalize_comment) | Comments should start with a capital letter | Yes |
 | [`firebase_custom`](#firebase_custom) | Custom Firebase usage should follow team conventions | |
@@ -110,23 +108,16 @@ Preferences for null-aware operators and collection manipulation patterns.
 | Rule | Description | Opposing Rule |
 |------|-------------|---------------|
 | `prefer_addall_over_spread` | Use addAll method | `prefer_spread_over_addall` |
-| `prefer_ifnull_over_ternary` | Use `??` instead of ternary for null defaults | `prefer_ternary_over_ifnull` |
-| `prefer_map_entries_over_foreach` | Use map.entries instead of forEach | `prefer_foreach_over_map_entries` |
 | `prefer_spread_over_addall` | Use `...` spread operator | `prefer_addall_over_spread` |
-| `prefer_ternary_over_ifnull` | Use explicit ternary for null checks | `prefer_ifnull_over_ternary` |
-| `prefer_wherecast_over_wheretype` | Use `.where().cast<T>()` pattern | `prefer_wheretype_over_wherecast` |
-| `prefer_wheretype_over_wherecast` | Use `.whereType<T>()` for filtering | `prefer_wherecast_over_wheretype` |
 
 ### Example: Cascade vs Multiple Calls
 
 ```dart
-// prefer_cascade_over_multiple_calls
 list
   ..add(1)
   ..add(2)
   ..add(3);
 
-// prefer_multiple_calls_over_cascade
 list.add(1);
 list.add(2);
 list.add(3);
@@ -140,13 +131,8 @@ Preferences for control flow patterns, guard clauses, and async/await style.
 
 | Rule | Description | Opposing Rule |
 |------|-------------|---------------|
-| `prefer_early_return` | Return early to reduce nesting | `prefer_single_exit` |
-| `prefer_single_exit` | Single return at end of function | `prefer_early_return` |
-| `prefer_guard_clauses` | Use guard clauses for preconditions | `prefer_if_else_over_guards` |
 | `prefer_switch_expression` | Use switch expressions (Dart 3) | `prefer_switch_statement` |
 | `prefer_switch_statement` | Use switch statements | `prefer_switch_expression` |
-| `prefer_async_await` | Use async/await pattern | `prefer_then_catcherror` |
-| `prefer_assigning_await_expressions` | Always await async operations | `prefer_fire_and_forget` |
 
 ### Example: Early Return vs Single Exit
 
@@ -158,7 +144,6 @@ void process(User? user) {
   // main logic here
 }
 
-// prefer_single_exit
 void process(User? user) {
   if (user != null && user.isActive) {
     // main logic here
@@ -176,8 +161,6 @@ Preferences for blank lines, member ordering, and constructor patterns.
 |------|-------------|---------------|
 | `prefer_blank_line_before_return` | Blank line before return statements | `prefer_no_blank_line_before_return` |
 | `prefer_no_blank_line_before_return` | No blank line before return | `prefer_blank_line_before_return` |
-| `prefer_initializing_formals` | Use `this.param` shorthand | `prefer_explicit_parameter_assignment` |
-| `prefer_static_method` | Use static methods over factories | `prefer_factory_constructor` |
 
 ### Example: Initializing Formals
 
@@ -188,7 +171,6 @@ class User {
   User(this.name);
 }
 
-// prefer_explicit_parameter_assignment
 class User {
   final String name;
   User(String name) : name = name;
@@ -277,7 +259,6 @@ Additional preferences for strings, imports, class structure, types, naming, and
 
 | Rule | Description | Opposing Rule |
 |------|-------------|---------------|
-| `prefer_var_over_explicit_type` | Use `var` when type is obvious | `prefer_explicit_types` |
 | `prefer_object_over_dynamic` | Use `Object?` instead of `dynamic` | `prefer_dynamic_over_object` |
 | `prefer_dynamic_over_object` | Use `dynamic` for truly dynamic types | `prefer_object_over_dynamic` |
 
@@ -287,8 +268,6 @@ Additional preferences for strings, imports, class structure, types, naming, and
 |------|-------------|---------------|
 | `prefer_lower_camel_case_constants` | Constants: `maxRetries` | `prefer_screaming_case_constants` |
 | `prefer_camel_case_method_names` | Methods: `fetchUserData` | |
-| `prefer_descriptive_variable_names` | Names at least 3 characters | `prefer_concise_variable_names` |
-| `prefer_concise_variable_names` | Names 30 characters or less | `prefer_descriptive_variable_names` |
 
 ### Expression Style
 
@@ -304,30 +283,18 @@ Additional preferences for strings, imports, class structure, types, naming, and
 
 Many stylistic rules have valid opposites. This table helps you choose which rules to enable based on your team's preferences:
 
-| Preference A | Rule A | vs | Rule B | Preference B |
 |--------------|--------|:--:|--------|--------------|
 | Relative imports | `prefer_relative_imports` | | `prefer_absolute_imports` | Absolute imports |
 | Arrow functions | `prefer_arrow_functions` | | (block bodies) | Block bodies |
 | Inline callbacks | `prefer_inline_callbacks` | | (extracted methods) | Extracted methods |
 | Single quotes | `prefer_single_quotes` | | `prefer_double_quotes` | Double quotes |
-| Readable apostrophes | `prefer_literal_apostrophe` | | `prefer_single_quotes` | Single quotes |
 | SizedBox | `prefer_sizedbox_over_container` | | `prefer_container_over_sizedbox` | Container |
 | Text.rich | `prefer_text_rich_over_richtext` | | `prefer_richtext_over_text_rich` | RichText |
 | EdgeInsets.symmetric | `prefer_edgeinsets_symmetric` | | `prefer_edgeinsets_only` | EdgeInsets.only |
 | Expanded | `prefer_expanded_over_flexible` | | `prefer_flexible_over_expanded` | Flexible |
 | Theme colors | `prefer_material_theme_colors` | | `prefer_explicit_colors` | Explicit colors |
-| `??` operator | `prefer_ifnull_over_ternary` | | `prefer_ternary_over_ifnull` | Ternary |
-| Cascades | `prefer_cascade_over_multiple_calls` | | `prefer_multiple_calls_over_cascade` | Separate calls |
 | Spread operator | `prefer_spread_over_addall` | | `prefer_addall_over_spread` | addAll |
-| Collection literals | `avoid_unnecessary_collections` | | `prefer_constructor_over_literals` | Constructors |
-| whereType | `prefer_wheretype_over_wherecast` | | `prefer_wherecast_over_wheretype` | where+cast |
-| fold | `prefer_fold_over_reduce` | | `prefer_reduce_over_fold` | reduce |
-| Early return | `prefer_early_return` | | `prefer_single_exit` | Single exit |
-| Guard clauses | `prefer_guard_clauses` | | `prefer_if_else_over_guards` | if-else |
 | Switch expressions | `prefer_switch_expression` | | `prefer_switch_statement` | Switch statements |
-| Null-aware `?.` | `prefer_null_aware_method_calls` | | `prefer_explicit_null_checks` | Explicit checks |
-| async/await | `prefer_async_await` | | `prefer_then_catcherror` | .then() |
-| await completion | `prefer_await_completion` | | `prefer_fire_and_forget` | Fire and forget |
 | Blank before return | `prefer_blank_line_before_return` | | `prefer_no_blank_line_before_return` | No blank |
 | Spaced declarations | `prefer_blank_line_after_declarations` | | `prefer_compact_declarations` | Compact |
 // ...existing code...
@@ -339,7 +306,6 @@ Many stylistic rules have valid opposites. This table helps you choose which rul
 | Fields first | `prefer_fields_before_methods` | | `prefer_methods_before_fields` | Methods first |
 | Static first | `prefer_static_members_first` | | `prefer_instance_members_first` | Instance first |
 | Public first | `prefer_public_members_first` | | `prefer_private_members_first` | Private first |
-| var | `prefer_var_over_explicit_type` | | `prefer_explicit_types` | Explicit types |
 | Object? | `prefer_object_over_dynamic` | | `prefer_dynamic_over_object` | dynamic |
 | lowerCamel constants | `prefer_lower_camel_case_constants` | | `prefer_screaming_case_constants` | SCREAMING_CASE |
 | Implicit bool | `prefer_implicit_boolean_comparison` | | `prefer_explicit_boolean_comparison` | Explicit bool |

@@ -814,6 +814,8 @@ class MaxImportsRule extends SaropaLintRule {
 class MemberOrderingRule extends SaropaLintRule {
   const MemberOrderingRule() : super(code: _code);
 
+  /// Alias: prefer_sorted_member
+
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_members',
     problemMessage:
@@ -885,6 +887,7 @@ class PreferSortedParametersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_sorted_parameter
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
     problemMessage:
@@ -1302,6 +1305,8 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
 /// ```
 class PreferStaticMethodRule extends SaropaLintRule {
   const PreferStaticMethodRule() : super(code: _code);
+
+  /// Alias: prefer_static_method_type
 
   static const LintCode _code = LintCode(
     name: 'prefer_static_method',

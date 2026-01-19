@@ -172,6 +172,7 @@ class PreferSingleExitPointRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Alias: prefer_single_exit
   static const LintCode _code = LintCode(
     name: 'prefer_single_exit_point',
     problemMessage:
@@ -393,94 +394,6 @@ class PreferPositiveConditionsFirstRule extends SaropaLintRule {
             condition.operator.type == TokenType.BANG) {
           reporter.atNode(node, code);
         }
-      }
-    });
-  }
-}
-
-/// Warns when switch statement could be a switch expression.
-///
-/// This is an **opinionated rule** - not included in any tier by default.
-///
-/// **Pros of switch expression:**
-/// - More concise for value production
-/// - Exhaustiveness checking
-/// - Dart 3.0+ idiomatic
-///
-/// **Cons (why some teams prefer switch statement):**
-/// - More familiar
-/// - Easier to add side effects
-/// - Works in all Dart versions
-///
-/// ### Example
-///
-/// #### BAD (with this rule enabled):
-/// ```dart
-/// String getLabel(Status status) {
-///   switch (status) {
-///     case Status.active: return 'Active';
-///     case Status.inactive: return 'Inactive';
-///   }
-/// }
-/// ```
-///
-/// #### GOOD:
-/// ```dart
-/// String getLabel(Status status) => switch (status) {
-///   Status.active => 'Active',
-///   Status.inactive => 'Inactive',
-/// };
-/// ```
-class PreferSwitchExpressionRule extends SaropaLintRule {
-  const PreferSwitchExpressionRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.opinionated;
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    name: 'prefer_switch_expression',
-    problemMessage:
-        '[prefer_switch_expression] Consider using switch expression instead of statement. Switch expressions are more concise and provide exhaustiveness checking.',
-    correctionMessage:
-        'Switch expressions are more concise for value production.',
-    errorSeverity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    CustomLintResolver resolver,
-    SaropaDiagnosticReporter reporter,
-    CustomLintContext context,
-  ) {
-    context.registry.addSwitchStatement((node) {
-      // Check if all cases just return a value
-      bool allReturn = true;
-
-      for (final member in node.members) {
-        if (member is SwitchCase) {
-          final statements = member.statements;
-          if (statements.length != 1) {
-            allReturn = false;
-            break;
-          }
-          if (statements.first is! ReturnStatement) {
-            allReturn = false;
-            break;
-          }
-        } else if (member is SwitchDefault) {
-          final statements = member.statements;
-          if (statements.length != 1 || statements.first is! ReturnStatement) {
-            allReturn = false;
-            break;
-          }
-        }
-      }
-
-      if (allReturn && node.members.isNotEmpty) {
-        reporter.atNode(node, code);
       }
     });
   }

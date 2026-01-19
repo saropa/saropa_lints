@@ -17,7 +17,7 @@ import '../saropa_lint_rule.dart';
 
 /// Warns when catch block swallows exception without logging.
 ///
-/// Alias: avoid_empty_catch, empty_catch, silent_catch, no_empty_catch_block
+/// Alias: avoid_empty_catch, empty_catch, no_empty_catch_block
 ///
 /// Empty catch blocks hide errors and make debugging difficult.
 ///
@@ -2124,6 +2124,221 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+}
+
+/// Warns when caught errors are not logged.
+///
+/// Alias: log_caught_errors, error_logging, catch_without_log
+///
+/// Caught errors should be logged for debugging and monitoring.
+/// Silent catch blocks make it impossible to diagnose issues in production.
+///
+/// **BAD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } catch (e) {
+///   // Error silently ignored - no logging!
+///   showErrorDialog();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await fetchData();
+/// } catch (e, stackTrace) {
+///   logger.error('Failed to fetch data', e, stackTrace);
+///   showErrorDialog();
+/// }
+///
+/// // Or with debugPrint for development:
+/// try {
+///   await fetchData();
+/// } catch (e, stackTrace) {
+///   debugPrint('Error: $e\n$stackTrace');
+///   showErrorDialog();
+/// }
+/// ```
+///
+/// **Quick fix available:** Adds a debugPrint statement for the error.
+class RequireErrorLoggingRule extends SaropaLintRule {
+  const RequireErrorLoggingRule() : super(code: _code);
+
+  /// Unlogged errors make debugging production issues nearly impossible.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_error_logging',
+    problemMessage:
+        '[require_error_logging] Caught error is not logged. Silent failures make debugging impossible.',
+    correctionMessage:
+        'Log the error using logger, debugPrint, print, or a crash reporting service.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Method/function names that indicate logging is happening.
+  static const Set<String> _loggingMethods = <String>{
+    // Standard logging
+    'log',
+    'print',
+    'debugPrint',
+    'debugPrintStack',
+
+    // Common logger methods
+    'error',
+    'warning',
+    'warn',
+    'info',
+    'debug',
+    'severe',
+    'shout',
+    'fine',
+    'finer',
+    'finest',
+
+    // Crash reporting services
+    'recordError',
+    'recordFlutterError',
+    'captureException',
+    'captureMessage',
+    'logError',
+    'logException',
+    'reportError',
+    'report',
+
+    // Firebase Crashlytics
+    'recordFlutterFatalError',
+
+    // Sentry
+    'captureEvent',
+
+    // Custom debug helpers
+    'debugException',
+    'logDebug',
+    'logWarning',
+    'logInfo',
+  };
+
+  /// Receiver names that indicate a logger object.
+  static const Set<String> _loggerReceivers = <String>{
+    'logger',
+    'log',
+    'Logger',
+    'Crashlytics',
+    'crashlytics',
+    'FirebaseCrashlytics',
+    'Sentry',
+    'sentry',
+    'analytics',
+    'Analytics',
+    'debugger',
+    'console',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      final Block body = node.body;
+
+      // Skip empty catch blocks - handled by AvoidSwallowingExceptionsRule
+      if (body.statements.isEmpty) return;
+
+      // Check if the exception variable exists and is used in logging
+      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
+      if (exceptionParam == null) {
+        // No exception variable captured - can't log it
+        reporter.atNode(node, code);
+        return;
+      }
+
+      // Check if any logging method is called in the catch body
+      if (!_hasLoggingCall(body)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  /// Checks if the block contains any logging method calls.
+  bool _hasLoggingCall(Block body) {
+    final String bodySource = body.toSource();
+
+    // Quick check: does the body contain any known logging method names?
+    for (final String method in _loggingMethods) {
+      // Check for method call pattern: methodName( or .methodName(
+      if (bodySource.contains('$method(') || bodySource.contains('.$method(')) {
+        return true;
+      }
+    }
+
+    // Check for logger receiver patterns: logger.something(
+    for (final String receiver in _loggerReceivers) {
+      if (bodySource.contains('$receiver.')) {
+        return true;
+      }
+    }
+
+    // Check for rethrow - error will be logged upstream
+    if (bodySource.contains('rethrow')) {
+      return true;
+    }
+
+    // Check for throw - error is being transformed and passed up
+    if (bodySource.contains('throw ')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDebugPrintForErrorFix()];
+}
+
+class _AddDebugPrintForErrorFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addCatchClause((CatchClause node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
+      if (exceptionParam == null) return;
+
+      final String exceptionName = exceptionParam.name.lexeme;
+      final CatchClauseParameter? stackParam = node.stackTraceParameter;
+      final String stackName = stackParam?.name.lexeme ?? 'stackTrace';
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add debugPrint for error logging',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert debugPrint at the start of the catch body
+        final int insertOffset = node.body.leftBracket.end;
+
+        final String logStatement = stackParam != null
+            ? "\n      debugPrint('Error: \$$exceptionName\\n\$$stackName');"
+            : "\n      debugPrint('Error: \$$exceptionName');";
+
+        builder.addSimpleInsertion(insertOffset, logStatement);
+      });
     });
   }
 }

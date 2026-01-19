@@ -1095,7 +1095,7 @@ class PreferTweenSequenceRule extends SaropaLintRule {
 
 /// Warns when one-shot animation lacks StatusListener for cleanup.
 ///
-/// Alias: animation_completion_listener, animation_status_callback, on_animation_complete
+/// Alias: animation_completion_listener, animation_status_callback, on_animation_complete, prefer_animation_status_listener
 ///
 /// Animations that run once need to know when they complete for cleanup
 /// or state updates. Use StatusListener to handle completion.

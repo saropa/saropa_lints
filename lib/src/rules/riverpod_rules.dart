@@ -618,6 +618,8 @@ class _CommentOutNotifierAssignmentFix extends DartFix {
 /// }
 /// ```
 class AvoidNotifierConstructorsRule extends SaropaLintRule {
+  /// Alias: avoid_notifier_constructors_usage
+
   static const LintCode _code = LintCode(
     name: 'avoid_notifier_constructors',
     problemMessage:
@@ -705,6 +707,8 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
 /// });
 /// ```
 class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
+  /// Alias: prefer_immutable_provider_arguments_type
+
   static const LintCode _code = LintCode(
     name: 'prefer_immutable_provider_arguments',
     problemMessage:

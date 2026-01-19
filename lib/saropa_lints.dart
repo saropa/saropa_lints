@@ -226,7 +226,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidUnsafeWhereMethodsRule(),
   PreferWhereOrNullRule(),
   PreferNamedBooleanParametersRule(),
-  PreferEarlyReturnRule(),
+  // PreferEarlyReturnRule(), // Hidden in all_rules.dart
   AvoidFlexibleOutsideFlexRule(),
   ProperSuperCallsRule(),
   AvoidNestedAssignmentsRule(),
@@ -628,6 +628,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferResultPatternRule(),
   RequireAsyncErrorDocumentationRule(),
   RequireErrorBoundaryRule(),
+  RequireErrorLoggingRule(),
 
   // Architecture rules (NEW)
   AvoidDirectDataAccessInUiRule(),
@@ -862,7 +863,7 @@ const List<LintRule> _allRules = <LintRule>[
   PreferSyncOverAsyncWhereSimpleRule(),
 
   // Whitespace & constructor stylistic rules (stylistic_whitespace_constructor_rules.dart)
-  PreferBlankLineBeforeReturnRule(),
+  // PreferBlankLineBeforeReturnRule(), // Not defined
   PreferNoBlankLineBeforeReturnRule(),
   PreferBlankLineAfterDeclarationsRule(),
   PreferCompactDeclarationsRule(),
@@ -1061,8 +1062,8 @@ const List<LintRule> _allRules = <LintRule>[
   PreferMultiProviderRule(),
   AvoidInstantiatingInValueProviderRule(),
   DisposeProvidersRule(),
-  ProperGetxSuperCallsRule(),
-  AlwaysRemoveGetxListenerRule(),
+  // ProperGetxSuperCallsRule(), // Hidden in all_rules.dart
+  // AlwaysRemoveGetxListenerRule(), // Hidden in all_rules.dart
   AvoidHooksOutsideBuildRule(),
   AvoidConditionalHooksRule(),
   AvoidUnnecessaryHookWidgetsRule(),
@@ -1161,9 +1162,9 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidCircularProviderDepsRule(),
   RequireErrorHandlingInAsyncRule(),
   PreferNotifierOverStateRule(),
-  // GetX rules
-  RequireGetxControllerDisposeRule(),
-  AvoidObsOutsideControllerRule(),
+  // GetX rules (hidden in all_rules.dart)
+  // RequireGetxControllerDisposeRule(),
+  // AvoidObsOutsideControllerRule(),
   // Bloc rules
   RequireBlocTransformerRule(),
   AvoidLongEventHandlersRule(),
@@ -1350,13 +1351,13 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidUnnecessaryConsumerWidgetsRule(),
   AvoidNullableAsyncValuePatternRule(),
 
-  // GetX Build rules (Phase 2)
-  AvoidGetxRxInsideBuildRule(),
-  AvoidMutableRxVariablesRule(),
+  // GetX Build rules (Phase 2) - hidden in all_rules.dart
+  // AvoidGetxRxInsideBuildRule(),
+  // AvoidMutableRxVariablesRule(),
 
   // Remaining ROADMAP_NEXT rules
   DisposeProvidedInstancesRule(),
-  DisposeGetxFieldsRule(),
+  // DisposeGetxFieldsRule(), // Hidden in all_rules.dart
   PreferNullableProviderTypesRule(),
 
   // Internationalization rules (ROADMAP_NEXT)
@@ -1503,14 +1504,14 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidYieldInOnEventRule(),
   PreferConsumerOverProviderOfRule(),
   AvoidListenInAsyncRule(),
-  PreferGetxBuilderRule(),
+  // PreferGetxBuilderRule(), // Hidden in all_rules.dart
   EmitNewBlocStateInstancesRule(),
   AvoidBlocPublicFieldsRule(),
   AvoidBlocPublicMethodsRule(),
   RequireAsyncValueOrderRule(),
   RequireBlocSelectorRule(),
   PreferSelectorRule(),
-  RequireGetxBindingRule(),
+  // RequireGetxBindingRule(), // Hidden in all_rules.dart
 
   // Provider dependency rules
   PreferProxyProviderRule(),
