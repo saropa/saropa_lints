@@ -4261,3 +4261,94 @@ class PreferDioTransformerRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// WebSocket Rules (from v4.1.7)
+// =============================================================================
+
+/// Warns when WebSocket connections lack reconnection logic.
+///
+/// `[HEURISTIC]` - Detects WebSocketChannel without reconnection handling.
+///
+/// WebSocket connections drop unexpectedly. Implement automatic reconnection
+/// with exponential backoff.
+///
+/// **BAD:**
+/// ```dart
+/// class ChatService {
+///   late WebSocketChannel _channel;
+///
+///   void connect() {
+///     _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
+///     // No reconnection logic - connection lost forever on disconnect!
+///   }
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class ChatService {
+///   WebSocketChannel? _channel;
+///   int _retryCount = 0;
+///
+///   void connect() {
+///     _channel = WebSocketChannel.connect(Uri.parse(wsUrl));
+///     _channel!.stream.listen(
+///       onMessage,
+///       onDone: _reconnect, // Handle disconnection
+///       onError: (e) => _reconnect(),
+///     );
+///   }
+///
+///   void _reconnect() {
+///     final delay = Duration(seconds: pow(2, _retryCount++).toInt());
+///     Future.delayed(delay, connect);
+///   }
+/// }
+/// ```
+class RequireWebsocketReconnectionRule extends SaropaLintRule {
+  const RequireWebsocketReconnectionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'require_websocket_reconnection',
+    problemMessage:
+        '[require_websocket_reconnection] WebSocket without reconnection logic will stay disconnected after network interruptions. Users will see stale data or miss real-time updates.',
+    correctionMessage:
+        'Implement automatic reconnection with exponential backoff for WebSocket connections.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      final String classSource = node.toSource();
+
+      // Check if class uses WebSocket
+      if (!classSource.contains('WebSocketChannel') &&
+          !classSource.contains('WebSocket')) {
+        return;
+      }
+
+      // Check for reconnection logic indicators
+      final bool hasReconnection = classSource.contains('reconnect') ||
+          classSource.contains('retry') ||
+          classSource.contains('onDone:') ||
+          classSource.contains('onError:') ||
+          classSource.contains('backoff');
+
+      if (!hasReconnection) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}

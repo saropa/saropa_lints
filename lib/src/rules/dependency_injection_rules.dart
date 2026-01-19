@@ -1609,3 +1609,77 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
     return false;
   }
 }
+
+// =============================================================================
+// Lazy Singleton Rules (from v4.1.7)
+// =============================================================================
+
+/// Warns when eager singleton registration is used for expensive objects.
+///
+/// `[HEURISTIC]` - Detects registerSingleton with expensive constructors.
+///
+/// Eager registration creates all singletons at startup.
+/// Use registerLazySingleton for expensive objects.
+///
+/// **BAD:**
+/// ```dart
+/// void setupDI() {
+///   GetIt.I.registerSingleton(DatabaseService()); // Created immediately!
+///   GetIt.I.registerSingleton(AnalyticsService()); // Created immediately!
+///   GetIt.I.registerSingleton(CacheService()); // All at startup!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// void setupDI() {
+///   GetIt.I.registerLazySingleton(() => DatabaseService()); // Created on first use
+///   GetIt.I.registerLazySingleton(() => AnalyticsService());
+///   GetIt.I.registerLazySingleton(() => CacheService());
+/// }
+/// ```
+class PreferLazySingletonRegistrationRule extends SaropaLintRule {
+  const PreferLazySingletonRegistrationRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_lazy_singleton_registration',
+    problemMessage:
+        '[prefer_lazy_singleton_registration] Eager singleton registration. Consider lazy registration.',
+    correctionMessage:
+        'Use registerLazySingleton(() => Service()) for deferred initialization.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  static final RegExp _expensiveServicePattern = RegExp(
+    r'(Database|Analytics|Cache|Logger|Http|Api|Network|Storage|Auth)',
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'registerSingleton') return;
+
+      // Check arguments for potentially expensive services
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      final String argSource = args.first.toSource();
+
+      // Check if registering a potentially expensive service
+      if (_expensiveServicePattern.hasMatch(argSource)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
