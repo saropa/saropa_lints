@@ -2453,18 +2453,46 @@ class DisposeClassFieldsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Skip State classes (they have their own disposal rules)
+      // Skip Flutter widget classes (they have their own disposal patterns)
+      // - StatefulWidget: disposal is handled by its State class
+      // - StatelessWidget: has no lifecycle, cannot dispose anything
+      // - State: has dedicated disposal rules (RequireDisposeImplementationRule, etc.)
+      // Also skip common base classes that handle their own disposal
       final extendsClause = node.extendsClause;
       if (extendsClause != null) {
         final superName = extendsClause.superclass.name.lexeme;
         if (superName == 'State' ||
+            superName == 'StatefulWidget' ||
+            superName == 'StatelessWidget' ||
             superName == 'GetxController' ||
             superName == 'ChangeNotifier') {
-          return; // Other rules handle these
+          return;
         }
       }
 
-      // Find disposable fields
+      // Collect constructor parameter names to exclude passed-in fields
+      final Set<String> constructorParams = <String>{};
+      for (final member in node.members) {
+        if (member is ConstructorDeclaration) {
+          // Check formal parameters
+          for (final param in member.parameters.parameters) {
+            if (param is DefaultFormalParameter) {
+              final normalParam = param.parameter;
+              if (normalParam is FieldFormalParameter) {
+                constructorParams.add(normalParam.name.lexeme);
+              } else if (normalParam is SimpleFormalParameter) {
+                constructorParams.add(normalParam.name?.lexeme ?? '');
+              }
+            } else if (param is FieldFormalParameter) {
+              constructorParams.add(param.name.lexeme);
+            } else if (param is SimpleFormalParameter) {
+              constructorParams.add(param.name?.lexeme ?? '');
+            }
+          }
+        }
+      }
+
+      // Find disposable fields that are OWNED by this class (not passed in)
       final List<String> disposableFields = <String>[];
       for (final member in node.members) {
         if (member is FieldDeclaration) {
@@ -2473,7 +2501,27 @@ class DisposeClassFieldsRule extends SaropaLintRule {
             for (final disposable in _disposableTypes) {
               if (typeName.contains(disposable)) {
                 for (final variable in member.fields.variables) {
-                  disposableFields.add(variable.name.lexeme);
+                  final fieldName = variable.name.lexeme;
+                  // Skip fields that are passed in via constructor
+                  if (constructorParams.contains(fieldName)) {
+                    continue;
+                  }
+                  // Only include fields that are initialized inline or have
+                  // no initializer (meaning they'll be set up in initState
+                  // or similar lifecycle method)
+                  final initializer = variable.initializer;
+                  if (initializer != null) {
+                    // Field is initialized inline - check if it's a constructor
+                    final initSource = initializer.toSource();
+                    if (initSource.startsWith('$disposable(') ||
+                        initSource.startsWith('$disposable.')) {
+                      disposableFields.add(fieldName);
+                    }
+                  }
+                  // Note: Fields with no initializer and not in constructor
+                  // params are likely late fields initialized in methods,
+                  // which should be checked by other rules (like
+                  // RequireDisposeImplementationRule for State classes)
                 }
                 break;
               }
