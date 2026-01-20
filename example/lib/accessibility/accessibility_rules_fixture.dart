@@ -159,7 +159,8 @@ class SnackBar {
 }
 
 class ReorderableListView extends StatelessWidget {
-  const ReorderableListView({super.key, required this.children, this.onReorder});
+  const ReorderableListView(
+      {super.key, required this.children, this.onReorder});
   final List<Widget> children;
   final void Function(int, int)? onReorder;
 
