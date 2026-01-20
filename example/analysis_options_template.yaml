@@ -1148,7 +1148,9 @@ custom_lint:
     - prefer_snake_case_files: false
     - prefer_doc_comments_over_regular: false
     - prefer_doc_curly_apostrophe: false         # Curly apostrophe in doc comments
+    - prefer_doc_straight_apostrophe: false      # Straight apostrophe in doc comments
     - prefer_straight_apostrophe: false          # Straight apostrophe in strings
+    - prefer_curly_apostrophe: false             # Curly apostrophe in strings
 
     # --- Widget Style Rules (v2.7.0) ---
     - prefer_sized_box_over_container: false     # SizedBox for dimensions only
