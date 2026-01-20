@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+**Progress reporting for large codebases** - Real-time feedback during CLI analysis showing files analyzed, elapsed time, and throughput. Reports every 25 files or every 3 seconds, whichever comes first. Output format: `[saropa_lints] Progress: 25 files analyzed (2s, 12.5 files/sec) - home_screen.dart`. Enabled by default, can be disabled via `--define=SAROPA_LINTS_PROGRESS=false`.
+
 **2 new stylistic apostrophe rules** - complementary opposite rules for the existing apostrophe preferences:
 
 - `prefer_doc_straight_apostrophe` - Warns when curly apostrophes (U+2019) are used in doc comments. Opposite of `prefer_doc_curly_apostrophe`. Quick fix replaces curly with straight apostrophes.
