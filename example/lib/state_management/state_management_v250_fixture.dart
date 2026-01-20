@@ -180,3 +180,52 @@ class SearchInitial extends SearchState {}
 EventTransformer<T> debounce<T>(Duration duration) {
   return (events, mapper) => events;
 }
+
+// =========================================================================
+// State Management Rules (from v4.1.4)
+// =========================================================================
+
+class AuthService extends ChangeNotifier {}
+
+class UserNotifier extends ChangeNotifier {
+  void updateAuth(AuthService auth) {}
+}
+
+void testChangeNotifierProxyProvider(BuildContext context) {
+  // expect_lint: prefer_change_notifier_proxy_provider
+  ChangeNotifierProvider(
+    create: (context) {
+      final auth = context.read<AuthService>();
+      return UserNotifier()..updateAuth(auth);
+    },
+    child: Container(),
+  );
+
+  // GOOD: Using ProxyProvider
+  ChangeNotifierProxyProvider<AuthService, UserNotifier>(
+    create: (_) => UserNotifier(),
+    update: (_, auth, previous) => previous!..updateAuth(auth),
+    child: Container(),
+  );
+}
+
+class ChangeNotifierProvider<T extends ChangeNotifier> {
+  ChangeNotifierProvider({required this.create, this.child});
+  final T Function(BuildContext) create;
+  final Widget? child;
+}
+
+class ChangeNotifierProxyProvider<A, T extends ChangeNotifier> {
+  ChangeNotifierProxyProvider({
+    required this.create,
+    required this.update,
+    this.child,
+  });
+  final T Function(BuildContext) create;
+  final T Function(BuildContext, A, T?) update;
+  final Widget? child;
+}
+
+extension BuildContextRead on BuildContext {
+  T read<T>() => throw UnimplementedError();
+}

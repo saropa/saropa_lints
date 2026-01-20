@@ -820,3 +820,58 @@ Future<void> testSqliteReservedWords() async {
     )
   ''');
 }
+
+// =========================================================================
+// Hive/SharedPreferences Rules (from v4.1.4)
+// =========================================================================
+
+// BAD: Regular Box for potentially large collection
+class MessageService {
+  // expect_lint: prefer_hive_lazy_box
+  late Box<Object> messagesBox;
+}
+
+// GOOD: LazyBox for large collection
+class GoodMessageService {
+  late LazyBox<Object> messagesBox;
+}
+
+// BAD: Binary data in Hive
+@HiveType(typeId: 0)
+class BadPhoto {
+  // expect_lint: avoid_hive_binary_storage
+  Uint8List imageBytes = Uint8List(0);
+}
+
+// GOOD: Store path instead
+@HiveType(typeId: 1)
+class GoodPhoto {
+  String imagePath = '';
+}
+
+void testSharedPrefsRules() async {
+  // expect_lint: require_shared_prefs_prefix
+  // expect_lint: prefer_shared_prefs_async_api
+  final prefs = await SharedPreferences.getInstance();
+}
+
+// BAD: SharedPreferences in isolate context
+Future<void> isolateEntry(SendPort sendPort) async {
+  // expect_lint: avoid_shared_prefs_in_isolate
+  final prefs = await SharedPreferences.getInstance();
+}
+
+// Mock classes
+class Box<T> {}
+
+class LazyBox<T> {}
+
+class Uint8List {
+  Uint8List(int length);
+}
+
+class SharedPreferences {
+  static Future<SharedPreferences> getInstance() async => SharedPreferences();
+}
+
+class SendPort {}

@@ -303,3 +303,43 @@ Widget testKeyForCollection(List<String> items) {
 
   return goodList;
 }
+
+// =========================================================================
+// Internationalization Rules (from v4.1.4)
+// =========================================================================
+
+class NumberFormatWidget extends StatelessWidget {
+  const NumberFormatWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final price = 1234.56;
+    // expect_lint: prefer_number_format
+    return Text(price.toStringAsFixed(2));
+  }
+}
+
+void testIntlArgs() {
+  final name = 'John';
+  // expect_lint: provide_correct_intl_args
+  Intl.message(
+    'Hello {name}, you have {count} messages',
+    args: [name], // Missing 'count' argument!
+  );
+}
+
+// Mock Intl class
+class Intl {
+  static String message(String text, {String? desc, List<Object>? args}) =>
+      text;
+}
+
+class StatelessWidget {
+  const StatelessWidget({this.key});
+  final Object? key;
+}
+
+abstract class StatelessWidgetBase extends StatelessWidget {
+  const StatelessWidgetBase({super.key});
+  Widget build(BuildContext context);
+}

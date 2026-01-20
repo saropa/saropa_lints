@@ -131,3 +131,59 @@ class _GoodDidUpdateWidgetEqualityState
   @override
   Widget build(BuildContext context) => Container();
 }
+
+// =========================================================================
+// Widget Lifecycle Rules (from v4.1.4)
+// =========================================================================
+
+class BadDialogWidget extends StatefulWidget {
+  const BadDialogWidget({super.key});
+
+  @override
+  State<BadDialogWidget> createState() => _BadDialogWidgetState();
+}
+
+class _BadDialogWidgetState extends State<BadDialogWidget> {
+  @override
+  void initState() {
+    super.initState();
+    // expect_lint: require_widgets_binding_callback
+    showDialog(context: context, builder: (_) => Container());
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: Using addPostFrameCallback
+class GoodDialogWidget extends StatefulWidget {
+  const GoodDialogWidget({super.key});
+
+  @override
+  State<GoodDialogWidget> createState() => _GoodDialogWidgetState();
+}
+
+class _GoodDialogWidgetState extends State<GoodDialogWidget> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(context: context, builder: (_) => Container());
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+Future<T?> showDialog<T>({
+  required BuildContext context,
+  required Widget Function(BuildContext) builder,
+}) async =>
+    null;
+
+class WidgetsBinding {
+  static final WidgetsBinding instance = WidgetsBinding._();
+  WidgetsBinding._();
+  void addPostFrameCallback(void Function(Duration) callback) {}
+}
