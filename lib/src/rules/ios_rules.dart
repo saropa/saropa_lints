@@ -40,6 +40,7 @@ import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../info_plist_utils.dart';
+import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -6674,10 +6675,8 @@ class AvoidIosDebugCodeInReleaseRule extends SaropaLintRule {
   ) {
     final String fileSource = resolver.source.contents.data;
 
-    // Skip if kDebugMode guard exists
-    if (fileSource.contains('kDebugMode') ||
-        fileSource.contains('kReleaseMode') ||
-        fileSource.contains('kProfileMode')) {
+    // Skip if mode constant guard exists
+    if (usesFlutterModeConstants(fileSource)) {
       return;
     }
 

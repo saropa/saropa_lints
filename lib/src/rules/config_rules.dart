@@ -4,6 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -112,10 +113,19 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   }
 }
 
-/// Warns when production and development config are mixed.
+/// Warns when production and development config are mixed in the same class.
+///
+/// `[HEURISTIC]` - Uses pattern matching to detect prod/dev indicators.
 ///
 /// Mixing production URLs/keys with development settings causes
-/// accidental production data corruption or security leaks.
+/// accidental production data corruption or security leaks. This rule
+/// detects classes with both production indicators (prod, production,
+/// live, release) and development indicators (dev, debug, staging, test,
+/// local) in field names or values.
+///
+/// Fields using Flutter's mode constants (`kReleaseMode`, `kDebugMode`,
+/// `kProfileMode`) are considered "properly conditional" and excluded
+/// from detection, since they intentionally handle both environments.
 ///
 /// **BAD:**
 /// ```dart
@@ -134,6 +144,18 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
 ///   static const debug = !kReleaseMode;
 /// }
 /// ```
+///
+/// **GOOD:** (enum with mode-conditional assignment)
+/// ```dart
+/// enum AppMode { release, profile, debug }
+///
+/// class AppModeSettings {
+///   // Uses kDebugMode - properly conditional, not flagged
+///   static const AppMode mode = kDebugMode
+///       ? AppMode.debug
+///       : (kProfileMode ? AppMode.profile : AppMode.release);
+/// }
+/// ```
 class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   const AvoidMixedEnvironmentsRule() : super(code: _code);
 
@@ -142,6 +164,10 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  // Performance: Only run on files with class declarations
+  @override
+  bool get requiresClassDeclaration => true;
 
   static const LintCode _code = LintCode(
     name: 'avoid_mixed_environments',
@@ -191,23 +217,27 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
             final String source = init.toSource();
             final String varName = variable.name.lexeme;
 
-            // Check for production indicators
-            if (_prodPattern.hasMatch(source) ||
-                _prodPattern.hasMatch(varName)) {
+            // Skip fields that use Flutter's mode constants - these are
+            // properly conditional and should not trigger mixed environment
+            // warnings even if they contain both prod and dev enum values
+            // (e.g., `kDebugMode ? AppModeEnum.debug : AppModeEnum.release`)
+            final bool isProperlyConditional = usesFlutterModeConstants(source);
+
+            // Check for production indicators (skip if properly conditional)
+            if (!isProperlyConditional &&
+                (_prodPattern.hasMatch(source) ||
+                    _prodPattern.hasMatch(varName))) {
               if (!hasProdIndicator) {
                 hasProdIndicator = true;
                 firstProdMember = member;
               }
             }
 
-            // Check for development indicators
-            if (_devPattern.hasMatch(source) || _devPattern.hasMatch(varName)) {
-              // Exclude kReleaseMode/kDebugMode usage (proper conditional)
-              if (!source.contains('kReleaseMode') &&
-                  !source.contains('kDebugMode') &&
-                  !source.contains('kProfileMode')) {
-                hasDevIndicator = true;
-              }
+            // Check for development indicators (skip if properly conditional)
+            if (!isProperlyConditional &&
+                (_devPattern.hasMatch(source) ||
+                    _devPattern.hasMatch(varName))) {
+              hasDevIndicator = true;
             }
           }
         }
