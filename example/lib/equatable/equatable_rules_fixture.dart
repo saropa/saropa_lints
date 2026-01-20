@@ -414,3 +414,61 @@ class ImmutableMixinClass with EquatableMixin {
   @override
   List<Object?> get props => [id, version];
 }
+
+// === require_deep_equality_collections ===
+// Warns when List/Set/Map in Equatable props are compared by reference.
+
+// BAD: List in Equatable props without deep equality
+class BadEquatableWithList extends Equatable {
+  const BadEquatableWithList(this.items);
+  // expect_lint: require_deep_equality_collections
+  final List<String> items;
+
+  @override
+  List<Object?> get props => [items]; // Reference comparison!
+}
+
+// BAD: Map in Equatable props
+class BadEquatableWithMap extends Equatable {
+  const BadEquatableWithMap(this.data);
+  // expect_lint: require_deep_equality_collections
+  final Map<String, int> data;
+
+  @override
+  List<Object?> get props => [data];
+}
+
+// GOOD: Using DeepCollectionEquality wrapper
+class GoodEquatableWithDeepEquality extends Equatable {
+  const GoodEquatableWithDeepEquality(this.items);
+  final List<String> items;
+
+  @override
+  List<Object?> get props => [DeepCollectionEquality().equals(items, items)];
+}
+
+class DeepCollectionEquality {
+  bool equals(Object? a, Object? b) => true;
+}
+
+// === avoid_equatable_datetime ===
+// Warns when DateTime is in Equatable props.
+
+// BAD: DateTime in Equatable props
+class BadEquatableWithDateTime extends Equatable {
+  const BadEquatableWithDateTime(this.createdAt);
+  // expect_lint: avoid_equatable_datetime
+  final DateTime createdAt;
+
+  @override
+  List<Object?> get props => [createdAt]; // Flaky equality!
+}
+
+// GOOD: Using millisecondsSinceEpoch for stable comparison
+class GoodEquatableWithEpoch extends Equatable {
+  const GoodEquatableWithEpoch(this.createdAt);
+  final DateTime createdAt;
+
+  @override
+  List<Object?> get props => [createdAt.millisecondsSinceEpoch];
+}

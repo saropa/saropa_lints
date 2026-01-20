@@ -96,20 +96,22 @@ final bool _profilingEnabled =
 /// Threshold in milliseconds for logging slow rules.
 const int _slowRuleThresholdMs = 10;
 
-/// Controls whether progress reporting is enabled.
+/// Controls whether progress reporting is enabled (default: true).
 ///
-/// Set via environment variable: SAROPA_LINTS_PROGRESS=true
+/// Disable via environment variable: SAROPA_LINTS_PROGRESS=false
 final bool _progressEnabled =
-    const bool.fromEnvironment('SAROPA_LINTS_PROGRESS') ||
-        const String.fromEnvironment('SAROPA_LINTS_PROGRESS') == 'true';
+    const bool.fromEnvironment('SAROPA_LINTS_PROGRESS', defaultValue: true) &&
+        const String.fromEnvironment('SAROPA_LINTS_PROGRESS',
+                defaultValue: 'true') !=
+            'false';
 
 // =============================================================================
 // PROGRESS TRACKING (User Feedback)
 // =============================================================================
 //
 // Tracks analysis progress to show the user that the linter is working.
-// Enable progress reporting by setting the environment variable:
-//   SAROPA_LINTS_PROGRESS=true dart run custom_lint
+// Enabled by default. Disable via environment variable:
+//   dart run custom_lint --define=SAROPA_LINTS_PROGRESS=false
 //
 // Progress output helps users see:
 // 1. That the linter is actively working (not frozen)
@@ -119,7 +121,7 @@ final bool _progressEnabled =
 
 /// Tracks and reports analysis progress across files.
 ///
-/// Usage: Enable via environment variable SAROPA_LINTS_PROGRESS=true
+/// Enabled by default. Disable via: SAROPA_LINTS_PROGRESS=false
 class ProgressTracker {
   ProgressTracker._();
 
