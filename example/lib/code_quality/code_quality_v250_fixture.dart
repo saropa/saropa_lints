@@ -137,6 +137,52 @@ void goodErrorLogging() {
 }
 
 // =========================================================================
+// prefer_returning_conditional_expressions
+// =========================================================================
+// Warns when if/else blocks only contain return statements.
+
+// BAD: If/else with single returns
+bool badConditionalReturn(bool condition) {
+  // expect_lint: prefer_returning_conditional_expressions
+  if (condition) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// BAD: Another if/else with returns
+String badConditionalReturnString(bool flag) {
+  // expect_lint: prefer_returning_conditional_expressions
+  if (flag) {
+    return 'yes';
+  } else {
+    return 'no';
+  }
+}
+
+// GOOD: Direct boolean return
+bool goodBooleanReturn(bool condition) {
+  return condition;
+}
+
+// GOOD: Ternary expression
+String goodTernaryReturn(bool flag) {
+  return flag ? 'yes' : 'no';
+}
+
+// GOOD: Complex logic in branches (not just returns)
+String goodComplexBranches(bool flag) {
+  if (flag) {
+    print('Processing true case');
+    return 'yes';
+  } else {
+    print('Processing false case');
+    return 'no';
+  }
+}
+
+// =========================================================================
 // Mock classes and functions
 // =========================================================================
 

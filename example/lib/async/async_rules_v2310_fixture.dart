@@ -110,6 +110,124 @@ void badCancelOutsideDispose() {
 }
 
 // =========================================================================
+// Stream Rules (from v4.1.4)
+// =========================================================================
+
+class StreamTestWidget extends StatefulWidget {
+  const StreamTestWidget({super.key});
+
+  @override
+  State<StreamTestWidget> createState() => _StreamTestWidgetState();
+}
+
+class _StreamTestWidgetState extends State<StreamTestWidget> {
+  late StreamController<int> _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = StreamController<int>();
+
+    // expect_lint: prefer_stream_distinct
+    _controller.stream.listen((value) {
+      setState(() {});
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+void testBroadcastStream() {
+  final controller = StreamController<int>();
+  final stream = controller.stream;
+
+  // BAD: Multiple listen on single-subscription stream
+  // expect_lint: prefer_broadcast_stream
+  stream.listen(print);
+  stream.listen(print);
+
+  // GOOD: Use broadcast
+  final broadcastStream = controller.stream.asBroadcastStream();
+  broadcastStream.listen(print);
+  broadcastStream.listen(print);
+}
+
+// =========================================================================
+// Async/Build Rules (from v4.1.4)
+// =========================================================================
+
+class BadAsyncWidget extends StatelessWidget {
+  const BadAsyncWidget({super.key});
+
+  // expect_lint: avoid_async_in_build
+  @override
+  Future<Widget> build(BuildContext context) async {
+    return Container();
+  }
+}
+
+class BadFutureInBuildWidget extends StatelessWidget {
+  const BadFutureInBuildWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: avoid_future_in_build
+    return FutureBuilder(
+      future: fetchDataForWidget(),
+      builder: (context, snapshot) => Container(),
+    );
+  }
+
+  Future<String> fetchDataForWidget() async => 'data';
+}
+
+class BadMountedCheckWidget extends StatefulWidget {
+  const BadMountedCheckWidget({super.key});
+
+  @override
+  State<BadMountedCheckWidget> createState() => _BadMountedCheckWidgetState();
+}
+
+class _BadMountedCheckWidgetState extends State<BadMountedCheckWidget> {
+  String _data = '';
+
+  Future<void> loadData() async {
+    final data = await fetchDataForWidget();
+    // expect_lint: require_mounted_check_after_await
+    setState(() => _data = data);
+  }
+
+  Future<String> fetchDataForWidget() async => 'data';
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// GOOD: With mounted check
+class GoodMountedCheckWidget extends StatefulWidget {
+  const GoodMountedCheckWidget({super.key});
+
+  @override
+  State<GoodMountedCheckWidget> createState() => _GoodMountedCheckWidgetState();
+}
+
+class _GoodMountedCheckWidgetState extends State<GoodMountedCheckWidget> {
+  String _data = '';
+
+  Future<void> loadData() async {
+    final data = await fetchDataForWidget();
+    if (!mounted) return;
+    setState(() => _data = data);
+  }
+
+  Future<String> fetchDataForWidget() async => 'data';
+
+  @override
+  Widget build(BuildContext context) => Text(_data);
+}
+
+// =========================================================================
 // Helper mocks
 // =========================================================================
 
@@ -124,4 +242,42 @@ class _MockScrollController {
 
 extension FutureIgnoreExtension<T> on Future<T> {
   void ignore() {}
+}
+
+// Flutter mocks for async rules
+abstract class StatelessWidget {
+  const StatelessWidget({this.key});
+  final Object? key;
+  Widget build(BuildContext context);
+}
+
+abstract class StatefulWidget {
+  const StatefulWidget({this.key});
+  final Object? key;
+  State createState();
+}
+
+abstract class State<T extends StatefulWidget> {
+  T get widget => throw UnimplementedError();
+  bool get mounted => true;
+  void setState(void Function() fn) {}
+  void initState() {}
+  Widget build(BuildContext context);
+}
+
+class BuildContext {}
+
+class Widget {}
+
+class Container extends Widget {}
+
+class Text extends Widget {
+  Text(this.data);
+  final String data;
+}
+
+class FutureBuilder<T> extends Widget {
+  FutureBuilder({required this.future, required this.builder});
+  final Future<T> future;
+  final Widget Function(BuildContext, dynamic) builder;
 }

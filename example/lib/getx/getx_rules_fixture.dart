@@ -81,3 +81,29 @@ class WorkerTestController extends GetxController {
     super.onClose();
   }
 }
+
+// =============================================================================
+// GetX Rules (from v4.1.4)
+// =============================================================================
+
+class BadGetxControllerDialog extends GetxController {
+  void showError() {
+    // expect_lint: avoid_getx_dialog_snackbar_in_controller
+    Get.snackbar('Error', 'Something went wrong');
+  }
+}
+
+void testGetxLazyPut() {
+  // expect_lint: require_getx_lazy_put
+  Get.put(BadGetxControllerDialog());
+
+  // GOOD: Using lazyPut
+  Get.lazyPut(() => BadGetxControllerDialog());
+}
+
+// Mock Get class
+class Get {
+  static T put<T>(T instance) => instance;
+  static void lazyPut<T>(T Function() builder) {}
+  static void snackbar(String title, String message) {}
+}

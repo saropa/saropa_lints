@@ -108,3 +108,31 @@ class GoodVideoWidget extends StatelessWidget {
   }
 }
 */
+
+// =========================================================================
+// prefer_image_picker_multi_selection
+// =========================================================================
+// Warns when pickImage is called in a loop.
+
+// BAD: pickImage in loop
+Future<void> badPickImageInLoop(int count) async {
+  final images = <Object>[];
+  for (int i = 0; i < count; i++) {
+    // expect_lint: prefer_image_picker_multi_selection
+    final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (image != null) images.add(image);
+  }
+}
+
+// GOOD: Using pickMultiImage
+Future<void> goodPickMultiImage() async {
+  final images = await ImagePicker().pickMultiImage();
+}
+
+// Mock classes
+class ImagePicker {
+  Future<Object?> pickImage({required ImageSource source}) async => null;
+  Future<List<Object>> pickMultiImage() async => [];
+}
+
+enum ImageSource { gallery, camera }

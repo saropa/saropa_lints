@@ -109,3 +109,45 @@ extension GoRouterExtension on BuildContext {
   void push(String path) {}
   void pushReplacement(String path) {}
 }
+
+// =========================================================================
+// Navigation Rules (from v4.1.4)
+// =========================================================================
+
+void testRouteSettings(BuildContext context) {
+  // expect_lint: prefer_route_settings_name
+  Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => Container()),
+  );
+
+  // GOOD: With RouteSettings
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => Container(),
+      settings: const RouteSettings(name: '/details'),
+    ),
+  );
+}
+
+// Mock Navigator
+class Navigator {
+  static NavigatorState of(BuildContext context) => NavigatorState();
+}
+
+class NavigatorState {
+  Future<T?> push<T>(Route<T> route) async => null;
+}
+
+class Route<T> {}
+
+class MaterialPageRoute<T> extends Route<T> {
+  MaterialPageRoute({required this.builder, this.settings});
+  final Widget Function(BuildContext) builder;
+  final RouteSettings? settings;
+}
+
+class RouteSettings {
+  const RouteSettings({this.name, this.arguments});
+  final String? name;
+  final Object? arguments;
+}

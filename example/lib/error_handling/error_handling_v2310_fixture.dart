@@ -94,6 +94,59 @@ Future<void> goodCatchWithObjectFallback() async {
 }
 
 // =========================================================================
+// require_finally_cleanup
+// =========================================================================
+// Warns when cleanup code is in catch block instead of finally.
+
+// BAD: Cleanup in catch block only
+Future<void> badCleanupInCatch() async {
+  late final Object file;
+  // expect_lint: require_finally_cleanup
+  try {
+    file = await openFile('test.txt');
+    await processFile(file);
+  } catch (e) {
+    await closeFile(file); // May not run!
+  }
+}
+
+// BAD: Dispose in catch block
+Future<void> badDisposeInCatch() async {
+  late final Object controller;
+  // expect_lint: require_finally_cleanup
+  try {
+    controller = createController();
+    await useController(controller);
+  } catch (e) {
+    disposeController(controller); // May not run!
+  }
+}
+
+// GOOD: Cleanup in finally block
+Future<void> goodCleanupInFinally() async {
+  late final Object file;
+  try {
+    file = await openFile('test.txt');
+    await processFile(file);
+  } catch (e) {
+    print('Error: $e');
+  } finally {
+    await closeFile(file); // Always runs
+  }
+}
+
+// GOOD: Dispose in finally block
+Future<void> goodDisposeInFinally() async {
+  late final Object controller;
+  try {
+    controller = createController();
+    await useController(controller);
+  } finally {
+    disposeController(controller); // Always runs
+  }
+}
+
+// =========================================================================
 // Helper mocks
 // =========================================================================
 
@@ -102,3 +155,10 @@ Future<String> fetchData() async => 'data';
 class FormatException implements Exception {}
 
 class HttpException implements Exception {}
+
+Future<Object> openFile(String path) async => Object();
+Future<void> processFile(Object file) async {}
+Future<void> closeFile(Object file) async {}
+Object createController() => Object();
+Future<void> useController(Object controller) async {}
+void disposeController(Object controller) {}
