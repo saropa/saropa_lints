@@ -177,3 +177,72 @@ class BadListBuilderMultipleLists extends StatelessWidget {
     );
   }
 }
+
+// =========================================================================
+// Flutter Widget Rules (from v4.1.5)
+// =========================================================================
+
+// BAD: GlobalKey in StatefulWidget
+// expect_lint: avoid_global_keys_in_state
+class BadGlobalKeyWidget extends StatefulWidget {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Wrong place!
+
+  @override
+  State<BadGlobalKeyWidget> createState() => _BadGlobalKeyWidgetState();
+}
+
+class _BadGlobalKeyWidgetState extends State<BadGlobalKeyWidget> {
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// GOOD: GlobalKey in State
+class GoodGlobalKeyWidget extends StatefulWidget {
+  const GoodGlobalKeyWidget({super.key});
+
+  @override
+  State<GoodGlobalKeyWidget> createState() => _GoodGlobalKeyWidgetState();
+}
+
+class _GoodGlobalKeyWidgetState extends State<GoodGlobalKeyWidget> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>(); // Correct!
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// BAD: Static router config
+class AppRouter {
+  // expect_lint: avoid_static_route_config
+  static final GoRouter router = GoRouter(routes: []);
+}
+
+// Mock classes
+class GlobalKey<T extends State> {
+  GlobalKey();
+}
+
+class FormState extends State<StatefulWidget> {
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class GoRouter {
+  GoRouter({required List<Object> routes});
+}
+
+class Container extends Widget {
+  const Container({super.key});
+}
+
+class StatefulWidget extends Widget {
+  const StatefulWidget({super.key});
+  State createState() => throw UnimplementedError();
+}
+
+abstract class State<T extends StatefulWidget> {
+  T get widget => throw UnimplementedError();
+  Widget build(BuildContext context);
+}
+
+class BuildContext {}
