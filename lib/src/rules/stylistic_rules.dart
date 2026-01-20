@@ -3485,6 +3485,347 @@ class _ReplaceStraightApostropheFix extends DartFix {
   }
 }
 
+/// Warns when stylized (curly) apostrophes are used instead of straight apostrophes
+/// in documentation comments.
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// For documentation comments, some teams prefer straight/ASCII apostrophes (')
+/// (U+0027) rather than Right Single Quotation Mark (\u2019) (U+2019).
+/// This is the inverse of [PreferDocCurlyApostropheRule].
+///
+/// **Pros of straight apostrophes in docs:**
+/// - Consistent with code conventions
+/// - Easier to type and search for
+/// - No Unicode confusion
+/// - Works in all editors and terminals
+///
+/// **Cons (why some teams use curly apostrophes):**
+/// - Better typography in rendered documentation
+/// - More professional appearance
+/// - Common in publishing
+///
+/// **Quick fix available:** Replaces curly apostrophes with straight ones.
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// /// It's a beautiful day.  // Right Single Quotation Mark (U+2019)
+/// void greet() {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// /// It's a beautiful day.  // ASCII apostrophe (U+0027)
+/// void greet() {}
+/// ```
+class PreferDocStraightApostropheRule extends SaropaLintRule {
+  const PreferDocStraightApostropheRule() : super(code: _code);
+
+  /// Stylistic rule - style/consistency issues are acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_doc_straight_apostrophe',
+    problemMessage:
+        "[prefer_doc_straight_apostrophe] Use straight apostrophe (') instead of Right Single Quotation Mark (') in documentation.",
+    correctionMessage:
+        "Replace Right Single Quotation Mark with straight apostrophe (U+0027).",
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// Unicode Right Single Quotation Mark (U+2019)
+  static const String rightSingleQuote = '\u2019';
+
+  /// Unicode Left Single Quotation Mark (U+2018)
+  static const String leftSingleQuote = '\u2018';
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    // Check doc comments
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      _checkDocComment(node.documentationComment, reporter);
+    });
+  }
+
+  void _checkDocComment(Comment? comment, SaropaDiagnosticReporter reporter) {
+    if (comment == null) return;
+
+    final List<Token> tokens = comment.tokens;
+    for (final Token token in tokens) {
+      final String lexeme = token.lexeme;
+
+      // Only check doc comments
+      if (!lexeme.startsWith('///')) continue;
+
+      // Check if it contains curly apostrophes
+      if (lexeme.contains(rightSingleQuote) ||
+          lexeme.contains(leftSingleQuote)) {
+        reporter.atToken(token, code);
+      }
+    }
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceDocCurlyApostropheFix()];
+}
+
+class _ReplaceDocCurlyApostropheFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
+    });
+
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
+    });
+
+    context.registry.addFunctionDeclaration((FunctionDeclaration node) {
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
+    });
+
+    context.registry.addFieldDeclaration((FieldDeclaration node) {
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
+    });
+
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      _checkAndFixDocComment(
+          node.documentationComment, analysisError, reporter);
+    });
+  }
+
+  void _checkAndFixDocComment(
+    Comment? comment,
+    AnalysisError analysisError,
+    ChangeReporter reporter,
+  ) {
+    if (comment == null) return;
+
+    for (final Token token in comment.tokens) {
+      final SourceRange tokenRange = SourceRange(token.offset, token.length);
+      if (!analysisError.sourceRange.intersects(tokenRange)) continue;
+
+      final String lexeme = token.lexeme;
+      if (!lexeme.startsWith('///')) continue;
+
+      // Replace curly apostrophes with straight ones
+      final String fixed = lexeme
+          .replaceAll(PreferDocStraightApostropheRule.rightSingleQuote, "'")
+          .replaceAll(PreferDocStraightApostropheRule.leftSingleQuote, "'");
+
+      if (fixed != lexeme) {
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Use straight apostrophe',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(tokenRange, fixed);
+        });
+      }
+    }
+  }
+}
+
+/// Warns when straight apostrophes are used instead of stylized (curly) apostrophes
+/// in string literals.
+///
+/// This is an **opinionated rule** - not included in any tier by default.
+///
+/// For user-facing strings, Right Single Quotation Mark (\u2019) (U+2019)
+/// provides better typography than straight ASCII apostrophes (') (U+0027).
+/// This is the inverse of [PreferStraightApostropheRule].
+///
+/// **Pros of curly apostrophes in strings:**
+/// - Better typography in user-facing text
+/// - Professional appearance
+/// - Common in publishing and design
+/// - More readable for prose
+///
+/// **Cons (why some teams avoid them):**
+/// - Code convention is straight apostrophes
+/// - Harder to type on some keyboards
+/// - May not display correctly in some contexts
+/// - Can be confusing when mixed with code
+///
+/// **Quick fix available:** Replaces straight apostrophes with curly ones in
+/// common contractions and proper names.
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// String message = "It's a beautiful day";  // Straight ASCII apostrophe (U+0027)
+/// String name = "O'Brien";                   // Straight ASCII apostrophe (U+0027)
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// String message = "It's a beautiful day";  // Right Single Quotation Mark (U+2019)
+/// String name = "O'Brien";                   // Right Single Quotation Mark (U+2019)
+/// ```
+class PreferCurlyApostropheRule extends SaropaLintRule {
+  const PreferCurlyApostropheRule() : super(code: _code);
+
+  /// Stylistic rule - style/consistency issues are acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.opinionated;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    name: 'prefer_curly_apostrophe',
+    problemMessage:
+        "[prefer_curly_apostrophe] Use Right Single Quotation Mark (') instead of straight apostrophe (') in strings.",
+    correctionMessage:
+        "Replace straight apostrophe with Right Single Quotation Mark (U+2019).",
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// ASCII straight apostrophe (U+0027)
+  static const String straightApostrophe = "'";
+
+  /// Unicode Right Single Quotation Mark (U+2019)
+  static const String curlyApostrophe = '\u2019';
+
+  /// Regex to detect common contractions with straight apostrophes.
+  /// Static to avoid recreation on every node visit.
+  // cspell:ignore shouldn wouldn aren hasn wasn weren
+  static final RegExp _contractionCheck = RegExp(
+    r"(don't|won't|can't|shouldn't|wouldn't|isn't|aren't|"
+    r"hasn't|haven't|wasn't|weren't|let's|it's|there's|"
+    r"here's|we'll|I've|I'm|you're|they're|that's|"
+    r"o'clock|O'Brien|O'Connor|O'Hara|O'Malley|O'Neill|"
+    r"'s\b|'t\b|'ll\b|'ve\b|'re\b|'m\b|'d\b)",
+    caseSensitive: false,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String value = node.value;
+
+      if (_contractionCheck.hasMatch(value)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    // Also check string interpolations
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final String value = node.toString();
+
+      if (_contractionCheck.hasMatch(value)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceStraightWithCurlyFix()];
+}
+
+class _ReplaceStraightWithCurlyFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final String lexeme = node.literal.lexeme;
+
+      // cspell:ignore shouldn wouldn aren hasn wasn weren
+      // Replace straight apostrophes with curly ones in contractions
+      final String fixed = lexeme
+          .replaceAll("don't", 'don\u2019t')
+          .replaceAll("won't", 'won\u2019t')
+          .replaceAll("can't", 'can\u2019t')
+          .replaceAll("shouldn't", 'shouldn\u2019t')
+          .replaceAll("wouldn't", 'wouldn\u2019t')
+          .replaceAll("isn't", 'isn\u2019t')
+          .replaceAll("aren't", 'aren\u2019t')
+          .replaceAll("hasn't", 'hasn\u2019t')
+          .replaceAll("haven't", 'haven\u2019t')
+          .replaceAll("wasn't", 'wasn\u2019t')
+          .replaceAll("weren't", 'weren\u2019t')
+          .replaceAll("let's", 'let\u2019s')
+          .replaceAll("it's", 'it\u2019s')
+          .replaceAll("there's", 'there\u2019s')
+          .replaceAll("here's", 'here\u2019s')
+          .replaceAll("we'll", 'we\u2019ll')
+          .replaceAll("I've", 'I\u2019ve')
+          .replaceAll("I'm", 'I\u2019m')
+          .replaceAll("you're", 'you\u2019re')
+          .replaceAll("they're", 'they\u2019re')
+          .replaceAll("that's", 'that\u2019s')
+          .replaceAll("o'clock", 'o\u2019clock')
+          .replaceAll("O'Brien", 'O\u2019Brien')
+          .replaceAll("O'Connor", 'O\u2019Connor')
+          .replaceAll("O'Hara", 'O\u2019Hara')
+          .replaceAll("O'Malley", 'O\u2019Malley')
+          .replaceAll("O'Neill", 'O\u2019Neill');
+
+      if (fixed != lexeme) {
+        final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+          message: 'Use curly apostrophe',
+          priority: 1,
+        );
+
+        changeBuilder.addDartFileEdit((builder) {
+          builder.addSimpleReplacement(node.sourceRange, fixed);
+        });
+      }
+    });
+  }
+}
+
 /// Warns when named arguments in function calls are not in alphabetical order.
 ///
 /// This is an **opinionated rule** - not included in any tier by default.

@@ -72,6 +72,10 @@ Core stylistic preferences for imports, functions, formatting, naming, and comme
 | [`prefer_snake_case_files`](#prefer_snake_case_files) | File names in `snake_case.dart` | |
 | [`avoid_small_text`](#avoid_small_text) | Font size at least 12 for accessibility | Yes |
 | [`prefer_doc_comments_over_regular`](#prefer_doc_comments_over_regular) | Use `///` instead of `//` for public API docs | Yes |
+| [`prefer_straight_apostrophe`](#prefer_straight_apostrophe) | Straight apostrophe `'` in strings | Yes |
+| [`prefer_curly_apostrophe`](#prefer_curly_apostrophe) | Curly apostrophe `'` in strings | Yes |
+| [`prefer_doc_curly_apostrophe`](#prefer_doc_curly_apostrophe) | Curly apostrophe `'` in doc comments | Yes |
+| [`prefer_doc_straight_apostrophe`](#prefer_doc_straight_apostrophe) | Straight apostrophe `'` in doc comments | Yes |
 | [`arguments_ordering`](#arguments_ordering) | Named arguments should be in alphabetical order | Yes |
 | [`capitalize_comment`](#capitalize_comment) | Comments should start with a capital letter | Yes |
 | [`firebase_custom`](#firebase_custom) | Custom Firebase usage should follow team conventions | |
@@ -502,6 +506,78 @@ Text('Readable', style: TextStyle(fontSize: 14));
 ```
 
 **Quick fix available:** Changes font size to 12 automatically.
+
+---
+
+### prefer_straight_apostrophe
+
+Use straight ASCII apostrophe (`'` U+0027) instead of curly apostrophe in string literals.
+
+```dart
+// BAD (with this rule enabled):
+String message = "It's a beautiful day";  // Curly apostrophe U+2019
+
+// GOOD:
+String message = "It's a beautiful day";  // Straight apostrophe U+0027
+```
+
+**Opposing rule:** `prefer_curly_apostrophe`
+
+**Quick fix available:** Replaces curly apostrophes with straight apostrophes.
+
+---
+
+### prefer_curly_apostrophe
+
+Use curly apostrophe (`'` U+2019) instead of straight apostrophe in string literals for better typography.
+
+```dart
+// BAD (with this rule enabled):
+String message = "It's a beautiful day";  // Straight apostrophe U+0027
+
+// GOOD:
+String message = "It's a beautiful day";  // Curly apostrophe U+2019
+```
+
+**Opposing rule:** `prefer_straight_apostrophe`
+
+**Quick fix available:** Replaces straight apostrophes with curly apostrophes in contractions.
+
+---
+
+### prefer_doc_curly_apostrophe
+
+Use curly apostrophe (`'` U+2019) in documentation comments for better typography.
+
+```dart
+// BAD (with this rule enabled):
+/// It's a beautiful day.  // Straight apostrophe
+
+// GOOD:
+/// It's a beautiful day.  // Curly apostrophe
+```
+
+**Opposing rule:** `prefer_doc_straight_apostrophe`
+
+**Quick fix available:** Replaces straight apostrophes with curly apostrophes in doc comments.
+
+---
+
+### prefer_doc_straight_apostrophe
+
+Use straight ASCII apostrophe (`'` U+0027) in documentation comments for consistency with code.
+
+```dart
+// BAD (with this rule enabled):
+/// It's a beautiful day.  // Curly apostrophe U+2019
+
+// GOOD:
+/// It's a beautiful day.  // Straight apostrophe U+0027
+```
+
+**Opposing rule:** `prefer_doc_curly_apostrophe`
+
+**Quick fix available:** Replaces curly apostrophes with straight apostrophes in doc comments.
 
 ---
 <!-- cspell:ignore Rossum -->

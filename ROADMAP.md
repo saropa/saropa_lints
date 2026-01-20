@@ -941,7 +941,6 @@ These rules are **not included in any tier** by default. They represent team pre
 | `prefer_foreach_over_map_entries` | Planned | INFO | Prefer forEach for map iteration over map.entries. |
 | `prefer_grouped_related_statements` | Planned | INFO | Prefer grouping related statements for readability. |
 | `prefer_if_else_over_guards` | Planned | INFO | Prefer if-else over guard clauses for certain logic. |
-| `prefer_literal_apostrophe` | Planned | INFO | Prefer straight apostrophe (') over curly in code. |
 | `prefer_named_constructor_parameters` | Planned | INFO | Prefer named parameters in constructors for clarity. |
 | `prefer_non_const_constructors` | Planned | INFO | Prefer non-const constructors when mutation is required. |
 | `prefer_null_aware_method_calls` | Planned | INFO | Prefer null-aware method calls (?.) for nullable objects. |

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 3.4.0.
 
+## [4.2.3] - 2026-01-20
+
+### Added
+
+**2 new stylistic apostrophe rules** - complementary opposite rules for the existing apostrophe preferences:
+
+- `prefer_doc_straight_apostrophe` - Warns when curly apostrophes (U+2019) are used in doc comments. Opposite of `prefer_doc_curly_apostrophe`. Quick fix replaces curly with straight apostrophes.
+- `prefer_curly_apostrophe` - Warns when straight apostrophes are used in string literals instead of curly. Opposite of `prefer_straight_apostrophe`. Quick fix replaces contractions with typographic apostrophes.
+
+Both rules are opinionated and not included in any tier by default. Enable them explicitly if your team prefers consistent apostrophe style.
+
 ## [4.2.2] - 2026-01-19
 
 ### Fixed

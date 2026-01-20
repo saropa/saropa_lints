@@ -97,7 +97,11 @@ export 'package:saropa_lints/src/project_context.dart'
 List<LintRule> get allSaropaRules => _allRules;
 
 /// Entry point for custom_lint
-PluginBase createPlugin() => _SaropaLints();
+PluginBase createPlugin() {
+  // ignore: avoid_print
+  print('[saropa_lints] createPlugin() called - version 4.2.2');
+  return _SaropaLints();
+}
 
 /// All available rules - instantiated once
 const List<LintRule> _allRules = <LintRule>[
@@ -820,6 +824,8 @@ const List<LintRule> _allRules = <LintRule>[
   PreferDocCommentsOverRegularRule(),
   PreferStraightApostropheRule(),
   PreferDocCurlyApostropheRule(),
+  PreferDocStraightApostropheRule(),
+  PreferCurlyApostropheRule(),
 
   // =========================================================================
   // NEW STYLISTIC RULES v2.5.0 (76+ opinionated rules with opposites)
@@ -2352,6 +2358,11 @@ class _SaropaLints extends PluginBase {
     _cachedTier = tier;
     _cachedEnableAll = enableAll;
     _cachedRulesHash = rulesHash;
+
+    // Debug: show rule count to help diagnose "No issues found" problems
+    // ignore: avoid_print
+    print(
+        '[saropa_lints] Loaded ${filteredRules.length} rules (tier: $tier, enableAll: $enableAll)');
 
     return filteredRules;
   }
