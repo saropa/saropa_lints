@@ -96,6 +96,109 @@ final bool _profilingEnabled =
 /// Threshold in milliseconds for logging slow rules.
 const int _slowRuleThresholdMs = 10;
 
+/// Controls whether progress reporting is enabled.
+///
+/// Set via environment variable: SAROPA_LINTS_PROGRESS=true
+final bool _progressEnabled =
+    const bool.fromEnvironment('SAROPA_LINTS_PROGRESS') ||
+        const String.fromEnvironment('SAROPA_LINTS_PROGRESS') == 'true';
+
+// =============================================================================
+// PROGRESS TRACKING (User Feedback)
+// =============================================================================
+//
+// Tracks analysis progress to show the user that the linter is working.
+// Enable progress reporting by setting the environment variable:
+//   SAROPA_LINTS_PROGRESS=true dart run custom_lint
+//
+// Progress output helps users see:
+// 1. That the linter is actively working (not frozen)
+// 2. How many files have been analyzed
+// 3. Approximate progress through the codebase
+// =============================================================================
+
+/// Tracks and reports analysis progress across files.
+///
+/// Usage: Enable via environment variable SAROPA_LINTS_PROGRESS=true
+class ProgressTracker {
+  ProgressTracker._();
+
+  static final Set<String> _seenFiles = {};
+  static DateTime? _startTime;
+  static DateTime? _lastProgressTime;
+  static int _lastReportedCount = 0;
+
+  /// Interval between progress reports (in files or time).
+  static const int _fileInterval = 25;
+  static const Duration _timeInterval = Duration(seconds: 3);
+
+  /// Record that a file is being analyzed and potentially report progress.
+  static void recordFile(String path) {
+    if (!_progressEnabled) return;
+
+    // Initialize start time on first file
+    _startTime ??= DateTime.now();
+    _lastProgressTime ??= _startTime;
+
+    // Track unique files
+    final wasNew = _seenFiles.add(path);
+    if (!wasNew) return; // Already seen this file
+
+    final now = DateTime.now();
+    final fileCount = _seenFiles.length;
+
+    // Report progress at intervals (every N files or every N seconds)
+    final timeSinceLastReport = now.difference(_lastProgressTime!);
+    final filesSinceLastReport = fileCount - _lastReportedCount;
+
+    if (filesSinceLastReport >= _fileInterval ||
+        timeSinceLastReport >= _timeInterval) {
+      _reportProgress(fileCount, now);
+      _lastProgressTime = now;
+      _lastReportedCount = fileCount;
+    }
+  }
+
+  static void _reportProgress(int fileCount, DateTime now) {
+    final elapsed = now.difference(_startTime!);
+    final filesPerSec =
+        elapsed.inMilliseconds > 0 ? fileCount / elapsed.inSeconds : 0;
+
+    // Extract just the filename from the last seen file for context
+    final lastFile = _seenFiles.last;
+    final shortName = lastFile.split('/').last.split('\\').last;
+
+    print(
+      '[saropa_lints] Progress: $fileCount files analyzed '
+      '(${elapsed.inSeconds}s, ${filesPerSec.toStringAsFixed(1)} files/sec) '
+      '- $shortName',
+    );
+  }
+
+  /// Report final summary when analysis completes.
+  static void reportSummary() {
+    if (!_progressEnabled || _startTime == null) return;
+
+    final elapsed = DateTime.now().difference(_startTime!);
+    final fileCount = _seenFiles.length;
+    final filesPerSec =
+        elapsed.inMilliseconds > 0 ? fileCount / elapsed.inSeconds : 0;
+
+    print(
+      '[saropa_lints] Complete: $fileCount files analyzed in ${elapsed.inSeconds}s '
+      '(${filesPerSec.toStringAsFixed(1)} files/sec)',
+    );
+  }
+
+  /// Reset tracking state (useful between analysis runs).
+  static void reset() {
+    _seenFiles.clear();
+    _startTime = null;
+    _lastProgressTime = null;
+    _lastReportedCount = 0;
+  }
+}
+
 /// Tracks cumulative timing for each rule across all files.
 class RuleTimingTracker {
   RuleTimingTracker._();
@@ -945,6 +1048,13 @@ abstract class SaropaLintRule extends DartLintRule {
     // Check if file should be skipped based on context
     final path = resolver.source.fullName;
     if (_shouldSkipFile(path)) return;
+
+    // =========================================================================
+    // PROGRESS TRACKING (User Feedback)
+    // =========================================================================
+    // Record this file for progress reporting. Only fires when enabled via
+    // environment variable SAROPA_LINTS_PROGRESS=true
+    ProgressTracker.recordFile(path);
 
     // =========================================================================
     // BATCH EXECUTION PLAN CHECK (Performance Optimization)

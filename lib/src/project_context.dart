@@ -1006,12 +1006,23 @@ class IncrementalAnalysisTracker {
     }
   }
 
+  /// Disable incremental caching entirely.
+  ///
+  /// Cache is DISABLED BY DEFAULT due to bugs causing stale "passed" entries.
+  /// Set SAROPA_LINTS_ENABLE_CACHE=true to re-enable (not recommended).
+  static final bool _cacheDisabled =
+      !(const bool.fromEnvironment('SAROPA_LINTS_ENABLE_CACHE') ||
+          const String.fromEnvironment('SAROPA_LINTS_ENABLE_CACHE') == 'true');
+
   /// Check if a rule can be skipped for this file.
   ///
   /// Returns `true` if:
   /// - The file's content hash matches the cached hash
   /// - The rule previously passed on this file
   static bool canSkipRule(String filePath, String content, String ruleName) {
+    // Allow complete cache bypass for debugging
+    if (_cacheDisabled) return false;
+
     // Normalize path separators for cross-platform consistency
     final normalizedPath = normalizePath(filePath);
     final state = _state[normalizedPath];
@@ -1035,6 +1046,9 @@ class IncrementalAnalysisTracker {
     String content,
     String ruleName,
   ) {
+    // Skip recording if cache is disabled
+    if (_cacheDisabled) return;
+
     // Normalize path separators for cross-platform consistency
     final normalizedPath = normalizePath(filePath);
     final hash = content.hashCode;
@@ -1090,6 +1104,9 @@ class IncrementalAnalysisTracker {
   ///
   /// Call this once at startup. Silently fails if no cache exists.
   static void loadFromDisk() {
+    // Skip loading if cache is disabled
+    if (_cacheDisabled) return;
+
     final path = _cacheFilePath;
     if (path == null) return;
 
@@ -1147,6 +1164,8 @@ class IncrementalAnalysisTracker {
   ///
   /// Call this periodically or when analysis completes.
   static void saveToDisk() {
+    // Skip saving if cache is disabled
+    if (_cacheDisabled) return;
     if (!_isDirty) return;
 
     final path = _cacheFilePath;

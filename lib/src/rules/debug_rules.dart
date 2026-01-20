@@ -7,6 +7,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Test-only rule that always reports a lint at the start of the file.
@@ -649,9 +650,7 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
     while (current != null) {
       if (current is IfStatement) {
         final String condition = current.expression.toSource();
-        if (condition.contains('kDebugMode') ||
-            condition.contains('kReleaseMode') ||
-            condition.contains('kProfileMode')) {
+        if (usesFlutterModeConstants(condition)) {
           return true;
         }
       }

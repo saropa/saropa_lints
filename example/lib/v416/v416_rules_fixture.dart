@@ -209,6 +209,20 @@ class ConsistentConfig {
   static const debug = !kReleaseMode;
 }
 
+// GOOD: Enum values with both 'debug' and 'release' guarded by mode constants
+enum AppModeEnum { release, profile, debug }
+
+class AppModeSettings {
+  // This should NOT trigger avoid_mixed_environments because it's properly
+  // conditional using kDebugMode/kProfileMode
+  static const AppModeEnum mode = kDebugMode
+      ? AppModeEnum.debug
+      : (kProfileMode ? AppModeEnum.profile : AppModeEnum.release);
+
+  static const bool isDebugMode = mode == AppModeEnum.debug;
+  static const bool isProfileMode = mode == AppModeEnum.profile;
+}
+
 // =============================================================================
 // v4.1.6 Test Fixtures - Lifecycle Rules
 // =============================================================================

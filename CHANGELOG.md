@@ -30,6 +30,18 @@ Both rules are opinionated and not included in any tier by default. Enable them 
 
 **Quick fix added**: Comments out the sensitive log statement with `// SECURITY:` prefix.
 
+**`avoid_mixed_environments` false positives on conditional configs** - The rule was incorrectly flagging classes that use Flutter's mode constants (`kReleaseMode`, `kDebugMode`, `kProfileMode`) to conditionally set values. For example, this pattern was incorrectly flagged:
+
+```dart
+class AppModeSettings {
+  static const AppModeEnum mode = kDebugMode
+      ? AppModeEnum.debug
+      : (kProfileMode ? AppModeEnum.profile : AppModeEnum.release);
+}
+```
+
+The rule now detects fields with mode constant checks and marks them as "properly conditional", skipping both production and development indicator checks for those fields. Doc header enhanced with `[HEURISTIC]` tag and additional examples. Added `requiresClassDeclaration` override for performance.
+
 ### Changed
 
 **Rule consolidation** - `avoid_sensitive_data_in_logs` (security_rules.dart) has been removed as a duplicate of `avoid_sensitive_in_logs` (debug_rules.dart). The canonical rule now:
@@ -38,6 +50,8 @@ Both rules are opinionated and not included in any tier by default. Enable them 
 - Has a quick fix to comment out sensitive log statements
 
 If you had `avoid_sensitive_data_in_logs` in your config, it will continue to work via the alias.
+
+**Shared utility for mode constant detection** - Extracted `usesFlutterModeConstants()` to `mode_constants_utils.dart` for detecting `kReleaseMode`, `kDebugMode`, and `kProfileMode` guards. Used by 5 rule files: config_rules.dart, debug_rules.dart, iap_rules.dart, isar_rules.dart, ios_rules.dart. This also fixed missing `kProfileMode` checks in iap_rules.dart and isar_rules.dart.
 
 ## [4.2.2] - 2026-01-19
 
