@@ -1261,7 +1261,7 @@ const List<LintRule> _allRules = <LintRule>[
   AvoidDateTimeParseUnvalidatedRule(),
   PreferTryParseForDynamicDataRule(),
   AvoidDoubleForMoneyRule(),
-  AvoidSensitiveDataInLogsRule(),
+  // AvoidSensitiveDataInLogsRule removed v4.2.3 - use AvoidSensitiveInLogsRule (alias works)
   RequireGetItResetInTestsRule(),
   RequireWebSocketErrorHandlingRule(),
   AvoidAutoplayAudioRule(),
