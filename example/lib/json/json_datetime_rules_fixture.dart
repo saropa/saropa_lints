@@ -177,14 +177,14 @@ class NotMoneyDoubles {
 }
 
 // =========================================================================
-// avoid_sensitive_data_in_logs
+// avoid_sensitive_in_logs (alias: avoid_sensitive_data_in_logs)
 // =========================================================================
 
 void badLogging(String password, String token) {
-  // expect_lint: avoid_sensitive_data_in_logs
+  // expect_lint: avoid_sensitive_in_logs
   print('User password: $password');
 
-  // expect_lint: avoid_sensitive_data_in_logs
+  // expect_lint: avoid_sensitive_in_logs
   print('Auth token: $token');
 }
 

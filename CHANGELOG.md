@@ -18,6 +18,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Both rules are opinionated and not included in any tier by default. Enable them explicitly if your team prefers consistent apostrophe style.
 
+### Fixed
+
+**`avoid_sensitive_in_logs` false positives** - The rule was matching sensitive keywords (token, credential, session, etc.) in plain string literals, even when they were just descriptive text like `'Updating local token.'` or `'failed (null credential)'`. The rule now uses AST-based detection:
+
+- **Plain string literals** (`SimpleStringLiteral`) → Always safe, no actual data being logged
+- **String interpolation** → Only checks the interpolated expressions, not the literal text parts
+- **Variable references** (`$password`) → Check if the variable name is sensitive
+- **Property access** (`user.token`) → Check if the property name is sensitive
+- **Conditionals** → Recursively check the branches, not the condition
+
+**Quick fix added**: Comments out the sensitive log statement with `// SECURITY:` prefix.
+
+### Changed
+
+**Rule consolidation** - `avoid_sensitive_data_in_logs` (security_rules.dart) has been removed as a duplicate of `avoid_sensitive_in_logs` (debug_rules.dart). The canonical rule now:
+- Has a config alias `avoid_sensitive_data_in_logs` for backwards compatibility
+- Uses proper AST analysis instead of regex matching (more accurate)
+- Has a quick fix to comment out sensitive log statements
+
+If you had `avoid_sensitive_data_in_logs` in your config, it will continue to work via the alias.
+
 ## [4.2.2] - 2026-01-19
 
 ### Fixed

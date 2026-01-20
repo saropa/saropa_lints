@@ -798,10 +798,18 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
 
 /// Warns when sensitive data is logged.
 ///
+/// Alias: avoid_sensitive_data_in_logs
+///
 /// `[HEURISTIC]` - Uses pattern matching to detect sensitive variable names.
 ///
 /// Logging passwords, tokens, secrets, or other sensitive data is a security
-/// risk. This rule detects common sensitive variable patterns in log calls.
+/// risk that can expose credentials and violate compliance requirements
+/// (OWASP A09: Security Logging and Monitoring Failures).
+///
+/// This rule uses AST-based detection to distinguish between:
+/// - **Actual data exposure**: `$password`, `${user.token}` → FLAGGED
+/// - **Safe descriptive text**: `'Updating token.'`, `'session expired'` → OK
+/// - **Safe property access**: `${password.length}`, `${token != null}` → OK
 ///
 /// **BAD:**
 /// ```dart
@@ -815,15 +823,31 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
 /// print('Login attempt for user: ${user.email}');
 /// log('Token refreshed', data: {'userId': user.id});
 /// debugPrint('API call completed');
+/// // Safe: just descriptive text, no actual data
+/// print('Updating local token.');
 /// ```
+///
+/// **Quick fix available:** Comments out the sensitive log statement for review.
 class AvoidSensitiveInLogsRule extends SaropaLintRule {
   const AvoidSensitiveInLogsRule() : super(code: _code);
+
+  /// Config alias for backwards compatibility with avoid_sensitive_data_in_logs
+  @override
+  List<String> get configAliases =>
+      const <String>['avoid_sensitive_data_in_logs'];
 
   @override
   LintImpact get impact => LintImpact.critical;
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  /// OWASP mapping: M6 (Privacy Controls), A09 (Logging Failures)
+  @override
+  OwaspMapping get owasp => const OwaspMapping(
+        mobile: <OwaspMobile>{OwaspMobile.m6},
+        web: <OwaspWeb>{OwaspWeb.a09},
+      );
 
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_in_logs',
@@ -880,7 +904,133 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
   }
 
   bool _containsSensitiveData(Expression expr) {
-    final String source = expr.toSource();
-    return _sensitivePattern.hasMatch(source);
+    // For simple string literals with no interpolation, no sensitive data
+    // is actually being logged (just descriptive text like "updating token")
+    // This MUST be checked first before StringInterpolation.
+    if (expr is SimpleStringLiteral) {
+      return false;
+    }
+
+    // For adjacent strings (multi-line string literals), check each part
+    if (expr is AdjacentStrings) {
+      for (final StringLiteral part in expr.strings) {
+        if (_containsSensitiveData(part)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Check string literals for interpolated sensitive variables
+    if (expr is StringInterpolation) {
+      for (final InterpolationElement element in expr.elements) {
+        if (element is InterpolationExpression) {
+          // Recursively check the interpolated expression
+          if (_containsSensitiveData(element.expression)) {
+            return true;
+          }
+        }
+        // Plain string parts (InterpolationString) are ignored - they're just
+        // descriptive text, not actual sensitive data being logged
+      }
+      return false;
+    }
+
+    // For concatenation, check if sensitive variables are being concatenated
+    if (expr is BinaryExpression && expr.operator.lexeme == '+') {
+      return _containsSensitiveData(expr.leftOperand) ||
+          _containsSensitiveData(expr.rightOperand);
+    }
+
+    // For conditional expressions, check all branches
+    if (expr is ConditionalExpression) {
+      // Don't check the condition itself - only what gets logged
+      return _containsSensitiveData(expr.thenExpression) ||
+          _containsSensitiveData(expr.elseExpression);
+    }
+
+    // For parenthesized expressions, check inside
+    if (expr is ParenthesizedExpression) {
+      return _containsSensitiveData(expr.expression);
+    }
+
+    // For identifiers (variable references) - check if the name is sensitive
+    if (expr is SimpleIdentifier) {
+      return _sensitivePattern.hasMatch(expr.name);
+    }
+
+    // For property access (e.g., user.token) - check the property name
+    if (expr is PrefixedIdentifier) {
+      return _sensitivePattern.hasMatch(expr.identifier.name);
+    }
+
+    if (expr is PropertyAccess) {
+      return _sensitivePattern.hasMatch(expr.propertyName.name);
+    }
+
+    // For method calls, don't flag - method results aren't inherently sensitive
+    // by name (e.g., getToken() might return masked data)
+    if (expr is MethodInvocation) {
+      // But do check arguments being passed
+      for (final Expression arg in expr.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (_containsSensitiveData(arg.expression)) {
+            return true;
+          }
+        } else if (_containsSensitiveData(arg)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // For index expressions (e.g., map['token']), check the index
+    if (expr is IndexExpression) {
+      final Expression index = expr.index;
+      if (index is SimpleStringLiteral) {
+        return _sensitivePattern.hasMatch(index.value);
+      }
+      return false;
+    }
+
+    // For other expressions (literals, etc.), no sensitive data
+    return false;
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_CommentOutSensitiveLogFix()];
+}
+
+class _CommentOutSensitiveLogFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodInvocation((MethodInvocation node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      // Find the statement containing this method invocation
+      AstNode? current = node;
+      while (current != null && current is! Statement) {
+        current = current.parent;
+      }
+      if (current == null) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Comment out sensitive log statement',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleReplacement(
+          SourceRange(current!.offset, current.length),
+          '// SECURITY: ${current.toSource()}',
+        );
+      });
+    });
   }
 }

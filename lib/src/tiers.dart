@@ -108,7 +108,7 @@ const Set<String> essentialRules = <String>{
   // Security
   'avoid_hardcoded_credentials',
   'avoid_logging_sensitive_data',
-  'avoid_sensitive_data_in_logs',
+  // 'avoid_sensitive_data_in_logs' removed v4.2.3 - alias of avoid_sensitive_in_logs
   'avoid_eval_like_patterns',
   'avoid_weak_cryptographic_algorithms',
   'avoid_token_in_url',
