@@ -106,3 +106,67 @@ class GoodTestWidget extends StatelessWidget {
     );
   }
 }
+
+// =============================================================================
+// Bloc/Cubit Rules (from v4.1.4)
+// =============================================================================
+
+// BAD: Bloc depending on another Bloc
+class BadOrderBloc extends Bloc<Object, Object> {
+  // expect_lint: avoid_passing_bloc_to_bloc
+  BadOrderBloc(this.userBloc) : super(Object());
+  final UserBloc userBloc;
+}
+
+// GOOD: Bloc with repository injection
+class GoodOrderBloc extends Bloc<Object, Object> {
+  GoodOrderBloc({required this.repository}) : super(Object());
+  final UserRepository repository;
+}
+
+class UserRepository {}
+
+// BAD: BuildContext in Bloc
+class BadContextBloc extends Bloc<Object, Object> {
+  // expect_lint: avoid_passing_build_context_to_blocs
+  BadContextBloc(this.context) : super(Object());
+  final BuildContext context;
+}
+
+// BAD: Bloc creating its own repository
+class BadDependencyBloc extends Bloc<Object, Object> {
+  BadDependencyBloc() : super(Object()) {
+    // expect_lint: require_bloc_repository_injection
+    _repository = UserRepository();
+  }
+  late final UserRepository _repository;
+}
+
+// BAD: Cubit returning value
+class CounterCubit extends Cubit<int> {
+  CounterCubit() : super(0);
+
+  // expect_lint: avoid_returning_value_from_cubit_methods
+  int increment() {
+    emit(state + 1);
+    return state;
+  }
+}
+
+// GOOD: Cubit emitting state
+class GoodCounterCubit extends Cubit<int> {
+  GoodCounterCubit() : super(0);
+
+  void increment() {
+    emit(state + 1);
+  }
+}
+
+// Mock Cubit class
+abstract class Cubit<S> {
+  Cubit(this.state);
+  S state;
+  void emit(S newState) {
+    state = newState;
+  }
+}

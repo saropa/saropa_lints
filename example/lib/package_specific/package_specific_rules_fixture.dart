@@ -316,3 +316,22 @@ void testUuidV4() {
   // GOOD: Uses v4
   final id = uuid.v4();
 }
+
+// -----------------------------------------------------------------------------
+// avoid_freezed_for_logic_classes (from v4.1.4)
+// -----------------------------------------------------------------------------
+
+const freezed = _Freezed();
+
+class _Freezed {
+  const _Freezed();
+}
+
+// BAD: Freezed on logic class
+// expect_lint: avoid_freezed_for_logic_classes
+@freezed
+class BadUserService {}
+
+// GOOD: Freezed on data class
+@freezed
+class UserData {}
