@@ -831,6 +831,9 @@ custom_lint:
     - avoid_sensitive_data_in_clipboard: false   # ERROR - clipboard accessible to other apps (v4.1.8)
     - require_clipboard_paste_validation: false  # WARNING - validate clipboard content (v4.1.8)
     - avoid_encryption_key_in_memory: false      # WARNING - keys in fields can be extracted (v4.1.8)
+    # v4.1.6 Configuration rules
+    - avoid_hardcoded_config: false              # WARNING - hardcoded URLs and keys (v4.1.6)
+    - avoid_mixed_environments: false            # ERROR - prod/dev config mismatch (v4.1.6)
 
     # =========================================================================
     # EQUATABLE (v2.3.9)

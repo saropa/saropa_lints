@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -90,9 +91,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
         if (functionBody != null) {
           final String bodySource = functionBody.toSource();
           // If there's environment checking, it's likely handled correctly
-          if (bodySource.contains('kReleaseMode') ||
-              bodySource.contains('kDebugMode') ||
-              bodySource.contains('kProfileMode') ||
+          if (usesFlutterModeConstants(bodySource) ||
               bodySource.contains('Environment.') ||
               bodySource.contains('isProduction') ||
               bodySource.contains('isSandbox')) {
@@ -127,8 +126,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
 
         if (functionBody != null) {
           final String bodySource = functionBody.toSource();
-          if (!bodySource.contains('kReleaseMode') &&
-              !bodySource.contains('kDebugMode') &&
+          if (!usesFlutterModeConstants(bodySource) &&
               !bodySource.contains('isProduction') &&
               !bodySource.contains('isSandbox')) {
             reporter.atNode(node, code);
