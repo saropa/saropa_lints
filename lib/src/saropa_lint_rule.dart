@@ -161,10 +161,16 @@ class ProgressTracker {
     }
   }
 
+  /// Calculate files per second, avoiding division by zero.
+  static double _calculateFilesPerSec(int fileCount, Duration elapsed) {
+    return elapsed.inMilliseconds > 0
+        ? (fileCount * 1000) / elapsed.inMilliseconds
+        : 0.0;
+  }
+
   static void _reportProgress(int fileCount, DateTime now) {
     final elapsed = now.difference(_startTime!);
-    final filesPerSec =
-        elapsed.inMilliseconds > 0 ? fileCount / elapsed.inSeconds : 0;
+    final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
 
     // Extract just the filename from the last seen file for context
     final lastFile = _seenFiles.last;
@@ -183,8 +189,7 @@ class ProgressTracker {
 
     final elapsed = DateTime.now().difference(_startTime!);
     final fileCount = _seenFiles.length;
-    final filesPerSec =
-        elapsed.inMilliseconds > 0 ? fileCount / elapsed.inSeconds : 0;
+    final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
 
     print(
       '[saropa_lints] Complete: $fileCount files analyzed in ${elapsed.inSeconds}s '
