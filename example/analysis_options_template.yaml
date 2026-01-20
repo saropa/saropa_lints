@@ -818,7 +818,7 @@ custom_lint:
     - prefer_secure_random_for_crypto: false
     - avoid_deprecated_crypto_algorithms: false
     - require_unique_iv_per_encryption: false
-    - avoid_sensitive_data_in_logs: false
+    - avoid_sensitive_in_logs: false         # WARNING - sensitive data in logs (alias: avoid_sensitive_data_in_logs)
     - avoid_api_key_in_code: false               # ERROR - security critical (v2.3.11)
     - avoid_storing_sensitive_unencrypted: false # ERROR - security critical (v2.3.11)
     # OWASP Coverage Gap Rules (v3.2.0)
