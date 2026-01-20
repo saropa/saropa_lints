@@ -229,3 +229,96 @@ class ChangeNotifierProxyProvider<A, T extends ChangeNotifier> {
 extension BuildContextRead on BuildContext {
   T read<T>() => throw UnimplementedError();
 }
+
+// =========================================================================
+// State Management Rules (from v4.1.7)
+// =========================================================================
+
+// BAD: Riverpod used only for network client
+// expect_lint: avoid_riverpod_for_network_only
+final apiProvider = ProviderDemo((ref) => ApiClientDemo());
+
+// GOOD: Riverpod with actual state management
+final userProvider = ProviderDemo((ref) {
+  final api = ref.watch(apiProvider);
+  return UserServiceDemo(api);
+});
+
+// BAD: Large Bloc with too many handlers
+// expect_lint: avoid_large_bloc
+class KitchenSinkBloc extends Bloc<AppEvent, AppState> {
+  KitchenSinkBloc() : super(AppState()) {
+    on<LoadUser>(_onLoadUser);
+    on<UpdateProfile>(_onUpdateProfile);
+    on<LoadOrders>(_onLoadOrders);
+    on<ProcessPayment>(_onProcessPayment);
+    on<SendNotification>(_onSendNotification);
+    on<UpdateSettings>(_onUpdateSettings);
+    on<RefreshData>(_onRefreshData);
+    on<SyncData>(_onSyncData);
+  }
+
+  void _onLoadUser(LoadUser event, Emitter<AppState> emit) {}
+  void _onUpdateProfile(UpdateProfile event, Emitter<AppState> emit) {}
+  void _onLoadOrders(LoadOrders event, Emitter<AppState> emit) {}
+  void _onProcessPayment(ProcessPayment event, Emitter<AppState> emit) {}
+  void _onSendNotification(SendNotification event, Emitter<AppState> emit) {}
+  void _onUpdateSettings(UpdateSettings event, Emitter<AppState> emit) {}
+  void _onRefreshData(RefreshData event, Emitter<AppState> emit) {}
+  void _onSyncData(SyncData event, Emitter<AppState> emit) {}
+}
+
+// GOOD: Focused Bloc
+class FocusedUserBloc extends Bloc<UserEvent, UserState> {
+  FocusedUserBloc() : super(UserState()) {
+    on<LoadUserEvent>(_onLoadUser);
+    on<UpdateUserEvent>(_onUpdateUser);
+  }
+
+  void _onLoadUser(LoadUserEvent event, Emitter<UserState> emit) {}
+  void _onUpdateUser(UpdateUserEvent event, Emitter<UserState> emit) {}
+}
+
+// BAD: GetX static context usage
+void navigateWithGetX() {
+  // expect_lint: avoid_getx_static_context
+  GetDemo.offNamed('/home');
+
+  // expect_lint: avoid_getx_static_context
+  GetDemo.dialog(Container());
+}
+
+// Mock classes for v417 state management
+class ProviderDemo<T> {
+  final T Function(dynamic ref) create;
+  ProviderDemo(this.create);
+}
+
+class ApiClientDemo {}
+
+class UserServiceDemo {
+  UserServiceDemo(ApiClientDemo api);
+}
+
+class AppEvent {}
+class LoadUser extends AppEvent {}
+class UpdateProfile extends AppEvent {}
+class LoadOrders extends AppEvent {}
+class ProcessPayment extends AppEvent {}
+class SendNotification extends AppEvent {}
+class UpdateSettings extends AppEvent {}
+class RefreshData extends AppEvent {}
+class SyncData extends AppEvent {}
+class AppState {}
+
+class UserEvent {}
+class LoadUserEvent extends UserEvent {}
+class UpdateUserEvent extends UserEvent {}
+class UserState {}
+
+typedef Emitter<S> = void Function(S);
+
+class GetDemo {
+  static void offNamed(String route) {}
+  static void dialog(Widget widget) {}
+}
