@@ -655,3 +655,37 @@ at:
 [custom_lint] 2026-01-19T13:09:50.489334 #23     main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
 [custom_lint] 2026-01-19T13:09:50.489334 <asynchronous suspension>
 [custom_lint] 2026-01-19T13:09:50.489334
+[custom_lint] 2026-01-19T18:19:21.575349 FileSystemException: writeFrom failed, path = '' (OS Error: The pipe is being closed, errno = 232)
+[custom_lint] 2026-01-19T18:19:21.575349 #0      _RandomAccessFile.writeFromSync (dart:io/file_impl.dart:1027:7)
+[custom_lint] 2026-01-19T18:19:21.575349 #1      _StdConsumer.addStream.<anonymous closure> (dart:io/stdio.dart:328:17)
+[custom_lint] 2026-01-19T18:19:21.575349 #2      _rootRunUnary (dart:async/zone.dart:1538:47)
+[custom_lint] 2026-01-19T18:19:21.575349 #3      _CustomZone.runUnary (dart:async/zone.dart:1429:19)
+[custom_lint] 2026-01-19T18:19:21.575349 #4      _CustomZone.runUnaryGuarded (dart:async/zone.dart:1329:7)
+[custom_lint] 2026-01-19T18:19:21.575349 #5      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:381:11)
+[custom_lint] 2026-01-19T18:19:21.575349 #6      _BufferingStreamSubscription._add (dart:async/stream_impl.dart:312:7)
+[custom_lint] 2026-01-19T18:19:21.575349 #7      _SyncStreamControllerDispatch._sendData (dart:async/stream_controller.dart:798:19)
+[custom_lint] 2026-01-19T18:19:21.575349 #8      _StreamController._add (dart:async/stream_controller.dart:663:7)
+[custom_lint] 2026-01-19T18:19:21.575349 #9      _StreamController.add (dart:async/stream_controller.dart:618:5)
+[custom_lint] 2026-01-19T18:19:21.575349 #10     _StreamSinkImpl.add (dart:io/io_sink.dart:155:17)
+[custom_lint] 2026-01-19T18:19:21.575349 #11     _IOSinkImpl.write (dart:io/io_sink.dart:293:5)
+[custom_lint] 2026-01-19T18:19:21.575349 #12     _StdSink.writeln (dart:io/stdio.dart:442:13)
+[custom_lint] 2026-01-19T18:19:21.575349 #13     CliLogger.stdout (package:custom_lint/src/cli_logger.dart:32:15)
+[custom_lint] 2026-01-19T18:19:21.575349 #14     DefaultOutputFormat.render (package:custom_lint/src/output/default_output_format.dart:20:11)
+[custom_lint] 2026-01-19T18:19:21.575349 #15     renderLints (package:custom_lint/src/output/render_lints.dart:74:16)
+[custom_lint] 2026-01-19T18:19:21.575349 #16     _runPlugins (package:custom_lint/custom_lint.dart:147:3)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349 #17     _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:102:7)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349 #18     _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349 #19     _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349 #20     _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349 #21     customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349 #22     entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349 #23     main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-19T18:19:21.575349 <asynchronous suspension>
+[custom_lint] 2026-01-19T18:19:21.575349
