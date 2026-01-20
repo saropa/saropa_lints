@@ -213,3 +213,105 @@ void goodLoggingNullChecks(Object? credential, String? token) {
 //     autoPlay: true,  // <- This would trigger the lint
 //   ),
 // );
+
+// =========================================================================
+// JSON/API Rules (from v4.1.6)
+// =========================================================================
+
+// BAD: DateTime.parse with variable (non-literal)
+void testDateFormatSpecification(Map<String, dynamic> json) {
+  // expect_lint: require_date_format_specification
+  final date = DateTime.parse(json['created_at'] as String);
+}
+
+// GOOD: DateTime.tryParse for safety
+void testGoodDateParsing(Map<String, dynamic> json) {
+  final date = DateTime.tryParse(json['created_at'] as String);
+}
+
+// BAD: Non-ISO date format
+void testIso8601Dates(DateTime date) {
+  // expect_lint: prefer_iso8601_dates
+  final formatted = DateFormatDemo('MM/dd/yyyy').format(date);
+}
+
+// GOOD: ISO 8601 format
+void testGoodDateFormat(DateTime date) {
+  final formatted = date.toIso8601String();
+}
+
+// BAD: Chained JSON access without null safety
+void testOptionalFieldCrash(Map<String, dynamic> json) {
+  // expect_lint: avoid_optional_field_crash
+  final name = json['user']['name'];
+}
+
+// GOOD: Null-aware chained access
+void testGoodJsonAccess(Map<String, dynamic> json) {
+  final name = json['user']?['name'];
+}
+
+// BAD: Manual JSON key mapping (3+ mappings)
+class UserJsonDemo {
+  final String userName;
+  final String emailAddress;
+  final int userAge;
+
+  UserJsonDemo({
+    required this.userName,
+    required this.emailAddress,
+    required this.userAge,
+  });
+
+  // expect_lint: prefer_explicit_json_keys
+  factory UserJsonDemo.fromJson(Map<String, dynamic> json) => UserJsonDemo(
+        userName: json['user_name'] as String,
+        emailAddress: json['email'] as String,
+        userAge: json['age'] as int,
+      );
+}
+
+// Mock DateFormat
+class DateFormatDemo {
+  DateFormatDemo(this.pattern, [this.locale]);
+  final String pattern;
+  final String? locale;
+  String format(DateTime date) => '';
+}
+
+// =========================================================================
+// Configuration Rules (from v4.1.6)
+// =========================================================================
+
+// BAD: Hardcoded config values
+class BadConfig {
+  // expect_lint: avoid_hardcoded_config
+  static const apiUrl = 'https://api.example.com/v1';
+
+  // expect_lint: avoid_hardcoded_config
+  static const apiKey = 'sk_live_abc123def456';
+}
+
+// GOOD: Environment-based config
+class GoodConfig {
+  static const apiUrl = String.fromEnvironment('API_URL');
+  static const apiKey = String.fromEnvironment('API_KEY');
+}
+
+// BAD: Mixed production/development config
+class MixedConfig {
+  // expect_lint: avoid_mixed_environments
+  static const apiUrl = 'https://api.prod.example.com'; // Production!
+  static const debug = true; // But debug mode!
+  static const testMode = false;
+}
+
+// GOOD: Conditional config
+class ConsistentConfig {
+  static const apiUrl = kReleaseMode
+      ? 'https://api.prod.example.com'
+      : 'https://api.dev.example.com';
+  static const debug = !kReleaseMode;
+}
+
+const bool kReleaseMode = false;
