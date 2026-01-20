@@ -292,3 +292,73 @@ class Color {
   const Color(this.value);
   final int value;
 }
+
+// =========================================================================
+// Widget Rules (from v4.1.7)
+// =========================================================================
+
+// BAD: DateFormat without locale
+class BadDateFormatWidget extends StatelessWidget {
+  const BadDateFormatWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: require_locale_for_text
+    final date = DateFormatMock.yMd().format(DateTime.now());
+    return Text(date);
+  }
+}
+
+// GOOD: DateFormat with locale
+class GoodDateFormatWidget extends StatelessWidget {
+  const GoodDateFormatWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final date = DateFormatMock.yMd('en_US').format(DateTime.now());
+    return Text(date);
+  }
+}
+
+// BAD: Destructive dialog without barrierDismissible
+void showDeleteDialog(BuildContext context) {
+  // expect_lint: require_dialog_barrier_consideration
+  showDialogMock(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Delete account?'),
+      content: Text('This action cannot be undone.'),
+    ),
+  );
+}
+
+// GOOD: Destructive dialog with barrierDismissible: false
+void showDeleteDialogGood(BuildContext context) {
+  showDialogMock(
+    context: context,
+    barrierDismissible: false, // Explicit
+    builder: (context) => AlertDialog(
+      title: Text('Delete account?'),
+      content: Text('This action cannot be undone.'),
+    ),
+  );
+}
+
+// Mock classes for widget rules
+class DateFormatMock {
+  DateFormatMock.yMd([String? locale]);
+  String format(DateTime date) => '';
+}
+
+Future<T?> showDialogMock<T>({
+  required BuildContext context,
+  required Widget Function(BuildContext) builder,
+  bool barrierDismissible = true,
+}) async =>
+    null;
+
+class AlertDialog extends Widget {
+  const AlertDialog({super.key, this.title, this.content});
+  final Widget? title;
+  final Widget? content;
+}

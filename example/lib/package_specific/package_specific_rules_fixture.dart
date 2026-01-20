@@ -335,3 +335,57 @@ class BadUserService {}
 // GOOD: Freezed on data class
 @freezed
 class UserData {}
+
+// -----------------------------------------------------------------------------
+// Firebase Rules (from v4.1.5)
+// -----------------------------------------------------------------------------
+
+Future<void> testFirebaseWithoutErrorHandling() async {
+  // expect_lint: require_firebase_error_handling
+  await FirebaseFirestoreDemo.instance.collection('users').get();
+}
+
+class FirebaseInBuildWidgetDemo extends StatelessWidgetDemo {
+  const FirebaseInBuildWidgetDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: avoid_firebase_realtime_in_build
+    final stream = FirebaseFirestoreDemo.instance.collection('users').snapshots();
+    return Container();
+  }
+}
+
+// GOOD: Firebase with error handling
+Future<void> testFirebaseWithErrorHandling() async {
+  try {
+    await FirebaseFirestoreDemo.instance.collection('users').get();
+  } on FirebaseExceptionDemo catch (e) {
+    print('Error: $e');
+  }
+}
+
+// Firebase mocks
+class FirebaseFirestoreDemo {
+  static final FirebaseFirestoreDemo instance = FirebaseFirestoreDemo._();
+  FirebaseFirestoreDemo._();
+  CollectionReferenceDemo collection(String path) => CollectionReferenceDemo();
+}
+
+class CollectionReferenceDemo {
+  Future<Object> get() async => Object();
+  Stream<Object> snapshots() => Stream.empty();
+}
+
+class FirebaseExceptionDemo implements Exception {
+  final String message;
+  FirebaseExceptionDemo(this.message);
+}
+
+abstract class StatelessWidgetDemo {
+  const StatelessWidgetDemo({this.key});
+  final Object? key;
+  Widget build(BuildContext context);
+}
+
+class BuildContext {}

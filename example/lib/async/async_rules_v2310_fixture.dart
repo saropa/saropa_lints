@@ -281,3 +281,108 @@ class FutureBuilder<T> extends Widget {
   final Future<T> future;
   final Widget Function(BuildContext, dynamic) builder;
 }
+
+// =========================================================================
+// Async Rules (from v4.1.7)
+// =========================================================================
+
+// BAD: WebSocket without reconnection handling
+class BadWebSocketService {
+  // expect_lint: require_websocket_reconnection
+  WebSocketDemo? _channel;
+
+  void connect() {
+    _channel = WebSocketDemo.connect('wss://example.com');
+  }
+}
+
+// GOOD: WebSocket with reconnection logic
+class GoodWebSocketService {
+  WebSocketDemo? _channel;
+  int _reconnectAttempts = 0;
+
+  void connect() {
+    _channel = WebSocketDemo.connect('wss://example.com');
+    _channel!.stream.listen(
+      (data) {},
+      onDone: _handleReconnect,
+      onError: (error) => _handleReconnect(),
+    );
+  }
+
+  void _handleReconnect() {
+    if (_reconnectAttempts < 5) {
+      _reconnectAttempts++;
+      connect();
+    }
+  }
+}
+
+// BAD: Heavy computation on main isolate
+void processLargeDataBad(List<int> data) {
+  // expect_lint: prefer_isolate_for_heavy_compute
+  for (var i = 0; i < 1000000; i++) {
+    // Heavy computation
+  }
+}
+
+// GOOD: Heavy computation on separate isolate
+Future<void> processLargeDataGood(List<int> data) async {
+  await computeDemo(() {
+    for (var i = 0; i < 1000000; i++) {
+      // Heavy computation
+    }
+  });
+}
+
+// BAD: Caching without TTL
+class BadCacheService {
+  // expect_lint: require_cache_ttl
+  final Map<String, Object> _cache = {};
+
+  void set(String key, Object value) {
+    _cache[key] = value;
+  }
+}
+
+// GOOD: Caching with TTL
+class GoodCacheService {
+  final Map<String, CacheEntryDemo> _cache = {};
+  final Duration ttl = Duration(minutes: 5);
+
+  void set(String key, Object value) {
+    _cache[key] = CacheEntryDemo(value, DateTime.now().add(ttl));
+  }
+
+  Object? get(String key) {
+    final entry = _cache[key];
+    if (entry != null && entry.expiry.isAfter(DateTime.now())) {
+      return entry.value;
+    }
+    _cache.remove(key);
+    return null;
+  }
+}
+
+// Mock classes
+class WebSocketDemo {
+  static WebSocketDemo connect(String url) => WebSocketDemo._();
+  WebSocketDemo._();
+  StreamDemo get stream => StreamDemo();
+}
+
+class StreamDemo {
+  void listen(
+    void Function(dynamic)? onData, {
+    void Function()? onDone,
+    void Function(Object)? onError,
+  }) {}
+}
+
+Future<T> computeDemo<T>(T Function() callback) async => callback();
+
+class CacheEntryDemo {
+  CacheEntryDemo(this.value, this.expiry);
+  final Object value;
+  final DateTime expiry;
+}

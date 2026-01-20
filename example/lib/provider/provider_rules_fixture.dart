@@ -78,3 +78,46 @@ void testDisposeProviders() {
     child: Container(),
   );
 }
+
+// =============================================================================
+// Dependency Injection Rules (from v4.1.5)
+// =============================================================================
+
+// BAD: GetIt in widget
+class BadDiWidget extends StatelessWidget {
+  const BadDiWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: avoid_di_in_widgets
+    final service = GetIt.I<DemoUserService>();
+    return Text(service.name);
+  }
+}
+
+// BAD: Concrete type injection
+class BadConcreteInjection {
+  // expect_lint: prefer_abstraction_injection
+  BadConcreteInjection(this._httpClientImpl);
+  final HttpClientImpl _httpClientImpl;
+}
+
+// GOOD: Abstract type injection
+class GoodAbstractInjection {
+  GoodAbstractInjection(this._client);
+  final ApiClient _client;
+}
+
+class DemoUserService {
+  String get name => 'User';
+}
+
+class HttpClientImpl {}
+
+abstract class ApiClient {}
+
+class GetIt {
+  static final GetIt I = GetIt._();
+  GetIt._();
+  T call<T>() => throw UnimplementedError();
+}

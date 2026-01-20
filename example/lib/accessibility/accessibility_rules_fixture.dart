@@ -102,3 +102,71 @@ class GoodBadgeCountWidget extends StatelessWidget {
     );
   }
 }
+
+// =========================================================================
+// Accessibility Rules (from v4.1.5)
+// =========================================================================
+
+// BAD: Small touch target
+class SmallTouchWidget extends StatelessWidget {
+  const SmallTouchWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: prefer_large_touch_targets
+    return GestureDetector(
+      child: Container(width: 30, height: 30), // Too small!
+      onTap: () {},
+    );
+  }
+}
+
+// BAD: Short toast duration
+void testShortDuration(BuildContext context) {
+  // expect_lint: avoid_time_limits
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Quick message'),
+      duration: Duration(seconds: 2), // Too short!
+    ),
+  );
+}
+
+// BAD: Drag without button alternative
+class DragWithoutButtonWidget extends StatelessWidget {
+  const DragWithoutButtonWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: require_drag_alternatives
+    return ReorderableListView(
+      children: [Container(key: Key('1'))],
+      onReorder: (_, __) {},
+    );
+  }
+}
+
+// Mock classes for accessibility rules
+class ScaffoldMessenger {
+  static ScaffoldMessenger of(BuildContext context) => ScaffoldMessenger();
+  void showSnackBar(SnackBar snackBar) {}
+}
+
+class SnackBar {
+  SnackBar({required this.content, this.duration});
+  final Widget content;
+  final Duration? duration;
+}
+
+class ReorderableListView extends StatelessWidget {
+  const ReorderableListView({super.key, required this.children, this.onReorder});
+  final List<Widget> children;
+  final void Function(int, int)? onReorder;
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+class Key {
+  const Key(String value);
+}
