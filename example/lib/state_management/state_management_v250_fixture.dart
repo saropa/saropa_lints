@@ -301,19 +301,31 @@ class UserServiceDemo {
 }
 
 class AppEvent {}
+
 class LoadUser extends AppEvent {}
+
 class UpdateProfile extends AppEvent {}
+
 class LoadOrders extends AppEvent {}
+
 class ProcessPayment extends AppEvent {}
+
 class SendNotification extends AppEvent {}
+
 class UpdateSettings extends AppEvent {}
+
 class RefreshData extends AppEvent {}
+
 class SyncData extends AppEvent {}
+
 class AppState {}
 
 class UserEvent {}
+
 class LoadUserEvent extends UserEvent {}
+
 class UpdateUserEvent extends UserEvent {}
+
 class UserState {}
 
 typedef Emitter<S> = void Function(S);

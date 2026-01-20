@@ -351,7 +351,8 @@ class FirebaseInBuildWidgetDemo extends StatelessWidgetDemo {
   @override
   Widget build(BuildContext context) {
     // expect_lint: avoid_firebase_realtime_in_build
-    final stream = FirebaseFirestoreDemo.instance.collection('users').snapshots();
+    final stream =
+        FirebaseFirestoreDemo.instance.collection('users').snapshots();
     return Container();
   }
 }
