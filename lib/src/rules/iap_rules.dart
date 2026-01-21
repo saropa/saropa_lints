@@ -56,11 +56,9 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_purchase_in_sandbox_production',
-    problemMessage:
-        '[avoid_purchase_in_sandbox_production] Hardcoded IAP environment URL '
+    problemMessage: '[avoid_purchase_in_sandbox_production] Hardcoded IAP environment URL '
         'detected. Sandbox receipts fail in production and vice versa.',
-    correctionMessage:
-        'Use kReleaseMode or kDebugMode to select the correct verification URL.',
+    correctionMessage: 'Use kReleaseMode or kDebugMode to select the correct verification URL.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -106,8 +104,7 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
     // Also check for string literals with these URLs
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
-      if (value.contains('sandbox.itunes.apple.com') ||
-          value.contains('buy.itunes.apple.com')) {
+      if (value.contains('sandbox.itunes.apple.com') || value.contains('buy.itunes.apple.com')) {
         // Check context for environment handling
         AstNode? functionBody;
         AstNode? current = node.parent;
@@ -148,6 +145,10 @@ class AvoidPurchaseInSandboxProductionRule extends SaropaLintRule {
 /// Subscriptions can be cancelled, refunded, or expired. Check status on app
 /// launch, not just after purchase. Users may have cancelled via App Store.
 ///
+/// Detection uses word boundary matching to avoid false positives. For example,
+/// `isProportional` will NOT trigger this rule even though it contains `isPro`
+/// as a substring.
+///
 /// **BAD:**
 /// ```dart
 /// // Only checking once after purchase
@@ -184,11 +185,9 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_subscription_status_check',
-    problemMessage:
-        '[require_subscription_status_check] Premium/subscription content '
+    problemMessage: '[require_subscription_status_check] Premium/subscription content '
         'displayed without status verification. Subscription may have expired.',
-    correctionMessage:
-        'Check subscription status before showing premium content. Use RevenueCat '
+    correctionMessage: 'Check subscription status before showing premium content. Use RevenueCat '
         'or InAppPurchase.instance.purchaseStream to verify entitlements.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -225,9 +224,15 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
       final String bodySource = body.toSource();
 
       // Check if build method references premium features
+      // Use word boundary regex to avoid false positives
+      // (e.g., "isProportional" should not match "isPro")
       bool hasPremiumReference = false;
       for (final String indicator in _premiumIndicators) {
-        if (bodySource.toLowerCase().contains(indicator.toLowerCase())) {
+        final RegExp pattern = RegExp(
+          r'\b' + RegExp.escape(indicator) + r'\b',
+          caseSensitive: false,
+        );
+        if (pattern.hasMatch(bodySource)) {
           hasPremiumReference = true;
           break;
         }
@@ -251,6 +256,7 @@ class RequireSubscriptionStatusCheckRule extends SaropaLintRule {
         return; // Has proper subscription checking
       }
 
+      // TODO: Add quick fix support when custom_lint supports it for this rule type.
       reporter.atNode(node, code);
     });
   }
@@ -289,11 +295,9 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_price_localization',
-    problemMessage:
-        '[require_price_localization] Hardcoded price detected. Prices vary by '
+    problemMessage: '[require_price_localization] Hardcoded price detected. Prices vary by '
         'region and currency. Users may see incorrect amounts.',
-    correctionMessage:
-        'Use productDetails.price or priceString from the store SDK.',
+    correctionMessage: 'Use productDetails.price or priceString from the store SDK.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -320,9 +324,7 @@ class RequirePriceLocalizationRule extends SaropaLintRule {
         while (current != null) {
           if (current is InstanceCreationExpression) {
             final String typeName = current.constructorName.type.name.lexeme;
-            if (typeName == 'Text' ||
-                typeName == 'RichText' ||
-                typeName == 'TextSpan') {
+            if (typeName == 'Text' || typeName == 'RichText' || typeName == 'TextSpan') {
               isInUiContext = true;
               break;
             }
