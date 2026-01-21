@@ -1282,7 +1282,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_controller_in_build',
   'avoid_debug_print',
   'avoid_double_slash_imports',
-  'avoid_duplicate_collection_elements',
+  'avoid_duplicate_number_elements',
+  'avoid_duplicate_string_elements',
+  'avoid_duplicate_object_elements',
   'avoid_duplicate_exports',
   'avoid_duplicate_mixins',
   'avoid_duplicate_named_imports',
@@ -2363,6 +2365,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_test_data_builder',
   'prefer_test_variant',
   'require_accessibility_tests',
+  'no_magic_number_in_tests', // Test-specific magic number detection
+  'no_magic_string_in_tests', // Test-specific magic string detection
   'prefer_fake_platform', // platform fakes in tests
 
   // Animation polish (moved from Professional)

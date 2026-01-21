@@ -173,7 +173,9 @@ custom_lint:
     - prefer_where_or_null: false
     - avoid_map_keys_contains: false
     - avoid_collection_equality_checks: false
-    - avoid_duplicate_collection_elements: false
+    - avoid_duplicate_number_elements: false
+    - avoid_duplicate_string_elements: false
+    - avoid_duplicate_object_elements: false
     - avoid_missing_enum_constant_in_map: false
     - avoid_enum_values_by_index: false
     - avoid_accessing_collections_by_constant_index: false
@@ -746,6 +748,8 @@ custom_lint:
     - no_empty_string: false
     - no_magic_string: false
     - no_magic_number: false
+    - no_magic_number_in_tests: false
+    - no_magic_string_in_tests: false
     - avoid_complex_arithmetic_expressions: false
     - avoid_bitwise_operators_with_booleans: false
     - avoid_digit_separators: false
