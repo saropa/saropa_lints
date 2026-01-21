@@ -640,15 +640,119 @@ Then restart VS Code.
 
 ## Troubleshooting
 
+### I'm new and completely lost
+
+**Start here:**
+
+1. **Install**: Add to your `pubspec.yaml` dev_dependencies:
+   ```yaml
+   dev_dependencies:
+     custom_lint: ^0.8.0
+     saropa_lints: ^4.2.3
+   ```
+
+2. **Configure**: Add to your `analysis_options.yaml`:
+   ```yaml
+   analyzer:
+     plugins:
+       - custom_lint
+
+   custom_lint:
+     enable_all_lint_rules: true  # Start with all rules
+   ```
+
+3. **Reload VS Code**:
+   - Press `Ctrl+Shift+P`
+   - Type "reload"
+   - Click "Developer: Reload Window"
+
+4. **Wait**: Give it 1-2 minutes to analyze your code
+
+5. **Check**: Look at the PROBLEMS panel (View → Problems)
+
+**Still not working?** See the sections below.
+
 ### IDE doesn't show lint warnings
 
-If your IDE isn't automatically detecting lint issues:
+**Quick Fix (works 90% of the time):**
 
-1. **Use the keyboard shortcut**: Press **Ctrl+Shift+B** (or **Cmd+Shift+B** on Mac) to run custom_lint manually via the VS Code task
-2. **Use the bug button**: If you installed the status bar extension, click the **"Lints"** button in the status bar or the search icon in the editor title bar
-3. Restart VS Code completely (not just the analysis server)
-4. Check **View → Output → Dart Analysis Server** for errors
-5. If IDE integration remains unreliable, use the CLI directly: `dart run custom_lint`
+1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+2. Type "reload"
+3. Click "Developer: Reload Window"
+4. Wait 1 minute for analysis to complete
+
+**If that doesn't work:**
+
+1. Clear the cache: Delete the `.dart_tool/custom_lint` folder in your project
+2. Reload VS Code again (steps above)
+3. Check **View → Output → Dart Analysis Server** for errors
+4. Verify configuration is correct (see "Configuration not working" below)
+
+**Alternative (command line):**
+
+Run `dart run custom_lint` in your terminal to see all issues immediately.
+
+### Configuration not working (tier not loading)
+
+**Problem:** You set `tier: insanity` but only get ~200 rules instead of 1400+.
+
+**Solution:** There's a bug in custom_lint v0.8.0 that doesn't read the tier configuration. Use this workaround:
+
+```yaml
+# ❌ DOESN'T WORK (custom_lint v0.8.0 bug)
+custom_lint:
+  saropa_lints:
+    tier: insanity
+
+# ✅ WORKAROUND - Use this instead
+custom_lint:
+  enable_all_lint_rules: true  # Loads all rules (insanity tier)
+  rules:
+    # Then disable specific rules you don't want
+    - some_rule: false
+```
+
+**Verify it worked:** Run `dart run custom_lint` and look for the first line:
+```
+[saropa_lints] Loaded 1453 rules (tier: essential, enableAll: true)
+```
+
+If it says `enableAll: true`, you're good! The tier name doesn't matter, what matters is the rule count.
+
+### Too many warnings! What do I do?
+
+**This is normal** when first installing. You'll see hundreds or thousands of warnings.
+
+**Option 1: Start smaller** (recommended for existing projects)
+
+```yaml
+custom_lint:
+  enable_all_lint_rules: false  # Start with just essential rules (~200)
+  rules:
+    # Gradually enable more rules as you fix issues
+    - some_specific_rule: true
+```
+
+**Option 2: Disable noisy rules**
+
+```yaml
+custom_lint:
+  enable_all_lint_rules: true
+  rules:
+    # Disable rules that are too opinionated for your project
+    - prefer_double_quotes: false
+    - prefer_trailing_comma_always: false
+    - no_magic_number: false
+```
+
+**Option 3: Use quick fixes**
+
+Many rules have automatic fixes:
+- Hover over the warning
+- Click "Quick Fix" or press `Ctrl+.`
+- Select "Fix all in file" to fix all instances at once
+
+**Don't stress about fixing everything immediately.** Pick one category (like accessibility or memory leaks) and fix those first.
 
 ### Out of Memory errors
 
