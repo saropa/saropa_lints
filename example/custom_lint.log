@@ -870,3 +870,17 @@ at:
 [avoid_snackbar_queue_buildup] 2026-01-21T11:22:17.569937 [saropa_lints] Progress: 32 files analyzed (6s, 5.1 files/sec) - json_datetime_rules_fixture.dart
 [avoid_snackbar_queue_buildup] 2026-01-21T11:22:20.785279 [saropa_lints] Progress: 42 files analyzed (9s, 4.4 files/sec) - owasp_coverage_gap_fixture.dart
 [avoid_snackbar_queue_buildup] 2026-01-21T11:22:23.945034 [saropa_lints] Progress: 54 files analyzed (12s, 4.3 files/sec) - prefer_explicit_type_arguments_fixture.dart
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint client] 2026-01-21T12:04:22.598500 [saropa_lints] createPlugin() called - version 4.2.3
+[custom_lint client] 2026-01-21T12:04:23.172299 [saropa_lints] Loaded 301 rules (tier: essential, enableAll: false)
+[avoid_snackbar_queue_buildup] 2026-01-21T12:04:28.766621 [saropa_lints] Progress: 20 files analyzed (3s, 6.3 files/sec) - disposal_rules_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T12:04:31.795806 [saropa_lints] Progress: 33 files analyzed (6s, 5.3 files/sec) - lifecycle_rules_v2310_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T12:04:35.117585 [saropa_lints] Progress: 42 files analyzed (9s, 4.4 files/sec) - owasp_coverage_gap_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T12:04:38.294852 [saropa_lints] Progress: 54 files analyzed (12s, 4.3 files/sec) - prefer_explicit_type_arguments_fixture.dart
