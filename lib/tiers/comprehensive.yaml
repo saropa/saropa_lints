@@ -159,7 +159,9 @@ custom_lint:
     # =========================================================================
     # COLLECTIONS - Complete
     # =========================================================================
-    avoid_duplicate_collection_elements: true
+    avoid_duplicate_number_elements: true
+    avoid_duplicate_string_elements: true
+    avoid_duplicate_object_elements: true
     avoid_accessing_collections_by_constant_index: true
     avoid_slow_collection_methods: true
     prefer_add_all: true
