@@ -2219,15 +2219,9 @@ class _SaropaLints extends PluginBase {
     //     baseline:
     //       file: "saropa_baseline.json"
     //       paths: ["lib/legacy/"]
-    // ignore: avoid_print
-    print('[saropa_lints] Available config keys: ${configs.rules.keys.toList()}');
     final LintOptions? saropaConfig = configs.rules['saropa_lints'];
-    // ignore: avoid_print
-    print('[saropa_lints] saropaConfig: $saropaConfig, json: ${saropaConfig?.json}');
     final String tier = saropaConfig?.json['tier'] as String? ?? 'essential';
     final bool enableAll = configs.enableAllLintRules == true;
-    // ignore: avoid_print
-    print('[saropa_lints] Loaded ${_allRules.length} rules (tier: $tier, enableAll: $enableAll)');
 
     // =========================================================================
     // BASELINE CONFIGURATION
