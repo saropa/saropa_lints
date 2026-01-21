@@ -5071,6 +5071,9 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
 /// ```dart
 /// const apiUrl = 'https://api.example.com/v1';
 /// final response = await http.get(Uri.parse('https://example.com/data'));
+///
+/// // Safe replacement patterns are allowed:
+/// final secureUrl = url.replaceFirst('http://', 'https://');
 /// ```
 class RequireHttpsOnlyRule extends SaropaLintRule {
   const RequireHttpsOnlyRule() : super(code: _code);
@@ -5107,6 +5110,34 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     'http://[::1]', // IPv6 localhost
   ];
 
+  /// Checks if this 'http://' string is part of a safe replacement pattern
+  /// like `url.replaceFirst('http://', 'https://')`.
+  static bool _isSafeReplacementPattern(SimpleStringLiteral node) {
+    final AstNode? parent = node.parent;
+    if (parent is! ArgumentList) return false;
+
+    final AstNode? grandparent = parent.parent;
+    if (grandparent is! MethodInvocation) return false;
+
+    final String methodName = grandparent.methodName.name;
+    if (!const <String>{'replaceFirst', 'replaceAll', 'replace'}
+        .contains(methodName)) {
+      return false;
+    }
+
+    // Check if first arg is 'http://' and second is 'https://'
+    final NodeList<Expression> args = parent.arguments;
+    if (args.length < 2) return false;
+
+    final Expression first = args[0];
+    final Expression second = args[1];
+    if (first is! SimpleStringLiteral || second is! SimpleStringLiteral) {
+      return false;
+    }
+
+    return first.value == 'http://' && second.value == 'https://';
+  }
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -5123,6 +5154,9 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
       for (final String pattern in _allowedHttpPatterns) {
         if (value.startsWith(pattern)) return;
       }
+
+      // Allow safe http→https replacement patterns
+      if (_isSafeReplacementPattern(node)) return;
 
       reporter.atNode(node, code);
     });
@@ -5928,6 +5962,7 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'value') {
           final Expression value = arg.expression;
 
+          // cspell:ignore imagedata
           // Check for indicators of large data
           final String valueSource = value.toSource().toLowerCase();
           if (valueSource.contains('jsonencode') ||
