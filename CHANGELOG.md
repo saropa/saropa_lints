@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 3.4.0.
 
+## [4.4.0] - 2026-01-21
+
+### Added
+
+**Split duplicate collection element detection into 3 separate rules** - The original `avoid_duplicate_collection_elements` rule has been replaced with three type-specific rules that can be suppressed independently:
+
+- `avoid_duplicate_number_elements` - Detects duplicate numeric literals (int, double) in lists and sets. Can be suppressed for legitimate cases like `const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]`.
+- `avoid_duplicate_string_elements` - Detects duplicate string literals in lists and sets.
+- `avoid_duplicate_object_elements` - Detects duplicate identifiers, booleans, and null literals in lists and sets.
+
+All three rules include quick fixes to remove duplicate elements.
+
+### Removed
+
+- `avoid_duplicate_collection_elements` - Replaced by the three type-specific rules above. If you had this rule disabled in your configuration, update to disable the new rules individually.
+
+### Fixed
+
+**`avoid_variable_shadowing` false positives on sibling closures** - The rule was incorrectly flagging variables with the same name in sibling closures (like separate `test()` callbacks within a `group()`) as shadowing. These are independent scopes, not nested scopes, so they don't actually shadow each other. The rule now properly tracks scope boundaries:
+
+```dart
+// Previously flagged incorrectly - now OK
+group('tests', () {
+  test('A', () { final list = [1]; });  // Scope A
+  test('B', () { final list = [2]; });  // Scope B - NOT shadowing
+});
+
+// Still correctly flagged - true shadowing
+void outer() {
+  final list = [1];
+  void inner() {
+    final list = [2];  // LINT: shadows outer 'list'
+  }
+}
+```
+
+## [4.3.0] - 2026-01-21
+
+### Added
+
+**2 new test-specific magic literal rules** - Test files legitimately use more literal values for test data, expected values, and test descriptions. The existing `no_magic_number` and `no_magic_string` rules now skip test files entirely, and two new test-specific variants provide appropriate enforcement for tests:
+
+- `no_magic_number_in_tests` - Warns when magic numbers are used in test files. More relaxed than the production rule, allowing common test values like HTTP status codes (200, 404, 500), small integers (0-5, 10, 100, 1000), and common floats (0.5, 1.0, 10.0, 100.0). Still encourages named constants for domain-specific values like `29.99` in a product price test.
+- `no_magic_string_in_tests` - Warns when magic strings are used in test files. More relaxed than the production rule, allowing common test values like single letters ('a', 'x', 'foo', 'bar') and automatically skipping test descriptions (first argument to `test()`, `group()`, `testWidgets()`, etc.). Still encourages named constants for meaningful test data like email addresses or URLs.
+
+Both rules are in the comprehensive tier with INFO severity. They use `applicableFileTypes: {FileType.test}` to only run on test files.
+
+### Changed
+
+**Production code rules now skip test files** - `no_magic_number` and `no_magic_string` now have `skipTestFiles: true`, preventing false positives on legitimate test data like hex strings ('7FfFfFfFfFfFfFfF'), test descriptions, and expected values. Use the test-specific variants for appropriate enforcement in tests.
+
+### Fixed
+
+**`no_magic_string` and `no_magic_string_in_tests` now skip regex patterns** - The rules were flagging regex pattern strings as magic strings, even when passed directly to `RegExp()` constructors. The rules now detect and skip:
+- Strings passed as arguments to `RegExp()` constructors
+- Raw strings (`r'...'`) that contain regex-specific syntax (anchors `^`/`$`, quantifiers `+`/`*`/`?`, character classes `\d`/`\w`/`\s`, etc.)
+
+This prevents false positives on legitimate regex patterns like `RegExp(r'0+$')` or `RegExp(r'\d{3}-\d{4}')`.
+
+**`avoid_commented_out_code` and `capitalize_comment_start` false positives on prose comments** - These rules use shared heuristics to detect commented-out code vs prose comments. The previous pattern matched keywords at the start of comments too broadly, causing false positives on natural language sentences like `// null is before non-null` or `// return when the condition is met`. The detection patterns are now context-aware and only match keywords when they appear in actual code contexts:
+- Control flow keywords (`if`, `for`, `while`) now require opening parens/braces: `if (` or `while {`
+- Simple statements (`return`, `break`, `throw`) now require semicolons or specific literals
+- Declarations (`final`, `const`, `var`) now require identifiers after them
+- Literals (`null`, `true`, `false`) now require code punctuation (`;`, `,`, `)`) or standalone usage
+
+This eliminates false positives while maintaining detection of actual commented-out code.
+
 ## [4.2.3] - 2026-01-20
 
 ### Added
