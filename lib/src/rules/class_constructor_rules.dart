@@ -312,24 +312,44 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a declaration shadows another declaration in an outer scope.
+/// Warns when a variable or parameter shadows another declaration from an
+/// outer scope.
 ///
-/// Shadowing can lead to confusion and bugs.
+/// Shadowing occurs when a nested scope declares a variable with the same name
+/// as one in an enclosing scope. This can lead to confusion about which
+/// variable is being referenced and is a common source of subtle bugs.
 ///
-/// Example of **bad** code:
+/// **Note:** Variables with the same name in sibling closures (not nested) are
+/// NOT shadowing - they are independent scopes. For example, multiple `test()`
+/// callbacks in a `group()` can each declare their own `list` variable.
+///
+/// **BAD:**
 /// ```dart
 /// int value = 10;
 /// void process(int value) {  // Shadows outer 'value'
 ///   print(value);
 /// }
+///
+/// void outer() {
+///   final list = [1, 2, 3];
+///   void inner() {
+///     final list = [];  // Shadows outer 'list'
+///   }
+/// }
 /// ```
 ///
-/// Example of **good** code:
+/// **GOOD:**
 /// ```dart
 /// int globalValue = 10;
 /// void process(int localValue) {
 ///   print(localValue);
 /// }
+///
+/// // Sibling closures - NOT shadowing (independent scopes)
+/// group('tests', () {
+///   test('A', () { final list = [1]; });  // Scope A
+///   test('B', () { final list = [2]; });  // Scope B - OK, not nested
+/// });
 /// ```
 class AvoidShadowingRule extends SaropaLintRule {
   const AvoidShadowingRule() : super(code: _code);
@@ -434,6 +454,32 @@ class _ShadowingChecker extends RecursiveAstVisitor<void> {
       outerNames.add(name);
     }
     super.visitFunctionDeclarationStatement(node);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // When entering a closure, create a snapshot of outer names.
+    // Variables declared in this closure should not leak to sibling closures.
+    final Set<String> savedOuterNames = Set<String>.from(outerNames);
+
+    // Collect parameter names for this closure
+    final FormalParameterList? params = node.parameters;
+    if (params != null) {
+      for (final FormalParameter param in params.parameters) {
+        final String? name = param.name?.lexeme;
+        if (name != null) {
+          outerNames.add(name);
+        }
+      }
+    }
+
+    // Visit the body
+    node.body.accept(this);
+
+    // Restore outer names - variables from this closure don't affect siblings
+    outerNames
+      ..clear()
+      ..addAll(savedOuterNames);
   }
 }
 
