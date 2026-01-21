@@ -1218,6 +1218,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_image_error_fallback', // INFO - image error handling
   'prefer_ignore_pointer', // INFO - IgnorePointer for non-interactive
 
+// cspell:ignore namespacing
   // ROADMAP ⭐ Rules - Recommended
   'avoid_passing_bloc_to_bloc', // WARNING - blocs should communicate via repository
   'avoid_passing_build_context_to_blocs', // WARNING - blocs shouldn't hold context
@@ -2053,6 +2054,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_absolute_imports',
   'prefer_abstract_final_static_class',
   'prefer_add_all',
+// cspell:ignore addall
   'prefer_addall_over_spread',
   'prefer_addition_subtraction_assignments',
   'prefer_all_named_parameters',
