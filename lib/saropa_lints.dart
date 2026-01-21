@@ -402,7 +402,9 @@ const List<LintRule> _allRules = <LintRule>[
 
   // Collection rules
   PreferAddAllRule(),
-  AvoidDuplicateCollectionElementsRule(),
+  AvoidDuplicateNumberElementsRule(),
+  AvoidDuplicateStringElementsRule(),
+  AvoidDuplicateObjectElementsRule(),
   PreferReturnAwaitRule(),
   PreferSetForLookupRule(),
 

@@ -1763,35 +1763,124 @@ class PreferAddAllRule extends SaropaLintRule {
   }
 }
 
-/// Warns when duplicate elements appear in collection literals.
+/// Warns when duplicate numeric elements appear in collection literals.
 ///
-/// Alias: no_duplicate_elements, unique_collection_elements
+/// Alias: no_duplicate_numbers, unique_number_elements
+///
+/// Duplicate numeric values in lists or sets are usually unintentional and
+/// indicate copy-paste errors or logic mistakes. However, some legitimate
+/// use cases exist (e.g., days-in-month arrays), which is why this rule
+/// can be suppressed independently from string and object duplicate rules.
+///
+/// **Why this matters:**
+/// - Duplicate numbers waste memory and may cause logic errors
+/// - Sets silently ignore duplicates, leading to unexpected behavior
+/// - Often indicates copy-paste mistakes
 ///
 /// Example of **bad** code:
 /// ```dart
 /// final list = [1, 2, 1, 3];  // 1 is duplicated
-/// final set = {'a', 'b', 'a'};  // 'a' is duplicated
+/// final doubles = [1.5, 2.0, 1.5];  // 1.5 is duplicated
+/// final prices = {9.99, 19.99, 9.99};  // Set silently ignores duplicate
 /// ```
 ///
 /// Example of **good** code:
 /// ```dart
-/// final list = [1, 2, 3];
-/// final set = {'a', 'b', 'c'};
+/// final list = [1, 2, 3, 4];
+/// // ignore: avoid_duplicate_number_elements
+/// const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 /// ```
-class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
-  const AvoidDuplicateCollectionElementsRule() : super(code: _code);
+///
+/// **Quick fix available:** Removes the duplicate element.
+///
+/// See also:
+/// - [avoid_duplicate_string_elements] for string duplicates
+/// - [avoid_duplicate_object_elements] for other duplicates
+class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
+  const AvoidDuplicateNumberElementsRule() : super(code: _code);
 
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.medium;
 
   @override
-  RuleCost get cost => RuleCost.medium;
+  RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_duplicate_collection_elements',
+    name: 'avoid_duplicate_number_elements',
     problemMessage:
-        '[avoid_duplicate_collection_elements] Duplicate element in collection literal.',
+        '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal.',
+    correctionMessage:
+        'Remove the duplicate element or suppress if intentional.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addListLiteral((ListLiteral node) {
+      _checkForDuplicateNumbers(node.elements, reporter, code);
+    });
+
+    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (node.isSet) {
+        _checkForDuplicateNumbers(node.elements, reporter, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveDuplicateElementFix(code)];
+}
+
+/// Warns when duplicate string elements appear in collection literals.
+///
+/// Alias: no_duplicate_strings, unique_string_elements
+///
+/// Duplicate string values in lists or sets indicate copy-paste errors or
+/// unintentional repetition. This rule can be suppressed independently from
+/// number and object duplicate rules.
+///
+/// **Why this matters:**
+/// - Duplicate strings waste memory
+/// - Sets silently ignore duplicates, leading to unexpected behavior
+/// - Often indicates copy-paste mistakes or incomplete refactoring
+///
+/// Example of **bad** code:
+/// ```dart
+/// final list = ['a', 'b', 'a'];  // 'a' is duplicated
+/// final set = {'hello', 'world', 'hello'};  // Set silently ignores duplicate
+/// final urls = ['https://api.com', 'https://backup.com', 'https://api.com'];
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final list = ['a', 'b', 'c'];
+/// final set = {'hello', 'world', 'foo'};
+/// ```
+///
+/// **Quick fix available:** Removes the duplicate element.
+///
+/// See also:
+/// - [avoid_duplicate_number_elements] for numeric duplicates
+/// - [avoid_duplicate_object_elements] for other duplicates
+class AvoidDuplicateStringElementsRule extends SaropaLintRule {
+  const AvoidDuplicateStringElementsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_duplicate_string_elements',
+    problemMessage:
+        '[avoid_duplicate_string_elements] Duplicate string element in collection literal.',
     correctionMessage: 'Remove the duplicate element.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1803,33 +1892,222 @@ class AvoidDuplicateCollectionElementsRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addListLiteral((ListLiteral node) {
-      _checkForDuplicates(node.elements, reporter);
+      _checkForDuplicateStrings(node.elements, reporter, code);
     });
 
     context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
       if (node.isSet) {
-        _checkForDuplicates(node.elements, reporter);
+        _checkForDuplicateStrings(node.elements, reporter, code);
       }
     });
   }
 
-  void _checkForDuplicates(
-    NodeList<CollectionElement> elements,
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveDuplicateElementFix(code)];
+}
+
+/// Warns when duplicate object elements appear in collection literals.
+///
+/// Alias: no_duplicate_objects, unique_object_elements
+///
+/// This rule detects duplicate boolean literals, null literals, and
+/// identifier references in collections. It complements the number and
+/// string duplicate rules.
+///
+/// **Why this matters:**
+/// - Duplicate references in lists are usually unintentional
+/// - Boolean lists like `[true, false, true]` are typically errors
+/// - Sets silently ignore duplicates, leading to unexpected size
+///
+/// Example of **bad** code:
+/// ```dart
+/// final list = [myObj, otherObj, myObj];  // myObj is duplicated
+/// final bools = [true, false, true];  // true is duplicated
+/// final nulls = [null, value, null];  // null is duplicated
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// final list = [myObj, otherObj, thirdObj];
+/// final bools = [true, false];
+/// ```
+///
+/// **Quick fix available:** Removes the duplicate element.
+///
+/// See also:
+/// - [avoid_duplicate_number_elements] for numeric duplicates
+/// - [avoid_duplicate_string_elements] for string duplicates
+class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
+  const AvoidDuplicateObjectElementsRule() : super(code: _code);
+
+  /// Code quality issue. Review when count exceeds 100.
+  @override
+  LintImpact get impact => LintImpact.medium;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_duplicate_object_elements',
+    problemMessage:
+        '[avoid_duplicate_object_elements] Duplicate object element in collection literal.',
+    correctionMessage: 'Remove the duplicate element.',
+    errorSeverity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
   ) {
-    final Set<String> seen = <String>{};
-    for (final CollectionElement element in elements) {
-      if (element is! Expression) continue;
+    context.registry.addListLiteral((ListLiteral node) {
+      _checkForDuplicateObjects(node.elements, reporter, code);
+    });
 
-      // Only check literals (not expressions that might have different values)
-      if (element is! Literal && element is! SimpleIdentifier) continue;
-
-      final String source = element.toSource();
-      if (seen.contains(source)) {
-        reporter.atNode(element, code);
-      } else {
-        seen.add(source);
+    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (node.isSet) {
+        _checkForDuplicateObjects(node.elements, reporter, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_RemoveDuplicateElementFix(code)];
+}
+
+// =============================================================================
+// Shared helpers for duplicate element detection
+// =============================================================================
+
+/// Checks for duplicate numeric literals in a collection.
+void _checkForDuplicateNumbers(
+  NodeList<CollectionElement> elements,
+  SaropaDiagnosticReporter reporter,
+  LintCode code,
+) {
+  final Set<String> seen = <String>{};
+  for (final CollectionElement element in elements) {
+    if (element is! Expression) continue;
+    if (element is! IntegerLiteral && element is! DoubleLiteral) continue;
+
+    final String source = element.toSource();
+    if (seen.contains(source)) {
+      reporter.atNode(element, code);
+    } else {
+      seen.add(source);
+    }
+  }
+}
+
+/// Checks for duplicate string literals in a collection.
+void _checkForDuplicateStrings(
+  NodeList<CollectionElement> elements,
+  SaropaDiagnosticReporter reporter,
+  LintCode code,
+) {
+  final Set<String> seen = <String>{};
+  for (final CollectionElement element in elements) {
+    if (element is! Expression) continue;
+    if (element is! StringLiteral) continue;
+
+    final String source = element.toSource();
+    if (seen.contains(source)) {
+      reporter.atNode(element, code);
+    } else {
+      seen.add(source);
+    }
+  }
+}
+
+/// Checks for duplicate object literals/identifiers in a collection.
+void _checkForDuplicateObjects(
+  NodeList<CollectionElement> elements,
+  SaropaDiagnosticReporter reporter,
+  LintCode code,
+) {
+  final Set<String> seen = <String>{};
+  for (final CollectionElement element in elements) {
+    if (element is! Expression) continue;
+
+    // Skip numeric and string literals (handled by other rules)
+    if (element is IntegerLiteral ||
+        element is DoubleLiteral ||
+        element is StringLiteral) {
+      continue;
+    }
+
+    // Check other literals (bool, null) and identifiers
+    if (element is! Literal && element is! SimpleIdentifier) continue;
+
+    final String source = element.toSource();
+    if (seen.contains(source)) {
+      reporter.atNode(element, code);
+    } else {
+      seen.add(source);
+    }
+  }
+}
+
+/// Quick fix that removes a duplicate element from a collection.
+class _RemoveDuplicateElementFix extends DartFix {
+  _RemoveDuplicateElementFix(LintCode _);
+
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    // Find the element to remove
+    context.registry.addListLiteral((ListLiteral node) {
+      _tryFixInElements(node.elements, analysisError, reporter);
+    });
+
+    context.registry.addSetOrMapLiteral((SetOrMapLiteral node) {
+      if (node.isSet) {
+        _tryFixInElements(node.elements, analysisError, reporter);
+      }
+    });
+  }
+
+  void _tryFixInElements(
+    NodeList<CollectionElement> elements,
+    AnalysisError analysisError,
+    ChangeReporter reporter,
+  ) {
+    for (int i = 0; i < elements.length; i++) {
+      final CollectionElement element = elements[i];
+      if (!analysisError.sourceRange.intersects(element.sourceRange)) continue;
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Remove duplicate element',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Calculate range including trailing comma and whitespace
+        int start = element.offset;
+        int end = element.end;
+
+        // If there's a comma after this element, include it
+        if (i < elements.length - 1) {
+          // Find the comma after this element
+          final nextElement = elements[i + 1];
+          end = nextElement.offset;
+          // Trim trailing whitespace from end but keep one space
+          // Actually, let's just remove up to the next element
+        } else if (i > 0) {
+          // Last element - need to remove preceding comma
+          final prevElement = elements[i - 1];
+          start = prevElement.end;
+        }
+
+        builder.addDeletion(SourceRange(start, end - start));
+      });
+      return;
     }
   }
 }
