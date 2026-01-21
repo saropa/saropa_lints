@@ -6,6 +6,7 @@ import 'package:analyzer/error/error.dart'
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
+import '../literal_context_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when digit separators are not grouped consistently.
@@ -224,6 +225,9 @@ class NoMagicNumberRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get skipTestFiles => true;
+
   static const LintCode _code = LintCode(
     name: 'no_magic_number',
     problemMessage: '[no_magic_number] Avoid magic numbers.',
@@ -257,31 +261,12 @@ class NoMagicNumberRule extends SaropaLintRule {
   bool _shouldReportInt(Literal node, int? value) {
     if (value == null) return false;
     if (_allowedInts.contains(value)) return false;
-    return _notInConstContext(node);
+    return !isLiteralInConstContext(node);
   }
 
   bool _shouldReportDouble(Literal node, double value) {
     if (_allowedDoubles.contains(value)) return false;
-    return _notInConstContext(node);
-  }
-
-  bool _notInConstContext(Literal node) {
-    // Don't report in const contexts
-    AstNode? parent = node.parent;
-    while (parent != null) {
-      if (parent is VariableDeclaration) {
-        final AstNode? grandparent = parent.parent;
-        if (grandparent is VariableDeclarationList) {
-          if (grandparent.isConst) return false;
-        }
-      }
-      // Check for const constructor calls
-      if (parent is InstanceCreationExpression && parent.isConst) {
-        return false;
-      }
-      parent = parent.parent;
-    }
-    return true;
+    return !isLiteralInConstContext(node);
   }
 }
 
@@ -312,6 +297,9 @@ class NoMagicStringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get skipTestFiles => true;
 
   static const LintCode _code = LintCode(
     name: 'no_magic_string',
@@ -356,51 +344,22 @@ class NoMagicStringRule extends SaropaLintRule {
       if (node.value.length <= 2) return;
 
       // Skip if in const context
-      if (_isInConstContext(node)) return;
+      if (isLiteralInConstContext(node)) return;
 
       // Skip if in annotation
-      if (_isInAnnotation(node)) return;
+      if (isInAnnotation(node)) return;
 
       // Skip if in import/export
-      if (_isInImportOrExport(node)) return;
+      if (isInImportOrExport(node)) return;
 
       // Skip interpolated strings (they're usually intentional)
       if (node.parent is StringInterpolation) return;
 
+      // Skip regex patterns
+      if (isStringUsedAsRegexPattern(node)) return;
+
       reporter.atNode(node, code);
     });
-  }
-
-  bool _isInConstContext(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is VariableDeclarationList && current.isConst) return true;
-      if (current is InstanceCreationExpression && current.isConst) return true;
-      if (current is ListLiteral && current.constKeyword != null) return true;
-      if (current is SetOrMapLiteral && current.constKeyword != null) {
-        return true;
-      }
-      current = current.parent;
-    }
-    return false;
-  }
-
-  bool _isInAnnotation(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is Annotation) return true;
-      current = current.parent;
-    }
-    return false;
-  }
-
-  bool _isInImportOrExport(AstNode node) {
-    AstNode? current = node.parent;
-    while (current != null) {
-      if (current is ImportDirective || current is ExportDirective) return true;
-      current = current.parent;
-    }
-    return false;
   }
 }
 
@@ -748,5 +707,511 @@ class AvoidDigitSeparatorsRule extends SaropaLintRule {
         reporter.atNode(node, code);
       }
     });
+  }
+}
+
+/// Warns when magic numbers are used in test files.
+///
+/// **Context**: This is the test-specific variant of `no_magic_number`, which
+/// skips test files entirely via `skipTestFiles: true`. The production rule
+/// enforces strict avoidance of magic numbers in application code, while this
+/// rule provides appropriate, relaxed enforcement for test code.
+///
+/// **Rationale**: Test files legitimately use more literal values than
+/// production code for:
+/// - HTTP status codes (200, 404, 500) in API tests
+/// - Small integers (0-5) for indexing and counting test cases
+/// - Powers of 10 (10, 100, 1000) for threshold/boundary tests
+/// - Common fractions (0.5, 1.0, 2.0) for mathematical assertions
+///
+/// However, meaningful domain values (like product prices, account balances,
+/// or business thresholds) should still use named constants to make tests
+/// self-documenting and maintainable.
+///
+/// **Allowed values**:
+/// - Integers: -1, 0, 1, 2, 3, 4, 5, 10, 100, 200, 201, 204, 400, 401,
+///   403, 404, 500, 503, 1000
+/// - Doubles: -1.0, 0.0, 0.5, 1.0, 2.0, 10.0, 100.0
+/// - All values in const contexts (const declarations, const constructors)
+///
+/// **Tier**: Comprehensive (optional, style enforcement)
+/// **Severity**: INFO
+/// **Performance**: Medium cost (addIntegerLiteral, addDoubleLiteral registries)
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// test('validates product price', () {
+///   final product = Product(price: 29.99); // Magic number - domain value
+///   expect(product.isValid, true);
+/// });
+///
+/// test('processes batch', () {
+///   final items = List.generate(137, (i) => Item()); // Magic number
+///   processBatch(items);
+/// });
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// test('validates product price', () {
+///   const validPrice = 29.99; // Named constant for clarity
+///   final product = Product(price: validPrice);
+///   expect(product.isValid, true);
+/// });
+///
+/// test('processes batch', () {
+///   const batchSize = 137; // Named constant explains purpose
+///   final items = List.generate(batchSize, (i) => Item());
+///   processBatch(items);
+/// });
+///
+/// test('returns 404 for missing resource', () async {
+///   final response = await client.get('/nonexistent');
+///   expect(response.statusCode, 404); // OK: Common HTTP status code
+/// });
+///
+/// test('handles empty list', () {
+///   final result = process([]); // OK: Empty list
+///   expect(result.length, 0); // OK: Allowed value
+/// });
+/// ```
+///
+/// ### Related Rules
+///
+/// - `no_magic_number` - Production code variant (skips test files)
+/// - `no_magic_string` - Similar pattern for string literals
+/// - `no_magic_string_in_tests` - Test-specific variant for strings
+class NoMagicNumberInTestsRule extends SaropaLintRule {
+  const NoMagicNumberInTestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    name: 'no_magic_number_in_tests',
+    problemMessage:
+        '[no_magic_number_in_tests] Avoid magic numbers in test files.',
+    correctionMessage: 'Extract the number to a named constant.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  // More relaxed allowed values for test files
+  static const Set<int> _allowedInts = <int>{
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    10,
+    100,
+    200,
+    201,
+    204,
+    400,
+    401,
+    403,
+    404,
+    500,
+    503,
+    1000,
+  };
+  static const List<double> _allowedDoubles = <double>[
+    -1.0,
+    0.0,
+    0.5,
+    1.0,
+    2.0,
+    10.0,
+    100.0,
+  ];
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addIntegerLiteral((IntegerLiteral node) {
+      if (_shouldReportInt(node, node.value)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry.addDoubleLiteral((DoubleLiteral node) {
+      if (_shouldReportDouble(node, node.value)) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_NoMagicNumberInTestsFix()];
+
+  bool _shouldReportInt(Literal node, int? value) {
+    if (value == null) return false;
+    if (_allowedInts.contains(value)) return false;
+    return !isLiteralInConstContext(node);
+  }
+
+  bool _shouldReportDouble(Literal node, double value) {
+    if (_allowedDoubles.contains(value)) return false;
+    return !isLiteralInConstContext(node);
+  }
+}
+
+class _NoMagicNumberInTestsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addIntegerLiteral((IntegerLiteral node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final value = node.literal.lexeme;
+      final constantName = _suggestConstantName(value);
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Extract to const $constantName',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the test function or test group containing this literal
+        AstNode? current = node;
+        while (current != null && current is! FunctionExpression) {
+          current = current.parent;
+        }
+
+        if (current == null) return;
+
+        // Insert constant declaration before the test function
+        final insertPosition = current.offset;
+        builder.addSimpleInsertion(
+          insertPosition,
+          'const $constantName = $value;\n  ',
+        );
+
+        // Replace the literal with the constant name
+        builder.addSimpleReplacement(node.sourceRange, constantName);
+      });
+    });
+
+    context.registry.addDoubleLiteral((DoubleLiteral node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final value = node.literal.lexeme;
+      final constantName = _suggestConstantName(value);
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Extract to const $constantName',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the test function or test group containing this literal
+        AstNode? current = node;
+        while (current != null && current is! FunctionExpression) {
+          current = current.parent;
+        }
+
+        if (current == null) return;
+
+        // Insert constant declaration before the test function
+        final insertPosition = current.offset;
+        builder.addSimpleInsertion(
+          insertPosition,
+          'const $constantName = $value;\n  ',
+        );
+
+        // Replace the literal with the constant name
+        builder.addSimpleReplacement(node.sourceRange, constantName);
+      });
+    });
+  }
+
+  String _suggestConstantName(String value) {
+    // Remove underscores and dots for the name
+    final cleaned = value.replaceAll('_', '').replaceAll('.', '');
+    // Convert to camelCase name
+    if (value.startsWith('-')) {
+      return 'negativeValue$cleaned';
+    } else if (value.contains('.')) {
+      return 'testValue${cleaned.replaceAll('-', '')}';
+    } else {
+      return 'testValue$cleaned';
+    }
+  }
+}
+
+/// Warns when magic strings are used in test files.
+///
+/// **Context**: This is the test-specific variant of `no_magic_string`, which
+/// skips test files entirely via `skipTestFiles: true`. The production rule
+/// enforces strict avoidance of magic strings in application code, while this
+/// rule provides appropriate, relaxed enforcement for test code.
+///
+/// **Rationale**: Test files legitimately use more literal strings than
+/// production code for:
+/// - Test descriptions (automatically allowed as first arg to test(), group())
+/// - Common test data (hex strings, single letters, placeholder values)
+/// - Simple assertions ('foo', 'bar', 'hello', 'world')
+/// - Regex patterns (automatically detected via RegExp() constructor)
+///
+/// However, meaningful domain strings (like email addresses, URLs, API keys,
+/// or business identifiers) should still use named constants to make tests
+/// self-documenting and maintainable.
+///
+/// **Automatically allowed**:
+/// - Test descriptions: `test('description', ...)` - first argument
+/// - Regex patterns: `RegExp(r'\d+')` or `RegExp('pattern')`
+/// - Import/export paths: `import 'foo.dart'`
+/// - Annotations: `@Tag('integration')`
+/// - Const contexts: `const name = 'value'`
+/// - Interpolated strings: `'Result: $value'`
+/// - Very short strings: 1-3 characters
+///
+/// **Allowed literal values**:
+/// - Common punctuation: '', ' ', ', ', ': ', '.', '...', '-', '_', '/', '\'
+/// - Single letters: 'a', 'b', 'c', 'x', 'y', 'z'
+/// - Test placeholders: 'foo', 'bar', 'baz', 'test', 'example', 'hello', 'world'
+/// - String representations: 'true', 'false', 'null', '0', '1'
+///
+/// **Tier**: Comprehensive (optional, style enforcement)
+/// **Severity**: INFO
+/// **Performance**: Medium cost (addSimpleStringLiteral registry)
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// test('validates email', () {
+///   final user = User(email: 'user@example.com'); // Magic string
+///   expect(user.isValid, true);
+/// });
+///
+/// test('fetches from API', () async {
+///   final data = await fetch('https://api.example.com/users'); // Magic URL
+///   expect(data, isNotEmpty);
+/// });
+///
+/// test('parses hex color', () {
+///   final color = parseColor('7FfFfFfFfFfFfFfF'); // Magic hex string
+///   expect(color.isValid, true);
+/// });
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// test('validates email', () {
+///   const testEmail = 'user@example.com'; // Named constant for clarity
+///   final user = User(email: testEmail);
+///   expect(user.isValid, true);
+/// });
+///
+/// test('fetches from API', () async {
+///   const apiUrl = 'https://api.example.com/users'; // Named constant
+///   final data = await fetch(apiUrl);
+///   expect(data, isNotEmpty);
+/// });
+///
+/// test('parses hex color', () {
+///   const testHexString = '7FfFfFfFfFfFfFfF'; // Named constant
+///   final color = parseColor(testHexString);
+///   expect(color.isValid, true);
+/// });
+///
+/// // Automatically allowed patterns:
+/// test('validates empty string', () { // Test description - OK
+///   final result = validate(''); // OK: Empty string
+///   expect(result.errors, isEmpty);
+/// });
+///
+/// test('matches regex pattern', () {
+///   final regex = RegExp(r'\d+'); // OK: Regex pattern
+///   expect(regex.hasMatch('123'), true);
+/// });
+///
+/// test('handles simple values', () {
+///   final result = process('x'); // OK: Single letter
+///   expect(result.value, 'foo'); // OK: Common test placeholder
+/// });
+/// ```
+///
+/// ### Related Rules
+///
+/// - `no_magic_string` - Production code variant (skips test files)
+/// - `no_magic_number` - Similar pattern for numeric literals
+/// - `no_magic_number_in_tests` - Test-specific variant for numbers
+class NoMagicStringInTestsRule extends SaropaLintRule {
+  const NoMagicStringInTestsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    name: 'no_magic_string_in_tests',
+    problemMessage:
+        '[no_magic_string_in_tests] Avoid magic strings in test files.',
+    correctionMessage: 'Extract the string to a named constant.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  /// More relaxed allowed strings for test files
+  static const Set<String> _allowedStrings = <String>{
+    '',
+    ' ',
+    ', ',
+    ': ',
+    '.',
+    '...',
+    '-',
+    '_',
+    '/',
+    '\\',
+    '\n',
+    '\t',
+    '\r',
+    '0',
+    '1',
+    'true',
+    'false',
+    'null',
+    // Common test values
+    'test',
+    'Test',
+    'example',
+    'Example',
+    'hello',
+    'world',
+    'foo',
+    'bar',
+    'baz',
+    'a',
+    'b',
+    'c',
+    'x',
+    'y',
+    'z',
+  };
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      // Skip allowed common strings
+      if (_allowedStrings.contains(node.value)) return;
+
+      // Skip very short strings (1-3 chars) - more lenient for tests
+      if (node.value.length <= 3) return;
+
+      // Skip if in const context
+      if (isLiteralInConstContext(node)) return;
+
+      // Skip if in annotation
+      if (isInAnnotation(node)) return;
+
+      // Skip if in import/export
+      if (isInImportOrExport(node)) return;
+
+      // Skip interpolated strings
+      if (node.parent is StringInterpolation) return;
+
+      // Skip test descriptions (first argument to test(), group(), etc.)
+      if (isTestDescription(node)) return;
+
+      // Skip regex patterns
+      if (isStringUsedAsRegexPattern(node)) return;
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => [_NoMagicStringInTestsFix()];
+}
+
+class _NoMagicStringInTestsFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      if (!analysisError.sourceRange.intersects(node.sourceRange)) return;
+
+      final value = node.literal.lexeme;
+      final constantName = _suggestConstantName(node.value);
+
+      final changeBuilder = reporter.createChangeBuilder(
+        message: 'Extract to const $constantName',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the test function or test group containing this literal
+        AstNode? current = node;
+        while (current != null && current is! FunctionExpression) {
+          current = current.parent;
+        }
+
+        if (current == null) return;
+
+        // Insert constant declaration before the test function
+        final insertPosition = current.offset;
+        builder.addSimpleInsertion(
+          insertPosition,
+          'const $constantName = $value;\n  ',
+        );
+
+        // Replace the literal with the constant name
+        builder.addSimpleReplacement(node.sourceRange, constantName);
+      });
+    });
+  }
+
+  String _suggestConstantName(String value) {
+    // Generate a descriptive constant name from the string value
+    if (value.isEmpty) return 'emptyString';
+    if (value.length <= 3) return 'test${value.toUpperCase()}';
+
+    // Try to make a meaningful name from the value
+    final cleaned = value
+        .replaceAll(RegExp(r'[^a-zA-Z0-9]'), ' ')
+        .trim()
+        .split(' ')
+        .where((s) => s.isNotEmpty)
+        .take(3) // Max 3 words
+        .map((s) => s[0].toUpperCase() + s.substring(1).toLowerCase())
+        .join('');
+
+    if (cleaned.isEmpty) return 'testString';
+
+    return 'test$cleaned';
   }
 }

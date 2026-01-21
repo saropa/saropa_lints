@@ -65,6 +65,19 @@ void badExamples() {
 
   // expect_lint: avoid_commented_out_code
   // List<int> items = [];
+
+  // Literals in code context (should still trigger)
+  // expect_lint: avoid_commented_out_code
+  // null;
+
+  // expect_lint: avoid_commented_out_code
+  // true,
+
+  // expect_lint: avoid_commented_out_code
+  // return null;
+
+  // expect_lint: avoid_commented_out_code
+  // return false;
 }
 
 // =============================================================================
@@ -79,6 +92,13 @@ void goodExamples() {
   // Check if the value is null before proceeding
   // This method handles authentication
   // Returns true if successful, false otherwise
+
+  // Prose with keywords (should NOT trigger - regression test for false positives)
+  // null is before non-null, null is not before null
+  // true means the operation succeeded
+  // false indicates an error occurred
+  // return when the condition is met
+  // return to the previous state after completion
 }
 
 // =============================================================================
