@@ -413,6 +413,13 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
 
 /// Warns when an object is passed as an argument to its own method.
 ///
+/// This rule catches potential circular reference bugs where an object
+/// reference is passed to its own method.
+///
+/// **Note:** Literal values (int, double, string, bool, null) are excluded
+/// from this check since they are values, not object references that could
+/// cause circular reference issues.
+///
 /// Example of **bad** code:
 /// ```dart
 /// list.add(list);  // Adding list to itself
@@ -423,6 +430,7 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
 /// ```dart
 /// list.add(item);
 /// map[key] = value;
+/// 0.isBetween(0, 10);  // OK - literals are values, not references
 /// ```
 class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
   const AvoidPassingSelfAsArgumentRule() : super(code: _code);
@@ -451,6 +459,10 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target == null) return;
+
+      // Skip literals - they are values, not object references that could
+      // cause circular reference issues (e.g., 0.isBetween(0, 10) is fine)
+      if (target is Literal) return;
 
       final String targetSource = target.toSource();
 

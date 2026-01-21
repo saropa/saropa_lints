@@ -26,22 +26,42 @@ class CommentPatterns {
   ///
   /// This pattern detects common code constructs:
   /// - Identifier followed by code punctuation: `foo.bar`, `x = 5`
-  /// - Dart keywords at start: `return`, `if (`, `final x`
+  /// - Control flow with parens/blocks: `if (`, `for (`, `while {`
+  /// - Simple statements: `return x`, `break;`, `throw error`
+  /// - Declarations: `final x`, `const y`, `class Foo`
+  /// - Import/export statements: `import 'package:...'`
+  /// - Standalone keywords: `super`, `this`, `else`
+  /// - Literals in code context: `null;`, `true,`, `false)` (not prose)
   /// - Type declarations: `int value`, `String name`
   /// - Function/method calls: `doSomething()`, `list.add(item)`
   /// - Annotations: `@override`, `@deprecated`
-  /// - Import/export: `import 'package:...'`
-  /// - Class/enum: `class Foo {`, `enum Status {`
   /// - Block delimiters: `}`, `{`
   /// - Arrow functions: `=>`
   /// - Statement terminators: ends with `;`
+  ///
+  /// Note: Keywords in prose context are NOT matched:
+  /// - `null is before...` ✓ prose (starts with keyword but followed by prose)
+  /// - `return when done` ✓ prose (not followed by identifier/semicolon)
+  /// - `true means success` ✓ prose (not followed by code punctuation)
   static final RegExp codePattern = RegExp(
     // Identifier immediately followed by code punctuation (no space)
     r'^[a-zA-Z_$][a-zA-Z0-9_$]*[:\.\(\[\{]|'
     // Assignment pattern: identifier = something
     r'^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*\S|'
-    // Dart keywords at start of comment (control flow + declarations)
-    r'^(return|if|else|for|while|switch|case|break|continue|final|const|var|late|await|async|throw|try|catch|finally|super|this|new|null|true|false|class|enum|extension|mixin|typedef|import|export|part|library)\b|'
+    // Control flow keywords followed by opening paren or block
+    r'^(if|for|while|switch|try)\s*[\(\{]|'
+    // Simple statements (keywords that stand alone or with semicolon)
+    r'^(return|break|continue|throw)\s*;|'
+    // Return with common literals
+    r'^return\s+(null|true|false|this|super|\d)\b|'
+    // Declaration keywords followed by type or identifier
+    r'^(final|const|var|late|await|async|class|enum|extension|mixin|typedef)\s+\w|'
+    // Import/export/part/library statements
+    r'^(import|export|part|library)\s+\S|'
+    // Standalone keywords (likely code if just the keyword alone or with semicolon)
+    r'^(super|this|new|else|case|finally)\b|'
+    // Literal values only when standalone or with semicolon (not in prose)
+    r'^(null|true|false)\s*[;,\)\]\}]|^(null|true|false)\s*$|'
     // Type keywords at start (common Dart types)
     r'^(void|int|double|String|bool|List|Map|Set|Future|Stream|dynamic|Object|Function|Iterable|num)\s+[a-zA-Z_]|'
     // Function/method call at end: foo() or foo();

@@ -70,3 +70,6 @@ custom_lint:
     - avoid_redirect_injection: true
     # Explicitly enable type safety rules for testing
     - prefer_explicit_type_arguments: true
+    # Explicitly enable stylistic comment rules for testing
+    - avoid_commented_out_code: true
+    - capitalize_comment_start: true
