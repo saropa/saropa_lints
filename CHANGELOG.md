@@ -32,6 +32,12 @@ Both rules are opinionated and not included in any tier by default. Enable them 
 
 **Quick fix added**: Comments out the sensitive log statement with `// SECURITY:` prefix.
 
+**`require_subscription_status_check` false positives on similar identifiers** - The rule used simple substring matching to detect premium indicators like `isPro`, which caused false positives when identifiers contained these as substrings (e.g., `isProportional` falsely matched `isPro`). The rule now uses word boundary regex (`\b`) to match whole words only.
+
+**`require_deep_link_fallback` false positives on utility getters** - The rule was incorrectly flagging utility getters that check URI state (e.g., `isNotUriNullOrEmpty`, `hasValidUri`, `isUriEmpty`) as if they were deep link handlers requiring fallback logic. The rule now skips getters that are clearly utility methods: those starting with `is`, `has`, `check`, `valid`, or ending with `empty`, `null`, or `nullable` (uses suffix matching for precision, so `handleEmptyDeepLink` would still be checked).
+
+**`require_https_only` false positives on safe URL upgrades** - The rule was flagging `http://` strings even when used in safe replacement patterns like `url.replaceFirst('http://', 'https://')`. The rule now detects and allows these safe HTTP-to-HTTPS upgrade patterns using `replaceFirst`, `replaceAll`, or `replace` methods.
+
 **`avoid_mixed_environments` false positives on conditional configs** - The rule was incorrectly flagging classes that use Flutter's mode constants (`kReleaseMode`, `kDebugMode`, `kProfileMode`) to conditionally set values. For example, this pattern was incorrectly flagged:
 
 ```dart

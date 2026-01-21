@@ -802,3 +802,71 @@ at:
 [custom_lint] 2026-01-20T10:09:21.161295 #8      main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
 [custom_lint] 2026-01-20T10:09:21.161295 <asynchronous suspension>
 [custom_lint] 2026-01-20T10:09:21.161295
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint client] 2026-01-21T11:20:11.975075 [saropa_lints] createPlugin() called - version 4.2.3
+[custom_lint client] 2026-01-21T11:20:12.593507 [saropa_lints] Available config keys: [prefer_sized_box_square, prefer_center_over_align, prefer_align_over_container, prefer_padding_over_container, prefer_constrained_box_over_container, prefer_async_callback, avoid_debug_print, avoid_print_in_production, prefer_where_or_null, avoid_gradient_in_build, avoid_snackbar_in_build, avoid_hardcoded_feature_flags, prefer_secure_random_for_crypto, require_json_decode_try_catch, avoid_datetime_parse_unvalidated, avoid_shrinkwrap_in_scrollview, avoid_nested_scrollables_conflict, avoid_multiple_autofocus, avoid_excessive_bottom_nav_items, require_media_player_dispose, require_tab_controller_dispose, require_dispose, avoid_undisposed_instances, extend_equatable, prefer_equatable_mixin, avoid_image_rebuild_on_scroll, require_dialog_result_handling, avoid_snackbar_queue_buildup, prefer_uuid_v4, require_avatar_alt_text, require_badge_semantics, require_badge_count_limit, require_avatar_fallback, prefer_video_loading_placeholder, prefer_multi_bloc_provider, prefer_correct_bloc_provider, prefer_multi_provider, require_snackbar_duration, require_dialog_barrier_dismissible, require_google_signin_error_handling, require_supabase_error_handling, require_workmanager_constraints, require_svg_error_handler, require_google_fonts_fallback, avoid_redirect_injection, prefer_explicit_type_arguments]
+[custom_lint client] 2026-01-21T11:20:12.621510 [saropa_lints] saropaConfig: null, json: null
+[custom_lint client] 2026-01-21T11:20:12.634517 [saropa_lints] Loaded 1536 rules (tier: essential, enableAll: false)
+[custom_lint client] 2026-01-21T11:20:15.467851 [saropa_lints] Loaded 301 rules (tier: essential, enableAll: false)
+[avoid_snackbar_queue_buildup] 2026-01-21T11:20:18.615251 [saropa_lints] Progress: 18 files analyzed (3s, 5.7 files/sec) - debug_print_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T11:20:21.825099 [saropa_lints] Progress: 31 files analyzed (6s, 4.9 files/sec) - avoid_cached_isar_stream_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T11:20:25.837802 [saropa_lints] Progress: 42 files analyzed (10s, 4.1 files/sec) - owasp_coverage_gap_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T11:20:29.071674 [saropa_lints] Progress: 53 files analyzed (13s, 3.9 files/sec) - test_rules_v2310_fixture.dart
+[custom_lint] 2026-01-21T11:20:30.350904 FileSystemException: writeFrom failed, path = '' (OS Error: The pipe is being closed, errno = 232)
+[custom_lint] 2026-01-21T11:20:30.350904 #0      _RandomAccessFile.writeFromSync (dart:io/file_impl.dart:1027:7)
+[custom_lint] 2026-01-21T11:20:30.350904 #1      _StdConsumer.addStream.<anonymous closure> (dart:io/stdio.dart:328:17)
+[custom_lint] 2026-01-21T11:20:30.350904 #2      _rootRunUnary (dart:async/zone.dart:1546:13)
+[custom_lint] 2026-01-21T11:20:30.350904 #3      _CustomZone.runUnary (dart:async/zone.dart:1429:19)
+[custom_lint] 2026-01-21T11:20:30.350904 #4      _CustomZone.runUnaryGuarded (dart:async/zone.dart:1329:7)
+[custom_lint] 2026-01-21T11:20:30.350904 #5      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:381:11)
+[custom_lint] 2026-01-21T11:20:30.350904 #6      _BufferingStreamSubscription._add (dart:async/stream_impl.dart:312:7)
+[custom_lint] 2026-01-21T11:20:30.350904 #7      _SyncStreamControllerDispatch._sendData (dart:async/stream_controller.dart:798:19)
+[custom_lint] 2026-01-21T11:20:30.350904 #8      _StreamController._add (dart:async/stream_controller.dart:663:7)
+[custom_lint] 2026-01-21T11:20:30.350904 #9      _StreamController.add (dart:async/stream_controller.dart:618:5)
+[custom_lint] 2026-01-21T11:20:30.350904 #10     _StreamSinkImpl.add (dart:io/io_sink.dart:155:17)
+[custom_lint] 2026-01-21T11:20:30.350904 #11     _IOSinkImpl.write (dart:io/io_sink.dart:293:5)
+[custom_lint] 2026-01-21T11:20:30.350904 #12     _StdSink.writeln (dart:io/stdio.dart:442:13)
+[custom_lint] 2026-01-21T11:20:30.350904 #13     CliLogger.stdout (package:custom_lint/src/cli_logger.dart:32:15)
+[custom_lint] 2026-01-21T11:20:30.350904 #14     DefaultOutputFormat.render (package:custom_lint/src/output/default_output_format.dart:20:11)
+[custom_lint] 2026-01-21T11:20:30.350904 #15     renderLints (package:custom_lint/src/output/render_lints.dart:74:16)
+[custom_lint] 2026-01-21T11:20:30.350904 #16     _runPlugins (package:custom_lint/custom_lint.dart:147:3)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904 #17     _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:102:7)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904 #18     _AsyncCompleter.complete (dart:async/future_impl.dart:96:3)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904 #19     _runServer.<anonymous closure> (package:custom_lint/custom_lint.dart:126:19)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904 #20     _runServer (package:custom_lint/custom_lint.dart:86:3)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904 #21     customLint (package:custom_lint/custom_lint.dart:50:5)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904 #22     entrypoint (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:68:3)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904 #23     main (file:///D:/tools/Pub/Cache/hosted/pub.dev/custom_lint-0.8.1/bin/custom_lint.dart:80:5)
+[custom_lint] 2026-01-21T11:20:30.350904 <asynchronous suspension>
+[custom_lint] 2026-01-21T11:20:30.350904
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'D:\src\saropa_lints\'
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'D:\src\saropa_lints\'
+[custom_lint client] 2026-01-21T11:22:08.174286 [saropa_lints] createPlugin() called - version 4.2.3
+[custom_lint client] 2026-01-21T11:22:08.765211 [saropa_lints] Available config keys: [prefer_sized_box_square, prefer_center_over_align, prefer_align_over_container, prefer_padding_over_container, prefer_constrained_box_over_container, prefer_async_callback, avoid_debug_print, avoid_print_in_production, prefer_where_or_null, avoid_gradient_in_build, avoid_snackbar_in_build, avoid_hardcoded_feature_flags, prefer_secure_random_for_crypto, require_json_decode_try_catch, avoid_datetime_parse_unvalidated, avoid_shrinkwrap_in_scrollview, avoid_nested_scrollables_conflict, avoid_multiple_autofocus, avoid_excessive_bottom_nav_items, require_media_player_dispose, require_tab_controller_dispose, require_dispose, avoid_undisposed_instances, extend_equatable, prefer_equatable_mixin, avoid_image_rebuild_on_scroll, require_dialog_result_handling, avoid_snackbar_queue_buildup, prefer_uuid_v4, require_avatar_alt_text, require_badge_semantics, require_badge_count_limit, require_avatar_fallback, prefer_video_loading_placeholder, prefer_multi_bloc_provider, prefer_correct_bloc_provider, prefer_multi_provider, require_snackbar_duration, require_dialog_barrier_dismissible, require_google_signin_error_handling, require_supabase_error_handling, require_workmanager_constraints, require_svg_error_handler, require_google_fonts_fallback, avoid_redirect_injection, prefer_explicit_type_arguments]
+[custom_lint client] 2026-01-21T11:22:08.790225 [saropa_lints] saropaConfig: null, json: null
+[custom_lint client] 2026-01-21T11:22:08.802605 [saropa_lints] Loaded 1536 rules (tier: essential, enableAll: false)
+[custom_lint client] 2026-01-21T11:22:11.304773 [saropa_lints] Loaded 301 rules (tier: essential, enableAll: false)
+[avoid_snackbar_queue_buildup] 2026-01-21T11:22:14.422676 [saropa_lints] Progress: 19 files analyzed (3s, 6.1 files/sec) - dialog_snackbar_rules_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T11:22:17.569937 [saropa_lints] Progress: 32 files analyzed (6s, 5.1 files/sec) - json_datetime_rules_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T11:22:20.785279 [saropa_lints] Progress: 42 files analyzed (9s, 4.4 files/sec) - owasp_coverage_gap_fixture.dart
+[avoid_snackbar_queue_buildup] 2026-01-21T11:22:23.945034 [saropa_lints] Progress: 54 files analyzed (12s, 4.3 files/sec) - prefer_explicit_type_arguments_fixture.dart

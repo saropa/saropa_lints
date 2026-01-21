@@ -884,6 +884,22 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         return;
       }
 
+      // Skip utility getters and simple boolean checks
+      // These are helpers, not actual deep link handlers
+      // Use endsWith instead of contains to be more precise:
+      // - isUriEmpty ✓ (utility)
+      // - handleEmptyDeepLink ✗ (might be actual handler)
+      if (node.isGetter &&
+          (methodName.startsWith('is') ||
+              methodName.startsWith('has') ||
+              methodName.startsWith('check') ||
+              methodName.startsWith('valid') ||
+              methodName.endsWith('empty') ||
+              methodName.endsWith('null') ||
+              methodName.endsWith('nullable'))) {
+        return;
+      }
+
       final FunctionBody? body = node.body;
       if (body == null) return;
 
