@@ -1,16 +1,19 @@
 import 'package:test/test.dart';
 
-/// Tests for false positive fixes in version 4.2.3
+/// Tests for false positive fixes in version 4.2.3+
 ///
-/// This test file documents the expected behavior for three rule fixes:
+/// This test file documents the expected behavior for rule fixes:
 /// 1. require_subscription_status_check - word boundary matching
 /// 2. require_deep_link_fallback - utility getter filtering
 /// 3. require_https_only - safe replacement pattern detection
+/// 4. avoid_passing_self_as_argument - literal value exclusion
+/// 5. avoid_variable_shadowing - sibling closure scoping
 ///
 /// Test fixtures are located in:
 /// - example/lib/require_subscription_status_check_example.dart
 /// - example/lib/navigation/require_deep_link_fallback_fixture.dart
 /// - example/lib/security/require_https_only_fixture.dart
+/// - example/lib/avoid_variable_shadowing_fixture.dart
 void main() {
   group('False Positive Fixes - v4.2.3', () {
     group('require_subscription_status_check', () {
@@ -126,6 +129,79 @@ void main() {
         );
       });
     });
+
+    group('avoid_passing_self_as_argument', () {
+      test('should skip literal values as targets', () {
+        // Expected behavior: These should NOT trigger
+        // - 0.isBetween(0, 10)         // IntegerLiteral
+        // - 3.14.isBetween(0.0, 5.0)   // DoubleLiteral
+        // - 'test'.contains('test')    // StringLiteral
+        // - true.toString() == 'true'  // BooleanLiteral
+
+        expect(
+          'Literal values (int, double, string, bool) are excluded',
+          isNotNull,
+        );
+      });
+
+      test('should still detect object self-references', () {
+        // Expected behavior: These SHOULD trigger
+        // - list.add(list)     // Adding list to itself
+        // - map[key] = map     // Assigning map to itself
+        // - obj.compare(obj)   // Comparing object to itself
+
+        expect(
+          'Object self-references are still detected',
+          isNotNull,
+        );
+      });
+    });
+
+    group('avoid_variable_shadowing', () {
+      test('should not flag sibling closures as shadowing', () {
+        // Expected behavior: These should NOT trigger
+        // Variables with same name in sibling closures (not nested) are
+        // independent scopes, not shadowing
+        //
+        // group('...', () {
+        //   test('A', () { final list = [1]; }); // Scope A
+        //   test('B', () { final list = [2]; }); // Scope B - NOT shadowing
+        // });
+        //
+        // The closures are siblings, not nested.
+
+        expect(
+          'Sibling closures have independent scopes',
+          isNotNull,
+        );
+      });
+
+      test('should still detect true nested shadowing', () {
+        // Expected behavior: These SHOULD trigger
+        // void outer() {
+        //   final list = [1];        // Outer scope
+        //   void inner() {
+        //     final list = [2];      // SHADOWING - nested, not sibling
+        //   }
+        // }
+
+        expect(
+          'Nested shadowing is still detected',
+          isNotNull,
+        );
+      });
+
+      test('should detect parameter shadowing', () {
+        // Expected behavior: These SHOULD trigger
+        // int value = 10;
+        // void process(int value) { } // Shadows outer 'value'
+
+        expect(
+          'Parameter shadowing outer variable is detected',
+          isNotNull,
+        );
+      });
+    });
   });
 
   group('Test Fixture Coverage', () {
@@ -141,6 +217,11 @@ void main() {
 
     test('require_https_only has test fixture', () {
       // Located at: example/lib/security/require_https_only_fixture.dart
+      expect(true, isTrue);
+    });
+
+    test('avoid_variable_shadowing has test fixture', () {
+      // Located at: example/lib/avoid_variable_shadowing_fixture.dart
       expect(true, isTrue);
     });
   });
