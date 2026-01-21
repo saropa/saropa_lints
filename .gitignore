@@ -15,8 +15,10 @@ pubspec.lock
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code personal preferences (keep local only)
 .claude/settings.local.json
-CLAUDE.md
+CLAUDE.local.md
 
 # Articles (not part of the package)
 articles/
@@ -24,11 +26,11 @@ __pycache__/
 
 # Generated reports
 reports/
-.claude/agents/validator/AGENT.md
-.claude/skills/lint-rules/SKILL.md
-.claude/skills/publishing/SKILL.md
 nul
 tmp_implemented.txt
 example/custom_lint.log
-example/custom_lint.log
-example/custom_lint.log
+/.claude
+CLAUDE.md
+CLAUDE_SETUP.md
+CODEBASE_INDEX.md
+CODE_INDEX.md
