@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 3.4.0.
 
+## [4.5.0] - 2026-01-21
+
+### Added
+
+- **New Dart CLI tool: `bin/init.dart`**
+  - Generates `analysis_options.yaml` with explicit `- rule_name: true/false` for all 1668 rules
+  - Supports tier selection: `--tier essential|recommended|professional|comprehensive|insanity` (or 1-5)
+  - Supports `--stylistic` flag to include opinionated formatting rules
+  - Supports `--dry-run` to preview output without writing
+  - Creates a backup of the existing file before overwriting
+
+### Changed
+
+- **pubspec.yaml**
+  - Added `executables` section exposing `init`, `baseline`, and `impact_report` commands
+
+- **Documentation**
+  - Updated `README.md` Quick Start to use the CLI tool
+  - Updated "Using a tier", "Customizing rules", "Stylistic Rules", and "Performance" sections
+  - Updated troubleshooting to recommend the CLI tool instead of workarounds
+  - Updated `README_STYLISTIC.md` to use the CLI approach
+
+### Usage
+
+```bash
+# Generate config for comprehensive tier (1618 rules) - recommended
+dart run saropa_lints:init --tier comprehensive
+
+# Generate config for essential tier (342 rules) - fastest
+dart run saropa_lints:init --tier essential
+
+# Include stylistic rules
+dart run saropa_lints:init --tier comprehensive --stylistic
+
+# Preview without writing
+dart run saropa_lints:init --dry-run
+
+# See all options
+dart run saropa_lints:init --help
+```
+
+---
+
 ## [4.4.0] - 2026-01-21
 
 ### Added

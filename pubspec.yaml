@@ -3,7 +3,7 @@ name: saropa_lints
 description: >-
   1656+ custom lint rules with 218 quick fixes for Flutter and Dart.
   Static analysis for security, accessibility, and performance.
-version: 4.4.0
+version: 4.5.0
 license: MIT
 
 # Project links for pub.dev
@@ -18,6 +18,12 @@ topics:
   - code-quality
   - flutter
   - dart
+
+# CLI executables (dart run saropa_lints:<name>)
+executables:
+  init: init
+  baseline: baseline
+  impact_report: impact_report
 
 # Dart SDK version constraint
 environment:
