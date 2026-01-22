@@ -575,19 +575,19 @@ custom_lint:
 
     # =========================================================================
     # FILE LENGTH (Opinionated)
-    # Production files: prefer_small_files (200), avoid_medium_files (300),
-    #                   avoid_long_files (500), avoid_very_long_files (1000)
-    # Test files:       prefer_small_test_files (400), avoid_medium_test_files (600),
-    #                   avoid_long_test_files (1000), avoid_very_long_test_files (2000)
+    # Production files: prefer_small_length_files (200), avoid_medium_length_files (300),
+    #                   avoid_long_length_files (500), avoid_very_long_length_files (1000)
+    # Test files:       prefer_small_length_test_files (400), avoid_medium_length_test_files (600),
+    #                   avoid_long_length_test_files (1000), avoid_very_long_length_test_files (2000)
     # =========================================================================
-    - prefer_small_files: false           # 200 lines [LOW] Tier: insanity
-    - avoid_medium_files: false           # 300 lines [LOW] Tier: professional
-    - avoid_long_files: false             # 500 lines [LOW] Tier: comprehensive
-    - avoid_very_long_files: false        # 1000 lines [LOW] Tier: recommended
-    - prefer_small_test_files: false      # 400 lines [LOW] Tier: insanity (test files)
-    - avoid_medium_test_files: false      # 600 lines [LOW] Tier: professional (test files)
-    - avoid_long_test_files: false        # 1000 lines [LOW] Tier: comprehensive (test files)
-    - avoid_very_long_test_files: false   # 2000 lines [LOW] Tier: recommended (test files)
+    - prefer_small_length_files: false           # 200 lines [LOW] Tier: insanity
+    - avoid_medium_length_files: false           # 300 lines [LOW] Tier: professional
+    - avoid_long_length_files: false             # 500 lines [LOW] Tier: comprehensive
+    - avoid_very_long_length_files: false        # 1000 lines [LOW] Tier: recommended
+    - prefer_small_length_test_files: false      # 400 lines [LOW] Tier: insanity (test files)
+    - avoid_medium_length_test_files: false      # 600 lines [LOW] Tier: professional (test files)
+    - avoid_long_length_test_files: false        # 1000 lines [LOW] Tier: comprehensive (test files)
+    - avoid_very_long_length_test_files: false   # 2000 lines [LOW] Tier: recommended (test files)
 
     # =========================================================================
     # FUNCTIONS
