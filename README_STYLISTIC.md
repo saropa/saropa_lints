@@ -5,31 +5,29 @@ Stylistic rules represent team preferences where there's no objectively "correct
 
 ## Two Ways to Enable Stylistic Rules
 
-### Option 1: Use `tier: stylistic` for Non-Conflicting Rules
+### Option 1: Include Stylistic Rules with CLI Tool
 
-```yaml
-# analysis_options.yaml
-custom_lint:
-  saropa_lints:
-    tier: stylistic  # Enables 35 non-conflicting stylistic rules
+```bash
+# Generate config with stylistic rules included
+dart run saropa_lints:init --tier comprehensive --stylistic
 ```
 
-This enables rules like `enforce_member_ordering`, `prefer_trailing_comma_always`, and `prefer_arrow_functions` that don't have opposing alternatives.
+This enables the 35 non-conflicting stylistic rules like `enforce_member_ordering`, `prefer_trailing_comma_always`, and `prefer_arrow_functions`.
 
 ### Option 2: Enable Individual Rules
 
+After generating your base configuration, edit `analysis_options.yaml` to enable specific stylistic rules:
+
 ```yaml
 # analysis_options.yaml
 custom_lint:
-  saropa_lints:
-    tier: recommended
   rules:
     # Enable specific stylistic rules your team prefers
     - prefer_single_quotes: true      # OR prefer_double_quotes
     - prefer_relative_imports: true   # OR prefer_absolute_imports
 ```
 
-**Conflicting pairs** (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) are NOT included in `tier: stylistic`. You must explicitly enable one of the pair.
+**Conflicting pairs** (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) are NOT auto-enabled. You must explicitly enable one of the pair.
 
 ---
 
