@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -135,7 +136,8 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
 
     // Handle named constructors like Key.fromUtf8(...), Key.fromBase64(...)
     // The encrypt package uses named constructors, not static methods.
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -245,7 +247,8 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -314,7 +317,8 @@ class _UseSecureRandomFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
@@ -406,7 +410,8 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
     });
 
     // Check for constructor calls like MD5()
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (_deprecatedAlgorithms.contains(typeName)) {
         reporter.atNode(node, code);
@@ -480,7 +485,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     final String lowerName = originalName.toLowerCase();
 
     // Snake_case patterns: my_iv, iv_value, _iv_
-    if (lowerName.contains('_iv_') || lowerName.endsWith('_iv') || lowerName.startsWith('iv_')) {
+    if (lowerName.contains('_iv_') ||
+        lowerName.endsWith('_iv') ||
+        lowerName.startsWith('iv_')) {
       return true;
     }
 
@@ -504,12 +511,14 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
         // Check variable name for IV-related patterns
         final String originalName = variable.name.lexeme;
         final String lowerName = originalName.toLowerCase();
-        final bool hasIvName =
-            lowerName == 'iv' || lowerName == 'nonce' || _isIvVariableName(originalName);
+        final bool hasIvName = lowerName == 'iv' ||
+            lowerName == 'nonce' ||
+            _isIvVariableName(originalName);
 
         // Check if type or initializer references IV class
         final String fieldSource = node.toSource();
-        final bool hasIvClass = fieldSource.contains('IV.') || fieldSource.contains('IV(');
+        final bool hasIvClass =
+            fieldSource.contains('IV.') || fieldSource.contains('IV(');
 
         if (hasIvName || hasIvClass) {
           reporter.atNode(variable, code);
@@ -520,7 +529,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     // Check for const IV
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       final VariableDeclarationList? parent =
-          node.parent is VariableDeclarationList ? node.parent as VariableDeclarationList : null;
+          node.parent is VariableDeclarationList
+              ? node.parent as VariableDeclarationList
+              : null;
       if (parent == null) return;
 
       final bool isConst = parent.isConst;
@@ -528,7 +539,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
       final String originalName = node.name.lexeme;
       final String lowerName = originalName.toLowerCase();
-      if (lowerName == 'iv' || lowerName == 'nonce' || _isIvVariableName(originalName)) {
+      if (lowerName == 'iv' ||
+          lowerName == 'nonce' ||
+          _isIvVariableName(originalName)) {
         reporter.atNode(node, code);
       }
     });
