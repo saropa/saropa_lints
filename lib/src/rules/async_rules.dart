@@ -4,8 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -29,8 +28,7 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
     name: 'avoid_future_ignore',
     problemMessage:
         '[avoid_future_ignore] Future.ignore() silently discards errors. Failures will go unnoticed, which can cause silent bugs, missed exceptions, and unreliable app behavior.',
-    correctionMessage:
-        'Use await to handle, unawaited() if intentional, or add .catchError().',
+    correctionMessage: 'Use await to handle, unawaited() if intentional, or add .catchError().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -81,8 +79,7 @@ class AvoidFutureToStringRule extends SaropaLintRule {
     name: 'avoid_future_tostring',
     problemMessage:
         "[avoid_future_tostring] Future.toString() returns 'Instance of Future', not the resolved value. Logs show useless output, error messages fail to include actual data, and debugging async code becomes nearly impossible.",
-    correctionMessage:
-        'Use await to get the value first: (await future).toString().',
+    correctionMessage: 'Use await to get the value first: (await future).toString().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -209,8 +206,7 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
     name: 'avoid_nested_streams_and_futures',
     problemMessage:
         '[avoid_nested_streams_and_futures] Stream<Future<T>> or Future<Stream<T>> detected. Complex to consume - each item needs await or stream needs await. This increases cognitive load and can lead to resource leaks or missed events.',
-    correctionMessage:
-        'Flatten with async* generator or Stream.asyncMap() instead.',
+    correctionMessage: 'Flatten with async* generator or Stream.asyncMap() instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -356,8 +352,7 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
     name: 'avoid_redundant_async',
     problemMessage:
         '[avoid_redundant_async] async keyword without await. Adds unnecessary Future wrapper and microtask scheduling overhead.',
-    correctionMessage:
-        'Remove async keyword, or add await if async behavior intended.',
+    correctionMessage: 'Remove async keyword, or add await if async behavior intended.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -376,8 +371,7 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
     });
   }
 
-  void _checkAsyncBody(
-      FunctionBody body, AstNode node, SaropaDiagnosticReporter reporter) {
+  void _checkAsyncBody(FunctionBody body, AstNode node, SaropaDiagnosticReporter reporter) {
     // Only check async functions (not async*)
     if (body.isAsynchronous && !body.isGenerator) {
       // Check if body contains any await expressions
@@ -438,8 +432,7 @@ class AvoidStreamToStringRule extends SaropaLintRule {
     name: 'avoid_stream_tostring',
     problemMessage:
         "[avoid_stream_tostring] Stream.toString() returns 'Instance of Stream', not stream contents. Data is lost.",
-    correctionMessage:
-        'Use await stream.toList() to collect values, or listen() to process.',
+    correctionMessage: 'Use await stream.toList() to collect values, or listen() to process.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -601,8 +594,7 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
     name: 'prefer_assigning_await_expressions',
     problemMessage:
         '[prefer_assigning_await_expressions] Inline await expression. Harder to debug and inspect intermediate values. Consequence: Extracting to a variable improves readability, makes debugging easier, and helps catch errors sooner.',
-    correctionMessage:
-        'Extract to variable: final result = await fetch(); then use result.',
+    correctionMessage: 'Extract to variable: final result = await fetch(); then use result.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -626,9 +618,7 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
       if (parent is ExpressionStatement) return;
 
       // OK if in a list/set/map literal at top level
-      if (parent is ListLiteral ||
-          parent is SetOrMapLiteral ||
-          parent is MapLiteralEntry) {
+      if (parent is ListLiteral || parent is SetOrMapLiteral || parent is MapLiteralEntry) {
         return;
       }
 
@@ -673,8 +663,7 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_commenting_future_delayed',
-    problemMessage:
-        '[prefer_commenting_future_delayed] Unexplained delay is a code smell '
+    problemMessage: '[prefer_commenting_future_delayed] Unexplained delay is a code smell '
         'that often hides race conditions or timing bugs.',
     correctionMessage: 'Add a comment before the delay explaining its purpose.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -713,8 +702,7 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_future_return_type',
-    problemMessage:
-        '[prefer_correct_future_return_type] Missing Future return type causes '
+    problemMessage: '[prefer_correct_future_return_type] Missing Future return type causes '
         'callers to handle dynamic, losing type safety and IDE support.',
     correctionMessage: 'Add explicit Future<T> return type.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -776,8 +764,7 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_correct_stream_return_type',
-    problemMessage:
-        '[prefer_correct_stream_return_type] Missing Stream return type causes '
+    problemMessage: '[prefer_correct_stream_return_type] Missing Stream return type causes '
         'listeners to receive dynamic, losing type safety and IDE support.',
     correctionMessage: 'Add explicit Stream<T> return type.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -849,8 +836,7 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final NamedType type = constructorName.type;
 
@@ -1257,8 +1243,7 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
     problemMessage:
         '[prefer_async_callback] VoidCallback discards Futures silently. Errors will be swallowed and '
         'callers cannot await completion.',
-    correctionMessage:
-        'Use Future<void> Function() to allow proper async handling.',
+    correctionMessage: 'Use Future<void> Function() to allow proper async handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1348,8 +1333,7 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
       if (name.startsWith(prefix) && name.length > prefix.length) {
         // Check that next char is uppercase (proper camelCase)
         final String nextChar = name[prefix.length];
-        if (nextChar == nextChar.toUpperCase() &&
-            nextChar != nextChar.toLowerCase()) {
+        if (nextChar == nextChar.toUpperCase() && nextChar != nextChar.toLowerCase()) {
           return true;
         }
       }
@@ -1454,8 +1438,7 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
     name: 'prefer_future_void_function_over_async_callback',
     problemMessage:
         '[prefer_future_void_function_over_async_callback] Prefer explicit Future<void> Function() instead of AsyncCallback.',
-    correctionMessage:
-        'Use Future<void> Function() to avoid Flutter-specific type dependencies.',
+    correctionMessage: 'Use Future<void> Function() to avoid Flutter-specific type dependencies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1474,8 +1457,7 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() =>
-      <Fix>[_ReplaceAsyncCallbackWithFutureVoidFunctionFix()];
+  List<Fix> getFixes() => <Fix>[_ReplaceAsyncCallbackWithFutureVoidFunctionFix()];
 }
 
 class _ReplaceAsyncCallbackWithFutureVoidFunctionFix extends DartFix {
@@ -1688,8 +1670,7 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'check_mounted_after_async',
-    problemMessage:
-        '[check_mounted_after_async] setState() after await without mounted check. '
+    problemMessage: '[check_mounted_after_async] setState() after await without mounted check. '
         'State may be disposed during async gap, causing "setState() called after dispose()" crash.',
     correctionMessage: 'Add if (mounted) { setState(...) } after the await.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1803,11 +1784,9 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_websocket_message_validation',
-    problemMessage:
-        '[require_websocket_message_validation] Unvalidated WebSocket messages '
+    problemMessage: '[require_websocket_message_validation] Unvalidated WebSocket messages '
         'crash when malformed data arrives, or enable injection attacks.',
-    correctionMessage:
-        'Add try-catch and type checking for WebSocket messages.',
+    correctionMessage: 'Add try-catch and type checking for WebSocket messages.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1890,11 +1869,9 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_feature_flag_default',
-    problemMessage:
-        '[require_feature_flag_default] Missing default causes null/zero when '
+    problemMessage: '[require_feature_flag_default] Missing default causes null/zero when '
         'remote config fetch fails, breaking expected feature behavior.',
-    correctionMessage:
-        'Use ?? operator or provide default in getBool/getString.',
+    correctionMessage: 'Use ?? operator or provide default in getBool/getString.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1924,8 +1901,7 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
       final AstNode? parent = node.parent;
 
       // OK if used with ?? operator
-      if (parent is BinaryExpression &&
-          parent.operator.type == TokenType.QUESTION_QUESTION) {
+      if (parent is BinaryExpression && parent.operator.type == TokenType.QUESTION_QUESTION) {
         return;
       }
 
@@ -1993,8 +1969,7 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_utc_for_storage',
-    problemMessage:
-        '[prefer_utc_for_storage] Local time stored without UTC conversion '
+    problemMessage: '[prefer_utc_for_storage] Local time stored without UTC conversion '
         'causes incorrect values when restored in different timezones.',
     correctionMessage: 'Call .toUtc() before storing DateTime values.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -2140,11 +2115,9 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_location_timeout',
-    problemMessage:
-        '[require_location_timeout] Location request without timeout can hang '
+    problemMessage: '[require_location_timeout] Location request without timeout can hang '
         'indefinitely if GPS is unavailable, freezing the app.',
-    correctionMessage:
-        'Add timeLimit or timeout parameter to location request.',
+    correctionMessage: 'Add timeLimit or timeout parameter to location request.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2233,9 +2206,9 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_stream_in_build',
     problemMessage:
-        '[avoid_stream_in_build] Creating a StreamController inside build() will create a new instance every frame, leaking previous streams and listeners. This causes memory leaks and unpredictable app behavior.',
+        '[avoid_stream_in_build] Creating a StreamController inside build() causes a new instance to be created on every widget rebuild. This leads to memory leaks, lost events, and unpredictable app behavior. Streams should be long-lived and managed at the widget level, not recreated per frame.',
     correctionMessage:
-        'Always create StreamController in initState() and store it as a field to avoid leaks and keep your app stable.',
+        'Move StreamController creation to initState() and store it as a field. Dispose of it in dispose() to prevent leaks and ensure correct event handling.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2294,9 +2267,9 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_controller_close',
     problemMessage:
-        '[require_stream_controller_close] StreamController without close() in dispose() keeps the stream open indefinitely. Listeners accumulate in memory, causing memory leaks that slow the app and eventually crash it when memory is exhausted.',
+        '[require_stream_controller_close] StreamController is not closed in dispose(). This keeps the stream open, causing memory leaks and preventing resources from being released. Over time, this can slow down or crash your app.',
     correctionMessage:
-        'Always call controller.close() in dispose() to safely release resources and prevent memory leaks.',
+        'Call controller.close() in dispose() to release resources and prevent memory leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2374,8 +2347,9 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_multiple_stream_listeners',
     problemMessage:
-        '[avoid_multiple_stream_listeners] Multiple listen() on same stream. Non-broadcast streams only allow one listener. This can cause runtime exceptions and unexpected behavior.',
-    correctionMessage: 'Use .asBroadcastStream() or share subscriptions.',
+        '[avoid_multiple_stream_listeners] Multiple listen() calls on the same non-broadcast stream are not allowed. This causes runtime exceptions and can break your app’s logic.',
+    correctionMessage:
+        'Convert the stream to a broadcast stream using .asBroadcastStream(), or ensure only one listener is attached.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2387,8 +2361,7 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
   ) {
     context.registry.addBlock((Block node) {
       // Track stream.listen calls by target
-      final Map<String, List<MethodInvocation>> listenCalls =
-          <String, List<MethodInvocation>>{};
+      final Map<String, List<MethodInvocation>> listenCalls = <String, List<MethodInvocation>>{};
 
       _findListenCalls(node, (MethodInvocation call, String targetId) {
         listenCalls.putIfAbsent(targetId, () => <MethodInvocation>[]).add(call);
@@ -2454,8 +2427,9 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_error_handling',
     problemMessage:
-        '[require_stream_error_handling] Stream.listen() without onError handler. Errors will be uncaught.',
-    correctionMessage: 'Add onError callback to handle stream errors.',
+        '[require_stream_error_handling] Stream.listen() is called without providing an onError handler. Unhandled stream errors will cause uncaught exceptions and may crash your app.',
+    correctionMessage:
+        'Add an onError callback to your stream.listen() to handle errors gracefully and prevent crashes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2628,8 +2602,7 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
     name: 'require_future_wait_error_handling',
     problemMessage:
         '[require_future_wait_error_handling] Future.wait without eagerError: false. Partial results lost on failure.',
-    correctionMessage:
-        'Add eagerError: false or wrap individual futures with catchError.',
+    correctionMessage: 'Add eagerError: false or wrap individual futures with catchError.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2694,8 +2667,9 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_stream_on_done',
     problemMessage:
-        '[require_stream_on_done] Stream.listen without onDone. Completion state not handled.',
-    correctionMessage: 'Add onDone callback to handle stream completion.',
+        '[require_stream_on_done] Stream.listen() is called without an onDone handler. When the stream completes, you will not be notified, which can lead to missed cleanup or UI updates.',
+    correctionMessage:
+        'Add an onDone callback to handle stream completion and perform necessary cleanup or state updates.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2923,8 +2897,7 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
           if (leftSide is SimpleIdentifier) {
             // Check if the left side is a StreamSubscription field
             final String leftSource = leftSide.name;
-            if (leftSource.contains('subscription') ||
-                leftSource.contains('Subscription')) {
+            if (leftSource.contains('subscription') || leftSource.contains('Subscription')) {
               return; // Likely storing properly
             }
           }
@@ -3138,10 +3111,8 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unawaited_future',
-    problemMessage:
-        '[avoid_unawaited_future] Future not awaited. Errors may be silently lost.',
-    correctionMessage:
-        'Use await or unawaited() to explicitly handle the Future.',
+    problemMessage: '[avoid_unawaited_future] Future not awaited. Errors may be silently lost.',
+    correctionMessage: 'Use await or unawaited() to explicitly handle the Future.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3162,8 +3133,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
           if (typeName.startsWith('Future<') || typeName == 'Future') {
             // Skip if wrapped in unawaited()
             final AstNode? parent = node.parent;
-            if (parent is! MethodInvocation ||
-                parent.methodName.name != 'unawaited') {
+            if (parent is! MethodInvocation || parent.methodName.name != 'unawaited') {
               // Skip safe patterns: subscription.cancel() in dispose(),
               // or chains ending with .catchError()/.ignore()
               if (_isSafeFireAndForget(expr, node)) {
@@ -3239,9 +3209,7 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
     while (current != null) {
       if (current is MethodDeclaration) {
         final String name = current.name.lexeme;
-        return name == 'dispose' ||
-            name == 'didUpdateWidget' ||
-            name == 'deactivate';
+        return name == 'dispose' || name == 'didUpdateWidget' || name == 'deactivate';
       }
       current = current.parent;
     }
@@ -3358,8 +3326,7 @@ class PreferFutureWaitRule extends SaropaLintRule {
     name: 'prefer_future_wait',
     problemMessage:
         '[prefer_future_wait] Sequential awaits could run in parallel with Future.wait.',
-    correctionMessage:
-        'Use Future.wait([future1, future2]) to run independent futures '
+    correctionMessage: 'Use Future.wait([future1, future2]) to run independent futures '
         'concurrently, or (future1, future2).wait in Dart 3.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -3402,8 +3369,7 @@ class PreferFutureWaitRule extends SaropaLintRule {
           if (initializer is AwaitExpression) {
             // Check if this await uses any previously declared variables
             final usedVars = _getUsedVariables(initializer);
-            final dependsOnPrevious =
-                usedVars.any((v) => usedVariables.contains(v));
+            final dependsOnPrevious = usedVars.any((v) => usedVariables.contains(v));
 
             if (dependsOnPrevious) {
               // This await depends on a previous result, break the chain
@@ -3501,11 +3467,9 @@ class PreferStreamDistinctRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_stream_distinct',
-    problemMessage:
-        '[prefer_stream_distinct] Stream.listen() without .distinct() may '
+    problemMessage: '[prefer_stream_distinct] Stream.listen() without .distinct() may '
         'process duplicate values unnecessarily.',
-    correctionMessage:
-        'Add .distinct() before .listen() to skip duplicate consecutive values.',
+    correctionMessage: 'Add .distinct() before .listen() to skip duplicate consecutive values.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3584,8 +3548,7 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
     problemMessage:
         '[prefer_broadcast_stream] Stream from StreamController is single-subscription. '
         'Multiple listeners will cause an error.',
-    correctionMessage:
-        'Use .asBroadcastStream() or StreamController.broadcast().',
+    correctionMessage: 'Use .asBroadcastStream() or StreamController.broadcast().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3680,11 +3643,9 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_future_in_build',
-    problemMessage:
-        '[avoid_future_in_build] Creating Future in build() causes repeated '
+    problemMessage: '[avoid_future_in_build] Creating Future in build() causes repeated '
         'async calls on every rebuild.',
-    correctionMessage:
-        'Create the Future in initState() and store it in a field.',
+    correctionMessage: 'Create the Future in initState() and store it in a field.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -3782,11 +3743,9 @@ class RequireMountedCheckAfterAwaitRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_mounted_check_after_await',
-    problemMessage:
-        '[require_mounted_check_after_await] setState called after await '
+    problemMessage: '[require_mounted_check_after_await] setState called after await '
         'without mounted check. Widget may have been disposed.',
-    correctionMessage:
-        'Add "if (!mounted) return;" before setState after await.',
+    correctionMessage: 'Add "if (!mounted) return;" before setState after await.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -3900,8 +3859,7 @@ class AvoidAsyncInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_async_in_build',
-    problemMessage:
-        '[avoid_async_in_build] Build method should never be async. '
+    problemMessage: '[avoid_async_in_build] Build method should never be async. '
         'This will cause rendering issues.',
     correctionMessage: 'Use FutureBuilder or fetch data in initState instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -3974,11 +3932,9 @@ class PreferAsyncInitStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_async_init_state',
-    problemMessage:
-        '[prefer_async_init_state] Using .then().setState() pattern in initState. '
+    problemMessage: '[prefer_async_init_state] Using .then().setState() pattern in initState. '
         'Consider storing Future and using FutureBuilder for loading states.',
-    correctionMessage:
-        'Store the Future in a field and use FutureBuilder in build().',
+    correctionMessage: 'Store the Future in a field and use FutureBuilder in build().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4060,11 +4016,9 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_network_status_check',
-    problemMessage:
-        '[require_network_status_check] `[HEURISTIC]` Network call without '
+    problemMessage: '[require_network_status_check] `[HEURISTIC]` Network call without '
         'connectivity check. Consider checking network status first.',
-    correctionMessage:
-        'Check Connectivity().checkConnectivity() before making requests.',
+    correctionMessage: 'Check Connectivity().checkConnectivity() before making requests.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4150,11 +4104,9 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_sync_on_every_change',
-    problemMessage:
-        '[avoid_sync_on_every_change] `[HEURISTIC]` API call in onChanged '
+    problemMessage: '[avoid_sync_on_every_change] `[HEURISTIC]` API call in onChanged '
         'callback may fire on every keystroke. Consider debouncing.',
-    correctionMessage:
-        'Use a debouncer or batch changes before syncing to server.',
+    correctionMessage: 'Use a debouncer or batch changes before syncing to server.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -4168,8 +4120,7 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String constructorName = node.constructorName.type.name2.lexeme;
-      if (constructorName != 'TextField' &&
-          constructorName != 'TextFormField') {
+      if (constructorName != 'TextField' && constructorName != 'TextFormField') {
         return;
       }
 
@@ -4241,11 +4192,9 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pending_changes_indicator',
-    problemMessage:
-        '[require_pending_changes_indicator] `[HEURISTIC]` Pending changes '
+    problemMessage: '[require_pending_changes_indicator] `[HEURISTIC]` Pending changes '
         'collection without UI notification. Users cannot see sync status.',
-    correctionMessage:
-        'Call notifyListeners() or setState() when pending changes update.',
+    correctionMessage: 'Call notifyListeners() or setState() when pending changes update.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4329,11 +4278,9 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_stream_sync_events',
-    problemMessage:
-        '[avoid_stream_sync_events] Stream event added synchronously right '
+    problemMessage: '[avoid_stream_sync_events] Stream event added synchronously right '
         'after controller creation. Listeners may not be attached yet.',
-    correctionMessage:
-        'Use scheduleMicrotask() or Future.microtask() to delay first event, '
+    correctionMessage: 'Use scheduleMicrotask() or Future.microtask() to delay first event, '
         'or use StreamController(sync: true) if synchronous delivery is intended.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -4355,8 +4302,7 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('controller') &&
-          !targetSource.contains('stream')) {
+      if (!targetSource.contains('controller') && !targetSource.contains('stream')) {
         return;
       }
 
@@ -4454,11 +4400,9 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_sequential_awaits',
-    problemMessage:
-        '[avoid_sequential_awaits] Multiple sequential awaits on independent '
+    problemMessage: '[avoid_sequential_awaits] Multiple sequential awaits on independent '
         'operations. Total time is sum of all; could run in parallel.',
-    correctionMessage:
-        'Use Future.wait([...]) to run independent futures concurrently.',
+    correctionMessage: 'Use Future.wait([...]) to run independent futures concurrently.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -4534,8 +4478,7 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
           assignedVars.add(parent.name.lexeme);
           break;
         }
-        if (parent is AssignmentExpression &&
-            parent.leftHandSide is SimpleIdentifier) {
+        if (parent is AssignmentExpression && parent.leftHandSide is SimpleIdentifier) {
           assignedVars.add((parent.leftHandSide as SimpleIdentifier).name);
           break;
         }

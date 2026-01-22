@@ -7,8 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -68,11 +67,9 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_media_player_dispose',
-    problemMessage:
-        '[require_media_player_dispose] Undisposed media controller holds '
+    problemMessage: '[require_media_player_dispose] Undisposed media controller holds '
         'audio/video hardware, blocking other apps and draining battery. This can cause resource leaks, app crashes, and poor user experience.',
-    correctionMessage:
-        'Add controller.dispose() in the dispose() method before super.dispose().',
+    correctionMessage: 'Add controller.dispose() in the dispose() method before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -111,8 +108,7 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
           if (typeName != null) {
             for (final String controllerType in _mediaControllerTypes) {
               if (typeName.contains(controllerType)) {
-                for (final VariableDeclaration variable
-                    in member.fields.variables) {
+                for (final VariableDeclaration variable in member.fields.variables) {
                   controllerNames.add(variable.name.lexeme);
                 }
               }
@@ -135,14 +131,12 @@ class RequireMediaPlayerDisposeRule extends SaropaLintRule {
       // Check if controllers are disposed
       for (final String name in controllerNames) {
         final bool isDisposed = disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose('));
+            (disposeBody.contains('$name.dispose(') || disposeBody.contains('$name?.dispose('));
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -209,8 +203,7 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_tab_controller_dispose',
-    problemMessage:
-        '[require_tab_controller_dispose] Undisposed TabController leaks '
+    problemMessage: '[require_tab_controller_dispose] Undisposed TabController leaks '
         'AnimationController, causing memory exhaustion over time.',
     correctionMessage:
         'Add _tabController.dispose() in the dispose() method before super.dispose().',
@@ -239,8 +232,7 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
           final String fieldSource = member.toSource();
           if ((typeName != null && typeName.contains('TabController')) ||
               fieldSource.contains('TabController(')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               controllerNames.add(variable.name.lexeme);
             }
           }
@@ -261,14 +253,12 @@ class RequireTabControllerDisposeRule extends SaropaLintRule {
       // Check if controllers are disposed
       for (final String name in controllerNames) {
         final bool isDisposed = disposeBody != null &&
-            (disposeBody.contains('$name.dispose(') ||
-                disposeBody.contains('$name?.dispose('));
+            (disposeBody.contains('$name.dispose(') || disposeBody.contains('$name?.dispose('));
 
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == name) {
                   reporter.atNode(variable, code);
                 }
@@ -306,8 +296,7 @@ List<String> _findOwnedFieldsOfType(ClassDeclaration node, String typeName) {
   for (final ClassMember member in node.members) {
     if (member is FieldDeclaration) {
       final String? declaredType = member.fields.type?.toSource();
-      if (declaredType != null &&
-          (declaredType == typeName || declaredType == '$typeName?')) {
+      if (declaredType != null && (declaredType == typeName || declaredType == '$typeName?')) {
         for (final VariableDeclaration variable in member.fields.variables) {
           final String fieldName = variable.name.lexeme;
           // Check if initialized inline with constructor call
@@ -315,8 +304,7 @@ List<String> _findOwnedFieldsOfType(ClassDeclaration node, String typeName) {
           if (initializer != null) {
             final String initSource = initializer.toSource();
             // Check for constructor call: TypeName() or TypeName.named()
-            if (initSource.startsWith('$typeName(') ||
-                initSource.startsWith('$typeName.')) {
+            if (initSource.startsWith('$typeName(') || initSource.startsWith('$typeName.')) {
               fieldOwnership[fieldName] = true;
             } else {
               fieldOwnership[fieldName] = false;
@@ -468,8 +456,7 @@ class RequireTextEditingControllerDisposeRule extends SaropaLintRule {
 
       // Only check controllers that are actually created by this class,
       // not ones passed in from callbacks (e.g., Autocomplete's fieldViewBuilder)
-      final List<String> fieldNames =
-          _findOwnedFieldsOfType(node, 'TextEditingController');
+      final List<String> fieldNames = _findOwnedFieldsOfType(node, 'TextEditingController');
       if (fieldNames.isEmpty) return;
 
       final String? disposeBody = _getDisposeMethodBody(node);
@@ -524,9 +511,9 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_page_controller_dispose',
     problemMessage:
-        '[require_page_controller_dispose] PageController field without dispose(). Memory leak - scroll position and listeners retained.',
+        '[require_page_controller_dispose] PageController is not disposed in dispose(). This causes memory leaks, retained scroll positions, and listeners that may trigger after the widget is destroyed, leading to crashes or unexpected behavior.',
     correctionMessage:
-        'Always call _pageController.dispose() in the dispose() method before super.dispose(). This releases scroll position and listeners, preventing memory leaks and ensuring proper cleanup of resources.',
+        'Always call controller.dispose() in the dispose() method of your State class to release resources and prevent leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -540,8 +527,7 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
       if (!_extendsState(node)) return;
 
       // Only check controllers that are actually created by this class
-      final List<String> fieldNames =
-          _findOwnedFieldsOfType(node, 'PageController');
+      final List<String> fieldNames = _findOwnedFieldsOfType(node, 'PageController');
       if (fieldNames.isEmpty) return;
 
       final String? disposeBody = _getDisposeMethodBody(node);
@@ -615,8 +601,7 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
     name: 'require_lifecycle_observer',
     problemMessage:
         '[require_lifecycle_observer] Timer.periodic continues running when app is backgrounded, draining battery and consuming CPU. When the app resumes, stale timer callbacks execute causing inconsistent state.',
-    correctionMessage:
-        'Add WidgetsBindingObserver and handle didChangeAppLifecycleState.',
+    correctionMessage: 'Add WidgetsBindingObserver and handle didChangeAppLifecycleState.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -652,9 +637,8 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
 
       // Check for WidgetsBindingObserver mixin
       final String classSource = enclosingClass.toSource();
-      final bool hasLifecycleObserver =
-          classSource.contains('WidgetsBindingObserver') &&
-              classSource.contains('didChangeAppLifecycleState');
+      final bool hasLifecycleObserver = classSource.contains('WidgetsBindingObserver') &&
+          classSource.contains('didChangeAppLifecycleState');
 
       if (!hasLifecycleObserver) {
         reporter.atNode(node.methodName, code);
@@ -717,9 +701,9 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_websocket_memory_leak',
     problemMessage:
-        '[avoid_websocket_memory_leak] WebSocketChannel field without close(). Connection stays open - wastes bandwidth, battery, and server resources.',
+        '[avoid_websocket_memory_leak] WebSocketChannel is not closed in dispose(). This leaves network connections open, wasting bandwidth, battery, and server resources. Unclosed sockets can also cause app crashes or server-side issues.',
     correctionMessage:
-        'Always call channel.sink.close() in the dispose() method before super.dispose(). This ensures the WebSocket connection is properly closed, freeing network resources and preventing memory leaks or battery drain.',
+        'Call channel.sink.close() in dispose() to properly close the WebSocket connection and free resources.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -741,8 +725,7 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
               (typeName.contains('WebSocketChannel') ||
                   typeName.contains('IOWebSocketChannel') ||
                   typeName.contains('HtmlWebSocketChannel'))) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               wsFields.add(variable.name.lexeme);
             }
           }
@@ -831,8 +814,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
     name: 'require_video_player_controller_dispose',
     problemMessage:
         '[require_video_player_controller_dispose] VideoPlayerController without dispose() keeps the native video decoder running. Audio continues playing in background, battery drains rapidly, and other media apps cannot acquire audio focus.',
-    correctionMessage:
-        'Add _controller.dispose() in dispose() before super.dispose().',
+    correctionMessage: 'Add _controller.dispose() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -851,8 +833,7 @@ class RequireVideoPlayerControllerDisposeRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName != null && typeName.contains('VideoPlayerController')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               vpFields.add(variable.name.lexeme);
             }
           }
@@ -965,8 +946,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     problemMessage:
         '[require_stream_subscription_cancel] StreamSubscription field without cancel(). '
         'Callbacks fire after State disposal, causing setState errors and memory leaks.',
-    correctionMessage:
-        'Add _sub?.cancel() in dispose(), or for-in loop for collections.',
+    correctionMessage: 'Add _sub?.cancel() in dispose(), or for-in loop for collections.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -987,8 +967,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
           if (typeName != null && typeName.contains('StreamSubscription')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               final String fieldName = variable.name.lexeme;
               // Check if it's a collection type (List, Set, Iterable, etc.)
               if (_isCollectionType(typeName)) {
@@ -1002,8 +981,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
       }
 
       // If no subscription fields found, nothing to check
-      if (singleSubscriptionFields.isEmpty &&
-          collectionSubscriptionFields.isEmpty) {
+      if (singleSubscriptionFields.isEmpty && collectionSubscriptionFields.isEmpty) {
         return;
       }
 
@@ -1128,8 +1106,7 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
             final bool isNullable = typeName.endsWith('?');
             final bool isCollection = _isCollectionType(typeName);
 
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               uncancelledFields.add(_SubscriptionField(
                 name: variable.name.lexeme,
                 isNullable: isNullable,
@@ -1156,8 +1133,7 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
         final String disposeSource = disposeMethod.body.toSource();
         uncancelledFields.removeWhere((field) {
           if (field.isCollection) {
-            return _hasCollectionCancellationInSource(
-                disposeSource, field.name);
+            return _hasCollectionCancellationInSource(disposeSource, field.name);
           } else {
             return disposeSource.contains('${field.name}.cancel()') ||
                 disposeSource.contains('${field.name}?.cancel()');
@@ -1171,8 +1147,7 @@ class _AddStreamSubscriptionCancelFix extends DartFix {
       final StringBuffer cancelCode = StringBuffer();
       for (final _SubscriptionField field in uncancelledFields) {
         if (field.isCollection) {
-          cancelCode.writeln(
-              '    for (final sub in ${field.name}) {\n      sub.cancel();\n    }');
+          cancelCode.writeln('    for (final sub in ${field.name}) {\n      sub.cancel();\n    }');
         } else if (field.isNullable) {
           cancelCode.writeln('    ${field.name}?.cancel();');
         } else {
@@ -1359,8 +1334,7 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
           if (typeName != null) {
             for (final String notifierType in _changeNotifierTypes) {
               if (typeName.contains(notifierType)) {
-                for (final VariableDeclaration variable
-                    in member.fields.variables) {
+                for (final VariableDeclaration variable in member.fields.variables) {
                   notifierFields.add(variable.name.lexeme);
                 }
               }
@@ -1372,8 +1346,7 @@ class RequireChangeNotifierDisposeRule extends SaropaLintRule {
       if (notifierFields.isEmpty) return;
 
       final String? disposeBody = _getDisposeMethodBody(node);
-      _reportUndisposedFields(
-          node, notifierFields, disposeBody, reporter, code);
+      _reportUndisposedFields(node, notifierFields, disposeBody, reporter, code);
     });
   }
 }
@@ -1448,8 +1421,7 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && typeName.contains('ReceivePort')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               portFields.add(variable.name.lexeme);
             }
           }
@@ -1469,13 +1441,11 @@ class RequireReceivePortCloseRule extends SaropaLintRule {
 
       for (final String field in portFields) {
         final bool isClosed = disposeBody != null &&
-            (disposeBody.contains('$field.close()') ||
-                disposeBody.contains('$field?.close()'));
+            (disposeBody.contains('$field.close()') || disposeBody.contains('$field?.close()'));
         if (!isClosed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == field) {
                   reporter.atNode(variable, code);
                 }
@@ -1557,8 +1527,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
               (typeName == 'Socket' ||
                   typeName == 'Socket?' ||
                   typeName.contains('SecureSocket'))) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               socketFields.add(variable.name.lexeme);
             }
           }
@@ -1585,8 +1554,7 @@ class RequireSocketCloseRule extends SaropaLintRule {
         if (!isClosed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == field) {
                   reporter.atNode(variable, code);
                 }
@@ -1651,8 +1619,7 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_debouncer_cancel',
-    problemMessage:
-        '[require_debouncer_cancel] Uncancelled debounce timer fires after '
+    problemMessage: '[require_debouncer_cancel] Uncancelled debounce timer fires after '
         'dispose, calling setState on unmounted widget causing crashes.',
     correctionMessage: 'Add _debounce?.cancel() in the dispose() method.',
     errorSeverity: DiagnosticSeverity.ERROR,
@@ -1672,10 +1639,8 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null &&
-              (typeName == 'Timer' || typeName == 'Timer?')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+          if (typeName != null && (typeName == 'Timer' || typeName == 'Timer?')) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               timerFields.add(variable.name.lexeme);
             }
           }
@@ -1695,13 +1660,11 @@ class RequireDebouncerCancelRule extends SaropaLintRule {
 
       for (final String field in timerFields) {
         final bool isCancelled = disposeBody != null &&
-            (disposeBody.contains('$field.cancel()') ||
-                disposeBody.contains('$field?.cancel()'));
+            (disposeBody.contains('$field.cancel()') || disposeBody.contains('$field?.cancel()'));
         if (!isCancelled) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == field) {
                   reporter.atNode(variable, code);
                 }
@@ -1768,11 +1731,9 @@ class RequireIntervalTimerCancelRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_interval_timer_cancel',
-    problemMessage:
-        '[require_interval_timer_cancel] Timer.periodic without cancel(). '
+    problemMessage: '[require_interval_timer_cancel] Timer.periodic without cancel(). '
         'Timer keeps firing after State disposal, draining battery and causing setState errors.',
-    correctionMessage:
-        'Add _timer?.cancel() in dispose() before super.dispose().',
+    correctionMessage: 'Add _timer?.cancel() in dispose() before super.dispose().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1915,10 +1876,8 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null &&
-              (typeName == 'RandomAccessFile' ||
-                  typeName == 'RandomAccessFile?')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+              (typeName == 'RandomAccessFile' || typeName == 'RandomAccessFile?')) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               fileFields.add(variable.name.lexeme);
             }
           }
@@ -1945,8 +1904,7 @@ class RequireFileHandleCloseRule extends SaropaLintRule {
         if (!isClosed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == field) {
                   reporter.atNode(variable, code);
                 }
@@ -2024,11 +1982,9 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_dispose_implementation',
-    problemMessage:
-        '[require_dispose_implementation] Controllers, subscriptions, or timers '
+    problemMessage: '[require_dispose_implementation] Controllers, subscriptions, or timers '
         'without cleanup cause memory leaks and setState errors.',
-    correctionMessage:
-        'Add dispose() method to clean up controllers, subscriptions, and timers.',
+    correctionMessage: 'Add dispose() method to clean up controllers, subscriptions, and timers.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2074,8 +2030,7 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
           if (typeName != null) {
             for (final String disposableType in _disposableTypes) {
               if (typeName.contains(disposableType)) {
-                for (final VariableDeclaration variable
-                    in member.fields.variables) {
+                for (final VariableDeclaration variable in member.fields.variables) {
                   disposableFields.add(variable.name.lexeme);
                 }
                 break;
@@ -2196,11 +2151,9 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_dispose_before_new_instance',
-    problemMessage:
-        '[prefer_dispose_before_new_instance] Reassigning without dispose leaks '
+    problemMessage: '[prefer_dispose_before_new_instance] Reassigning without dispose leaks '
         'the old instance. Listeners and resources remain active forever.',
-    correctionMessage:
-        'Call dispose() on the old value before assigning a new instance.',
+    correctionMessage: 'Call dispose() on the old value before assigning a new instance.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2427,8 +2380,7 @@ class DisposeClassFieldsRule extends SaropaLintRule {
     problemMessage:
         '[dispose_class_fields] Class has disposable fields but no dispose/close method. '
         'This may cause memory leaks.',
-    correctionMessage:
-        'Add a dispose() or close() method that cleans up all disposable fields.',
+    correctionMessage: 'Add a dispose() or close() method that cleans up all disposable fields.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
