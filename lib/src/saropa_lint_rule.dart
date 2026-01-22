@@ -89,8 +89,9 @@ export 'project_context.dart'
 /// Controls whether rule timing is enabled.
 ///
 /// Set via environment variable: SAROPA_LINTS_PROFILE=true
-final bool _profilingEnabled = const bool.fromEnvironment('SAROPA_LINTS_PROFILE') ||
-    const String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true';
+final bool _profilingEnabled =
+    const bool.fromEnvironment('SAROPA_LINTS_PROFILE') ||
+        const String.fromEnvironment('SAROPA_LINTS_PROFILE') == 'true';
 
 /// Threshold in milliseconds for logging slow rules.
 const int _slowRuleThresholdMs = 10;
@@ -100,7 +101,9 @@ const int _slowRuleThresholdMs = 10;
 /// Disable via environment variable: SAROPA_LINTS_PROGRESS=false
 final bool _progressEnabled =
     const bool.fromEnvironment('SAROPA_LINTS_PROGRESS', defaultValue: true) &&
-        const String.fromEnvironment('SAROPA_LINTS_PROGRESS', defaultValue: 'true') != 'false';
+        const String.fromEnvironment('SAROPA_LINTS_PROGRESS',
+                defaultValue: 'true') !=
+            'false';
 
 // =============================================================================
 // PROGRESS TRACKING (User Feedback)
@@ -150,7 +153,8 @@ class ProgressTracker {
     final timeSinceLastReport = now.difference(_lastProgressTime!);
     final filesSinceLastReport = fileCount - _lastReportedCount;
 
-    if (filesSinceLastReport >= _fileInterval || timeSinceLastReport >= _timeInterval) {
+    if (filesSinceLastReport >= _fileInterval ||
+        timeSinceLastReport >= _timeInterval) {
       _reportProgress(fileCount, now);
       _lastProgressTime = now;
       _lastReportedCount = fileCount;
@@ -159,7 +163,9 @@ class ProgressTracker {
 
   /// Calculate files per second, avoiding division by zero.
   static double _calculateFilesPerSec(int fileCount, Duration elapsed) {
-    return elapsed.inMilliseconds > 0 ? (fileCount * 1000) / elapsed.inMilliseconds : 0.0;
+    return elapsed.inMilliseconds > 0
+        ? (fileCount * 1000) / elapsed.inMilliseconds
+        : 0.0;
   }
 
   static void _reportProgress(int fileCount, DateTime now) {
@@ -223,7 +229,8 @@ class RuleTimingTracker {
 
   /// Get all timing data sorted by total time (slowest first).
   static List<RuleTimingRecord> get sortedTimings {
-    final entries = _totalTime.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final entries = _totalTime.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     return entries.map((e) {
       final count = _callCount[e.key] ?? 1;
@@ -417,7 +424,8 @@ class ImpactTracker {
   }
 
   /// Get all violations grouped by impact.
-  static Map<LintImpact, List<ViolationRecord>> get violations => Map.unmodifiable(_violations);
+  static Map<LintImpact, List<ViolationRecord>> get violations =>
+      Map.unmodifiable(_violations);
 
   /// Get count of violations by impact level.
   static Map<LintImpact, int> get counts => {
@@ -429,7 +437,8 @@ class ImpactTracker {
       };
 
   /// Get total violation count.
-  static int get total => _violations.values.fold(0, (sum, v) => sum + v.length);
+  static int get total =>
+      _violations.values.fold(0, (sum, v) => sum + v.length);
 
   /// Returns true if there are any critical violations.
   static bool get hasCritical => _violations[LintImpact.critical]!.isNotEmpty;
@@ -468,7 +477,8 @@ class ImpactTracker {
       buffer.writeln('LOW:      ${c[LintImpact.low]} (style)');
     }
     if (c[LintImpact.opinionated]! > 0) {
-      buffer.writeln('OPINIONATED: ${c[LintImpact.opinionated]} (team preference)');
+      buffer.writeln(
+          'OPINIONATED: ${c[LintImpact.opinionated]} (team preference)');
     }
 
     if (total == 0) {
@@ -906,7 +916,8 @@ abstract class SaropaLintRule extends DartLintRule {
 
     // Check example files
     if (skipExampleFiles) {
-      if (normalizedPath.contains('/example/') || normalizedPath.contains('/examples/')) {
+      if (normalizedPath.contains('/example/') ||
+          normalizedPath.contains('/examples/')) {
         return true;
       }
     }
@@ -914,8 +925,8 @@ abstract class SaropaLintRule extends DartLintRule {
     // Check fixture files - but NOT in example/ directory
     // (example fixtures are specifically for testing the linter rules)
     if (skipFixtureFiles) {
-      final isInExample =
-          normalizedPath.contains('/example/') || normalizedPath.contains('/examples/');
+      final isInExample = normalizedPath.contains('/example/') ||
+          normalizedPath.contains('/examples/');
       if (!isInExample) {
         if (normalizedPath.contains('/fixture/') ||
             normalizedPath.contains('/fixtures/') ||
@@ -935,7 +946,8 @@ abstract class SaropaLintRule extends DartLintRule {
   /// Base URL for rule documentation.
   ///
   /// Override to customize the documentation host.
-  static const String documentationBaseUrl = 'https://pub.dev/packages/saropa_lints';
+  static const String documentationBaseUrl =
+      'https://pub.dev/packages/saropa_lints';
 
   /// Returns the documentation URL for this rule.
   ///
@@ -971,7 +983,8 @@ abstract class SaropaLintRule extends DartLintRule {
   bool get isDisabled => disabledRules?.contains(code.name) ?? false;
 
   /// Get the effective severity for this rule, considering overrides.
-  DiagnosticSeverity? get effectiveSeverity => severityOverrides?[code.name] ?? code.errorSeverity;
+  DiagnosticSeverity? get effectiveSeverity =>
+      severityOverrides?[code.name] ?? code.errorSeverity;
 
   // ============================================================
   // Core Implementation
@@ -1093,7 +1106,8 @@ abstract class SaropaLintRule extends DartLintRule {
     final analysisKey = '$path:${content.hashCode}:${code.name}';
     final now = DateTime.now();
     final lastAnalysis = _recentAnalysis[analysisKey];
-    if (lastAnalysis != null && now.difference(lastAnalysis) < _throttleWindow) {
+    if (lastAnalysis != null &&
+        now.difference(lastAnalysis) < _throttleWindow) {
       return; // Same content analyzed too recently
     }
     _recentAnalysis[analysisKey] = now;
