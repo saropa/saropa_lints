@@ -31,9 +31,9 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_responsive_breakpoints',
     problemMessage:
-        '[require_responsive_breakpoints] Breakpoint value should be a named constant.',
+        '[require_responsive_breakpoints] Using raw numeric literals (magic numbers) for responsive breakpoints in MediaQuery comparisons makes your code less readable and harder to maintain. Without named constants, it is unclear what the number represents, and updating breakpoints across your app becomes error-prone.',
     correctionMessage:
-        'Extract the magic number to a constant like kTabletBreakpoint.',
+        'Extract the magic number to a well-named constant (e.g., kTabletBreakpoint or kMobileBreakpoint) and use that constant in your MediaQuery comparisons. This improves code clarity, maintainability, and makes it easier to update breakpoints consistently throughout your codebase.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -128,8 +128,9 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_paint_objects',
     problemMessage:
-        '[prefer_cached_paint_objects] Paint created in paint() is recreated every frame.',
-    correctionMessage: 'Move Paint to a class field for better performance.',
+        '[prefer_cached_paint_objects] Instantiating Paint objects inside the paint() method of a CustomPainter causes a new Paint to be created on every frame, leading to unnecessary memory allocations and potential performance issues. This is inefficient and can degrade rendering performance, especially in animations or frequently redrawn widgets.',
+    correctionMessage:
+        'Move Paint object creation outside the paint() method and store it as a static or instance field in your CustomPainter class. This ensures the Paint is reused across frames, reducing memory allocations and improving performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -210,9 +211,9 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_custom_painter_shouldrepaint',
     problemMessage:
-        '[require_custom_painter_shouldrepaint] shouldRepaint always returns true, causing unnecessary repaints.',
+        '[require_custom_painter_shouldrepaint] Overriding shouldRepaint to always return true in a CustomPainter causes the widget to repaint on every frame, even when nothing has changed. This results in wasted CPU/GPU resources and can cause jank or battery drain, especially in complex UIs or on low-end devices.',
     correctionMessage:
-        'Compare relevant fields instead of always returning true.',
+        'Compare relevant fields or properties in shouldRepaint to determine if a repaint is actually needed. Only return true when the painter’s visual output would change. This optimizes performance and avoids unnecessary repaints.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -292,9 +293,9 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_currency_formatting_locale',
     problemMessage:
-        '[require_currency_formatting_locale] NumberFormat.currency should have explicit locale.',
+        '[require_currency_formatting_locale] Using NumberFormat.currency() without specifying a locale can result in inconsistent currency formatting across different devices and locales. This may confuse users or display currency in an unexpected format.',
     correctionMessage:
-        'Add locale parameter for consistent currency formatting.',
+        'Always provide an explicit locale parameter to NumberFormat.currency() to ensure consistent and expected currency formatting for all users, regardless of their device or system locale.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -368,8 +369,9 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_number_formatting_locale',
     problemMessage:
-        '[require_number_formatting_locale] NumberFormat should have explicit locale.',
-    correctionMessage: 'Add locale parameter for consistent number formatting.',
+        '[require_number_formatting_locale] Using NumberFormat or its named constructors without an explicit locale can lead to inconsistent number formatting, such as decimal separators and grouping, depending on the user’s device or system settings. This can cause confusion or misinterpretation of numbers.',
+    correctionMessage:
+        'Provide an explicit locale parameter to NumberFormat or its named constructors to ensure numbers are formatted consistently and as intended for all users.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -458,8 +460,9 @@ class RequireGraphqlOperationNamesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_graphql_operation_names',
     problemMessage:
-        '[require_graphql_operation_names] GraphQL operation should have a name.',
-    correctionMessage: 'Add operation name after query/mutation keyword.',
+        '[require_graphql_operation_names] Defining anonymous GraphQL queries, mutations, or subscriptions (without an operation name) makes debugging, error tracking, and persisted queries more difficult. Operation names are essential for identifying and managing GraphQL operations in large codebases and production environments.',
+    correctionMessage:
+        'Add a descriptive operation name immediately after the query, mutation, or subscription keyword in your GraphQL document. This improves maintainability, debugging, and compatibility with GraphQL tooling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -524,8 +527,9 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_badge_without_meaning',
     problemMessage:
-        '[avoid_badge_without_meaning] Badge with count 0 should be hidden.',
-    correctionMessage: 'Add isLabelVisible: count > 0 to hide when empty.',
+        '[avoid_badge_without_meaning] Displaying a badge with a count of 0 provides no useful information to users and can create visual noise or confusion. Badges are intended to highlight actionable or noteworthy items, and showing them when empty diminishes their value.',
+    correctionMessage:
+        'Add isLabelVisible: count > 0 (or equivalent logic) to your Badge widget to hide the badge when the count is zero. This ensures badges only appear when there is something to notify the user about.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -598,8 +602,9 @@ class PreferLoggerOverPrintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_logger_over_print',
     problemMessage:
-        '[prefer_logger_over_print] Use log() from dart:developer instead of print().',
-    correctionMessage: 'Replace print() with log() for better log management.',
+        '[prefer_logger_over_print] Using print() for logging in production code is discouraged because print statements are not filterable, lack log levels, and may expose sensitive information in release builds. Proper logging allows for better control, filtering, and analysis of application events.',
+    correctionMessage:
+        'Replace print() statements with calls to dart:developer log() or a structured logging package. This provides better log management, filtering, and security in production environments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

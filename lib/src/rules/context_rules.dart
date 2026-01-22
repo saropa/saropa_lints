@@ -65,9 +65,9 @@ class AvoidStoringContextRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_storing_context',
     problemMessage:
-        '[avoid_storing_context] Storing BuildContext in fields causes crashes when the widget is disposed. The stored context points to a removed widget tree, and using it throws exceptions or shows dialogs on invalid screens.',
+        '[avoid_storing_context] Storing a BuildContext in a field or variable for later use is dangerous because the context may become invalid after the widget is disposed or rebuilt. Using a stale context can cause exceptions, show dialogs on the wrong screen, or trigger subtle bugs. This is a common source of crashes and hard-to-diagnose UI issues in Flutter apps.',
     correctionMessage:
-        'Use context directly where needed and check mounted before use.',
+        'Always use BuildContext directly where needed, and avoid storing it in fields or long-lived variables. If you must use context asynchronously, check if the widget is still mounted before using it. Audit your codebase for stored BuildContext references and refactor to use context safely.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

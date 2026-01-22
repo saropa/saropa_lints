@@ -169,8 +169,9 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_animation_in_build',
     problemMessage:
-        '[avoid_animation_in_build] AnimationController is created inside the build() method. This causes a memory leak because a new controller is created on every rebuild, while previous controllers are never disposed. Over time, this leads to wasted memory, degraded performance, and unpredictable animation behavior. Always create AnimationController in initState() and dispose it in dispose() to ensure proper resource management and avoid leaks.',
-    correctionMessage: 'Create in initState() as field; dispose in dispose().',
+        '[avoid_animation_in_build] Creating an AnimationController inside the build() method causes a new controller to be instantiated on every widget rebuild, leading to severe memory leaks, degraded animation performance, and unpredictable UI behavior. Previous controllers are never disposed, which can crash your app or exhaust system resources. AnimationControllers must be long-lived and managed at the widget level, not recreated per frame. This is a critical resource management issue in Flutter.',
+    correctionMessage:
+        'Always create AnimationController instances in initState() and store them as fields in your State class. Dispose of them in the dispose() method to release resources and prevent leaks. Audit your codebase for AnimationController usage and refactor any controllers created in build() to follow this pattern. See Flutter documentation for best practices on animation lifecycle management.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -500,9 +501,9 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_hero_tag_uniqueness',
     problemMessage:
-        '[require_hero_tag_uniqueness] Duplicate Hero tag detected. When multiple Hero widgets share the same tag, Flutter cannot distinguish between them during navigation transitions, resulting in a "Multiple heroes" error. This breaks the animation and confuses users, making navigation unpredictable. Always use unique tags for each Hero widget, such as including IDs or indices, to ensure smooth transitions.',
+        '[require_hero_tag_uniqueness] Multiple Hero widgets share the same tag, which causes Flutter to throw a "Multiple heroes" error during navigation transitions. This breaks hero animations, confuses users, and can make navigation unpredictable or visually jarring. Each Hero must have a unique tag to ensure smooth, reliable transitions and avoid runtime errors. This is especially important in lists, grids, or dynamic UIs where tags may be generated programmatically.',
     correctionMessage:
-        'Use unique tags for each Hero widget, e.g., include IDs or indices.',
+        'Assign a unique tag to every Hero widget, such as by including a unique ID, index, or other distinguishing value. Audit your widget tree for duplicate tags and refactor to guarantee uniqueness. Test navigation transitions to confirm that hero animations work as expected. See Flutter documentation for guidance on Hero tag management and best practices.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
