@@ -74,6 +74,9 @@ const Set<String> stylisticRules = <String>{
 
   // === Testing style ===
   'prefer_expect_over_assert_in_tests',
+  // === Type argument style (conflicting, opt-in only) ===
+  'avoid_inferrable_type_arguments',
+  'prefer_explicit_type_arguments',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -2422,9 +2425,7 @@ Set<String> getRulesForTier(String tier) {
       return essentialRules.union(recommendedOnlyRules);
     case 'professional':
       // professional = recommended + professionalOnly
-      return essentialRules
-          .union(recommendedOnlyRules)
-          .union(professionalOnlyRules);
+      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules);
     case 'comprehensive':
       // comprehensive = professional + comprehensiveOnly
       return essentialRules

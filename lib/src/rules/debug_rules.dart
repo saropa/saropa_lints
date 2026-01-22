@@ -2,8 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -23,8 +22,7 @@ class AlwaysFailRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'always_fail_test_case',
-    problemMessage:
-        '[always_fail_test_case] This custom lint always fails (test hook).',
+    problemMessage: '[always_fail_test_case] This custom lint always fails (test hook).',
     correctionMessage: 'Disable the rule or remove the test lint trigger.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
@@ -192,8 +190,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unguarded_debug',
-    problemMessage:
-        '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
+    problemMessage: '[avoid_unguarded_debug] Debug statement is not guarded by a debug mode check.',
     correctionMessage: 'Wrap in if (kDebugMode), if (DebugType.*.isDebug), '
         'or add level: DebugLevels.Warning/Error parameter.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -210,8 +207,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     // Check for debug() function calls
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'debug') {
         if (!_isGuarded(node) && !_hasDebugLevel(node.argumentList)) {
@@ -368,16 +364,14 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
     name: 'prefer_commenting_analyzer_ignores',
     problemMessage:
         '[prefer_commenting_analyzer_ignores] Analyzer ignore comment should have a preceding explanatory comment.',
-    correctionMessage:
-        'Add a comment on the line above explaining why this rule is ignored.',
+    correctionMessage: 'Add a comment on the line above explaining why this rule is ignored.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
   /// Pre-compiled patterns for performance
   static final RegExp _ignorePattern = RegExp(r'^//\s*ignore:');
   static final RegExp _ignoreForFilePattern = RegExp(r'^//\s*ignore_for_file:');
-  static final RegExp _ignoreDirectivePattern =
-      RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+');
+  static final RegExp _ignoreDirectivePattern = RegExp(r'//\s*ignore(?:_for_file)?:\s*\S+');
 
   @override
   void runWithReporter(
@@ -425,8 +419,7 @@ class PreferCommentingAnalyzerIgnoresRule extends SaropaLintRule {
   bool _isIgnoreComment(String line) {
     // Match // ignore: or // ignore_for_file:
     // But not lines that are already explanatory comments followed by ignore
-    return _ignorePattern.hasMatch(line) ||
-        _ignoreForFilePattern.hasMatch(line);
+    return _ignorePattern.hasMatch(line) || _ignoreForFilePattern.hasMatch(line);
   }
 
   /// Check if the line before has an explanatory comment
@@ -507,8 +500,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
     name: 'prefer_debugPrint',
     problemMessage:
         '[prefer_debugPrint] print() should use debugPrint() for throttled console output.',
-    correctionMessage:
-        'Replace print() with debugPrint() to prevent console buffer overflow.',
+    correctionMessage: 'Replace print() with debugPrint() to prevent console buffer overflow.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -533,8 +525,7 @@ class PreferDebugPrintRule extends SaropaLintRule {
     });
 
     // Also check for function expression invocations of print
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'print') {
         reporter.atNode(node, code);
@@ -614,8 +605,7 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
     name: 'avoid_print_in_release',
     problemMessage:
         '[avoid_print_in_release] print() runs in production, exposing debug info to users and impacting performance.',
-    correctionMessage:
-        'Wrap in if (kDebugMode) or use a logging framework with log levels.',
+    correctionMessage: 'Wrap in if (kDebugMode) or use a logging framework with log levels.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -634,8 +624,7 @@ class AvoidPrintInReleaseRule extends SaropaLintRule {
       }
     });
 
-    context.registry
-        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final Expression function = node.function;
       if (function is SimpleIdentifier && function.name == 'print') {
         if (!_isInsideDebugGuard(node)) {
@@ -783,13 +772,11 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
   bool _usesConcatenation(Expression expr) {
     if (expr is BinaryExpression && expr.operator.lexeme == '+') {
       // Check if either operand is a string
-      if (expr.leftOperand is StringLiteral ||
-          expr.rightOperand is StringLiteral) {
+      if (expr.leftOperand is StringLiteral || expr.rightOperand is StringLiteral) {
         return true;
       }
       // Recursively check for nested concatenation
-      return _usesConcatenation(expr.leftOperand) ||
-          _usesConcatenation(expr.rightOperand);
+      return _usesConcatenation(expr.leftOperand) || _usesConcatenation(expr.rightOperand);
     }
     return false;
   }
@@ -832,8 +819,7 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
   /// Config alias for backwards compatibility with avoid_sensitive_data_in_logs
   @override
-  List<String> get configAliases =>
-      const <String>['avoid_sensitive_data_in_logs'];
+  List<String> get configAliases => const <String>['avoid_sensitive_data_in_logs'];
 
   @override
   LintImpact get impact => LintImpact.critical;
@@ -851,9 +837,9 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_sensitive_in_logs',
     problemMessage:
-        '[avoid_sensitive_in_logs] Sensitive data in logs exposes credentials and violates security compliance (OWASP A09).',
+        '[avoid_sensitive_in_logs] Logging sensitive data (such as passwords, tokens, or personal information) exposes users to credential theft, privacy violations, and compliance failures (e.g., OWASP A09). Attackers or support staff may access logs and extract secrets, leading to data breaches.',
     correctionMessage:
-        'Remove passwords, tokens, secrets, and keys from log statements.',
+        'Never log sensitive information. Remove or redact secrets, credentials, and personal data before logging. Use secure logging practices and review log statements for accidental leaks.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -937,8 +923,7 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
     // For concatenation, check if sensitive variables are being concatenated
     if (expr is BinaryExpression && expr.operator.lexeme == '+') {
-      return _containsSensitiveData(expr.leftOperand) ||
-          _containsSensitiveData(expr.rightOperand);
+      return _containsSensitiveData(expr.leftOperand) || _containsSensitiveData(expr.rightOperand);
     }
 
     // For conditional expressions, check all branches
