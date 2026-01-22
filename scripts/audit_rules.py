@@ -239,7 +239,7 @@ def print_section(text: str) -> None:
 def print_subheader(text: str) -> None:
     """Print a subsection header."""
     print()
-    print_colored(f"▶ {text}", Color.YELLOW)
+    print_colored(f"▶ {text}", Color.BLUE)
     print()
 
 
@@ -1211,9 +1211,9 @@ def print_dx_audit_report(messages: list[RuleMessage], show_all: bool = False) -
         if m.impact in ("critical", "high") and m.dx_issues
     ]
 
-    # Sort by score (worst first), then by impact
-    impact_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-    needs_work.sort(key=lambda m: (m.dx_score, impact_order.get(m.impact, 4)))
+    # Sort by impact (critical first, then high), then by score (worst first)
+    impact_priority = {"critical": 0, "high": 1}
+    needs_work.sort(key=lambda m: (impact_priority.get(m.impact, 99), m.dx_score))
 
     total_needs_work = sum(len(v) for v in needs_work_by_impact.values())
     print_subheader(f"DX Message Quality ({total_needs_work} total issues)")
@@ -1240,21 +1240,23 @@ def print_dx_audit_report(messages: list[RuleMessage], show_all: bool = False) -
               f"{pct_color.value}({pct:>5.1f}%){Color.RESET.value}")
 
     # Show top 3 worst offenders in terminal (full list in report)
-    limit = 20 if not show_all else len(needs_work)
+    limit = 25 if not show_all else len(needs_work)
     shown = needs_work[:limit]
 
     if shown:
         print()
         print_colored("    Worst offenders (critical/high):", Color.DIM)
         for m in shown:
-            score_color = (
-                Color.RED if m.dx_score < 50 else
-                Color.YELLOW if m.dx_score < 70 else
-                Color.WHITE
-            )
+            # Color by impact: red for critical, yellow for high
+            if m.impact == "critical":
+                impact_color = Color.RED
+            elif m.impact == "high":
+                impact_color = Color.YELLOW
+            else:
+                impact_color = Color.WHITE
             issue_preview = m.dx_issues[0] if m.dx_issues else ""
             print(
-                f"      {score_color.value}{m.dx_score:>3}{Color.RESET.value} "
+                f"      {impact_color.value}{m.dx_score:>3}{Color.RESET.value} "
                 f"{m.name:<40} "
                 f"{Color.DIM.value}{issue_preview[:30]}{Color.RESET.value}"
             )
@@ -1284,7 +1286,7 @@ def export_dx_report(messages: list[RuleMessage], output_dir: Path) -> Path:
 
     # Generate filename with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"dx_audit_{timestamp}.md"
+    filename = f"{timestamp}_dx_audit.md"
     output_path = output_dir / filename
 
     # Group by file for easier batch editing
@@ -1406,7 +1408,7 @@ def export_full_audit_report(
 ) -> Path:
     """Export a full audit report to markdown, covering all analysis sections."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"full_audit_{timestamp}.md"
+    filename = f"{timestamp}_full_audit.md"
     output_path = output_dir / filename
     lines: list[str] = []
     lines.append(f"# Saropa Lints Full Audit Report\n")

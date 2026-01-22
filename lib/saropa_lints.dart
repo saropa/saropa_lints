@@ -129,7 +129,6 @@ const List<LintRule> _allRules = <LintRule>[
   RequireTimerCancellationRule(),
   NullifyAfterDisposeRule(),
   AvoidMisnamedPaddingRule(),
-  AvoidUnsafeSetStateRule(),
   AvoidRedundantElseRule(),
   AvoidDuplicateMapKeysRule(),
   AvoidNestedSwitchesRule(),
@@ -375,7 +374,6 @@ const List<LintRule> _allRules = <LintRule>[
   PreferExpectLaterRule(),
   PreferPublicExceptionClassesRule(),
   PreferSpecifyingFutureValueTypeRule(),
-  AvoidUnremovableCallbacksInListenersRule(),
   PreferDeclaringConstConstructorRule(),
   AvoidUnnecessaryIfRule(),
 
@@ -2386,8 +2384,7 @@ const List<List<String>> _conflictingRulePairs = <List<String>>[
 /// This helps users catch configuration mistakes where they've enabled
 /// two mutually exclusive stylistic rules.
 void _checkConflictingRules(List<LintRule> enabledRules) {
-  final Set<String> enabledNames =
-      enabledRules.map((LintRule rule) => rule.code.name).toSet();
+  final Set<String> enabledNames = enabledRules.map((LintRule rule) => rule.code.name).toSet();
 
   for (final List<String> pair in _conflictingRulePairs) {
     final String rule1 = pair[0];
@@ -2449,12 +2446,7 @@ void _registerRuleGroups() {
       'use_build_context_synchronously',
       'prefer_stateless_widget',
     },
-    sharedPatterns: const {
-      'StatelessWidget',
-      'StatefulWidget',
-      'State<',
-      'build('
-    },
+    sharedPatterns: const {'StatelessWidget', 'StatefulWidget', 'State<', 'build('},
     priority: 20,
   ));
 
@@ -2479,12 +2471,7 @@ void _registerRuleGroups() {
       'dispose_controllers',
       'require_dispose_method',
     },
-    sharedPatterns: const {
-      'dispose',
-      'Controller',
-      'StreamSubscription',
-      'StreamController'
-    },
+    sharedPatterns: const {'dispose', 'Controller', 'StreamSubscription', 'StreamController'},
     priority: 40,
   ));
 
@@ -2511,14 +2498,7 @@ void _registerRuleGroups() {
       'avoid_dynamic_sql',
       'avoid_insecure_random',
     },
-    sharedPatterns: const {
-      'password',
-      'secret',
-      'token',
-      'credential',
-      'MD5',
-      'SHA1'
-    },
+    sharedPatterns: const {'password', 'secret', 'token', 'credential', 'MD5', 'SHA1'},
     priority: 60,
   ));
 }

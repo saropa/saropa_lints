@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
+## [4.5.2] - 2026-01-22
+
+### Changed
+
+- **Major improvements to lint rule messages:**
+  - All critical and high-impact rules now have detailed, actionable `problemMessage` and `correctionMessage` fields.
+  - Messages now clearly explain the risk, impact, and how to fix each violation, following accessibility and best-practice standards.
+  - The following files were updated with improved messages for many rules:
+    - `debug_rules.dart`
+    - `disposal_rules.dart`
+    - `equatable_rules.dart`
+    - `file_handling_rules.dart`
+    - `hive_rules.dart`
+    - `internationalization_rules.dart`
+    - `json_datetime_rules.dart`
+    - `memory_management_rules.dart`
+    - `security_rules.dart`
+    - `type_safety_rules.dart`
+  - Notable rules improved: `avoid_sensitive_in_logs`, `require_page_controller_dispose`, `avoid_websocket_memory_leak`, `avoid_mutable_field_in_equatable`, `require_sqflite_whereargs`, `avoid_hive_field_index_reuse`, `require_intl_args_match`, `prefer_try_parse_for_dynamic_data`, `require_image_disposal`, `avoid_expando_circular_references`, `avoid_path_traversal`, `require_null_safe_json_access`, and others.
+  - Many rules now provide context-specific examples and describe the consequences of ignoring the lint.
+
+- **Stylistic tier now includes both type argument rules:**
+  - `avoid_inferrable_type_arguments` and `prefer_explicit_type_arguments` have been added to the `stylisticRules` set in `tiers.dart`.
+  - Both rules are now included when the stylistic tier is enabled, but remain mutually exclusive in effect (enabling both will cause conflicting lints).
+  - This change makes it easier to opt into either style preference via the `--stylistic` flag or tier selection, but users should only enable one of the two in their configuration to avoid conflicts.
+
 ## [4.5.1] - 2026-01-22
 
 ### Package Dependancies
@@ -140,7 +166,7 @@ Both rules are in the comprehensive tier with INFO severity. They use `applicabl
 
 ### Changed
 
-**Production code rules now skip test files** - `no_magic_number` and `no_magic_string` now have `skipTestFiles: true`, preventing false positives on legitimate test data like hex strings ('7FfFfFfFfFfFfFfF'), test descriptions, and expected values. Use the test-specific variants for appropriate enforcement in tests.
+**Production code rules now skip test files** - `no_magic_number` and `no_magic_string` now have `skipTestFiles: true`, preventing false positives on legitimate test data like hex strings ('7FfFfFfFfFfFfFf'), test descriptions, and expected values. Use the test-specific variants for appropriate enforcement in tests.
 
 ### Fixed
 

@@ -42,8 +42,7 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
     name: 'avoid_hardcoded_strings_in_ui',
     problemMessage:
         '[avoid_hardcoded_strings_in_ui] Hardcoded user-facing string. Cannot be translated to other languages.',
-    correctionMessage:
-        'Replace with l10n.yourKey or AppLocalizations.of(context).yourKey.',
+    correctionMessage: 'Replace with l10n.yourKey or AppLocalizations.of(context).yourKey.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -62,9 +61,7 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
   ) {
     // Skip test files and generated files
     final String path = resolver.source.fullName;
-    if (path.contains('_test.dart') ||
-        path.contains('.g.dart') ||
-        path.contains('.freezed.dart')) {
+    if (path.contains('_test.dart') || path.contains('.g.dart') || path.contains('.freezed.dart')) {
       return;
     }
 
@@ -99,8 +96,7 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
     });
   }
 
-  void _checkForHardcodedText(
-      Expression expr, SaropaDiagnosticReporter reporter) {
+  void _checkForHardcodedText(Expression expr, SaropaDiagnosticReporter reporter) {
     if (expr is InstanceCreationExpression) {
       final String? name = expr.constructorName.type.element?.name;
       if (name == 'Text') {
@@ -160,13 +156,11 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for manual number formatting
-      if (methodName == 'toStringAsFixed' ||
-          methodName == 'toStringAsPrecision') {
+      if (methodName == 'toStringAsFixed' || methodName == 'toStringAsPrecision') {
         // Check if inside a Text widget or string interpolation
         AstNode? current = node.parent;
         while (current != null) {
-          if (current is InterpolationExpression ||
-              current is StringInterpolation) {
+          if (current is InterpolationExpression || current is StringInterpolation) {
             reporter.atNode(node, code);
             return;
           }
@@ -221,8 +215,7 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
     name: 'require_directional_widgets',
     problemMessage:
         '[require_directional_widgets] Non-directional widget. Layout will be wrong for RTL languages (Arabic, Hebrew).',
-    correctionMessage:
-        'Replace left/right with start/end: EdgeInsetsDirectional.only(start: 16).',
+    correctionMessage: 'Replace left/right with start/end: EdgeInsetsDirectional.only(start: 16).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -305,8 +298,7 @@ class RequirePluralHandlingRule extends SaropaLintRule {
     name: 'require_plural_handling',
     problemMessage:
         '[require_plural_handling] Simple plural logic fails for many languages (Russian, Arabic have complex plural rules).',
-    correctionMessage:
-        "Use Intl.plural(count, zero: '...', one: '...', other: '...').",
+    correctionMessage: "Use Intl.plural(count, zero: '...', one: '...', other: '...').",
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -404,10 +396,8 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale',
-    problemMessage:
-        "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings.",
-    correctionMessage:
-        'Use Localizations.localeOf(context).toString() to get device locale.',
+    problemMessage: "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings.",
+    correctionMessage: 'Use Localizations.localeOf(context).toString() to get device locale.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -492,8 +482,7 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     // Check if either operand is a string literal
-    if (expr.leftOperand is SimpleStringLiteral ||
-        expr.rightOperand is SimpleStringLiteral) {
+    if (expr.leftOperand is SimpleStringLiteral || expr.rightOperand is SimpleStringLiteral) {
       reporter.atNode(expr, code);
     }
   }
@@ -605,8 +594,7 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_app_name',
-    problemMessage:
-        '[avoid_hardcoded_app_name] App name should not be hardcoded in UI.',
+    problemMessage: '[avoid_hardcoded_app_name] App name should not be hardcoded in UI.',
     correctionMessage: 'Use a configuration constant or localized string.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -628,14 +616,11 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
           if (arg.expression is InstanceCreationExpression) {
             final InstanceCreationExpression textWidget =
                 arg.expression as InstanceCreationExpression;
-            final String? textName =
-                textWidget.constructorName.type.element?.name;
+            final String? textName = textWidget.constructorName.type.element?.name;
 
             if (textName == 'Text') {
-              final NodeList<Expression> textArgs =
-                  textWidget.argumentList.arguments;
-              if (textArgs.isNotEmpty &&
-                  textArgs.first is SimpleStringLiteral) {
+              final NodeList<Expression> textArgs = textWidget.argumentList.arguments;
+              if (textArgs.isNotEmpty && textArgs.first is SimpleStringLiteral) {
                 // AppBar title with hardcoded string
                 reporter.atNode(textArgs.first, code);
               }
@@ -675,10 +660,8 @@ class PreferDateFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_date_format',
-    problemMessage:
-        '[prefer_date_format] Raw DateTime formatting ignores user locale.',
-    correctionMessage:
-        'Use DateFormat from intl package for locale-aware formatting.',
+    problemMessage: '[prefer_date_format] Raw DateTime formatting ignores user locale.',
+    correctionMessage: 'Use DateFormat from intl package for locale-aware formatting.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -710,8 +693,7 @@ class PreferDateFormatRule extends SaropaLintRule {
   bool _isInUiContext(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is InterpolationExpression ||
-          current is StringInterpolation) {
+      if (current is InterpolationExpression || current is StringInterpolation) {
         return true;
       }
       if (current is InstanceCreationExpression) {
@@ -821,10 +803,8 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_description',
-    problemMessage:
-        '[prefer_providing_intl_description] Intl.message without description.',
-    correctionMessage:
-        'Add desc parameter to help translators understand context.',
+    problemMessage: '[prefer_providing_intl_description] Intl.message without description.',
+    correctionMessage: 'Add desc parameter to help translators understand context.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -898,8 +878,7 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_providing_intl_examples',
-    problemMessage:
-        '[prefer_providing_intl_examples] Intl.message with args but no examples.',
+    problemMessage: '[prefer_providing_intl_examples] Intl.message with args but no examples.',
     correctionMessage: 'Add examples parameter to help translators.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1028,8 +1007,7 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
     // First pass: check for Intl.defaultLocale assignment
     context.registry.addAssignmentExpression((AssignmentExpression node) {
       final String leftSource = node.leftHandSide.toSource();
-      if (leftSource == 'Intl.defaultLocale' ||
-          leftSource.endsWith('.defaultLocale')) {
+      if (leftSource == 'Intl.defaultLocale' || leftSource.endsWith('.defaultLocale')) {
         hasLocaleInit = true;
       }
     });
@@ -1271,8 +1249,7 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
           break;
         }
         // First positional argument for methods that take locale positionally
-        if (arg is! NamedExpression &&
-            node.argumentList.arguments.first == arg) {
+        if (arg is! NamedExpression && node.argumentList.arguments.first == arg) {
           // Some methods like decimalPattern take locale as first positional
           if (methodName == 'decimalPattern' ||
               methodName == 'percentPattern' ||
@@ -1322,8 +1299,7 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
     name: 'avoid_manual_date_formatting',
     problemMessage:
         '[avoid_manual_date_formatting] Manual date formatting is error-prone and ignores locale.',
-    correctionMessage:
-        'Use DateFormat from intl: DateFormat.yMd(locale).format(date)',
+    correctionMessage: 'Use DateFormat from intl: DateFormat.yMd(locale).format(date)',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1375,8 +1351,7 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
       if (node.methodName.name != 'substring') return;
 
       final target = node.target;
-      if (target is MethodInvocation &&
-          target.methodName.name == 'toIso8601String') {
+      if (target is MethodInvocation && target.methodName.name == 'toIso8601String') {
         reporter.atNode(node, code);
       }
     });
@@ -1462,8 +1437,7 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
         if (element is InterpolationExpression) {
           final expr = element.expression;
           // Check for toStringAsFixed which is common for prices
-          if (expr is MethodInvocation &&
-              expr.methodName.name == 'toStringAsFixed') {
+          if (expr is MethodInvocation && expr.methodName.name == 'toStringAsFixed') {
             reporter.atNode(node, code);
             return;
           }
@@ -1681,9 +1655,9 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_intl_args_match',
     problemMessage:
-        '[require_intl_args_match] Intl.message args may not match placeholders in the message.',
+        '[require_intl_args_match] The arguments passed to Intl.message do not match the placeholders in the message string. This causes runtime errors, missing translations, or incorrect formatting in localized apps.',
     correctionMessage:
-        'Always ensure that the args list for Intl.message contains every variable referenced in the message string. Missing or mismatched arguments can cause runtime errors, broken translations, and confusing user experiences.',
+        'Ensure all placeholders in the message string have corresponding arguments, and vice versa, for correct localization.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1719,8 +1693,7 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
 
       // Count placeholders in message ($ followed by word characters)
       final RegExp placeholderPattern = RegExp(r'\$(\w+)');
-      final Iterable<RegExpMatch> placeholders =
-          placeholderPattern.allMatches(messageText);
+      final Iterable<RegExpMatch> placeholders = placeholderPattern.allMatches(messageText);
       final int placeholderCount = placeholders.length;
 
       if (placeholderCount == 0) return;
@@ -1791,8 +1764,8 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
       if (node.operator.lexeme != '+') return;
 
       // Check if either side is a string literal
-      final bool hasStringLiteral = node.leftOperand is SimpleStringLiteral ||
-          node.rightOperand is SimpleStringLiteral;
+      final bool hasStringLiteral =
+          node.leftOperand is SimpleStringLiteral || node.rightOperand is SimpleStringLiteral;
 
       if (!hasStringLiteral) return;
 
@@ -1801,9 +1774,7 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
       while (current != null) {
         if (current is InstanceCreationExpression) {
           final String typeName = current.constructorName.type.name2.lexeme;
-          if (typeName == 'Text' ||
-              typeName == 'RichText' ||
-              typeName == 'SelectableText') {
+          if (typeName == 'Text' || typeName == 'RichText' || typeName == 'SelectableText') {
             reporter.atNode(node, code);
             return;
           }
@@ -1845,11 +1816,9 @@ class PreferNumberFormatRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_number_format',
-    problemMessage:
-        '[prefer_number_format] Number displayed without locale formatting. '
+    problemMessage: '[prefer_number_format] Number displayed without locale formatting. '
         'Different locales use different decimal/grouping separators.',
-    correctionMessage:
-        'Use NumberFormat.decimalPattern(locale).format(number) for i18n.',
+    correctionMessage: 'Use NumberFormat.decimalPattern(locale).format(number) for i18n.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1899,9 +1868,7 @@ class PreferNumberFormatRule extends SaropaLintRule {
     while (current != null) {
       if (current is InstanceCreationExpression) {
         final String typeName = current.constructorName.type.name2.lexeme;
-        if (typeName == 'Text' ||
-            typeName == 'RichText' ||
-            typeName == 'SelectableText') {
+        if (typeName == 'Text' || typeName == 'RichText' || typeName == 'SelectableText') {
           return true;
         }
       }
@@ -1942,11 +1909,9 @@ class ProvideCorrectIntlArgsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'provide_correct_intl_args',
-    problemMessage:
-        '[provide_correct_intl_args] Intl.message args count does not match '
+    problemMessage: '[provide_correct_intl_args] Intl.message args count does not match '
         'placeholders. This will cause runtime errors.',
-    correctionMessage:
-        'Ensure args list matches all {placeholder} names in the message.',
+    correctionMessage: 'Ensure args list matches all {placeholder} names in the message.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1973,20 +1938,15 @@ class ProvideCorrectIntlArgsRule extends SaropaLintRule {
       if (firstArg is SimpleStringLiteral) {
         messageText = firstArg.value;
       } else if (firstArg is AdjacentStrings) {
-        messageText = firstArg.strings
-            .whereType<SimpleStringLiteral>()
-            .map((s) => s.value)
-            .join();
+        messageText = firstArg.strings.whereType<SimpleStringLiteral>().map((s) => s.value).join();
       }
 
       if (messageText == null) return;
 
       // Count placeholders in message
       final placeholderPattern = RegExp(r'\{(\w+)\}');
-      final placeholders = placeholderPattern
-          .allMatches(messageText)
-          .map((m) => m.group(1)!)
-          .toSet();
+      final placeholders =
+          placeholderPattern.allMatches(messageText).map((m) => m.group(1)!).toSet();
 
       // Find args parameter
       for (final arg in args) {
@@ -2039,11 +1999,9 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_string_concatenation_l10n',
-    problemMessage:
-        '[avoid_string_concatenation_l10n] String concatenation in UI breaks '
+    problemMessage: '[avoid_string_concatenation_l10n] String concatenation in UI breaks '
         'word order for translations.',
-    correctionMessage:
-        'Use Intl.message with placeholders or a localization solution that '
+    correctionMessage: 'Use Intl.message with placeholders or a localization solution that '
         'supports proper word order.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2122,8 +2080,7 @@ class PreferIntlMessageDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_intl_message_description',
-    problemMessage:
-        '[prefer_intl_message_description] Intl.message without description. '
+    problemMessage: '[prefer_intl_message_description] Intl.message without description. '
         'Translators need context to translate correctly.',
     correctionMessage: 'Add desc parameter explaining when this text is shown.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -2189,11 +2146,9 @@ class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_locale_strings',
-    problemMessage:
-        '[avoid_hardcoded_locale_strings] `[HEURISTIC]` Hardcoded string in '
+    problemMessage: '[avoid_hardcoded_locale_strings] `[HEURISTIC]` Hardcoded string in '
         'Text widget. Use localization for user-visible text.',
-    correctionMessage:
-        'Replace with AppLocalizations.of(context).yourString or Intl.message.',
+    correctionMessage: 'Replace with AppLocalizations.of(context).yourString or Intl.message.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2234,10 +2189,7 @@ class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
       if (firstArg is SimpleStringLiteral) {
         stringValue = firstArg.value;
       } else if (firstArg is AdjacentStrings) {
-        stringValue = firstArg.strings
-            .whereType<SimpleStringLiteral>()
-            .map((s) => s.value)
-            .join();
+        stringValue = firstArg.strings.whereType<SimpleStringLiteral>().map((s) => s.value).join();
       }
 
       if (stringValue == null) return;
