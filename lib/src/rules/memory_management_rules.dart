@@ -49,7 +49,8 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
     name: 'avoid_large_objects_in_state',
     problemMessage:
         '[avoid_large_objects_in_state] Large data structures in State may cause memory issues.',
-    correctionMessage: 'Consider pagination, streaming, or external state management.',
+    correctionMessage:
+        'Consider pagination, streaming, or external state management.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -169,7 +170,8 @@ class RequireImageDisposalRule extends SaropaLintRule {
         if (member is FieldDeclaration) {
           final String fieldSource = member.toSource();
           if (fieldSource.contains('ui.Image') ||
-              fieldSource.contains('Image ') && fieldSource.contains('dart:ui')) {
+              fieldSource.contains('Image ') &&
+                  fieldSource.contains('dart:ui')) {
             hasUiImageField = true;
           }
         }
@@ -177,7 +179,8 @@ class RequireImageDisposalRule extends SaropaLintRule {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.body.toSource();
           // Check for dispose (including *Safe extension variants)
-          if (disposeSource.contains('.dispose()') || disposeSource.contains('.disposeSafe(')) {
+          if (disposeSource.contains('.dispose()') ||
+              disposeSource.contains('.disposeSafe(')) {
             hasDisposeCall = true;
           }
         }
@@ -334,7 +337,8 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cache_eviction_policy',
-    problemMessage: '[require_cache_eviction_policy] Unbounded cache consumes memory until '
+    problemMessage:
+        '[require_cache_eviction_policy] Unbounded cache consumes memory until '
         'app crashes with OutOfMemoryError after extended use.',
     correctionMessage: 'Implement LRU eviction, TTL, or max size limit.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -411,7 +415,8 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
     name: 'prefer_weak_references_for_cache',
     problemMessage:
         '[prefer_weak_references_for_cache] Consider using WeakReference for cache entries.',
-    correctionMessage: 'WeakReference allows garbage collection under memory pressure.',
+    correctionMessage:
+        'WeakReference allows garbage collection under memory pressure.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -436,7 +441,8 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
           final String typeSource = type.toSource();
 
           // Check for Map that doesn't use WeakReference
-          if (typeSource.contains('Map<') && !typeSource.contains('WeakReference')) {
+          if (typeSource.contains('Map<') &&
+              !typeSource.contains('WeakReference')) {
             reporter.atNode(member, code);
           }
         }
@@ -504,7 +510,8 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 
       // Check if target is likely an Expando
       final String targetSource = target.toSource().toLowerCase();
-      if (!targetSource.contains('expando') && !targetSource.contains('_meta')) {
+      if (!targetSource.contains('expando') &&
+          !targetSource.contains('_meta')) {
         return;
       }
 
@@ -596,7 +603,8 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource().toLowerCase();
-          if (targetSource.contains('port') || targetSource.contains('sendport')) {
+          if (targetSource.contains('port') ||
+              targetSource.contains('sendport')) {
             final NodeList<Expression> args = node.argumentList.arguments;
             if (args.isNotEmpty) {
               final String argSource = args.first.toSource().toLowerCase();
@@ -659,8 +667,10 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cache_expiration',
-    problemMessage: '[require_cache_expiration] Cache implementation lacks expiration logic.',
-    correctionMessage: 'Add TTL/expiration to prevent serving stale data indefinitely.',
+    problemMessage:
+        '[require_cache_expiration] Cache implementation lacks expiration logic.',
+    correctionMessage:
+        'Add TTL/expiration to prevent serving stale data indefinitely.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -743,7 +753,8 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
     name: 'avoid_unbounded_cache_growth',
     problemMessage:
         '[avoid_unbounded_cache_growth] Cache without size limit grows indefinitely. This will eventually exhaust device memory and crash the app with an out-of-memory error.',
-    correctionMessage: 'Add size limit with LRU eviction or use a bounded cache implementation.',
+    correctionMessage:
+        'Add size limit with LRU eviction or use a bounded cache implementation.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -773,7 +784,8 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
           classSource.contains('lru');
 
       // Check for Map used as cache storage
-      final bool hasMapCache = classSource.contains('map<') || classSource.contains('= {}');
+      final bool hasMapCache =
+          classSource.contains('map<') || classSource.contains('= {}');
 
       if (hasMapCache && !hasSizeLimit) {
         reporter.atNode(node, code);
@@ -817,8 +829,10 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_cache_key_uniqueness',
-    problemMessage: '[require_cache_key_uniqueness] Cache key type may have unstable hashCode.',
-    correctionMessage: 'Use String, int, or objects with stable hashCode/equality as cache keys.',
+    problemMessage:
+        '[require_cache_key_uniqueness] Cache key type may have unstable hashCode.',
+    correctionMessage:
+        'Use String, int, or objects with stable hashCode/equality as cache keys.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
