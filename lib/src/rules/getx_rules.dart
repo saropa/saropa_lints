@@ -72,8 +72,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
     name: 'require_getx_worker_dispose',
     problemMessage:
         '[require_getx_worker_dispose] GetX Worker field is not disposed in onClose(). This causes memory leaks.',
-    correctionMessage:
-        'Call worker.dispose() in onClose() before super.onClose().',
+    correctionMessage: 'Call worker.dispose() in onClose() before super.onClose().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -105,8 +104,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
               (typeName == 'Worker' ||
                   typeName == 'Worker?' ||
                   typeName.contains('List<Worker>'))) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               workerFields.add(variable.name.lexeme);
             }
           }
@@ -133,8 +131,7 @@ class RequireGetxWorkerDisposeRule extends SaropaLintRule {
         if (!isDisposed) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }
@@ -199,9 +196,9 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_getx_permanent_cleanup',
     problemMessage:
-        '[require_getx_permanent_cleanup] Get.put(permanent: true) bypasses automatic GetxController disposal. Without explicit Get.delete(), the GetxController remains in memory forever, causing memory leaks.',
+        '[require_getx_permanent_cleanup] Get.put(permanent: true) registers a controller or service that will never be automatically deleted. This can cause memory leaks and resource waste if you do not manually clean up. Controllers registered as permanent remain in memory for the lifetime of the app unless explicitly deleted. This is especially risky for generic or global controllers that may not always be needed.',
     correctionMessage:
-        'Add Get.delete<T>() when the controller is no longer needed, or document why permanent is required. Otherwise, unused controllers may accumulate and waste resources.',
+        'Always call Get.delete<T>() when the controller or service is no longer needed, such as during logout or app shutdown. If the controller must remain for the entire app lifetime, document the reason with a code comment or ignore. Avoid using permanent: true for generic or feature-specific controllers unless absolutely necessary.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -268,8 +265,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
       final String classSource = enclosingClass.toSource();
       final bool hasDelete = classSource.contains('Get.delete') ||
           classSource.contains('Get.deleteAll') ||
-          (controllerType != null &&
-              classSource.contains('Get.delete<$controllerType>'));
+          (controllerType != null && classSource.contains('Get.delete<$controllerType>'));
 
       if (!hasDelete) {
         reporter.atNode(node, code);
@@ -385,8 +381,7 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (target.name != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass = node.thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
@@ -419,8 +414,7 @@ class AvoidGetxContextOutsideWidgetRule extends SaropaLintRule {
       if (prefix != 'Get') return;
 
       // Check if this is inside a widget class
-      final ClassDeclaration? enclosingClass =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? enclosingClass = node.thisOrAncestorOfType<ClassDeclaration>();
 
       if (enclosingClass == null) {
         // Top-level or function scope - not in a widget
@@ -496,8 +490,7 @@ class AvoidGetxGlobalNavigationRule extends SaropaLintRule {
     name: 'avoid_getx_global_navigation',
     problemMessage:
         '[avoid_getx_global_navigation] GetX global navigation (Get.to, Get.off) bypasses widget context.',
-    correctionMessage:
-        'Use Navigator.of(context) or a typed routing solution like GoRouter.',
+    correctionMessage: 'Use Navigator.of(context) or a typed routing solution like GoRouter.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -574,8 +567,7 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_getx_binding_routes',
-    problemMessage:
-        '[require_getx_binding_routes] GetPage without binding parameter.',
+    problemMessage: '[require_getx_binding_routes] GetPage without binding parameter.',
     correctionMessage: 'Add binding: YourBinding() for proper DI lifecycle.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -598,8 +590,7 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
 
       for (final Expression arg in args.arguments) {
         if (arg is NamedExpression) {
-          if (arg.name.label.name == 'binding' ||
-              arg.name.label.name == 'bindings') {
+          if (arg.name.label.name == 'binding' || arg.name.label.name == 'bindings') {
             hasBinding = true;
             break;
           }
@@ -654,11 +645,9 @@ class AvoidGetxDialogSnackbarInControllerRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getx_dialog_snackbar_in_controller',
-    problemMessage:
-        '[avoid_getx_dialog_snackbar_in_controller] Get.snackbar/dialog in '
+    problemMessage: '[avoid_getx_dialog_snackbar_in_controller] Get.snackbar/dialog in '
         'controller couples UI to business logic and prevents testing.',
-    correctionMessage:
-        'Use reactive state or events to trigger UI feedback instead.',
+    correctionMessage: 'Use reactive state or events to trigger UI feedback instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -742,11 +731,9 @@ class RequireGetxLazyPutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_getx_lazy_put',
-    problemMessage:
-        '[require_getx_lazy_put] Consider using Get.lazyPut() for controllers '
+    problemMessage: '[require_getx_lazy_put] Consider using Get.lazyPut() for controllers '
         'that may not be needed immediately. This improves startup performance.',
-    correctionMessage:
-        'Use Get.lazyPut(() => Controller()) instead of Get.put(Controller()).',
+    correctionMessage: 'Use Get.lazyPut(() => Controller()) instead of Get.put(Controller()).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
