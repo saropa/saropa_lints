@@ -750,8 +750,8 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_future_wait', // INFO - parallel independent awaits
 
   // Code Quality
-  'avoid_very_long_files', // 1000 lines - code smell (production files)
-  'avoid_very_long_test_files', // 2000 lines - code smell (test files)
+  'avoid_very_long_length_files', // 1000 lines - code smell (production files)
+  'avoid_very_long_length_test_files', // 2000 lines - code smell (test files)
   'avoid_self_assignment',
   'avoid_self_compare',
   'avoid_assignments_as_conditions',
@@ -1543,8 +1543,8 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_async_callback',
 
   // Code Quality
-  'avoid_medium_files', // 300 lines - starting to get complex (production files)
-  'avoid_medium_test_files', // 600 lines - starting to get complex (test files)
+  'avoid_medium_length_files', // 300 lines - starting to get complex (production files)
+  'avoid_medium_length_test_files', // 600 lines - starting to get complex (test files)
   'avoid_long_functions',
   'avoid_long_parameter_list',
   'avoid_generics_shadowing',
@@ -1963,8 +1963,8 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_ios_debug_code_in_release',
   'avoid_late_keyword',
   'avoid_local_functions',
-  'avoid_long_files',
-  'avoid_long_test_files',
+  'avoid_long_length_files',
+  'avoid_long_length_test_files',
   'avoid_long_records',
   'avoid_missing_image_alt',
   'avoid_mixing_named_and_positional_fields',
@@ -2237,8 +2237,8 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_single_widget_per_file',
   'prefer_sizedbox_over_container',
   'prefer_sliver_prefix',
-  'prefer_small_files',
-  'prefer_small_test_files',
+  'prefer_small_length_files',
+  'prefer_small_length_test_files',
   'prefer_snake_case_files',
   'prefer_specific_exceptions',
   'prefer_spread_over_addall',
@@ -2422,9 +2422,7 @@ Set<String> getRulesForTier(String tier) {
       return essentialRules.union(recommendedOnlyRules);
     case 'professional':
       // professional = recommended + professionalOnly
-      return essentialRules
-          .union(recommendedOnlyRules)
-          .union(professionalOnlyRules);
+      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules);
     case 'comprehensive':
       // comprehensive = professional + comprehensiveOnly
       return essentialRules
