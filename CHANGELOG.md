@@ -104,12 +104,14 @@ Both rules are in the comprehensive tier with INFO severity. They use `applicabl
 ### Fixed
 
 **`no_magic_string` and `no_magic_string_in_tests` now skip regex patterns** - The rules were flagging regex pattern strings as magic strings, even when passed directly to `RegExp()` constructors. The rules now detect and skip:
+
 - Strings passed as arguments to `RegExp()` constructors
 - Raw strings (`r'...'`) that contain regex-specific syntax (anchors `^`/`$`, quantifiers `+`/`*`/`?`, character classes `\d`/`\w`/`\s`, etc.)
 
 This prevents false positives on legitimate regex patterns like `RegExp(r'0+$')` or `RegExp(r'\d{3}-\d{4}')`.
 
 **`avoid_commented_out_code` and `capitalize_comment_start` false positives on prose comments** - These rules use shared heuristics to detect commented-out code vs prose comments. The previous pattern matched keywords at the start of comments too broadly, causing false positives on natural language sentences like `// null is before non-null` or `// return when the condition is met`. The detection patterns are now context-aware and only match keywords when they appear in actual code contexts:
+
 - Control flow keywords (`if`, `for`, `while`) now require opening parens/braces: `if (` or `while {`
 - Simple statements (`return`, `break`, `throw`) now require semicolons or specific literals
 - Declarations (`final`, `const`, `var`) now require identifiers after them
@@ -163,6 +165,7 @@ The rule now detects fields with mode constant checks and marks them as "properl
 ### Changed
 
 **Rule consolidation** - `avoid_sensitive_data_in_logs` (security_rules.dart) has been removed as a duplicate of `avoid_sensitive_in_logs` (debug_rules.dart). The canonical rule now:
+
 - Has a config alias `avoid_sensitive_data_in_logs` for backwards compatibility
 - Uses proper AST analysis instead of regex matching (more accurate)
 - Has a quick fix to comment out sensitive log statements
