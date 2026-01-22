@@ -51,9 +51,9 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_icon_buttons_without_tooltip',
     problemMessage:
-        '[avoid_icon_buttons_without_tooltip] IconButton lacks a tooltip. Screen readers cannot announce its purpose.',
+        '[avoid_icon_buttons_without_tooltip] This IconButton does not provide a tooltip, making it inaccessible to screen readers and users with visual impairments. Without a tooltip, users cannot understand the button’s purpose, which reduces usability and fails accessibility standards. Tooltips are essential for describing the action of icon-only buttons.',
     correctionMessage:
-        "Add tooltip: 'Description of action' to describe what the button does.",
+        "Always provide a tooltip for every IconButton, describing its action clearly (e.g., tooltip: 'Open settings'). Audit your codebase for IconButton usage and add tooltips where missing. Refer to Flutter accessibility documentation for best practices on labeling interactive elements.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -442,9 +442,9 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_gesture_only_interactions',
     problemMessage:
-        '[avoid_gesture_only_interactions] GestureDetector without keyboard support. Users with motor disabilities using switch control cannot activate.',
+        '[avoid_gesture_only_interactions] GestureDetector is used without providing keyboard or accessibility support, making the interaction inaccessible to users with motor disabilities or those relying on switch control. This excludes users who cannot use touch input and fails to meet accessibility standards for interactive elements.',
     correctionMessage:
-        'Wrap with Focus + onKeyEvent, or replace with InkWell/Button.',
+        'Wrap GestureDetector with Focus and provide onKeyEvent handlers, or use InkWell, ElevatedButton, or other accessible widgets that support keyboard and assistive technologies. Audit your codebase for GestureDetector usage and refactor to ensure all interactions are accessible. See Flutter accessibility documentation for guidance.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -532,9 +532,9 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_semantics_label',
     problemMessage:
-        '[require_semantics_label] Semantics with button/link role lacks label. Screen readers announce role without describing action.',
+        '[require_semantics_label] This Semantics widget with a button, link, or other interactive role is missing a label, making it inaccessible to screen readers. Without a label, users cannot understand the purpose of the interactive element, which reduces usability and fails accessibility standards. Labels are essential for describing the action or purpose of interactive elements.',
     correctionMessage:
-        "Add label: 'Description' to describe the interactive element's purpose.",
+        "Always provide a descriptive label for Semantics widgets with interactive roles (e.g., label: 'Submit form'). Audit your codebase for Semantics usage and add labels where missing. Refer to Flutter accessibility documentation for best practices on labeling interactive elements.",
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -725,9 +725,9 @@ class RequireLiveRegionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_live_region',
     problemMessage:
-        '[require_live_region] Dynamic content that changes should use Semantics with liveRegion.',
+        '[require_live_region] Dynamic content that changes (such as error messages, notifications, or status updates) should use Semantics with liveRegion enabled. Without liveRegion, screen readers will not announce updates, leaving users unaware of important changes. This is critical for accessibility in apps with real-time or changing content.',
     correctionMessage:
-        'Wrap with Semantics(liveRegion: true) to announce changes.',
+        'Wrap dynamic content with Semantics(liveRegion: true) to ensure screen readers announce changes. Audit your codebase for dynamic UI updates and add liveRegion where appropriate. Refer to Flutter accessibility documentation for best practices on live regions and dynamic content.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -952,9 +952,9 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_image_buttons_without_tooltip',
     problemMessage:
-        '[avoid_image_buttons_without_tooltip] Image-only button lacks accessible label. Screen readers announce nothing, leaving blind users unable to interact.',
+        '[avoid_image_buttons_without_tooltip] This image-only button does not provide an accessible label, making it invisible to screen readers and users with visual impairments. Without a tooltip or semantic label, users cannot understand or interact with the button, which fails accessibility standards and excludes blind users from key actions.',
     correctionMessage:
-        'Wrap with Tooltip or add Semantics to describe the action.',
+        'Always wrap image-only buttons with Tooltip or add a Semantics widget with a descriptive label to ensure accessibility. Audit your codebase for image buttons and add labels where missing. Refer to Flutter accessibility documentation for best practices on labeling interactive elements.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1066,9 +1066,9 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_text_scale_factor_ignore',
     problemMessage:
-        '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 ignores user accessibility settings.',
+        '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 on a text widget overrides user accessibility settings, preventing users from increasing text size for readability. This excludes users with low vision and fails accessibility standards. Respecting user-configured text scaling is essential for inclusive design.',
     correctionMessage:
-        'Remove textScaleFactor or use clamp() to limit scaling range.',
+        'Remove hardcoded textScaleFactor values or use clamp() to limit scaling range while still allowing user adjustments. Audit your codebase for textScaleFactor usage and refactor to respect accessibility settings. See Flutter documentation for best practices on text scaling and accessibility.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1274,9 +1274,9 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hidden_interactive',
     problemMessage:
-        '[avoid_hidden_interactive] Interactive element with excludeFromSemantics is inaccessible to screen readers.',
+        '[avoid_hidden_interactive] This interactive element uses excludeFromSemantics, making it completely inaccessible to screen readers and users with assistive technologies. Excluding interactive widgets from semantics prevents users with disabilities from discovering or activating key actions, which fails accessibility standards and can break critical workflows.',
     correctionMessage:
-        'Remove excludeFromSemantics or provide Semantics wrapper with label.',
+        'Remove excludeFromSemantics from interactive elements, or wrap them in a Semantics widget with a descriptive label to ensure accessibility. Audit your codebase for excludeFromSemantics usage and refactor to provide proper semantic information. Refer to Flutter accessibility documentation for guidance on semantics and interactive widgets.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

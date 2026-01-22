@@ -3722,9 +3722,9 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_sse_subscription_cancel',
     problemMessage:
-        '[require_sse_subscription_cancel] If you do not close your EventSource/SSE connection in dispose(), your app will leak resources and may hit system limits, causing crashes or failed network connections. This is especially dangerous for long-lived or frequently recreated widgets.',
+        '[require_sse_subscription_cancel] Failing to close EventSource or SSE connections in the dispose() method causes resource leaks, can exhaust system limits, and may result in network failures or app crashes. This is especially critical for widgets that are long-lived or frequently recreated, as open connections accumulate and degrade app stability. Proper cancellation is required for robust, production-quality Flutter apps.',
     correctionMessage:
-        'Always call _eventSource?.close() in your dispose() method before super.dispose() to safely release resources and keep your app stable.',
+        'Always call _eventSource?.close() (or equivalent) in your widget’s dispose() method before calling super.dispose(). Audit your codebase for SSE/EventSource usage and verify all connections are closed properly. Document this requirement in your team’s Flutter best practices and code review checklists.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

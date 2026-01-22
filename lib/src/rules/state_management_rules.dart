@@ -8471,9 +8471,9 @@ class AvoidFreezedJsonSerializableConflictRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_freezed_json_serializable_conflict',
     problemMessage:
-        '[avoid_freezed_json_serializable_conflict] Applying both @freezed and @JsonSerializable to the same class causes code generation conflicts and unpredictable serialization behavior. This can result in broken toJson/fromJson methods, runtime errors, and maintenance headaches. Only one annotation should be used for JSON serialization.',
+        '[avoid_freezed_json_serializable_conflict] Decorating a class with both @freezed and @JsonSerializable leads to code generation conflicts, unpredictable serialization behavior, and broken toJson/fromJson methods. The two packages generate incompatible code, resulting in runtime errors, data loss, or maintenance headaches. Only one annotation should be used for JSON serialization in a given class, as recommended by both package maintainers.',
     correctionMessage:
-        'Remove the @JsonSerializable annotation when using @freezed. The @freezed package provides its own JSON serialization logic and does not require @JsonSerializable.',
+        'Remove the @JsonSerializable annotation from any class that uses @freezed. The @freezed package provides its own JSON serialization logic and is not compatible with @JsonSerializable. Audit your codebase for classes with both annotations and refactor to use only one, then regenerate code and test serialization thoroughly.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
