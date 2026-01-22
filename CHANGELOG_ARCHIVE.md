@@ -1,6 +1,830 @@
 # Changelog Archive
 
-Archived releases 0.1.0 through 2.7.0. See [CHANGELOG.md](./CHANGELOG.md) for the latest versions.
+<!-- cspell:disable -->
+
+Archived releases 0.1.0 through 4.2.0. See [CHANGELOG.md](./CHANGELOG.md) for the latest versions.
+
+## [4.2.0] - 2026-01-19
+
+### Added
+
+**Config key aliases** - Rules can now define alternate config keys that users can use in `custom_lint.yaml`. This helps when rule names have prefixes (like `enforce_`) that users commonly omit:
+
+```yaml
+rules:
+  # Both work now:
+  - enforce_arguments_ordering: false # canonical name
+  - arguments_ordering: false # alias
+```
+
+Added aliases for:
+
+- `enforce_arguments_ordering` → `arguments_ordering`
+- `enforce_member_ordering` → `member_ordering`
+- `enforce_parameters_ordering` → `parameters_ordering`
+
+**41 new lint rules** covering Android platform, in-app purchases, URL launching, permissions, connectivity, geolocation, SQLite, test file handling, and more:
+
+#### Android Platform Rules (android_rules.dart) - 6 rules
+
+- `require_android_permission_request` - Runtime permission not requested before using permission-gated API
+- `avoid_android_task_affinity_default` - Multiple activities with default taskAffinity cause back stack issues
+- `require_android_12_splash` - Flutter splash may cause double-splash on Android 12+
+- `prefer_pending_intent_flags` - PendingIntent without FLAG_IMMUTABLE/FLAG_MUTABLE crashes on Android 12+
+- `avoid_android_cleartext_traffic` - HTTP URLs blocked by default on Android 9+
+- `require_android_backup_rules` - Sensitive data in SharedPreferences may be backed up
+
+#### In-App Purchase Rules (iap_rules.dart) - 3 rules
+
+- `avoid_purchase_in_sandbox_production` - Hardcoded IAP environment URL causes receipt validation failures
+- `require_subscription_status_check` - Premium content shown without verifying subscription status
+- `require_price_localization` - Hardcoded prices instead of store-provided localized prices
+
+#### URL Launcher Rules (url_launcher_rules.dart) - 3 rules
+
+- `require_url_launcher_can_launch_check` - launchUrl without canLaunchUrl check
+- `avoid_url_launcher_simulator_tests` - URL launcher tests with tel:/mailto: fail on simulator
+- `prefer_url_launcher_fallback` - launchUrl without fallback for unsupported schemes
+
+#### Permission Rules (permission_rules.dart) - 3 rules
+
+- `require_location_permission_rationale` - Location permission requested without showing rationale
+- `require_camera_permission_check` - Camera initialized without permission check
+- `prefer_image_cropping` - Profile image picked without cropping option
+
+#### Connectivity Rules (connectivity_rules.dart) - 1 rule
+
+- `require_connectivity_error_handling` - Connectivity check without error handling
+
+#### Geolocator Rules (geolocator_rules.dart) - 1 rule
+
+- `require_geolocator_battery_awareness` - High-accuracy continuous location tracking without battery consideration
+
+#### SQLite Rules (sqflite_rules.dart) - 1 rule
+
+- `avoid_sqflite_type_mismatch` - SQLite type may not match Dart type (bool vs INTEGER, DateTime vs TEXT)
+
+#### Rules Added to Existing Files - 19 rules
+
+- **firebase_rules.dart**: `require_firestore_index` - Firestore query requires composite index
+- **notification_rules.dart**: `prefer_notification_grouping`, `avoid_notification_silent_failure`
+- **hive_rules.dart**: `require_hive_migration_strategy`
+- **async_rules.dart**: `avoid_stream_sync_events`, `avoid_sequential_awaits`
+- **file_handling_rules.dart**: `prefer_streaming_for_large_files`, `require_file_path_sanitization`
+- **error_handling_rules.dart**: `require_app_startup_error_handling`, `avoid_assert_in_production`
+- **accessibility_rules.dart**: `prefer_focus_traversal_order`
+- **ui_ux_rules.dart**: `avoid_loading_flash`
+- **performance_rules.dart**: `avoid_animation_in_large_list`, `prefer_lazy_loading_images`
+- **json_datetime_rules.dart**: `require_json_schema_validation`, `prefer_json_serializable`
+- **forms_rules.dart**: `prefer_regex_validation`
+- **package_specific_rules.dart**: `prefer_typed_prefs_wrapper`, `prefer_freezed_for_data_classes`
+
+### Tier Assignments
+
+- **Essential tier:** 14 rules (permissions, security, crashes)
+- **Recommended tier:** 10 rules (best practices, UX improvements)
+- **Professional tier:** 13 rules (architecture, performance, maintainability)
+
+#### Parameter Safety Rules (code_quality_rules.dart) - 1 new rule + 1 renamed
+
+- `avoid_parameter_mutation` **(NEW)** - Detects when parameter objects are mutated (caller's data modified). Essential tier.
+- `avoid_parameter_reassignment` - Renamed from `avoid_mutating_parameters`. Detects parameter variable reassignment. Moved to Stylistic tier.
+
+**Quick fix for `prefer_explicit_type_arguments`** - Adds explicit type arguments to empty collection literals and generic constructor calls.
+
+**Conflicting rule detection** - Warns at analysis startup when mutually exclusive stylistic rules are both enabled:
+
+- `avoid_inferrable_type_arguments` ↔ `prefer_explicit_type_arguments`
+- `prefer_relative_imports` ↔ `always_use_package_imports`
+
+**Stylistic rule tier changes** - Removed opposing stylistic rules from Comprehensive tier (now opt-in only):
+
+- `avoid_inferrable_type_arguments` - conflicts with `prefer_explicit_type_arguments`
+- `prefer_explicit_type_arguments` - conflicts with `avoid_inferrable_type_arguments`
+
+### Changed
+
+- **Rule renamed**: `avoid_mutating_parameters` → `avoid_parameter_reassignment` (old name kept as deprecated alias in doc header). Tier changed from Recommended to Stylistic to reflect that reassignment is a style preference, not a correctness issue.
+- **Heuristics improved** - `require_android_backup_rules` now uses word-boundary matching to avoid false positives on keys like "authentication_method"
+
+### Fixed
+
+- **`function_always_returns_null` false positives on void functions** - The rule was incorrectly flagging void functions that use bare `return;` statements for early exit. Now correctly skips:
+  - Functions with explicit `void` return type
+  - Functions with `Future<void>` or `FutureOr<void>` return types (including type aliases via resolved type checking)
+  - Functions with no explicit return type that only use bare `return;` statements (inferred void)
+
+- **`capitalize_comment_start` code detection overhauled** - The previous regex pattern `[:\.\(\)\[\]\{\};,=>]` was too broad, matching ANY comment containing punctuation (periods, colons, commas). This caused massive false negatives where legitimate prose comments like `// this is important.` were incorrectly skipped as "code". The new pattern specifically detects:
+  - Identifier followed by code punctuation: `foo.bar`, `x = 5`
+  - Dart keywords at start: `return`, `if (`, `final x`
+  - Function calls: `doSomething()`, `list.add(item)`
+  - Statement terminators: ends with `;`
+  - Annotations: `@override`
+  - Arrow functions: `=>`
+  - Block delimiters at boundaries: `{`, `}`
+
+  **Quick fix added**: Capitalizes the first letter of the comment.
+
+- **`avoid_commented_out_code` completely overhauled** - Moved from `debug_rules.dart` to `stylistic_rules.dart`. The rule now:
+  - Reports at the **actual comment location** (previously reported at file start)
+  - Reports **all instances** (previously only reported once per file)
+  - Has a **quick fix** to delete the commented-out code
+  - Uses shared `CommentPatterns` utility with `capitalize_comment_start`
+  - **Tier changed**: Moved from Insanity tier to Stylistic tier (not enabled by default in any tier)
+
+- **New shared utility: `comment_utils.dart`** - Extracted common comment detection patterns into `CommentPatterns` class used by both `capitalize_comment_start` and `avoid_commented_out_code`. This ensures consistent behavior between the two complementary rules.
+
+### Improved
+
+**`prefer_utc_for_storage` rule enhanced:**
+
+- Added 6 new serialization patterns: `toJson`, `toMap`, `serialize`, `encode`, `cache`, `persist`
+- Removed `toString()` from method check (reduces false positives from logging/debugging)
+- Patterns moved to `static final` class member (compiled once at class load, not per invocation)
+- Added comprehensive doc header with multiple BAD/GOOD examples
+- **Quick fix added**: Inserts `.toUtc()` before the serialization call
+
+**DX message quality for 60+ lint rules** - Added clear consequences to problem messages explaining _why_ issues matter. Messages now follow the pattern: "[What's wrong]. [Why it matters]." Extended short messages to meet 180-character minimum for critical/high impact rules.
+
+#### Security Rules (11 rules)
+
+- `avoid_sensitive_data_in_clipboard` - "Malicious apps can silently read clipboard contents, stealing passwords, tokens, or API keys"
+- `require_certificate_pinning` - "Attackers on the same network can intercept and modify traffic"
+- `avoid_generic_key_in_url` - "Exposes credentials in access logs and browser history"
+- `avoid_jwt_decode_client` - "Attackers can manipulate decoded claims to bypass permissions"
+- `require_logout_cleanup` - "Next user on shared device could access previous user data"
+- `require_deep_link_validation` - "Malicious links can inject arbitrary data, leading to crashes or unauthorized access"
+- `require_shared_prefs_null_handling` - "Common source of production crashes on first launch or after app updates"
+- `require_url_validation` - "Attackers can make your app request internal network resources"
+- `prefer_webview_javascript_disabled` - "Malicious scripts can steal data or execute arbitrary code"
+- `avoid_unsafe_deserialization` - "Attackers can exploit this to corrupt state or trigger unexpected behavior"
+- `avoid_notification_payload_sensitive` - "Anyone nearby can see passwords, tokens, or PII without unlocking"
+
+#### Performance Rules (7 rules)
+
+- `prefer_const_widgets` - "Wastes CPU cycles and battery, slowing down UI rendering"
+- `avoid_widget_creation_in_loop` - "Causes jank and high memory usage for long lists"
+- `avoid_calling_of_in_build` - "Adds unnecessary overhead that slows down frame rendering"
+- `avoid_rebuild_on_scroll` - "Memory leaks and duplicate callbacks that compound over time"
+- `avoid_shrinkwrap_in_scrollview` - "Forces all items to render immediately, causing jank"
+- `avoid_text_span_in_build` - "Causes visible jank when scrolling or animating"
+- `avoid_money_arithmetic_on_double` - "Users may be charged incorrect amounts or see wrong totals"
+
+#### State Management Rules (7 rules)
+
+- `avoid_bloc_in_bloc` - "Makes testing difficult and breaks unidirectional data flow"
+- `avoid_static_state` - "Causes flaky tests, unexpected state retention, and hard-to-reproduce bugs"
+- `require_bloc_manual_dispose` - "Memory leaks that accumulate over time, eventually crashing the app"
+- `prefer_bloc_listener_for_side_effects` - "Causes duplicate navigation, multiple snackbars, or repeated API calls"
+- `avoid_bloc_context_dependency` - "Makes Bloc untestable and can cause crashes when context is invalid"
+- `avoid_provider_value_rebuild` - "Loses all state and causes infinite rebuild loops"
+- `avoid_ref_watch_outside_build` - "Causes missed updates, stale data, and hard-to-debug state inconsistencies"
+
+#### Notification Rules (3 rules)
+
+- `avoid_notification_same_id` - "Users will miss important alerts and messages without any indication"
+- `require_notification_initialize_per_platform` - "Users on unsupported platform will never receive notifications"
+- `avoid_refresh_without_await` - "Spinner dismisses immediately while data is still loading"
+
+#### Other Rules (7 rules)
+
+- `avoid_image_picker_without_source` - "Users will see an empty dialog and be unable to select images"
+- `avoid_unbounded_cache_growth` - "Eventually exhausts device memory and crashes the app"
+- `require_websocket_reconnection` - "Users will see stale data or miss real-time updates"
+- `require_sqflite_error_handling` - "Operations can fail due to disk full, corruption, or constraint violations"
+- `require_avatar_fallback` - "Users will see a broken or blank avatar with no indication of the error"
+- `require_image_error_fallback` - "Users see an ugly error state instead of a graceful fallback"
+- `require_google_signin_error_handling` / `require_supabase_error_handling` - "Users will see unexpected crashes instead of friendly error messages"
+
+#### Disposal & Memory Rules (10 rules)
+
+- `require_stream_controller_close` - "Listeners accumulate in memory, eventually crashing the app"
+- `require_video_player_controller_dispose` - "Video decoder stays active, audio continues, battery drains"
+- `require_change_notifier_dispose` - "Disposed widgets remain referenced, crashes on notification"
+- `require_receive_port_close` - "Isolate port stays open, memory leaks accumulate"
+- `require_socket_close` - "TCP connection stays occupied, file descriptors leak"
+- `require_lifecycle_observer` - "Timer drains battery and stale callbacks cause inconsistent state"
+- `avoid_closure_memory_leak` - "StatefulWidget leaks memory, setState crashes on unmounted"
+- `require_dispose_pattern` - "Controllers leak memory and crash when accessed after disposal"
+- `require_hive_box_close` - "File handle stays open, database can't compact"
+- `require_getx_permanent_cleanup` - "GetxController remains in memory forever"
+
+#### Additional Security Rules (8 rules)
+
+- `avoid_dynamic_sql` - "Attackers can read, modify, or delete database contents"
+- `avoid_ignoring_ssl_errors` - "Man-in-the-middle attackers can intercept all HTTPS traffic"
+- `avoid_user_controlled_urls` - "SSRF vulnerability allows attackers to access internal services"
+- `require_apple_signin_nonce` - "Replay attacks allow impersonation of the user"
+- `require_webview_ssl_error_handling` - "Invalid certificates silently accepted, credentials stolen"
+- `prefer_secure_random_for_crypto` - "Predictable seed allows attackers to guess keys and tokens"
+- `require_unique_iv_per_encryption` - "Same key+IV breaks confidentiality"
+- `avoid_webview_file_access` - "Malicious content can read local files, exposing data"
+
+#### Platform & Context Rules (6 rules)
+
+- `avoid_mixed_environments` - "Debug APIs expose data, development endpoints corrupt production"
+- `avoid_storing_context` - "Stored context crashes when widget disposed"
+- `avoid_web_only_dependencies` - "Web-only imports crash on mobile and desktop"
+- `avoid_future_tostring` - "Logs show useless output, debugging becomes impossible"
+- `require_ios_callkit_integration` - "Calls fail to show, App Store rejection"
+- `avoid_navigator_push_unnamed` - "Deep linking fails, users can't share screens"
+
+#### Widget & State Rules (7 rules)
+
+- `avoid_obs_outside_controller` - "Observables leak memory without lifecycle management"
+- `pass_existing_future_to_future_builder` - "Duplicate network calls, slow UI with visible loading"
+- `require_late_initialization_in_init_state` - "Objects recreated on every setState"
+- `require_media_loading_state` - "Shows black rectangle or crashes"
+- `list_all_equatable_fields` - "Equality checks fail silently"
+- `require_openai_error_handling` - "Rate limits crash instead of graceful fallback"
+- `prefer_value_listenable_builder` - "Full-widget rebuilds cause jank"
+
+## [4.1.9] - 2026-01-18
+
+### Changed
+
+**Tier rebalancing** - Redistributed rules across tiers to match tier philosophy:
+
+- **Essential**: Now strictly crash/security/memory-leak rules. Removed style preferences (`prefer_list_first`, `enforce_member_ordering`, `avoid_continue_statement`). Added crash-causing rules from Recommended (`require_getit_registration_order`, `require_default_config`, `avoid_builder_index_out_of_bounds`).
+
+- **Stylistic**: Expanded with ordering/naming rules that were incorrectly in Essential/Recommended. Now 129 rules for formatting, ordering, and naming conventions.
+
+- **Comprehensive**: Expanded from 5 to 51 rules. Added optimization hints and strict patterns from Professional (immutability patterns, type strictness, documentation extras, testing extras).
+
+- **Insanity**: Expanded from 1 to 10 rules. Added pedantic rules like `avoid_object_creation_in_hot_loops`, `prefer_feature_folder_structure`, `avoid_returning_widgets`.
+
+**Documentation**: Updated README tier table with detailed purpose, target user, and examples for each tier.
+
+## [4.1.8] - 2026-01-18
+
+### Added
+
+**25 new lint rules** focusing on state management, performance, security, caching, testing, and widgets:
+
+#### State Management Rules (v417_state_rules.dart)
+
+- `avoid_riverpod_for_network_only` - `[HEURISTIC]` Riverpod just for network access is overkill
+- `avoid_large_bloc` - `[HEURISTIC]` Blocs with too many event handlers (>7) need splitting
+- `avoid_overengineered_bloc_states` - `[HEURISTIC]` Too many state subclasses; use single state
+- `avoid_getx_static_context` - Get.offNamed/Get.dialog use untestable static context
+- `avoid_tight_coupling_with_getx` - `[HEURISTIC]` Heavy GetX usage reduces testability
+
+#### Performance Rules (v417_performance_rules.dart)
+
+- `prefer_element_rebuild` - Conditional widget returns destroy Elements and state
+- `require_isolate_for_heavy` - Heavy computation blocks UI (jsonDecode, encrypt)
+- `avoid_finalizer_misuse` - Finalizers add GC overhead; prefer dispose()
+- `avoid_json_in_main` - `[HEURISTIC]` jsonDecode in async context should use compute()
+
+#### Security Rules (v417_security_rules.dart)
+
+- `avoid_sensitive_data_in_clipboard` - `[HEURISTIC]` Clipboard accessible to other apps
+- `require_clipboard_paste_validation` - Validate clipboard content before using
+- `avoid_encryption_key_in_memory` - `[HEURISTIC]` Keys as fields can be extracted from dumps
+
+#### Caching Rules (v417_caching_rules.dart)
+
+- `require_cache_expiration` - `[HEURISTIC]` Caches without TTL serve stale data forever
+- `avoid_unbounded_cache_growth` - `[HEURISTIC]` Caches without limits cause OOM
+- `require_cache_key_uniqueness` - Cache keys need stable hashCode
+
+#### Testing Rules (v417_testing_rules.dart)
+
+- `require_dialog_tests` - Dialogs need pumpAndSettle after showing
+- `prefer_fake_platform` - Platform widgets need fakes/mocks in tests
+- `require_test_documentation` - `[HEURISTIC]` Complex tests (>15 lines) need comments
+
+#### Widget Rules (v417_widget_rules.dart)
+
+- `prefer_custom_single_child_layout` - Deep positioning nesting should use delegate
+- `require_locale_for_text` - DateFormat/NumberFormat need explicit locale
+- `require_dialog_barrier_consideration` - `[HEURISTIC]` Destructive dialogs need explicit barrierDismissible
+- `prefer_feature_folder_structure` - `[HEURISTIC]` Type-based folders (/blocs/) should be feature-based
+
+#### Misc Rules (v417_misc_rules.dart)
+
+- `require_websocket_reconnection` - `[HEURISTIC]` WebSocket needs reconnection logic
+- `require_currency_code_with_amount` - `[HEURISTIC]` Money amounts need currency field
+- `prefer_lazy_singleton_registration` - `[HEURISTIC]` Expensive services should be lazy
+
+### Tier Assignments
+
+- **Essential tier:** 3 rules (websocket, clipboard security, cache limits)
+- **Recommended tier:** 5 rules (dialog tests, clipboard validation, currency, cache TTL, dialog barrier)
+- **Professional tier:** 11 rules (locale, state management, performance, security, caching)
+- **Comprehensive tier:** 5 rules (folder structure, element rebuild, finalizer, platform fakes, test docs)
+- **Insanity tier:** 1 rule (CustomSingleChildLayout preference)
+
+### Changed
+
+- **Shared utilities extracted** - Added `isInsideIsolate()` and `isInAsyncContext()` to `async_context_utils.dart` to reduce code duplication across performance rules
+- **Performance file type filtering** - Added `applicableFileTypes` to `RequireDialogBarrierConsiderationRule` to skip non-widget files
+- **Template updated** - Added all 25 new rules to `analysis_options_template.yaml` with proper categorization
+
+## [4.1.7] - 2026-01-18
+
+### Fixed
+
+**Critical Windows compatibility bugs** that caused rules to not fire on Windows:
+
+- **Cache key incomplete** - Rule filtering cache only checked `tier` and `enableAll`, ignoring individual rule overrides like `- always_fail_test_case: true`. Now includes hash of all rule configurations.
+
+- **Windows path normalization** - File paths used as map keys without normalizing backslashes. On Windows, analyzer provides `d:\src\file.dart` but caches may store `d:/src/file.dart`. Added `normalizePath()` utility and fixed 15+ locations:
+  - `IncrementalAnalysisTracker` - disk-persisted cache
+  - `RuleBatchExecutor` - batch execution plan
+  - `BaselineAwareEarlyExit` - baseline suppression
+  - `FileContentCache` - content change detection
+  - `FileTypeDetector` - file type classification
+  - `ProjectContext.findProjectRoot()` - project detection
+
+### Added
+
+- `normalizePath()` utility function with documentation to prevent future path issues
+
+---
+
+## [4.1.6] - 2026-01-18
+
+### Added
+
+**14 new lint rules** focusing on logging, platform safety, JSON/API handling, and configuration:
+
+#### Logging Rules (debug_rules.dart)
+
+- `avoid_print_in_release` - print() executes in release builds; guard with kDebugMode
+- `require_structured_logging` - Use structured logging instead of string concatenation
+- `avoid_sensitive_in_logs` - Detect passwords, tokens, secrets in log calls
+
+#### Platform Rules (platform_rules.dart)
+
+- `require_platform_check` - Platform-specific APIs need Platform/kIsWeb guards
+- `prefer_platform_io_conditional` - Platform.isX crashes on web; use kIsWeb first
+- `avoid_web_only_dependencies` - dart:html and web-only imports crash on mobile
+- `prefer_foundation_platform_check` - Use defaultTargetPlatform in widget code
+
+#### JSON/API Rules (json_datetime_rules.dart)
+
+- `require_date_format_specification` - DateTime.parse may fail on server dates
+- `prefer_iso8601_dates` - Use ISO 8601 format for date serialization
+- `avoid_optional_field_crash` - JSON field chaining needs null-aware operators
+- `prefer_explicit_json_keys` - Use @JsonKey instead of manual mapping
+
+#### Configuration Rules (config_rules.dart)
+
+- `avoid_hardcoded_config` - Hardcoded URLs/keys should use environment variables
+- `avoid_mixed_environments` - Don't mix production and development config
+
+#### Lifecycle Rules (lifecycle_rules.dart)
+
+- `require_late_initialization_in_init_state` - Late fields should init in initState(), not build()
+
+### Tier Assignments
+
+- **Essential tier:** 9 rules for critical safety (print in release, platform crashes, etc.)
+- **Recommended tier:** 2 rules for best practices
+- **Professional tier:** 3 rules for code quality
+
+## [4.1.5] - 2026-01-18
+
+### Added
+
+**24 new lint rules** focusing on architecture, accessibility, navigation, and internationalization:
+
+#### Dependency Injection Rules
+
+- `avoid_di_in_widgets` - Widgets shouldn't directly use GetIt/service locators
+- `prefer_abstraction_injection` - Inject abstract types, not concrete implementations
+
+#### Accessibility Rules
+
+- `prefer_large_touch_targets` - Touch targets should be at least 48dp for WCAG compliance
+- `avoid_time_limits` - Short durations (< 5s) disadvantage users needing more time
+- `require_drag_alternatives` - Provide button alternatives for drag gestures
+
+#### Flutter Widget Rules
+
+- `avoid_global_keys_in_state` - GlobalKey fields in StatefulWidget cause issues
+- `avoid_static_route_config` - Static final router configs limit testability
+
+#### State Management Rules
+
+- `require_flutter_riverpod_not_riverpod` - Flutter apps need flutter_riverpod, not base riverpod
+- `avoid_riverpod_navigation` - Navigation logic belongs in widgets, not providers
+
+#### Firebase Rules
+
+- `require_firebase_error_handling` - Firebase async calls need try-catch
+- `avoid_firebase_realtime_in_build` - Don't start Firebase listeners in build method
+
+#### Security Rules
+
+- `require_secure_storage_error_handling` - Secure storage needs error handling
+- `avoid_secure_storage_large_data` - Large data shouldn't use secure storage
+
+#### Navigation Rules
+
+- `avoid_navigator_context_issue` - Avoid GlobalKey.currentContext in navigation
+- `require_pop_result_type` - Navigator.push should specify result type parameter
+- `avoid_push_replacement_misuse` - Don't use pushReplacement for detail pages
+- `avoid_nested_navigators_misuse` - Nested Navigators need WillPopScope/PopScope
+- `require_deep_link_testing` - Routes should support deep links, not just object params
+
+#### Internationalization Rules
+
+- `avoid_string_concatenation_l10n` - String concatenation in Text breaks translations
+- `prefer_intl_message_description` - Intl.message needs desc parameter for translators
+- `avoid_hardcoded_locale_strings` - Don't hardcode strings that need localization
+
+#### Async Rules
+
+- `require_network_status_check` - Check connectivity before network requests
+- `avoid_sync_on_every_change` - Debounce API calls in onChanged callbacks
+- `require_pending_changes_indicator` - Notify users when changes haven't synced
+
+### Tier Assignments
+
+- **Recommended tier:** 14 rules for common best practices
+- **Professional tier:** 11 rules for stricter architecture/quality standards
+
+## [4.1.4] - 2026-01-18
+
+### Added
+
+**25 new lint rules** from ROADMAP star priorities:
+
+#### Bloc/Cubit Rules
+
+- `avoid_passing_bloc_to_bloc` - Detects Bloc depending on another Bloc (tight coupling)
+- `avoid_passing_build_context_to_blocs` - Warns when BuildContext is passed to Bloc/Cubit
+- `avoid_returning_value_from_cubit_methods` - Cubit methods should emit states, not return values
+- `require_bloc_repository_injection` - Blocs should receive repositories via constructor injection
+- `prefer_bloc_hydration` - Suggests HydratedBloc for persistent state instead of SharedPreferences
+
+#### GetX Rules
+
+- `avoid_getx_dialog_snackbar_in_controller` - UI dialogs shouldn't be called from controllers
+- `require_getx_lazy_put` - Prefer lazyPut for efficient GetX dependency injection
+
+#### Hive/SharedPreferences Rules
+
+- `prefer_hive_lazy_box` - Use LazyBox for potentially large collections
+- `avoid_hive_binary_storage` - Don't store large binary data in Hive
+- `require_shared_prefs_prefix` - Set prefix to avoid key conflicts
+- `prefer_shared_prefs_async_api` - Use SharedPreferencesAsync for new code
+- `avoid_shared_prefs_in_isolate` - SharedPreferences doesn't work in isolates
+
+#### Stream Rules
+
+- `prefer_stream_distinct` - Add .distinct() before .listen() for UI streams
+- `prefer_broadcast_stream` - Use broadcast streams when multiple listeners needed
+
+#### Async/Build Rules
+
+- `avoid_future_in_build` - Don't create Futures inside build() method
+- `require_mounted_check_after_await` - Check mounted before setState after await
+- `avoid_async_in_build` - Build methods must never be async
+- `prefer_async_init_state` - Use Future field + FutureBuilder pattern
+
+#### Widget Lifecycle Rules
+
+- `require_widgets_binding_callback` - Wrap showDialog in addPostFrameCallback in initState
+
+#### Navigation Rules
+
+- `prefer_route_settings_name` - Include RouteSettings with name for debugging
+
+#### Internationalization Rules
+
+- `prefer_number_format` - Use NumberFormat for locale-aware number formatting
+- `provide_correct_intl_args` - Intl.message args must match placeholders
+
+#### Package-specific Rules
+
+- `avoid_freezed_for_logic_classes` - Freezed is for data classes, not Blocs/Services
+
+#### Disposal Rules
+
+- `dispose_class_fields` - Classes with disposable fields need dispose/close methods
+
+#### State Management Rules
+
+- `prefer_change_notifier_proxy_provider` - Use ProxyProvider for dependent notifiers
+
+### Tier Assignments
+
+- **Essential tier:** avoid_shared_prefs_in_isolate, avoid_future_in_build, require_mounted_check_after_await, provide_correct_intl_args, dispose_class_fields, avoid_async_in_build
+- **Recommended tier:** 17 rules covering best practices
+- **Professional tier:** require_bloc_repository_injection, avoid_freezed_for_logic_classes
+
+## [4.1.3] - 2026-01-14
+
+- Migrated all single/double-word lint rules to three-word convention for clarity and discoverability. Notable migrations include:
+  - `arguments_ordering` → `enforce_arguments_ordering`
+  - `capitalize_comment` → `capitalize_comment_start`
+  - `prefer_first_method_usage` → `prefer_list_first`
+  - `prefer_last_method_usage` → `prefer_list_last`
+  - `prefer_member_ordering` → `enforce_member_ordering`
+  - `prefer_container_widget` → `prefer_single_container`
+  - `prefer_pagination_pattern` → `prefer_api_pagination`
+  - `prefer_contains_method_usage` → `prefer_list_contains`
+  - `avoid_dynamic_typing` → `avoid_dynamic_type`
+  - `avoid_substring_usage` → `avoid_string_substring`
+  - `avoid_continue_statement` → `avoid_continue_statement`
+  - `extend_equatable` → `require_extend_equatable`
+  - `require_dispose_method` → `require_field_dispose`
+  - `dispose_fields` → `dispose_widget_fields`
+  - `parameters_ordering` → `enforce_parameters_ordering`
+  - `format_comment` → `format_comment_style`
+  - `max_imports` → `limit_max_imports`
+  - `avoid_shadowing` → `avoid_variable_shadowing`
+  - `prefer_selector` → `prefer_context_selector`
+  - `dispose_providers` → `dispose_provider_instances`
+  - `prefer_first` → `prefer_list_first`
+  - `prefer_last` → `prefer_list_last`
+  - `prefer_contains` → `prefer_list_contains`
+  - `prefer_container` → `prefer_single_container`
+  - `prefer_pagination` → `prefer_api_pagination`
+  - `avoid_dynamic` → `avoid_dynamic_type`
+  - `avoid_substring` → `avoid_string_substring`
+  - `member_ordering` → `enforce_member_ordering`
+  - `parameters_ordering` → `enforce_parameters_ordering`
+  - `format_comment` → `format_comment_style`
+  - `require_dispose` → `require_field_dispose`
+  - `dispose_fields` → `dispose_widget_fields`
+  - `avoid_continue` → `avoid_continue_statement`
+  - `extend_equatable` → `require_extend_equatable`
+  - `avoid_shadowing` → `avoid_variable_shadowing`
+
+## [4.1.2] - 2026-01-13
+
+### Fixed
+
+- Removed a stray change log entry from the readme
+
+## [4.1.1] - 2026-01-13
+
+### Added
+
+- **New Rule:** `avoid_cached_isar_stream` ([lib/src/rules/isar_rules.dart])
+  - Detects and prevents caching of Isar query streams (must be created inline).
+  - **Tier:** Professional
+  - **Quick Fix:** Inlines offending Isar stream expressions at usage sites and removes the cached variable.
+  - **Example:** [example/lib/isar/avoid_cached_isar_stream_fixture.dart]
+
+### Tier Assignment for Previously Unassigned Rules
+
+The following 6 rules, previously implemented but not assigned to any tier, are now included in the most appropriate tier sets in `lib/src/tiers.dart`:
+
+- **Recommended Tier:**
+  - `avoid_duplicate_test_assertions` (test quality)
+  - `avoid_real_network_calls_in_tests` (test reliability)
+  - `require_error_case_tests` (test completeness)
+  - `require_test_isolation` (test reliability)
+  - `prefer_where_or_null` (idiomatic Dart collections)
+- **Professional Tier:**
+  - `prefer_copy_with_for_state` (state management, immutability)
+
+This ensures all implemented rules are available through tiered configuration and improves coverage for test and state management best practices.
+
+### Rule Tier Assignment Audit
+
+- Ran `scripts/audit_rules.py` to identify all implemented rules not assigned to any tier.
+- Assigned the following rules to the most appropriate tier sets in `lib/src/tiers.dart`:
+  - **Recommended:** `avoid_duplicate_test_assertions`, `avoid_real_network_calls_in_tests`, `require_error_case_tests`, `require_test_isolation`, `prefer_where_or_null`
+  - **Professional:** `prefer_copy_with_for_state`
+- All implemented rules are now available through tiered configuration. This ensures no orphaned rules and improves test and state management coverage.
+- Updated changelog to document these assignments and maintain full transparency of tier coverage.
+
+### Tier Set Maintenance
+
+- Commented out unimplemented rules in all tier sets in `lib/src/tiers.dart` to ensure only implemented rules are active per tier.
+- Confirmed all unimplemented rules are tracked in `ROADMAP.md` for future implementation.
+- This change improves roadmap alignment and prevents accidental activation of unimplemented rules.
+- Materially improve the message quality for all Critical rules
+
+## [4.1.0] - 2026-01-12
+
+### Tier Assignment Audit
+
+**181 rules** previously unassigned to any tier are now properly categorized. These rules existed but were not included in tier configurations, meaning users weren't getting them unless explicitly enabled.
+
+#### Essential Tier (+50 rules)
+
+Critical and high-impact rules now included in the essential tier:
+
+| Category                  | Rules Added                                                                                                                                                                                                                                                          |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Security**              | `avoid_deep_link_sensitive_params`, `avoid_path_traversal`, `avoid_webview_insecure_content`, `require_data_encryption`, `require_secure_password_field`, `prefer_html_escape`                                                                                       |
+| **JSON/Type Safety**      | `avoid_dynamic_json_access`, `avoid_dynamic_json_chains`, `avoid_unrelated_type_casts`, `require_null_safe_json_access`                                                                                                                                              |
+| **Platform Permissions**  | `avoid_platform_channel_on_web`, `require_image_picker_permission_android`, `require_image_picker_permission_ios`, `require_permission_manifest_android`, `require_permission_plist_ios`, `require_url_launcher_queries_android`, `require_url_launcher_schemes_ios` |
+| **Memory/Resource Leaks** | `avoid_stream_subscription_in_field`, `avoid_websocket_memory_leak`, `prefer_dispose_before_new_instance`, `require_dispose_implementation`, `require_video_player_controller_dispose`                                                                               |
+| **Widget Lifecycle**      | `check_mounted_after_async`, `avoid_ref_in_build_body`, `avoid_flashing_content`                                                                                                                                                                                     |
+| **Animation**             | `avoid_animation_rebuild_waste`, `avoid_overlapping_animations`                                                                                                                                                                                                      |
+| **Navigation**            | `prefer_maybe_pop`, `require_deep_link_fallback`, `require_stepper_validation`                                                                                                                                                                                       |
+| **Firebase/Backend**      | `prefer_firebase_remote_config_defaults`, `require_background_message_handler`, `require_fcm_token_refresh_handler`                                                                                                                                                  |
+| **Forms/WebView**         | `require_validator_return_null`, `avoid_image_picker_large_files`, `prefer_webview_javascript_disabled`, `require_webview_error_handling`, `require_webview_navigation_delegate`, `require_websocket_message_validation`                                             |
+| **Data/Storage**          | `prefer_utc_for_storage`, `require_database_migration`, `require_enum_unknown_value`                                                                                                                                                                                 |
+| **State/UI**              | `require_error_widget`, `require_feature_flag_default`, `require_immutable_bloc_state`, `require_map_idle_callback`, `require_media_loading_state`, `prefer_bloc_listener_for_side_effects`, `require_cors_handling`                                                 |
+
+#### Recommended Tier (+83 rules)
+
+Medium-impact rules for better code quality:
+
+| Category                | Rules Added                                                                                                                                                                                                                                                                             |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Widget Structure**    | `avoid_deep_widget_nesting`, `avoid_find_child_in_build`, `avoid_layout_builder_in_scrollable`, `avoid_nested_providers`, `avoid_opacity_misuse`, `avoid_shrink_wrap_in_scroll`, `avoid_unbounded_constraints`, `avoid_unconstrained_box_misuse`                                        |
+| **Gesture/Input**       | `avoid_double_tap_submit`, `avoid_gesture_conflict`, `avoid_gesture_without_behavior`, `prefer_actions_and_shortcuts`, `prefer_cursor_for_buttons`, `require_disabled_state`, `require_drag_feedback`, `require_focus_indicator`, `require_hover_states`, `require_long_press_callback` |
+| **Forms/Testing**       | `require_button_loading_state`, `require_form_validation`, `avoid_flaky_tests`, `avoid_real_timer_in_widget_test`, `avoid_stateful_test_setup`, `prefer_matcher_over_equals`, `prefer_mock_http`, `require_golden_test`, `require_mock_verification`                                    |
+| **Performance**         | `avoid_hardcoded_layout_values`, `avoid_hardcoded_text_styles`, `avoid_large_images_in_memory`, `avoid_map_markers_in_build`, `avoid_stack_overflow`, `prefer_clip_behavior`, `prefer_deferred_loading_web`, `prefer_keep_alive`, `prefer_sliver_app_bar`, `prefer_sliver_list`         |
+| **State Management**    | `avoid_late_context`, `prefer_cubit_for_simple_state`, `prefer_selector_over_consumer`, `require_bloc_consumer_when_both`                                                                                                                                                               |
+| **Accessibility**       | `avoid_screenshot_sensitive`, `avoid_semantics_exclusion`, `prefer_merge_semantics`, `avoid_small_text`                                                                                                                                                                                 |
+| **Database/Navigation** | `require_database_index`, `prefer_transaction_for_batch`, `prefer_typed_route_params`, `require_refresh_indicator`, `require_scroll_controller`, `require_scroll_physics`                                                                                                               |
+| **Desktop/i18n**        | `require_menu_bar_for_desktop`, `require_window_close_confirmation`, `require_intl_locale_initialization`, `require_notification_timezone_awareness`                                                                                                                                    |
+
+#### Comprehensive Tier (+48 rules)
+
+Low-impact style and pattern rules:
+
+- Code style: `avoid_digit_separators`, `avoid_nested_try_statements`, `avoid_type_casts`
+- Documentation: `prefer_doc_comments_over_regular`, `prefer_error_suffix`, `prefer_exception_suffix`
+- Patterns: `prefer_class_over_record_return`, `prefer_record_over_equatable`, `prefer_guard_clauses`
+- Async: `prefer_async_only_when_awaiting`, `prefer_await_over_then`, `prefer_sync_over_async_where_possible`
+- Testing: `prefer_expect_over_assert_in_tests`, `prefer_single_expectation_per_test`
+- And 33 more...
+
+#### Intentionally Untiered (81 rules)
+
+Stylistic/opinionated rules remain untiered for team-specific configuration:
+
+- Quote style: `prefer_single_quotes` vs `prefer_double_quotes`
+- Import style: `prefer_relative_imports` vs `prefer_absolute_imports`
+- Member ordering: `prefer_fields_before_methods` vs `prefer_methods_before_fields`
+- Control flow: `prefer_ternary_over_if_null` vs `prefer_if_null_over_ternary`
+- Debug rules: `always_fail`, `greeting`, `firebase_custom`
+
+---
+
+## [4.0.1] - 2026-01-12
+
+### Testing Best Practices Rules
+
+Activated 5 previously unregistered testing best practices rules:
+
+| Rule                                  | Tier         | Description                                                              |
+| ------------------------------------- | ------------ | ------------------------------------------------------------------------ |
+| `prefer_test_find_by_key`             | Recommended  | Suggests `find.byKey()` over `find.byType()` for reliable widget testing |
+| `prefer_setup_teardown`               | Recommended  | Detects duplicated test setup code (3+ occurrences)                      |
+| `require_test_description_convention` | Recommended  | Ensures test names include descriptive words                             |
+| `prefer_bloc_test_package`            | Professional | Suggests `blocTest()` when detecting Bloc testing patterns               |
+| `prefer_mock_verify`                  | Professional | Warns when `when()` is used without `verify()`                           |
+
+**Note:** `avoid_test_sleep` was already registered.
+
+**Code cleanup:** Removed redundant test file path checks from these rules (file type filtering is handled by `applicableFileTypes`).
+
+### DX Message Quality Improvements
+
+Improved problem messages for 7 critical-impact rules to provide specific consequences instead of generic descriptions:
+
+| Rule                                  | Improvement                                                     |
+| ------------------------------------- | --------------------------------------------------------------- |
+| `require_secure_storage`              | Now explains XML storage exposure enables credential extraction |
+| `avoid_storing_sensitive_unencrypted` | Added backup extraction and identity theft consequence          |
+| `check_mounted_after_async`           | Specifies State disposal during async gap                       |
+| `avoid_stream_subscription_in_field`  | Clarifies callbacks fire after State disposal                   |
+| `require_stream_subscription_cancel`  | Specifies State disposal context                                |
+| `require_interval_timer_cancel`       | Specifies State disposal context                                |
+| `avoid_dialog_context_after_async`    | Clarifies BuildContext deactivation during async gap            |
+
+**Result**: Critical impact rules now at 100% DX compliance (40/40 passing).
+
+### Documentation
+
+- **PROFESSIONAL_SERVICES.md**: Rewrote professional services documentation with clearer service offerings and contact information
+
+---
+
+## [4.0.0] - 2026-01-12
+
+### OWASP Compliance Mapping
+
+Security rules are now mapped to **OWASP Mobile Top 10 (2024)** and **OWASP Top 10 (2021)** standards, transforming saropa_lints from a developer tool into a **security audit tool**.
+
+#### Coverage
+
+| OWASP Mobile        | Rules | OWASP Web                   | Rules |
+| ------------------- | ----- | --------------------------- | ----- |
+| M1 Credential Usage | 5+    | A01 Broken Access Control   | 4+    |
+| M3 Authentication   | 5+    | A02 Cryptographic Failures  | 10+   |
+| M4 Input Validation | 6+    | A03 Injection               | 6+    |
+| M5 Communication    | 2+    | A05 Misconfiguration        | 4+    |
+| M6 Privacy Controls | 5+    | A07 Authentication Failures | 8+    |
+| M8 Misconfiguration | 4+    | A09 Logging Failures        | 2+    |
+| M9 Data Storage     | 7+    |                             |       |
+| M10 Cryptography    | 4+    |                             |       |
+
+**Gaps**: M2 (Supply Chain), M7 (Binary Protection), and A06 (Outdated Components) require separate tooling — dependency scanners and build-time protections.
+
+#### New Files
+
+- `lib/src/owasp/owasp_category.dart` - `OwaspMobile` and `OwaspWeb` enums with category metadata
+- `lib/src/owasp/owasp_mapping.dart` - Compliance reporting utilities
+- `lib/src/owasp/owasp.dart` - Barrel export
+
+#### API
+
+Rules expose OWASP mappings via the `owasp` property:
+
+```dart
+final rule = AvoidHardcodedCredentialsRule();
+print(rule.owasp); // Mobile: M1 | Web: A07
+
+// Generate compliance report
+final mappings = getAllSecurityRuleMappings();
+final report = generateComplianceReport(mappings);
+```
+
+#### Modified Files
+
+- `lib/src/saropa_lint_rule.dart` - Added `OwaspMapping? get owasp` to `SaropaLintRule` base class
+- `lib/src/rules/security_rules.dart` - Added OWASP mappings to 41 security rules
+- `lib/src/rules/crypto_rules.dart` - Added OWASP mappings to 4 cryptography rules
+- `lib/saropa_lints.dart` - Export `OwaspMapping`, `OwaspMobile`, `OwaspWeb`
+
+### Baseline Feature for Brownfield Projects
+
+**The problem**: You want to adopt saropa_lints on an existing project, but running analysis shows 500+ violations in legacy code. You can't fix them all before your next sprint, but you want new code to be clean.
+
+**The solution**: The baseline feature records existing violations and hides them. Old code is "baselined" (hidden), new code is still checked. You can adopt linting today without fixing legacy code first.
+
+#### Quick Start
+
+```bash
+# Generate baseline - hides all current violations
+dart run saropa_lints:baseline
+```
+
+This command creates `saropa_baseline.json` and updates your `analysis_options.yaml`. Old violations are hidden, new code is still checked.
+
+#### Three Combinable Baseline Types
+
+| Type           | Config           | Description                                         |
+| -------------- | ---------------- | --------------------------------------------------- |
+| **File-based** | `baseline.file`  | JSON file listing specific violations to ignore     |
+| **Path-based** | `baseline.paths` | Glob patterns for directories (e.g., `lib/legacy/`) |
+| **Date-based** | `baseline.date`  | Git blame - ignore code unchanged since a date      |
+
+All three types are combinable - any match suppresses the violation.
+
+#### Full Configuration
+
+```yaml
+custom_lint:
+  saropa_lints:
+    tier: recommended
+    baseline:
+      file: "saropa_baseline.json" # Specific violations
+      date: "2025-01-15" # Code unchanged since this date
+      paths: # Directories/patterns
+        - "lib/legacy/"
+        - "lib/deprecated/"
+        - "**/generated/"
+      only_impacts: [low, medium] # Only baseline these severities
+```
+
+#### CLI Commands
+
+```bash
+dart run saropa_lints:baseline              # Generate new baseline
+dart run saropa_lints:baseline --update     # Refresh, remove fixed violations
+dart run saropa_lints:baseline --dry-run    # Preview without changes
+dart run saropa_lints:baseline --help       # See all options
+```
+
+#### New Files
+
+- `lib/src/baseline/baseline_config.dart` - Configuration parsing
+- `lib/src/baseline/baseline_file.dart` - JSON file handling
+- `lib/src/baseline/baseline_paths.dart` - Glob pattern matching
+- `lib/src/baseline/baseline_date.dart` - Git blame integration
+- `lib/src/baseline/baseline_manager.dart` - Central orchestrator
+- `bin/baseline.dart` - CLI tool
+
+See [README.md](README.md#baseline-for-brownfield-projects) for full documentation.
+
+### New Rules
+
+#### OWASP Coverage Gap Rules
+
+Five new rules to fill gaps in OWASP coverage:
+
+| Rule                           | OWASP   | Severity | Description                                                                                |
+| ------------------------------ | ------- | -------- | ------------------------------------------------------------------------------------------ |
+| `avoid_ignoring_ssl_errors`    | M5, A05 | ERROR    | Detects `badCertificateCallback = (...) => true` that bypasses SSL validation              |
+| `require_https_only`           | M5, A05 | WARNING  | Flags `http://` URLs (except localhost). Has quick fix to replace with HTTPS               |
+| `avoid_unsafe_deserialization` | M4, A08 | WARNING  | Detects `jsonDecode` results used in dangerous operations without type validation          |
+| `avoid_user_controlled_urls`   | M4, A10 | WARNING  | Flags user input (text controllers) passed directly to HTTP methods without URL validation |
+| `require_catch_logging`        | M8, A09 | WARNING  | Catch blocks that silently swallow exceptions without logging or rethrowing                |
 
 ---
 
@@ -143,12 +967,12 @@ python scripts/audit_rules.py --no-dx      # Skip DX audit
 
 Opinionated style preferences for teams that prefer smaller files. **Not quality indicators** - large files are often necessary and valid for data, enums, constants, generated code, configs, and lookup tables.
 
-| Rule | Threshold | Tier | Severity |
-|------|-----------|------|----------|
-| `prefer_small_files` | 200 lines | insanity | INFO |
-| `avoid_medium_files` | 300 lines | professional | INFO |
-| `avoid_long_files` | 500 lines | comprehensive | INFO |
-| `avoid_very_long_files` | 1000 lines | recommended | INFO |
+| Rule                           | Threshold  | Tier          | Severity |
+| ------------------------------ | ---------- | ------------- | -------- |
+| `prefer_small_length_files`    | 200 lines  | insanity      | INFO     |
+| `avoid_medium_length_files`    | 300 lines  | professional  | INFO     |
+| `avoid_long_length_files`      | 500 lines  | comprehensive | INFO     |
+| `avoid_very_long_length_files` | 1000 lines | recommended   | INFO     |
 
 All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
@@ -449,6 +1273,7 @@ None. All changes are backwards-compatible performance improvements.
 **IMPORTANT**: These rules are **not included in any tier by default**. They express team style preferences where valid arguments exist for opposing approaches. Enable them individually based on your team's style guide.
 
 **Widget Style Rules (11 rules)** - `stylistic_widget_rules.dart`
+
 - **`prefer_sized_box_over_container`**: Prefer SizedBox over Container when only setting dimensions. (INFO)
 - **`prefer_container_over_sized_box`**: Opposite - prefer Container for consistency. (INFO)
 - **`prefer_text_rich_over_richtext`**: Prefer Text.rich over RichText widget. (INFO)
@@ -462,6 +1287,7 @@ None. All changes are backwards-compatible performance improvements.
 - **`prefer_media_query_over_fractional`**: Opposite - prefer explicit MediaQuery. (INFO)
 
 **Null & Collection Style Rules (14 rules)** - `stylistic_null_collection_rules.dart`
+
 - **`prefer_if_null_operator`**: Prefer `??` over ternary null checks. (INFO)
 - **`prefer_ternary_over_if_null`**: Opposite - prefer ternary for explicitness. (INFO)
 - **`prefer_null_aware_assignment`**: Prefer `??=` over if-null assignment patterns. (INFO)
@@ -478,6 +1304,7 @@ None. All changes are backwards-compatible performance improvements.
 - **`prefer_var_in_for_each`**: Opposite - prefer var for mutability. (INFO)
 
 **Control Flow & Async Rules (14 rules)** - `stylistic_control_flow_rules.dart`
+
 - **`prefer_early_return`**: Prefer early return over nested if-else. (INFO)
 - **`prefer_switch_expression`**: Prefer switch expressions over statements. (INFO)
 - **`prefer_switch_statement_over_expression`**: Opposite - prefer statements. (INFO)
@@ -493,6 +1320,7 @@ None. All changes are backwards-compatible performance improvements.
 - **`prefer_sync_over_async_where_possible`**: Prefer sync when no await needed. (INFO)
 
 **Whitespace & Constructor Rules (18 rules)** - `stylistic_whitespace_constructor_rules.dart`
+
 - **`prefer_blank_line_before_return`**: Prefer blank line before return statements. (INFO)
 - **`prefer_no_blank_line_before_return`**: Opposite - prefer compact returns. (INFO)
 - **`prefer_blank_line_after_declarations`**: Prefer blank line after variable declarations. (INFO)
@@ -513,6 +1341,7 @@ None. All changes are backwards-compatible performance improvements.
 - **`prefer_mutable_constructors`**: Opposite - allow mutable patterns. (INFO)
 
 **Error Handling & Testing Style Rules (13 rules)** - `stylistic_error_testing_rules.dart`
+
 - **`prefer_specific_exceptions`**: Prefer specific exception types over Exception/Error. (INFO)
 - **`prefer_generic_exceptions`**: Opposite - prefer generic for catch-all. (INFO)
 - **`prefer_rethrow`**: Prefer rethrow over throw e. (INFO)
@@ -528,6 +1357,7 @@ None. All changes are backwards-compatible performance improvements.
 - **`prefer_single_expectation_per_test`**: Prefer one expect per test. (INFO)
 
 **Additional Style Rules (22 rules)** - `stylistic_additional_rules.dart`
+
 - **`prefer_string_interpolation`**: Prefer interpolation over concatenation. (INFO)
 - **`prefer_string_concatenation`**: Opposite - prefer explicit concatenation. (INFO)
 - **`prefer_single_quotes`**: Prefer single quotes for strings. (INFO)
@@ -565,56 +1395,70 @@ None. All changes are backwards-compatible performance improvements.
 #### New Lint Rules (23 rules from ROADMAP_NEXT)
 
 **Code Quality Rules (1 rule)**
+
 - **`prefer_returning_conditional_expressions`**: Warns when if/else blocks only contain return statements. Use ternary expression or direct return. **Quick fix available.** (INFO)
 
 **Riverpod Rules (2 rules)**
+
 - **`prefer_riverpod_auto_dispose`**: Warns when providers don't use `.autoDispose` modifier. Prevents memory leaks from retained providers. (INFO)
 - **`prefer_riverpod_family_for_params`**: Warns when `StateProvider<T?>` with `=> null` initializer is used for parameterized data. Use `.family` modifier instead. (INFO)
 
 **GetX Rules (2 rules)**
+
 - **`avoid_getx_global_navigation`**: Warns when `Get.to()`, `Get.off()`, etc. are used outside widgets. Hurts testability. (WARNING)
 - **`require_getx_binding_routes`**: Warns when `GetPage` is created without `binding:` parameter. (INFO)
 
 **Dio HTTP Rules (3 rules)**
+
 - **`require_dio_response_type`**: Warns when Dio `download()` is called without explicit `responseType`. (INFO)
 - **`require_dio_retry_interceptor`**: Warns when `Dio()` is created without retry interceptor. (INFO)
 - **`prefer_dio_transformer`**: Warns when `Dio()` is created without custom transformer for background parsing. (INFO)
 
 **GoRouter Rules (3 rules)**
+
 - **`prefer_shell_route_shared_layout`**: Warns when `GoRoute` builder includes `Scaffold` with `AppBar`. Use `ShellRoute` instead. (INFO)
 - **`require_stateful_shell_route_tabs`**: Warns when `ShellRoute` with tab-like navigation should use `StatefulShellRoute`. (INFO)
 - **`require_go_router_fallback_route`**: Warns when `GoRouter` is created without `errorBuilder` or `errorPageBuilder`. (INFO)
 
 **SQLite Rules (2 rules)**
+
 - **`prefer_sqflite_singleton`**: Warns when `openDatabase()` is called outside a singleton pattern. (INFO)
 - **`prefer_sqflite_column_constants`**: Warns when string literals are used for column names in database queries. (INFO)
 
 **Freezed Rules (2 rules)**
+
 - **`require_freezed_json_converter`**: Warns when Freezed classes with DateTime/Color fields lack `JsonConverter`. (INFO)
 - **`require_freezed_lint_package`**: Warns when project uses Freezed but doesn't import `freezed_lint`. (INFO)
 
 **Geolocation Rules (2 rules)**
+
 - **`prefer_geolocator_accuracy_appropriate`**: Warns when `LocationAccuracy.high` is used. Consider lower accuracy to save battery. (INFO)
 - **`prefer_geolocator_last_known`**: Warns when `getCurrentPosition` with low accuracy could use `getLastKnownPosition`. (INFO)
 
 **Resource Management Rules (1 rule)**
+
 - **`prefer_image_picker_multi_selection`**: Warns when `pickImage()` is called inside a loop. Use `pickMultiImage()`. (INFO)
 
 **Notification Rules (1 rule)**
+
 - **`require_notification_action_handling`**: Warns when notification actions are defined without handler setup. (INFO)
 
 **Error Handling Rules (1 rule)**
+
 - **`require_finally_cleanup`**: Warns when cleanup code (close/dispose) is in catch block instead of finally. (INFO)
 
 **DI Rules (1 rule)**
+
 - **`require_di_scope_awareness`**: Warns about potential scope mismatches in GetIt registration (stateful as singleton, expensive as factory). (INFO)
 
 **Equatable Rules (3 rules)**
+
 - **`require_deep_equality_collections`**: Warns when List/Set/Map fields in Equatable props are compared by reference. (WARNING)
 - **`avoid_equatable_datetime`**: Warns when DateTime fields in Equatable props may cause flaky equality. (WARNING)
 - **`prefer_unmodifiable_collections`**: Warns when collection fields in Equatable/State classes could be mutated externally. (INFO)
 
 **Hive Rules (1 rule)**
+
 - **`prefer_hive_value_listenable`**: Warns when `setState()` is called after Hive operations. Use `box.listenable()`. (INFO)
 
 ### Changed
@@ -636,18 +1480,23 @@ None. All changes are backwards-compatible performance improvements.
 #### New Lint Rules (17 rules)
 
 **Code Quality Rules (1 rule)**
+
 - **`no_boolean_literal_compare`**: Warns when comparing boolean expressions to `true` or `false` literals (e.g., `if (x == true)`). Use the expression directly or negate it. **Quick fix available.** (INFO)
 
 **JSON Serialization Rules (1 rule)**
+
 - **`avoid_not_encodable_in_to_json`**: Warns when `toJson()` methods return non-JSON-encodable types (DateTime, Function, Widget, etc.). **Quick fix available** for DateTime → `.toIso8601String()`. (WARNING)
 
 **Dependency Injection Rules (1 rule)**
+
 - **`prefer_constructor_injection`**: Warns when setter/method injection is used instead of constructor injection. Flags `late` fields for service types, setter methods for dependencies, and `init()`/`configure()` methods. (INFO)
 
 **Async Performance Rules (1 rule)**
+
 - **`prefer_future_wait`**: Warns when sequential independent awaits could run in parallel with `Future.wait()`. Detects dependency chains to avoid false positives. (INFO)
 
 **Testing Best Practices Rules (6 rules)**
+
 - **`prefer_test_find_by_key`**: Warns when `find.byType` is used instead of `find.byKey` in widget tests. Keys are more reliable. (INFO)
 - **`prefer_setup_teardown`**: Warns when test setup code is duplicated 3+ times. Use `setUp()`/`tearDown()` instead. (INFO)
 - **`require_test_description_convention`**: Warns when test descriptions don't follow conventions (should explain what is tested and expected behavior). (INFO)
@@ -656,6 +1505,7 @@ None. All changes are backwards-compatible performance improvements.
 - **`require_error_logging`**: Warns when catch blocks don't log errors. Silent failures are hard to debug. (INFO)
 
 **State Management Rules (7 rules)**
+
 - **`prefer_change_notifier_proxy`**: Warns when `Provider.of` is used without `listen: false` in callbacks. Use `context.read()` instead. (INFO)
 - **`prefer_selector_widget`**: Warns when `Consumer` rebuilds entire subtree. Consider `Selector` for targeted rebuilds. (INFO)
 - **`require_bloc_event_sealed`**: Warns when Bloc event hierarchy uses `abstract class` instead of `sealed class` for Dart 3+ exhaustive pattern matching. (INFO)
@@ -708,6 +1558,7 @@ This release adds comprehensive iOS and macOS platform rules to help Flutter dev
 See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob/main/doc/guides/apple_platform_rules.md) for detailed documentation.
 
 **iOS Core Rules (14 rules)**
+
 - **`prefer_ios_safe_area`**: Warns when Scaffold body doesn't use SafeArea. Content may be hidden by iOS notch or Dynamic Island. (INFO)
 - **`avoid_ios_hardcoded_status_bar`**: Warns when hardcoded status bar heights (20, 44, 47, 59) are used. Use MediaQuery.padding.top instead. (WARNING)
 - **`prefer_ios_haptic_feedback`**: Suggests adding haptic feedback for important button interactions on iOS devices. (INFO)
@@ -724,6 +1575,7 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`require_ios_scene_delegate_awareness`**: Suggests using Flutter's unified lifecycle handler for iOS 13+ Scene Delegate. (INFO)
 
 **App Store Review Rules (12 rules)**
+
 - **`require_ios_app_tracking_transparency`**: Warns when ad SDKs are used without ATT implementation. Required for iOS 14.5+. (ERROR)
 - **`require_ios_face_id_usage_description`**: Warns when biometric auth is used without NSFaceIDUsageDescription. (WARNING)
 - **`require_ios_photo_library_add_usage`**: Warns when photo saving APIs lack NSPhotoLibraryAddUsageDescription. (WARNING)
@@ -738,6 +1590,7 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`require_https_for_ios`**: Warns when HTTP URLs are used that will be blocked by App Transport Security. (WARNING)
 
 **Security & Authentication Rules (8 rules)**
+
 - **`require_ios_keychain_accessibility`**: Suggests specifying iOS Keychain accessibility level for secure storage. (INFO)
 - **`require_ios_keychain_sync_awareness`**: Warns when sensitive keys may sync via iCloud Keychain. (INFO)
 - **`require_ios_keychain_for_credentials`**: Warns when credentials are stored in SharedPreferences instead of Keychain. (ERROR)
@@ -748,6 +1601,7 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`avoid_ios_debug_code_in_release`**: Warns when debug logging may be included in release builds. (INFO)
 
 **Platform Integration Rules (14 rules)**
+
 - **`require_ios_push_notification_capability`**: Reminds to enable Push Notifications capability in Xcode. (INFO)
 - **`require_ios_background_audio_capability`**: Reminds to enable Background Modes > Audio capability. (INFO)
 - **`require_ios_background_refresh_declaration`**: Reminds about UIBackgroundModes "fetch" in Info.plist. (INFO)
@@ -764,6 +1618,7 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`prefer_ios_app_intents_framework`**: Suggests migrating from legacy SiriKit to App Intents framework. (INFO)
 
 **Device & Hardware Rules (8 rules)**
+
 - **`avoid_ios_hardcoded_device_model`**: Warns when device model names are hardcoded. Breaks on new devices. (WARNING)
 - **`require_ios_orientation_handling`**: Reminds to configure UISupportedInterfaceOrientations. (INFO)
 - **`require_ios_photo_library_limited_access`**: Warns when photo library access may not handle iOS 14+ limited access. (INFO)
@@ -774,6 +1629,7 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`prefer_ios_storekit2`**: Suggests evaluating StoreKit 2 for new IAP implementations. (INFO)
 
 **Data & Storage Rules (6 rules)**
+
 - **`require_ios_database_conflict_resolution`**: Reminds to implement conflict resolution for cloud-synced databases. (INFO)
 - **`require_ios_icloud_kvstore_limitations`**: Reminds about iCloud Key-Value Storage 1 MB and 1024 key limits. (INFO)
 - **`require_ios_share_sheet_uti_declaration`**: Reminds about UTI declarations for custom file type sharing. (INFO)
@@ -782,10 +1638,12 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`require_ios_local_notification_permission`**: Warns when local notifications are scheduled without permission request. (WARNING)
 
 **Deep Linking Rules (2 rules)**
+
 - **`require_universal_link_validation`**: Reminds to validate iOS Universal Links server configuration. (INFO)
 - **`require_ios_universal_links_domain_matching`**: Reminds to verify apple-app-site-association paths match. (INFO)
 
 **macOS Platform Rules (12 rules)**
+
 - **`prefer_macos_menu_bar_integration`**: Suggests using PlatformMenuBar for native macOS menu integration. (INFO)
 - **`prefer_macos_keyboard_shortcuts`**: Suggests implementing standard macOS keyboard shortcuts. (INFO)
 - **`require_macos_window_size_constraints`**: Warns when macOS apps lack window size constraints. (INFO)
@@ -800,6 +1658,7 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`require_ios_accessibility_labels`**: Warns when interactive widgets lack Semantics wrapper for VoiceOver. (INFO)
 
 **Background Processing Rules (5 rules)**
+
 - **`avoid_long_running_isolates`**: Warns when Dart isolates perform long operations. iOS terminates isolates after 30 seconds in background. (WARNING)
 - **`require_workmanager_for_background`**: Warns when Timer.periodic is used without workmanager. Dart isolates die when app backgrounds. (WARNING)
 - **`require_notification_for_long_tasks`**: Warns when long-running tasks may run in background without progress notification. (WARNING)
@@ -807,14 +1666,17 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`require_sync_error_recovery`**: Warns when data sync operations don't implement retry/recovery for failed syncs. (WARNING)
 
 **Notification Rules (2 rules)**
+
 - **`prefer_delayed_permission_prompt`**: Warns when permission requests occur in initState. Show context before requesting. (WARNING)
 - **`avoid_notification_spam`**: Warns when notifications may be sent in loops or without proper batching. (WARNING)
 
 **In-App Purchase Rules (2 rules)**
+
 - **`require_purchase_verification`**: Warns when purchases lack server-side receipt verification. Prevents IAP fraud. (ERROR)
 - **`require_purchase_restoration`**: Warns when IAP implementation lacks restorePurchases. App Store requires restore functionality. (ERROR)
 
 **iOS Platform Enhancement Rules (16 rules)**
+
 - **`avoid_ios_wifi_only_assumption`**: Warns when large downloads don't check connectivity. Users may incur cellular charges. (WARNING)
 - **`require_ios_low_power_mode_handling`**: Warns when apps don't adapt behavior for Low Power Mode. (WARNING)
 - **`require_ios_accessibility_large_text`**: Warns when fixed text sizes don't support Dynamic Type. (WARNING)
@@ -833,6 +1695,7 @@ See the [Apple Platform Rules Guide](https://github.com/saropa/saropa_lints/blob
 - **`require_ios_voiceover_gesture_compatibility`**: Warns when custom gestures may conflict with VoiceOver gestures. (INFO)
 
 **macOS Platform Enhancement Rules (5 rules)**
+
 - **`require_macos_sandbox_exceptions`**: Warns when macOS apps may need sandbox exception entitlements. (WARNING)
 - **`avoid_macos_hardened_runtime_violations`**: Warns when code may violate Hardened Runtime requirements. (WARNING)
 - **`require_macos_app_transport_security`**: Warns when HTTP URLs may be blocked by macOS App Transport Security. (WARNING)
@@ -858,6 +1721,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_context_in_static_methods`** (Comprehensive/INFO): Now only warns for SYNC static methods with BuildContext. Async methods are handled by the more specific rules above. Sync methods are generally safe but the pattern is still discouraged.
 
 **Migration:**
+
 - Essential tier users get only the critical `avoid_context_after_await_in_static` rule (ERROR)
 - Recommended tier users also get `avoid_context_in_async_static` (WARNING)
 - Comprehensive tier users get all three including the INFO-level sync method rule
@@ -877,50 +1741,61 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ### Added
 
 #### Test Rules (2 rules)
+
 - **`require_test_widget_pump`**: Warns when widget test interactions (tap, enterText, drag) are not followed by pump() or pumpAndSettle(). Events may not be processed. (ERROR)
 - **`require_integration_test_timeout`**: Warns when integration tests don't have a timeout. Long tests can hang CI indefinitely. (WARNING)
 
 #### Hive Database Rules (4 rules)
+
 - **`require_hive_field_default_value`**: Warns when @HiveField on nullable fields lacks defaultValue. Existing data may fail to load after schema changes. (WARNING)
 - **`require_hive_adapter_registration_order`**: Warns when Hive.openBox is called before registering adapters. Will cause runtime crash. (ERROR)
 - **`require_hive_nested_object_adapter`**: Warns when @HiveField contains custom types without @HiveType annotation. (ERROR)
 - **`avoid_hive_box_name_collision`**: Warns when generic Hive box names are used that may cause collisions. (WARNING)
 
 #### Security Rules (2 rules)
+
 - **`avoid_api_key_in_code`**: Warns when API keys appear hardcoded in source code. Keys can be extracted from builds. (ERROR)
 - **`avoid_storing_sensitive_unencrypted`**: Warns when sensitive data (tokens, passwords) is stored in unencrypted storage. (ERROR)
 
 #### State Management Rules (3 rules)
+
 - **`avoid_riverpod_notifier_in_build`**: Warns when Notifiers are instantiated in build methods. State is lost on rebuild. (WARNING)
 - **`require_riverpod_async_value_guard`**: Suggests using AsyncValue.guard over try-catch in Riverpod providers. (WARNING)
 - **`avoid_bloc_business_logic_in_ui`**: Warns when UI code (Navigator, showDialog) is used inside Bloc classes. (WARNING)
 
 #### Navigation Rules (2 rules)
+
 - **`require_url_launcher_encoding`**: Warns when URL strings with interpolation may have unencoded characters. (WARNING)
 - **`avoid_nested_routes_without_parent`**: Warns when navigating to deeply nested routes without ensuring parent routes are in stack. (WARNING)
 
 #### Equatable Rules (1 rule)
+
 - **`require_copy_with_null_handling`**: Warns when copyWith methods use ?? operator and can't set nullable fields to null. (WARNING)
 
 #### Internationalization Rules (2 rules)
+
 - **`require_intl_args_match`**: Warns when Intl.message args don't match placeholders in the message. (ERROR)
 - **`avoid_string_concatenation_for_l10n`**: Warns when string concatenation is used in Text widgets, breaking l10n word order. (WARNING)
 
 #### Performance Rules (3 rules)
+
 - **`avoid_blocking_database_ui`**: Warns when database operations are performed in build method. Causes UI jank. (WARNING)
 - **`avoid_money_arithmetic_on_double`**: Warns when arithmetic is performed on double for money values. Precision issues. (WARNING)
 - **`avoid_rebuild_on_scroll`**: Warns when scroll listeners are added in build method. Causes memory leaks. (WARNING)
 
 #### Error Handling Rules (3 rules)
+
 - **`avoid_exception_in_constructor`**: Warns when exceptions are thrown in constructors. Use factory methods instead. (WARNING)
 - **`require_cache_key_determinism`**: Warns when cache keys use non-deterministic values like DateTime.now(). (ERROR)
 - **`require_permission_permanent_denial_handling`**: Warns when permission requests don't handle permanent denial with settings redirect. (WARNING)
 
 #### Dependency Injection Rules (2 rules)
+
 - **`require_getit_registration_order`**: Warns when GetIt registration order may cause unresolved dependencies. (WARNING)
 - **`require_default_config`**: Warns when config/env access doesn't provide default values for missing values. (WARNING)
 
 #### Widget Rules (1 rule)
+
 - **`avoid_builder_index_out_of_bounds`**: Warns when itemBuilder accesses list without bounds check. Index may be out of bounds if list changes. (WARNING)
 
 ## [2.3.10] - 2026-01-11
@@ -928,55 +1803,69 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ### Added
 
 #### BuildContext Safety Rules (3 rules)
+
 - **`avoid_storing_context`**: Warns when BuildContext is stored in a field. Context may become invalid after widget disposal, causing crashes. (ERROR)
 - **`avoid_context_across_async`**: Warns when BuildContext is used after an await without checking `mounted`. Widget may be disposed during async operation. (ERROR)
 - **`avoid_context_in_static_methods`**: Warns when BuildContext is passed to static methods. Static methods cannot check `mounted` state. (ERROR)
 
 #### Test Rules (2 rules)
+
 - **`avoid_test_print_statements`**: Warns when print() is used in test files. Use expect() assertions or proper test logging instead. (WARNING)
 - **`require_mock_http_client`**: Warns when real HTTP clients are used in test files. Mock HTTP calls to ensure reliable, fast tests. (ERROR)
 
 #### Async Rules (2 rules)
+
 - **`avoid_future_then_in_async`**: Warns when .then() is used inside an async function. Use await for cleaner, more readable code. (WARNING)
 - **`avoid_unawaited_future`**: Warns when a Future is returned without being awaited in an async function. May cause silent failures. (ERROR)
 
 #### Forms Rules (3 rules)
+
 - **`require_text_input_type`**: Warns when TextField lacks keyboardType. Set appropriate keyboard for better UX (email, phone, number). (INFO)
 - **`prefer_text_input_action`**: Warns when TextField lacks textInputAction. Set action for better keyboard UX (next, done, search). (INFO)
 - **`require_form_key_in_stateful_widget`**: Warns when GlobalKey<FormState> is created inside build(). Create keys in initState or as class fields. (ERROR)
 
 #### API/Network Rules (2 rules)
+
 - **`prefer_timeout_on_requests`**: Warns when HTTP requests lack timeout. Add timeout to prevent hanging requests. (WARNING)
 - **`prefer_dio_over_http`**: Suggests using Dio over http package for better features like interceptors, cancellation, retries. (INFO)
 
 #### Error Handling Rules (1 rule)
+
 - **`avoid_catch_all`**: Warns when catch block has no exception type. Catch specific exceptions for proper error handling. (ERROR)
 
 #### State Management Rules (2 rules)
+
 - **`avoid_bloc_context_dependency`**: Warns when BuildContext is passed to Bloc constructor. Bloc should not depend on widget lifecycle. (ERROR)
 - **`avoid_provider_value_rebuild`**: Warns when Provider.value() creates instance inline. Create instance outside to avoid rebuilds. (WARNING)
 
 #### Lifecycle Rules (1 rule)
+
 - **`require_did_update_widget_check`**: Warns when didUpdateWidget doesn't check if widget properties changed. May cause unnecessary updates. (WARNING)
 
 #### Equatable Rules (1 rule)
+
 - **`require_equatable_copy_with`**: Suggests adding copyWith() method to Equatable classes for immutable updates. (INFO)
 
 #### Notification Rules (1 rule)
+
 - **`avoid_notification_same_id`**: Warns when notifications use same hardcoded ID. Use unique IDs to avoid overwriting. (WARNING)
 
 #### Internationalization Rules (1 rule)
+
 - **`require_intl_plural_rules`**: Warns when Intl.plural() is missing required forms (zero, one, other). Incomplete forms cause i18n issues. (ERROR)
 
 #### Image Rules (2 rules)
+
 - **`prefer_cached_image_cache_manager`**: Suggests providing custom CacheManager to CachedNetworkImage for better cache control. (INFO)
 - **`require_image_cache_dimensions`**: Warns when CachedNetworkImage lacks memCacheWidth/Height. Set dimensions to reduce memory usage. (WARNING)
 
 #### Navigation Rules (2 rules)
+
 - **`prefer_url_launcher_uri_over_string`**: Suggests using launchUrl(Uri) over launch(String) for type safety. (INFO)
 - **`avoid_go_router_push_replacement_confusion`**: Warns when pushReplacement is used where go() or push() may be intended. (WARNING)
 
 #### Flutter Widget Rules (2 rules)
+
 - **`avoid_stack_without_positioned`**: Warns when Stack has children without Positioned wrapper. Non-positioned children overlay each other. (WARNING)
 - **`avoid_expanded_outside_flex`**: Warns when Expanded/Flexible is used outside Row, Column, or Flex. Will cause runtime error. (ERROR)
 
@@ -985,21 +1874,26 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ### Added
 
 #### Internationalization Rules (4 rules)
+
 - **`require_intl_date_format_locale`**: Warns when DateFormat is used without explicit locale parameter. Format varies by device/platform.
 - **`require_number_format_locale`**: Warns when NumberFormat is used without explicit locale parameter. Decimal separators vary by locale (1,234.56 vs 1.234,56).
 - **`avoid_manual_date_formatting`**: Warns when dates are formatted manually using DateTime properties instead of DateFormat.
 - **`require_intl_currency_format`**: Warns when currency values are formatted manually with symbols like $, €, £ instead of NumberFormat.currency.
 
 #### Equatable Rules (1 rule)
+
 - **`avoid_mutable_field_in_equatable`**: Warns when Equatable class has non-final fields. Mutable fields break equality contracts. (ERROR)
 
 #### Error Handling Rules (1 rule)
+
 - **`avoid_print_error`**: Warns when print() is used for error logging in catch blocks. Use proper logging frameworks in production.
 
 #### Collection/Widget Rules (1 rule)
+
 - **`require_key_for_collection`**: Warns when widgets in ListView.builder, GridView.builder lack a Key parameter. May cause inefficient rebuilds or state loss.
 
 #### Database Rules (2 rules)
+
 - **`avoid_hive_field_index_reuse`**: Warns when @HiveField indices are duplicated within a class. Data corruption will occur. (ERROR)
 - **`avoid_sqflite_reserved_words`**: Warns when SQLite reserved words (ORDER, GROUP, SELECT, etc.) are used as column names without escaping.
 
@@ -1025,6 +1919,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ### Added
 
 #### Scroll & List Performance Rules (5 rules)
+
 - **`avoid_shrink_wrap_expensive`**: Warns when `shrinkWrap: true` is used in expensive scroll contexts
 - **`prefer_item_extent`**: Suggests setting `itemExtent` for uniform ListView items
 - **`prefer_prototype_item`**: Suggests using `prototypeItem` for consistent list item sizing
@@ -1032,16 +1927,19 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_add_automatic_keep_alives_off`**: Suggests disabling keep-alives for long lists
 
 #### Accessibility Rules (3 rules)
+
 - **`require_semantic_label_icons`**: Requires `semanticLabel` on Icon widgets (WARNING)
 - **`require_accessible_images`**: Requires accessibility attributes on images (WARNING)
 - **`avoid_auto_play_media`**: Warns against auto-playing media without user control
 
 #### Form UX Rules (3 rules)
+
 - **`require_form_auto_validate_mode`**: Suggests setting `autovalidateMode` on Forms
 - **`require_autofill_hints`**: Suggests `autofillHints` for better autofill support
 - **`prefer_on_field_submitted`**: Suggests handling field submission for form navigation
 
 #### Equatable & Freezed Rules (5 rules)
+
 - **`prefer_equatable_stringify`**: Suggests enabling `stringify: true` on Equatable
 - **`prefer_immutable_annotation`**: Suggests `@immutable` annotation on Equatable classes
 - **`require_freezed_explicit_json`**: Warns when Freezed lacks `explicit_to_json` for nested objects
@@ -1049,9 +1947,11 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_record_over_equatable`**: Suggests Dart 3 records for simple value types
 
 #### Boolean & Control Flow Rules (1 rule)
+
 - **`prefer_simpler_boolean_expressions`**: Detects boolean expressions simplifiable via De Morgan's laws
 
 #### Dispose Pattern Rules (9 rules)
+
 - **`require_bloc_manual_dispose`**: Warns when Bloc controllers lack cleanup
 - **`require_getx_worker_dispose`**: Warns when GetX Workers lack `onClose` cleanup
 - **`require_getx_permanent_cleanup`**: Warns about permanent GetX instances
@@ -1063,6 +1963,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_dispose_before_new_instance`**: Warns when disposable fields are reassigned without cleanup
 
 #### Type Safety Rules (6 rules)
+
 - **`avoid_unrelated_type_casts`**: Detects casts between unrelated types (ERROR)
 - **`avoid_dynamic_json_access`**: Warns against chained JSON access without null checks
 - **`require_null_safe_json_access`**: Requires null check before JSON key access (ERROR)
@@ -1071,6 +1972,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_validator_return_null`**: Requires form validators to return null for valid input (ERROR)
 
 #### Widget Replacement & State Management Rules (6 rules)
+
 - **`prefer_selector_over_consumer`**: Suggests Selector for granular Provider rebuilds
 - **`prefer_cubit_for_simple_state`**: Suggests Cubit for single-event Blocs
 - **`prefer_bloc_listener_for_side_effects`**: Detects side effects in BlocBuilder
@@ -1079,25 +1981,30 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_update_callback`**: Warns when ProxyProvider update callback is unused
 
 #### Navigation & Debug Rules (3 rules)
+
 - **`prefer_maybe_pop`**: Suggests `maybePop()` instead of `pop()` for route safety
 - **`prefer_go_router_extra_typed`**: Warns against untyped `extra` parameter in go_router
 - **`prefer_debugPrint`**: Suggests `debugPrint` instead of `print` for throttling
 
 #### Code Quality Rules (2 rules)
+
 - **`prefer_late_final`**: Suggests `late final` for singly-assigned late variables
 - **`avoid_late_for_nullable`**: Warns against `late` for nullable types
 
 #### WebView Security Rules (4 rules)
+
 - **`prefer_webview_javascript_disabled`**: Warns when JavaScript enabled without justification
 - **`avoid_webview_insecure_content`**: Warns against allowing mixed content (ERROR)
 - **`require_webview_error_handling`**: Requires `onWebResourceError` handler
 - **`require_webview_progress_indicator`**: Suggests progress indicator for WebViews
 
 #### Image Picker Rules (2 rules)
+
 - **`prefer_image_picker_request_full_metadata`**: Suggests disabling full metadata when not needed
 - **`avoid_image_picker_large_files`**: Warns when `imageQuality` not set for compression
 
 #### Package-Specific Rules (7 rules)
+
 - **`avoid_graphql_string_queries`**: Warns against raw GraphQL query strings
 - **`prefer_ble_mtu_negotiation`**: Suggests MTU negotiation for large BLE transfers
 - **`avoid_loading_full_pdf_in_memory`**: Warns against loading large PDFs entirely (WARNING)
@@ -1107,12 +2014,15 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_geolocator_distance_filter`**: Suggests `distanceFilter` to reduce GPS battery drain
 
 #### Firebase Rules (1 rule)
+
 - **`prefer_firebase_auth_persistence`**: Suggests explicit persistence setting on web
 
 #### GetX Rules (1 rule)
+
 - **`avoid_getx_context_outside_widget`**: Warns against GetX context access outside widgets
 
 #### Stylistic Rules (1 rule)
+
 - **`arguments_ordering`**: Enforces consistent ordering of function arguments
 
 ### Fixed
@@ -1235,18 +2145,23 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 #### Image & Package-Specific Rules (5 rules)
 
 **Image Picker Rules**
+
 - **`prefer_image_picker_max_dimensions`**: Warns when `pickImage()` is called without `maxWidth`/`maxHeight` parameters - prevents OOM on high-resolution cameras (12-108MP). Quick fix available.
 
 **Cached Network Image Rules**
+
 - **`prefer_cached_image_fade_animation`**: Suggests explicitly setting `fadeInDuration` on CachedNetworkImage for intentional UX design (default is 500ms).
 
 **URL Launcher Rules**
+
 - **`require_url_launcher_mode`**: Warns when `launchUrl()` is called without `mode` parameter - behavior varies by platform without explicit mode.
 
 **SQLite Database Rules**
+
 - **`avoid_sqflite_read_all_columns`**: Warns when `SELECT *` is used in `rawQuery()` - wastes memory and bandwidth by fetching unnecessary columns.
 
 **Notification Rules**
+
 - **`require_notification_initialize_per_platform`**: Warns when `InitializationSettings` is missing `android:` or `iOS:` parameters - notifications fail silently on missing platforms. Quick fix available.
 
 ### Changed
@@ -1289,26 +2204,33 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 #### ROADMAP_NEXT Parts 1-7 Rules (11 new rules + ~70 rules registered in tiers)
 
 **GoRouter Navigation Rules (2 rules)**
+
 - **`prefer_go_router_redirect_auth`**: Suggests using redirect callback instead of auth checks in page builders
 - **`require_go_router_typed_params`**: Warns when path parameters are used without type conversion
 
 **Provider State Management Rules (2 rules)**
+
 - **`avoid_provider_in_init_state`**: Warns when Provider.of or context.read/watch is used in initState
 - **`prefer_context_read_in_callbacks`**: Suggests using context.read instead of context.watch in callbacks
 
 **Hive Database Rules (1 rule)**
+
 - **`require_hive_type_id_management`**: Warns when @HiveType typeId may conflict with others
 
 **Image Picker Rules (1 rule)**
+
 - **`require_image_picker_result_handling`**: Warns when pickImage result is not checked for null
 
 **Cached Network Image Rules (1 rule)**
+
 - **`avoid_cached_image_in_build`**: Warns when CachedNetworkImage uses variable cacheKey in build
 
 **SQLite Migration Rules (1 rule)**
+
 - **`require_sqflite_migration`**: Warns when onUpgrade callback doesn't check oldVersion
 
 **Permission Handler Rules (3 rules)**
+
 - **`require_permission_rationale`**: Suggests checking shouldShowRequestRationale before requesting permission
 - **`require_permission_status_check`**: Warns when using permission-gated features without checking status
 - **`require_notification_permission_android13`**: Warns when notifications shown without POST_NOTIFICATIONS permission
@@ -1388,34 +2310,41 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 #### Package-Specific Rules (19 rules)
 
 **Authentication Rules (3 rules)**
+
 - **`require_google_signin_error_handling`**: Warns when `signIn()` call lacks try-catch error handling
 - **`require_apple_signin_nonce`**: Warns when Apple Sign-In is missing `rawNonce` parameter - security requirement
 - **`avoid_openai_key_in_code`**: Warns when OpenAI API key pattern (`sk-...`) appears in source code
 
 **Supabase Rules (3 rules)**
+
 - **`require_supabase_error_handling`**: Warns when Supabase client calls lack try-catch error handling
 - **`avoid_supabase_anon_key_in_code`**: Warns when Supabase anon key appears hardcoded in source
 - **`require_supabase_realtime_unsubscribe`**: Warns when Supabase realtime channel lacks unsubscribe in dispose
 
 **WebView Security Rules (2 rules)**
+
 - **`require_webview_ssl_error_handling`**: Warns when WebView lacks `onSslError` handler
 - **`avoid_webview_file_access`**: Warns when WebView has `allowFileAccess: true` enabled
 
 **WorkManager Rules (2 rules)**
+
 - **`require_workmanager_constraints`**: Warns when WorkManager task lacks network/battery constraints
 - **`require_workmanager_result_return`**: Warns when WorkManager callback doesn't return TaskResult
 
 **Dispose Pattern Rules (3 rules)**
+
 - **`require_keyboard_visibility_dispose`**: Warns when KeyboardVisibilityController subscription not disposed
 - **`require_speech_stop_on_dispose`**: Warns when SpeechToText instance not stopped in dispose
 - **`require_calendar_timezone_handling`**: Warns when calendar events lack time zone handling
 
 **Deep Linking & Security Rules (3 rules)**
+
 - **`avoid_app_links_sensitive_params`**: Warns when deep link URLs contain sensitive parameters (token, password)
 - **`require_envied_obfuscation`**: Warns when @Envied annotation lacks `obfuscate: true`
 - **`require_openai_error_handling`**: Warns when OpenAI API calls lack error handling
 
 **UI Component Rules (3 rules)**
+
 - **`require_svg_error_handler`**: Warns when SvgPicture lacks `errorBuilder` parameter
 - **`require_google_fonts_fallback`**: Warns when GoogleFonts lacks `fontFamilyFallback`
 - **`prefer_uuid_v4`**: Suggests using UUID v4 over v1 for better randomness
@@ -1423,12 +2352,14 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [2.1.0] - 2026-01-10
 
 #### SharedPreferences Security Rules (4 rules)
+
 - **`avoid_shared_prefs_sensitive_data`**: Warns when sensitive data (passwords, tokens) is stored in SharedPreferences
 - **`require_secure_storage_for_auth`**: Warns when auth tokens use SharedPreferences instead of flutter_secure_storage
 - **`require_shared_prefs_null_handling`**: Warns when SharedPreferences getter is used with null assertion
 - **`require_shared_prefs_key_constants`**: Warns when string literals are used as SharedPreferences keys
 
 #### sqflite Database Rules (5 rules)
+
 - **`require_sqflite_whereargs`**: Warns when SQL queries use string interpolation - SQL injection vulnerability
 - **`require_sqflite_transaction`**: Warns when multiple sequential writes should use transaction
 - **`require_sqflite_error_handling`**: Warns when database operations lack try-catch
@@ -1436,6 +2367,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_sqflite_close`**: Warns when database is opened but not closed in dispose
 
 #### Hive Database Rules (5 rules)
+
 - **`require_hive_initialization`**: Reminds to ensure Hive.init() is called before openBox (heuristic)
 - **`require_hive_type_adapter`**: Warns when custom object is stored in Hive without @HiveType
 - **`require_hive_box_close`**: Warns when Hive box is opened but not closed in dispose
@@ -1443,6 +2375,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_hive_encryption_key_secure`**: Warns when HiveAesCipher uses hardcoded key
 
 #### Dio HTTP Client Rules (6 rules)
+
 - **`require_dio_timeout`**: Warns when Dio instance lacks timeout configuration
 - **`require_dio_error_handling`**: Warns when Dio requests lack error handling
 - **`require_dio_interceptor_error_handler`**: Warns when InterceptorsWrapper lacks onError callback
@@ -1451,6 +2384,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_dio_form_data_leak`**: Warns when FormData with files lacks cleanup
 
 #### Stream/Future Rules (6 rules)
+
 - **`avoid_stream_in_build`**: Warns when StreamController is created in build() method
 - **`require_stream_controller_close`**: Warns when StreamController field is not closed in dispose
 - **`avoid_multiple_stream_listeners`**: Warns when multiple listen() calls on non-broadcast stream
@@ -1459,28 +2393,33 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_future_timeout`**: Warns when long-running Future lacks timeout
 
 #### go_router Navigation Rules (4 rules)
+
 - **`avoid_go_router_inline_creation`**: Warns when GoRouter is created inside build() method
 - **`require_go_router_error_handler`**: Warns when GoRouter lacks errorBuilder
 - **`require_go_router_refresh_listenable`**: Warns when GoRouter with redirect lacks refreshListenable
 - **`avoid_go_router_string_paths`**: Warns when string literals used in go_router navigation
 
 #### Riverpod Rules (3 rules)
+
 - **`require_riverpod_error_handling`**: Warns when AsyncValue is accessed without error handling
 - **`avoid_riverpod_state_mutation`**: Warns when state is mutated directly in Notifier
 - **`prefer_riverpod_select`**: Warns when ref.watch() accesses single field - use select()
 
 #### cached_network_image Rules (3 rules)
+
 - **`require_cached_image_dimensions`**: Warns when CachedNetworkImage lacks cache dimensions
 - **`require_cached_image_placeholder`**: Warns when CachedNetworkImage lacks placeholder
 - **`require_cached_image_error_widget`**: Warns when CachedNetworkImage lacks errorWidget
 
 #### Geolocator Rules (4 rules)
+
 - **`require_geolocator_permission_check`**: Warns when location request lacks permission check
 - **`require_geolocator_service_enabled`**: Warns when location request lacks service enabled check
 - **`require_geolocator_stream_cancel`**: Warns when position stream subscription lacks cancel
 - **`require_geolocator_error_handling`**: Warns when location request lacks error handling
 
 #### State Management Rules (11 rules)
+
 - **`avoid_yield_in_on_event`**: Warns when yield is used in Bloc event handler (deprecated in Bloc 8.0+)
 - **`prefer_consumer_over_provider_of`**: Warns when Provider.of<T>(context) is used in build method
 - **`avoid_listen_in_async`**: Warns when context.watch() is used inside async callback
@@ -1494,11 +2433,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_getx_binding`**: Warns when Get.put() is used in widget build - use Bindings
 
 #### Theming Rules (3 rules)
+
 - **`require_dark_mode_testing`**: Warns when MaterialApp is missing darkTheme parameter
 - **`avoid_elevation_opacity_in_dark`**: Warns when high elevation used without brightness check
 - **`prefer_theme_extensions`**: Warns when ThemeData.copyWith used for custom colors
 
 #### UI/UX Rules (5 rules)
+
 - **`prefer_skeleton_over_spinner`**: Suggests skeleton loaders over CircularProgressIndicator
 - **`require_empty_results_state`**: Warns when search list lacks empty state handling
 - **`require_search_loading_indicator`**: Warns when search callback lacks loading state
@@ -1506,61 +2447,75 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_pagination_loading_state`**: Warns when paginated list lacks loading indicator
 
 #### Lifecycle Rules (2 rules)
+
 - **`avoid_work_in_paused_state`**: Warns when Timer.periodic runs without lifecycle handling
 - **`require_resume_state_refresh`**: Warns when didChangeAppLifecycleState handles paused but not resumed
 
 #### Security Rules (4 rules)
+
 - **`require_url_validation`**: Warns when Uri.parse on variable lacks scheme validation
 - **`avoid_redirect_injection`**: Warns when redirect URL from parameter lacks domain validation
 - **`avoid_external_storage_sensitive`**: Warns when sensitive data written to external storage
 - **`prefer_local_auth`**: Warns when payment/sensitive operation lacks biometric authentication
 
 #### Firebase Rules (3 rules)
+
 - **`require_crashlytics_user_id`**: Warns when Crashlytics setup lacks setUserIdentifier
 - **`require_firebase_app_check`**: Warns when Firebase.initializeApp lacks App Check activation
 - **`avoid_storing_user_data_in_auth`**: Warns when setCustomClaims stores large user data
 
 #### Collection/Performance Rules (4 rules)
+
 - **`prefer_null_aware_elements`**: Warns when if (x != null) x can use ?x syntax
 - **`prefer_iterable_operations`**: Warns when .toList() after chain in for-in is unnecessary
 - **`prefer_inherited_widget_cache`**: Warns when same .of(context) called 3+ times in method
 - **`prefer_layout_builder_over_media_query`**: Warns when MediaQuery.of in list item builder
 
 #### Flutter Widget Rules (3 rules)
+
 - **`require_should_rebuild`**: Warns when InheritedWidget missing updateShouldNotify
 - **`require_orientation_handling`**: Warns when MaterialApp lacks orientation handling
 - **`require_web_renderer_awareness`**: Warns when kIsWeb check uses HTML APIs without renderer check
 
 #### Image/Media Rules (4 rules)
+
 - **`require_exif_handling`**: Warns when Image.file may show photos rotated
 - **`prefer_camera_resolution_selection`**: Warns when CameraController uses max resolution
 - **`prefer_audio_session_config`**: Warns when AudioPlayer lacks audio session config
 - **`require_image_loading_placeholder`**: Warns when Image.network lacks loadingBuilder
 
 #### Scroll/Navigation Rules (1 rule)
+
 - **`require_refresh_indicator_on_lists`**: Warns when ListView lacks RefreshIndicator wrapper
 
 #### Dialog/SnackBar Rules (2 rules)
+
 - **`prefer_adaptive_dialog`**: Warns when AlertDialog lacks adaptive styling
 - **`require_snackbar_action_for_undo`**: Warns when delete SnackBar lacks undo action
 
 #### API/Network Rules (2 rules)
+
 - **`require_content_type_check`**: Warns when response parsed without Content-Type check
 - **`avoid_websocket_without_heartbeat`**: Warns when WebSocket lacks heartbeat/ping mechanism
 
 #### Forms Rules (1 rule)
+
 - **`avoid_keyboard_overlap`**: Warns when TextField in Column may be hidden by keyboard
 
 #### Location Rules (1 rule)
+
 - **`require_location_timeout`**: Warns when Geolocator.getCurrentPosition lacks timeLimit
 
 #### Code Quality Rules (1 rule)
+
 - **`prefer_dot_shorthand`**: Suggests Dart 3 dot shorthand (.value) for enum values
 
 #### Architecture Rules (1 rule)
+
 - **`avoid_touch_only_gestures`**: Warns when GestureDetector only handles touch gestures
 
 #### Async Rules (3 rules)
+
 - **`require_future_wait_error_handling`**: Warns when Future.wait lacks eagerError: false
 - **`require_stream_on_done`**: Warns when Stream.listen lacks onDone handler
 - **`require_completer_error_handling`**: Warns when Completer in try-catch lacks completeError
@@ -1568,15 +2523,18 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [2.0.0] - 2026-01-10
 
 ### Changed
+
 - **Rule aliases**: Each rule now tracks numerous aliases and alternate names, making it easier to find rules by different naming conventions (e.g., `avoid_`, `prefer_`, `require_` variants)
 
 ### Fixed
+
 - **`require_text_editing_controller_dispose`**: Fixed false positives for controllers passed in from callbacks (e.g., Autocomplete's `fieldViewBuilder`). Rule now only flags controllers that are actually instantiated by the class (via inline initialization or in `initState`), not those assigned from external sources.
 - **`require_page_controller_dispose`**: Same ownership-based detection fix as above.
 
 ### Added
 
 #### Riverpod Rules (8 rules)
+
 - **`avoid_ref_read_inside_build`**: Warns when ref.read() is used inside build() - use ref.watch() for reactivity
 - **`avoid_ref_watch_outside_build`**: Warns when ref.watch() is used outside build() - causes subscription leaks
 - **`avoid_ref_inside_state_dispose`**: Warns when ref is accessed in dispose() - ref is unavailable there
@@ -1587,6 +2545,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_immutable_provider_arguments`**: Warns when provider arguments are not final
 
 #### Bloc State Management Rules (8 rules)
+
 - **`check_is_not_closed_after_async_gap`**: Warns when emit() is called after await without isClosed check
 - **`avoid_duplicate_bloc_event_handlers`**: Warns when multiple on<SameEvent> handlers are registered
 - **`prefer_immutable_bloc_events`**: Warns when Bloc event classes have mutable fields
@@ -1597,30 +2556,36 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_bloc_state_suffix`**: Suggests Bloc state classes end with 'State' suffix
 
 #### Riverpod Widget Rules (2 rules)
+
 - **`avoid_unnecessary_consumer_widgets`**: Warns when ConsumerWidget doesn't use ref
 - **`avoid_nullable_async_value_pattern`**: Warns when nullable access patterns used on AsyncValue
 
 #### Collection & Loop Rules (2 rules)
+
 - **`prefer_correct_for_loop_increment`**: Warns when for loop uses non-standard increment patterns
 - **`avoid_unreachable_for_loop`**: Warns when for loop has impossible bounds
 
 #### Widget Optimization Rules (4 rules)
+
 - **`prefer_single_setstate`**: Warns when multiple setState calls in same method
 - **`prefer_compute_over_isolate_run`**: Suggests using compute() instead of Isolate.run()
 - **`prefer_for_loop_in_children`**: Warns when List.generate used in widget children
 - **`prefer_container`**: Warns when nested decoration widgets could be Container
 
 #### Flame Engine Rules (2 rules)
+
 - **`avoid_creating_vector_in_update`**: Warns when Vector2/Vector3 created in update() - GC churn
 - **`avoid_redundant_async_on_load`**: Warns when async onLoad() has no await
 
 #### Code Quality Rules (4 rules)
+
 - **`prefer_typedefs_for_callbacks`**: Suggests using typedefs for callback function types
 - **`prefer_redirecting_superclass_constructor`**: Suggests using super parameters
 - **`avoid_empty_build_when`**: Warns when buildWhen always returns true
 - **`prefer_use_prefix`**: Suggests using 'use' prefix for custom hooks
 
 #### Provider Advanced Rules (5 rules)
+
 - **`prefer_immutable_selector_value`**: Warns when mutable values used in Selector
 - **`prefer_provider_extensions`**: Warns when long provider access chains used
 - **`dispose_provided_instances`**: Warns when Provider.create returns disposable without dispose callback
@@ -1628,22 +2593,27 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_nullable_provider_types`**: Warns when Provider type is non-nullable but create may return null
 
 #### GetX Build Rules (2 rules)
+
 - **`avoid_getx_rx_inside_build`**: Warns when .obs is used inside build() - memory leaks
 - **`avoid_mutable_rx_variables`**: Warns when Rx variables are reassigned - breaks reactivity
 
 #### Internationalization Rules (4 rules)
+
 - **`prefer_date_format`**: Warns when raw DateTime methods (toIso8601String, toString) are used - use DateFormat for locale-aware formatting
 - **`prefer_intl_name`**: Warns when Intl.message() lacks name parameter - required for translation extraction
 - **`prefer_providing_intl_description`**: Warns when Intl.message() lacks desc parameter - helps translators understand context
 - **`prefer_providing_intl_examples`**: Warns when Intl.message() lacks examples parameter - helps translators with placeholders
 
 #### Error Handling Rules (1 rule)
+
 - **`avoid_uncaught_future_errors`**: Warns when Future is used without error handling (catchError, onError, or try-catch)
 
 #### Type Safety Rules (1 rule)
+
 - **`prefer_explicit_type_arguments`**: Warns when generic types lack explicit type arguments - prevents accidental dynamic typing
 
 #### Container Widget Rules (5 rules)
+
 - **`prefer_sized_box_square`**: Warns when SizedBox(width: X, height: X) uses identical values - use SizedBox.square() instead
 - **`prefer_center_over_align`**: Warns when Align(alignment: Alignment.center) is used - use Center widget instead
 - **`prefer_align_over_container`**: Warns when Container is used only for alignment - use Align widget instead
@@ -1658,7 +2628,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`dispose_providers`**: Warns when Provider lacks dispose callback - resource cleanup
 - **`proper_getx_super_calls`**: Warns when GetxController lifecycle methods don't call super
 - **`always_remove_getx_listener`**: Warns when GetX workers are not assigned for cleanup
-- **`avoid_hooks_outside_build`**: Warns when Flutter hooks (use* functions) are called outside build methods
+- **`avoid_hooks_outside_build`**: Warns when Flutter hooks (use\* functions) are called outside build methods
 - **`avoid_conditional_hooks`**: Warns when hooks are called inside conditionals (breaks hook rules)
 - **`avoid_unnecessary_hook_widgets`**: Warns when HookWidget doesn't use any hooks - use StatelessWidget instead
 - **`extend_equatable`**: Warns when a class overrides operator == but doesn't use Equatable
@@ -1676,15 +2646,18 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_functions_in_register_singleton`**: Warns when function is passed to registerSingleton (use registerLazySingleton)
 
 #### Image & Media Rules (4 rules)
+
 - **`require_image_loading_placeholder`**: Warns when Image.network lacks loadingBuilder - improves UX during image load
 - **`require_media_loading_state`**: Warns when VideoPlayer is used without isInitialized check - prevents blank widget display
 - **`require_pdf_loading_indicator`**: Warns when PDF viewer lacks loading state handling - large PDFs need load feedback
 - **`prefer_clipboard_feedback`**: Warns when Clipboard.setData lacks user feedback (SnackBar/Toast) - users need confirmation
 
 #### Disposal & Cleanup Rules (1 rule)
+
 - **`require_stream_subscription_cancel`**: Warns when StreamSubscription field is not cancelled in dispose() - memory leak risk
 
 #### Async Safety Rules (5 rules)
+
 - **`avoid_dialog_context_after_async`**: Warns when Navigator.pop uses context after await in dialog callback - context may be invalid
 - **`require_websocket_message_validation`**: Warns when WebSocket message is processed without validation/try-catch
 - **`require_feature_flag_default`**: Warns when RemoteConfig is accessed without fallback value - graceful degradation
@@ -1692,6 +2665,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_location_timeout`**: Warns when Geolocator request lacks timeout parameter - GPS can hang indefinitely
 
 #### Firebase & Maps Rules (8 rules)
+
 - **`prefer_firestore_batch_write`**: Warns when multiple sequential Firestore writes should use batch operation
 - **`avoid_firestore_in_widget_build`**: Warns when Firestore query is inside build() method - causes unnecessary reads
 - **`prefer_firebase_remote_config_defaults`**: Warns when RemoteConfig.getInstance() used without setDefaults()
@@ -1702,6 +2676,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_marker_clustering`**: Warns when many individual markers are used without clustering - performance issue
 
 #### Accessibility Rules (7 rules)
+
 - **`require_image_description`**: Warns when Image lacks semanticLabel or explicit excludeFromSemantics
 - **`avoid_semantics_exclusion`**: Warns when excludeFromSemantics:true is used - should be justified with comment
 - **`prefer_merge_semantics`**: Warns when Icon+Text siblings lack MergeSemantics wrapper - better screen reader UX
@@ -1711,6 +2686,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_motion_without_reduce`**: Warns when animation lacks MediaQuery.disableAnimations check - accessibility
 
 #### Navigation & Dialog Rules (6 rules)
+
 - **`require_deep_link_fallback`**: Warns when deep link handler lacks error/not-found fallback
 - **`avoid_deep_link_sensitive_params`**: Warns when deep link contains password/token params - security risk
 - **`prefer_typed_route_params`**: Warns when route parameters are used without type parsing
@@ -1719,6 +2695,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_refresh_indicator_on_lists`**: Warns when ListView.builder lacks RefreshIndicator wrapper
 
 #### Animation Rules (5 rules)
+
 - **`prefer_tween_sequence`**: Warns when multiple chained .forward().then() should use TweenSequence
 - **`require_animation_status_listener`**: Warns when one-shot animation lacks StatusListener for completion
 - **`avoid_overlapping_animations`**: Warns when multiple transitions animate the same property (scale, opacity)
@@ -1726,6 +2703,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_physics_simulation`**: Warns when drag-release uses animateTo instead of SpringSimulation
 
 #### Platform-Specific Rules (7 rules)
+
 - **`avoid_platform_channel_on_web`**: Warns when MethodChannel is used without kIsWeb check - not available on web
 - **`require_cors_handling`**: Warns when HTTP calls in web-specific files lack CORS consideration
 - **`prefer_deferred_loading_web`**: Warns when heavy packages lack deferred import on web - improves load time
@@ -1735,6 +2713,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_native_file_dialogs`**: Warns when showDialog is used for file picking on desktop - use native dialogs
 
 #### Testing Rules (4 rules)
+
 - **`require_test_cleanup`**: Warns when test creates files/data without tearDown cleanup
 - **`prefer_test_variant`**: Warns when similar tests with different screen sizes should use variant
 - **`require_accessibility_tests`**: Warns when widget tests lack meetsGuideline accessibility checks
@@ -1745,6 +2724,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [1.8.2] - 2026-01-10
 
 ### Added
+
 - **`require_text_editing_controller_dispose`**: Warns when TextEditingController is not disposed in StatefulWidget - very common source of memory leaks in forms
 - **`require_page_controller_dispose`**: Warns when PageController is not disposed - prevents memory leaks in PageView widgets
 - **`require_avatar_alt_text`**: Warns when CircleAvatar lacks semanticLabel - accessibility requirement for screen readers
@@ -1785,6 +2765,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_lifecycle_observer`**: Warns when Timer.periodic is used without WidgetsBindingObserver lifecycle handling
 
 ### Documentation
+
 - **Migration from solid_lints**: Complete rewrite of [migration_from_solid_lints.md](doc/guides/migration_from_solid_lints.md):
   - Corrected rule count: solid_lints has 16 custom rules (not ~50)
   - Full rule mapping table: saropa_lints implements 15 of 16 rules (94% coverage)
@@ -1806,12 +2787,14 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [1.8.1] - 2026-01-10
 
 ### Fixed
+
 - **`avoid_double_for_money`**: Fixed remaining false positives:
   - Switched from substring matching to **word-boundary matching** - variable names are now split into words (camelCase/snake_case aware) and only exact word matches trigger the rule
   - Fixes issues like `audioVolume` matching `aud` or `imageUrlVerticalOffsetPercent` triggering false positives
   - Removed short currency codes (`usd`, `eur`, `gbp`, `jpy`, `cad`, `aud`, `yen`) - still too ambiguous even as complete words (e.g., "cad" for CAD files, "aud" for audio-related)
 
 ### Changed
+
 - **Refactored rule files** for better organization:
   - Created `money_rules.dart` - moved `AvoidDoubleForMoneyRule`
   - Created `media_rules.dart` - moved `AvoidAutoplayAudioRule`
@@ -1821,6 +2804,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - `json_datetime_rules.dart` now only contains JSON and DateTime parsing rules
 
 ### Quick Fixes
+
 - `avoid_double_for_money`: Adds review comment for manual attention
 - `avoid_sensitive_data_in_logs`: Comments out the sensitive log statement
 - `require_getit_reset_in_tests`: Adds reminder comment for GetIt reset
@@ -1829,34 +2813,41 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [1.8.0] - 2026-01-10
 
 ### Changed
+
 - **`avoid_double_for_money`**: **BREAKING** - Rule is now much stricter to eliminate false positives. Only flags unambiguous money terms: `price`, `money`, `currency`, `salary`, `wage`, and currency codes (`dollar`, `euro`, `yen`, `usd`, `eur`, `gbp`, `jpy`, `cad`, `aud`). Generic terms like `total`, `amount`, `balance`, `cost`, `fee`, `tax`, `discount`, `payment`, `revenue`, `profit`, `budget`, `expense`, `income` are **no longer flagged** as they have too many non-monetary uses.
 
 ### Fixed
+
 - **`avoid_sensitive_data_in_logs`**: Fixed false positives for null checks and property access. Now only flags direct value interpolation (`$password`, `${password}`), not expressions like `${credential != null}`, `${password.length}`, or `${token?.isEmpty}`. Pre-compiled regex patterns for better performance.
 - **`avoid_hardcoded_encryption_keys`**: Simplified rule to only detect string literals passed directly to `Key.fromUtf8()`, `Key.fromBase64()`, etc. - removes false positives from variable name heuristics
 
 ## [1.7.12] - 2026-01-10
 
 ### Fixed
+
 - **`require_unique_iv_per_encryption`**: Improved IV variable name detection to avoid false positives like "activity", "private", "derivative" - now uses proper word boundary detection for camelCase and snake_case patterns
 
 ### Quick Fixes
+
 - **`require_unique_iv_per_encryption`**: Auto-replaces `IV.fromUtf8`/`IV.fromBase64` with `IV.fromSecureRandom(16)`
 
 ## [1.7.11] - 2026-01-10
 
 ### Fixed
+
 - **`avoid_shrinkwrap_in_scrollview`**: Rule now properly skips widgets with `NeverScrollableScrollPhysics` - the recommended fix should no longer trigger the lint
 - **Test fixtures**: Updated fixture files with correct `expect_lint` annotations and disabled conflicting rules in example analysis_options.yaml
 
 ## [1.7.10] - 2026-01-10
 
 ### Fixed
+
 - **Rule detection for implicit constructors**: Fixed `avoid_gradient_in_build`, `avoid_shrinkwrap_in_scrollview`, `avoid_nested_scrollables_conflict`, and `avoid_excessive_bottom_nav_items` rules not detecting widgets created without explicit `new`/`const` keywords
 - **AST visitor pattern**: Rules now use `GeneralizingAstVisitor` or `addNamedExpression` callbacks to properly detect both explicit and implicit constructor calls
 - **Test fixtures**: Updated expect_lint positions to match actual lint locations
 
 ### Changed
+
 - **Rule implementation**: `AvoidGradientInBuildRule` now uses `GeneralizingAstVisitor` with both `visitInstanceCreationExpression` and `visitMethodInvocation`
 - **Rule implementation**: `AvoidShrinkWrapInScrollViewRule` now uses `addNamedExpression` to detect `shrinkWrap: true` directly
 - **Rule implementation**: `AvoidNestedScrollablesConflictRule` now uses visitor pattern with `RecursiveAstVisitor`
@@ -1865,13 +2856,16 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [1.7.9] - 2026-01-09
 
 ### Added
+
 - **29 New Rules** covering disposal, build method anti-patterns, scroll/list issues, cryptography, and JSON/DateTime handling:
 
 #### Disposal Rules (2 rules)
+
 - `require_media_player_dispose` - Warns when VideoPlayerController/AudioPlayer is not disposed
 - `require_tab_controller_dispose` - Warns when TabController is not disposed
 
 #### Build Method Anti-Patterns (8 rules)
+
 - `avoid_gradient_in_build` - Warns when Gradient objects are created inside build()
 - `avoid_dialog_in_build` - Warns when showDialog is called inside build()
 - `avoid_snackbar_in_build` - Warns when showSnackBar is called inside build()
@@ -1882,6 +2876,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `avoid_hardcoded_feature_flags` - Warns when if(true)/if(false) patterns are used
 
 #### Scroll and List Rules (7 rules)
+
 - `avoid_shrinkwrap_in_scrollview` - Warns when shrinkWrap: true is used inside a ScrollView
 - `avoid_nested_scrollables_conflict` - Warns when nested scrollables don't have explicit physics
 - `avoid_listview_children_for_large_lists` - Suggests ListView.builder for large lists
@@ -1891,12 +2886,14 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `avoid_multiple_autofocus` - Warns when multiple widgets have autofocus: true
 
 #### Cryptography Rules (4 rules)
+
 - `avoid_hardcoded_encryption_keys` - Warns when encryption keys are hardcoded
 - `prefer_secure_random_for_crypto` - Warns when Random() is used for cryptographic purposes
 - `avoid_deprecated_crypto_algorithms` - Warns when MD5, SHA1, DES are used
 - `require_unique_iv_per_encryption` - Warns when static or reused IVs are detected
 
 #### JSON and DateTime Rules (8 rules)
+
 - `require_json_decode_try_catch` - Warns when jsonDecode is used without try-catch
 - `avoid_datetime_parse_unvalidated` - Warns when DateTime.parse is used without try-catch
 - `prefer_try_parse_for_dynamic_data` - **CRITICAL**: Warns when int/double/num.parse is used without try-catch
@@ -1907,11 +2904,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `avoid_autoplay_audio` - Warns when autoPlay: true is set on audio/video players
 
 ### Changed
+
 - **Docs**: Updated rule count from 792+ to 821+
 - **Impact tuning**: `avoid_hardcoded_feature_flags` and `avoid_autoplay_audio` changed to `low` to match INFO severity
 - **Impact tuning**: `avoid_double_for_money` promoted to `critical` to match ERROR severity (financial bugs)
 
 ### Quick Fixes
+
 - `prefer_secure_random_for_crypto`: Auto-replaces `Random()` with `Random.secure()`
 - `avoid_datetime_parse_unvalidated`: Auto-replaces `DateTime.parse` with `DateTime.tryParse`
 - `prefer_try_parse_for_dynamic_data`: Auto-replaces `int/double/num.parse` with `tryParse`
@@ -1921,9 +2920,11 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [1.7.8] - 2026-01-09
 
 ### Added
+
 - **25 New Rules** covering network performance, state management, testing, security, and database patterns:
 
 #### Network Performance (6 rules)
+
 - `prefer_http_connection_reuse` - Warns when HTTP clients are created without connection reuse
 - `avoid_redundant_requests` - Warns about API calls in build()/initState() without caching
 - `require_response_caching` - Warns when GET responses aren't cached
@@ -1932,17 +2933,20 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `require_cancel_token` - Warns when async requests lack cancellation in StatefulWidgets
 
 #### State Management (3 rules)
+
 - `require_riverpod_lint` - Warns when Riverpod projects don't include riverpod_lint
 - `require_multi_provider` - Warns about nested Provider widgets instead of MultiProvider
 - `avoid_nested_providers` - Warns about Provider inside Consumer callbacks
 
 #### Testing (4 rules)
+
 - `prefer_fake_over_mock` - Warns about excessive mocking vs simpler fakes
 - `require_edge_case_tests` - Warns when tests don't cover edge cases
 - `prefer_test_data_builder` - Warns about complex test objects without builders
 - `avoid_test_implementation_details` - Warns when tests verify internal implementation
 
 #### Security (6 rules)
+
 - `require_data_encryption` - Warns when sensitive data stored without encryption
 - `prefer_data_masking` - Warns when sensitive data displayed without masking
 - `avoid_screenshot_sensitive` - Warns about sensitive screens without screenshot protection
@@ -1951,6 +2955,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `prefer_html_escape` - Warns about user content in WebViews without HTML escaping
 
 #### Database (6 rules)
+
 - `require_database_migration` - Warns about database schema changes without migration support
 - `require_database_index` - Warns about queries on non-indexed fields
 - `prefer_transaction_for_batch` - Warns about multiple writes not batched in transactions
@@ -1959,58 +2964,71 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `prefer_lazy_box_for_large` - Warns about large data in regular Hive boxes vs lazy boxes
 
 ### Changed
+
 - **Docs**: Updated rule count from 767+ to 792+
 - **Impact tuning**: `prefer_fake_over_mock`, `prefer_test_data_builder`, `require_response_caching`, `avoid_over_fetching` changed to `opinionated`
 
 ### Quick Fix
+
 - `require_secure_password_field`: Auto-adds `enableSuggestions: false` and `autocorrect: false`
 
 ## [1.7.7] - 2026-01-09
 
 ### Changed
+
 - **Docs**: README now has a Limitations section clarifying Dart-only analysis and dependency_overrides behavior.
 
 ## [1.7.6] - 2026-01-09
 
 ### Added
+
 - **Quick fix**: avoid_isar_enum_field auto-converts enum fields to string storage.
 
 ### Changed
+
 - **Impact tuning**: avoid_isar_enum_field promoted to LintImpact.high.
 
 ### Fixed
+
 - Restored NullabilitySuffix-based checks for analyzer compatibility.
 
 ## [1.7.5] - 2026-01-09
 
 ### Added
+
 - **Opinionated severity**: Added LintImpact.opinionated.
 - **New rule**: prefer_future_void_function_over_async_callback.
 - **Configuration template**: Added example/analysis_options_template.yaml with 767+ rules.
 
 ### Fixed
+
 - Empty block warnings in async callback fixture tests.
 
 ### Changed
+
 - **Docs**: Updated counts to reflect 767+ rules.
 - **Severity**: Stylistic rules moved to LintImpact.opinionated.
 
 ## [1.7.4] - 2026-01-08
+
 - Updated the banner image to show the project name Saropa Lints.
 
 ## [1.7.3] - 2026-01-08
 
 ### Added
+
 - **New documentation guides**: using_with_flutter_lints.md and migration_from_solid_lints.md.
 - Added "Related Packages" section to VGA guide.
 
 ### Changed
+
 - **Naming**: Standardized "Saropa Lints" vs saropa_lints across all docs.
 - **Migration Guides**: Updated rules (766+), versions (^1.3.0), and tier counts.
 
 ## [1.7.2] - 2026-01-08
 
 ### Added
+
 - **Impact Classification System**: Categorized rules by critical, high, medium, and low.
 - **Impact Report CLI Tool**: dart run saropa_lints:impact_report for prioritized violation reporting.
 - **47 New Rules**: Covering Riverpod, GetX, Bloc, Accessibility, Security, and Testing.
@@ -2019,11 +3037,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ## [1.7.1] - 2026-01-08
 
 ### Fixed
+
 - Resolved 25 violations for curly_braces_in_flow_control_structures.
 
 ## [1.7.0] - 2026-01-08
 
 ### Added
+
 - **50 New Rules**: Massive expansion across Riverpod, Build Performance, Testing, Security, and Forms.
 - Added support for sealed events in Bloc.
 
@@ -2043,7 +3063,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
   **Widget/UI Rules (4)**:
   - `avoid_fixed_dimensions` - Fixed pixel dimensions >200px break on different screen sizes [Info tier]
-  - `require_theme_color_from_scheme` - Hardcoded Color/Colors.* breaks theming [Info tier]
+  - `require_theme_color_from_scheme` - Hardcoded Color/Colors.\* breaks theming [Info tier]
   - `prefer_color_scheme_from_seed` - Manual ColorScheme is error-prone; use fromSeed() [Info tier]
   - `prefer_rich_text_for_complex` - 3+ Text widgets in Row should use Text.rich [Info tier]
 
@@ -2356,7 +3376,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - `avoid_unbounded_constraints` - Avoid widgets with unbounded constraints in scrollables [Warning tier]
 
   **Flutter Widget Rules - Advanced (10)**:
-  - `prefer_fractional_sizing` - Use FractionallySizedBox instead of MediaQuery * 0.x [Info tier]
+  - `prefer_fractional_sizing` - Use FractionallySizedBox instead of MediaQuery \* 0.x [Info tier]
   - `avoid_unconstrained_box_misuse` - UnconstrainedBox in constrained parent may overflow [Warning tier]
   - `require_error_widget` - FutureBuilder/StreamBuilder should handle error state [Warning tier]
   - `prefer_sliver_app_bar` - Use SliverAppBar in CustomScrollView, not AppBar [Info tier]
@@ -2452,6 +3472,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 ### Fixed
 
 - **Ignore comment handling for catch clauses** - Comments placed before the closing `}` of a try block now properly suppress warnings on the catch clause:
+
   ```dart
   try {
     // code

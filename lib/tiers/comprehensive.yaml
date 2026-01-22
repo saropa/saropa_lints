@@ -38,8 +38,8 @@ custom_lint:
     # =========================================================================
     # CODE QUALITY - Thorough
     # =========================================================================
-    avoid_long_files: true
-    avoid_long_test_files: true
+    avoid_long_length_files: true
+    avoid_long_length_test_files: true
     avoid_local_functions: true
     avoid_declaring_call_method: true
     avoid_immediately_invoked_functions: true

@@ -3,8 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -41,10 +40,8 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_barrel_files',
-    problemMessage:
-        '[avoid_barrel_files] File contains only export statements (barrel file).',
-    correctionMessage:
-        'Import specific files where needed instead of using barrel files.',
+    problemMessage: '[avoid_barrel_files] File contains only export statements (barrel file).',
+    correctionMessage: 'Import specific files where needed instead of using barrel files.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -108,8 +105,7 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_double_slash_imports',
-    problemMessage:
-        '[avoid_double_slash_imports] Import path contains double slashes.',
+    problemMessage: '[avoid_double_slash_imports] Import path contains double slashes.',
     correctionMessage: 'Remove the extra slash from the import path.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -171,8 +167,7 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_duplicate_exports',
-    problemMessage:
-        '[avoid_duplicate_exports] File is exported multiple times.',
+    problemMessage: '[avoid_duplicate_exports] File is exported multiple times.',
     correctionMessage: 'Remove the duplicate export directive.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -397,18 +392,18 @@ class AvoidGlobalStateRule extends SaropaLintRule {
 // Production rules (non-test files):
 // | Threshold  | Rule                    | Tier          |
 // |------------|-------------------------|---------------|
-// | 200 lines  | prefer_small_files      | insanity      |
-// | 300 lines  | avoid_medium_files      | professional  |
-// | 500 lines  | avoid_long_files        | comprehensive |
-// | 1000 lines | avoid_very_long_files   | recommended   |
+// | 200 lines  | prefer_small_length_files      | insanity      |
+// | 300 lines  | avoid_medium_length_files      | professional  |
+// | 500 lines  | avoid_long_length_files        | comprehensive |
+// | 1000 lines | avoid_very_long_length_files   | recommended   |
 //
 // Test file rules (files in test/, test_driver/, integration_test/):
 // | Threshold  | Rule                         | Tier          |
 // |------------|------------------------------|---------------|
-// | 400 lines  | prefer_small_test_files      | insanity      |
-// | 600 lines  | avoid_medium_test_files      | professional  |
-// | 1000 lines | avoid_long_test_files        | comprehensive |
-// | 2000 lines | avoid_very_long_test_files   | recommended   |
+// | 400 lines  | prefer_small_length_test_files      | insanity      |
+// | 600 lines  | avoid_medium_length_test_files      | professional  |
+// | 1000 lines | avoid_long_length_test_files        | comprehensive |
+// | 2000 lines | avoid_very_long_length_test_files   | recommended   |
 // =============================================================================
 
 /// Checks if a file is a test file based on its path.
@@ -461,7 +456,7 @@ void _checkFileLength({
 ///
 /// Disable for data files, enums, or generated code:
 /// ```dart
-/// // ignore_for_file: prefer_small_files
+/// // ignore_for_file: prefer_small_length_files
 /// ```
 class PreferSmallFilesRule extends SaropaLintRule {
   const PreferSmallFilesRule() : super(code: _code);
@@ -475,12 +470,11 @@ class PreferSmallFilesRule extends SaropaLintRule {
   static const int _maxLines = 200;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_small_files',
-    problemMessage: '[prefer_small_files] File has more than $_maxLines lines. '
+    name: 'prefer_small_length_files',
+    problemMessage: '[prefer_small_length_files] File has more than $_maxLines lines. '
         'Smaller files are easier to understand and maintain.',
-    correctionMessage:
-        'Split this file into focused modules with single responsibilities. '
-        'For data/enum files, disable with: // ignore_for_file: prefer_small_files',
+    correctionMessage: 'Split this file into focused modules with single responsibilities. '
+        'For data/enum files, disable with: // ignore_for_file: prefer_small_length_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -507,7 +501,7 @@ class PreferSmallFilesRule extends SaropaLintRule {
 ///
 /// Disable for files where size is intentional:
 /// ```dart
-/// // ignore_for_file: avoid_medium_files
+/// // ignore_for_file: avoid_medium_length_files
 /// ```
 class AvoidMediumFilesRule extends SaropaLintRule {
   const AvoidMediumFilesRule() : super(code: _code);
@@ -521,10 +515,9 @@ class AvoidMediumFilesRule extends SaropaLintRule {
   static const int _maxLines = 300;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_medium_files',
-    problemMessage: '[avoid_medium_files] File exceeds $_maxLines lines.',
-    correctionMessage:
-        'Consider splitting into smaller modules, or disable this rule '
+    name: 'avoid_medium_length_files',
+    problemMessage: '[avoid_medium_length_files] File exceeds $_maxLines lines.',
+    correctionMessage: 'Consider splitting into smaller modules, or disable this rule '
         'for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -552,7 +545,7 @@ class AvoidMediumFilesRule extends SaropaLintRule {
 ///
 /// Disable for files where size is intentional:
 /// ```dart
-/// // ignore_for_file: avoid_long_files
+/// // ignore_for_file: avoid_long_length_files
 /// ```
 class AvoidLongFilesRule extends SaropaLintRule {
   const AvoidLongFilesRule() : super(code: _code);
@@ -566,10 +559,9 @@ class AvoidLongFilesRule extends SaropaLintRule {
   static const int _maxLines = 500;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_long_files',
-    problemMessage: '[avoid_long_files] File exceeds $_maxLines lines.',
-    correctionMessage:
-        'Consider splitting into smaller modules, or disable this rule '
+    name: 'avoid_long_length_files',
+    problemMessage: '[avoid_long_length_files] File exceeds $_maxLines lines.',
+    correctionMessage: 'Consider splitting into smaller modules, or disable this rule '
         'for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -599,7 +591,7 @@ class AvoidLongFilesRule extends SaropaLintRule {
 ///
 /// Disable for files where size is intentional:
 /// ```dart
-/// // ignore_for_file: avoid_very_long_files
+/// // ignore_for_file: avoid_very_long_length_files
 /// ```
 class AvoidVeryLongFilesRule extends SaropaLintRule {
   const AvoidVeryLongFilesRule() : super(code: _code);
@@ -613,10 +605,9 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
   static const int _maxLines = 1000;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_very_long_files',
-    problemMessage: '[avoid_very_long_files] File exceeds $_maxLines lines.',
-    correctionMessage:
-        'Consider splitting into smaller modules, or disable this rule '
+    name: 'avoid_very_long_length_files',
+    problemMessage: '[avoid_very_long_length_files] File exceeds $_maxLines lines.',
+    correctionMessage: 'Consider splitting into smaller modules, or disable this rule '
         'for data/enum files where large size is intentional.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -659,7 +650,7 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
 /// feature, scenario, or test category.
 ///
 /// This rule only applies to files in `test/`, `test_driver/`, or
-/// `integration_test/` directories. Production files use `prefer_small_files`
+/// `integration_test/` directories. Production files use `prefer_small_length_files`
 /// with a 200-line threshold instead.
 ///
 /// **BAD:** A single test file testing multiple unrelated features:
@@ -678,7 +669,7 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
 ///
 /// Disable for comprehensive test suites:
 /// ```dart
-/// // ignore_for_file: prefer_small_test_files
+/// // ignore_for_file: prefer_small_length_test_files
 /// ```
 class PreferSmallTestFilesRule extends SaropaLintRule {
   const PreferSmallTestFilesRule() : super(code: _code);
@@ -692,12 +683,10 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
   static const int _maxLines = 400;
 
   static const LintCode _code = LintCode(
-    name: 'prefer_small_test_files',
-    problemMessage:
-        '[prefer_small_test_files] Test file has more than $_maxLines lines.',
-    correctionMessage:
-        'Split tests by feature or scenario for better organization. '
-        'Disable with: // ignore_for_file: prefer_small_test_files',
+    name: 'prefer_small_length_test_files',
+    problemMessage: '[prefer_small_length_test_files] Test file has more than $_maxLines lines.',
+    correctionMessage: 'Split tests by feature or scenario for better organization. '
+        'Disable with: // ignore_for_file: prefer_small_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -725,12 +714,12 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
 /// maintainability and faster test runs.
 ///
 /// This rule only applies to files in `test/`, `test_driver/`, or
-/// `integration_test/` directories. Production files use `avoid_medium_files`
+/// `integration_test/` directories. Production files use `avoid_medium_length_files`
 /// with a 300-line threshold instead.
 ///
 /// Disable for comprehensive test suites:
 /// ```dart
-/// // ignore_for_file: avoid_medium_test_files
+/// // ignore_for_file: avoid_medium_length_test_files
 /// ```
 class AvoidMediumTestFilesRule extends SaropaLintRule {
   const AvoidMediumTestFilesRule() : super(code: _code);
@@ -744,11 +733,10 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
   static const int _maxLines = 600;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_medium_test_files',
-    problemMessage:
-        '[avoid_medium_test_files] Test file exceeds $_maxLines lines.',
+    name: 'avoid_medium_length_test_files',
+    problemMessage: '[avoid_medium_length_test_files] Test file exceeds $_maxLines lines.',
     correctionMessage: 'Consider splitting tests by feature or scenario. '
-        'Disable with: // ignore_for_file: avoid_medium_test_files',
+        'Disable with: // ignore_for_file: avoid_medium_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -776,12 +764,12 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
 /// organized by feature area.
 ///
 /// This rule only applies to files in `test/`, `test_driver/`, or
-/// `integration_test/` directories. Production files use `avoid_long_files`
+/// `integration_test/` directories. Production files use `avoid_long_length_files`
 /// with a 500-line threshold instead.
 ///
 /// Disable for comprehensive test suites:
 /// ```dart
-/// // ignore_for_file: avoid_long_test_files
+/// // ignore_for_file: avoid_long_length_test_files
 /// ```
 class AvoidLongTestFilesRule extends SaropaLintRule {
   const AvoidLongTestFilesRule() : super(code: _code);
@@ -795,11 +783,10 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
   static const int _maxLines = 1000;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_long_test_files',
-    problemMessage:
-        '[avoid_long_test_files] Test file exceeds $_maxLines lines.',
+    name: 'avoid_long_length_test_files',
+    problemMessage: '[avoid_long_length_test_files] Test file exceeds $_maxLines lines.',
     correctionMessage: 'Consider splitting tests by feature or scenario. '
-        'Disable with: // ignore_for_file: avoid_long_test_files',
+        'Disable with: // ignore_for_file: avoid_long_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -827,12 +814,12 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
 /// organized by feature, screen, or use case.
 ///
 /// This rule only applies to files in `test/`, `test_driver/`, or
-/// `integration_test/` directories. Production files use `avoid_very_long_files`
+/// `integration_test/` directories. Production files use `avoid_very_long_length_files`
 /// with a 1000-line threshold instead.
 ///
 /// Disable for comprehensive test suites:
 /// ```dart
-/// // ignore_for_file: avoid_very_long_test_files
+/// // ignore_for_file: avoid_very_long_length_test_files
 /// ```
 class AvoidVeryLongTestFilesRule extends SaropaLintRule {
   const AvoidVeryLongTestFilesRule() : super(code: _code);
@@ -846,11 +833,10 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
   static const int _maxLines = 2000;
 
   static const LintCode _code = LintCode(
-    name: 'avoid_very_long_test_files',
-    problemMessage:
-        '[avoid_very_long_test_files] Test file exceeds $_maxLines lines.',
+    name: 'avoid_very_long_length_test_files',
+    problemMessage: '[avoid_very_long_length_test_files] Test file exceeds $_maxLines lines.',
     correctionMessage: 'Consider splitting tests by feature or scenario. '
-        'Disable with: // ignore_for_file: avoid_very_long_test_files',
+        'Disable with: // ignore_for_file: avoid_very_long_length_test_files',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -892,8 +878,7 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_functions',
-    problemMessage:
-        '[avoid_long_functions] Function body exceeds $_maxLines lines.',
+    problemMessage: '[avoid_long_functions] Function body exceeds $_maxLines lines.',
     correctionMessage: 'Consider extracting parts into smaller functions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -954,10 +939,8 @@ class AvoidLongParameterListRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_long_parameter_list',
-    problemMessage:
-        '[avoid_long_parameter_list] Function has too many parameters (max 5).',
-    correctionMessage:
-        'Consider using a configuration object or named parameters.',
+    problemMessage: '[avoid_long_parameter_list] Function has too many parameters (max 5).',
+    correctionMessage: 'Consider using a configuration object or named parameters.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1027,8 +1010,7 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
+    context.registry.addFunctionDeclarationStatement((FunctionDeclarationStatement node) {
       reporter.atNode(node.functionDeclaration, code);
     });
   }
@@ -1054,8 +1036,7 @@ class MaxImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'limit_max_imports',
-    problemMessage:
-        '[limit_max_imports] File has more than $_maxImports imports.',
+    problemMessage: '[limit_max_imports] File has more than $_maxImports imports.',
     correctionMessage: 'Consider splitting the file or reducing dependencies.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1097,8 +1078,7 @@ class MemberOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_members',
-    problemMessage:
-        '[prefer_sorted_members] Consider reordering class members.',
+    problemMessage: '[prefer_sorted_members] Consider reordering class members.',
     correctionMessage:
         'Order: static fields, instance fields, constructors, static methods, instance methods.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1169,8 +1149,7 @@ class PreferSortedParametersRule extends SaropaLintRule {
   /// Alias: prefer_sorted_parameter
   static const LintCode _code = LintCode(
     name: 'prefer_sorted_parameters',
-    problemMessage:
-        '[prefer_sorted_parameters] Named parameters should be in alphabetical order.',
+    problemMessage: '[prefer_sorted_parameters] Named parameters should be in alphabetical order.',
     correctionMessage: 'Reorder parameters alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1260,13 +1239,11 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
         if (param.isNamed) continue;
 
         // Check if the parameter type is bool
-        final SimpleFormalParameter? simpleParam =
-            param is SimpleFormalParameter
-                ? param
-                : (param is DefaultFormalParameter &&
-                        param.parameter is SimpleFormalParameter
-                    ? param.parameter as SimpleFormalParameter
-                    : null);
+        final SimpleFormalParameter? simpleParam = param is SimpleFormalParameter
+            ? param
+            : (param is DefaultFormalParameter && param.parameter is SimpleFormalParameter
+                ? param.parameter as SimpleFormalParameter
+                : null);
 
         if (simpleParam == null) continue;
 
@@ -1285,8 +1262,7 @@ class PreferNamedImportsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_imports',
-    problemMessage:
-        '[prefer_named_imports] Consider using named imports (show/hide) for clarity.',
+    problemMessage: '[prefer_named_imports] Consider using named imports (show/hide) for clarity.',
     correctionMessage: 'Use "show" to explicitly list imported symbols.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1348,10 +1324,8 @@ class PreferNamedParametersRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_named_parameters',
-    problemMessage:
-        '[prefer_named_parameters] Function has too many positional parameters.',
-    correctionMessage:
-        'Consider using named parameters for better readability.',
+    problemMessage: '[prefer_named_parameters] Function has too many positional parameters.',
+    correctionMessage: 'Consider using named parameters for better readability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1389,8 +1363,7 @@ class PreferStaticClassRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_static_class',
     problemMessage: '[prefer_static_class] Class only has static members.',
-    correctionMessage:
-        'Consider using top-level functions and constants instead.',
+    correctionMessage: 'Consider using top-level functions and constants instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1776,8 +1749,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_colors',
     problemMessage: '[avoid_hardcoded_colors] Avoid hardcoded color values.',
-    correctionMessage:
-        'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
+    correctionMessage: 'Use theme colors instead (e.g., Theme.of(context).colorScheme.primary).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1787,8 +1759,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
 
       // Check for Color constructor
@@ -1839,10 +1810,8 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unused_generics',
-    problemMessage:
-        '[avoid_unused_generics] Type parameter is declared but never used.',
-    correctionMessage:
-        'Remove unused type parameter or use it in the declaration.',
+    problemMessage: '[avoid_unused_generics] Type parameter is declared but never used.',
+    correctionMessage: 'Remove unused type parameter or use it in the declaration.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1877,8 +1846,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     });
 
     context.registry.addFunctionDeclaration((FunctionDeclaration node) {
-      final TypeParameterList? typeParams =
-          node.functionExpression.typeParameters;
+      final TypeParameterList? typeParams = node.functionExpression.typeParameters;
       if (typeParams == null) return;
 
       for (final TypeParameter param in typeParams.typeParameters) {
@@ -1905,8 +1873,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
       if (found) return true;
     }
     // Check parameters and body
-    node.parameters
-        ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.parameters?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
     node.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
@@ -1922,8 +1889,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
     node.functionExpression.parameters
         ?.visitChildren(_TypeNameFinder(typeName, () => found = true));
     if (found) return true;
-    node.functionExpression.body
-        .visitChildren(_TypeNameFinder(typeName, () => found = true));
+    node.functionExpression.body.visitChildren(_TypeNameFinder(typeName, () => found = true));
     return found;
   }
 }
@@ -2037,8 +2003,7 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_futures',
-    problemMessage:
-        '[avoid_unnecessary_futures] Async function has no await expressions.',
+    problemMessage: '[avoid_unnecessary_futures] Async function has no await expressions.',
     correctionMessage: 'Remove async keyword or add await expressions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2238,8 +2203,7 @@ class AvoidUnnecessaryNullableReturnTypeRule extends SaropaLintRule {
 }
 
 class _NullReturnFinder extends RecursiveAstVisitor<void> {
-  _NullReturnFinder(
-      {required this.onNullReturn, required this.onImplicitReturn});
+  _NullReturnFinder({required this.onNullReturn, required this.onImplicitReturn});
   final void Function() onNullReturn;
   final void Function() onImplicitReturn;
 
@@ -2376,8 +2340,7 @@ class _AddHackForGlobalStateFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry
-        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+    context.registry.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
