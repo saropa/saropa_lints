@@ -120,7 +120,7 @@ The tier system lets you adopt gradually — start with ~100 critical rules, wor
 # pubspec.yaml
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^1.3.0
+  saropa_lints: ^4.4.0
 ```
 
 ### 2. Enable custom_lint
@@ -132,14 +132,17 @@ analyzer:
     - custom_lint
 ```
 
-### 3. Choose your tier
+### 3. Generate tier configuration
 
-```yaml
-# analysis_options.yaml
-custom_lint:
-  saropa_lints:
-    tier: recommended # Options: essential, recommended, professional, comprehensive, insanity
+```bash
+dart run saropa_lints:init --tier comprehensive
 ```
+
+This generates `analysis_options.yaml` with explicit `true`/`false` for every rule.
+
+Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `insanity` (5)
+
+> **Why a CLI tool?** The `custom_lint` plugin doesn't reliably pass configuration like `tier: recommended` to plugins. The CLI tool bypasses this limitation by generating explicit rule lists that work 100% of the time.
 
 ### 4. Run the linter
 
@@ -170,7 +173,15 @@ Pick the tier that matches your team's needs. Each tier builds on the previous o
 
 **[100+ stylistic rules](https://github.com/saropa/saropa_lints/blob/main/README_STYLISTIC.md)** for formatting, ordering, and naming conventions.
 
-Use `tier: stylistic` to enable **35 non-conflicting stylistic rules** (like `enforce_member_ordering`, `prefer_trailing_comma_always`). Conflicting pairs (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) must be enabled individually.
+To include stylistic rules when generating configuration:
+
+```bash
+dart run saropa_lints:init --tier comprehensive --stylistic
+```
+
+Or enable specific stylistic rules in your generated config by changing `false` to `true`.
+
+Conflicting pairs (e.g., `prefer_single_quotes` vs `prefer_double_quotes`) must be enabled individually - you choose which style your team prefers.
 
 Stylistic rules are orthogonal to correctness. Your code can be perfectly correct while violating every stylistic rule, or perfectly formatted while crashing on every screen. That's why they're separate.
 
@@ -180,49 +191,55 @@ See [example/analysis_options_template.yaml](https://github.com/saropa/saropa_li
 
 ### Using a tier
 
-```yaml
-# analysis_options.yaml
-custom_lint:
-  saropa_lints:
-    tier: recommended # Most teams start here
+Generate configuration for your chosen tier:
+
+```bash
+# Most teams start here
+dart run saropa_lints:init --tier recommended
+
+# See all options
+dart run saropa_lints:init --help
+
+# Preview without writing
+dart run saropa_lints:init --tier professional --dry-run
 ```
 
-Available tiers: `essential`, `recommended`, `professional`, `comprehensive`, `insanity`, `stylistic`
+Available tiers: `essential` (1), `recommended` (2), `professional` (3), `comprehensive` (4), `insanity` (5)
+
+Add `--stylistic` to include opinionated formatting rules.
 
 ### Customizing rules
 
-After choosing a tier, you can enable or disable specific rules.
-
-**IMPORTANT:** Rules must use YAML list format (with `-` prefix), not map format:
+After generating configuration, customize rules by editing `analysis_options.yaml`:
 
 ```yaml
 custom_lint:
-  saropa_lints:
-    tier: recommended
   rules:
-    # Disable a rule from the tier
-    - avoid_hardcoded_strings_in_ui: false
+    # The init tool generates explicit true/false for every rule
+    - avoid_hardcoded_strings_in_ui: true  # change to false to disable
+    - require_public_api_documentation: false  # change to true to enable
 
-    # Enable a rule from a higher tier
-    - require_public_api_documentation: true
-
-    # Enable stylistic rules (not in any tier by default)
+    # Stylistic rules (enable the ones your team prefers)
     - prefer_single_quotes: true
     - prefer_trailing_comma_always: true
 ```
 
-**Wrong (map format - rules will be silently ignored):**
+**IMPORTANT:** Rules must use YAML list format (with `-` prefix):
 
 ```yaml
+# ✅ Correct (list format)
 rules:
-  avoid_hardcoded_strings_in_ui: false # NO DASH = NOT PARSED!
+  - avoid_hardcoded_strings_in_ui: false
+
+# ❌ Wrong (map format - rules will be silently ignored)
+rules:
+  avoid_hardcoded_strings_in_ui: false  # NO DASH = NOT PARSED!
 ```
 
-**Correct (list format):**
+To change tiers, re-run the init tool:
 
-```yaml
-rules:
-  - avoid_hardcoded_strings_in_ui: false # DASH = PARSED!
+```bash
+dart run saropa_lints:init --tier professional
 ```
 
 ### Config key names and aliases
@@ -420,22 +437,18 @@ Examples: `prefer_relative_imports`, `prefer_single_quotes`, `prefer_arrow_funct
 
 ## Performance
 
-Running all 1637+ rules uses significant memory. The tier system helps:
+Running all 1668+ rules uses significant memory. The tier system helps:
 
 - Rules set to `false` are not loaded
 - Start with `essential` or `recommended`
 - Upgrade tiers as you fix warnings
 
-```yaml
+```bash
 # GOOD: Start with recommended tier
-custom_lint:
-  saropa_lints:
-    tier: recommended
+dart run saropa_lints:init --tier recommended
 
-# BAD: Enabling everything at once on a legacy codebase
-custom_lint:
-  saropa_lints:
-    tier: insanity  # May show thousands of warnings
+# CAUTION: Enabling everything on a legacy codebase may show thousands of warnings
+dart run saropa_lints:init --tier insanity
 ```
 
 ### Performance Tip: Use Lower Tiers During Development
@@ -446,16 +459,12 @@ custom_lint:
 2. **Use `professional` or higher in CI** - thorough checking where speed matters less
 3. **Upgrade tiers gradually** - fix warnings before enabling more rules
 
-```yaml
-# Fast local development
-custom_lint:
-  saropa_lints:
-    tier: essential  # ~400 rules, fastest
+```bash
+# Fast local development (~400 rules)
+dart run saropa_lints:init --tier essential
 
-# Thorough CI checking
-custom_lint:
-  saropa_lints:
-    tier: professional  # ~1400 rules, comprehensive
+# Thorough CI checking (~1400 rules)
+dart run saropa_lints:init --tier professional
 ```
 
 The tier you choose has a direct impact on analysis speed:
@@ -463,7 +472,7 @@ The tier you choose has a direct impact on analysis speed:
 - `essential`: ~400 rules → **fastest** (memory leaks, security, crashes)
 - `recommended`: ~900 rules → moderate (+ accessibility, performance)
 - `professional`: ~1400 rules → slower (+ architecture, documentation)
-- `comprehensive`/`insanity`: 1637+ rules → **slowest** (everything)
+- `comprehensive`/`insanity`: 1668+ rules → **slowest** (everything)
 
 ## Adoption Strategy
 
@@ -694,30 +703,23 @@ Run `dart run custom_lint` in your terminal to see all issues immediately.
 
 ### Configuration not working (tier not loading)
 
-**Problem:** You set `tier: insanity` but only get ~200 rules instead of 1400+.
+**Problem:** You set `tier: insanity` in YAML but only get ~200 rules instead of 1400+.
 
-**Solution:** There's a bug in custom_lint v0.8.0 that doesn't read the tier configuration. Use this workaround:
+**Cause:** The `custom_lint` plugin doesn't reliably pass configuration to plugins. This is a known limitation.
 
-```yaml
-# ❌ DOESN'T WORK (custom_lint v0.8.0 bug)
-custom_lint:
-  saropa_lints:
-    tier: insanity
+**Solution:** Use the CLI tool to generate explicit configuration:
 
-# ✅ WORKAROUND - Use this instead
-custom_lint:
-  enable_all_lint_rules: true  # Loads all rules (insanity tier)
-  rules:
-    # Then disable specific rules you don't want
-    - some_rule: false
+```bash
+# Generate config for comprehensive tier (1618 rules)
+dart run saropa_lints:init --tier comprehensive
+
+# Or for all rules (insanity tier)
+dart run saropa_lints:init --tier insanity
 ```
 
-**Verify it worked:** Run `dart run custom_lint` and look for the first line:
-```
-[saropa_lints] Loaded 1453 rules (tier: essential, enableAll: true)
-```
+This generates `analysis_options.yaml` with explicit `- rule_name: true` for every enabled rule, which works 100% of the time.
 
-If it says `enableAll: true`, you're good! The tier name doesn't matter, what matters is the rule count.
+**Verify it worked:** Run `dart run custom_lint` and check the rule count in the output.
 
 ### Too many warnings! What do I do?
 
@@ -725,27 +727,31 @@ If it says `enableAll: true`, you're good! The tier name doesn't matter, what ma
 
 **Option 1: Start smaller** (recommended for existing projects)
 
-```yaml
-custom_lint:
-  enable_all_lint_rules: false  # Start with just essential rules (~200)
-  rules:
-    # Gradually enable more rules as you fix issues
-    - some_specific_rule: true
+```bash
+# Start with essential tier (~400 critical rules)
+dart run saropa_lints:init --tier essential
 ```
 
-**Option 2: Disable noisy rules**
+**Option 2: Use baseline** (for brownfield projects)
+
+Generate a baseline to suppress existing issues and only catch new violations:
+
+```bash
+dart run saropa_lints:baseline
+```
+
+**Option 3: Disable noisy rules**
+
+Edit your generated `analysis_options.yaml` and change specific rules from `true` to `false`:
 
 ```yaml
-custom_lint:
-  enable_all_lint_rules: true
-  rules:
-    # Disable rules that are too opinionated for your project
-    - prefer_double_quotes: false
+rules:
+    - prefer_double_quotes: false  # disabled
     - prefer_trailing_comma_always: false
     - no_magic_number: false
 ```
 
-**Option 3: Use quick fixes**
+**Option 4: Use quick fixes**
 
 Many rules have automatic fixes:
 - Hover over the warning
