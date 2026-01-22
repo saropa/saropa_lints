@@ -246,9 +246,9 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_web_only_dependencies',
     problemMessage:
-        '[avoid_web_only_dependencies] Web-only import like dart:html or dart:js crashes immediately on mobile and desktop platforms. The app throws UnsupportedError at startup, making it completely unusable for non-web users.',
+        '[avoid_web_only_dependencies] Importing web-only libraries such as dart:html, dart:js, or dart:indexed_db in a Flutter or Dart app that targets mobile or desktop platforms will cause the app to crash with UnsupportedError at startup. This makes the app completely unusable for non-web users and can result in poor user experience, negative reviews, and lost users. Web-only dependencies must be isolated to web-specific code.',
     correctionMessage:
-        'Use conditional imports or platform-agnostic alternatives.',
+        'Use conditional imports or platform-agnostic alternatives to ensure your app runs on all supported platforms. Refactor code to isolate web-only dependencies behind platform checks or abstractions, and test your app on all target platforms to catch unsupported imports before release.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

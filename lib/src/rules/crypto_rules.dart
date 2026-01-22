@@ -74,9 +74,9 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_encryption_keys',
     problemMessage:
-        '[avoid_hardcoded_encryption_keys] Hardcoded keys can be extracted '
-        'from app binary, compromising all encrypted data for all users.',
-    correctionMessage: 'Load key from secure storage or derive at runtime.',
+        '[avoid_hardcoded_encryption_keys] Hardcoded encryption keys present in source code or binaries can be easily extracted by attackers using reverse engineering tools. Once exposed, these keys allow adversaries to decrypt all user data protected by the key, resulting in a complete compromise of confidentiality for every user of your application. This vulnerability is especially critical in mobile and web apps, where binaries are distributed to end users. Hardcoded keys are often found in test code, examples, or as quick fixes, but they must never be used in production or shipped code. Attackers routinely scan for such patterns, and automated tools can detect and extract these secrets within minutes of release.',
+    correctionMessage:
+        'Never store encryption keys directly in your source code, configuration files, or application binaries. Instead, load keys securely at runtime from protected sources such as secure storage (e.g., Android Keystore, iOS Keychain, server APIs, or environment variables), or derive them from user input (such as passwords) using a secure key derivation function (KDF) with a unique salt. Review your codebase for any hardcoded secrets, and refactor to ensure that all cryptographic keys are dynamically loaded or derived at runtime. Document your key management strategy and ensure that secrets are never committed to version control or distributed with your app.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -234,9 +234,9 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random_for_crypto',
     problemMessage:
-        '[prefer_secure_random_for_crypto] Random() uses a predictable seed based on system time. Attackers can reproduce the exact sequence to guess cryptographic keys, nonces, or tokens, completely breaking your security.',
+        '[prefer_secure_random_for_crypto] The default Random() constructor in Dart uses a seed based on the current system time, making its output predictable and vulnerable to attack. If Random() is used to generate cryptographic keys, initialization vectors (IVs), nonces, tokens, or any value intended to protect sensitive data, attackers can reproduce the same sequence of random numbers and break your security. This flaw has led to real-world breaches where cryptographic protections were bypassed due to weak randomness. Only a cryptographically secure random number generator (CSPRNG) can provide the unpredictability required for security-critical operations.',
     correctionMessage:
-        'Replace Random() with Random.secure() for cryptographic use.',
+        'Replace every use of Random() in cryptographic or security-sensitive contexts with Random.secure(), which leverages the operating system’s cryptographically secure random number generator. This ensures that generated values are truly unpredictable and cannot be reproduced by attackers. Audit your codebase for any use of Random() related to encryption, authentication, token generation, or any feature that relies on secrecy. Update all such instances to use Random.secure(), and add tests or code reviews to prevent future regressions. Document the importance of using CSPRNGs for all cryptographic operations in your project guidelines.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -371,10 +371,9 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_deprecated_crypto_algorithms',
     problemMessage:
-        '[avoid_deprecated_crypto_algorithms] MD5/SHA1/DES have known '
-        'vulnerabilities. Attackers can forge hashes or break encryption.',
+        '[avoid_deprecated_crypto_algorithms] The use of outdated cryptographic algorithms such as MD5, SHA1, DES, 3DES, and RC4 exposes your application to well-known attacks. These algorithms have been broken by the security community: MD5 and SHA1 are vulnerable to collision and preimage attacks, allowing attackers to forge digital signatures or tamper with data. DES and 3DES have insufficient key lengths and are susceptible to brute-force attacks, while RC4 is vulnerable to several biases and key recovery attacks. Continuing to use these algorithms puts all encrypted or hashed data at risk of compromise, regardless of other security measures.',
     correctionMessage:
-        'Replace MD5/SHA1 with SHA-256+. Replace DES with AES-256.',
+        'Replace all uses of deprecated algorithms with modern, secure alternatives. For hashing, use SHA-256 or stronger (SHA-384, SHA-512) for integrity, and HMAC with a strong hash for authentication. For encryption, use AES-256 in a secure mode (e.g., GCM or CBC with random IVs). For password storage, use dedicated password hashing algorithms like bcrypt, scrypt, or Argon2. Review your codebase, dependencies, and third-party libraries for any references to MD5, SHA1, DES, 3DES, or RC4, and refactor to use only cryptographically secure primitives. Document your cryptographic choices and ensure all team members are aware of the risks of deprecated algorithms.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -470,9 +469,9 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',
     problemMessage:
-        '[require_unique_iv_per_encryption] Reusing IV (initialization vector) allows attackers to detect patterns in encrypted data. The same key+IV combination always encrypts identical plaintexts to identical ciphertexts, breaking confidentiality.',
+        '[require_unique_iv_per_encryption] Using a static or reused initialization vector (IV) with the same encryption key enables attackers to detect patterns in your encrypted data. When the same IV is used for multiple encryption operations, identical plaintexts will always produce identical ciphertexts, making it possible for adversaries to infer relationships between messages, perform replay attacks, or even recover plaintexts in some encryption modes. This breaks the fundamental guarantee of confidentiality provided by encryption and has led to serious vulnerabilities in real-world systems.',
     correctionMessage:
-        'Generate a new random IV for each encryption operation.',
+        'Always generate a new, random IV for every encryption operation, especially when using block cipher modes like CBC or GCM. Use secure random number generators (such as IV.fromSecureRandom(16)) to ensure IVs are unpredictable and unique for each message. Never use a constant, hardcoded, or reused IV, even for testing or non-production code. If you need to decrypt data later, store the IV alongside the ciphertext (it does not need to be secret, only unique per key). Review your codebase for static or reused IVs and refactor to generate fresh IVs for every encryption. Educate your team about the risks of IV reuse and document best practices in your project.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 

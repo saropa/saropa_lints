@@ -35,8 +35,10 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_empty_spread',
-    problemMessage: '[avoid_empty_spread] Empty spread has no effect.',
-    correctionMessage: 'Remove the empty spread expression.',
+    problemMessage:
+        '[avoid_empty_spread] Using an empty spread operator (e.g., ...[] or ...{}) in a list, set, or map literal has no effect and can confuse readers or reviewers. It may suggest that elements could be added dynamically, but in reality, nothing is added. This can lead to misunderstandings about the intent of the code and may be a leftover from refactoring or copy-pasting.',
+    correctionMessage:
+        'Remove the empty spread expression from your collection literal. If you intended to add elements dynamically, ensure the spread is not empty. Otherwise, omitting the empty spread will make your code clearer and easier to maintain. Review your codebase for similar patterns and clean up any unnecessary or misleading spread operators.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -124,8 +126,10 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_block',
-    problemMessage: '[avoid_unnecessary_block] Unnecessary nested block.',
-    correctionMessage: 'Remove the extra braces.',
+    problemMessage:
+        '[avoid_unnecessary_block] Nested code blocks that do not introduce a new scope or serve a specific purpose add unnecessary visual clutter and can make code harder to read and maintain. Such blocks are often the result of refactoring or copy-pasting and do not provide any functional benefit.',
+    correctionMessage:
+        'Remove the extra braces from nested blocks that do not introduce a new scope or serve a specific purpose. This will simplify your code and improve readability. Only use additional blocks when you need to introduce a new variable scope or for clarity in complex logic.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -179,8 +183,9 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_call',
     problemMessage:
-        '[avoid_unnecessary_call] Unnecessary explicit .call() invocation.',
-    correctionMessage: 'Use implicit call with () instead.',
+        '[avoid_unnecessary_call] Explicitly invoking the .call() method on a callable object (e.g., fn.call()) is redundant in Dart, as the () operator already invokes the call method implicitly. This can make code look verbose and unfamiliar to most Dart developers, reducing clarity.',
+    correctionMessage:
+        'Replace explicit .call() invocations with the more idiomatic and concise () operator. For example, use fn() instead of fn.call(). This makes your code more readable and consistent with Dart best practices.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -273,8 +278,9 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_constructor',
     problemMessage:
-        '[avoid_unnecessary_constructor] Unnecessary constructor. Dart provides a default constructor.',
-    correctionMessage: 'Remove the empty constructor.',
+        '[avoid_unnecessary_constructor] Declaring an empty constructor with no parameters, initializers, or body is redundant because Dart automatically provides a default constructor for classes. Keeping such constructors adds unnecessary code and can mislead readers into thinking there is a special reason for its presence.',
+    correctionMessage:
+        'Remove the empty constructor from your class. If you do not need to customize construction, Dart will automatically provide a default constructor. This reduces boilerplate and makes your codebase cleaner.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -381,8 +387,9 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_arguments',
     problemMessage:
-        '[avoid_unnecessary_enum_arguments] Enum argument matches default value and can be omitted.',
-    correctionMessage: 'Remove the argument to use the default value.',
+        '[avoid_unnecessary_enum_arguments] Providing an argument to an enum constructor that matches the default value is unnecessary and can make the code harder to read. It may also mislead readers into thinking the value is intentionally different from the default.',
+    correctionMessage:
+        'Remove arguments from enum constructors when they match the default value. This makes your code more concise and avoids confusion about the intent of the value.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -427,8 +434,9 @@ class AvoidUnnecessaryEnumPrefixRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_enum_prefix',
     problemMessage:
-        '[avoid_unnecessary_enum_prefix] Unnecessary enum name prefix inside enum declaration.',
-    correctionMessage: 'Remove the enum name prefix when referencing values.',
+        '[avoid_unnecessary_enum_prefix] Using the enum type name as a prefix when referencing enum values inside the enum declaration is redundant. Dart allows you to reference enum values directly within the enum, and including the prefix adds unnecessary verbosity.',
+    correctionMessage:
+        'Remove the enum type name prefix when referencing enum values inside the enum declaration. Use the value name directly for clarity and conciseness.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -567,8 +575,10 @@ class AvoidUnnecessaryExtendsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_extends',
-    problemMessage: '[avoid_unnecessary_extends] Unnecessary extends Object.',
-    correctionMessage: 'Remove the extends clause.',
+    problemMessage:
+        '[avoid_unnecessary_extends] All Dart classes implicitly extend Object, so explicitly writing extends Object is unnecessary and adds clutter to your class declaration. This can confuse readers and is never required.',
+    correctionMessage:
+        'Remove the extends Object clause from your class declaration. Dart will automatically inherit from Object, so this is always implied.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1119,9 +1129,10 @@ class NoEmptyBlockRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: _name,
-    problemMessage: '[no_empty_block] Empty block detected.',
-    correctionMessage: 'Add implementation, a comment inside the block, or use '
-        '`// ignore: $_name` to suppress.',
+    problemMessage:
+        '[no_empty_block] An empty code block (i.e., {}) does not perform any action and may indicate incomplete code, a forgotten implementation, or a placeholder left by mistake. Empty blocks can confuse maintainers and may hide bugs or unfinished features.',
+    correctionMessage:
+        'Add meaningful implementation or a comment inside the block to clarify its purpose. If the block is intentionally left empty, use `// ignore: $_name` to suppress the lint and document why the block is empty.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1277,8 +1288,10 @@ class NoEmptyStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'no_empty_string',
-    problemMessage: '[no_empty_string] Avoid empty string literals.',
-    correctionMessage: 'Use .isEmpty for comparisons.',
+    problemMessage:
+        '[no_empty_string] Using empty string literals ("") in your code can be ambiguous and may indicate a missing value or a placeholder. Relying on empty strings for logic can lead to subtle bugs and makes intent unclear to readers.',
+    correctionMessage:
+        'Instead of using empty string literals directly, use .isEmpty or .isNotEmpty for string comparisons. This makes your intent explicit and your code more robust.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
