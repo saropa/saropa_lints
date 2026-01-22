@@ -2425,7 +2425,9 @@ Set<String> getRulesForTier(String tier) {
       return essentialRules.union(recommendedOnlyRules);
     case 'professional':
       // professional = recommended + professionalOnly
-      return essentialRules.union(recommendedOnlyRules).union(professionalOnlyRules);
+      return essentialRules
+          .union(recommendedOnlyRules)
+          .union(professionalOnlyRules);
     case 'comprehensive':
       // comprehensive = professional + comprehensiveOnly
       return essentialRules
