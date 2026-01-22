@@ -210,9 +210,9 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_apple_signin_nonce',
     problemMessage:
-        '[require_apple_signin_nonce] Apple Sign-In without nonce is vulnerable to replay attacks. An attacker can intercept the authorization token and reuse it to impersonate the user, gaining full access to their account.',
+        '[require_apple_signin_nonce] Omitting a cryptographic nonce when using Apple Sign-In exposes your app to replay attacks. Attackers can intercept a valid authorization token and reuse it to impersonate the user, gaining unauthorized access to their account and sensitive data. Apple’s security documentation strongly recommends using a unique, random nonce for every authentication request to prevent these attacks and ensure user safety.',
     correctionMessage:
-        'Add nonce parameter to getAppleIDCredential() to prevent replay attacks.',
+        'Always provide a unique, random nonce parameter to getAppleIDCredential() when implementing Apple Sign-In. This binds the authentication request to a single session and prevents replay attacks. Review your authentication flows, update your code to generate and pass a secure nonce, and test thoroughly to ensure the nonce is included in every request.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -672,9 +672,9 @@ class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_webview_ssl_error_handling',
     problemMessage:
-        '[require_webview_ssl_error_handling] WebView without SSL error handling silently accepts invalid certificates or fails without warning. This allows man-in-the-middle attacks where users unknowingly submit credentials to attackers.',
+        '[require_webview_ssl_error_handling] If your WebView does not handle SSL certificate errors, it may silently accept invalid or malicious certificates, exposing users to man-in-the-middle attacks. Users may unknowingly submit sensitive information (such as passwords or payment details) to attackers, resulting in account compromise, data theft, or financial loss. Proper SSL error handling is essential for secure in-app browsing.',
     correctionMessage:
-        'Add onSslAuthError callback to NavigationDelegate to handle certificate errors.',
+        'Implement an onSslAuthError callback in your WebView’s NavigationDelegate to detect and handle certificate errors. Warn users about invalid certificates, block navigation to untrusted sites, and log incidents for further review. Test your WebView implementation with both valid and invalid certificates to ensure robust SSL error handling.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
