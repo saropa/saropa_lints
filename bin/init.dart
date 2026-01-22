@@ -1,6 +1,11 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
+library;
+
+import 'package:yaml/yaml.dart' as yaml;
+import 'package:json2yaml/json2yaml.dart' as json2yaml;
+
 /// CLI tool to generate analysis_options.yaml with explicit rule configuration.
 ///
 /// Usage:
@@ -11,8 +16,6 @@
 ///
 /// The tier system works correctly in the Dart code, but custom_lint doesn't
 /// reliably pass plugin config (like `tier: comprehensive`) to plugins.
-/// This tool solves that by generating explicit rule lists.
-library;
 
 import 'dart:io';
 
@@ -38,8 +41,7 @@ const Map<String, int> tierIds = {
 
 /// Tier descriptions for display.
 const Map<String, String> tierDescriptions = {
-  'essential':
-      'Critical rules preventing crashes, security holes, memory leaks',
+  'essential': 'Critical rules preventing crashes, security holes, memory leaks',
   'recommended': 'Essential + accessibility, performance patterns',
   'professional': 'Recommended + architecture, testing, documentation',
   'comprehensive': 'Professional + thorough coverage (recommended)',
@@ -47,6 +49,7 @@ const Map<String, String> tierDescriptions = {
 };
 
 Future<void> main(List<String> args) async {
+  // Show help if requested
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
     return;
@@ -55,19 +58,26 @@ Future<void> main(List<String> args) async {
   // Parse arguments
   final dryRun = args.contains('--dry-run');
   final includeStylistic = args.contains('--stylistic');
+  final noPager = args.contains('--no-pager'); // New: disables pagination in dry-run
 
-  // Parse output file option
+  // Parse output file option (last one wins)
   var outputPath = 'analysis_options.yaml';
+  final outputFlags = <int, String>{};
   final outputIndex = args.indexOf('--output');
   if (outputIndex != -1 && outputIndex + 1 < args.length) {
-    outputPath = args[outputIndex + 1];
+    outputFlags[outputIndex] = args[outputIndex + 1];
   }
   final outputIndexShort = args.indexOf('-o');
   if (outputIndexShort != -1 && outputIndexShort + 1 < args.length) {
-    outputPath = args[outputIndexShort + 1];
+    outputFlags[outputIndexShort] = args[outputIndexShort + 1];
+  }
+  if (outputFlags.isNotEmpty) {
+    // Use the value from the last flag occurrence
+    final last = outputFlags.entries.reduce((a, b) => a.key > b.key ? a : b);
+    outputPath = last.value;
   }
 
-  // Parse tier option
+  // Parse tier option (by name or number)
   String? requestedTier;
   final tierIndex = args.indexOf('--tier');
   if (tierIndex != -1 && tierIndex + 1 < args.length) {
@@ -100,20 +110,18 @@ Future<void> main(List<String> args) async {
   print('Description: ${tierDescriptions[tier]}');
   print('');
 
-  // Get all rules
+  // Get all rules (from all tiers and stylistic)
   final allRules = _getAllRules();
   final enabledRules = getRulesForTier(tier);
   final disabledRules = allRules.difference(enabledRules);
 
-  // Handle stylistic rules
+  // Handle stylistic rules (opt-in)
   Set<String> finalEnabled = enabledRules;
   Set<String> finalDisabled = disabledRules;
-
   if (includeStylistic) {
     finalEnabled = finalEnabled.union(stylisticRules);
     finalDisabled = finalDisabled.difference(stylisticRules);
   } else {
-    // Remove stylistic from enabled (they're opt-in)
     finalEnabled = finalEnabled.difference(stylisticRules);
     finalDisabled = finalDisabled.union(stylisticRules);
   }
@@ -123,42 +131,100 @@ Future<void> main(List<String> args) async {
   print('  Disabled: ${finalDisabled.length}');
   print('  Total: ${allRules.length}');
   if (!includeStylistic) {
-    print(
-        '  (Stylistic rules disabled by default - use --stylistic to enable)');
+    print('  (Stylistic rules disabled by default - use --stylistic to enable)');
   }
   print('');
 
-  // Generate YAML content
-  final yamlContent = _generateYaml(
-    tier: tier,
-    enabledRules: finalEnabled,
-    disabledRules: finalDisabled,
-    includeStylistic: includeStylistic,
-  );
+  // Only update custom_lint section, preserve other config
+  Map<String, dynamic> newCustomLintSection = {'rules': {}};
+  for (final rule in finalEnabled) {
+    newCustomLintSection['rules'][rule] = true;
+  }
+  for (final rule in finalDisabled) {
+    newCustomLintSection['rules'][rule] = false;
+  }
+
+  Map<String, dynamic> mergedConfig = {};
+  final outputFile = File(outputPath);
+  bool fileExisted = outputFile.existsSync();
+  if (fileExisted) {
+    print('Warning: $outputPath already exists.');
+    print('Backing up to ${outputPath}.bak');
+    outputFile.copySync('${outputPath}.bak');
+    final existingContent = outputFile.readAsStringSync();
+    try {
+      // Try to parse existing YAML config
+      final doc = yaml.loadYaml(existingContent);
+      if (doc is Map) {
+        mergedConfig = Map<String, dynamic>.from(doc);
+      }
+    } catch (e) {
+      stderr.writeln('Error: Failed to parse existing YAML: $e');
+      stderr.writeln('Proceeding with a fresh config.');
+      mergedConfig = {};
+    }
+  }
+
+  // Overwrite only the custom_lint section
+  mergedConfig['custom_lint'] = newCustomLintSection;
+
+  // Add header as a comment (not preserved by YAML serialization)
+  final header = [
+    '# SAROPA LINTS CONFIGURATION',
+    '# Generated by: dart run saropa_lints:init --tier $tier',
+    '# Date: ${DateTime.now().toIso8601String().split('T')[0]}',
+    '#',
+    '# Tier: $tier (${finalEnabled.length} of ${finalEnabled.length + finalDisabled.length} rules enabled)',
+    '#',
+    '# This file contains explicit true/false for every rule.',
+    '# To customize: change "true" to "false" (or vice versa).',
+    '# To change tiers: re-run "dart run saropa_lints:init --tier <name>"',
+    '#',
+    '# Tiers:',
+    ...tierOrder.map((tierName) {
+      final id = tierIds[tierName];
+      final desc = tierDescriptions[tierName];
+      final marker = tierName == tier ? ' <-- current' : '';
+      return '#   $id. $tierName: $desc$marker';
+    }),
+    ''
+  ].join('\n');
+
+  final yamlContent = header + '\n' + json2yaml.json2yaml(mergedConfig);
 
   if (dryRun) {
     print('[DRY RUN] Would write to: $outputPath');
     print('');
-    print('Preview (first 50 lines):');
-    print('-' * 40);
-    final lines = yamlContent.split('\n');
-    for (final line in lines.take(50)) {
-      print(line);
+    // Print summary of enabled/disabled rules by tier
+    print('Enabled rules by tier:');
+    for (final t in tierOrder) {
+      final rules = getRulesForTier(t);
+      print('  ${tierIds[t]}. $t: ${rules.length} rules');
     }
-    if (lines.length > 50) {
-      print('... (${lines.length - 50} more lines)');
+    print(
+        'Stylistic rules: ${includeStylistic ? stylisticRules.length : 0} ${includeStylistic ? "(included)" : "(not included)"}');
+    print('');
+    // Paginate preview if output is long, unless --no-pager or not a terminal
+    final lines = yamlContent.split('\n');
+    const pageSize = 50;
+    int page = 0;
+    final isTerminal = stdin.hasTerminal;
+    final usePager = !noPager && isTerminal;
+    while (page * pageSize < lines.length) {
+      final start = page * pageSize;
+      final end = ((page + 1) * pageSize).clamp(0, lines.length);
+      print('Preview (lines ${start + 1}-${end} of ${lines.length}):');
+      print('-' * 40);
+      for (final line in lines.sublist(start, end)) {
+        print(line);
+      }
+      if (end < lines.length && usePager) {
+        print('--- Press Enter to continue, Ctrl+C to quit ---');
+        stdin.readLineSync();
+      }
+      page++;
     }
     return;
-  }
-
-  // Write file
-  final outputFile = File(outputPath);
-
-  // Check for existing file
-  if (outputFile.existsSync()) {
-    print('Warning: $outputPath already exists.');
-    print('Backing up to ${outputPath}.bak');
-    outputFile.copySync('${outputPath}.bak');
   }
 
   outputFile.writeAsStringSync(yamlContent);
@@ -169,8 +235,7 @@ Future<void> main(List<String> args) async {
   print('  2. Run: dart run custom_lint');
   print('  3. Customize rules as needed (change true to false)');
   print('');
-  print(
-      'To change tiers later, run this command again with a different --tier');
+  print('To change tiers later, run this command again with a different --tier');
 }
 
 /// Resolve tier from name or number.
@@ -211,95 +276,6 @@ Set<String> _getAllRules() {
 }
 
 /// Generate YAML configuration content.
-String _generateYaml({
-  required String tier,
-  required Set<String> enabledRules,
-  required Set<String> disabledRules,
-  required bool includeStylistic,
-}) {
-  final buffer = StringBuffer();
-
-  // Header
-  buffer.writeln('# SAROPA LINTS CONFIGURATION');
-  buffer.writeln('# Generated by: dart run saropa_lints:init --tier $tier');
-  buffer.writeln('# Date: ${DateTime.now().toIso8601String().split('T')[0]}');
-  buffer.writeln('#');
-  buffer.writeln(
-      '# Tier: $tier (${enabledRules.length} of ${enabledRules.length + disabledRules.length} rules enabled)');
-  buffer.writeln('#');
-  buffer.writeln('# This file contains explicit true/false for every rule.');
-  buffer.writeln('# To customize: change "true" to "false" (or vice versa).');
-  buffer.writeln(
-      '# To change tiers: re-run "dart run saropa_lints:init --tier <name>"');
-  buffer.writeln('#');
-  buffer.writeln('# Tiers:');
-  for (final tierName in tierOrder) {
-    final id = tierIds[tierName];
-    final desc = tierDescriptions[tierName];
-    final marker = tierName == tier ? ' <-- current' : '';
-    buffer.writeln('#   $id. $tierName: $desc$marker');
-  }
-  buffer.writeln('');
-
-  // Analyzer section (optional - for dart analyze)
-  buffer.writeln('# Optional: Include recommended Dart lints for dart analyze');
-  buffer.writeln('# include: package:lints/recommended.yaml');
-  buffer.writeln('');
-
-  // custom_lint section
-  buffer.writeln('custom_lint:');
-  buffer.writeln('  rules:');
-
-  // Write enabled rules
-  buffer.writeln(
-      '    # **************************************************************************');
-  buffer.writeln(
-      '    # ***  ENABLED RULES ($tier tier)  *****************************************');
-  buffer.writeln(
-      '    # **************************************************************************');
-
-  final sortedEnabled = enabledRules.toList()..sort();
-  for (final rule in sortedEnabled) {
-    buffer.writeln('    - $rule: true');
-  }
-
-  buffer.writeln('');
-  buffer.writeln(
-      '    # **************************************************************************');
-  buffer.writeln(
-      '    # ***  DISABLED RULES (enable manually if needed)  ************************');
-  buffer.writeln(
-      '    # **************************************************************************');
-
-  // Separate stylistic rules
-  final disabledStylistic = disabledRules.intersection(stylisticRules);
-  final disabledOther = disabledRules.difference(stylisticRules);
-
-  if (disabledOther.isNotEmpty) {
-    buffer.writeln('');
-    buffer.writeln('    # --- Higher tier rules (not in $tier) ---');
-    final sortedDisabledOther = disabledOther.toList()..sort();
-    for (final rule in sortedDisabledOther) {
-      buffer.writeln('    - $rule: false');
-    }
-  }
-
-  if (disabledStylistic.isNotEmpty && !includeStylistic) {
-    buffer.writeln('');
-    buffer.writeln('    # --- Stylistic rules (opinionated, opt-in) ---');
-    buffer.writeln(
-        '    # These are formatting/style preferences. Enable with --stylistic flag');
-    buffer.writeln('    # or set individual rules to true below.');
-    final sortedStylistic = disabledStylistic.toList()..sort();
-    for (final rule in sortedStylistic) {
-      buffer.writeln('    - $rule: false');
-    }
-  }
-
-  buffer.writeln('');
-
-  return buffer.toString();
-}
 
 void _printUsage() {
   print('');
@@ -311,11 +287,12 @@ void _printUsage() {
   print('Usage: dart run saropa_lints:init [options]');
   print('');
   print('Options:');
+  print('  -t, --tier <tier>     Tier level (1-5 or name, default: comprehensive)');
   print(
-      '  -t, --tier <tier>     Tier level (1-5 or name, default: comprehensive)');
-  print('  -o, --output <file>   Output file (default: analysis_options.yaml)');
+      '  -o, --output <file>   Output file (default: analysis_options.yaml). If both --output and -o are provided, the last one wins.');
   print(
-      '  --stylistic           Include stylistic rules (opinionated, off by default)');
+      '  --no-pager            Print full preview in dry-run mode without pausing (for CI/non-interactive use).');
+  print('  --stylistic           Include stylistic rules (opinionated, off by default)');
   print('  --dry-run             Preview output without writing');
   print('  -h, --help            Show this help message');
   print('');
