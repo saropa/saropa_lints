@@ -1381,3 +1381,17 @@ The Dart DevTools debugger and profiler is available at: http://127.0.0.1:55798/
 [require_url_validation] 2026-01-21T18:17:06.273836 [saropa_lints] Progress: 41 files analyzed (9s, 4.1 files/sec) - provider_rules_fixture.dart
 [require_url_validation] 2026-01-21T18:17:09.314250 [saropa_lints] Progress: 46 files analyzed (12s, 3.5 files/sec) - owasp_coverage_gap_fixture.dart
 [require_url_validation] 2026-01-21T18:17:12.425682 [saropa_lints] Progress: 58 files analyzed (16s, 3.6 files/sec) - prefer_explicit_type_arguments_fixture.dart
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint client] 2026-01-22T00:03:08.297310 [saropa_lints] createPlugin() called - version 4.2.3
+[custom_lint client] 2026-01-22T00:03:09.040709 [saropa_lints] Loaded 303 rules (tier: essential, enableAll: false)
+[require_url_validation] 2026-01-22T00:03:15.031619 [saropa_lints] Progress: 17 files analyzed (3s, 5.7 files/sec) - avoid_unsafe_where_fixture.dart
+[require_url_validation] 2026-01-22T00:03:18.148675 [saropa_lints] Progress: 31 files analyzed (6s, 5.1 files/sec) - image_rules_v2310_fixture.dart
+[require_url_validation] 2026-01-22T00:03:21.168806 [saropa_lints] Progress: 43 files analyzed (9s, 4.7 files/sec) - scroll_rules_fixture.dart
+[require_url_validation] 2026-01-22T00:03:24.364484 [saropa_lints] Progress: 51 files analyzed (12s, 4.1 files/sec) - avoid_commented_out_code_fixture.dart
