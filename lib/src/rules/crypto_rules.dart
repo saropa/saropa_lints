@@ -7,8 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -136,8 +135,7 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
 
     // Handle named constructors like Key.fromUtf8(...), Key.fromBase64(...)
     // The encrypt package uses named constructors, not static methods.
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String typeName = constructorName.type.name.lexeme;
 
@@ -233,6 +231,7 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_secure_random_for_crypto',
+    // cspell:ignore PRNG CSPRNG
     problemMessage:
         '[prefer_secure_random_for_crypto] The default Random() constructor in Dart uses a seed based on the current system time, making its output predictable and vulnerable to attack. If Random() is used to generate cryptographic keys, initialization vectors (IVs), nonces, tokens, or any value intended to protect sensitive data, attackers can reproduce the same sequence of random numbers and break your security. This flaw has led to real-world breaches where cryptographic protections were bypassed due to weak randomness. Only a cryptographically secure random number generator (CSPRNG) can provide the unpredictability required for security-critical operations.',
     correctionMessage:
@@ -246,8 +245,7 @@ class PreferSecureRandomForCryptoRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       final String? constructorName = node.constructorName.name?.name;
 
@@ -316,8 +314,7 @@ class _UseSecureRandomFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
@@ -370,6 +367,7 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_deprecated_crypto_algorithms',
+    // cspell:ignore preimage
     problemMessage:
         '[avoid_deprecated_crypto_algorithms] The use of outdated cryptographic algorithms such as MD5, SHA1, DES, 3DES, and RC4 exposes your application to well-known attacks. These algorithms have been broken by the security community: MD5 and SHA1 are vulnerable to collision and preimage attacks, allowing attackers to forge digital signatures or tamper with data. DES and 3DES have insufficient key lengths and are susceptible to brute-force attacks, while RC4 is vulnerable to several biases and key recovery attacks. Continuing to use these algorithms puts all encrypted or hashed data at risk of compromise, regardless of other security measures.',
     correctionMessage:
@@ -408,8 +406,7 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
     });
 
     // Check for constructor calls like MD5()
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name2.lexeme;
       if (_deprecatedAlgorithms.contains(typeName)) {
         reporter.atNode(node, code);
@@ -426,6 +423,7 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
   }
 }
 
+// cspell:ignore ciphertext
 /// Warns when static or reused IVs are detected in encryption.
 ///
 /// Alias: static_iv, reused_iv, iv_reuse, nonce_reuse
@@ -466,6 +464,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
         web: <OwaspWeb>{OwaspWeb.a02},
       );
 
+  // cspell:ignore ciphertexts plaintexts
   static const LintCode _code = LintCode(
     name: 'require_unique_iv_per_encryption',
     problemMessage:
@@ -481,9 +480,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     final String lowerName = originalName.toLowerCase();
 
     // Snake_case patterns: my_iv, iv_value, _iv_
-    if (lowerName.contains('_iv_') ||
-        lowerName.endsWith('_iv') ||
-        lowerName.startsWith('iv_')) {
+    if (lowerName.contains('_iv_') || lowerName.endsWith('_iv') || lowerName.startsWith('iv_')) {
       return true;
     }
 
@@ -507,14 +504,12 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
         // Check variable name for IV-related patterns
         final String originalName = variable.name.lexeme;
         final String lowerName = originalName.toLowerCase();
-        final bool hasIvName = lowerName == 'iv' ||
-            lowerName == 'nonce' ||
-            _isIvVariableName(originalName);
+        final bool hasIvName =
+            lowerName == 'iv' || lowerName == 'nonce' || _isIvVariableName(originalName);
 
         // Check if type or initializer references IV class
         final String fieldSource = node.toSource();
-        final bool hasIvClass =
-            fieldSource.contains('IV.') || fieldSource.contains('IV(');
+        final bool hasIvClass = fieldSource.contains('IV.') || fieldSource.contains('IV(');
 
         if (hasIvName || hasIvClass) {
           reporter.atNode(variable, code);
@@ -525,9 +520,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
     // Check for const IV
     context.registry.addVariableDeclaration((VariableDeclaration node) {
       final VariableDeclarationList? parent =
-          node.parent is VariableDeclarationList
-              ? node.parent as VariableDeclarationList
-              : null;
+          node.parent is VariableDeclarationList ? node.parent as VariableDeclarationList : null;
       if (parent == null) return;
 
       final bool isConst = parent.isConst;
@@ -535,9 +528,7 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
 
       final String originalName = node.name.lexeme;
       final String lowerName = originalName.toLowerCase();
-      if (lowerName == 'iv' ||
-          lowerName == 'nonce' ||
-          _isIvVariableName(originalName)) {
+      if (lowerName == 'iv' || lowerName == 'nonce' || _isIvVariableName(originalName)) {
         reporter.atNode(node, code);
       }
     });
