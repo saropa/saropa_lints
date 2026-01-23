@@ -47,8 +47,9 @@ class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_creating_vector_in_update',
     problemMessage:
-        '[avoid_creating_vector_in_update] Creating Vector in update() causes GC churn every frame.',
-    correctionMessage: 'Cache vectors as static final or instance fields.',
+        '[avoid_creating_vector_in_update] Creating new Vector objects (Vector2, Vector3, etc.) inside update() causes frequent garbage collection (GC) churn every frame, leading to performance degradation, frame drops, and increased CPU usage. In real-time games, this can cause stuttering, input lag, and poor user experience, especially on lower-end devices.',
+    correctionMessage:
+        'Cache reusable vectors as static final or instance fields, and reuse them in update() instead of creating new objects each frame. Profile memory usage and GC activity to ensure smooth performance. Document vector reuse strategy for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -86,8 +87,8 @@ class _VectorVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName = node.constructorName.type.element?.name ??
-        node.constructorName.type.name2.lexeme;
+    final String typeName =
+        node.constructorName.type.element?.name ?? node.constructorName.type.name2.lexeme;
 
     if (vectorTypes.contains(typeName)) {
       // Skip const vectors - they're properly reused

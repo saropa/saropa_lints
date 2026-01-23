@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.5.6] - 2026-01-23
+
+### Changed
+- **Major upgrade to developer-facing lint rule messages:**
+  - All `problemMessage` and `correctionMessage` fields for the following rules were rewritten to be context-rich, actionable, and consequence-focused, referencing best practices and real-world risks. This includes the latest upgrades for:
+    - `require_bluetooth_state_check`, `require_ble_disconnect_handling`, `require_geolocator_service_enabled`, `require_geolocator_stream_cancel`, `require_geolocator_error_handling`, `avoid_snackbar_in_build`, `avoid_analytics_in_build`, `avoid_canvas_operations_in_build`, `avoid_unreachable_for_loop`, `require_key_for_collection`, `avoid_print_in_release`, `require_default_config`, `require_lifecycle_observer`, `require_file_handle_close`, `require_deep_equality_collections`, `avoid_throw_in_catch_block`, `avoid_throw_objects_without_tostring`, `require_graphql_error_handling`, `require_sqflite_error_handling`, `require_sqflite_close`, `avoid_sqflite_reserved_words`, `avoid_loading_full_pdf_in_memory`, `avoid_database_in_build`, `avoid_secure_storage_on_web`, `require_database_migration`.
+  - Each message now clearly explains the context and consequences of ignoring the rule (e.g., memory leaks, security risks, user confusion, app crashes), and the best practice for remediation.
+
+- **require_field_dispose** lint rule is now much smarter:
+  - Maintains a list of controller types that never require manual disposal (e.g., `WebViewController`, `GoogleMapController`, `MapController`, `QuillController`, etc.), skipping disposal checks for these types. This prevents false positives for controllers managed by plugins or the framework.
+  - For common controllers (e.g., `TabController`, `ScrollController`, `PageController`, `AnimationController`, `TextEditingController`), disposal is only required if they are manually instantiated in the State class. If managed by a widget (such as `DefaultTabController`, `ListView.builder`, `AnimatedWidget`, or `TextFormField`), disposal is handled automatically and not flagged.
+  - The rule now includes substantial code comments explaining the rationale, edge cases, and references to official documentation, making future maintenance and audits easier.
+  - Edge cases and plugin-managed controllers are now handled correctly, ensuring only true disposal issues are flagged and reducing noise for developers.
+
+- **require_stream_controller_close** lint rule is now smarter:
+- Rule now detects wrapper types (e.g., IsarStreamController, custom wrappers) and accepts .dispose() as valid for those, while requiring .close() for direct StreamController instances.
+- Improved detection logic for disposal in dispose() method.
+- Messages remain context-rich and actionable, emphasizing consequences and best practices.
+
+---
+
 ## [4.5.5] - 2026-01-23
 
 ### Changed
@@ -197,23 +218,7 @@ All three rules include quick fixes to remove duplicate elements.
 
 ### Fixed
 
-**`avoid_variable_shadowing` false positives on sibling closures** - The rule was incorrectly flagging variables with the same name in sibling closures (like separate `test()` callbacks within a `group()`) as shadowing. These are independent scopes, not nested scopes, so they don't actually shadow each other. The rule now properly tracks scope boundaries:
-
-```dart
-// Previously flagged incorrectly - now OK
-group('tests', () {
-  test('A', () { final list = [1]; });  // Scope A
-  test('B', () { final list = [2]; });  // Scope B - NOT shadowing
-});
-
-// Still correctly flagged - true shadowing
-void outer() {
-  final list = [1];
-  void inner() {
-    final list = [2];  // LINT: shadows outer 'list'
-  }
-}
-```
+**`avoid_variable_shadowing` false positives on sibling closures** - The rule was incorrectly flagging variables with the same name in sibling closures (like separate `test()` callbacks within a `group()`) as shadowing. These are independent scopes, not nested scopes, so they don't actually shadow each other. The rule now properly tracks scope boundaries.
 
 ## [4.3.0] - 2026-01-21
 
@@ -279,15 +284,7 @@ Both rules are opinionated and not included in any tier by default. Enable them 
 
 **`require_https_only` false positives on safe URL upgrades** - The rule was flagging `http://` strings even when used in safe replacement patterns like `url.replaceFirst('http://', 'https://')`. The rule now detects and allows these safe HTTP-to-HTTPS upgrade patterns using `replaceFirst`, `replaceAll`, or `replace` methods.
 
-**`avoid_mixed_environments` false positives on conditional configs** - The rule was incorrectly flagging classes that use Flutter's mode constants (`kReleaseMode`, `kDebugMode`, `kProfileMode`) to conditionally set values. For example, this pattern was incorrectly flagged:
-
-```dart
-class AppModeSettings {
-  static const AppModeEnum mode = kDebugMode
-      ? AppModeEnum.debug
-      : (kProfileMode ? AppModeEnum.profile : AppModeEnum.release);
-}
-```
+**`avoid_mixed_environments` false positives on conditional configs** - The rule was incorrectly flagging classes that use Flutter's mode constants (`kReleaseMode`, `kDebugMode`, `kProfileMode`) to conditionally set values.
 
 The rule now detects fields with mode constant checks and marks them as "properly conditional", skipping both production and development indicator checks for those fields. Doc header enhanced with `[HEURISTIC]` tag and additional examples. Added `requiresClassDeclaration` override for performance.
 

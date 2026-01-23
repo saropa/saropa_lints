@@ -30,11 +30,9 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bluetooth_scan_without_timeout',
-    problemMessage:
-        '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
+    problemMessage: '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
         'battery and may run until app termination.',
-    correctionMessage:
-        'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
+    correctionMessage: 'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -106,9 +104,9 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_bluetooth_state_check',
     problemMessage:
-        '[require_bluetooth_state_check] BLE operations should check adapter state first. Skipping this check can cause failed connections, wasted battery, and degraded user experience.',
+        '[require_bluetooth_state_check] Bluetooth Low Energy (BLE) operations must check the adapter state before attempting connections, scans, or service discovery. Failing to check adapter state can result in failed connections, wasted battery due to repeated attempts, degraded user experience, and hard-to-debug errors—especially on devices where Bluetooth is disabled or unavailable. This can also cause your app to be rejected during app store review for reliability issues.',
     correctionMessage:
-        'Check FlutterBluePlus.adapterState before BLE operations.',
+        'Always check FlutterBluePlus.adapterState (or equivalent) before performing BLE operations. If the adapter is not powered on, prompt the user to enable Bluetooth or handle the error gracefully. Document this check in your connection logic to ensure robust and user-friendly BLE workflows.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -216,9 +214,9 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_ble_disconnect_handling',
     problemMessage:
-        '[require_ble_disconnect_handling] BLE connection should handle disconnect state. Not handling disconnects can lead to stale UI, resource leaks, and user confusion.',
+        '[require_ble_disconnect_handling] BLE connections must handle disconnect events to maintain app stability and resource management. Ignoring disconnects can lead to stale UI (showing devices as connected when they are not), resource leaks (unreleased connections or streams), and user confusion when devices unexpectedly disappear or fail to reconnect. This can also cause battery drain and degraded reliability, especially in apps that manage multiple devices.',
     correctionMessage:
-        'Listen to device.connectionState for disconnect events.',
+        'Listen to device.connectionState (or equivalent) for disconnect events and update your UI and resources accordingly. Clean up streams, subscriptions, and device references when a disconnect occurs. Provide user feedback and attempt reconnection only when appropriate, to avoid infinite loops or excessive battery usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -519,8 +517,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'getCurrentPosition' &&
-          methodName != 'getPositionStream') {
+      if (methodName != 'getCurrentPosition' && methodName != 'getPositionStream') {
         return;
       }
 
@@ -545,8 +542,7 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('checkPermission') &&
-          !bodySource.contains('requestPermission')) {
+      if (!bodySource.contains('checkPermission') && !bodySource.contains('requestPermission')) {
         reporter.atNode(node, code);
       }
     });
@@ -582,8 +578,9 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_service_enabled',
     problemMessage:
-        '[require_geolocator_service_enabled] Location request without service check. May fail if GPS is off.',
-    correctionMessage: 'Call Geolocator.isLocationServiceEnabled() first.',
+        '[require_geolocator_service_enabled] Location requests must check if the location service (GPS) is enabled before attempting to access position data. Failing to check service status can cause runtime errors, user confusion, and app store rejection due to non-compliance with platform requirements. On devices where GPS is disabled, location requests will fail, resulting in poor UX and potentially lost functionality.',
+    correctionMessage:
+        'Always call Geolocator.isLocationServiceEnabled() before requesting location. If the service is disabled, prompt the user to enable it or handle the error gracefully. Document this check in your location logic to ensure robust and compliant location workflows.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -658,8 +655,9 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_stream_cancel',
     problemMessage:
-        '[require_geolocator_stream_cancel] Position stream subscription without cancel. Battery drain.',
-    correctionMessage: 'Store subscription and call cancel() in dispose().',
+        '[require_geolocator_stream_cancel] Position stream subscriptions must be cancelled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations.',
+    correctionMessage:
+        'Store the stream subscription and always call cancel() in dispose() or when the subscription is no longer needed. Document this cleanup to prevent resource leaks and ensure responsible location usage.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -722,8 +720,9 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_geolocator_error_handling',
     problemMessage:
-        '[require_geolocator_error_handling] Location request without error handling. May crash on failure.',
-    correctionMessage: 'Wrap in try-catch to handle location errors.',
+        '[require_geolocator_error_handling] Location requests must be wrapped in error handling logic. Failing to handle errors can cause app crashes, lost user trust, and poor reviews—especially when location permissions are denied or hardware fails. Unhandled exceptions may also prevent your app from passing app store review.',
+    correctionMessage:
+        'Wrap location requests in try-catch blocks to handle errors such as permission denial, hardware failure, or service unavailability. Provide user feedback and fallback logic to maintain a robust and user-friendly experience.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -735,8 +734,7 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'getCurrentPosition' &&
-          methodName != 'getLastKnownPosition') {
+      if (methodName != 'getCurrentPosition' && methodName != 'getLastKnownPosition') {
         return;
       }
 
@@ -795,8 +793,7 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
     name: 'prefer_ble_mtu_negotiation',
     problemMessage:
         '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers.',
-    correctionMessage:
-        'Call device.requestMtu(512) after connect() and before write operations.',
+    correctionMessage: 'Call device.requestMtu(512) after connect() and before write operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -860,8 +857,7 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
         while (current != null) {
           if (current is MethodDeclaration) {
             final String methodSource = current.toSource();
-            if (methodSource.contains('requestMtu') ||
-                methodSource.contains('mtuRequest')) {
+            if (methodSource.contains('requestMtu') || methodSource.contains('mtuRequest')) {
               hasMtuNegotiation = true;
             }
             break;
