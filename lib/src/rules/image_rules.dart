@@ -37,8 +37,7 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
     name: 'avoid_image_rebuild_on_scroll',
     problemMessage:
         '[avoid_image_rebuild_on_scroll] Image.network in ListView.builder will rebuild on scroll.',
-    correctionMessage:
-        'Use CachedNetworkImage or move image loading outside the builder.',
+    correctionMessage: 'Use CachedNetworkImage or move image loading outside the builder.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -69,14 +68,12 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
       AstNode? current = node.parent;
 
       while (current != null) {
-        if (current is NamedExpression &&
-            current.name.label.name == 'itemBuilder') {
+        if (current is NamedExpression && current.name.label.name == 'itemBuilder') {
           // Found itemBuilder, now check if parent is ListView/GridView
           AstNode? listViewNode = current.parent;
           while (listViewNode != null) {
             if (listViewNode is InstanceCreationExpression) {
-              final String listTypeName =
-                  listViewNode.constructorName.type.name.lexeme;
+              final String listTypeName = listViewNode.constructorName.type.name.lexeme;
               if (_listBuilders.contains(listTypeName)) {
                 insideListBuilder = true;
                 break;
@@ -142,9 +139,9 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_avatar_fallback',
     problemMessage:
-        '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error.',
+        '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error, leading to confusion, poor UX, and missed identity cues. This can also mask backend or connectivity issues during development.',
     correctionMessage:
-        'Add onBackgroundImageError callback or use Image with ClipOval.',
+        'Add onBackgroundImageError callback or use Image with ClipOval and provide a fallback asset or initials. Audit all avatar usage for error handling and add tests for image failure scenarios. Document fallback logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -172,8 +169,7 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
             if (arg.expression is InstanceCreationExpression) {
               final InstanceCreationExpression imgExpr =
                   arg.expression as InstanceCreationExpression;
-              final String? imgTypeName =
-                  imgExpr.constructorName.type.element?.name;
+              final String? imgTypeName = imgExpr.constructorName.type.element?.name;
               if (imgTypeName == 'NetworkImage') {
                 hasNetworkImage = true;
               }
@@ -311,8 +307,7 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
     name: 'prefer_image_size_constraints',
     problemMessage:
         '[prefer_image_size_constraints] Consider adding cacheWidth/cacheHeight for memory optimization.',
-    correctionMessage:
-        'Set cacheWidth/cacheHeight to avoid decoding at full resolution.',
+    correctionMessage: 'Set cacheWidth/cacheHeight to avoid decoding at full resolution.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -627,10 +622,8 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pdf_loading_indicator',
-    problemMessage:
-        '[require_pdf_loading_indicator] PDF viewer should provide loading feedback.',
-    correctionMessage:
-        'Add loading state handling or use onDocumentLoaded callback.',
+    problemMessage: '[require_pdf_loading_indicator] PDF viewer should provide loading feedback.',
+    correctionMessage: 'Add loading state handling or use onDocumentLoaded callback.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -711,8 +704,7 @@ class PreferClipboardFeedbackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_clipboard_feedback',
-    problemMessage:
-        '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback.',
+    problemMessage: '[prefer_clipboard_feedback] Clipboard.setData should provide user feedback.',
     correctionMessage: 'Add SnackBar or Toast to confirm clipboard operation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1005,8 +997,7 @@ class RequireExifHandlingRule extends SaropaLintRule {
     name: 'require_exif_handling',
     problemMessage:
         '[require_exif_handling] Image.file may show photos rotated. Consider EXIF handling.',
-    correctionMessage:
-        'Use flutter_image_compress or similar to auto-rotate camera photos.',
+    correctionMessage: 'Use flutter_image_compress or similar to auto-rotate camera photos.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1194,8 +1185,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
     name: 'require_image_stream_dispose',
     problemMessage:
         '[require_image_stream_dispose] ImageStream listener must be removed in dispose() to prevent memory leaks.',
-    correctionMessage:
-        'Add _imageStream?.removeListener(_listener) in dispose() method.',
+    correctionMessage: 'Add _imageStream?.removeListener(_listener) in dispose() method.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1221,10 +1211,8 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null &&
-              (typeName == 'ImageStream' || typeName == 'ImageStream?')) {
-            for (final VariableDeclaration variable
-                in member.fields.variables) {
+          if (typeName != null && (typeName == 'ImageStream' || typeName == 'ImageStream?')) {
+            for (final VariableDeclaration variable in member.fields.variables) {
               imageStreamFields.add(variable.name.lexeme);
             }
           }
@@ -1257,8 +1245,7 @@ class RequireImageStreamDisposeRule extends SaropaLintRule {
         if (!hasRemoveListener) {
           for (final ClassMember member in node.members) {
             if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
+              for (final VariableDeclaration variable in member.fields.variables) {
                 if (variable.name.lexeme == fieldName) {
                   reporter.atNode(variable, code);
                 }
@@ -1315,8 +1302,7 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
     name: 'prefer_image_picker_request_full_metadata',
     problemMessage:
         '[prefer_image_picker_request_full_metadata] pickImage without requestFullMetadata. Consider setting false for privacy.',
-    correctionMessage:
-        'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed.',
+    correctionMessage: 'Add requestFullMetadata: false if EXIF data (GPS, timestamps) not needed.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1446,9 +1432,7 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String paramName = arg.name.label.name;
-          if (paramName == 'imageQuality' ||
-              paramName == 'maxWidth' ||
-              paramName == 'maxHeight') {
+          if (paramName == 'imageQuality' || paramName == 'maxWidth' || paramName == 'maxHeight') {
             hasCompression = true;
             break;
           }
@@ -1503,8 +1487,7 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
     name: 'prefer_cached_image_cache_manager',
     problemMessage:
         '[prefer_cached_image_cache_manager] CachedNetworkImage without CacheManager. Cache may grow unbounded.',
-    correctionMessage:
-        'Add cacheManager parameter to limit cache size and stale period.',
+    correctionMessage: 'Add cacheManager parameter to limit cache size and stale period.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1570,8 +1553,7 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
     name: 'require_image_cache_dimensions',
     problemMessage:
         '[require_image_cache_dimensions] Image.network without cacheWidth/cacheHeight. High memory usage.',
-    correctionMessage:
-        'Add cacheWidth and/or cacheHeight to limit decoded image size.',
+    correctionMessage: 'Add cacheWidth and/or cacheHeight to limit decoded image size.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

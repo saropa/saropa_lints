@@ -4,8 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -25,8 +24,7 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_final_exception_class_fields',
-    problemMessage:
-        '[avoid_non_final_exception_class_fields] Mutable exception fields '
+    problemMessage: '[avoid_non_final_exception_class_fields] Mutable exception fields '
         'allow modification after throw, corrupting error data for handlers.',
     correctionMessage: 'Make all fields final in exception classes.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -99,8 +97,7 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_only_rethrow',
-    problemMessage:
-        '[avoid_only_rethrow] Catch-rethrow with no handling is dead code that '
+    problemMessage: '[avoid_only_rethrow] Catch-rethrow with no handling is dead code that '
         'adds nesting and complexity without providing any value.',
     correctionMessage: 'Remove the try-catch or add meaningful error handling.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -116,8 +113,7 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
       final Block body = node.body;
       if (body.statements.length == 1) {
         final Statement statement = body.statements.first;
-        if (statement is ExpressionStatement &&
-            statement.expression is RethrowExpression) {
+        if (statement is ExpressionStatement && statement.expression is RethrowExpression) {
           reporter.atNode(node, code);
         }
       }
@@ -165,9 +161,9 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_throw_in_catch_block',
     problemMessage:
-        '[avoid_throw_in_catch_block] Throwing in catch block loses the original stack trace.',
+        '[avoid_throw_in_catch_block] Throwing a new error in a catch block without preserving the original stack trace makes debugging much harder. This can hide the root cause of failures and lead to incomplete error logs, making it difficult to diagnose and fix issues.',
     correctionMessage:
-        'Use rethrow or Error.throwWithStackTrace to preserve stack trace.',
+        'Use rethrow to propagate the original error, or Error.throwWithStackTrace to preserve the stack trace when throwing a new error. Always document error handling logic for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -233,9 +229,9 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_throw_objects_without_tostring',
     problemMessage:
-        '[avoid_throw_objects_without_tostring] Thrown object may not have a useful toString() method.',
+        '[avoid_throw_objects_without_tostring] Thrown objects should have a useful toString() method for error reporting and debugging. Throwing objects without a meaningful string representation makes error logs cryptic and hinders troubleshooting, especially in production.',
     correctionMessage:
-        'Consider throwing an Exception or Error subclass, or implement toString().',
+        'Throw Exception or Error subclasses, or implement toString() on custom error objects. Ensure error messages are clear and actionable for maintainers and support teams.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -283,8 +279,7 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
       if (type is InterfaceType) {
         final bool hasToString = type.element.methods.any(
           (MethodElement e) =>
-              e.name == 'toString' &&
-              (e as Element).enclosingElement == type.element,
+              e.name == 'toString' && (e as Element).enclosingElement == type.element,
         );
         if (hasToString) return;
       }
@@ -307,8 +302,7 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_public_exception_classes',
-    problemMessage:
-        '[prefer_public_exception_classes] Private exception classes cannot be '
+    problemMessage: '[prefer_public_exception_classes] Private exception classes cannot be '
         'caught by name outside this library, forcing generic catch blocks.',
     correctionMessage: 'Remove underscore prefix from exception class name.',
     errorSeverity: DiagnosticSeverity.INFO,

@@ -8,8 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -57,8 +56,7 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
     name: 'avoid_gradient_in_build',
     problemMessage:
         '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain.',
-    correctionMessage:
-        'Store gradient as a static const field or create outside build().',
+    correctionMessage: 'Store gradient as a static const field or create outside build().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -93,8 +91,8 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    final String typeName = node.constructorName.type.element?.name ??
-        node.constructorName.type.name2.lexeme;
+    final String typeName =
+        node.constructorName.type.element?.name ?? node.constructorName.type.name2.lexeme;
 
     if (gradientTypes.contains(typeName)) {
       // Skip const gradients - they're properly reused
@@ -299,8 +297,9 @@ class AvoidSnackbarInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_snackbar_in_build',
     problemMessage:
-        '[avoid_snackbar_in_build] showSnackBar in build() causes repeated snackbars. This leads to poor UX and can overwhelm users with duplicate messages.',
-    correctionMessage: 'Move snackbar calls to event handlers.',
+        '[avoid_snackbar_in_build] Calling showSnackBar inside build() causes a snackbar to be shown on every rebuild, flooding the user with duplicate messages and overwhelming the snackbar queue. This leads to poor user experience, lost context, and can make the app feel buggy or unresponsive. It may also result in app store rejection for UX violations and negative user reviews due to notification spam.',
+    correctionMessage:
+        'Move all snackbar calls out of build() and into event handlers (e.g., onPressed) or lifecycle methods (e.g., initState). Ensure snackbars are only shown in response to user actions or specific events. Audit your codebase for accidental snackbar triggers in build() and add tests to verify correct notification behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -389,8 +388,9 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_analytics_in_build',
     problemMessage:
-        '[avoid_analytics_in_build] Analytics calls in build() fire on every rebuild. This can skew analytics data and degrade app performance.',
-    correctionMessage: 'Move analytics to initState() or event handlers.',
+        '[avoid_analytics_in_build] Analytics calls inside build() are triggered on every rebuild, resulting in duplicate events, inaccurate tracking data, degraded app performance, and inflated backend costs. This can skew business metrics, violate analytics best practices, and make it difficult to analyze real user behavior. Persistent analytics spam may also trigger rate limits or data quality flags in analytics platforms.',
+    correctionMessage:
+        'Move analytics calls to initState(), event handlers, or lifecycle methods triggered once per user action or screen view. Audit analytics logic for duplicate events and add tests to verify correct event tracking. Document analytics integration for maintainability.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -425,8 +425,7 @@ class AvoidAnalyticsInBuildRule extends SaropaLintRule {
       final String? returnType = node.returnType?.toSource();
       if (returnType != 'Widget') return;
 
-      node.body
-          .visitChildren(_AnalyticsVisitor(reporter, code, _analyticsMethods));
+      node.body.visitChildren(_AnalyticsVisitor(reporter, code, _analyticsMethods));
     });
   }
 }
@@ -537,8 +536,7 @@ class _JsonEncodeVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'jsonEncode' ||
-        node.methodName.name == 'json.encode') {
+    if (node.methodName.name == 'jsonEncode' || node.methodName.name == 'json.encode') {
       reporter.atNode(node, code);
     }
     super.visitMethodInvocation(node);
@@ -593,10 +591,8 @@ class AvoidGetItInBuildRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_getit_in_build',
-    problemMessage:
-        '[avoid_getit_in_build] GetIt service locator in build() hides dependencies.',
-    correctionMessage:
-        'Inject dependencies via constructor or access in initState().',
+    problemMessage: '[avoid_getit_in_build] GetIt service locator in build() hides dependencies.',
+    correctionMessage: 'Inject dependencies via constructor or access in initState().',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -686,8 +682,9 @@ class AvoidCanvasInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_canvas_operations_in_build',
     problemMessage:
-        '[avoid_canvas_operations_in_build] Canvas operations belong in CustomPainter, not build(). Doing this in build() can cause performance issues and unpredictable rendering.',
-    correctionMessage: 'Move canvas operations to CustomPainter.paint().',
+        '[avoid_canvas_operations_in_build] Canvas operations (drawing, painting) should only be performed in CustomPainter.paint(), not in build() or other widget methods. Doing this in build() can cause severe performance issues, unpredictable rendering, visual glitches, and broken platform optimizations. This may result in app store rejection for poor graphics handling and negative user feedback due to laggy or broken UI.',
+    correctionMessage:
+        'Move all canvas operations to a CustomPainter subclass and override the paint() method. Trigger repaints using setState or notifier patterns, not by calling canvas methods in build(). Audit your codebase for accidental canvas calls in build() and add tests for rendering correctness.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -846,8 +843,7 @@ class PreferSingleSetStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_single_setstate',
-    problemMessage:
-        '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds.',
+    problemMessage: '[prefer_single_setstate] Multiple setState calls cause unnecessary rebuilds.',
     correctionMessage: 'Combine setState calls into a single call.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1004,8 +1000,7 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
       // Check if inside a children argument
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is NamedExpression &&
-            current.name.label.name == 'children') {
+        if (current is NamedExpression && current.name.label.name == 'children') {
           reporter.atNode(node, code);
           return;
         }
@@ -1089,8 +1084,7 @@ class PreferContainerRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression childExpr = arg.expression;
           if (childExpr is InstanceCreationExpression) {
-            final String? childType =
-                childExpr.constructorName.type.element?.name;
+            final String? childType = childExpr.constructorName.type.element?.name;
             if (_containerRelatedWidgets.contains(childType)) {
               reporter.atNode(node, code);
               return;
