@@ -247,16 +247,6 @@ Before merging any fix:
 
 ### 1.1 Widget Rules
 
-#### Layout & Composition
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-#### Text & Typography
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.2 State Management
 
 #### Riverpod Rules
@@ -273,22 +263,7 @@ Before merging any fix:
 | `require_bloc_test_coverage` | Professional | INFO | `[CROSS-FILE]` Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
 | 🐙 [`require_bloc_test_coverage`](https://github.com/saropa/saropa_lints/issues/4) | Professional | INFO | `[CROSS-FILE]` Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
 
-#### Provider Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-#### GetX Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.3 Performance Rules
-
-#### Build Optimization
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 #### Memory Optimization
 
@@ -315,11 +290,6 @@ Before merging any fix:
 ### 1.4 Testing Rules
 
 #### Unit Testing
-
-#### Widget Testing
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 #### Integration Testing
 
@@ -457,16 +427,6 @@ Before merging any fix:
 |-----------|------|----------|-------------|
 | `avoid_large_assets_on_web` | Recommended | WARNING | Web has no app install; assets download on demand. Lazy-load images and use appropriate formats (WebP) for faster loads. |
 
-#### Desktop-Specific (Windows/macOS/Linux)
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-### 1.12 Firebase Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.13 Offline-First & Sync Rules
 
 | Rule Name | Tier | Severity | Description |
@@ -515,41 +475,11 @@ Before merging any fix:
 | ⭐ `prefer_adaptive_icons` | Recommended | INFO | Icons at 24px default are too small on tablets, too large on watches. Use IconTheme or scale based on screen size. |
 | `require_foldable_awareness` | Comprehensive | INFO | Foldable devices have hinges and multiple displays. Use DisplayFeature API to avoid placing content on fold. |
 
-### 1.21 WebSocket & Real-time Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-### 1.22 GraphQL Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.23 Audio & Video Player Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_audio_in_background_without_config` | Essential | ERROR | `[CROSS-FILE]` Background audio requires proper iOS/Android configuration. Detect audio playback in apps without background audio capability. |
-
-### 1.24 Bluetooth & IoT Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-### 1.25 PDF & Document Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-### 1.26 QR Code & Barcode Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-### 1.27 Clipboard Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 ### 1.28 Analytics & Tracking Rules
 
@@ -576,22 +506,12 @@ Before merging any fix:
 | ⭐ `avoid_datetime_comparison_without_precision` | Professional | INFO | DateTime equality fails due to microsecond differences. Detect direct DateTime equality; suggest difference threshold. |
 | 🐙 [`avoid_datetime_comparison_without_precision`](https://github.com/saropa/saropa_lints/issues/23) | Professional | INFO | DateTime equality fails due to microsecond differences. Detect direct DateTime equality; suggest difference threshold. |
 
-### 1.31 Money & Currency Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.32 File I/O Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_temp_file_cleanup` | Professional | INFO | `[CROSS-FILE]` Temp files accumulate over time. Detect temp file creation without corresponding delete. |
 | 🐙 [`require_temp_file_cleanup`](https://github.com/saropa/saropa_lints/issues/6) | Professional | INFO | `[CROSS-FILE]` Temp files accumulate over time. Detect temp file creation without corresponding delete. |
-
-### 1.33 Encryption & Cryptography Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 ### 1.34 JSON & Serialization Rules
 
@@ -639,11 +559,6 @@ Before merging any fix:
 |-----------|------|----------|-------------|
 | `prefer_search_cancel_previous` | Professional | INFO | Cancel previous search request when new search starts. Detect search without CancelToken or similar mechanism. |
 
-### 1.41 Image Loading & Optimization Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.42 ListView & ScrollView Rules
 
 | Rule Name | Tier | Severity | Description |
@@ -656,37 +571,17 @@ Before merging any fix:
 |-----------|------|----------|-------------|
 | ⭐ `require_rtl_layout_support` | Recommended | WARNING | RTL languages need directional awareness. Detect hardcoded left/right in layouts without Directionality check. |
 
-### 1.45 Gradient & CustomPaint Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-### 1.46 Dialog & Modal Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.47 Snackbar & Toast Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_snackbar_duration_consideration` | Recommended | INFO | `[HEURISTIC]` Important messages need longer duration. Detect SnackBar without explicit duration for important content. |
 
-### 1.48 Tab & Bottom Navigation Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 ### 1.49 Stepper & Multi-step Flow Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⭐ `require_stepper_state_management` | Professional | INFO | Stepper state should handle back navigation. Detect Stepper without preserving form state across steps. |
-
-### 1.50 Badge & Indicator Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 ### 1.51 Avatar & Profile Image Rules
 
@@ -788,32 +683,12 @@ Before merging any fix:
 | `handle_bloc_event_subclasses` | Professional | INFO | Ensure all event subclasses are handled in event handlers. |
 | `prefer_bloc_extensions` | Professional | INFO | Use Bloc extension methods for cleaner code. |
 
-#### Riverpod Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-#### Provider Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
-#### GetX Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
-
 #### Flutter Hooks Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⭐ `avoid_misused_hooks` | Essential | WARNING | Detect common hook misuse patterns. |
 | ⭐ `prefer_use_callback` | Professional | INFO | Use useCallback for memoizing callback functions. |
-
-#### Flame Engine Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 #### Intl/Localization Rules
 
@@ -1121,11 +996,6 @@ This section tracks new Dart/Flutter language features that developers should le
 
 ### 4.3 Modern Dart Rules Summary
 
-#### High Priority (Widely Applicable)
-
-| Rule Name | Tier | Description | Version |
-|-----------|------|-------------|---------|
-
 #### Medium Priority (Architecture/Design)
 
 | Rule Name | Tier | Description | Version |
@@ -1175,11 +1045,6 @@ Pick a rule from the list above and submit a PR!
 ## Part 5: Package-Specific Rules (500 New Rules)
 
 Based on research into the top 20 Flutter packages and their common gotchas, anti-patterns, and best practices.
-
-### 5.1 Dio HTTP Client Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 ### 5.2 go_router Navigation Rules
 
@@ -1434,11 +1299,6 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | `require_test_golden_threshold` | Professional | INFO | Set golden test threshold for CI differences. Detect default threshold. |
 | 🐙 [`require_test_golden_threshold`](https://github.com/saropa/saropa_lints/issues/30) | Professional | INFO | Set golden test threshold for CI differences. Detect default threshold. |
 | 🐙 [`require_test_coverage_threshold`](https://github.com/saropa/saropa_lints/issues/31) | Professional | INFO | Set minimum coverage threshold. Detect coverage below threshold. |
-
-### 5.32 Dispose Pattern Rules
-
-| Rule Name | Tier | Severity | Description |
-|-----------|------|----------|-------------|
 
 ### 5.33 Memory Optimization Rules
 
