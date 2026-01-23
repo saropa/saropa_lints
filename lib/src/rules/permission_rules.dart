@@ -244,14 +244,15 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
         return;
       }
 
-      // For initialize, check if target is CameraController
+      // For initialize, check if target is CameraController (not just by name)
       if (methodName == 'initialize') {
         final Expression? target = node.target;
         if (target == null) return;
 
-        final String targetSource = target.toSource().toLowerCase();
-        if (!targetSource.contains('camera') &&
-            !targetSource.contains('controller')) {
+        // Use staticType to check for CameraController
+        final staticType =
+            target.staticType?.getDisplayString(withNullability: false) ?? '';
+        if (staticType != 'CameraController') {
           return;
         }
       }

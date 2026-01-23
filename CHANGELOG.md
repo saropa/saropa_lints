@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+
+## [4.5.5] - 2026-01-23
+
+### Fixed
+
+- **require_camera_permission_check**: False positive fixed for `.initialize()` calls on non-camera controllers (e.g., IsarStreamController). The rule now checks the static type to ensure only `CameraController` is flagged. Thanks to user report and test case.
+- Added test fixture: `example/lib/isar_stream_controller_initialize_fixture.dart` to document and prevent regression of this false positive.
+
+---
 ## [4.5.4] - 2026-01-22
 
 ### Changed
