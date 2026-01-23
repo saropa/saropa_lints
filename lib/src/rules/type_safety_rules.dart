@@ -8,8 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -47,8 +46,7 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_cast',
-    problemMessage:
-        '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime.',
+    problemMessage: '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime.',
     correctionMessage: 'Use "is" check or pattern matching instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -103,8 +101,7 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_constrained_generics',
-    problemMessage:
-        '[prefer_constrained_generics] Generic type parameter has no constraint.',
+    problemMessage: '[prefer_constrained_generics] Generic type parameter has no constraint.',
     correctionMessage: 'Consider adding extends clause to constrain the type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -159,10 +156,8 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_covariant_documentation',
-    problemMessage:
-        '[require_covariant_documentation] Covariant parameter should be documented.',
-    correctionMessage:
-        'Add documentation explaining why covariant is necessary.',
+    problemMessage: '[require_covariant_documentation] Covariant parameter should be documented.',
+    correctionMessage: 'Add documentation explaining why covariant is necessary.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -231,8 +226,7 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_safe_json_parsing',
-    problemMessage:
-        '[require_safe_json_parsing] JSON parsing may throw on missing keys.',
+    problemMessage: '[require_safe_json_parsing] JSON parsing may throw on missing keys.',
     correctionMessage: 'Use null-aware operators or provide defaults.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -300,8 +294,9 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_null_safe_extensions',
     problemMessage:
-        '[require_null_safe_extensions] Extension on nullable type uses null assertion.',
-    correctionMessage: 'Use null-aware operators instead of "!".',
+        '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions.',
+    correctionMessage:
+        'Add null checks or use ?. to safely handle nullable receivers in extension methods.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -418,8 +413,7 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_non_null_assertion',
-    problemMessage:
-        '[avoid_non_null_assertion] Avoid using the non-null assertion operator (!).',
+    problemMessage: '[avoid_non_null_assertion] Avoid using the non-null assertion operator (!).',
     correctionMessage: 'Use null-aware operators or explicit null checks.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -465,8 +459,7 @@ class AvoidTypeCastsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_type_casts',
-    problemMessage:
-        '[avoid_type_casts] Type cast with "as" may throw at runtime.',
+    problemMessage: '[avoid_type_casts] Type cast with "as" may throw at runtime.',
     correctionMessage: 'Use "is" check or pattern matching instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -509,8 +502,7 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_futureor_documentation',
-    problemMessage:
-        '[require_futureor_documentation] FutureOr return type should be documented.',
+    problemMessage: '[require_futureor_documentation] FutureOr return type should be documented.',
     correctionMessage: 'Add documentation explaining when sync vs async.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -600,8 +592,7 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       // Check for generic types without explicit args
-      final TypeArgumentList? typeArgs =
-          node.constructorName.type.typeArguments;
+      final TypeArgumentList? typeArgs = node.constructorName.type.typeArguments;
       final String? typeName = node.constructorName.type.element?.name;
 
       // Only check common generic types
@@ -615,9 +606,7 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
         'PublishSubject',
       };
 
-      if (typeName != null &&
-          genericTypes.contains(typeName) &&
-          typeArgs == null) {
+      if (typeName != null && genericTypes.contains(typeName) && typeArgs == null) {
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -662,8 +651,7 @@ class _PreferExplicitTypeArgumentsFix extends DartFix {
       final List<DartType> typeArgs = listType.typeArguments;
       if (typeArgs.isEmpty) return;
 
-      final String typeArgStr =
-          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
+      final String typeArgStr = typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
         message: 'Add <$typeArgStr>',
@@ -686,8 +674,7 @@ class _PreferExplicitTypeArgumentsFix extends DartFix {
       final List<DartType> typeArgs = type.typeArguments;
       if (typeArgs.isEmpty) return;
 
-      final String typeArgStr =
-          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
+      final String typeArgStr = typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
         message: 'Add <$typeArgStr>',
@@ -705,8 +692,7 @@ class _PreferExplicitTypeArgumentsFix extends DartFix {
     ) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
-      final TypeArgumentList? existingTypeArgs =
-          node.constructorName.type.typeArguments;
+      final TypeArgumentList? existingTypeArgs = node.constructorName.type.typeArguments;
       if (existingTypeArgs != null) return;
 
       final DartType? staticType = node.staticType;
@@ -715,8 +701,7 @@ class _PreferExplicitTypeArgumentsFix extends DartFix {
       final List<DartType> typeArgs = staticType.typeArguments;
       if (typeArgs.isEmpty) return;
 
-      final String typeArgStr =
-          typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
+      final String typeArgStr = typeArgs.map((DartType t) => t.getDisplayString()).join(', ');
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
         message: 'Add <$typeArgStr>',
@@ -1049,8 +1034,7 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_json_chains',
-    problemMessage:
-        '[avoid_dynamic_json_chains] Deep dynamic access throws NoSuchMethodError '
+    problemMessage: '[avoid_dynamic_json_chains] Deep dynamic access throws NoSuchMethodError '
         'or TypeError at runtime when any nested key is missing. Chaining multiple dynamic map accesses (e.g., json["a"]["b"]["c"]) is fragile and will crash if any key is missing or null. This leads to runtime exceptions, broken features, and poor user experience. Always check each level for null before accessing the next.',
     correctionMessage:
         'Break deep dynamic map accesses into separate statements with null checks at each level. Use safe navigation (?.) or explicit checks to prevent runtime errors and improve code robustness.',
@@ -1248,8 +1232,7 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_validator_return_null',
-    problemMessage:
-        '[require_validator_return_null] Non-null return on valid input shows '
+    problemMessage: '[require_validator_return_null] Non-null return on valid input shows '
         'error message even when field is correct, confusing users. Validator functions in forms must return null for valid input. Returning a non-null value causes error messages to display even when the field is correct, leading to user frustration and broken form validation.',
     correctionMessage:
         'Always return null from validator functions when the input is valid. This ensures error messages are only shown for invalid input and provides a correct user experience.',
@@ -1293,8 +1276,8 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
 
     // Check for conditional with null
     // Pattern: condition ? 'error' : null
-    final ternaryWithNullPattern = RegExp(
-        r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null");
+    final ternaryWithNullPattern =
+        RegExp(r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null");
     if (ternaryWithNullPattern.hasMatch(source)) {
       return true;
     }
