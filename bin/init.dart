@@ -48,67 +48,36 @@ const Map<String, String> tierDescriptions = {
   'insanity': 'All rules enabled (may have conflicts)',
 };
 
+/// Main entry point for the CLI tool.
 Future<void> main(List<String> args) async {
-  // Show help if requested
-  if (args.contains('--help') || args.contains('-h')) {
+  // Parse and validate arguments
+  final cliArgs = _parseArguments(args);
+  if (cliArgs.showHelp) {
     _printUsage();
     return;
   }
 
-  // Parse arguments
-  final dryRun = args.contains('--dry-run');
-  final includeStylistic = args.contains('--stylistic');
-  final noPager = args.contains('--no-pager'); // New: disables pagination in dry-run
-
-  // Parse output file option (last one wins)
-  var outputPath = 'analysis_options.yaml';
-  final outputFlags = <int, String>{};
-  final outputIndex = args.indexOf('--output');
-  if (outputIndex != -1 && outputIndex + 1 < args.length) {
-    outputFlags[outputIndex] = args[outputIndex + 1];
-  }
-  final outputIndexShort = args.indexOf('-o');
-  if (outputIndexShort != -1 && outputIndexShort + 1 < args.length) {
-    outputFlags[outputIndexShort] = args[outputIndexShort + 1];
-  }
-  if (outputFlags.isNotEmpty) {
-    // Use the value from the last flag occurrence
-    final last = outputFlags.entries.reduce((a, b) => a.key > b.key ? a : b);
-    outputPath = last.value;
-  }
-
-  // Parse tier option (by name or number)
-  String? requestedTier;
-  final tierIndex = args.indexOf('--tier');
-  if (tierIndex != -1 && tierIndex + 1 < args.length) {
-    requestedTier = args[tierIndex + 1];
-  }
-  final tierIndexShort = args.indexOf('-t');
-  if (tierIndexShort != -1 && tierIndexShort + 1 < args.length) {
-    requestedTier = args[tierIndexShort + 1];
-  }
-
-  print('');
-  print('Saropa Lints Configuration Generator');
-  print('=====================================');
-  print('');
+  _logTerminal('Saropa Lints Configuration Generator');
+  _logTerminal('=====================================');
+  _logTerminal('');
 
   // Resolve tier (handle numeric input)
-  final tier = _resolveTier(requestedTier);
+  final tier = _resolveTier(cliArgs.tier);
   if (tier == null) {
-    stderr.writeln('Error: Invalid tier "$requestedTier"');
+    stderr.writeln('Error: Invalid tier "${cliArgs.tier}"');
     stderr.writeln('');
     stderr.writeln('Valid tiers:');
     for (final entry in tierIds.entries) {
       stderr.writeln('  ${entry.value} or ${entry.key}');
     }
     exitCode = 1;
+    _logFile('Invalid tier: ${cliArgs.tier}', error: true);
     return;
   }
 
-  print('Tier: $tier (${tierIds[tier]})');
-  print('Description: ${tierDescriptions[tier]}');
-  print('');
+  _logTerminal('Tier: $tier (${tierIds[tier]})');
+  _logTerminal('Description: ${tierDescriptions[tier]}');
+  _logTerminal('');
 
   // Get all rules (from all tiers and stylistic)
   final allRules = _getAllRules();
@@ -118,7 +87,7 @@ Future<void> main(List<String> args) async {
   // Handle stylistic rules (opt-in)
   Set<String> finalEnabled = enabledRules;
   Set<String> finalDisabled = disabledRules;
-  if (includeStylistic) {
+  if (cliArgs.includeStylistic) {
     finalEnabled = finalEnabled.union(stylisticRules);
     finalDisabled = finalDisabled.difference(stylisticRules);
   } else {
@@ -126,14 +95,14 @@ Future<void> main(List<String> args) async {
     finalDisabled = finalDisabled.union(stylisticRules);
   }
 
-  print('Rules summary:');
-  print('  Enabled: ${finalEnabled.length}');
-  print('  Disabled: ${finalDisabled.length}');
-  print('  Total: ${allRules.length}');
-  if (!includeStylistic) {
-    print('  (Stylistic rules disabled by default - use --stylistic to enable)');
+  _logTerminal('Rules summary:');
+  _logTerminal('  Enabled: ${finalEnabled.length}');
+  _logTerminal('  Disabled: ${finalDisabled.length}');
+  _logTerminal('  Total: ${allRules.length}');
+  if (!cliArgs.includeStylistic) {
+    _logTerminal('  (Stylistic rules disabled by default - use --stylistic to enable)');
   }
-  print('');
+  _logTerminal('');
 
   // Only update custom_lint section, preserve other config
   Map<String, dynamic> newCustomLintSection = {'rules': {}};
@@ -145,12 +114,17 @@ Future<void> main(List<String> args) async {
   }
 
   Map<String, dynamic> mergedConfig = {};
-  final outputFile = File(outputPath);
+  final outputFile = File(cliArgs.outputPath);
   bool fileExisted = outputFile.existsSync();
   if (fileExisted) {
-    print('Warning: $outputPath already exists.');
-    print('Backing up to ${outputPath}.bak');
-    outputFile.copySync('${outputPath}.bak');
+    _logTerminal('Warning: ${cliArgs.outputPath} already exists.');
+    _logTerminal('Backing up to ${cliArgs.outputPath}.bak');
+    try {
+      outputFile.copySync('${cliArgs.outputPath}.bak');
+    } catch (e) {
+      stderr.writeln('Error: Failed to backup file: $e');
+      _logFile('Failed to backup file: $e', error: true);
+    }
     final existingContent = outputFile.readAsStringSync();
     try {
       // Try to parse existing YAML config
@@ -161,6 +135,7 @@ Future<void> main(List<String> args) async {
     } catch (e) {
       stderr.writeln('Error: Failed to parse existing YAML: $e');
       stderr.writeln('Proceeding with a fresh config.');
+      _logFile('Failed to parse existing YAML: $e', error: true);
       mergedConfig = {};
     }
   }
@@ -205,50 +180,146 @@ Future<void> main(List<String> args) async {
 
   final yamlContent = header + '\n' + json2yaml.json2yaml(toDartMap(mergedConfig));
 
-  if (dryRun) {
-    print('[DRY RUN] Would write to: $outputPath');
-    print('');
+  if (cliArgs.dryRun) {
+    _logTerminal('[DRY RUN] Would write to: ${cliArgs.outputPath}');
+    _logTerminal('');
     // Print summary of enabled/disabled rules by tier
-    print('Enabled rules by tier:');
+    _logTerminal('Enabled rules by tier:');
     for (final t in tierOrder) {
       final rules = getRulesForTier(t);
-      print('  ${tierIds[t]}. $t: ${rules.length} rules');
+      _logTerminal('  ${tierIds[t]}. $t: ${rules.length} rules');
     }
-    print(
-        'Stylistic rules: ${includeStylistic ? stylisticRules.length : 0} ${includeStylistic ? "(included)" : "(not included)"}');
-    print('');
+    _logTerminal(
+        'Stylistic rules: ${cliArgs.includeStylistic ? stylisticRules.length : 0} ${cliArgs.includeStylistic ? "(included)" : "(not included)"}');
+    _logTerminal('');
     // Paginate preview if output is long, unless --no-pager or not a terminal
     final lines = yamlContent.split('\n');
     const pageSize = 50;
     int page = 0;
     final isTerminal = stdin.hasTerminal;
-    final usePager = !noPager && isTerminal;
+    final usePager = !cliArgs.noPager && isTerminal;
     while (page * pageSize < lines.length) {
       final start = page * pageSize;
       final end = ((page + 1) * pageSize).clamp(0, lines.length);
-      print('Preview (lines ${start + 1}-${end} of ${lines.length}):');
-      print('-' * 40);
+      _logTerminal('Preview (lines ${start + 1}-${end} of ${lines.length}):');
+      _logTerminal('-' * 40);
       for (final line in lines.sublist(start, end)) {
-        print(line);
+        _logTerminal(line);
       }
       if (end < lines.length && usePager) {
-        print('--- Press Enter to continue, Ctrl+C to quit ---');
+        _logTerminal('--- Press Enter to continue, Ctrl+C to quit ---');
         stdin.readLineSync();
       }
       page++;
     }
+    _logFile('Dry run completed for ${cliArgs.outputPath}');
     return;
   }
 
-  outputFile.writeAsStringSync(yamlContent);
-  print('Written to: $outputPath');
-  print('');
-  print('Next steps:');
-  print('  1. Review the generated configuration');
-  print('  2. Run: dart run custom_lint');
-  print('  3. Customize rules as needed (change true to false)');
-  print('');
-  print('To change tiers later, run this command again with a different --tier');
+  try {
+    outputFile.writeAsStringSync(yamlContent);
+    _logTerminal('Written to: ${cliArgs.outputPath}');
+    _logFile('Written to: ${cliArgs.outputPath}');
+  } catch (e) {
+    stderr.writeln('Error: Failed to write file: $e');
+    _logFile('Failed to write file: $e', error: true);
+    exitCode = 2;
+    return;
+  }
+
+  _logTerminal('');
+  _logTerminal('Next steps:');
+  _logTerminal('  1. Review the generated configuration');
+  _logTerminal('  2. Run: dart run custom_lint');
+  _logTerminal('  3. Customize rules as needed (change true to false)');
+  _logTerminal('');
+  _logTerminal('To change tiers later, run this command again with a different --tier');
+  _logTerminal('Log file written to: ${_logFilePath()}');
+}
+
+/// Struct for parsed CLI arguments.
+class _CliArgs {
+  final bool showHelp;
+  final bool dryRun;
+  final bool includeStylistic;
+  final bool noPager;
+  final String outputPath;
+  final String? tier;
+  _CliArgs({
+    required this.showHelp,
+    required this.dryRun,
+    required this.includeStylistic,
+    required this.noPager,
+    required this.outputPath,
+    required this.tier,
+  });
+}
+
+/// Parse CLI arguments into a struct for clarity and modularity.
+_CliArgs _parseArguments(List<String> args) {
+  bool showHelp = args.contains('--help') || args.contains('-h');
+  bool dryRun = args.contains('--dry-run');
+  bool includeStylistic = args.contains('--stylistic');
+  bool noPager = args.contains('--no-pager');
+  // Output file (last one wins)
+  String outputPath = 'analysis_options.yaml';
+  final outputFlags = <int, String>{};
+  final outputIndex = args.indexOf('--output');
+  if (outputIndex != -1 && outputIndex + 1 < args.length) {
+    outputFlags[outputIndex] = args[outputIndex + 1];
+  }
+  final outputIndexShort = args.indexOf('-o');
+  if (outputIndexShort != -1 && outputIndexShort + 1 < args.length) {
+    outputFlags[outputIndexShort] = args[outputIndexShort + 1];
+  }
+  if (outputFlags.isNotEmpty) {
+    final last = outputFlags.entries.reduce((a, b) => a.key > b.key ? a : b);
+    outputPath = last.value;
+  }
+  // Tier (by name or number)
+  String? requestedTier;
+  final tierIndex = args.indexOf('--tier');
+  if (tierIndex != -1 && tierIndex + 1 < args.length) {
+    requestedTier = args[tierIndex + 1];
+  }
+  final tierIndexShort = args.indexOf('-t');
+  if (tierIndexShort != -1 && tierIndexShort + 1 < args.length) {
+    requestedTier = args[tierIndexShort + 1];
+  }
+  return _CliArgs(
+    showHelp: showHelp,
+    dryRun: dryRun,
+    includeStylistic: includeStylistic,
+    noPager: noPager,
+    outputPath: outputPath,
+    tier: requestedTier,
+  );
+}
+
+/// Write a message to the terminal and log file.
+void _logTerminal(String message) {
+  print(message);
+  _logFile(message);
+}
+
+/// Write a message to the log file (with optional error flag).
+void _logFile(String message, {bool error = false}) {
+  final logFile = File(_logFilePath());
+  final now = DateTime.now().toIso8601String();
+  final prefix = error ? '[ERROR]' : '[INFO]';
+  try {
+    logFile.writeAsStringSync('$now $prefix $message\n', mode: FileMode.append);
+  } catch (_) {
+    // Ignore logging errors
+  }
+}
+
+/// Get the log file path for this run (in /reports/).
+String _logFilePath() {
+  final now = DateTime.now();
+  final yyyymmdd =
+      '${now.year.toString().padLeft(4, '0')}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+  return 'reports/${yyyymmdd}_saropa_lints_init.log';
 }
 
 /// Resolve tier from name or number.
