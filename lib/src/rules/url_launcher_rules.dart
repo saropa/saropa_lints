@@ -85,7 +85,8 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
       final String bodySource = functionBody.toSource();
 
       // Check for canLaunchUrl check
-      if (bodySource.contains('canLaunchUrl') || bodySource.contains('canLaunch')) {
+      if (bodySource.contains('canLaunchUrl') ||
+          bodySource.contains('canLaunch')) {
         return; // Has the check
       }
 
@@ -169,7 +170,9 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for test function calls
       final String methodName = node.methodName.name;
-      if (methodName != 'test' && methodName != 'testWidgets' && methodName != 'group') {
+      if (methodName != 'test' &&
+          methodName != 'testWidgets' &&
+          methodName != 'group') {
         return;
       }
 
@@ -181,7 +184,8 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
 
           // Check for problematic schemes
           for (final String scheme in _problematicSchemes) {
-            if (bodySource.contains("'$scheme") || bodySource.contains('"$scheme')) {
+            if (bodySource.contains("'$scheme") ||
+                bodySource.contains('"$scheme')) {
               // Check if there's mocking or skip
               if (!bodySource.contains('mock') &&
                   !bodySource.contains('Mock') &&
