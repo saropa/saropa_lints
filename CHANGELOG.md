@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - List items: `WebsiteItem(url: 'test.com'), // ignore: rule`
   - Extracted `_checkNextTokenForIgnore()` helper for better code organization.
 
+- **require_deep_link_fallback**: Fixed false positives on utility methods:
+  - Skip methods starting with `reset`, `clear`, `set`, `get`
+  - Skip simple getter expressions that just return a field
+  - Skip trivial method bodies with single assignment statements
+
 ---
 
 ## [4.5.6] - 2026-01-23
