@@ -2,21 +2,26 @@
 """
 Publish saropa_lints package to pub.dev and create GitHub release.
 
+
 This script automates the complete release workflow for the saropa_lints package:
-  1. Checks prerequisites (flutter, git, gh)
-  2. Validates pubspec.yaml and CHANGELOG.md versions are in sync
-  3. Validates working tree and remote sync status
-  4. Checks remote sync
-  5. Runs tests
-  6. Formats code (ensures CI won't fail on formatting)
-  7. Runs static analysis
-  8. Validates version exists in CHANGELOG.md
-  9. Generates documentation with dart doc
-  10. Pre-publish validation (dry-run)
-  11. Commits and pushes changes
-  12. Creates and pushes git tag (triggers GitHub Actions publish workflow)
-  13. GitHub Actions automatically publishes to pub.dev
-  14. Creates GitHub release with release notes
+    1. Checks prerequisites (flutter, git, gh)
+    2. Validates pubspec.yaml and CHANGELOG.md versions are in sync
+    3. Validates working tree and remote sync status
+    4. Checks remote sync
+    5. Runs tests
+    6. Formats code (ensures CI won't fail on formatting)
+    7. Runs static analysis
+    8. Validates version exists in CHANGELOG.md
+    9. Generates documentation with dart doc
+ 10. **Runs pre-publish validation (dart pub publish --dry-run) and surfaces all pub.dev errors and warnings before you push or tag.**
+         - If any pub.dev validation errors are found, the script will print them in red and explain how to fix them, so you never have to debug failed CI/CD publishes again.
+         - This step is critical: pub.dev enforces stricter rules than local analysis/tests, especially for CLI tools in bin/. Always fix these errors before publishing!
+ 11. Commits and pushes changes
+ 12. Creates and pushes git tag (triggers GitHub Actions publish workflow)
+ 13. GitHub Actions automatically publishes to pub.dev
+ 14. Creates GitHub release with release notes
+
+**Tip:** You can always run `dart pub publish --dry-run` yourself to see what pub.dev will check. This script now does it for you and blocks the release if there are any errors.
 
 Version:   3.9
 Author:    Saropa
@@ -963,9 +968,9 @@ def generate_docs(project_dir: Path) -> bool:
 
 def pre_publish_validation(project_dir: Path) -> bool:
     """Run dart pub publish --dry-run silently, only showing output on failure."""
-    print_header("STEP 9: PRE-PUBLISH VALIDATION")
+    print_header("STEP 9: PRE-PUBLISH VALIDATION (pub.dev checks)")
 
-    print_info("Running pre-publish validation...")
+    print_info("Running 'dart pub publish --dry-run' to check for pub.dev errors and warnings...")
     use_shell = get_shell_mode()
 
     result = subprocess.run(
@@ -982,20 +987,24 @@ def pre_publish_validation(project_dir: Path) -> bool:
         return True
 
     # Check for Windows-specific 'nul' path bug in Dart SDK
-    # This is a known bug where dart pub tries to access a path containing 'nul'
-    # which is a reserved device name on Windows (like /dev/null on Unix)
     output = (result.stdout or "") + (result.stderr or "")
     if is_windows() and "nul" in output.lower() and "path is invalid" in output.lower():
         print_warning("Encountered Windows 'nul' path bug in Dart SDK (known issue)")
         print_warning("Dependencies resolved successfully - continuing with publish")
         return True
 
-    # Real failure - show the output
-    print_error("Pre-publish validation failed:")
+    # Real failure - show the output and provide clear instructions
+    print_error("Pre-publish validation failed! Your package will NOT be published to pub.dev until these errors are fixed.")
+    print_colored("\n================ pub.dev validation errors ================", Color.RED)
     if result.stdout:
         print(result.stdout)
     if result.stderr:
         print(result.stderr)
+    print_colored("==========================================================\n", Color.RED)
+    print_colored("[!] pub.dev will reject this release. Fix the above errors before publishing!", Color.RED)
+    print_colored("[!] Run 'dart pub publish --dry-run' locally to reproduce this check.", Color.YELLOW)
+    print_colored("[!] See https://dart.dev/tools/pub/cmd/pub-lish for more info.\n", Color.YELLOW)
+    print_colored("[!] This script now blocks the release if pub.dev validation fails, so you never have to debug failed CI/CD publishes again.", Color.MAGENTA)
     return False
 
 
