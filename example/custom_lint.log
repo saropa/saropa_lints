@@ -3568,3 +3568,18 @@ at:
 [require_url_validation] 2026-01-22T17:48:13.016589 [saropa_lints] Progress: 31 files analyzed (6s, 5.1 files/sec) - image_rules_v2310_fixture.dart
 [require_url_validation] 2026-01-22T17:48:16.131854 [saropa_lints] Progress: 42 files analyzed (9s, 4.6 files/sec) - require_subscription_status_check_example.dart
 [require_url_validation] 2026-01-22T17:48:19.290384 [saropa_lints] Progress: 50 files analyzed (12s, 4.1 files/sec) - arguments_ordering_fixture.dart
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint client] 2026-01-22T20:34:01.242818 [saropa_lints] createPlugin() called - version 4.2.3
+[custom_lint client] 2026-01-22T20:34:01.855460 [saropa_lints] Loaded 302 rules (tier: essential, enableAll: false)
+[require_url_validation] 2026-01-22T20:34:07.382274 [saropa_lints] Progress: 17 files analyzed (3s, 5.7 files/sec) - avoid_unsafe_where_fixture.dart
+[require_url_validation] 2026-01-22T20:34:10.381464 [saropa_lints] Progress: 30 files analyzed (6s, 5.0 files/sec) - image_rules_fixture.dart
+[require_url_validation] 2026-01-22T20:34:13.430365 [saropa_lints] Progress: 41 files analyzed (9s, 4.5 files/sec) - provider_rules_fixture.dart
+[require_url_validation] 2026-01-22T20:34:16.509833 [saropa_lints] Progress: 48 files analyzed (12s, 4.0 files/sec) - state_management_v250_fixture.dart
+[require_url_validation] 2026-01-22T20:34:19.801808 [saropa_lints] Progress: 59 files analyzed (15s, 3.8 files/sec) - container_rules_fixture.dart
