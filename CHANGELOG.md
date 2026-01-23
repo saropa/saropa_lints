@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
+---
+
+## [4.5.4] - 2026-01-22
+
+### Changed
+
+- **All remaining lint rule messages upgraded:**
+  - Updated all `problemMessage` and `correctionMessage` fields for every rule in:
+    - `unnecessary_code_rules.dart`
+    - `ui_ux_rules.dart`
+    - `type_safety_rules.dart`
+  - All messages now follow the latest DX, clarity, and style guide standards.
+  - This completes the full upgrade of all 30 targeted lint rules.
+
+### Notes
+- This change ensures all lint rule messages are actionable, concise, and consistent with the project's documentation and audit requirements.
+- No rules remain to be upgraded; all tracked batches are now complete.
+
+### Fixed
+
+- Fixed a type error in the CLI tool (`bin/init.dart`) when serializing YAML to JSON for config generation. The tool now correctly converts `YamlMap` and nested YAML structures to regular Dart maps before passing them to `json2yaml`, preventing runtime exceptions when updating `analysis_options.yaml`.
+
+---
 ## [4.5.3] - 2026-01-22
 
 ### Fixed
