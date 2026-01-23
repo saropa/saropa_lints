@@ -4,8 +4,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -46,8 +45,7 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
     name: 'avoid_collection_equality_checks',
     problemMessage:
         '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior.',
-    correctionMessage:
-        'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality.',
+    correctionMessage: 'Use listEquals, setEquals, mapEquals, or DeepCollectionEquality.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -67,8 +65,7 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addBinaryExpression((BinaryExpression node) {
-      if (node.operator.type != TokenType.EQ_EQ &&
-          node.operator.type != TokenType.BANG_EQ) {
+      if (node.operator.type != TokenType.EQ_EQ && node.operator.type != TokenType.BANG_EQ) {
         return;
       }
 
@@ -207,10 +204,8 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_map_keys_contains',
-    problemMessage:
-        '[avoid_map_keys_contains] Use containsKey() instead of keys.contains().',
-    correctionMessage:
-        'Replace map.keys.contains(key) with map.containsKey(key).',
+    problemMessage: '[avoid_map_keys_contains] Use containsKey() instead of keys.contains().',
+    correctionMessage: 'Replace map.keys.contains(key) with map.containsKey(key).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -305,8 +300,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_collections',
-    problemMessage:
-        '[avoid_unnecessary_collections] Unnecessary collection wrapper.',
+    problemMessage: '[avoid_unnecessary_collections] Unnecessary collection wrapper.',
     correctionMessage: 'Use the collection literal directly.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -335,8 +329,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
       final String typeName = target.name;
       final String methodName = node.methodName.name;
 
-      if (_collectionTypes.contains(typeName) &&
-          _unnecessaryMethods.contains(methodName)) {
+      if (_collectionTypes.contains(typeName) && _unnecessaryMethods.contains(methodName)) {
         final ArgumentList args = node.argumentList;
         if (args.arguments.length == 1) {
           final Expression arg = args.arguments.first;
@@ -527,8 +520,7 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
       // List<MyEnum> where MyEnum is an enum - this is what .values returns
       if (typeStr.startsWith('List<')) {
         // Check the element type to see if it's an enum
-        if (prefixType is InterfaceType &&
-            prefixType.typeArguments.isNotEmpty) {
+        if (prefixType is InterfaceType && prefixType.typeArguments.isNotEmpty) {
           final DartType elementType = prefixType.typeArguments.first;
           final Element? element = elementType.element;
           if (element is EnumElement) {
@@ -652,8 +644,7 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   bool _isValidGuardCondition(Expression condition, String collectionName) {
     // Handle: list.isNotEmpty
     if (condition is PrefixedIdentifier) {
-      if (condition.prefix.name == collectionName &&
-          condition.identifier.name == 'isNotEmpty') {
+      if (condition.prefix.name == collectionName && condition.identifier.name == 'isNotEmpty') {
         return true;
       }
     }
@@ -661,26 +652,22 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
     // Handle: list.isNotEmpty (as PropertyAccess)
     if (condition is PropertyAccess) {
       final String targetSource = condition.target?.toSource() ?? '';
-      if (targetSource == collectionName &&
-          condition.propertyName.name == 'isNotEmpty') {
+      if (targetSource == collectionName && condition.propertyName.name == 'isNotEmpty') {
         return true;
       }
     }
 
     // Handle: !list.isEmpty
-    if (condition is PrefixExpression &&
-        condition.operator.type == TokenType.BANG) {
+    if (condition is PrefixExpression && condition.operator.type == TokenType.BANG) {
       final Expression operand = condition.operand;
       if (operand is PrefixedIdentifier) {
-        if (operand.prefix.name == collectionName &&
-            operand.identifier.name == 'isEmpty') {
+        if (operand.prefix.name == collectionName && operand.identifier.name == 'isEmpty') {
           return true;
         }
       }
       if (operand is PropertyAccess) {
         final String targetSource = operand.target?.toSource() ?? '';
-        if (targetSource == collectionName &&
-            operand.propertyName.name == 'isEmpty') {
+        if (targetSource == collectionName && operand.propertyName.name == 'isEmpty') {
           return true;
         }
       }
@@ -716,16 +703,14 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
   bool _isInvertedGuardCondition(Expression condition, String collectionName) {
     // Handle: list.isEmpty -> access in else is safe
     if (condition is PrefixedIdentifier) {
-      if (condition.prefix.name == collectionName &&
-          condition.identifier.name == 'isEmpty') {
+      if (condition.prefix.name == collectionName && condition.identifier.name == 'isEmpty') {
         return true;
       }
     }
 
     if (condition is PropertyAccess) {
       final String targetSource = condition.target?.toSource() ?? '';
-      if (targetSource == collectionName &&
-          condition.propertyName.name == 'isEmpty') {
+      if (targetSource == collectionName && condition.propertyName.name == 'isEmpty') {
         return true;
       }
     }
@@ -895,10 +880,8 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unsafe_reduce',
-    problemMessage:
-        '[avoid_unsafe_reduce] reduce() throws on empty collections.',
-    correctionMessage:
-        'Use fold() with an initial value or check isEmpty first.',
+    problemMessage: '[avoid_unsafe_reduce] reduce() throws on empty collections.',
+    correctionMessage: 'Use fold() with an initial value or check isEmpty first.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -996,8 +979,7 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
     name: 'avoid_unsafe_where_methods',
     problemMessage:
         '[avoid_unsafe_where_methods] firstWhere/lastWhere/singleWhere throws if no element matches.',
-    correctionMessage:
-        'Use firstWhereOrNull/lastWhereOrNull/singleWhereOrNull from '
+    correctionMessage: 'Use firstWhereOrNull/lastWhereOrNull/singleWhereOrNull from '
         'package:collection, or provide an orElse callback.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -1278,8 +1260,7 @@ class MapKeysOrderingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'map_keys_ordering',
-    problemMessage:
-        '[map_keys_ordering] Map keys should be in alphabetical order.',
+    problemMessage: '[map_keys_ordering] Map keys should be in alphabetical order.',
     correctionMessage: 'Reorder the map entries alphabetically by key.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1538,8 +1519,7 @@ class PreferIterableOfRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_iterable_of',
-    problemMessage:
-        '[prefer_iterable_of] Prefer using .of() instead of .from() for collections.',
+    problemMessage: '[prefer_iterable_of] Prefer using .of() instead of .from() for collections.',
     correctionMessage: 'Replace .from() with .of() for better type safety.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1557,8 +1537,7 @@ class PreferIterableOfRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
       final ConstructorName constructorName = node.constructorName;
       final String? name = constructorName.name?.name;
 
@@ -1614,16 +1593,14 @@ class PreferLastRule extends SaropaLintRule {
             // Check if the target matches
             final Expression? indexTarget = node.target;
             final Expression lengthTarget = left.target!;
-            if (indexTarget != null &&
-                indexTarget.toSource() == lengthTarget.toSource()) {
+            if (indexTarget != null && indexTarget.toSource() == lengthTarget.toSource()) {
               reporter.atNode(node, code);
             }
           }
           // Also check for simple identifier.length pattern
           if (left is PrefixedIdentifier && left.identifier.name == 'length') {
             final Expression? indexTarget = node.target;
-            if (indexTarget is SimpleIdentifier &&
-                indexTarget.name == left.prefix.name) {
+            if (indexTarget is SimpleIdentifier && indexTarget.name == left.prefix.name) {
               reporter.atNode(node, code);
             }
           }
@@ -1692,8 +1669,7 @@ class PreferAddAllRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_add_all',
-    problemMessage:
-        '[prefer_add_all] Use addAll() instead of forEach/for with add().',
+    problemMessage: '[prefer_add_all] Use addAll() instead of forEach/for with add().',
     correctionMessage: 'Replace with list.addAll(items).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1810,8 +1786,7 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
     name: 'avoid_duplicate_number_elements',
     problemMessage:
         '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal.',
-    correctionMessage:
-        'Remove the duplicate element or suppress if intentional.',
+    correctionMessage: 'Remove the duplicate element or suppress if intentional.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2031,9 +2006,7 @@ void _checkForDuplicateObjects(
     if (element is! Expression) continue;
 
     // Skip numeric and string literals (handled by other rules)
-    if (element is IntegerLiteral ||
-        element is DoubleLiteral ||
-        element is StringLiteral) {
+    if (element is IntegerLiteral || element is DoubleLiteral || element is StringLiteral) {
       continue;
     }
 
@@ -2236,8 +2209,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
           final Expression right = updater.rightHandSide;
           if (right is BinaryExpression) {
             // i = i + n or i = i - n
-            if (right.operator.type == TokenType.PLUS ||
-                right.operator.type == TokenType.MINUS) {
+            if (right.operator.type == TokenType.PLUS || right.operator.type == TokenType.MINUS) {
               final Expression rightOperand = right.rightOperand;
               if (rightOperand is IntegerLiteral && rightOperand.value != 1) {
                 reporter.atNode(updater, code);
@@ -2280,8 +2252,9 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unreachable_for_loop',
     problemMessage:
-        '[avoid_unreachable_for_loop] For loop has impossible bounds and will never execute. This is dead code and may indicate a logic error or typo.',
-    correctionMessage: 'Check the loop condition and increment direction.',
+        '[avoid_unreachable_for_loop] For loop with impossible bounds will never execute, resulting in dead code. This often indicates a logic error, typo, or incorrect increment direction. Unreachable loops can hide bugs, confuse maintainers, and lead to missed updates or calculations.',
+    correctionMessage:
+        'Review the loop condition and increment direction. Ensure the bounds allow the loop to execute at least once, and correct any off-by-one errors or typos. Add tests to verify loop behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2324,14 +2297,12 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
       // Check for impossible initial conditions
       if (initValue != null && boundValue != null) {
         // i = 10; i < 5 (start > end with <)
-        if ((op == TokenType.LT || op == TokenType.LT_EQ) &&
-            initValue > boundValue) {
+        if ((op == TokenType.LT || op == TokenType.LT_EQ) && initValue > boundValue) {
           reporter.atNode(condition, code);
           return;
         }
         // i = 5; i > 10 (start < end with >)
-        if ((op == TokenType.GT || op == TokenType.GT_EQ) &&
-            initValue < boundValue) {
+        if ((op == TokenType.GT || op == TokenType.GT_EQ) && initValue < boundValue) {
           reporter.atNode(condition, code);
           return;
         }
@@ -2502,8 +2473,7 @@ class PreferIterableOperationsRule extends SaropaLintRule {
     name: 'prefer_iterable_operations',
     problemMessage:
         '[prefer_iterable_operations] .toList() after iterable chain in for-in. Unnecessary allocation.',
-    correctionMessage:
-        'Remove .toList() to keep iteration lazy and avoid extra allocation.',
+    correctionMessage: 'Remove .toList() to keep iteration lazy and avoid extra allocation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2525,8 +2495,7 @@ class PreferIterableOperationsRule extends SaropaLintRule {
         return;
       }
 
-      if (iterable.methodName.name != 'toList' &&
-          iterable.methodName.name != 'toSet') {
+      if (iterable.methodName.name != 'toList' && iterable.methodName.name != 'toSet') {
         return;
       }
 
@@ -2580,8 +2549,9 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_key_for_collection',
     problemMessage:
-        '[require_key_for_collection] List item without Key loses TextField/animation state when list reorders or updates. Missing keys can cause UI bugs and loss of user input.',
-    correctionMessage: 'Add a Key (e.g., ValueKey, ObjectKey) to list items.',
+        '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter UI issues.',
+    correctionMessage:
+        'Add a Key (such as ValueKey, ObjectKey, or UniqueKey) to each list item. Ensure the key is unique and stable for each item, especially when items are reordered or updated. Document key usage in your builder methods to prevent state loss.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
