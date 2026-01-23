@@ -12,10 +12,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.5.5] - 2026-01-23
 
+### Documentation
+
+- **PERFORMANCE.md**: Updated to reflect current best practices for configuration and performance:
+  - The summary table now states that tier set caching and rule filtering cache are "Built-in" (not just v3.0.0).
+  - The guide now recommends using the CLI tool for tier selection and config generation, not YAML `tier:` keys.
+  - All quick start and troubleshooting sections now match the latest workflow and recommendations from README.md and bin/init.dart.
+
 ### Fixed
 
 - **require_camera_permission_check**: False positive fixed for `.initialize()` calls on non-camera controllers (e.g., IsarStreamController). The rule now checks the static type to ensure only `CameraController` is flagged. Thanks to user report and test case.
 - Added test fixture: `example/lib/isar_stream_controller_initialize_fixture.dart` to document and prevent regression of this false positive.
+
+### Added
+
+- **Roadmap/issue tracking improvements:**
+  - 53 complex or cross-file rules from ROADMAP.md are now tracked as GitHub issues ([#1](https://github.com/saropa/saropa_lints/issues/1)–[#53](https://github.com/saropa/saropa_lints/issues/53)).
+  - Each tracked rule is now marked with the 🐙 emoji in the ROADMAP and links directly to its GitHub issue for easier collaboration and progress tracking.
+  - Added 🐙 emoji to the legend in ROADMAP.md to indicate rules tracked as GitHub issues.
+  - This improves transparency, prioritization, and community contribution for complex or research-level lint rules.
 
 ---
 ## [4.5.4] - 2026-01-22

@@ -21,18 +21,14 @@ v3.0.0 addresses all of these bottlenecks.
 
 ### 1. Use Lower Tiers During Development
 
-The single biggest performance improvement is using fewer rules:
+The single biggest performance improvement is using fewer rules. **Always generate your config with the CLI tool for reliable tier selection:**
 
-```yaml
+```bash
 # Fast local development (~400 rules)
-custom_lint:
-  saropa_lints:
-    tier: essential
+dart run saropa_lints:init --tier essential
 
 # Thorough CI checking (~1400 rules)
-custom_lint:
-  saropa_lints:
-    tier: professional
+dart run saropa_lints:init --tier professional
 ```
 
 **Speed comparison:**
