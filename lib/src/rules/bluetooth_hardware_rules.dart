@@ -30,9 +30,11 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_bluetooth_scan_without_timeout',
-    problemMessage: '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
+    problemMessage:
+        '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
         'battery and may run until app termination.',
-    correctionMessage: 'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
+    correctionMessage:
+        'Add timeout parameter: startScan(timeout: Duration(seconds: 10))',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -517,7 +519,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'getCurrentPosition' && methodName != 'getPositionStream') {
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getPositionStream') {
         return;
       }
 
@@ -542,7 +545,8 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('checkPermission') && !bodySource.contains('requestPermission')) {
+      if (!bodySource.contains('checkPermission') &&
+          !bodySource.contains('requestPermission')) {
         reporter.atNode(node, code);
       }
     });
@@ -734,7 +738,8 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (methodName != 'getCurrentPosition' && methodName != 'getLastKnownPosition') {
+      if (methodName != 'getCurrentPosition' &&
+          methodName != 'getLastKnownPosition') {
         return;
       }
 
@@ -793,7 +798,8 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
     name: 'prefer_ble_mtu_negotiation',
     problemMessage:
         '[prefer_ble_mtu_negotiation] BLE data transfer without MTU negotiation causes slow, fragmented transfers.',
-    correctionMessage: 'Call device.requestMtu(512) after connect() and before write operations.',
+    correctionMessage:
+        'Call device.requestMtu(512) after connect() and before write operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -857,7 +863,8 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
         while (current != null) {
           if (current is MethodDeclaration) {
             final String methodSource = current.toSource();
-            if (methodSource.contains('requestMtu') || methodSource.contains('mtuRequest')) {
+            if (methodSource.contains('requestMtu') ||
+                methodSource.contains('mtuRequest')) {
               hasMtuNegotiation = true;
             }
             break;
