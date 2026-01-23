@@ -3583,3 +3583,17 @@ at:
 [require_url_validation] 2026-01-22T20:34:13.430365 [saropa_lints] Progress: 41 files analyzed (9s, 4.5 files/sec) - provider_rules_fixture.dart
 [require_url_validation] 2026-01-22T20:34:16.509833 [saropa_lints] Progress: 48 files analyzed (12s, 4.0 files/sec) - state_management_v250_fixture.dart
 [require_url_validation] 2026-01-22T20:34:19.801808 [saropa_lints] Progress: 59 files analyzed (15s, 3.8 files/sec) - container_rules_fixture.dart
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint DEBUG] Checking 3 dependencies for plugins
+[custom_lint DEBUG] Dependencies: [custom_lint, saropa_lints]
+[custom_lint DEBUG] Package custom_lint: isPlugin=false, dir=Directory: 'D:\tools\Pub\Cache\hosted\pub.dev\custom_lint-0.8.1\'
+[custom_lint DEBUG] Package saropa_lints: isPlugin=true, dir=Directory: 'd:\src\saropa_lints\'
+[custom_lint client] 2026-01-22T23:41:20.441398 [saropa_lints] createPlugin() called - version 4.2.3
+[custom_lint client] 2026-01-22T23:41:21.006936 [saropa_lints] Loaded 302 rules (tier: essential, enableAll: false)
+[require_url_validation] 2026-01-22T23:41:26.522856 [saropa_lints] Progress: 19 files analyzed (3s, 6.1 files/sec) - crypto_rules_fixture.dart
+[require_url_validation] 2026-01-22T23:41:29.766198 [saropa_lints] Progress: 32 files analyzed (6s, 5.0 files/sec) - intl_rules_fixture.dart
+[require_url_validation] 2026-01-22T23:41:32.788063 [saropa_lints] Progress: 43 files analyzed (9s, 4.6 files/sec) - scroll_rules_fixture.dart
+[require_url_validation] 2026-01-22T23:41:35.948660 [saropa_lints] Progress: 51 files analyzed (12s, 4.1 files/sec) - avoid_commented_out_code_fixture.dart
