@@ -101,8 +101,7 @@ class RequireHiveInitializationRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for openBox variants
-      if (!methodName.startsWith('openBox') &&
-          !methodName.startsWith('openLazyBox')) {
+      if (!methodName.startsWith('openBox') && !methodName.startsWith('openLazyBox')) {
         return;
       }
 
@@ -152,8 +151,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_type_adapter',
-    problemMessage:
-        '[require_hive_type_adapter] Hive cannot serialize this object without '
+    problemMessage: '[require_hive_type_adapter] Hive cannot serialize this object without '
         '@HiveType annotation. Storing will throw a HiveError at runtime.',
     correctionMessage:
         'Add @HiveType(typeId: X) annotation and generate adapter with build_runner.',
@@ -170,9 +168,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
 
       // Check for put/add operations
-      if (methodName != 'put' &&
-          methodName != 'add' &&
-          methodName != 'addAll') {
+      if (methodName != 'put' && methodName != 'add' && methodName != 'addAll') {
         return;
       }
 
@@ -184,8 +180,7 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       if (args.isEmpty) return;
 
       // Get the value argument (2nd for put, 1st for add)
-      final Expression valueArg =
-          methodName == 'put' && args.length > 1 ? args[1] : args.first;
+      final Expression valueArg = methodName == 'put' && args.length > 1 ? args[1] : args.first;
 
       // Check if value is a user-defined class instance
       final String? typeName = valueArg.staticType?.element?.name;
@@ -332,11 +327,9 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_encryption',
-    problemMessage:
-        '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
+    problemMessage: '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
         'Anyone with device access can read sensitive user data.',
-    correctionMessage:
-        'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
+    correctionMessage: 'Use encryptionCipher parameter with HiveAesCipher for sensitive data.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -412,11 +405,9 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_encryption_key_secure',
-    problemMessage:
-        '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
+    problemMessage: '[require_hive_encryption_key_secure] Hardcoded key defeats encryption. '
         'Anyone decompiling the app can decrypt all stored user data.',
-    correctionMessage:
-        'Store encryption key in flutter_secure_storage, not in code.',
+    correctionMessage: 'Store encryption key in flutter_secure_storage, not in code.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -623,8 +614,7 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
       final String scopeSource = current.toSource();
       final String adapterName = '${typeArg}Adapter';
 
-      if (!scopeSource.contains('registerAdapter') ||
-          !scopeSource.contains(adapterName)) {
+      if (!scopeSource.contains('registerAdapter') || !scopeSource.contains(adapterName)) {
         reporter.atNode(node, code);
       }
     });
@@ -664,8 +654,7 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
     name: 'prefer_lazy_box_for_large',
     problemMessage:
         '[prefer_lazy_box_for_large] Large collection uses regular Hive box. Consider openLazyBox for memory.',
-    correctionMessage:
-        'Use Hive.openLazyBox() for collections that may grow large.',
+    correctionMessage: 'Use Hive.openLazyBox() for collections that may grow large.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -862,9 +851,9 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_hive_field_index_reuse',
     problemMessage:
-        '[avoid_hive_field_index_reuse] Using the same @HiveField index for multiple fields in a HiveType class causes data corruption: fields will overwrite each other during serialization, resulting in lost, misread, or unrecoverable data. This can break migrations, cause subtle bugs, and make it impossible to reliably read or write data from Hive boxes. Unique indices are required for Hive to map fields correctly between Dart objects and stored data.',
+        'Reusing Hive field indexes across different fields or types can corrupt your database, cause data loss, and make migrations impossible. This can result in users losing critical data or experiencing app crashes after updates. Always assign unique field indexes and never change them after release. See https://docs.hivedb.dev/#/adapters/fields.',
     correctionMessage:
-        'Ensure every field in a HiveType class has a unique @HiveField index. Audit your classes for duplicate indices, update them to be unique, and test serialization/deserialization thoroughly after changes. Document index assignments to avoid accidental reuse, and add code review checks to prevent future conflicts.',
+        'Ensure each Hive field has a unique, immutable index and avoid reusing or changing indexes after deployment. See https://docs.hivedb.dev/#/adapters/fields for guidance.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -971,8 +960,7 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
     name: 'require_hive_field_default_value',
     problemMessage:
         '[require_hive_field_default_value] @HiveField on nullable field without defaultValue. Existing data may fail to load.',
-    correctionMessage:
-        'Add defaultValue parameter: @HiveField(0, defaultValue: null)',
+    correctionMessage: 'Add defaultValue parameter: @HiveField(0, defaultValue: null)',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -984,11 +972,10 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   ) {
     context.registry.addFieldDeclaration((FieldDeclaration node) {
       // Check if field has @HiveField annotation
-      final Annotation? hiveFieldAnnotation =
-          node.metadata.cast<Annotation?>().firstWhere(
-                (Annotation? a) => a?.name.name == 'HiveField',
-                orElse: () => null,
-              );
+      final Annotation? hiveFieldAnnotation = node.metadata.cast<Annotation?>().firstWhere(
+            (Annotation? a) => a?.name.name == 'HiveField',
+            orElse: () => null,
+          );
 
       if (hiveFieldAnnotation == null) return;
 
@@ -1056,11 +1043,9 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_adapter_registration_order',
-    problemMessage:
-        '[require_hive_adapter_registration_order] Opening box before registering '
+    problemMessage: '[require_hive_adapter_registration_order] Opening box before registering '
         'adapters throws HiveError. Adapters must be registered first.',
-    correctionMessage:
-        'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
+    correctionMessage: 'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1088,8 +1073,7 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
         },
         onRegisterAdapter: (MethodInvocation node) {
           final int line = node.offset;
-          if (lastRegisterAdapterLine == null ||
-              line > lastRegisterAdapterLine!) {
+          if (lastRegisterAdapterLine == null || line > lastRegisterAdapterLine!) {
             lastRegisterAdapterLine = line;
           }
         },
@@ -1121,8 +1105,7 @@ class _HiveOrderVisitor extends RecursiveAstVisitor<void> {
     final Expression? target = node.target;
 
     if (target is SimpleIdentifier && target.name == 'Hive') {
-      if (methodName.startsWith('openBox') ||
-          methodName.startsWith('openLazyBox')) {
+      if (methodName.startsWith('openBox') || methodName.startsWith('openLazyBox')) {
         onOpenBox(node);
       } else if (methodName == 'registerAdapter') {
         onRegisterAdapter(node);
@@ -1172,11 +1155,9 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_nested_object_adapter',
-    problemMessage:
-        '[require_hive_nested_object_adapter] Nested custom type without adapter '
+    problemMessage: '[require_hive_nested_object_adapter] Nested custom type without adapter '
         'causes runtime crash when Hive tries to serialize the object.',
-    correctionMessage:
-        'Add @HiveType annotation to the nested class or use a primitive type.',
+    correctionMessage: 'Add @HiveType annotation to the nested class or use a primitive type.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1267,8 +1248,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
     name: 'avoid_hive_box_name_collision',
     problemMessage:
         '[avoid_hive_box_name_collision] Generic Hive box name may cause collision. Use a specific name.',
-    correctionMessage:
-        'Use a unique, descriptive box name like "users" or "settings".',
+    correctionMessage: 'Use a unique, descriptive box name like "users" or "settings".',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1294,8 +1274,7 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
-      if (!methodName.startsWith('openBox') &&
-          !methodName.startsWith('openLazyBox')) {
+      if (!methodName.startsWith('openBox') && !methodName.startsWith('openLazyBox')) {
         return;
       }
 
@@ -1358,8 +1337,7 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
     name: 'prefer_hive_value_listenable',
     problemMessage:
         '[prefer_hive_value_listenable] setState after Hive put/delete. Consider using box.listenable().',
-    correctionMessage:
-        'Use ValueListenableBuilder with box.listenable() for reactive UI.',
+    correctionMessage: 'Use ValueListenableBuilder with box.listenable() for reactive UI.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1422,11 +1400,9 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_hive_lazy_box',
-    problemMessage:
-        '[prefer_hive_lazy_box] Consider using LazyBox for potentially large '
+    problemMessage: '[prefer_hive_lazy_box] Consider using LazyBox for potentially large '
         'collections. Regular Box loads all entries into memory.',
-    correctionMessage:
-        'Use Hive.openLazyBox() instead of Hive.openBox() for large datasets.',
+    correctionMessage: 'Use Hive.openLazyBox() instead of Hive.openBox() for large datasets.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1527,11 +1503,9 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_hive_binary_storage',
-    problemMessage:
-        '[avoid_hive_binary_storage] Storing Uint8List/binary data in Hive. '
+    problemMessage: '[avoid_hive_binary_storage] Storing Uint8List/binary data in Hive. '
         'This degrades performance for large files.',
-    correctionMessage:
-        'Store file paths instead and keep binary data in the file system.',
+    correctionMessage: 'Store file paths instead and keep binary data in the file system.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1564,8 +1538,7 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           final typeName = member.fields.type?.toSource();
-          if (typeName != null &&
-              _binaryTypes.any((t) => typeName.contains(t))) {
+          if (typeName != null && _binaryTypes.any((t) => typeName.contains(t))) {
             for (final variable in member.fields.variables) {
               reporter.atNode(variable, code);
             }
@@ -1604,11 +1577,9 @@ class RequireSharedPrefsPrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_shared_prefs_prefix',
-    problemMessage:
-        '[require_shared_prefs_prefix] SharedPreferences usage detected. '
+    problemMessage: '[require_shared_prefs_prefix] SharedPreferences usage detected. '
         'Consider calling SharedPreferences.setPrefix() to avoid key conflicts.',
-    correctionMessage:
-        'Call SharedPreferences.setPrefix("myapp_") at app startup.',
+    correctionMessage: 'Call SharedPreferences.setPrefix("myapp_") at app startup.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1659,11 +1630,9 @@ class PreferSharedPrefsAsyncApiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_shared_prefs_async_api',
-    problemMessage:
-        '[prefer_shared_prefs_async_api] Legacy SharedPreferences.getInstance() '
+    problemMessage: '[prefer_shared_prefs_async_api] Legacy SharedPreferences.getInstance() '
         'detected. Consider using SharedPreferencesAsync for new code.',
-    correctionMessage:
-        'Use SharedPreferencesAsync() instead of SharedPreferences.getInstance().',
+    correctionMessage: 'Use SharedPreferencesAsync() instead of SharedPreferences.getInstance().',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1715,11 +1684,9 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_shared_prefs_in_isolate',
-    problemMessage:
-        '[avoid_shared_prefs_in_isolate] SharedPreferences used in isolate context. '
+    problemMessage: '[avoid_shared_prefs_in_isolate] SharedPreferences used in isolate context. '
         'SharedPreferences does not work in isolates.',
-    correctionMessage:
-        'Pass required data through SendPort/ReceivePort instead.',
+    correctionMessage: 'Pass required data through SendPort/ReceivePort instead.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1761,9 +1728,7 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
         }
         // Check function name for isolate hints
         final name = current.name.lexeme.toLowerCase();
-        if (name.contains('isolate') ||
-            name.contains('background') ||
-            name.contains('worker')) {
+        if (name.contains('isolate') || name.contains('background') || name.contains('worker')) {
           return true;
         }
       }
@@ -1845,8 +1810,7 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_hive_migration_strategy',
-    problemMessage:
-        '[require_hive_migration_strategy] @HiveType with gaps in @HiveField '
+    problemMessage: '[require_hive_migration_strategy] @HiveType with gaps in @HiveField '
         'indices. This suggests fields were removed without migration.',
     correctionMessage:
         'Keep all @HiveField indices even for removed fields, or create new typeId for breaking changes.',

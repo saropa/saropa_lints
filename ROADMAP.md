@@ -8,12 +8,9 @@ See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md
 ## ⭐ Next in Line for Implementation
 
 Rules marked with ⭐ are the **next batch** prioritized for implementation. These have been selected for:
-- Low false-positive risk (exact API/pattern matching)
-- Clear detection logic (no cross-file analysis needed)
-- High developer impact
 
-**Contributors:** Pick any ⭐ rule to implement!
-
+ 🐙 [`require_android_manifest_entries`](https://github.com/saropa/saropa_lints/issues/36) | Essential | ERROR | `[CROSS-FILE]` Android features need manifest entries. Detect feature without manifest. |
+ 🐙 [`require_desktop_window_setup`](https://github.com/saropa/saropa_lints/issues/37) | Professional | INFO | `[CROSS-FILE]` Desktop apps need window configuration. Detect desktop target without setup. |
 ## Maintenance Rules
 
 **IMPORTANT: When a rule is implemented:**
@@ -67,6 +64,8 @@ This ROADMAP is for **planned/unimplemented rules only**.
 | `[CROSS-FILE]` | Requires analysis across multiple files | Check if type is registered elsewhere |
 | `[TOO-COMPLEX]` | Pattern too abstract for reliable AST detection | Detect "loading state" or "user feedback" generically |
 | `[PUBSPEC]` | Requires pubspec.yaml analysis (not Dart AST) | Check package versions, detect deprecated packages |
+| 🐙 | Tracked as GitHub issue | [#0000](https://github.com/saropa/saropa_lints/issues/0000) |
+| 💡 | Planned enhancement tracked as GitHub Discussion | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions/000) |
 
 ## Deferred: Cross-File Analysis Rules (2 rules)
 
@@ -75,7 +74,8 @@ This ROADMAP is for **planned/unimplemented rules only**.
 | Rule | Tier | Severity | Why Complex |
 |------|------|----------|-------------|
 | `avoid_provider_circular_dependency` | Essential | ERROR | Requires tracking **Provider dependencies across files** (Provider A depends on Provider B in another file which depends on Provider A). Needs cross-file type resolution and dependency graph construction. |
-| `avoid_riverpod_circular_provider` | Essential | ERROR | Requires tracking `ref.watch()` and `ref.read()` calls across **multiple provider definitions in different files** to detect cycles. Needs cross-file provider dependency graph. |
+| 🐙 [`avoid_provider_circular_dependency`](https://github.com/saropa/saropa_lints/issues/2) | Essential | ERROR | Requires tracking **Provider dependencies across files** (Provider A depends on Provider B in another file which depends on Provider A). Needs cross-file type resolution and dependency graph construction. |
+| 🐙 [`avoid_riverpod_circular_provider`](https://github.com/saropa/saropa_lints/issues/1) | Essential | ERROR | Requires tracking `ref.watch()` and `ref.read()` calls across **multiple provider definitions in different files** to detect cycles. Needs cross-file provider dependency graph. |
 
 **Implementation Requirements**:
 1. Build on existing `ImportGraphCache` infrastructure
@@ -264,12 +264,14 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_riverpod_override_in_tests` | Professional | INFO | `[CROSS-FILE]` Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
+| 🐙 [`require_riverpod_override_in_tests`](https://github.com/saropa/saropa_lints/issues/3) | Professional | INFO | `[CROSS-FILE]` Tests using real providers have hidden dependencies and unpredictable state. Override providers with mocks for isolated, deterministic tests. |
 
 #### Bloc/Cubit Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_bloc_test_coverage` | Professional | INFO | `[CROSS-FILE]` Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
+| 🐙 [`require_bloc_test_coverage`](https://github.com/saropa/saropa_lints/issues/4) | Professional | INFO | `[CROSS-FILE]` Blocs should have tests covering all state transitions. Untested state machines have hidden bugs in edge cases. |
 
 #### Provider Rules
 
@@ -293,16 +295,22 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `prefer_pool_pattern` | Comprehensive | INFO | Frequently created/destroyed objects cause GC churn. Object pools reuse instances (e.g., for particles, bullet hell games, or recyclable list items). |
+| 🐙 [`prefer_pool_pattern`](https://github.com/saropa/saropa_lints/issues/13) | Comprehensive | INFO | Frequently created/destroyed objects cause GC churn. Object pools reuse instances (e.g., for particles, bullet hell games, or recyclable list items). |
 | `require_expando_cleanup` | Comprehensive | INFO | Expando attaches data to objects without modifying them. Entries persist until the key object is GC'd. Remove entries explicitly when done. |
+| 🐙 [`require_expando_cleanup`](https://github.com/saropa/saropa_lints/issues/14) | Comprehensive | INFO | Expando attaches data to objects without modifying them. Entries persist until the key object is GC'd. Remove entries explicitly when done. |
 
 #### Network Performance
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_compression` | Comprehensive | INFO | Large JSON/text responses should use gzip compression. Reduces bandwidth 60-80% for typical API responses. |
+| 🐙 [`require_compression`](https://github.com/saropa/saropa_lints/issues/15) | Comprehensive | INFO | Large JSON/text responses should use gzip compression. Reduces bandwidth 60-80% for typical API responses. |
 | `prefer_batch_requests` | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
+| 🐙 [`prefer_batch_requests`](https://github.com/saropa/saropa_lints/issues/16) | Professional | INFO | Multiple small requests have more overhead than one batched request. Combine related queries when the API supports it. |
 | `avoid_blocking_main_thread` | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
+| 🐙 [`avoid_blocking_main_thread`](https://github.com/saropa/saropa_lints/issues/17) | Essential | WARNING | Network I/O on main thread blocks UI during DNS/TLS. While Dart's http is async, large response processing should use isolates. |
 | `prefer_binary_format` | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
+| 🐙 [`prefer_binary_format`](https://github.com/saropa/saropa_lints/issues/18) | Comprehensive | INFO | Protocol Buffers or MessagePack are smaller and faster to parse than JSON. Consider for high-frequency or large-payload APIs. |
 
 ### 1.4 Testing Rules
 
@@ -321,6 +329,7 @@ Before merging any fix:
 | `prefer_retry_flaky` | Comprehensive | INFO | Integration tests on real devices are inherently flaky. Configure retry count in CI (e.g., `--retry=2`) rather than deleting useful tests. |
 | `prefer_test_data_reset` | Professional | INFO | Each test should start with known state. Reset database, clear shared preferences, and log out users in setUp to prevent test pollution. |
 | `require_e2e_coverage` | Professional | INFO | `[CROSS-FILE]` Integration tests are expensive. Focus on critical user journeys: signup, purchase, core features. Don't duplicate unit test coverage. |
+| 🐙 [`require_e2e_coverage`](https://github.com/saropa/saropa_lints/issues/5) | Professional | INFO | `[CROSS-FILE]` Integration tests are expensive. Focus on critical user journeys: signup, purchase, core features. Don't duplicate unit test coverage. |
 | `avoid_screenshot_in_ci` | Comprehensive | INFO | Screenshots in CI consume storage and slow tests. Take screenshots only on failure for debugging, not on every test. |
 | `prefer_test_report` | Comprehensive | INFO | Generate JUnit XML or JSON reports for CI dashboards. Raw console output is hard to track over time. |
 | `require_performance_test` | Professional | INFO | Measure frame rendering time and startup latency in integration tests. Catch performance regressions before they reach production. |
@@ -547,20 +556,25 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_analytics_event_naming` | Professional | INFO | Consistent event naming improves analysis. Detect analytics events not matching configured naming pattern (e.g., snake_case). |
+| 🐙 [`require_analytics_event_naming`](https://github.com/saropa/saropa_lints/issues/19) | Professional | INFO | Consistent event naming improves analysis. Detect analytics events not matching configured naming pattern (e.g., snake_case). |
 | ⭐ `require_analytics_error_handling` | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
+| [⭐ `require_analytics_error_handling`](https://github.com/saropa/saropa_lints/issues/20) | Recommended | INFO | Analytics failures shouldn't crash the app. Detect analytics calls without try-catch wrapper. |
 
 ### 1.29 Feature Flag Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⭐ `require_feature_flag_type_safety` | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
+| 🐙 [`require_feature_flag_type_safety`](https://github.com/saropa/saropa_lints/issues/21) | Recommended | INFO | Use typed feature flag accessors, not raw string lookups. Detect string literal keys in feature flag calls. |
 
 ### 1.30 Date & Time Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | ⭐ `require_timezone_display` | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
+| 🐙 [`require_timezone_display`](https://github.com/saropa/saropa_lints/issues/22) | Recommended | INFO | When displaying times, indicate timezone or use relative time. Detect time formatting without timezone context. |
 | ⭐ `avoid_datetime_comparison_without_precision` | Professional | INFO | DateTime equality fails due to microsecond differences. Detect direct DateTime equality; suggest difference threshold. |
+| 🐙 [`avoid_datetime_comparison_without_precision`](https://github.com/saropa/saropa_lints/issues/23) | Professional | INFO | DateTime equality fails due to microsecond differences. Detect direct DateTime equality; suggest difference threshold. |
 
 ### 1.31 Money & Currency Rules
 
@@ -572,6 +586,7 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_temp_file_cleanup` | Professional | INFO | `[CROSS-FILE]` Temp files accumulate over time. Detect temp file creation without corresponding delete. |
+| 🐙 [`require_temp_file_cleanup`](https://github.com/saropa/saropa_lints/issues/6) | Professional | INFO | `[CROSS-FILE]` Temp files accumulate over time. Detect temp file creation without corresponding delete. |
 
 ### 1.33 Encryption & Cryptography Rules
 
@@ -583,20 +598,25 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `prefer_json_codegen` | Professional | INFO | Manual fromJson/toJson is error-prone. Detect hand-written fromJson methods; suggest json_serializable/freezed. |
+| 🐙 [`prefer_json_codegen`](https://github.com/saropa/saropa_lints/issues/24) | Professional | INFO | Manual fromJson/toJson is error-prone. Detect hand-written fromJson methods; suggest json_serializable/freezed. |
 | `require_json_date_format_consistency` | Professional | INFO | Dates in JSON need consistent format. Detect DateTime serialization without explicit format. |
+| 🐙 [`require_json_date_format_consistency`](https://github.com/saropa/saropa_lints/issues/25) | Professional | INFO | Dates in JSON need consistent format. Detect DateTime serialization without explicit format. |
 
 ### 1.35 GetIt & Dependency Injection Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `avoid_getit_unregistered_access` | Essential | ERROR | `[CROSS-FILE]` Accessing unregistered type crashes. Detect GetIt.I<T>() for types not registered in visible scope. |
+| 🐙 [`avoid_getit_unregistered_access`](https://github.com/saropa/saropa_lints/issues/7) | Essential | ERROR | `[CROSS-FILE]` Accessing unregistered type crashes. Detect GetIt.I<T>() for types not registered in visible scope. |
 | `require_getit_dispose_registration` | Professional | INFO | Disposable singletons need dispose callbacks. Detect registerSingleton of Disposable types without dispose parameter. |
+| 🐙 [`require_getit_dispose_registration`](https://github.com/saropa/saropa_lints/issues/26) | Professional | INFO | Disposable singletons need dispose callbacks. Detect registerSingleton of Disposable types without dispose parameter. |
 
 ### 1.36 Logging Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_log_level_for_production` | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
+| 🐙 [`require_log_level_for_production`](https://github.com/saropa/saropa_lints/issues/27) | Professional | INFO | Debug logs in production waste resources. Detect verbose logging without level checks. |
 | `avoid_expensive_log_string_construction` | Professional | INFO | Don't build expensive strings for logs that won't print. Detect string interpolation in log calls without level guard. |
 
 ### 1.37 Caching Rules
@@ -679,20 +699,25 @@ Before merging any fix:
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_loading_timeout` | Essential | WARNING | `[TOO-COMPLEX]` Infinite loading states lose users. Cannot reliably detect "loading state" generically via AST - would need package-specific implementations (dio timeout, etc.). |
+| 🐙 [`require_loading_timeout`](https://github.com/saropa/saropa_lints/issues/9) | Essential | WARNING | `[TOO-COMPLEX]` Infinite loading states lose users. Cannot reliably detect "loading state" generically via AST - would need package-specific implementations (dio timeout, etc.). |
 | `require_loading_state_distinction` | Recommended | INFO | `[TOO-COMPLEX]` Initial load vs refresh should differ. Cannot reliably distinguish "initial load" vs "refresh" states in static analysis. |
+| 🐙 [`require_loading_state_distinction`](https://github.com/saropa/saropa_lints/issues/10) | Recommended | INFO | `[TOO-COMPLEX]` Initial load vs refresh should differ. Cannot reliably distinguish "initial load" vs "refresh" states in static analysis. |
 
 ### 1.53 Pull-to-Refresh Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_refresh_completion_feedback` | Recommended | INFO | `[TOO-COMPLEX]` Refresh without visible change confuses users. Cannot detect "visible change" or "user feedback" generically - setState could update anything. |
+| 🐙 [`require_refresh_completion_feedback`](https://github.com/saropa/saropa_lints/issues/11) | Recommended | INFO | `[TOO-COMPLEX]` Refresh without visible change confuses users. Cannot detect "visible change" or "user feedback" generically - setState could update anything. |
 
 ### 1.54 Infinite Scroll Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_infinite_scroll_end_indicator` | Recommended | INFO | `[TOO-COMPLEX]` Detect when all items loaded. Pattern requires detecting scroll listener + hasMore flag + end indicator - too many variables for reliable detection. |
+| 🐙 [`require_infinite_scroll_end_indicator`](https://github.com/saropa/saropa_lints/issues/12) | Recommended | INFO | `[TOO-COMPLEX]` Detect when all items loaded. Pattern requires detecting scroll listener + hasMore flag + end indicator - too many variables for reliable detection. |
 | ⭐ `prefer_infinite_scroll_preload` | Professional | INFO | Load next page before reaching end. Detect ScrollController listener triggering at 100% scroll. |
+| 🐙 [`prefer_infinite_scroll_preload`](https://github.com/saropa/saropa_lints/issues/28) | Professional | INFO | Load next page before reaching end. Detect ScrollController listener triggering at 100% scroll. |
 | `require_infinite_scroll_error_recovery` | Recommended | INFO | Failed page loads need retry. Detect infinite scroll without error state and retry button. |
 | ⭐ `avoid_infinite_scroll_duplicate_requests` | Professional | WARNING | Prevent multiple simultaneous page requests. Detect scroll listener without loading guard. |
 
@@ -748,6 +773,7 @@ Before merging any fix:
 | `avoid_importing_entrypoint_exports` | Professional | INFO | Avoid importing from files that re-export entry points. |
 | ⭐ `avoid_missing_interpolation` | Recommended | WARNING | Detect string concatenation that should use interpolation. |
 | `avoid_never_passed_parameters` | Professional | INFO | `[CROSS-FILE]` Detect function parameters that are never passed by any caller. |
+| 🐙 [`avoid_never_passed_parameters`](https://github.com/saropa/saropa_lints/issues/8) | Professional | INFO | `[CROSS-FILE]` Detect function parameters that are never passed by any caller. |
 | `avoid_suspicious_global_reference` | Professional | WARNING | Detect suspicious references to global state in methods. |
 | `avoid_unused_local_variable` | Recommended | WARNING | Local variables that are declared but never used. |
 | ⭐ `no_empty_block` | Recommended | WARNING | Empty blocks indicate missing implementation or dead code. |
@@ -1044,119 +1070,13 @@ The `SaropaLintRule` base class provides enhanced features for all lint rules.
 
 | Feature | Priority | Description |
 |---------|----------|-------------|
-| **Diagnostic Statistics** | Medium | Track hit counts per rule for metrics/reporting |
-| **Related Rules** | Low | Link related rules together, suggest complementary rules |
-| **Suppression Tracking** | High | Audit trail of suppressed lints for tech debt tracking |
-| **Batch Deduplication** | Low | Prevent duplicate reports at same offset |
-| **Custom Ignore Prefixes** | Low | Support `// saropa-ignore:`, `// tech-debt:` prefixes |
-| **Performance Tracking** | Medium | Measure rule execution time for optimization |
-| **Tier-Based Filtering** | Medium | Enable/disable rules by tier at runtime |
-
-##### 3.0.1 Diagnostic Statistics
-
-Track how many times each rule fires across a codebase for:
-- Prioritizing fixes ("847 `avoid_print` vs 3 `avoid_hardcoded_credentials`")
-- Measuring progress over time
-- Identifying problem files
-- Tuning overly aggressive rules
-
-```dart
-abstract class SaropaLintRule extends DartLintRule {
-  static final Map<String, int> hitCounts = {};
-  static final Map<String, Set<String>> fileHits = {};
-
-  int get hitCount => hitCounts[code.name] ?? 0;
-}
-```
-
-##### 3.0.2 Related Rules
-
-Link rules together for better discoverability:
-
-```dart
-class RequireDisposeRule extends SaropaLintRule {
-  @override
-  List<String> get relatedRules => [
-    'require_stream_controller_dispose',
-    'require_animation_controller_dispose',
-  ];
-}
-
-```
-
-##### 3.0.3 Suppression Tracking
-
-Record every time a lint is suppressed for tech debt auditing:
-
-```dart
-class SaropaDiagnosticReporter {
-  static final List<SuppressionRecord> suppressions = [];
-
-  // Output: "avoid_print: 12 suppressions in 5 files"
-}
-```
-
-Use cases:
-- Tech debt tracking
-- Security audits ("are security rules being suppressed?")
-- Cleanup campaigns
-
-##### 3.0.4 Batch Deduplication
-
-Prevent the same issue from being reported multiple times when AST visitors traverse nodes from multiple angles:
-
-```dart
-class SaropaDiagnosticReporter {
-  final Set<int> _reportedOffsets = {};
-
-  void atNode(AstNode node, LintCode code) {
-    if (_reportedOffsets.contains(node.offset)) return;
-    _reportedOffsets.add(node.offset);
-    // ...
-  }
-}
-```
-
-##### 3.0.5 Custom Ignore Prefixes
-
-Support project-specific ignore comment styles:
-
-```dart
-// All of these would suppress the lint:
-// ignore: avoid_print
-// saropa-ignore: avoid_print
-// tech-debt: avoid_print (tracked separately for auditing)
-```
-
-##### 3.0.6 Performance Tracking
-
-Measure rule execution time to identify slow rules:
-
-```dart
-abstract class SaropaLintRule extends DartLintRule {
-  static final Map<String, Duration> executionTimes = {};
-
-  // Output report:
-  // avoid_excessive_widget_depth: 2.3s (needs optimization!)
-  // require_dispose: 0.1s
-}
-```
-
-##### 3.0.7 Tier-Based Filtering
-
-Enable/disable rules based on strictness tiers at runtime:
-
-```dart
-// Configure via environment or analysis_options.yaml
-// SAROPA_TIER=recommended dart analyze
-
-abstract class SaropaLintRule extends DartLintRule {
-  SaropaTier get tier;
-
-  bool shouldRunForTier(SaropaTier activeTier) =>
-    tier.index <= activeTier.index;
-}
-```
+| 💡 [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions/55) | Medium | Track hit counts per rule for metrics/reporting |
+| 💡 [Discussion: Related Rules](https://github.com/saropa/saropa_lints/discussions/57) | Low | Link related rules together, suggest complementary rules |
+| 💡 [Discussion: Suppression Tracking](https://github.com/saropa/saropa_lints/discussions/56) | High | Audit trail of suppressed lints for tech debt tracking |
+| 💡 [Discussion: Batch Deduplication](https://github.com/saropa/saropa_lints/discussions/58) | Low | Prevent duplicate reports at same offset |
+| 💡 [Discussion: Custom Ignore Prefixes](https://github.com/saropa/saropa_lints/discussions/59) | Low | Support `// saropa-ignore:`, `// tech-debt:` prefixes |
+| 💡 [Discussion: Performance Tracking](https://github.com/saropa/saropa_lints/discussions/60) | Medium | Measure rule execution time for optimization |
+| 💡 [Discussion: Tier-Based Filtering](https://github.com/saropa/saropa_lints/discussions/61) | Medium | Enable/disable rules by tier at runtime |
 
 ---
 
@@ -1421,7 +1341,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `prefer_stream_transformer` | Professional | INFO | Use transformers for complex operations. Detect manual stream manipulation. |
-| `require_stream_cancel_on_error | Professional | INFO | Consider cancelOnError for critical streams. Detect error-sensitive streams. |
+| `require_stream_cancel_on_error` | Professional | INFO | Consider cancelOnError for critical streams. Detect error-sensitive streams. |
 | `prefer_rxdart_for_complex_streams` | Professional | INFO | RxDart provides better operators. Detect complex stream transformations. |
 
 ### 5.22 Future/Async Rules
@@ -1512,7 +1432,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_test_golden_threshold` | Professional | INFO | Set golden test threshold for CI differences. Detect default threshold. |
-| `require_test_coverage_threshold` | Professional | INFO | Set minimum coverage threshold. Detect coverage below threshold. |
+| 🐙 [`require_test_golden_threshold`](https://github.com/saropa/saropa_lints/issues/30) | Professional | INFO | Set golden test threshold for CI differences. Detect default threshold. |
+| 🐙 [`require_test_coverage_threshold`](https://github.com/saropa/saropa_lints/issues/31) | Professional | INFO | Set minimum coverage threshold. Detect coverage below threshold. |
 
 ### 5.32 Dispose Pattern Rules
 
@@ -1544,7 +1465,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_ios_info_plist_entries` | Essential | ERROR | `[CROSS-FILE]` iOS features need Info.plist entries. Detect feature without plist. |
-| `require_android_manifest_entries` | Essential | ERROR | `[CROSS-FILE]` Android features need manifest entries. Detect feature without manifest. |
+| 🐙 [`require_ios_info_plist_entries`](https://github.com/saropa/saropa_lints/issues/35) | Essential | ERROR | `[CROSS-FILE]` iOS features need Info.plist entries. Detect feature without plist. |
 | `avoid_platform_specific_imports` | Recommended | WARNING | Use conditional imports for platform code. Detect dart:io in web code. |
 | `prefer_platform_widget_adaptive` | Recommended | INFO | Use platform-adaptive widgets. Detect Material widgets in iOS-only context. |
 | `require_desktop_window_setup` | Professional | INFO | `[CROSS-FILE]` Desktop apps need window configuration. Detect desktop target without setup. |
@@ -1584,7 +1505,8 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `require_cache_invalidation` | Essential | WARNING | `[HEURISTIC]` Caches need invalidation strategy. Detect cache without clear/invalidate. |
 | `prefer_lru_cache` | Professional | INFO | Use LRU for memory-bounded cache. Detect Map used as cache without eviction. |
-| `require_cache_ttl` | Recommended | WARNING | `[HEURISTIC]` Caches need TTL. Detect cache entry without expiration. |
+| 🐙 [`require_cache_invalidation`](https://github.com/saropa/saropa_lints/issues/38) | Essential | WARNING | `[HEURISTIC]` Caches need invalidation strategy. Detect cache without clear/invalidate. |
+| 🐙 [`require_cache_ttl`](https://github.com/saropa/saropa_lints/issues/39) | Recommended | WARNING | `[HEURISTIC]` Caches need TTL. Detect cache entry without expiration. |
 | `avoid_over_caching` | Professional | WARNING | `[HEURISTIC]` Not everything needs caching. Detect excessive cache usage. |
 | `prefer_stale_while_revalidate` | Professional | INFO | Show stale data while refreshing. Detect blocking refresh pattern. |
 | `avoid_cache_stampede` | Professional | WARNING | Prevent thundering herd on cache miss. Detect cache without locking. |
@@ -1596,6 +1518,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 |-----------|------|----------|-------------|
 | `prefer_log_levels` | Professional | INFO | Use log levels appropriately. Detect single log level usage. |
 | `require_crash_reporting` | Professional | INFO | `[CROSS-FILE]` Production apps need crash reporting. Detect production without Crashlytics/Sentry. |
+| 🐙 [`require_crash_reporting`](https://github.com/saropa/saropa_lints/issues/40) | Professional | INFO | `[CROSS-FILE]` Production apps need crash reporting. Detect production without Crashlytics/Sentry. |
 | `avoid_excessive_logging` | Professional | WARNING | `[HEURISTIC]` Too much logging impacts performance. Detect high-frequency log calls. |
 | `prefer_conditional_logging` | Professional | INFO | Expensive log message construction should be conditional. Detect expensive string in log. |
 | `require_error_context_in_logs` | Professional | INFO | Errors need context for debugging. Detect error log without context. |
@@ -1606,6 +1529,7 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_env_file_gitignore` | Essential | ERROR | `[CROSS-FILE]` .env files shouldn't be committed. Detect .env without gitignore entry. |
+| 🐙 [`require_env_file_gitignore`](https://github.com/saropa/saropa_lints/issues/41) | Essential | ERROR | `[CROSS-FILE]` .env files shouldn't be committed. Detect .env without gitignore entry. |
 | `prefer_flavor_configuration` | Professional | INFO | Use Flutter flavors for environments. Detect manual environment switching. |
 | `avoid_string_env_parsing` | Recommended | WARNING | Parse environment strings properly. Detect raw String.fromEnvironment usage. |
 | `prefer_compile_time_config` | Professional | INFO | Use const for compile-time config. Detect runtime config lookup for static values. |
@@ -1624,22 +1548,24 @@ Based on research into the top 20 Flutter packages and their common gotchas, ant
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_text_scale_factor_awareness` | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
-| `avoid_insufficient_contrast` | Essential | WARNING | `[HEURISTIC]` Text needs sufficient contrast. Detect low contrast color combinations. |
-| `require_focus_order` | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
-| `require_reduced_motion_support` | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
-| `prefer_readable_line_length` | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
-| `require_heading_hierarchy` | Professional | INFO | Use proper heading structure. Detect inconsistent heading levels. |
+| 🐙 [`require_text_scale_factor_awareness`](https://github.com/saropa/saropa_lints/issues/42) | Essential | WARNING | UI should handle text scaling. Detect fixed-size text containers. |
+| 🐙 [`avoid_insufficient_contrast`](https://github.com/saropa/saropa_lints/issues/43) | Essential | WARNING | `[HEURISTIC]` Text needs sufficient contrast. Detect low contrast color combinations. |
+| 🐙 [`require_focus_order`](https://github.com/saropa/saropa_lints/issues/44) | Professional | INFO | Ensure logical focus order. Detect FocusTraversalGroup misconfiguration. |
+| 🐙 [`require_reduced_motion_support`](https://github.com/saropa/saropa_lints/issues/45) | Recommended | INFO | Check MediaQuery.disableAnimations. Detect animations without reduced motion check. |
+| 🐙 [`prefer_readable_line_length`](https://github.com/saropa/saropa_lints/issues/46) | Professional | INFO | Lines shouldn't exceed ~80 characters. Detect wide text without constraints. |
+| 🐙 [`require_heading_hierarchy`](https://github.com/saropa/saropa_lints/issues/47) | Professional | INFO | Use proper heading structure. Detect inconsistent heading levels. |
 
 ### 5.44 Auto-Dispose Pattern Rules
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `prefer_automatic_dispose | Professional | INFO | Use packages with auto-dispose. Detect manual disposal patterns. |
-| `require_subscription_composite` | Professional | INFO | Group subscriptions for batch disposal. Detect multiple individual subscriptions. |
-| `prefer_using_for_temp_resources` | Recommended | INFO | Use using() extension for scoped resources. Detect try-finally for temp resources. |
-| `require_resource_tracker` | Comprehensive | INFO | Track resources for leak detection. Detect undisposed resources in debug mode. |
-| `prefer_cancellation_token_pattern` | Professional | INFO | Use CancelToken pattern for cancelable operations. Detect manual cancellation. |
-| `require_dispose_verification_tests` | Professional | INFO | Test dispose is called properly. Detect disposable without dispose test. |
+| 🐙 [`prefer_automatic_dispose`](https://github.com/saropa/saropa_lints/issues/48) | Professional | INFO | Use packages with auto-dispose. Detect manual disposal patterns. |
+| 🐙 [`require_subscription_composite`](https://github.com/saropa/saropa_lints/issues/49) | Professional | INFO | Group subscriptions for batch disposal. Detect multiple individual subscriptions. |
+| 🐙 [`prefer_using_for_temp_resources`](https://github.com/saropa/saropa_lints/issues/50) | Recommended | INFO | Use using() extension for scoped resources. Detect try-finally for temp resources. |
+| 🐙 [`require_resource_tracker`](https://github.com/saropa/saropa_lints/issues/51) | Comprehensive | INFO | Track resources for leak detection. Detect undisposed resources in debug mode. |
+| 🐙 [`prefer_cancellation_token_pattern`](https://github.com/saropa/saropa_lints/issues/52) | Professional | INFO | Use CancelToken pattern for cancelable operations. Detect manual cancellation. |
+| 🐙 [`require_dispose_verification_tests`](https://github.com/saropa/saropa_lints/issues/53) | Professional | INFO | Test dispose is called properly. Detect disposable without dispose test. |
 
 ### 5.46 Hot Reload Compatibility Rules
 
@@ -1771,16 +1697,6 @@ This section consolidates all rules that are deferred or marked as too complex f
 |------|--------|-------------|
 | `require_riverpod_override_in_tests` | CROSS-FILE | Test overrides may be in setup |
 | `require_bloc_test_coverage` | CROSS-FILE | Test coverage requires test file analysis |
-
-### Deferred: GetX Rules (with markers)
-
-| Rule | Reason | Description |
-|------|--------|-------------|
-
-### Deferred: Performance Rules (with markers)
-
-| Rule | Reason | Description |
-|------|--------|-------------|
 
 ### Deferred: Code Quality Rules (with markers)
 
@@ -1960,8 +1876,3 @@ These rules should be revisited when:
 | `require_cache_manager_clear_on_logout` | Recommended | flutter_cache_manager | Clear cache on logout |
 | `require_timezone_initialization` | Essential | timezone | Call initializeTimeZones() first |
 | `require_password_strength_threshold` | Recommended | zxcvbn | Enforce minimum score 3+ |
-
-### Utilities
-
-| Rule | Tier | Package | Description |
-|------|------|---------|-------------|
