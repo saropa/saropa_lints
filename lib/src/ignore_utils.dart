@@ -97,27 +97,56 @@ class IgnoreUtils {
   /// Checks for a trailing ignore comment on the same line as the node.
   ///
   /// Trailing comments like `// ignore: rule` at the end of a line are stored
-  /// as `precedingComments` on the first token of the next line/statement.
+  /// as `precedingComments` on the next token (which could be on the same line
+  /// or the next line).
+  ///
+  /// This handles multiple scenarios:
+  /// 1. Statement-level: `doSomething(); // ignore: rule`
+  /// 2. Constructor args: `url: 'http://example.com', // ignore: rule`
+  /// 3. List items: `WebsiteItem(url: 'http://test.com'), // ignore: rule`
   static bool _hasTrailingIgnoreComment(AstNode node, String ruleName) {
-    // Find the ExpressionStatement containing this node
-    // Note: Block is a Statement subclass, so we need to look for
-    // ExpressionStatement specifically (which ends with `;`)
-    AstNode? statement = node.parent;
-    while (statement != null && statement is! ExpressionStatement) {
-      // Stop if we hit a function/method body - no statement to check
-      if (statement is FunctionBody) return false;
-      statement = statement.parent;
-    }
-    if (statement == null) return false;
-
-    // Get the token after the statement ends (typically first token of next line)
-    final Token? nextToken = statement.endToken.next;
-    if (nextToken == null) return false;
-
     final String hyphenatedName = toHyphenated(ruleName);
 
-    // Check ALL preceding comments on the next token - any of them could be
-    // a trailing ignore comment from the statement
+    // Strategy 1: Check the token immediately after this node's end token.
+    // This handles cases like constructor arguments where the comment
+    // follows the value directly: `url: 'http://...', // ignore: rule`
+    if (_checkNextTokenForIgnore(node.endToken, ruleName, hyphenatedName)) {
+      return true;
+    }
+
+    // Strategy 2: Walk up to find a statement-level container and check
+    // the token after its end. This handles cases where the ignore comment
+    // is at the end of a full statement: `doSomething(); // ignore: rule`
+    AstNode? container = node.parent;
+    while (container != null) {
+      // Check various statement/declaration types that could end a line
+      if (container is Statement ||
+          container is VariableDeclaration ||
+          container is FieldDeclaration ||
+          container is MethodDeclaration ||
+          container is CollectionElement) {
+        if (_checkNextTokenForIgnore(
+            container.endToken, ruleName, hyphenatedName)) {
+          return true;
+        }
+      }
+      // Stop if we hit a function/method body - don't go higher
+      if (container is FunctionBody || container is CompilationUnit) break;
+      container = container.parent;
+    }
+
+    return false;
+  }
+
+  /// Checks if the token after [endToken] has a preceding ignore comment.
+  static bool _checkNextTokenForIgnore(
+    Token endToken,
+    String ruleName,
+    String hyphenatedName,
+  ) {
+    final Token? nextToken = endToken.next;
+    if (nextToken == null) return false;
+
     Token? comment = nextToken.precedingComments;
     while (comment != null) {
       final String text = comment.lexeme;

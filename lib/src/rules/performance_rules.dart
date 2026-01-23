@@ -3158,12 +3158,19 @@ class _KeyConsistencyVisitor extends RecursiveAstVisitor<void> {
 /// final result = await platform.invokeMethod('getData');
 /// ```
 ///
-/// **GOOD:**
+/// **GOOD (if statement):**
 /// ```dart
 /// if (!kIsWeb) {
 ///   final platform = MethodChannel('my_channel');
 ///   final result = await platform.invokeMethod('getData');
 /// }
+/// ```
+///
+/// **GOOD (ternary operator):**
+/// ```dart
+/// static const MethodChannel? _channel = kIsWeb
+///     ? null
+///     : MethodChannel('my_channel');
 /// ```
 class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   const AvoidPlatformChannelOnWebRule() : super(code: _code);
@@ -3210,15 +3217,26 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
     while (current != null) {
       if (current is IfStatement) {
         final String condition = current.expression.toSource();
-        if (condition.contains('kIsWeb') ||
-            condition.contains('Platform.') ||
-            condition.contains('defaultTargetPlatform')) {
+        if (_containsPlatformCheck(condition)) {
+          return true;
+        }
+      }
+      // Handle ternary operator: kIsWeb ? null : MethodChannel(...)
+      if (current is ConditionalExpression) {
+        final String condition = current.condition.toSource();
+        if (_containsPlatformCheck(condition)) {
           return true;
         }
       }
       current = current.parent;
     }
     return false;
+  }
+
+  bool _containsPlatformCheck(String condition) {
+    return condition.contains('kIsWeb') ||
+        condition.contains('Platform.') ||
+        condition.contains('defaultTargetPlatform');
   }
 }
 

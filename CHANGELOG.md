@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.5.7] - 2026-01-23
+
+### Fixed
+
+- **avoid_platform_channel_on_web**: Fixed false positives when MethodChannel is properly guarded with a ternary operator. The rule now recognizes both patterns:
+  - `if (!kIsWeb) { MethodChannel(...) }` (already supported)
+  - `kIsWeb ? null : MethodChannel(...)` (now supported)
+
+- **Trailing ignore comment detection**: Fixed `// ignore:` comments not being recognized in certain contexts:
+  - Constructor arguments: `url: 'http://example.com', // ignore: rule`
+  - List items: `WebsiteItem(url: 'test.com'), // ignore: rule`
+  - Extracted `_checkNextTokenForIgnore()` helper for better code organization.
+
+---
+
 ## [4.5.6] - 2026-01-23
 
 ### Changed
