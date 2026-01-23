@@ -121,7 +121,8 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
     name: 'avoid_small_touch_targets',
     problemMessage:
         '[avoid_small_touch_targets] Touch target under 44px. Users with motor impairments will struggle to tap accurately (WCAG 2.5.5).',
-    correctionMessage: 'Wrap in SizedBox(width: 48, height: 48) or use Material minimumSize.',
+    correctionMessage:
+        'Wrap in SizedBox(width: 48, height: 48) or use Material minimumSize.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -251,9 +252,11 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_exclude_semantics_justification',
-    problemMessage: '[require_exclude_semantics_justification] ExcludeSemantics without '
+    problemMessage:
+        '[require_exclude_semantics_justification] ExcludeSemantics without '
         'justification makes accessibility audits harder to pass.',
-    correctionMessage: 'Add a comment above ExcludeSemantics explaining the rationale.',
+    correctionMessage:
+        'Add a comment above ExcludeSemantics explaining the rationale.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -277,7 +280,8 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
       }
 
       // Look for comments in the compilation unit
-      final CompilationUnit? unit = node.thisOrAncestorOfType<CompilationUnit>();
+      final CompilationUnit? unit =
+          node.thisOrAncestorOfType<CompilationUnit>();
       if (unit == null) {
         reporter.atNode(node.constructorName, code);
         return;
@@ -354,7 +358,8 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
     name: 'avoid_color_only_indicators',
     problemMessage:
         '[avoid_color_only_indicators] Color-only status indicator. 8% of men are colorblind and cannot distinguish red/green (WCAG 1.4.1).',
-    correctionMessage: 'Add Icon(isError ? Icons.error : Icons.check) alongside the color.',
+    correctionMessage:
+        'Add Icon(isError ? Icons.error : Icons.check) alongside the color.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -475,10 +480,13 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
 
       if (!hasKeyboardSupport) {
         // Check if GestureDetector has interactive callbacks
-        final bool hasInteractiveCallback = node.argumentList.arguments.any((Expression arg) {
+        final bool hasInteractiveCallback =
+            node.argumentList.arguments.any((Expression arg) {
           if (arg is NamedExpression) {
             final String name = arg.name.label.name;
-            return name == 'onTap' || name == 'onDoubleTap' || name == 'onLongPress';
+            return name == 'onTap' ||
+                name == 'onDoubleTap' ||
+                name == 'onLongPress';
           }
           return false;
         });
@@ -619,7 +627,8 @@ class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_merged_semantics_hiding_info',
-    problemMessage: '[avoid_merged_semantics_hiding_info] MergeSemantics hides interactive '
+    problemMessage:
+        '[avoid_merged_semantics_hiding_info] MergeSemantics hides interactive '
         'elements from screen readers, making buttons/inputs unusable.',
     correctionMessage:
         'Move interactive widgets outside MergeSemantics, or wrap only related text content.',
@@ -772,8 +781,10 @@ class RequireLiveRegionRule extends SaropaLintRule {
         if (current is InstanceCreationExpression) {
           final String? parentName = current.constructorName.type.element?.name;
           if (parentName == 'Semantics') {
-            hasLiveRegion = current.argumentList.arguments.any((Expression arg) {
-              if (arg is NamedExpression && arg.name.label.name == 'liveRegion') {
+            hasLiveRegion =
+                current.argumentList.arguments.any((Expression arg) {
+              if (arg is NamedExpression &&
+                  arg.name.label.name == 'liveRegion') {
                 if (arg.expression is BooleanLiteral) {
                   return (arg.expression as BooleanLiteral).value;
                 }
@@ -828,9 +839,11 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_heading_semantics',
-    problemMessage: '[require_heading_semantics] Missing header semantics prevents screen '
+    problemMessage:
+        '[require_heading_semantics] Missing header semantics prevents screen '
         'reader users from navigating by headings.',
-    correctionMessage: 'Wrap with Semantics(header: true) for screen reader navigation.',
+    correctionMessage:
+        'Wrap with Semantics(header: true) for screen reader navigation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -978,9 +991,12 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           if (arg.expression is InstanceCreationExpression) {
-            final InstanceCreationExpression child = arg.expression as InstanceCreationExpression;
+            final InstanceCreationExpression child =
+                arg.expression as InstanceCreationExpression;
             final String? childName = child.constructorName.type.element?.name;
-            if (childName == 'Image' || childName == 'Icon' || childName == 'SvgPicture') {
+            if (childName == 'Image' ||
+                childName == 'Icon' ||
+                childName == 'SvgPicture') {
               hasImageChild = true;
             }
           }
@@ -1170,7 +1186,8 @@ class RequireImageSemanticsRule extends SaropaLintRule {
           }
           if (name == 'excludeFromSemantics') {
             if (arg.expression is BooleanLiteral) {
-              isExcludedFromSemantics = (arg.expression as BooleanLiteral).value;
+              isExcludedFromSemantics =
+                  (arg.expression as BooleanLiteral).value;
             }
           }
         }
@@ -1187,7 +1204,8 @@ class RequireImageSemanticsRule extends SaropaLintRule {
       final Expression? target = node.target;
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
-      if (!<String>{'network', 'asset', 'file', 'memory'}.contains(methodName)) {
+      if (!<String>{'network', 'asset', 'file', 'memory'}
+          .contains(methodName)) {
         return;
       }
 
@@ -1202,7 +1220,8 @@ class RequireImageSemanticsRule extends SaropaLintRule {
           }
           if (name == 'excludeFromSemantics') {
             if (arg.expression is BooleanLiteral) {
-              isExcludedFromSemantics = (arg.expression as BooleanLiteral).value;
+              isExcludedFromSemantics =
+                  (arg.expression as BooleanLiteral).value;
             }
           }
         }
@@ -1304,7 +1323,8 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
         bool hasExcludeSemantics = false;
 
         for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'excludeSemantics') {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'excludeSemantics') {
             if (arg.expression is BooleanLiteral) {
               hasExcludeSemantics = (arg.expression as BooleanLiteral).value;
             }
@@ -1813,7 +1833,8 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
         r'colors\.red|\.red\b|\.error\b|errorcolor|redaccent',
         caseSensitive: false,
       );
-      if (!errorColorPattern.hasMatch(thenSource) && !errorColorPattern.hasMatch(elseSource)) {
+      if (!errorColorPattern.hasMatch(thenSource) &&
+          !errorColorPattern.hasMatch(elseSource)) {
         return;
       }
 
@@ -1888,7 +1909,8 @@ class RequireMinimumContrastRule extends SaropaLintRule {
     name: 'require_minimum_contrast',
     problemMessage:
         '[require_minimum_contrast] Low contrast text is unreadable for users with low vision. WCAG 2.1 requires 4.5:1 minimum.',
-    correctionMessage: 'Use darker text on light backgrounds or lighter text on dark backgrounds.',
+    correctionMessage:
+        'Use darker text on light backgrounds or lighter text on dark backgrounds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2180,8 +2202,10 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
 
           // Check if it's a Text widget with a literal number
           if (labelExpr is InstanceCreationExpression) {
-            final String labelTypeName = labelExpr.constructorName.type.name.lexeme;
-            if (labelTypeName == 'Text' && labelExpr.argumentList.arguments.isNotEmpty) {
+            final String labelTypeName =
+                labelExpr.constructorName.type.name.lexeme;
+            if (labelTypeName == 'Text' &&
+                labelExpr.argumentList.arguments.isNotEmpty) {
               final Expression textArg = labelExpr.argumentList.arguments.first;
               if (textArg is SimpleStringLiteral) {
                 final int? number = int.tryParse(textArg.value);
@@ -2232,9 +2256,11 @@ class RequireImageDescriptionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_image_description',
-    problemMessage: '[require_image_description] Image without semanticLabel is announced '
+    problemMessage:
+        '[require_image_description] Image without semanticLabel is announced '
         'as "image" by screen readers, providing no useful information.',
-    correctionMessage: 'Add semanticLabel for content images or excludeFromSemantics: true '
+    correctionMessage:
+        'Add semanticLabel for content images or excludeFromSemantics: true '
         'for decorative images.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -2303,7 +2329,8 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
     name: 'avoid_semantics_exclusion',
     problemMessage:
         '[avoid_semantics_exclusion] excludeFromSemantics: true should have a comment explaining why.',
-    correctionMessage: 'Add a comment explaining why this is decorative content.',
+    correctionMessage:
+        'Add a comment explaining why this is decorative content.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2372,8 +2399,10 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_merge_semantics',
-    problemMessage: '[prefer_merge_semantics] Icon + Text should be wrapped in MergeSemantics.',
-    correctionMessage: 'Wrap Row/Column with MergeSemantics for unified screen reader output.',
+    problemMessage:
+        '[prefer_merge_semantics] Icon + Text should be wrapped in MergeSemantics.',
+    correctionMessage:
+        'Wrap Row/Column with MergeSemantics for unified screen reader output.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2399,7 +2428,8 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
           if (children is ListLiteral) {
             for (final CollectionElement element in children.elements) {
               if (element is InstanceCreationExpression) {
-                final String childType = element.constructorName.type.name.lexeme;
+                final String childType =
+                    element.constructorName.type.name.lexeme;
                 if (childType == 'Icon') hasIcon = true;
                 if (childType == 'Text') hasText = true;
               }
@@ -2478,7 +2508,8 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
     name: 'require_focus_indicator',
     problemMessage:
         '[require_focus_indicator] Interactive widget should have visible focus indicator.',
-    correctionMessage: 'Wrap in Focus widget and show visual feedback on focus.',
+    correctionMessage:
+        'Wrap in Focus widget and show visual feedback on focus.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2564,9 +2595,11 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_flashing_content',
-    problemMessage: '[avoid_flashing_content] Flashing >3Hz can trigger seizures in users '
+    problemMessage:
+        '[avoid_flashing_content] Flashing >3Hz can trigger seizures in users '
         'with photosensitive epilepsy. WCAG 2.3.1 compliance required.',
-    correctionMessage: 'Increase duration to at least 333ms to stay under 3 flashes/second.',
+    correctionMessage:
+        'Increase duration to at least 333ms to stay under 3 flashes/second.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2587,10 +2620,12 @@ class AvoidFlashingContentRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'duration') {
           final Expression duration = arg.expression;
           if (duration is InstanceCreationExpression) {
-            final String durationTypeName = duration.constructorName.type.name.lexeme;
+            final String durationTypeName =
+                duration.constructorName.type.name.lexeme;
             if (durationTypeName == 'Duration') {
               // Check milliseconds
-              for (final Expression durationArg in duration.argumentList.arguments) {
+              for (final Expression durationArg
+                  in duration.argumentList.arguments) {
                 if (durationArg is NamedExpression &&
                     durationArg.name.label.name == 'milliseconds') {
                   final Expression millisExpr = durationArg.expression;
@@ -2732,7 +2767,8 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
     name: 'avoid_motion_without_reduce',
     problemMessage:
         '[avoid_motion_without_reduce] Animation should respect disableAnimations preference.',
-    correctionMessage: 'Check MediaQuery.disableAnimations and reduce/skip animation if true.',
+    correctionMessage:
+        'Check MediaQuery.disableAnimations and reduce/skip animation if true.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2868,7 +2904,8 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
         // Check for Semantics with excludeSemantics: true
         if (typeName == 'Semantics') {
           for (final Expression arg in current.argumentList.arguments) {
-            if (arg is NamedExpression && arg.name.label.name == 'excludeSemantics') {
+            if (arg is NamedExpression &&
+                arg.name.label.name == 'excludeSemantics') {
               if (arg.expression is BooleanLiteral) {
                 if ((arg.expression as BooleanLiteral).value) {
                   return true;
@@ -2953,7 +2990,8 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
       final Expression? target = node.target;
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
-      if (!<String>{'network', 'asset', 'file', 'memory'}.contains(methodName)) {
+      if (!<String>{'network', 'asset', 'file', 'memory'}
+          .contains(methodName)) {
         return;
       }
 
@@ -3166,7 +3204,8 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_large_touch_targets',
-    problemMessage: '[prefer_large_touch_targets] Touch target is smaller than 48px. '
+    problemMessage:
+        '[prefer_large_touch_targets] Touch target is smaller than 48px. '
         'This makes it difficult for users with motor impairments.',
     correctionMessage: 'Increase the touch target size to at least 48x48 '
         'logical pixels, or wrap in a larger touchable area.',
@@ -3335,9 +3374,11 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_time_limits',
-    problemMessage: '[avoid_time_limits] Short duration may disadvantage users who need '
+    problemMessage:
+        '[avoid_time_limits] Short duration may disadvantage users who need '
         'more time. Consider longer durations or manual dismissal.',
-    correctionMessage: 'Use duration >= 10 seconds or provide manual dismiss option.',
+    correctionMessage:
+        'Use duration >= 10 seconds or provide manual dismiss option.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -3478,7 +3519,8 @@ class RequireDragAlternativesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_drag_alternatives',
-    problemMessage: '[require_drag_alternatives] `[HEURISTIC]` Drag-based widget without '
+    problemMessage:
+        '[require_drag_alternatives] `[HEURISTIC]` Drag-based widget without '
         'obvious button alternative. Some users cannot perform drag gestures.',
     correctionMessage: 'Provide button-based alternatives for drag operations.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -3580,9 +3622,11 @@ class PreferFocusTraversalOrderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_focus_traversal_order',
-    problemMessage: '[prefer_focus_traversal_order] Form with multiple inputs in Row/Wrap '
+    problemMessage:
+        '[prefer_focus_traversal_order] Form with multiple inputs in Row/Wrap '
         'layout without FocusTraversalOrder. Keyboard navigation may be confusing.',
-    correctionMessage: 'Wrap in FocusTraversalGroup and use FocusTraversalOrder for each input.',
+    correctionMessage:
+        'Wrap in FocusTraversalGroup and use FocusTraversalOrder for each input.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -7,7 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -62,7 +63,8 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
       }
     });
 
-    context.registry.addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
+    context.registry
+        .addFunctionExpressionInvocation((FunctionExpressionInvocation node) {
       final String source = node.function.toSource();
       if (source != 'jsonDecode') return;
 
@@ -332,7 +334,8 @@ class PreferDurationConstantsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_duration_constants',
-    problemMessage: '[prefer_duration_constants] Duration can use a cleaner unit.',
+    problemMessage:
+        '[prefer_duration_constants] Duration can use a cleaner unit.',
     correctionMessage: 'Use a larger unit for cleaner code.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -359,7 +362,9 @@ class PreferDurationConstantsRule extends SaropaLintRule {
         if (intValue <= 0) continue;
 
         // Check for conversions
-        if (name == 'milliseconds' && intValue >= 1000 && intValue % 1000 == 0) {
+        if (name == 'milliseconds' &&
+            intValue >= 1000 &&
+            intValue % 1000 == 0) {
           reporter.atNode(arg, code);
         } else if (name == 'seconds' && intValue >= 60 && intValue % 60 == 0) {
           reporter.atNode(arg, code);
@@ -409,7 +414,8 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
     name: 'avoid_datetime_now_in_tests',
     problemMessage:
         '[avoid_datetime_now_in_tests] DateTime.now() in tests can cause flaky behavior.',
-    correctionMessage: 'Use fixed datetime values or a clock abstraction for predictable tests.',
+    correctionMessage:
+        'Use fixed datetime values or a clock abstraction for predictable tests.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -486,7 +492,8 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
     name: 'avoid_not_encodable_in_to_json',
     problemMessage:
         '[avoid_not_encodable_in_to_json] Value is not JSON-encodable and will cause runtime error.',
-    correctionMessage: 'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
+    correctionMessage:
+        'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
         '.toJson() for objects, or remove non-serializable values.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -754,7 +761,8 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
     name: 'require_freezed_json_converter',
     problemMessage:
         '[require_freezed_json_converter] Freezed class with DateTime/Color field may need JsonConverter.',
-    correctionMessage: 'Add @JsonSerializable(converters: [...]) for custom types.',
+    correctionMessage:
+        'Add @JsonSerializable(converters: [...]) for custom types.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -830,7 +838,8 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
                       break;
                     }
                     if (annotSource.contains('JsonKey') &&
-                        (annotSource.contains('fromJson') || annotSource.contains('toJson'))) {
+                        (annotSource.contains('fromJson') ||
+                            annotSource.contains('toJson'))) {
                       hasConverter = true;
                       break;
                     }
@@ -937,7 +946,8 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
     name: 'require_date_format_specification',
     problemMessage:
         '[require_date_format_specification] DateTime.parse may fail on server dates. Use tryParse or DateFormat.',
-    correctionMessage: 'Use DateTime.tryParse() for safety or DateFormat for specific formats.',
+    correctionMessage:
+        'Use DateTime.tryParse() for safety or DateFormat for specific formats.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1025,8 +1035,10 @@ class PreferIso8601DatesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_iso8601_dates',
-    problemMessage: '[prefer_iso8601_dates] Use ISO 8601 format for date serialization.',
-    correctionMessage: 'Use toIso8601String() or yyyy-MM-dd format for interoperability.',
+    problemMessage:
+        '[prefer_iso8601_dates] Use ISO 8601 format for date serialization.',
+    correctionMessage:
+        'Use toIso8601String() or yyyy-MM-dd format for interoperability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1041,7 +1053,8 @@ class PreferIso8601DatesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addInstanceCreationExpression((InstanceCreationExpression node) {
+    context.registry
+        .addInstanceCreationExpression((InstanceCreationExpression node) {
       final String constructorName = node.constructorName.type.name2.lexeme;
       if (constructorName != 'DateFormat') return;
 
@@ -1091,7 +1104,8 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
     name: 'avoid_optional_field_crash',
     problemMessage:
         '[avoid_optional_field_crash] JSON field access may crash if null. Use null-aware operators.',
-    correctionMessage: 'Use ?[] for optional access or provide default with ?? operator.',
+    correctionMessage:
+        'Use ?[] for optional access or provide default with ?? operator.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1200,8 +1214,10 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_explicit_json_keys',
-    problemMessage: '[prefer_explicit_json_keys] Consider using @JsonKey for field name mapping.',
-    correctionMessage: 'Use json_serializable with @JsonKey annotation for cleaner mapping.',
+    problemMessage:
+        '[prefer_explicit_json_keys] Consider using @JsonKey for field name mapping.',
+    correctionMessage:
+        'Use json_serializable with @JsonKey annotation for cleaner mapping.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1303,7 +1319,8 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_json_schema_validation',
-    problemMessage: '[require_json_schema_validation] JSON API response used without '
+    problemMessage:
+        '[require_json_schema_validation] JSON API response used without '
         'validation. Malformed data may crash the app or cause unexpected behavior.',
     correctionMessage:
         'Validate JSON structure with fromJson in try-catch, or check required fields.',
@@ -1318,7 +1335,8 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
   ) {
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for jsonDecode
-      if (node.methodName.name != 'jsonDecode' && node.methodName.name != 'json.decode') {
+      if (node.methodName.name != 'jsonDecode' &&
+          node.methodName.name != 'json.decode') {
         return;
       }
 
@@ -1419,9 +1437,11 @@ class PreferJsonSerializableRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_json_serializable',
-    problemMessage: '[prefer_json_serializable] Data class with manual JSON serialization. '
+    problemMessage:
+        '[prefer_json_serializable] Data class with manual JSON serialization. '
         'Manual parsing is error-prone and hard to maintain.',
-    correctionMessage: 'Use @JsonSerializable() or @freezed for type-safe serialization.',
+    correctionMessage:
+        'Use @JsonSerializable() or @freezed for type-safe serialization.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1440,7 +1460,9 @@ class PreferJsonSerializableRule extends SaropaLintRule {
       // Check for annotations
       for (final annotation in node.metadata) {
         final name = annotation.name.name;
-        if (name == 'JsonSerializable' || name == 'freezed' || name == 'Freezed') {
+        if (name == 'JsonSerializable' ||
+            name == 'freezed' ||
+            name == 'Freezed') {
           hasCodegenAnnotation = true;
           break;
         }
@@ -1451,11 +1473,13 @@ class PreferJsonSerializableRule extends SaropaLintRule {
       // Check members
       for (final ClassMember member in node.members) {
         if (member is ConstructorDeclaration) {
-          if (member.factoryKeyword != null && member.name?.lexeme == 'fromJson') {
+          if (member.factoryKeyword != null &&
+              member.name?.lexeme == 'fromJson') {
             // Check if it's manual (not calling _$ClassName...)
             final String bodySource = member.body.toSource();
             if (!bodySource.contains(r'_$') &&
-                (bodySource.contains("json['") || bodySource.contains('json["'))) {
+                (bodySource.contains("json['") ||
+                    bodySource.contains('json["'))) {
               hasManualFromJson = true;
             }
           }
