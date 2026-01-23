@@ -56,8 +56,7 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
     name: 'prefer_specific_exceptions',
     problemMessage:
         '[prefer_specific_exceptions] Throw specific exception types instead of generic Exception.',
-    correctionMessage:
-        'Create a custom exception class for better error handling.',
+    correctionMessage: 'Create a custom exception class for better error handling.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -114,8 +113,7 @@ class PreferGenericExceptionRule extends SaropaLintRule {
   /// Alias: prefer_generic_exception_type
   static const LintCode _code = LintCode(
     name: 'prefer_generic_exception',
-    problemMessage:
-        '[prefer_generic_exception] Consider using generic Exception for simplicity.',
+    problemMessage: '[prefer_generic_exception] Consider using generic Exception for simplicity.',
     correctionMessage: 'Generic Exception is often sufficient.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -248,8 +246,7 @@ class PreferErrorSuffixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_error_suffix',
-    problemMessage:
-        '[prefer_error_suffix] Exception classes should end with "Error" suffix.',
+    problemMessage: '[prefer_error_suffix] Exception classes should end with "Error" suffix.',
     correctionMessage: 'Rename to end with "Error" for consistency.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -327,8 +324,7 @@ class PreferOnOverCatchRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_on_over_catch',
-    problemMessage:
-        '[prefer_on_over_catch] Use "on ExceptionType" instead of bare "catch".',
+    problemMessage: '[prefer_on_over_catch] Use "on ExceptionType" instead of bare "catch".',
     correctionMessage: 'Specific exception types make error handling clearer.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -391,8 +387,7 @@ class PreferCatchOverOnRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_catch_over_on',
-    problemMessage:
-        '[prefer_catch_over_on] Consider using bare "catch" for simplicity.',
+    problemMessage: '[prefer_catch_over_on] Consider using bare "catch" for simplicity.',
     correctionMessage: 'Bare catch is simpler and catches all exceptions.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -557,8 +552,7 @@ class PreferSelfDocumentingTestsRule extends SaropaLintRule {
     name: 'prefer_self_documenting_tests',
     problemMessage:
         '[prefer_self_documenting_tests] Avoid Arrange/Act/Assert comments - prefer self-documenting code.',
-    correctionMessage:
-        'Write clear, self-documenting tests without structure comments.',
+    correctionMessage: 'Write clear, self-documenting tests without structure comments.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -645,7 +639,8 @@ class PreferExpectOverAssertInTestsRule extends SaropaLintRule {
     name: 'prefer_expect_over_assert_in_tests',
     problemMessage:
         '[prefer_expect_over_assert_in_tests] Use expect() instead of assert() in tests.',
-    correctionMessage: 'expect() provides better error messages and matchers.',
+    correctionMessage:
+        'Use expect() for assertions in tests. Example: expect(user.name, "John"). This provides better error messages and matchers than assert.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -974,8 +969,9 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_test_name_descriptive',
     problemMessage:
-        '[prefer_test_name_descriptive] Use descriptive test names instead of rigid should/when pattern.',
-    correctionMessage: 'Use natural, descriptive test names.',
+        '[prefer_test_name_descriptive] Test name is not descriptive. Rigid patterns make test failures harder to diagnose and understand.',
+    correctionMessage:
+        'Use natural, descriptive test names that explain the behavior being tested. Example: test("user can authenticate with valid credentials").',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

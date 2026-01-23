@@ -50,9 +50,9 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_url_launcher_can_launch_check',
     problemMessage:
-        '[require_url_launcher_can_launch_check] launchUrl called without '
-        'canLaunchUrl check. May fail silently on unsupported schemes.',
-    correctionMessage: 'Check canLaunchUrl(uri) before calling launchUrl(uri).',
+        '[require_url_launcher_can_launch_check] launchUrl called without canLaunchUrl check. May fail silently on unsupported schemes, confusing users and breaking expected flows.',
+    correctionMessage:
+        'Check canLaunchUrl(uri) before calling launchUrl(uri). Example: if (await canLaunchUrl(uri)) { launchUrl(uri); } else { showError("Could not open link"); }',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -85,8 +85,7 @@ class RequireUrlLauncherCanLaunchCheckRule extends SaropaLintRule {
       final String bodySource = functionBody.toSource();
 
       // Check for canLaunchUrl check
-      if (bodySource.contains('canLaunchUrl') ||
-          bodySource.contains('canLaunch')) {
+      if (bodySource.contains('canLaunchUrl') || bodySource.contains('canLaunch')) {
         return; // Has the check
       }
 
@@ -141,10 +140,9 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_url_launcher_simulator_tests',
     problemMessage:
-        '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms: '
-        'scheme may fail on simulator. Mock or skip these tests.',
+        '[avoid_url_launcher_simulator_tests] URL launcher test with tel:/mailto:/sms:/facetime:/maps: scheme may fail on simulator. These schemes are not supported in emulators and will cause test failures.',
     correctionMessage:
-        'Mock url_launcher in tests or add skip condition for simulator.',
+        'Mock url_launcher in tests or add skip condition for simulator. Example: skip: !Platform.isAndroid or use a mockUrlLauncher.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -171,9 +169,7 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       // Check for test function calls
       final String methodName = node.methodName.name;
-      if (methodName != 'test' &&
-          methodName != 'testWidgets' &&
-          methodName != 'group') {
+      if (methodName != 'test' && methodName != 'testWidgets' && methodName != 'group') {
         return;
       }
 
@@ -185,8 +181,7 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
 
           // Check for problematic schemes
           for (final String scheme in _problematicSchemes) {
-            if (bodySource.contains("'$scheme") ||
-                bodySource.contains('"$scheme')) {
+            if (bodySource.contains("'$scheme") || bodySource.contains('"$scheme')) {
               // Check if there's mocking or skip
               if (!bodySource.contains('mock') &&
                   !bodySource.contains('Mock') &&
@@ -244,10 +239,9 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_url_launcher_fallback',
     problemMessage:
-        '[prefer_url_launcher_fallback] launchUrl without fallback. If the '
-        'scheme is unsupported, the user gets no feedback.',
+        '[prefer_url_launcher_fallback] launchUrl called without a fallback. If the scheme is unsupported, the user gets no feedback and cannot complete the action. This leads to user frustration and failed actions.',
     correctionMessage:
-        'Provide a fallback action (copy to clipboard, show dialog) when launch fails.',
+        'Provide a fallback action (copy to clipboard, show dialog) when launch fails. Example: if (!await launchUrl(uri)) { showDialog(context: context, builder: (_) => Text("Could not open link")); }',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

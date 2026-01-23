@@ -3,8 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -36,9 +35,9 @@ class AvoidEmptySpreadRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_empty_spread',
     problemMessage:
-        '[avoid_empty_spread] Using an empty spread operator (e.g., ...[] or ...{}) in a list, set, or map literal has no effect and can confuse readers or reviewers. It may suggest that elements could be added dynamically, but in reality, nothing is added. This can lead to misunderstandings about the intent of the code and may be a leftover from refactoring or copy-pasting.',
+        '[avoid_empty_spread] Empty spread operator (...[] or ...{}) adds nothing to your collection and may confuse readers. This is often a leftover from refactoring or copy-paste and serves no purpose.',
     correctionMessage:
-        'Remove the empty spread expression from your collection literal. If you intended to add elements dynamically, ensure the spread is not empty. Otherwise, omitting the empty spread will make your code clearer and easier to maintain. Review your codebase for similar patterns and clean up any unnecessary or misleading spread operators.',
+        'Remove the empty spread from your collection literal. Only use spreads when they add elements. Clean up any unnecessary or misleading spread operators for clarity.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -127,9 +126,9 @@ class AvoidUnnecessaryBlockRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_block',
     problemMessage:
-        '[avoid_unnecessary_block] Nested code blocks that do not introduce a new scope or serve a specific purpose add unnecessary visual clutter and can make code harder to read and maintain. Such blocks are often the result of refactoring or copy-pasting and do not provide any functional benefit.',
+        '[avoid_unnecessary_block] Unnecessary nested code blocks add clutter and reduce readability. They rarely serve a purpose and are often left from copy-paste or refactoring.',
     correctionMessage:
-        'Remove the extra braces from nested blocks that do not introduce a new scope or serve a specific purpose. This will simplify your code and improve readability. Only use additional blocks when you need to introduce a new variable scope or for clarity in complex logic.',
+        'Remove extra braces from nested blocks that do not introduce a new scope. Only use additional blocks when needed for variable scope or clarity.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -183,9 +182,9 @@ class AvoidUnnecessaryCallRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_call',
     problemMessage:
-        '[avoid_unnecessary_call] Explicitly invoking the .call() method on a callable object (e.g., fn.call()) is redundant in Dart, as the () operator already invokes the call method implicitly. This can make code look verbose and unfamiliar to most Dart developers, reducing clarity.',
+        '[avoid_unnecessary_call] Using .call() on a function or callable is redundant. Dart automatically calls .call() when you use ().',
     correctionMessage:
-        'Replace explicit .call() invocations with the more idiomatic and concise () operator. For example, use fn() instead of fn.call(). This makes your code more readable and consistent with Dart best practices.',
+        'Replace fn.call() with fn(). Use the () operator for clarity and idiomatic Dart.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -278,9 +277,9 @@ class AvoidUnnecessaryConstructorRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_constructor',
     problemMessage:
-        '[avoid_unnecessary_constructor] Declaring an empty constructor with no parameters, initializers, or body is redundant because Dart automatically provides a default constructor for classes. Keeping such constructors adds unnecessary code and can mislead readers into thinking there is a special reason for its presence.',
+        '[avoid_unnecessary_constructor] Empty constructors are redundant—Dart provides a default constructor automatically. Leaving them in adds noise and may confuse readers.',
     correctionMessage:
-        'Remove the empty constructor from your class. If you do not need to customize construction, Dart will automatically provide a default constructor. This reduces boilerplate and makes your codebase cleaner.',
+        'Remove empty constructors with no parameters, initializers, or body. Let Dart provide the default constructor.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -673,8 +672,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
     name: 'avoid_unnecessary_getter',
     problemMessage:
         '[avoid_unnecessary_getter] Getter just returns a final field without additional logic.',
-    correctionMessage:
-        'Consider making the field public or adding meaningful logic.',
+    correctionMessage: 'Consider making the field public or adding meaningful logic.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -727,8 +725,7 @@ class AvoidUnnecessaryGetterRule extends SaropaLintRule {
           if (body is BlockFunctionBody) {
             final NodeList<Statement> statements = body.block.statements;
             if (statements.length == 1 && statements.first is ReturnStatement) {
-              final ReturnStatement returnStmt =
-                  statements.first as ReturnStatement;
+              final ReturnStatement returnStmt = statements.first as ReturnStatement;
               final Expression? expr = returnStmt.expression;
               if (expr is SimpleIdentifier) {
                 final String fieldName = expr.name;
@@ -762,8 +759,7 @@ class AvoidUnnecessaryLengthCheckRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_length_check',
-    problemMessage:
-        '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison.',
+    problemMessage: '[avoid_unnecessary_length_check] Use isNotEmpty instead of length comparison.',
     correctionMessage: 'Replace with .isNotEmpty or .isEmpty.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -888,9 +884,7 @@ class _UseIsEmptyOrIsNotEmptyFix extends DartFix {
       if (replacement.isEmpty) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
-        message: replacement.contains('isNotEmpty')
-            ? 'Use .isNotEmpty'
-            : 'Use .isEmpty',
+        message: replacement.contains('isNotEmpty') ? 'Use .isNotEmpty' : 'Use .isEmpty',
         priority: 1,
       );
 
@@ -941,10 +935,8 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_negations',
-    problemMessage:
-        '[avoid_unnecessary_negations] Unnecessary negation can be simplified.',
-    correctionMessage:
-        'Simplify by using the opposite operator or removing double negation.',
+    problemMessage: '[avoid_unnecessary_negations] Unnecessary negation can be simplified.',
+    correctionMessage: 'Simplify by using the opposite operator or removing double negation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -960,8 +952,7 @@ class AvoidUnnecessaryNegationsRule extends SaropaLintRule {
       final Expression operand = node.operand;
 
       // Check for double negation: !!x
-      if (operand is PrefixExpression &&
-          operand.operator.type == TokenType.BANG) {
+      if (operand is PrefixExpression && operand.operator.type == TokenType.BANG) {
         reporter.atNode(node, code);
         return;
       }
@@ -1015,8 +1006,7 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_super',
-    problemMessage:
-        '[avoid_unnecessary_super] Unnecessary super() call with no arguments.',
+    problemMessage: '[avoid_unnecessary_super] Unnecessary super() call with no arguments.',
     correctionMessage: 'Remove the super() call - it is implicit.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -1031,8 +1021,7 @@ class AvoidUnnecessarySuperRule extends SaropaLintRule {
       for (final ConstructorInitializer initializer in node.initializers) {
         if (initializer is SuperConstructorInvocation) {
           // Check if super() has no arguments and no name
-          if (initializer.constructorName == null &&
-              initializer.argumentList.arguments.isEmpty) {
+          if (initializer.constructorName == null && initializer.argumentList.arguments.isEmpty) {
             reporter.atNode(initializer, code);
           }
         }
@@ -1196,8 +1185,7 @@ class NoEmptyBlockRule extends SaropaLintRule {
       final List<String> lines = content.split('\n');
 
       // Check the line where the block ends (the } character)
-      final int blockEndLine =
-          resolver.lineInfo.getLocation(node.end - 1).lineNumber;
+      final int blockEndLine = resolver.lineInfo.getLocation(node.end - 1).lineNumber;
       if (blockEndLine > 0 && blockEndLine <= lines.length) {
         final String line = lines[blockEndLine - 1];
         if (line.contains('// ignore: $_name') ||
@@ -1213,8 +1201,7 @@ class NoEmptyBlockRule extends SaropaLintRule {
         statement = statement.parent;
       }
       if (statement is ExpressionStatement) {
-        final int stmtEndLine =
-            resolver.lineInfo.getLocation(statement.end - 1).lineNumber;
+        final int stmtEndLine = resolver.lineInfo.getLocation(statement.end - 1).lineNumber;
         if (stmtEndLine > 0 && stmtEndLine <= lines.length) {
           final String line = lines[stmtEndLine - 1];
           if (line.contains('// ignore: $_name') ||
