@@ -244,7 +244,6 @@
       [97m 75[0m require_geolocator_permission_check      [2mToo short (57 chars) - add con[0m
       [97m 75[0m avoid_storing_context                    [2mToo short (67 chars) - add con[0m
       [97m 75[0m prefer_secure_random_for_crypto          [2mToo short (58 chars) - add con[0m
-      [97m 75[0m require_unique_iv_per_encryption         [2mToo short (47 chars) - add con[0m
       [97m 75[0m require_page_controller_dispose          [2mToo short (93 chars) - add con[0m
       [97m 75[0m avoid_websocket_memory_leak              [2mToo short (112 chars) - add co[0m
       [97m 75[0m require_video_player_controller_dispose  [2mToo short (115 chars) - add co[0m
