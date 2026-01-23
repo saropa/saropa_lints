@@ -31,9 +31,9 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_responsive_breakpoints',
     problemMessage:
-        '[require_responsive_breakpoints] Using raw numeric literals (magic numbers) for responsive breakpoints in MediaQuery comparisons makes your code less readable and harder to maintain. Without named constants, it is unclear what the number represents, and updating breakpoints across your app becomes error-prone.',
+        '[require_responsive_breakpoints] Using magic numbers for breakpoints in MediaQuery makes code unclear and hard to maintain. Readers won’t know what the number means.',
     correctionMessage:
-        'Extract the magic number to a well-named constant (e.g., kTabletBreakpoint or kMobileBreakpoint) and use that constant in your MediaQuery comparisons. This improves code clarity, maintainability, and makes it easier to update breakpoints consistently throughout your codebase.',
+        'Extract the number to a named constant (e.g., kTabletBreakpoint) and use that in your MediaQuery comparisons for clarity and maintainability.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -71,8 +71,7 @@ class RequireResponsiveBreakpointsRule extends SaropaLintRule {
       // Check if the other side contains MediaQuery.of(context).size.width
       final String otherSource = otherSide.toSource();
       if (!otherSource.contains('MediaQuery') ||
-          (!otherSource.contains('.width') &&
-              !otherSource.contains('.height'))) {
+          (!otherSource.contains('.width') && !otherSource.contains('.height'))) {
         return;
       }
 
@@ -128,9 +127,9 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_cached_paint_objects',
     problemMessage:
-        '[prefer_cached_paint_objects] Instantiating Paint objects inside the paint() method of a CustomPainter causes a new Paint to be created on every frame, leading to unnecessary memory allocations and potential performance issues. This is inefficient and can degrade rendering performance, especially in animations or frequently redrawn widgets.',
+        '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance.',
     correctionMessage:
-        'Move Paint object creation outside the paint() method and store it as a static or instance field in your CustomPainter class. This ensures the Paint is reused across frames, reducing memory allocations and improving performance.',
+        'Move Paint creation outside paint() and reuse a static or instance field. This reduces allocations and improves performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -211,9 +210,9 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_custom_painter_shouldrepaint',
     problemMessage:
-        '[require_custom_painter_shouldrepaint] Overriding shouldRepaint to always return true in a CustomPainter causes the widget to repaint on every frame, even when nothing has changed. This results in wasted CPU/GPU resources and can cause jank or battery drain, especially in complex UIs or on low-end devices.',
+        '[require_custom_painter_shouldrepaint] Always returning true from shouldRepaint causes unnecessary repaints and wastes resources.',
     correctionMessage:
-        'Compare relevant fields or properties in shouldRepaint to determine if a repaint is actually needed. Only return true when the painter’s visual output would change. This optimizes performance and avoids unnecessary repaints.',
+        'Compare relevant fields in shouldRepaint and only return true when the painter’s output would change. Avoid always returning true.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -249,11 +248,9 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
       } else if (body is BlockFunctionBody) {
         final List<Statement> statements = body.block.statements;
         if (statements.length == 1 && statements.first is ReturnStatement) {
-          final ReturnStatement returnStmt =
-              statements.first as ReturnStatement;
+          final ReturnStatement returnStmt = statements.first as ReturnStatement;
           if (returnStmt.expression is BooleanLiteral) {
-            final BooleanLiteral boolLit =
-                returnStmt.expression as BooleanLiteral;
+            final BooleanLiteral boolLit = returnStmt.expression as BooleanLiteral;
             if (boolLit.value) {
               reporter.atNode(returnStmt.expression!, code);
             }
@@ -293,9 +290,9 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_currency_formatting_locale',
     problemMessage:
-        '[require_currency_formatting_locale] Using NumberFormat.currency() without specifying a locale can result in inconsistent currency formatting across different devices and locales. This may confuse users or display currency in an unexpected format.',
+        '[require_currency_formatting_locale] NumberFormat.currency() without a locale can format currency inconsistently for users.',
     correctionMessage:
-        'Always provide an explicit locale parameter to NumberFormat.currency() to ensure consistent and expected currency formatting for all users, regardless of their device or system locale.',
+        'Always specify a locale for NumberFormat.currency() to ensure consistent formatting for all users.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -319,8 +316,7 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.name?.name;
 
       if (typeName != 'NumberFormat') return;
-      if (constructorName == null ||
-          !_currencyConstructors.contains(constructorName)) {
+      if (constructorName == null || !_currencyConstructors.contains(constructorName)) {
         return;
       }
 
@@ -661,8 +657,7 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
     name: 'prefer_itemextent_when_known',
     problemMessage:
         '[prefer_itemextent_when_known] Consider adding itemExtent for better scroll performance.',
-    correctionMessage:
-        'Set itemExtent when all list items have the same height.',
+    correctionMessage: 'Set itemExtent when all list items have the same height.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -813,8 +808,7 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
     name: 'prefer_skeleton_over_spinner',
     problemMessage:
         '[prefer_skeleton_over_spinner] CircularProgressIndicator for content loading. Consider skeleton loaders.',
-    correctionMessage:
-        'Use skeleton/shimmer loaders for better perceived performance.',
+    correctionMessage: 'Use skeleton/shimmer loaders for better perceived performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -827,17 +821,14 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
     context.registry.addInstanceCreationExpression((node) {
       final typeName = node.constructorName.type.name.lexeme;
 
-      if (typeName != 'CircularProgressIndicator' &&
-          typeName != 'LinearProgressIndicator') {
+      if (typeName != 'CircularProgressIndicator' && typeName != 'LinearProgressIndicator') {
         return;
       }
 
       // Check if inside conditional (loading state)
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is ConditionalExpression ||
-            current is IfStatement ||
-            current is IfElement) {
+        if (current is ConditionalExpression || current is IfStatement || current is IfElement) {
           // Found in conditional - likely a loading state
           reporter.atNode(node.constructorName, code);
           return;
@@ -927,8 +918,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
       final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
 
       // Check if it's search-related
-      final isSearchRelated =
-          _searchTerms.any((term) => itemCountSource.contains(term));
+      final isSearchRelated = _searchTerms.any((term) => itemCountSource.contains(term));
 
       if (!isSearchRelated) {
         return;
@@ -941,9 +931,7 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
         if (source.contains('.isempty') || source.contains('.isnotempty')) {
           return; // Has empty check
         }
-        if (current is ConditionalExpression ||
-            current is IfStatement ||
-            current is IfElement) {
+        if (current is ConditionalExpression || current is IfStatement || current is IfElement) {
           // Check if condition checks for empty
           if (source.contains('length') && source.contains('0')) {
             return;
@@ -997,8 +985,7 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
     name: 'require_search_loading_indicator',
     problemMessage:
         '[require_search_loading_indicator] Search callback without loading state management.',
-    correctionMessage:
-        'Set loading state before search and clear it on completion.',
+    correctionMessage: 'Set loading state before search and clear it on completion.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1184,8 +1171,7 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
     name: 'require_pagination_loading_state',
     problemMessage:
         '[require_pagination_loading_state] Paginated list triggers loadMore but shows no loading indicator.',
-    correctionMessage:
-        'Add +1 to itemCount when loading and show indicator at the end.',
+    correctionMessage: 'Add +1 to itemCount when loading and show indicator at the end.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1309,8 +1295,7 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
     name: 'require_webview_progress_indicator',
     problemMessage:
         '[require_webview_progress_indicator] WebView without progress indicator. Users see no loading feedback.',
-    correctionMessage:
-        'Add onProgress/onProgressChanged callback to show loading state.',
+    correctionMessage: 'Add onProgress/onProgressChanged callback to show loading state.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1438,11 +1423,9 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_loading_flash',
-    problemMessage:
-        '[avoid_loading_flash] Loading indicator shown without delay. Fast '
+    problemMessage: '[avoid_loading_flash] Loading indicator shown without delay. Fast '
         'responses will cause jarring visual flash.',
-    correctionMessage:
-        'Add a small delay (~200ms) before showing loading indicator, '
+    correctionMessage: 'Add a small delay (~200ms) before showing loading indicator, '
         'or use skeleton/shimmer placeholders.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

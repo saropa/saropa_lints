@@ -6,8 +6,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:analyzer/source/source_range.dart';
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
@@ -43,8 +42,7 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_casting_to_extension_type',
-    problemMessage:
-        '[avoid_casting_to_extension_type] Avoid casting to extension types.',
+    problemMessage: '[avoid_casting_to_extension_type] Avoid casting to extension types.',
     correctionMessage: 'Use the extension type constructor instead of casting.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -106,8 +104,7 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
     name: 'avoid_collection_methods_with_unrelated_types',
     problemMessage:
         '[avoid_collection_methods_with_unrelated_types] Collection method called with unrelated type.',
-    correctionMessage:
-        'The argument type cannot match any element in the collection.',
+    correctionMessage: 'The argument type cannot match any element in the collection.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -175,10 +172,7 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
   bool _areUnrelatedTypes(String type1, String type2) {
     // Skip dynamic/Object comparisons
-    if (type1 == 'dynamic' ||
-        type2 == 'dynamic' ||
-        type1 == 'Object' ||
-        type2 == 'Object') {
+    if (type1 == 'dynamic' || type2 == 'dynamic' || type1 == 'Object' || type2 == 'Object') {
       return false;
     }
 
@@ -222,8 +216,7 @@ class AvoidDynamicRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_dynamic_type',
     problemMessage: "[avoid_dynamic_type] Avoid using 'dynamic' type.",
-    correctionMessage:
-        'Use a specific type, Object, or a generic type instead.',
+    correctionMessage: 'Use a specific type, Object, or a generic type instead.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -283,8 +276,7 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final ImplementsClause? implementsClause = node.implementsClause;
 
       // Check if it implements Object
@@ -323,8 +315,7 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_interpolation',
-    problemMessage:
-        '[avoid_nullable_interpolation] Avoid interpolating nullable values.',
+    problemMessage: '[avoid_nullable_interpolation] Avoid interpolating nullable values.',
     correctionMessage: 'Add null check or use ?? to provide default value.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -381,8 +372,7 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
     name: 'avoid_nullable_parameters_with_default_values',
     problemMessage:
         '[avoid_nullable_parameters_with_default_values] Parameter with default value should not be nullable.',
-    correctionMessage:
-        'Remove the ? from the type since it has a non-null default.',
+    correctionMessage: 'Remove the ? from the type since it has a non-null default.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -444,8 +434,7 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_nullable_tostring',
-    problemMessage:
-        '[avoid_nullable_tostring] Calling toString() on a nullable value.',
+    problemMessage: '[avoid_nullable_tostring] Calling toString() on a nullable value.',
     correctionMessage: 'Check for null first or provide a default value.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -523,8 +512,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_null_assertion',
-    problemMessage:
-        '[avoid_null_assertion] Avoid using the null assertion operator (!). '
+    problemMessage: '[avoid_null_assertion] Avoid using the null assertion operator (!). '
         'It can cause runtime crashes if the value is null.',
     correctionMessage: 'Use null-safe alternatives: ?? for defaults, '
         'if-null checks, or ?. for optional chaining.',
@@ -662,12 +650,10 @@ class AvoidNullAssertionRule extends SaropaLintRule {
           final String? checkedExpr = _getNullCheckedExpression(condition);
           if (checkedExpr != null && checkedExpr == assertedExpr) {
             // Verify the ! is on the correct branch
-            if (condition.operator.lexeme == '==' &&
-                _containsNode(current.elseExpression, node)) {
+            if (condition.operator.lexeme == '==' && _containsNode(current.elseExpression, node)) {
               return true;
             }
-            if (condition.operator.lexeme == '!=' &&
-                _containsNode(current.thenExpression, node)) {
+            if (condition.operator.lexeme == '!=' && _containsNode(current.thenExpression, node)) {
               return true;
             }
           }
@@ -714,13 +700,11 @@ class AvoidNullAssertionRule extends SaropaLintRule {
               final String? checkedExpr = _getNullCheckedExpression(innerExpr);
               if (checkedExpr != null && checkedExpr == assertedExpr) {
                 // `if (!(x == null)) { x! }` - safe in then branch
-                if (innerExpr.operator.lexeme == '==' &&
-                    _isInThenBranch(current, node)) {
+                if (innerExpr.operator.lexeme == '==' && _isInThenBranch(current, node)) {
                   return true;
                 }
                 // `if (!(x != null)) return; x!` - safe after early return
-                if (innerExpr.operator.lexeme == '!=' &&
-                    _isAfterEarlyReturn(current, node)) {
+                if (innerExpr.operator.lexeme == '!=' && _isAfterEarlyReturn(current, node)) {
                   return true;
                 }
               }
@@ -733,13 +717,11 @@ class AvoidNullAssertionRule extends SaropaLintRule {
           final String? checkedExpr = _getNullCheckedExpression(condition);
           if (checkedExpr != null && checkedExpr == assertedExpr) {
             // `if (x != null) { x! }` - safe in then branch
-            if (condition.operator.lexeme == '!=' &&
-                _isInThenBranch(current, node)) {
+            if (condition.operator.lexeme == '!=' && _isInThenBranch(current, node)) {
               return true;
             }
             // `if (x == null) return; x!` - safe after the if
-            if (condition.operator.lexeme == '==' &&
-                _isAfterEarlyReturn(current, node)) {
+            if (condition.operator.lexeme == '==' && _isAfterEarlyReturn(current, node)) {
               return true;
             }
           }
@@ -763,8 +745,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
           // Check for `if (x?.prop == value)` or `if (x!.prop == value)` patterns
           // If condition uses x?. or x!. and compares to non-null, x! in body is safe
-          if (_isNullPropagatingGuard(condition, assertedExpr) &&
-              _isInThenBranch(current, node)) {
+          if (_isNullPropagatingGuard(condition, assertedExpr) && _isInThenBranch(current, node)) {
             return true;
           }
         }
@@ -777,13 +758,11 @@ class AvoidNullAssertionRule extends SaropaLintRule {
           final String? target = _getExtensionMethodTarget(condition);
           if (target == assertedExpr) {
             // Truthy check: `if (x.isNotEmpty) { x! }` - safe in then branch
-            if (_truthyNullCheckNames.contains(methodName) &&
-                _isInThenBranch(current, node)) {
+            if (_truthyNullCheckNames.contains(methodName) && _isInThenBranch(current, node)) {
               return true;
             }
             // Falsy check: `if (x.isEmpty) { } else { x! }` - safe in else branch
-            if (_falsyNullCheckNames.contains(methodName) &&
-                _isInElseBranch(current, node)) {
+            if (_falsyNullCheckNames.contains(methodName) && _isInElseBranch(current, node)) {
               return true;
             }
           }
@@ -832,8 +811,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
           final String? checkedExpr = _getNullCheckedExpression(condition);
           if (checkedExpr != null && checkedExpr == assertedExpr) {
             // `if (x != null) x!` - safe in then element
-            if (condition.operator.lexeme == '!=' &&
-                _containsNode(current.thenElement, node)) {
+            if (condition.operator.lexeme == '!=' && _containsNode(current.thenElement, node)) {
               return true;
             }
             // `if (x == null) ... else x!` - safe in else element
@@ -909,8 +887,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   ///
   /// The key insight: if `x?.something == nonNullValue` is true, x cannot be null.
   /// Similarly, if `x!.something` didn't throw, x was not null.
-  bool _isNullPropagatingGuard(
-      BinaryExpression condition, String assertedExpr) {
+  bool _isNullPropagatingGuard(BinaryExpression condition, String assertedExpr) {
     final Expression left = condition.leftOperand;
     final Expression right = condition.rightOperand;
     final String op = condition.operator.lexeme;
@@ -936,8 +913,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     }
 
     // For numeric comparisons like `x?.length > 0`
-    if ((op == '>' || op == '>=' || op == '<' || op == '<=') &&
-        right is IntegerLiteral) {
+    if ((op == '>' || op == '>=' || op == '<' || op == '<=') && right is IntegerLiteral) {
       return true;
     }
 
@@ -1070,15 +1046,13 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     bool isEarlyExit = false;
     if (thenStmt is ReturnStatement) {
       isEarlyExit = true;
-    } else if (thenStmt is ExpressionStatement &&
-        thenStmt.expression is ThrowExpression) {
+    } else if (thenStmt is ExpressionStatement && thenStmt.expression is ThrowExpression) {
       isEarlyExit = true;
     } else if (thenStmt is Block && thenStmt.statements.isNotEmpty) {
       final Statement lastStmt = thenStmt.statements.last;
       if (lastStmt is ReturnStatement) {
         isEarlyExit = true;
-      } else if (lastStmt is ExpressionStatement &&
-          lastStmt.expression is ThrowExpression) {
+      } else if (lastStmt is ExpressionStatement && lastStmt.expression is ThrowExpression) {
         isEarlyExit = true;
       }
     }
@@ -1272,8 +1246,7 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     // `if (!snapshot.hasData || snapshot.data == null) return;`
     if (condition is BinaryExpression && condition.operator.lexeme == '||') {
       // Check if either operand guards the property
-      if (_containsNullCheckFor(condition, assertedExpr) &&
-          _isAfterEarlyReturn(ifStmt, node)) {
+      if (_containsNullCheckFor(condition, assertedExpr) && _isAfterEarlyReturn(ifStmt, node)) {
         return true;
       }
 
@@ -1306,10 +1279,8 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     }
 
     if (condition is BinaryExpression && condition.operator.lexeme == '||') {
-      return _containsNegatedHasCheck(
-              condition.leftOperand, targetBase, guardProperty) ||
-          _containsNegatedHasCheck(
-              condition.rightOperand, targetBase, guardProperty);
+      return _containsNegatedHasCheck(condition.leftOperand, targetBase, guardProperty) ||
+          _containsNegatedHasCheck(condition.rightOperand, targetBase, guardProperty);
     }
 
     return false;
@@ -1522,12 +1493,7 @@ class _UseNullAwareOperatorFix extends DartFix {
       // Part of a binary comparison (==, !=, >, <, etc.)
       if (current is BinaryExpression) {
         final String op = current.operator.lexeme;
-        if (op == '==' ||
-            op == '!=' ||
-            op == '>' ||
-            op == '<' ||
-            op == '>=' ||
-            op == '<=') {
+        if (op == '==' || op == '!=' || op == '>' || op == '<' || op == '>=' || op == '<=') {
           // Could be in a condition - check if parent is condition context
           final AstNode? grandparent = current.parent;
           if (grandparent is IfStatement ||
@@ -1635,8 +1601,7 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unnecessary_type_assertions',
-    problemMessage:
-        '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
+    problemMessage: '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
         'The expression is already known to be of this type.',
     correctionMessage: 'Remove the redundant type check.',
     errorSeverity: DiagnosticSeverity.INFO,
@@ -1729,9 +1694,7 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
       // Also check by display name for common cases
       final String exprTypeName = expressionType.getDisplayString();
       final String castTypeName = castType.getDisplayString();
-      if (exprTypeName == castTypeName &&
-          !castType.isDartCoreObject &&
-          castTypeName != 'dynamic') {
+      if (exprTypeName == castTypeName && !castType.isDartCoreObject && castTypeName != 'dynamic') {
         reporter.atNode(node, code);
       }
     });
@@ -1768,8 +1731,7 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'avoid_unrelated_type_assertions',
-    problemMessage:
-        '[avoid_unrelated_type_assertions] Type assertion can never be true. '
+    problemMessage: '[avoid_unrelated_type_assertions] Type assertion can never be true. '
         'The types are unrelated.',
     correctionMessage: 'Remove the impossible type check or fix the types.',
     errorSeverity: DiagnosticSeverity.WARNING,
@@ -1857,8 +1819,9 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_correct_type_name',
     problemMessage:
-        '[prefer_correct_type_name] Type name should be UpperCamelCase.',
-    correctionMessage: 'Rename to use UpperCamelCase convention.',
+        '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions.',
+    correctionMessage:
+        'Rename type to use UpperCamelCase. Example: MyType, UserProfile, HttpClient.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1898,8 +1861,7 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
       checkName(node.name);
     });
 
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       checkName(node.name);
     });
 
@@ -1958,8 +1920,7 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
     name: 'prefer_explicit_function_type',
     problemMessage:
         '[prefer_explicit_function_type] Use explicit function type instead of bare "Function".',
-    correctionMessage:
-        'Specify the function signature (e.g., void Function()).',
+    correctionMessage: 'Specify the function signature (e.g., void Function()).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2003,8 +1964,7 @@ class PreferTypeOverVarRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_type_over_var',
-    problemMessage:
-        '[prefer_type_over_var] Prefer explicit type annotation over var.',
+    problemMessage: '[prefer_type_over_var] Prefer explicit type annotation over var.',
     correctionMessage: 'Replace var with the explicit type.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -2060,8 +2020,7 @@ class _AddHackForImplicitlyNullableExtensionFix extends DartFix {
     AnalysisError analysisError,
     List<AnalysisError> others,
   ) {
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
 
       final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
@@ -2200,8 +2159,7 @@ class _AddHackForIncorrectTypeNameFix extends DartFix {
       addFix(node);
     });
 
-    context.registry
-        .addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
+    context.registry.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       addFix(node);
     });
 
