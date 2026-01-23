@@ -41,7 +41,8 @@ const Map<String, int> tierIds = {
 
 /// Tier descriptions for display.
 const Map<String, String> tierDescriptions = {
-  'essential': 'Critical rules preventing crashes, security holes, memory leaks',
+  'essential':
+      'Critical rules preventing crashes, security holes, memory leaks',
   'recommended': 'Essential + accessibility, performance patterns',
   'professional': 'Recommended + architecture, testing, documentation',
   'comprehensive': 'Professional + thorough coverage (recommended)',
@@ -100,7 +101,8 @@ Future<void> main(List<String> args) async {
   _logTerminal('  Disabled: ${finalDisabled.length}');
   _logTerminal('  Total: ${allRules.length}');
   if (!cliArgs.includeStylistic) {
-    _logTerminal('  (Stylistic rules disabled by default - use --stylistic to enable)');
+    _logTerminal(
+        '  (Stylistic rules disabled by default - use --stylistic to enable)');
   }
   _logTerminal('');
 
@@ -169,7 +171,8 @@ Future<void> main(List<String> args) async {
   dynamic toDartMap(dynamic yamlMap) {
     if (yamlMap is Map) {
       return Map<String, dynamic>.fromEntries(
-        yamlMap.entries.map((e) => MapEntry(e.key.toString(), toDartMap(e.value))),
+        yamlMap.entries
+            .map((e) => MapEntry(e.key.toString(), toDartMap(e.value))),
       );
     } else if (yamlMap is List) {
       return yamlMap.map((e) => toDartMap(e)).toList();
@@ -178,7 +181,8 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  final yamlContent = header + '\n' + json2yaml.json2yaml(toDartMap(mergedConfig));
+  final yamlContent =
+      header + '\n' + json2yaml.json2yaml(toDartMap(mergedConfig));
 
   if (cliArgs.dryRun) {
     _logTerminal('[DRY RUN] Would write to: ${cliArgs.outputPath}');
@@ -233,7 +237,8 @@ Future<void> main(List<String> args) async {
   _logTerminal('  2. Run: dart run custom_lint');
   _logTerminal('  3. Customize rules as needed (change true to false)');
   _logTerminal('');
-  _logTerminal('To change tiers later, run this command again with a different --tier');
+  _logTerminal(
+      'To change tiers later, run this command again with a different --tier');
   _logTerminal('Log file written to: ${_logFilePath()}');
 }
 
@@ -371,12 +376,14 @@ void _printUsage() {
   print('Usage: dart run saropa_lints:init [options]');
   print('');
   print('Options:');
-  print('  -t, --tier <tier>     Tier level (1-5 or name, default: comprehensive)');
+  print(
+      '  -t, --tier <tier>     Tier level (1-5 or name, default: comprehensive)');
   print(
       '  -o, --output <file>   Output file (default: analysis_options.yaml). If both --output and -o are provided, the last one wins.');
   print(
       '  --no-pager            Print full preview in dry-run mode without pausing (for CI/non-interactive use).');
-  print('  --stylistic           Include stylistic rules (opinionated, off by default)');
+  print(
+      '  --stylistic           Include stylistic rules (opinionated, off by default)');
   print('  --dry-run             Preview output without writing');
   print('  -h, --help            Show this help message');
   print('');
