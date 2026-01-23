@@ -138,6 +138,7 @@
     "prereqs",
     "pubdev",
     "pubspec",
+    "pycache",
     "realtime",
     "refreshtoken",
     "reorderable",
