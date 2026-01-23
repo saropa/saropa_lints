@@ -47,7 +47,8 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_public_api_documentation',
-    problemMessage: '[require_public_api_documentation] Public API should be documented.',
+    problemMessage:
+        '[require_public_api_documentation] Public API should be documented.',
     correctionMessage: 'Add a doc comment explaining the purpose and usage.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -78,7 +79,8 @@ class RequirePublicApiDocumentationRule extends SaropaLintRule {
       }
 
       // Check if in public class
-      final ClassDeclaration? classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? classDecl =
+          node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl != null && classDecl.name.lexeme.startsWith('_')) return;
 
       if (node.documentationComment == null) {
@@ -133,13 +135,16 @@ class AvoidMisleadingDocumentationRule extends SaropaLintRule {
       if (docComment == null) return;
 
       final String methodName = node.name.lexeme.toLowerCase();
-      final String docText = docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText =
+          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
 
       // Check for common mismatches
       if (methodName.contains('get') && docText.contains('sets ')) {
         reporter.atNode(docComment, code);
       }
-      if (methodName.contains('set') && docText.contains('gets ') && !docText.contains('sets ')) {
+      if (methodName.contains('set') &&
+          docText.contains('gets ') &&
+          !docText.contains('sets ')) {
         reporter.atNode(docComment, code);
       }
       if (methodName.contains('delete') && docText.contains('creates ')) {
@@ -181,7 +186,8 @@ class RequireDeprecationMessageRule extends SaropaLintRule {
     name: 'require_deprecation_message',
     problemMessage:
         '[require_deprecation_message] Deprecated annotation should include migration guidance.',
-    correctionMessage: 'Use @Deprecated("message") with explanation of what to use instead.',
+    correctionMessage:
+        'Use @Deprecated("message") with explanation of what to use instead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -256,8 +262,10 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_complex_logic_comments',
-    problemMessage: '[require_complex_logic_comments] Complex method lacks explanatory comments.',
-    correctionMessage: 'Add comments explaining the logic, especially for chained operations.',
+    problemMessage:
+        '[require_complex_logic_comments] Complex method lacks explanatory comments.',
+    correctionMessage:
+        'Add comments explaining the logic, especially for chained operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -288,7 +296,8 @@ class RequireComplexLogicCommentsRule extends SaropaLintRule {
 
       if (complexity >= _complexityThreshold) {
         // Check if there are any comments
-        final bool hasComments = bodySource.contains('//') || bodySource.contains('/*');
+        final bool hasComments =
+            bodySource.contains('//') || bodySource.contains('/*');
         if (!hasComments && node.documentationComment == null) {
           reporter.atNode(node, code);
         }
@@ -328,7 +337,8 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_parameter_documentation',
-    problemMessage: '[require_parameter_documentation] Parameters should be documented.',
+    problemMessage:
+        '[require_parameter_documentation] Parameters should be documented.',
     correctionMessage: 'Add [paramName] documentation for each parameter.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -354,7 +364,8 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText = docComment.tokens.map((Token t) => t.lexeme).join(' ');
+      final String docText =
+          docComment.tokens.map((Token t) => t.lexeme).join(' ');
 
       // Check if parameters are documented
       for (final FormalParameter param in params.parameters) {
@@ -410,7 +421,8 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_return_documentation',
-    problemMessage: '[require_return_documentation] Return value should be documented.',
+    problemMessage:
+        '[require_return_documentation] Return value should be documented.',
     correctionMessage: 'Add documentation explaining what the method returns.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -438,7 +450,8 @@ class RequireReturnDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText = docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText =
+          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
 
       // Check for return documentation
       if (!docText.contains('return') && !docText.contains('yields')) {
@@ -481,7 +494,8 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_exception_documentation',
-    problemMessage: '[require_exception_documentation] Thrown exceptions should be documented.',
+    problemMessage:
+        '[require_exception_documentation] Thrown exceptions should be documented.',
     correctionMessage: 'Add "Throws [ExceptionType]" to documentation.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -508,7 +522,8 @@ class RequireExceptionDocumentationRule extends SaropaLintRule {
         return;
       }
 
-      final String docText = docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
+      final String docText =
+          docComment.tokens.map((Token t) => t.lexeme).join(' ').toLowerCase();
 
       // Check for throw documentation
       if (!docText.contains('throw')) {
@@ -592,7 +607,8 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
       final Comment? docComment = node.documentationComment;
       if (docComment == null) return;
 
-      final String docText = docComment.tokens.map((Token t) => t.lexeme).join(' ');
+      final String docText =
+          docComment.tokens.map((Token t) => t.lexeme).join(' ');
 
       // Check for example code block
       if (!docText.contains('```') && !docText.contains('Example')) {
