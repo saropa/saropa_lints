@@ -9,8 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart' show Token;
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart'
-    show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -684,9 +683,9 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_error_boundary',
     problemMessage:
-        '[require_error_boundary] Unhandled widget errors crash the entire app. No fallback UI is shown, leading to a poor user experience.',
+        '[require_error_boundary] Top-level app widget is missing an error boundary. Without a dedicated error handler, uncaught exceptions will crash the entire application, leaving users with a blank or frozen screen and no recovery path. All production apps should provide a visible fallback UI for unexpected errors.',
     correctionMessage:
-        'Wrap app content in an ErrorBoundary widget or use a builder with error handling to show a fallback UI. Example: ErrorBoundary(child: MyApp())',
+        'Wrap your root widget (e.g., MaterialApp or CupertinoApp) in an ErrorBoundary or equivalent error handler. Use the builder parameter to provide a fallback UI for uncaught errors. Example: builder: (context, child) => ErrorBoundary(child: child!).',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -700,8 +699,7 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'MaterialApp' &&
-          constructorName != 'CupertinoApp') {
+      if (constructorName != 'MaterialApp' && constructorName != 'CupertinoApp') {
         return;
       }
 
@@ -1155,8 +1153,7 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
       }
     }
     if (expr is BinaryExpression) {
-      return _usesException(expr.leftOperand) ||
-          _usesException(expr.rightOperand);
+      return _usesException(expr.leftOperand) || _usesException(expr.rightOperand);
     }
     if (expr is MethodInvocation && expr.target != null) {
       return _usesException(expr.target!);
@@ -1585,9 +1582,9 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_cache_key_determinism',
     problemMessage:
-        '[require_cache_key_determinism] Cache key uses DateTime.now or Random, causing cache misses and duplicated data. This wastes resources and causes unpredictable app behavior.',
+        '[require_cache_key_determinism] Cache key uses non-deterministic values (e.g., DateTime.now, Random, hashCode, or UUID). This causes cache misses, duplicated resources, and unpredictable behavior. Cache keys must uniquely and consistently identify the same resource for the same input. Using unstable values breaks cache integrity and wastes memory.',
     correctionMessage:
-        'Use deterministic values like IDs or stable hashes for cache keys. Example: cacheKey = userId or hash(queryParams)',
+        'Construct cache keys only from stable, deterministic values such as unique IDs, query parameters, or content hashes. Never use timestamps, random numbers, or object hashCodes. Example: cacheKey = "user_\$userId" or hash(queryParams).',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -1729,8 +1726,7 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
   /// Returns true for generic method names that need receiver context validation.
   bool _isGenericMethodName(String methodName) {
-    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}
-        .contains(methodName);
+    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}.contains(methodName);
   }
 
   /// Checks if the method receiver suggests a caching context.
@@ -1834,8 +1830,7 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() =>
-      <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
+  List<Fix> getFixes() => <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
 }
 
 class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
@@ -1954,8 +1949,7 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('isPermanentlyDenied') &&
-          !bodySource.contains('openAppSettings')) {
+      if (!bodySource.contains('isPermanentlyDenied') && !bodySource.contains('openAppSettings')) {
         reporter.atNode(node, code);
       }
     });
@@ -2019,8 +2013,7 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'AndroidNotificationDetails' &&
-          typeName != 'DarwinNotificationDetails') {
+      if (typeName != 'AndroidNotificationDetails' && typeName != 'DarwinNotificationDetails') {
         return;
       }
 
@@ -2117,8 +2110,7 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
       for (final CatchClause catchClause in node.catchClauses) {
         final String catchSource = catchClause.body.toSource();
         for (final String method in _cleanupMethods) {
-          if (catchSource.contains('.$method(') ||
-              catchSource.contains('.$method;')) {
+          if (catchSource.contains('.$method(') || catchSource.contains('.$method;')) {
             reporter.atNode(catchClause, code);
             return;
           }

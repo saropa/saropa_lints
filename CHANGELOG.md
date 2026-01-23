@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.5.5] - 2026-01-23
 
+### Changed
+- **Major upgrade to developer-facing lint rule messages:**
+  - All `problemMessage` and `correctionMessage` fields for the following rules were rewritten to be context-rich, actionable, and consequence-focused, referencing best practices and real-world risks:
+    - `avoid_dio_debug_print_production`, `require_url_launcher_error_handling`, `require_image_picker_error_handling`, `require_geolocator_timeout`, `require_permission_denied_handling`, `require_sqflite_migration`, `require_permission_status_check`, `prefer_timeout_on_requests`, `avoid_future_ignore`, `avoid_redundant_async`, `avoid_stream_tostring`, `prefer_async_await`, `prefer_specifying_future_value_type`, `prefer_return_await`, `require_future_timeout`, `require_completer_error_handling`, `avoid_unawaited_future`, and more.
+  - Each message now clearly explains the widget/resource context, the consequences of ignoring the rule (e.g., memory leaks, security risks, user confusion, app crashes), and the best practice for remediation.
+  - This batch completes the full upgrade of all remaining rules flagged as too short, vague, or generic in previous audits.
+
 ### Documentation
 
 - **PERFORMANCE.md**: Updated to reflect current best practices for configuration and performance:

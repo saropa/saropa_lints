@@ -12,6 +12,9 @@
 Developed by [Saropa][saropa_link]. Making the world of Dart & Flutter better, one lint at a time.
 
 [saropa_link]: https://saropa.com
+license
+
+> 💬 **Have feedback on Saropa Lints2?** Share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
 
 ---
 
@@ -67,7 +70,15 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 | **Hive**     | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues                     | [Using with Hive](doc/guides/using_with_hive.md)         |
 | **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
+
 Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. Recent update: `require_camera_permission_check` no longer triggers on non-camera controllers (e.g., IsarStreamController), eliminating a key false positive for Isar users. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
+
+### Legend: Roadmap Markers
+
+| Marker | Meaning | Example |
+|--------|---------|---------|
+| 🐙 | Tracked as GitHub issue | [#0000](https://github.com/saropa/saropa_lints/issues/0000) |
+| 💡 | Planned enhancement tracked as GitHub Discussion | [Discussion: Diagnostic Statistics](https://github.com/saropa/saropa_lints/discussions/000) |
 
 ### Why it matters
 
