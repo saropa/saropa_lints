@@ -3,7 +3,7 @@
 # Saropa Lints
 
 [![ci](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml/badge.svg)](https://github.com/saropa/saropa_lints/actions/workflows/ci.yml)
-[![pub package](https://img.shields.io/pub/v/saropa_lints.svg)](https://pub.dev/packages/saropa_lints)
+[![pub package](https://img.shields.io/badge/pub-4.5.5-blue)](https://pub.dev/packages/saropa_lints)
 [![pub points](https://img.shields.io/pub/points/saropa_lints)](https://pub.dev/packages/saropa_lints/score)
 [![rules](https://img.shields.io/badge/rules-1656%2B-4B0082)](https://github.com/saropa/saropa_lints/blob/main/doc/rules/README.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -67,7 +67,7 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 | **Hive**     | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues                     | [Using with Hive](doc/guides/using_with_hive.md)         |
 | **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/using_with_firebase.md) |
 
-Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
+Standard linters don't understand these libraries. They see valid Dart code. Saropa Lints has 50+ rules specifically for library-specific anti-patterns that cause crashes, memory leaks, cost overruns, and data corruption in production. Recent update: `require_camera_permission_check` no longer triggers on non-camera controllers (e.g., IsarStreamController), eliminating a key false positive for Isar users. The new `avoid_cached_isar_stream` rule (with quick fix) prevents a common Isar runtime error.
 
 ### Why it matters
 
@@ -120,7 +120,7 @@ The tier system lets you adopt gradually — start with ~100 critical rules, wor
 # pubspec.yaml
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^4.4.0
+  saropa_lints: ^4.5.5
 ```
 
 ### 2. Enable custom_lint
