@@ -9,7 +9,8 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart' show Token;
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show AnalysisError, DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -699,7 +700,8 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'MaterialApp' && constructorName != 'CupertinoApp') {
+      if (constructorName != 'MaterialApp' &&
+          constructorName != 'CupertinoApp') {
         return;
       }
 
@@ -1153,7 +1155,8 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
       }
     }
     if (expr is BinaryExpression) {
-      return _usesException(expr.leftOperand) || _usesException(expr.rightOperand);
+      return _usesException(expr.leftOperand) ||
+          _usesException(expr.rightOperand);
     }
     if (expr is MethodInvocation && expr.target != null) {
       return _usesException(expr.target!);
@@ -1726,7 +1729,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
   /// Returns true for generic method names that need receiver context validation.
   bool _isGenericMethodName(String methodName) {
-    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}.contains(methodName);
+    return const <String>{'get', 'put', 'delete', 'read', 'write', 'remove'}
+        .contains(methodName);
   }
 
   /// Checks if the method receiver suggests a caching context.
@@ -1830,7 +1834,8 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
+  List<Fix> getFixes() =>
+      <Fix>[_AddHackCommentForNonDeterministicCacheKeyFix()];
 }
 
 class _AddHackCommentForNonDeterministicCacheKeyFix extends DartFix {
@@ -1949,7 +1954,8 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
       if (enclosingBody == null) return;
 
       final String bodySource = enclosingBody.toSource();
-      if (!bodySource.contains('isPermanentlyDenied') && !bodySource.contains('openAppSettings')) {
+      if (!bodySource.contains('isPermanentlyDenied') &&
+          !bodySource.contains('openAppSettings')) {
         reporter.atNode(node, code);
       }
     });
@@ -2013,7 +2019,8 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'AndroidNotificationDetails' && typeName != 'DarwinNotificationDetails') {
+      if (typeName != 'AndroidNotificationDetails' &&
+          typeName != 'DarwinNotificationDetails') {
         return;
       }
 
@@ -2110,7 +2117,8 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
       for (final CatchClause catchClause in node.catchClauses) {
         final String catchSource = catchClause.body.toSource();
         for (final String method in _cleanupMethods) {
-          if (catchSource.contains('.$method(') || catchSource.contains('.$method;')) {
+          if (catchSource.contains('.$method(') ||
+              catchSource.contains('.$method;')) {
             reporter.atNode(catchClause, code);
             return;
           }
