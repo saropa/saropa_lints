@@ -143,7 +143,8 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_pdf_error_handling',
-    problemMessage: '[require_pdf_error_handling] PDF loading should have error handling.',
+    problemMessage:
+        '[require_pdf_error_handling] PDF loading should have error handling.',
     correctionMessage: 'Wrap PDF loading in try-catch block.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
@@ -449,7 +450,8 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
     name: 'require_sqflite_transaction',
     problemMessage:
         '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity.',
-    correctionMessage: 'Wrap writes in db.transaction() for better performance.',
+    correctionMessage:
+        'Wrap writes in db.transaction() for better performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -486,7 +488,8 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
         bool insideTransaction = false;
         AstNode? current = node.parent;
         while (current != null) {
-          if (current is MethodInvocation && current.methodName.name == 'transaction') {
+          if (current is MethodInvocation &&
+              current.methodName.name == 'transaction') {
             insideTransaction = true;
             break;
           }
@@ -506,7 +509,8 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
         final Expression? target = node.target;
         if (target != null) {
           final String targetSource = target.toSource().toLowerCase();
-          if (targetSource.contains('db') || targetSource.contains('database')) {
+          if (targetSource.contains('db') ||
+              targetSource.contains('database')) {
             onWrite(node);
           }
         }
@@ -677,7 +681,8 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
     });
   }
 
-  void _visitStatements(AstNode node, void Function(MethodInvocation) callback) {
+  void _visitStatements(
+      AstNode node, void Function(MethodInvocation) callback) {
     if (node is MethodInvocation) {
       callback(node);
     }
@@ -741,7 +746,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           for (final variable in member.fields.variables) {
-            final String typeStr = member.fields.type?.toSource().toLowerCase() ?? '';
+            final String typeStr =
+                member.fields.type?.toSource().toLowerCase() ?? '';
             final String nameStr = variable.name.lexeme.toLowerCase();
 
             if (typeStr.contains('database') ||
@@ -1073,7 +1079,8 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
     name: 'avoid_sqflite_read_all_columns',
     problemMessage:
         '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth.',
-    correctionMessage: 'Specify only the columns you need: SELECT id, name, email FROM ...',
+    correctionMessage:
+        'Specify only the columns you need: SELECT id, name, email FROM ...',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1312,11 +1319,13 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
 
       // Check if we're inside a non-singleton context
       // Look for common singleton patterns: static field, getter, or factory
-      final FunctionBody? enclosingBody = node.thisOrAncestorOfType<FunctionBody>();
+      final FunctionBody? enclosingBody =
+          node.thisOrAncestorOfType<FunctionBody>();
       if (enclosingBody == null) return;
 
       // Check if enclosing function/method is a static getter or uses null-aware
-      final MethodDeclaration? method = enclosingBody.parent as MethodDeclaration?;
+      final MethodDeclaration? method =
+          enclosingBody.parent as MethodDeclaration?;
       if (method != null) {
         // If it's a getter returning cached value, it's likely a singleton
         if (method.isGetter) return;
@@ -1468,7 +1477,8 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'prefer_streaming_for_large_files',
-    problemMessage: '[prefer_streaming_for_large_files] Reading potentially large file '
+    problemMessage:
+        '[prefer_streaming_for_large_files] Reading potentially large file '
         'into memory. Consider streaming for logs, media, or data exports.',
     correctionMessage:
         'Use file.openRead() with stream transformers for memory-efficient processing.',
@@ -1508,7 +1518,8 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
       // Check if the file path suggests a large file
       AstNode? current = node;
       while (current != null) {
-        if (current is MethodInvocation || current is InstanceCreationExpression) {
+        if (current is MethodInvocation ||
+            current is InstanceCreationExpression) {
           final String source = current.toSource().toLowerCase();
 
           for (final String pattern in _largeFilePatterns) {
@@ -1526,7 +1537,8 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
       if (body != null) {
         final String bodySource = body.toSource().toLowerCase();
         for (final String pattern in _largeFilePatterns) {
-          if (bodySource.contains('${pattern}file') || bodySource.contains('${pattern}_file')) {
+          if (bodySource.contains('${pattern}file') ||
+              bodySource.contains('${pattern}_file')) {
             reporter.atNode(node, code);
             return;
           }
@@ -1589,9 +1601,11 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     name: 'require_file_path_sanitization',
-    problemMessage: '[require_file_path_sanitization] File path constructed from parameter '
+    problemMessage:
+        '[require_file_path_sanitization] File path constructed from parameter '
         'without sanitization. Path traversal attack possible with ../',
-    correctionMessage: 'Use path.basename() to extract filename and path.isWithin() to verify.',
+    correctionMessage:
+        'Use path.basename() to extract filename and path.isWithin() to verify.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1652,8 +1666,10 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     }
 
     // Get function parameters
-    final FunctionDeclaration? funcDecl = node.thisOrAncestorOfType<FunctionDeclaration>();
-    final MethodDeclaration? methodDecl = node.thisOrAncestorOfType<MethodDeclaration>();
+    final FunctionDeclaration? funcDecl =
+        node.thisOrAncestorOfType<FunctionDeclaration>();
+    final MethodDeclaration? methodDecl =
+        node.thisOrAncestorOfType<MethodDeclaration>();
 
     FormalParameterList? params;
     if (funcDecl != null) {
