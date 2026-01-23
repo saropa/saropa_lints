@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
+## [4.5.3] - 2026-01-22
+
+### Fixed
+
+- Moved `json2yaml` and added `yaml` to main dependencies in pubspec.yaml to satisfy pub.dev requirements for CLI tools in `bin/`.
+  This fixes publishing errors and allows versions above 4.5.0 to be published to pub.dev.
+
 ## [4.5.2] - 2026-01-22
 
 ### Changed

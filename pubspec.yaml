@@ -3,7 +3,7 @@ name: saropa_lints
 description: >-
   1656+ custom lint rules with 218 quick fixes for Flutter and Dart.
   Static analysis for security, accessibility, and performance.
-version: 4.5.2
+version: 4.5.3
 license: MIT
 
 # Project links for pub.dev
@@ -37,6 +37,12 @@ dependencies:
   # https://pub.dev/packages/analyzer/changelog
   analyzer: ">=8.0.0 <11.0.0" # Dart static analysis engine (8.x+ uses enclosingElement)
 
+  # https://pub.dev/packages/json2yaml/changelog
+  json2yaml: ^3.0.1 # YAML serialization for CLI tool
+
+  # https://pub.dev/packages/yaml/changelog
+  yaml: ^3.1.3 # YAML parsing for CLI tool
+
 # Development-only dependencies
 dev_dependencies:
   # https://pub.dev/packages/custom_lint/changelog
@@ -44,6 +50,3 @@ dev_dependencies:
 
   # https://pub.dev/packages/test/changelog
   test: ^1.29.0 # Unit testing framework
-
-  # https://pub.dev/packages/json2yaml/changelog
-  json2yaml: ^3.0.1 # YAML serialization for CLI tool
