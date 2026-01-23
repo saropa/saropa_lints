@@ -900,10 +900,42 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         return;
       }
 
+      // Skip utility methods that manage state rather than handle deep links
+      // e.g., resetInitialUri(), clearUri(), setRouteUri(), getInitialUri()
+      if (methodName.startsWith('reset') ||
+          methodName.startsWith('clear') ||
+          methodName.startsWith('set') ||
+          methodName.startsWith('get')) {
+        return;
+      }
+
       final FunctionBody? body = node.body;
       if (body == null) return;
 
       final String bodySource = body.toSource();
+
+      // Skip simple expression body getters that just return a field
+      // e.g., Uri? get initialUri => _initialUri;
+      if (node.isGetter && body is ExpressionFunctionBody) {
+        final Expression expr = body.expression;
+        // Simple field access or identifier (e.g., => _field or => field)
+        if (expr is SimpleIdentifier || expr is PrefixedIdentifier) {
+          return;
+        }
+      }
+
+      // Skip trivial method bodies (single assignment statement)
+      // e.g., void resetUri() { _uri = null; }
+      if (body is BlockFunctionBody) {
+        final Block block = body.block;
+        if (block.statements.length == 1) {
+          final Statement stmt = block.statements.first;
+          if (stmt is ExpressionStatement &&
+              stmt.expression is AssignmentExpression) {
+            return;
+          }
+        }
+      }
 
       // Check for fallback patterns
       final bool hasFallback = bodySource.contains('NotFound') ||
