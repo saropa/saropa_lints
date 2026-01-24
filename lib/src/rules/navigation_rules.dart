@@ -829,6 +829,15 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 /// **Quick fix available:** Wraps the handler body with try/catch for
 /// fallback handling.
 ///
+/// **Skipped patterns** (not deep link handlers):
+/// - Utility getters: `is*`, `has*`, `check*`, `valid*` prefixes
+/// - State methods: `reset*`, `clear*`, `set*` prefixes
+/// - Simple field returns: `=> _uri`, `=> prefix.uri`
+/// - Lazy-loading: `=> _uri ??= parseUri(url)`
+/// - URI conversions: `=> url.toUri()`, `=> url?.toUriSafe()`
+/// - Property access: `=> url?.uri`
+/// - Trivial blocks: `{ return _uri; }`, `{ _uri = value; }`
+///
 /// **BAD:**
 /// ```dart
 /// void handleDeepLink(Uri uri) {
