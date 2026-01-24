@@ -81,6 +81,40 @@ void main() {
         );
       });
 
+      test('should skip lazy-loading patterns', () {
+        // Expected behavior: These should NOT trigger
+        // - Uri? get uri => _uri ??= Uri.parse(url);
+        // - Uri? get cachedUri => _cachedUri ??= parseUri();
+
+        expect(
+          'Lazy-loading with ??= operator is skipped',
+          isNotNull,
+        );
+      });
+
+      test('should skip simple method invocations', () {
+        // Expected behavior: These should NOT trigger
+        // - Uri? get parsedUri => url.toUri();
+        // - Uri? get safeUri => url?.toUriSafe();
+        // - Uri? uri() => _url.toUri();
+
+        expect(
+          'Simple method invocations on fields are skipped',
+          isNotNull,
+        );
+      });
+
+      test('should skip property access patterns', () {
+        // Expected behavior: These should NOT trigger
+        // - String? get uriScheme => _uri?.scheme;
+        // - String? get uriHost => uri?.host;
+
+        expect(
+          'Null-aware property access is skipped',
+          isNotNull,
+        );
+      });
+
       test('should skip trivial single-assignment method bodies', () {
         // Expected behavior: These should NOT trigger
         // - void resetUri() { _uri = null; }

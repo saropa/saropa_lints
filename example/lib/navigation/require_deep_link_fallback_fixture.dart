@@ -69,12 +69,25 @@ class GoodDeepLinkHandler {
 class DeepLinkStateManager {
   Uri? _initialUri;
   Uri? _currentUri;
+  final String _url = 'https://example.com';
 
   // OK: Simple getter returning a field - not a handler
   Uri? get initialUri => _initialUri;
 
   // OK: Simple getter returning a field - not a handler
   Uri? get currentRouteUri => _currentUri;
+
+  // OK: Lazy-loading pattern - not a handler
+  Uri? get uri => _initialUri ??= Uri.parse(_url);
+
+  // OK: Simple method invocation on a field - not a handler
+  Uri? get parsedUri => _url.toUri();
+
+  // OK: Null-aware method invocation - not a handler
+  Uri? get safeUri => _url.toUriSafe();
+
+  // OK: Null-aware property access - not a handler
+  String? get uriScheme => _initialUri?.scheme;
 
   // OK: Reset utility method - not a handler
   void resetInitialUri() {
@@ -158,4 +171,10 @@ class NotFoundPage extends StatelessWidget {
 
 Future<dynamic> fetchUser(String userId) async {
   return null;
+}
+
+// Mock extension for URI conversion
+extension StringToUri on String {
+  Uri? toUri() => Uri.tryParse(this);
+  Uri? toUriSafe() => Uri.tryParse(this);
 }
