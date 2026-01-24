@@ -8,6 +8,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.6.2] - 2026-01-24
+
+### Fixed
+
+- **require_build_context_scope**: Fixed false positives for BuildContext used as argument to awaited function calls. Previously, `await showDialog(context: context)` was incorrectly flagged. The rule now correctly distinguishes between:
+  - **Safe:** Context as argument to awaited call (`await showDialog(context: context)`)
+  - **Unsafe:** Context used after await completes (`await foo(); Navigator.of(context).pop()`)
+  - Also fixed: Parameter type detection was broken (using `declaredFragment` instead of `getBuildContextParamName` utility)
+  - Added `LintImpact.high`, `RuleCost.medium`, `requiresAsync` for proper classification and performance
+
+### Added
+
+- **Slow rule deferral system**: New two-pass analysis mode for faster feedback:
+  - `SAROPA_LINTS_DEFER=true` - Skip rules that historically take >50ms in first pass
+  - `SAROPA_LINTS_DEFERRED=true` - Run only the deferred slow rules in second pass
+  - Rules exceeding 50ms are automatically tracked for future deferral
+
+- **Report generation** (experimental): `SAROPA_LINTS_REPORT=true` enables detailed reports:
+  - Timing report with all rules sorted by execution time
+  - Slow rules report (rules exceeding 10ms threshold)
+  - Skipped files report
+  - Impact report (violations grouped by severity)
+
+- **Expanded file exclusion patterns**: Additional generated file detection:
+  - New suffixes: `.chopper.dart`, `.reflectable.dart`, `.pb.dart`, `.pbjson.dart`, `.pbenum.dart`, `.pbserver.dart`, `.mapper.dart`, `.module.dart`
+  - Global folder exclusions: `/ios/Pods/`, `/ios/.symlinks/`, `/android/.gradle/`, `/windows/flutter/`, `/linux/flutter/`, `/macos/Flutter/`, `/.fvm/`
+  - Content-based detection for generated files without recognizable suffixes (checks first 500 chars for markers like "GENERATED CODE", "DO NOT EDIT")
+
+### Changed
+
+- **Quote/apostrophe style rules moved to stylistic tier**: The following conflicting rules are now opt-in only (require explicit configuration):
+  - `prefer_double_quotes`
+  - `prefer_single_quotes`
+  - `prefer_doc_curly_apostrophe`
+  - `prefer_doc_straight_apostrophe`
+  - `prefer_straight_apostrophe`
+
+### Performance
+
+- **RegExp caching**: Cached ~30 RegExp patterns as `static final` fields across 13 rule files. Previously, patterns were recompiled on every method call.
+
+- **Widget detection optimization**: `_WidgetDepthVisitor` now uses O(1) Set lookup + single regex pattern instead of 19 separate `.endsWith()` calls.
+
+- **Consolidated duplicate RegExp**: Merged two identical `_privateMethodCallPattern` definitions in `flutter_widget_rules.dart` into a single shared constant.
+
+---
 ## [4.6.1] - 2026-01-24
 
 ### Added

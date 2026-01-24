@@ -99,7 +99,7 @@ List<LintRule> get allSaropaRules => _allRules;
 /// Entry point for custom_lint
 PluginBase createPlugin() {
   // ignore: avoid_print
-  print('[saropa_lints] createPlugin() called - version 4.2.3');
+  print('[saropa_lints] createPlugin() called - version 4.6.2');
   return _SaropaLints();
 }
 

@@ -17,6 +17,10 @@ import '../saropa_lint_rule.dart';
 // Shared Utilities
 // =============================================================================
 
+// Cached regex patterns for performance
+final RegExp _boxTargetPattern = RegExp(r'\bbox\b|box$|^box|_box');
+final RegExp _boxFieldPattern = RegExp(r'\bbox$|_box\b|^box$');
+
 /// Check if an expression target looks like a Hive box.
 /// Uses word boundary matching to avoid false positives like 'infobox'.
 bool _isHiveBoxTarget(Expression? target) {
@@ -26,8 +30,7 @@ bool _isHiveBoxTarget(Expression? target) {
 
   // Check for exact 'box' variable or common patterns like myBox, userBox
   // Use word boundary to avoid matching 'infobox', 'checkbox', etc.
-  final boxPattern = RegExp(r'\bbox\b|box$|^box|_box');
-  return boxPattern.hasMatch(source);
+  return _boxTargetPattern.hasMatch(source);
 }
 
 /// Check if a field declaration or variable name indicates a Hive Box type.
@@ -41,8 +44,7 @@ bool _isHiveBoxField(String typeSource, String variableName) {
   }
 
   // Variable name ends with 'box' or contains '_box'
-  final boxPattern = RegExp(r'\bbox$|_box\b|^box$');
-  return boxPattern.hasMatch(nameLower);
+  return _boxFieldPattern.hasMatch(nameLower);
 }
 
 // =============================================================================

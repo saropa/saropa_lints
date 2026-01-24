@@ -205,6 +205,9 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // Cached regex for performance - extracts type from constructor call
+  static final RegExp _typePattern = RegExp(r'^(\w+)\(');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -256,8 +259,7 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
         if (firstArg is! NamedExpression) {
           final String argSource = firstArg.toSource();
           // Try to extract type from constructor call
-          final RegExp typePattern = RegExp(r'^(\w+)\(');
-          final RegExpMatch? match = typePattern.firstMatch(argSource);
+          final RegExpMatch? match = _typePattern.firstMatch(argSource);
           if (match != null) {
             controllerType = match.group(1);
           }

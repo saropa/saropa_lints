@@ -665,6 +665,9 @@ class FormatCommentFormattingRule extends SaropaLintRule {
     caseSensitive: false,
   );
 
+  // Cached regex for performance - matches lowercase start
+  static final RegExp _lowercaseStart = RegExp(r'^[a-z]');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -707,7 +710,7 @@ class FormatCommentFormattingRule extends SaropaLintRule {
         // Check if starts with lowercase (excluding URLs and code)
         if (content.isNotEmpty &&
             content[0].toLowerCase() == content[0] &&
-            RegExp(r'^[a-z]').hasMatch(content) &&
+            _lowercaseStart.hasMatch(content) &&
             !content.startsWith('http') &&
             !content.contains('://')) {
           reporter.atToken(comment, code);

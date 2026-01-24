@@ -458,6 +458,7 @@ custom_lint:
     - require_isolate_for_heavy: false        # WARNING - heavy computation blocks UI (v4.1.8)
     - avoid_finalizer_misuse: false           # INFO - prefer dispose() over Finalizer (v4.1.8)
     - avoid_json_in_main: false               # INFO - jsonDecode in async should use compute() (v4.1.8)
+    - require_build_context_scope: false      # WARNING - context after await may be invalid (v4.6.2) [HIGH]
 
     # =========================================================================
     # FLUTTER WIDGETS

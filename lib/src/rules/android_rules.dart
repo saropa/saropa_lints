@@ -518,6 +518,10 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  // Cached regex patterns for performance
+  static final RegExp _camelCaseBoundary = RegExp(r'([a-z])([A-Z])');
+  static final RegExp _wordSplitPattern = RegExp(r'[_\s]+');
+
   /// Sensitive key patterns that should use secure storage.
   /// Uses word-boundary matching to avoid false positives like
   /// "authentication_method" matching "auth".
@@ -542,11 +546,11 @@ class RequireAndroidBackupRulesRule extends SaropaLintRule {
     // Split on underscores and camelCase boundaries
     return input
         .replaceAllMapped(
-          RegExp(r'([a-z])([A-Z])'),
+          _camelCaseBoundary,
           (Match m) => '${m.group(1)}_${m.group(2)}',
         )
         .toLowerCase()
-        .split(RegExp(r'[_\s]+'))
+        .split(_wordSplitPattern)
         .where((String s) => s.isNotEmpty)
         .toList();
   }

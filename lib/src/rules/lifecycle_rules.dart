@@ -275,6 +275,9 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  // Cached regex for performance - matches whitespace
+  static final RegExp _whitespacePattern = RegExp(r'\s+');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -306,7 +309,7 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
 
       // Check if it only calls super.didUpdateWidget
       final String trimmed = bodySource
-          .replaceAll(RegExp(r'\s+'), '')
+          .replaceAll(_whitespacePattern, '')
           .replaceAll('{', '')
           .replaceAll('}', '');
 

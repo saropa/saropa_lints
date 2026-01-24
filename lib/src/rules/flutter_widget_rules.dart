@@ -11,6 +11,10 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 import '../async_context_utils.dart';
 import '../saropa_lint_rule.dart';
 
+/// Shared regex for detecting private method calls (e.g., `_dispose()`).
+/// Used by multiple rules to detect calls to private helper methods.
+final RegExp _privateMethodCallPattern = RegExp(r'_(\w+)\s*\(');
+
 /// Warns when `context` is used inside `initState` or `dispose` methods.
 ///
 /// Alias: avoid_context_in_init_state, avoid_using_context_after_dispose
@@ -3047,8 +3051,8 @@ class RequireDisposeRule extends SaropaLintRule {
     final StringBuffer expanded = StringBuffer(body);
 
     // Find method calls to private methods (starting with _)
-    final RegExp methodCallPattern = RegExp(r'_(\w+)\s*\(');
-    for (final RegExpMatch match in methodCallPattern.allMatches(body)) {
+    for (final RegExpMatch match
+        in _privateMethodCallPattern.allMatches(body)) {
       final String methodName = '_${match.group(1)}';
       final String? methodBody = methodBodies[methodName];
       if (methodBody != null) {
@@ -3358,9 +3362,9 @@ class RequireTimerCancellationRule extends SaropaLintRule {
     }
 
     final StringBuffer expanded = StringBuffer(body);
-    final RegExp methodCallPattern = RegExp(r'_(\w+)\s*\(');
 
-    for (final RegExpMatch match in methodCallPattern.allMatches(body)) {
+    for (final RegExpMatch match
+        in _privateMethodCallPattern.allMatches(body)) {
       final String methodName = '_${match.group(1)}';
       final String? methodBody = methodBodies[methodName];
       if (methodBody != null) {
@@ -3680,6 +3684,9 @@ class UseSetStateSynchronouslyRule extends SaropaLintRule {
 }
 
 class _WrapSetStateInMountedCheckFix extends DartFix {
+  // Cached regex for performance - matches any non-whitespace
+  static final RegExp _nonWhitespacePattern = RegExp(r'[^\s]');
+
   @override
   void run(
     CustomLintResolver resolver,
@@ -3710,7 +3717,7 @@ class _WrapSetStateInMountedCheckFix extends DartFix {
         final String leadingText = resolver.source.contents.data
             .substring(lineStart, statement.offset);
         final String indent = leadingText.replaceAll(
-            RegExp(r'[^\s]'), ''); // Keep only whitespace
+            _nonWhitespacePattern, ''); // Keep only whitespace
 
         builder.addSimpleReplacement(
           SourceRange(statement.offset, statement.length),
@@ -4035,6 +4042,18 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
   int _currentDepth = 0;
   bool _reported = false;
 
+  // Cached patterns for performance - avoids 19 string comparisons per widget
+  static const Set<String> _exactWidgetNames = <String>{
+    'Text',
+    'Icon',
+    'Image',
+  };
+
+  static final RegExp _widgetSuffixPattern = RegExp(
+    r'(Widget|Button|Text|Container|Card|Row|Column|Padding|Center|'
+    r'Expanded|Flexible|SizedBox|Scaffold|AppBar|ListView|GridView|Stack)$',
+  );
+
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     // Check if this looks like a widget (PascalCase name)
@@ -4055,27 +4074,9 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
   }
 
   bool _looksLikeWidget(String name) {
-    // Common widget suffixes
-    return name.endsWith('Widget') ||
-        name.endsWith('Button') ||
-        name.endsWith('Text') ||
-        name.endsWith('Container') ||
-        name.endsWith('Card') ||
-        name.endsWith('Row') ||
-        name.endsWith('Column') ||
-        name.endsWith('Padding') ||
-        name.endsWith('Center') ||
-        name.endsWith('Expanded') ||
-        name.endsWith('Flexible') ||
-        name.endsWith('SizedBox') ||
-        name.endsWith('Scaffold') ||
-        name.endsWith('AppBar') ||
-        name.endsWith('ListView') ||
-        name.endsWith('GridView') ||
-        name.endsWith('Stack') ||
-        name == 'Text' ||
-        name == 'Icon' ||
-        name == 'Image';
+    // O(1) lookup for exact matches, then single regex check for suffixes
+    return _exactWidgetNames.contains(name) ||
+        _widgetSuffixPattern.hasMatch(name);
   }
 }
 
