@@ -45,6 +45,7 @@ custom_lint:
     avoid_logging_sensitive_data: true
     avoid_eval_like_patterns: true
     avoid_weak_cryptographic_algorithms: true
+    avoid_path_traversal: true
 
     # =========================================================================
     # NULL SAFETY - Crashes
