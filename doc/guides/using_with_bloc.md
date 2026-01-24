@@ -397,17 +397,17 @@ dev_dependencies:
   bloc_test: ^9.1.0
 ```
 
-### 2. Update analysis_options.yaml
+### 2. Generate configuration
 
-```yaml
-analyzer:
-  plugins:
-    - custom_lint
+```bash
+# Generate analysis_options.yaml with recommended tier
+dart run saropa_lints:init --tier recommended
 
-custom_lint:
-  saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+# Or use essential tier for legacy projects
+dart run saropa_lints:init --tier essential
 ```
+
+This generates explicit rule configuration that works reliably with custom_lint.
 
 ### 3. Run the linter
 

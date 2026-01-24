@@ -38,10 +38,12 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   plugins:
     - custom_lint
+```
 
-custom_lint:
-  saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+Then generate the configuration:
+
+```bash
+dart run saropa_lints:init --tier recommended
 ```
 
 ### Step 3: Run the linter
@@ -61,10 +63,12 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   plugins:
     - custom_lint
+```
 
-custom_lint:
-  saropa_lints:
-    tier: recommended
+Then generate saropa_lints configuration:
+
+```bash
+dart run saropa_lints:init --tier recommended
 ```
 
 ```yaml
@@ -72,7 +76,7 @@ custom_lint:
 dev_dependencies:
   very_good_analysis: ^6.0.0
   custom_lint: ^0.8.0
-  saropa_lints: ^2.6.0
+  saropa_lints: ^4.5.7
 ```
 
 This gives you:
@@ -163,11 +167,9 @@ include: package:lints/recommended.yaml
 analyzer:
   plugins:
     - custom_lint
-
-custom_lint:
-  saropa_lints:
-    tier: recommended
 ```
+
+Then run: `dart run saropa_lints:init --tier recommended`
 
 ### lint (by passsy)
 
@@ -183,11 +185,9 @@ include: package:lint/analysis_options.yaml
 analyzer:
   plugins:
     - custom_lint
-
-custom_lint:
-  saropa_lints:
-    tier: recommended
 ```
+
+Then run: `dart run saropa_lints:init --tier recommended`
 
 ### pedantic (Deprecated)
 
@@ -203,11 +203,9 @@ include: package:lints/recommended.yaml
 analyzer:
   plugins:
     - custom_lint
-
-custom_lint:
-  saropa_lints:
-    tier: recommended
 ```
+
+Then run: `dart run saropa_lints:init --tier recommended`
 
 ### Comparison
 
