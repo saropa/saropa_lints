@@ -37,3 +37,5 @@ CODE_INDEX.md
 dx_full.txt
 dartdoc-log.txt
 custom_lint.log
+*.bak
+BROKEN_TIERS.md
