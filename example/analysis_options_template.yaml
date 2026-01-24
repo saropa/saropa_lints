@@ -399,6 +399,7 @@ custom_lint:
     - prefer_scaffold_messenger_maybeof: false
     - require_unknown_route_handler: false
     - avoid_context_after_navigation: false
+    - avoid_navigator_context_issue: false       # ERROR - GlobalKey context in navigation (v4.1.5)
     - prefer_url_launcher_uri_over_string: false # INFO - use Uri type safety (v2.3.10)
     - avoid_go_router_push_replacement_confusion: false # WARNING - clear routing intent (v2.3.10)
     - require_url_launcher_encoding: false       # WARNING - URL failure (v2.3.11)
