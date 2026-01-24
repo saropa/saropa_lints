@@ -69,6 +69,61 @@ class GoodFlexibleInRow extends StatelessWidget {
   }
 }
 
+// GOOD: Expanded returned from helper method used in Row
+// This is a common pattern for caching children in StatefulWidget
+class GoodExpandedInHelperMethod extends StatelessWidget {
+  const GoodExpandedInHelperMethod({super.key});
+
+  List<Widget> _buildChildren() {
+    // OK: Helper method returns Expanded for use in Flex at call site
+    return [Expanded(child: Container())];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: _buildChildren());
+  }
+}
+
+// GOOD: Expanded in List.generate used in Column
+class GoodExpandedInListGenerate extends StatelessWidget {
+  const GoodExpandedInListGenerate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      // OK: List.generate builds children for Flex widget
+      children: List.generate(3, (i) => Expanded(child: Text('$i'))),
+    );
+  }
+}
+
+// GOOD: Expanded in .map() used in Row
+class GoodExpandedInMap extends StatelessWidget {
+  const GoodExpandedInMap({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [1, 2, 3];
+    return Row(
+      // OK: .map() builds children for Flex widget
+      children: items.map((i) => Expanded(child: Text('$i'))).toList(),
+    );
+  }
+}
+
+// GOOD: Expanded assigned to variable
+class GoodExpandedAssignedToVariable extends StatelessWidget {
+  const GoodExpandedAssignedToVariable({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // OK: Assigned to variable, trust developer placement
+    final Widget child = Expanded(child: Container());
+    return Row(children: [child]);
+  }
+}
+
 // =========================================================================
 // avoid_stack_without_positioned
 // =========================================================================
