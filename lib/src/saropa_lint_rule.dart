@@ -159,6 +159,16 @@ class ProgressTracker {
   static bool _discoveredFromFiles =
       false; // True only if discoverFiles() found files
 
+  // Severity tracking
+  static int _errorCount = 0;
+  static int _warningCount = 0;
+  static int _infoCount = 0;
+
+  // Per-file and per-rule tracking for summary
+  static final Map<String, int> _issuesByFile = {};
+  static final Map<String, int> _issuesByRule = {};
+  static final Map<String, String> _ruleSeverities = {}; // rule -> severity
+
   // Rolling rate samples for more stable ETA (last N samples)
   static final List<double> _rateSamples = [];
   static const int _maxRateSamples = 5;
@@ -206,12 +216,36 @@ class ProgressTracker {
   }
 
   /// Record a violation found for the current file.
-  static void recordViolation() {
+  /// [severity] should be 'ERROR', 'WARNING', or 'INFO'
+  /// [ruleName] is the lint rule that triggered
+  static void recordViolation({String? severity, String? ruleName}) {
     _violationsFound++;
-    // Track unique files with issues
-    if (_currentFile != null && _currentFile != _lastFileWithIssue) {
-      _filesWithIssues++;
-      _lastFileWithIssue = _currentFile;
+
+    // Track by severity
+    switch (severity?.toUpperCase()) {
+      case 'ERROR':
+        _errorCount++;
+      case 'WARNING':
+        _warningCount++;
+      case 'INFO':
+        _infoCount++;
+    }
+
+    // Track by file
+    if (_currentFile != null) {
+      _issuesByFile[_currentFile!] = (_issuesByFile[_currentFile!] ?? 0) + 1;
+      if (_currentFile != _lastFileWithIssue) {
+        _filesWithIssues++;
+        _lastFileWithIssue = _currentFile;
+      }
+    }
+
+    // Track by rule
+    if (ruleName != null) {
+      _issuesByRule[ruleName] = (_issuesByRule[ruleName] ?? 0) + 1;
+      if (severity != null) {
+        _ruleSeverities[ruleName] = severity.toUpperCase();
+      }
     }
   }
 
@@ -333,14 +367,138 @@ class ProgressTracker {
     final elapsed = DateTime.now().difference(_startTime!);
     final fileCount = _seenFiles.length;
     final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
-    final issuePercent =
-        fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0;
 
-    // Use stderr to avoid custom_lint rule name prefix
-    stderr.writeln(
-      '✅ Complete: $fileCount files in ${_formatDuration(elapsed.inSeconds)} '
-      '(${filesPerSec.round()}/s) - $_violationsFound issues in $_filesWithIssues files ($issuePercent%)',
-    );
+    final buf = StringBuffer();
+
+    // Header
+    buf.writeln();
+    buf.writeln('${'═' * 70}');
+    buf.writeln('📋 SAROPA LINTS ANALYSIS COMPLETE');
+    buf.writeln('${'═' * 70}');
+
+    // Overview
+    buf.writeln();
+    buf.writeln(
+        '📁 Files: $fileCount analyzed in ${_formatDuration(elapsed.inSeconds)} (${filesPerSec.round()}/s)');
+    buf.writeln(
+        '📄 Files with issues: $_filesWithIssues (${fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0}%)');
+
+    // Severity breakdown
+    buf.writeln();
+    buf.writeln('${'─' * 70}');
+    buf.writeln('🎯 ISSUES BY SEVERITY');
+    buf.writeln('${'─' * 70}');
+    if (_errorCount > 0) buf.writeln('  🔴 Errors:   $_errorCount');
+    if (_warningCount > 0) buf.writeln('  🟡 Warnings: $_warningCount');
+    if (_infoCount > 0) buf.writeln('  🔵 Info:     $_infoCount');
+    buf.writeln('  ── Total:    $_violationsFound');
+
+    // Top offending files (max 10)
+    if (_issuesByFile.isNotEmpty) {
+      final sortedFiles = _issuesByFile.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      final topFiles = sortedFiles.take(10);
+
+      buf.writeln();
+      buf.writeln('${'─' * 70}');
+      buf.writeln('📂 TOP FILES WITH ISSUES');
+      buf.writeln('${'─' * 70}');
+      for (final entry in topFiles) {
+        final shortName = entry.key.split('/').last.split('\\').last;
+        buf.writeln(
+            '  ${entry.value.toString().padLeft(4)} issues  $shortName');
+      }
+    }
+
+    // Top triggered rules (max 10)
+    if (_issuesByRule.isNotEmpty) {
+      final sortedRules = _issuesByRule.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+      final topRules = sortedRules.take(10);
+
+      buf.writeln();
+      buf.writeln('${'─' * 70}');
+      buf.writeln('📏 TOP TRIGGERED RULES');
+      buf.writeln('${'─' * 70}');
+      for (final entry in topRules) {
+        final severity = _ruleSeverities[entry.key] ?? '?';
+        final icon = severity == 'ERROR'
+            ? '🔴'
+            : severity == 'WARNING'
+                ? '🟡'
+                : '🔵';
+        buf.writeln(
+            '  $icon ${entry.value.toString().padLeft(4)}x  ${entry.key}');
+      }
+    }
+
+    buf.writeln();
+    buf.writeln('${'═' * 70}');
+
+    stderr.writeln(buf.toString());
+
+    // Write log file
+    _writeLogFile(buf.toString(), elapsed);
+  }
+
+  /// Write detailed log to reports directory.
+  static void _writeLogFile(String summary, Duration elapsed) {
+    try {
+      final now = DateTime.now();
+      final timestamp =
+          '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_'
+          '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+
+      final reportsDir = Directory('reports');
+      if (!reportsDir.existsSync()) {
+        reportsDir.createSync(recursive: true);
+      }
+
+      final logPath = 'reports/${timestamp}_saropa_lints_analysis.log';
+      final logBuf = StringBuffer();
+
+      logBuf.writeln('Saropa Lints Analysis Report');
+      logBuf.writeln('Generated: ${now.toIso8601String()}');
+      logBuf.writeln('Duration: ${_formatDuration(elapsed.inSeconds)}');
+      logBuf.writeln();
+
+      // Summary (stripped of emojis for plain text)
+      logBuf.writeln(summary.replaceAll(RegExp(r'[^\x00-\x7F]'), ''));
+
+      // Full file breakdown
+      if (_issuesByFile.isNotEmpty) {
+        logBuf.writeln();
+        logBuf.writeln('=' * 70);
+        logBuf.writeln('ALL FILES WITH ISSUES (${_issuesByFile.length} files)');
+        logBuf.writeln('=' * 70);
+        final sortedFiles = _issuesByFile.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+        for (final entry in sortedFiles) {
+          logBuf.writeln(
+              '  ${entry.value.toString().padLeft(4)} issues  ${entry.key}');
+        }
+      }
+
+      // Full rule breakdown
+      if (_issuesByRule.isNotEmpty) {
+        logBuf.writeln();
+        logBuf.writeln('=' * 70);
+        logBuf.writeln('ALL TRIGGERED RULES (${_issuesByRule.length} rules)');
+        logBuf.writeln('=' * 70);
+        final sortedRules = _issuesByRule.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
+        for (final entry in sortedRules) {
+          final severity = _ruleSeverities[entry.key] ?? '?';
+          logBuf.writeln(
+              '  [$severity] ${entry.value.toString().padLeft(4)}x  ${entry.key}');
+        }
+      }
+
+      File(logPath).writeAsStringSync(logBuf.toString());
+      stderr.writeln('📝 Log written to: $logPath');
+    } catch (e) {
+      stderr.writeln('⚠️  Could not write log file: $e');
+    }
   }
 
   /// Reset tracking state (useful between analysis runs).
@@ -355,6 +513,12 @@ class ProgressTracker {
     _violationsFound = 0;
     _filesWithIssues = 0;
     _lastFileWithIssue = null;
+    _errorCount = 0;
+    _warningCount = 0;
+    _infoCount = 0;
+    _issuesByFile.clear();
+    _issuesByRule.clear();
+    _ruleSeverities.clear();
     _rateSamples.clear();
   }
 }
@@ -2050,8 +2214,9 @@ class SaropaDiagnosticReporter {
       message: code.problemMessage,
     );
 
-    // Track for progress reporting
-    ProgressTracker.recordViolation();
+    // Track for progress reporting with severity
+    final severity = code.errorSeverity.name;
+    ProgressTracker.recordViolation(severity: severity, ruleName: _ruleName);
   }
 
   /// Get approximate line number from an AST node.
