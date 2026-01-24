@@ -153,6 +153,8 @@ class ProgressTracker {
   static DateTime? _currentFileStart;
   static int _totalExpectedFiles = 0;
   static int _violationsFound = 0;
+  static int _filesWithIssues = 0;
+  static String? _lastFileWithIssue;
   static bool _etaCalibrated = false;
   static bool _discoveredFromFiles =
       false; // True only if discoverFiles() found files
@@ -203,9 +205,14 @@ class ProgressTracker {
     }
   }
 
-  /// Record a violation found.
+  /// Record a violation found for the current file.
   static void recordViolation() {
     _violationsFound++;
+    // Track unique files with issues
+    if (_currentFile != null && _currentFile != _lastFileWithIssue) {
+      _filesWithIssues++;
+      _lastFileWithIssue = _currentFile;
+    }
   }
 
   /// Record that a file is being analyzed and potentially report progress.
@@ -222,10 +229,10 @@ class ProgressTracker {
     final wasNew = _seenFiles.add(path);
 
     if (wasNew) {
-      // Report long-running files (> 5 seconds on previous file)
+      // Report long-running files (> 2 seconds on previous file)
       if (_currentFile != null && _currentFileStart != null) {
         final fileTime = now.difference(_currentFileStart!);
-        if (fileTime.inSeconds >= 5) {
+        if (fileTime.inSeconds >= 2) {
           final shortName = _currentFile!.split('/').last.split('\\').last;
           // Use stderr to avoid custom_lint rule name prefix
           stderr.writeln('⏱️  Slow: $shortName (${fileTime.inSeconds}s)');
@@ -307,11 +314,15 @@ class ProgressTracker {
       progressStr = '$fileCount files';
     }
 
+    // Calculate % of files with issues
+    final issuePercent =
+        fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0;
+
     // Use stderr to avoid custom_lint rule name prefix
-    // Clean format: progress | time | rate | issues | current file
+    // Clean format: progress | time | rate | issues (% files) | current file
     stderr.writeln(
       '📊 $progressStr | ${_formatDuration(elapsed.inSeconds)} | '
-      '${filesPerSec.round()}/s | $_violationsFound issues | $shortName',
+      '${filesPerSec.round()}/s | $_violationsFound issues ($issuePercent% files) | $shortName',
     );
   }
 
@@ -322,11 +333,13 @@ class ProgressTracker {
     final elapsed = DateTime.now().difference(_startTime!);
     final fileCount = _seenFiles.length;
     final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
+    final issuePercent =
+        fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0;
 
     // Use stderr to avoid custom_lint rule name prefix
     stderr.writeln(
       '✅ Complete: $fileCount files in ${_formatDuration(elapsed.inSeconds)} '
-      '(${filesPerSec.round()}/s) - $_violationsFound issues',
+      '(${filesPerSec.round()}/s) - $_violationsFound issues in $_filesWithIssues files ($issuePercent%)',
     );
   }
 
@@ -340,6 +353,8 @@ class ProgressTracker {
     _etaCalibrated = false;
     _discoveredFromFiles = false;
     _violationsFound = 0;
+    _filesWithIssues = 0;
+    _lastFileWithIssue = null;
     _rateSamples.clear();
   }
 }
