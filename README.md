@@ -131,7 +131,7 @@ The tier system lets you adopt gradually — start with ~100 critical rules, wor
 # pubspec.yaml
 dev_dependencies:
   custom_lint: ^0.8.0
-  saropa_lints: ^4.5.7
+  saropa_lints: ^4.6.0
 ```
 
 ### 2. Enable custom_lint
