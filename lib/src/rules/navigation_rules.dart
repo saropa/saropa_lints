@@ -2806,16 +2806,39 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
 /// Navigator.of() needs proper context from the widget tree.
 ///
 /// Using context from a different part of the tree (like a GlobalKey's
-/// currentContext) can cause navigation failures or unexpected behavior.
+/// `currentContext`) can cause navigation failures or unexpected behavior.
+/// The widget referenced by the GlobalKey may not be mounted, may be in a
+/// different Navigator scope, or may have been disposed.
+///
+/// **Why this matters:**
+/// - `currentContext` can be null if the widget isn't in the tree
+/// - The context may belong to a different Navigator (nested navigators)
+/// - Force-unwrapping (`!`) will crash if the widget was disposed
+/// - Navigation may silently fail or go to the wrong navigator
+///
+/// **Note:** This rule does NOT flag `Scrollable.ensureVisible()` which
+/// legitimately requires `GlobalKey.currentContext` to scroll to a widget.
 ///
 /// **BAD:**
 /// ```dart
-/// Navigator.of(scaffoldKey.currentContext!).push(...);  // Fragile
+/// // GlobalKey context - may not be in tree or wrong navigator
+/// Navigator.of(scaffoldKey.currentContext!).push(route);
+///
+/// // NavigatorState.context - same issues
+/// final nav = Navigator.of(context);
+/// // ... later in callback ...
+/// nav.context; // Stale reference
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
-/// Navigator.of(context).push(...);  // Direct context
+/// // Direct BuildContext from widget tree
+/// Navigator.of(context).push(route);
+///
+/// // With mounted check for async scenarios
+/// if (context.mounted) {
+///   Navigator.of(context).push(route);
+/// }
 /// ```
 class AvoidNavigatorContextIssueRule extends SaropaLintRule {
   const AvoidNavigatorContextIssueRule() : super(code: _code);
@@ -2848,33 +2871,61 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
       if (target == null) return;
 
       final String targetSource = target.toSource();
-      if (!targetSource.contains('Navigator')) return;
 
-      // Check arguments for currentContext
+      // Only flag Navigator operations, not Scrollable or other APIs
+      if (!targetSource.contains('Navigator')) return;
+      if (targetSource.contains('Scrollable')) return;
+
+      // Check arguments for currentContext usage
       final ArgumentList args = node.argumentList;
       for (final Expression arg in args.arguments) {
-        final String argSource = arg.toSource();
-        if (argSource.contains('currentContext') ||
-            argSource.contains('.context')) {
+        if (_hasProblematicContextUsage(arg.toSource())) {
           reporter.atNode(arg, code);
           return;
         }
       }
     });
 
-    // Also check Navigator.of() calls
+    // Check Navigator-related instance creations (routes, pages)
     context.registry.addInstanceCreationExpression((
       InstanceCreationExpression node,
     ) {
+      final String constructorName = node.constructorName.toSource();
+
+      // Only check Navigator-related instance creations
+      if (!constructorName.contains('Route') &&
+          !constructorName.contains('Page') &&
+          !constructorName.contains('Navigator')) {
+        return;
+      }
+
       for (final Expression arg in node.argumentList.arguments) {
-        final String argSource = arg.toSource();
-        if (argSource.contains('currentContext') ||
-            (argSource.contains('.context') &&
-                !argSource.contains('BuildContext'))) {
+        if (_hasProblematicContextUsage(arg.toSource())) {
           reporter.atNode(arg, code);
         }
       }
     });
+  }
+
+  /// Check for problematic context patterns in source code.
+  ///
+  /// Returns true if the source contains:
+  /// - `.currentContext` (GlobalKey context access)
+  /// - `navigator.context` or `Navigator.of(...).context`
+  bool _hasProblematicContextUsage(String source) {
+    // Check for GlobalKey.currentContext patterns
+    if (source.contains('.currentContext')) {
+      return true;
+    }
+
+    // Check specifically for navigator.context (NavigatorState's context)
+    // but not general .context usage or property names containing "context"
+    if (source.contains('navigator.context') ||
+        (source.contains('Navigator.of(') && source.contains(').context'))) {
+      return true;
+    }
+
+    return false;
   }
 }
 

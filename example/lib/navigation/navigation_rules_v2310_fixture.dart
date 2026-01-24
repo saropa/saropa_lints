@@ -151,3 +151,85 @@ class RouteSettings {
   final String? name;
   final Object? arguments;
 }
+
+// =========================================================================
+// avoid_navigator_context_issue
+// =========================================================================
+// Warns when using GlobalKey.currentContext or NavigatorState.context for
+// navigation, which can cause navigation failures.
+
+final GlobalKey<State<StatefulWidget>> scaffoldKey = GlobalKey();
+final GlobalKey<State<StatefulWidget>> navKey = GlobalKey();
+
+// BAD: Using GlobalKey.currentContext with Navigator.of
+void badNavigatorOfWithCurrentContext() {
+  // expect_lint: avoid_navigator_context_issue
+  Navigator.of(scaffoldKey.currentContext!).push(
+    MaterialPageRoute(builder: (_) => Container()),
+  );
+}
+
+// BAD: Using GlobalKey.currentContext with Navigator static method
+void badNavigatorPushWithCurrentContext(BuildContext context) {
+  // This pattern is less common but still problematic
+  final ctx = navKey.currentContext;
+  if (ctx != null) {
+    Navigator.of(ctx).push(
+      // expect_lint: avoid_navigator_context_issue
+      MaterialPageRoute(builder: (_) => Container()),
+    );
+  }
+}
+
+// GOOD: Using direct BuildContext from widget tree
+void goodNavigatorOfWithContext(BuildContext context) {
+  Navigator.of(context).push(
+    MaterialPageRoute(builder: (_) => Container()),
+  );
+}
+
+// GOOD: Using context with mounted check
+void goodNavigatorWithMountedCheck(BuildContext context) async {
+  await Future.delayed(const Duration(seconds: 1));
+  if (context.mounted) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => Container()),
+    );
+  }
+}
+
+// GOOD: Scrollable.ensureVisible with currentContext is legitimate
+void goodScrollableEnsureVisible() {
+  final ctx = navKey.currentContext;
+  if (ctx != null) {
+    Scrollable.ensureVisible(ctx);
+  }
+}
+
+// GOOD: Property names containing "context" should not trigger
+class ContextMessageWidget extends StatelessWidget {
+  const ContextMessageWidget({super.key, required this.contextMessage});
+  final String contextMessage;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialogMessage(message: contextMessage);
+  }
+}
+
+// Helper mocks
+class GlobalKey<T extends State<StatefulWidget>> {
+  BuildContext? get currentContext => null;
+}
+
+class Scrollable {
+  static void ensureVisible(BuildContext context) {}
+}
+
+class AlertDialogMessage extends StatelessWidget {
+  const AlertDialogMessage({super.key, required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
