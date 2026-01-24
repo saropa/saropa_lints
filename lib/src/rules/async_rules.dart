@@ -2272,6 +2272,11 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
 /// StreamControllers must be closed to prevent memory leaks and
 /// allow garbage collection.
 ///
+/// For exact `StreamController` types, requires `.close()` call.
+/// For wrapper types (e.g., `IsarStreamController`), accepts either
+/// `.close()` or `.dispose()` since wrapper classes typically close
+/// their internal StreamController in their dispose method.
+///
 /// **BAD:**
 /// ```dart
 /// final _controller = StreamController<int>();
@@ -2282,6 +2287,15 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
 /// ```dart
 /// void dispose() {
 ///   _controller.close();
+///   super.dispose();
+/// }
+/// ```
+///
+/// **GOOD (wrapper class):**
+/// ```dart
+/// late IsarStreamController<T> _controller;
+/// void dispose() {
+///   _controller.dispose(); // Wrapper's dispose() closes internal stream
 ///   super.dispose();
 /// }
 /// ```
@@ -2299,7 +2313,7 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
     problemMessage:
         '[require_stream_controller_close] Failing to close a StreamController in the dispose() method leaves the stream open, causing memory leaks, resource exhaustion, and potential app crashes. Unclosed streams can accumulate events and listeners, degrading performance and making debugging difficult. Proper closure is essential for robust, production-quality Flutter apps.',
     correctionMessage:
-        'Always call controller.close() in your widget’s dispose() method before calling super.dispose(). Audit your codebase for StreamController instances and verify they are closed properly. Document this requirement in your team’s Flutter best practices and code review checklists.',
+        'Call controller.close() in dispose() before super.dispose(). For wrapper types (e.g., IsarStreamController), calling wrapper.dispose() is also acceptable if the wrapper internally closes its StreamController.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
@@ -2310,15 +2324,21 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
     CustomLintContext context,
   ) {
     context.registry.addClassDeclaration((ClassDeclaration node) {
-      // Find StreamController fields
-      final List<VariableDeclaration> controllers = <VariableDeclaration>[];
+      // Find StreamController fields, tracking if they are exact types or
+      // wrappers. Record format: (variable, isExactStreamControllerType)
+      final List<(VariableDeclaration, bool)> controllers =
+          <(VariableDeclaration, bool)>[];
 
       for (final member in node.members) {
         if (member is FieldDeclaration) {
           final String? typeStr = member.fields.type?.toSource();
           if (typeStr != null && typeStr.contains('StreamController')) {
+            // Check if this is an exact StreamController type vs a wrapper
+            final bool isExactType = typeStr.startsWith('StreamController<') ||
+                typeStr.startsWith('StreamController ') ||
+                typeStr == 'StreamController';
             for (final variable in member.fields.variables) {
-              controllers.add(variable);
+              controllers.add((variable, isExactType));
             }
           }
         }
@@ -2326,22 +2346,33 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
 
       if (controllers.isEmpty) return;
 
-      // Check for dispose method with close() calls
+      // Check for dispose method with close() or dispose() calls
       bool hasClose = false;
+      bool hasDispose = false;
 
       for (final member in node.members) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String? bodySource = member.body.toSource();
-          if (bodySource != null && bodySource.contains('.close()')) {
-            hasClose = true;
-            break;
+          if (bodySource != null) {
+            hasClose = bodySource.contains('.close()');
+            hasDispose = bodySource.contains('.dispose()');
           }
+          break;
         }
       }
 
-      if (!hasClose) {
-        for (final controller in controllers) {
-          reporter.atNode(controller, code);
+      for (final (controller, isExactType) in controllers) {
+        if (isExactType) {
+          // Exact StreamController requires .close()
+          if (!hasClose) {
+            reporter.atNode(controller, code);
+          }
+        } else {
+          // Wrapper type (e.g., IsarStreamController) accepts .close() OR
+          // .dispose() since wrappers typically close internally
+          if (!hasClose && !hasDispose) {
+            reporter.atNode(controller, code);
+          }
         }
       }
     });
