@@ -8,6 +8,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.6.1] - 2026-01-24
+
+### Added
+
+- **`getAllDefinedRules()` function**: New public function in `tiers.dart` returns the complete set of all rule names across all tiers (including stylistic). Used by both the CLI tool and unit tests to eliminate code duplication.
+
+### Changed
+
+- **Import style rules moved to stylistic tier**: The following rules are now opt-in only (not included in any tier by default) since import style is a team preference:
+  - `prefer_absolute_imports`
+  - `prefer_flat_imports`
+  - `prefer_grouped_imports`
+  - `prefer_named_imports`
+  - `prefer_relative_imports`
+
+- **Test refactoring**: Tier validation tests now use `setUpAll` to compute rule sets once and share across tests, eliminating duplication.
+
+### Fixed
+
+- **avoid_stateful_without_state**: Fixed false positives when StatefulWidget calls `setState` but has no mutable fields or lifecycle methods. The rule now correctly excludes State classes that:
+  - Have non-final instance fields (mutable state)
+  - Override lifecycle methods (initState, didChangeDependencies, didUpdateWidget, deactivate, dispose)
+  - Call `setState` anywhere in method bodies (new detection via AST visitor)
+  - Changed severity from ERROR to WARNING for less disruptive feedback
+  - Added quick fix: Inserts TODO comment to convert to StatelessWidget
+
+- **Tier/plugin sync validation**: Added unit tests to validate that all plugin rules are assigned to a tier in `tiers.dart` and all tier entries have corresponding implementations. This prevents:
+  - Rules defaulting to unknown state when not assigned to any tier
+  - Phantom rules (tier entries without implementations) causing config errors
+  - Typos in tier rule names going undetected
+
+- **Tier cleanup**: Removed 144 phantom rules from `tiers.dart` (rules defined in tiers but never implemented). Added 3 missing rules (`no_empty_block`, `prefer_uuid_v4`, `prefer_ios_storekit2`) to professionalOnlyRules. Cleaned up empty section comments left after phantom rule removal.
+
+---
 
 ## [4.6.0] - 2026-01-24
 

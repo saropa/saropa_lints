@@ -259,8 +259,10 @@ Additional preferences for strings, imports, class structure, types, naming, and
 | Rule | Description | Opposing Rule |
 |------|-------------|---------------|
 | `prefer_absolute_imports` | Use `package:` imports | `prefer_relative_imports` |
+| `prefer_relative_imports` | Use relative imports for local files | `prefer_absolute_imports` |
 | `prefer_grouped_imports` | Group: dart, package, relative | `prefer_flat_imports` |
 | `prefer_flat_imports` | No grouping, flat import list | `prefer_grouped_imports` |
+| `prefer_named_imports` | Use `show`/`hide` for explicit imports | — |
 
 ### Class Structure
 

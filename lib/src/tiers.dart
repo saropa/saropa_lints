@@ -77,6 +77,13 @@ const Set<String> stylisticRules = <String>{
   // === Type argument style (conflicting, opt-in only) ===
   'avoid_inferrable_type_arguments',
   'prefer_explicit_type_arguments',
+
+  // === Import style (opinionated - opt-in only) ===
+  'prefer_absolute_imports',
+  'prefer_flat_imports',
+  'prefer_grouped_imports',
+  'prefer_named_imports',
+  'prefer_relative_imports',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -97,7 +104,6 @@ const Set<String> essentialRules = <String>{
   // Flutter Lifecycle - causes crashes
   'avoid_setstate_in_build', // Infinite loop/crash
   'avoid_inherited_widget_in_initstate',
-  'avoid_unsafe_setstate',
   'avoid_recursive_widget_calls',
   'avoid_global_key_in_build',
   'pass_existing_future_to_future_builder',
@@ -140,8 +146,6 @@ const Set<String> essentialRules = <String>{
   'avoid_existing_instances_in_bloc_provider', // Unexpected closure
   'avoid_instantiating_in_value_provider', // Memory leak (Provider package)
   'require_provider_dispose', // Resource cleanup
-  'proper_getx_super_calls', // Broken lifecycle
-  'always_remove_getx_listener', // Memory leak
   'avoid_getx_context_outside_widget', // Unsafe context access outside widgets
   'avoid_hooks_outside_build', // Runtime error
   'avoid_conditional_hooks', // Runtime error
@@ -171,7 +175,6 @@ const Set<String> essentialRules = <String>{
   // Resource Management
   'require_native_resource_cleanup',
   'require_file_close_in_finally',
-  'require_database_close',
   'require_websocket_close',
 
   // Error Handling
@@ -183,13 +186,8 @@ const Set<String> essentialRules = <String>{
   // Collection/Loop Safety (Phase 2)
   'avoid_unreachable_for_loop',
 
-  // GetX (Phase 2 - memory leaks)
-  'avoid_getx_rx_inside_build',
-  'avoid_mutable_rx_variables',
-
   // Remaining ROADMAP_NEXT - resource cleanup
   'dispose_provided_instances',
-  'dispose_getx_fields',
 
   // Widget Structure
   'avoid_nested_scaffolds',
@@ -249,9 +247,6 @@ const Set<String> essentialRules = <String>{
   'check_is_not_closed_after_async_gap',
   'avoid_duplicate_bloc_event_handlers',
 
-  // GetX (Essential - prevent memory leaks)
-  'require_getx_controller_dispose',
-
   // Build Performance (Essential - prevent memory leaks)
   'avoid_scroll_listener_in_build',
 
@@ -272,9 +267,6 @@ const Set<String> essentialRules = <String>{
   'missing_test_assertion',
   'avoid_async_callback_in_fake_async',
   'avoid_test_sleep', // WARNING - blocks test runner, use pump() instead
-
-  // JSON Serialization (Essential - runtime crashes)
-  'avoid_not_encodable_in_to_json', // WARNING - non-JSON types cause runtime errors
 
   // QR/Camera (Essential - app store compliance)
   'require_qr_permission_check',
@@ -355,75 +347,8 @@ const Set<String> essentialRules = <String>{
   'avoid_keyboard_overlap',
   'require_search_debounce', // Prevents request spam
 
-  // =========================================================================
-  // ROADMAP_NEXT Parts 1-7 Rules
-  // =========================================================================
-
-  // Part 1 - Isar Database Rules (Essential - prevent data corruption)
-  'require_isar_collection_annotation', // ERROR - missing annotation
-  'require_isar_id_field', // ERROR - missing ID field
-  'require_isar_close_on_dispose', // WARNING - resource leak
-  'avoid_isar_schema_breaking_changes', // ERROR - data corruption
-  'require_isar_links_load', // ERROR - accessing unloaded links
-  'avoid_isar_transaction_nesting', // ERROR - deadlocks
-  'require_isar_non_nullable_migration', // ERROR - data corruption
-  'require_isar_inspector_debug_only', // WARNING - production exposure
-  'avoid_isar_clear_in_production', // ERROR - data loss
-
-  // Part 2 - Dispose Pattern Rules (Essential - memory leaks)
-  'require_change_notifier_dispose', // ERROR - memory leak
-  'require_receive_port_close', // ERROR - resource leak
-  'require_socket_close', // ERROR - resource leak
-  'require_debouncer_cancel', // ERROR - timer leak
-  'require_interval_timer_cancel', // ERROR - timer leak
-  'require_file_handle_close', // WARNING - file handle leak
-
-  // Part 3 - Widget Lifecycle Rules (Essential - crashes)
-  'require_super_dispose_call', // ERROR - broken lifecycle
-  'require_super_init_state_call', // ERROR - broken lifecycle
-  'avoid_set_state_in_dispose', // ERROR - disposed widget
-  'avoid_navigation_in_build', // ERROR - navigation chaos
-
-  // Part 4 - Missing Parameter Rules (Essential)
-  'require_provider_generic_type', // ERROR - wrong type inference
-  'require_text_form_field_in_form', // WARNING - broken validation
-
-  // Part 5 - Exact API Pattern Rules (Essential)
-  'require_flutter_riverpod_package', // ERROR - import error
-  'avoid_bloc_emit_after_close', // ERROR - emit on closed bloc
-  'avoid_bloc_state_mutation', // ERROR - equality bugs
-  'require_bloc_initial_state', // ERROR - null state
-  'require_physics_for_nested_scroll', // WARNING - scroll conflict
-  'require_animated_builder_child', // WARNING - performance
-  'require_rethrow_preserve_stack', // WARNING - lost stack trace
-  'require_https_over_http', // ERROR - security
-  'require_wss_over_ws', // ERROR - security
-  'avoid_late_without_guarantee', // WARNING - LateInitializationError
-
-  // Part 6 - Additional Easy Rules (Essential)
-  'require_secure_storage_auth_data', // ERROR - security
-  'avoid_freezed_json_serializable_conflict', // ERROR - build failure
-  'require_freezed_arrow_syntax', // ERROR - wrong fromJson
-  'require_freezed_private_constructor', // ERROR - build failure
-  'require_equatable_immutable', // ERROR - equality bugs
-  'require_equatable_props_override', // ERROR - equality bugs
-  'avoid_equatable_mutable_collections', // WARNING - equality bugs
-  'avoid_static_state', // WARNING - state leaks between tests
-
-  // Part 7 - Package-Specific Rules (Essential)
-  'avoid_dio_debug_print_production', // WARNING - security
-  'require_url_launcher_error_handling', // WARNING - crash
-  'require_image_picker_error_handling', // WARNING - crash
-  'require_geolocator_timeout', // WARNING - hang
-  'require_connectivity_subscription_cancel', // ERROR - leak
-  'require_notification_handler_top_level', // ERROR - crash
-  'require_permission_denied_handling', // WARNING - crash
-
   // Image Picker Rules (Essential - OOM prevention)
   'prefer_image_picker_max_dimensions', // WARNING - OOM on high-res cameras
-
-  // Notification Rules (Essential - silent failure prevention)
-  'require_notification_initialize_per_platform', // WARNING - missing platform settings
 
   'avoid_unawaited_future', // WARNING - lost errors
   'avoid_catch_all', // WARNING - bare catch without on clause
@@ -480,34 +405,13 @@ const Set<String> essentialRules = <String>{
   // Security (Critical)
   'avoid_deep_link_sensitive_params', // ERROR - token exposure in deep links
   'avoid_path_traversal', // ERROR - directory traversal attack
-  'avoid_webview_insecure_content', // ERROR - mixed content security
   'require_data_encryption', // ERROR - sensitive data must be encrypted
   'require_secure_password_field', // ERROR - password field security
 
-  // JSON/Type Safety (Critical)
-  'avoid_dynamic_json_access', // ERROR - unsafe dynamic access
-  'avoid_dynamic_json_chains', // ERROR - chained dynamic access crashes
-  'avoid_unrelated_type_casts', // ERROR - invalid cast crash
-  'require_null_safe_json_access', // ERROR - null safety in JSON
-
   // Platform/Permissions (Critical)
   'avoid_platform_channel_on_web', // ERROR - crashes on web
-  'require_image_picker_permission_android', // ERROR - permission required
-  'require_image_picker_permission_ios', // ERROR - permission required
-  'require_permission_manifest_android', // ERROR - manifest entry required
-  'require_permission_plist_ios', // ERROR - plist entry required
-  'require_url_launcher_queries_android', // ERROR - queries element required
-  'require_url_launcher_schemes_ios', // ERROR - LSApplicationQueriesSchemes
-
-  // Memory/Resource Leaks (Critical/High)
-  'avoid_stream_subscription_in_field', // ERROR - subscription leak
-  'avoid_websocket_memory_leak', // ERROR - WebSocket leak
-  'prefer_dispose_before_new_instance', // ERROR - dispose before reassign
-  'require_dispose_implementation', // ERROR - disposable must implement dispose
-  'require_video_player_controller_dispose', // ERROR - video controller leak
 
   // Widget Lifecycle (Critical/High)
-  'check_mounted_after_async', // ERROR - setState after dispose
   'avoid_ref_in_build_body', // ERROR - ref.watch in wrong place
   'avoid_flashing_content', // ERROR - accessibility seizure risk
 
@@ -516,7 +420,6 @@ const Set<String> essentialRules = <String>{
   'avoid_overlapping_animations', // WARNING - animation conflicts
 
   // Navigation (High)
-  'prefer_maybe_pop', // WARNING - safe navigation
   'require_deep_link_fallback', // WARNING - deep link error handling
   'require_stepper_validation', // WARNING - stepper form validation
 
@@ -525,20 +428,12 @@ const Set<String> essentialRules = <String>{
   'require_background_message_handler', // WARNING - FCM background
   'require_fcm_token_refresh_handler', // WARNING - token refresh
 
-  // Forms/Input (High)
-  'require_validator_return_null', // WARNING - validator pattern
-  'avoid_image_picker_large_files', // WARNING - OOM prevention
-
   // WebView (High)
-  'prefer_webview_javascript_disabled', // WARNING - security default
-  'require_webview_error_handling', // WARNING - error handling
-  'require_webview_navigation_delegate', // WARNING - navigation control
   'require_websocket_message_validation', // WARNING - message validation
 
   // Data/Storage (High)
   'prefer_utc_for_storage', // WARNING - timezone consistency
   'require_database_migration', // WARNING - migration safety
-  'require_enum_unknown_value', // WARNING - future-proof enums
 
   // UI/UX (High)
   'prefer_html_escape', // WARNING - XSS prevention
@@ -547,9 +442,6 @@ const Set<String> essentialRules = <String>{
   'require_immutable_bloc_state', // WARNING - state immutability
   'require_map_idle_callback', // WARNING - map performance
   'require_media_loading_state', // WARNING - loading indicators
-
-  // State Management (High)
-  'prefer_bloc_listener_for_side_effects', // WARNING - side effect pattern
 
   // Network (High)
   'require_cors_handling', // WARNING - CORS on web
@@ -682,9 +574,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_bloc_event_in_constructor',
   'avoid_provider_recreate',
   'avoid_provider_in_widget',
-  'prefer_change_notifier_proxy', // INFO - use context.read() in callbacks
-  'require_bloc_event_sealed', // INFO - sealed classes for exhaustive matching
-  'avoid_getx_global_state', // INFO - avoid Get.put/Get.find for global state
 
   // Animation
   'avoid_animation_in_build',
@@ -750,7 +639,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_return_await',
   'avoid_future_ignore',
   'avoid_stream_tostring',
-  'prefer_future_wait', // INFO - parallel independent awaits
 
   // Code Quality
   'avoid_very_long_length_files', // 1000 lines - code smell (production files)
@@ -833,7 +721,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_notification_payload_sensitive',
 
   // GetX (Batch 17)
-  'avoid_obs_outside_controller',
 
   // Accessibility (Plan Group C)
   'require_avatar_alt_text',
@@ -942,7 +829,6 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Part 6 - State Management Rules (Recommended)
   'prefer_consumer_over_provider_of',
-  'prefer_getx_builder',
   'require_async_value_order',
   'avoid_bloc_public_fields',
 
@@ -970,17 +856,12 @@ const Set<String> recommendedOnlyRules = <String>{
   // =========================================================================
 
   // Part 6 - Bloc Rules (Recommended - good practice)
-  'require_bloc_loading_state', // INFO - UX
-  'require_bloc_error_state', // INFO - UX
 
   // Part 7 - Dio Rules (Recommended - maintainability)
-  'avoid_dio_without_base_url', // INFO - consistency
 
   // Part 7 - Image Picker Rules (Recommended - UX)
-  'require_image_picker_source_choice', // INFO - flexibility
 
   // Cached Image Rules (Recommended - UX)
-  'prefer_cached_image_fade_animation', // INFO - smooth image loading
 
   // Late Keyword Rules (Recommended - code quality)
   'prefer_late_final', // INFO - prefer late final for one-time init
@@ -1163,8 +1044,6 @@ const Set<String> recommendedOnlyRules = <String>{
   // State Management (Medium)
   'avoid_late_context', // INFO - late context access
   // Note: prefer_cubit_for_simple_state is in Professional tier (architecture pattern)
-  'prefer_selector_over_consumer', // INFO - targeted rebuilds
-  'require_bloc_consumer_when_both', // INFO - BlocConsumer pattern
 
   // Accessibility (Medium)
   'avoid_screenshot_sensitive', // INFO - screenshot protection
@@ -1174,12 +1053,10 @@ const Set<String> recommendedOnlyRules = <String>{
 
   // Data/Collections (Medium)
   'avoid_misused_set_literals', // INFO - set literal usage
-  'avoid_non_null_assertion', // INFO - null assertion warning
   'move_variable_closer_to_its_usage', // INFO - variable scope
 
   // Images/Media (Medium)
   'prefer_asset_image_for_local', // INFO - local image loading
-  'prefer_image_picker_request_full_metadata', // INFO - EXIF metadata
   'prefer_marker_clustering', // INFO - map marker clustering
   'require_pdf_loading_indicator', // INFO - PDF loading state
 
@@ -1205,20 +1082,15 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_tween_sequence', // INFO - tween sequences
 
   // i18n (Medium)
-  'require_intl_locale_initialization', // INFO - intl locale init
-  'require_notification_timezone_awareness', // INFO - timezone handling
 
   // Misc (Medium)
   'prefer_adequate_spacing', // INFO - spacing consistency
   'prefer_safe_area_aware', // INFO - safe area handling
   'prefer_wrap_over_overflow', // INFO - overflow handling
   'require_default_text_style', // INFO - text style defaults
-  'require_freezed_explicit_json', // INFO - Freezed JSON
-  'require_webview_progress_indicator', // INFO - WebView progress
   // Note: prefer_sorted_pattern_fields, prefer_sorted_record_fields moved to Stylistic
 
   // Additional orphans (missed in initial pass)
-  'require_image_error_fallback', // INFO - image error handling
   'prefer_ignore_pointer', // INFO - IgnorePointer for non-interactive
 
 // cspell:ignore namespacing
@@ -1380,6 +1252,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_webview_javascript_enabled',
   'require_biometric_fallback',
   'require_token_refresh',
+  'prefer_uuid_v4', // UUID v4 over v1 for privacy
 
   // Accessibility
   'avoid_merged_semantics_hiding_info',
@@ -1443,14 +1316,11 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_nullable_provider_types',
 
   // Bloc (Professional - cleaner patterns)
-  'prefer_bloc_transform', // INFO - debounce/throttle for search events
-  'prefer_selector_widget', // INFO - targeted rebuilds vs full Consumer
   // Note: prefer_immutable_bloc_events, prefer_immutable_bloc_state,
   // prefer_sealed_bloc_events, prefer_sealed_bloc_state moved to Comprehensive
   // require_bloc_repository_abstraction moved to Insanity
 
   // State Management (Batch 10)
-  'prefer_cubit_for_simple_state',
   'avoid_expensive_computation_in_build',
   'require_image_cache_management',
   'require_submit_button_state',
@@ -1496,7 +1366,6 @@ const Set<String> professionalOnlyRules = <String>{
   'require_typed_di_registration',
   'avoid_getit_in_build',
   'require_getit_reset_in_tests',
-  'prefer_constructor_injection', // INFO - constructor DI over setter injection
 
   // Memory Management
   'require_image_disposal',
@@ -1510,7 +1379,6 @@ const Set<String> professionalOnlyRules = <String>{
   // Flutter Widgets
   'avoid_flexible_outside_flex',
   'proper_super_calls',
-  'avoid_unremovable_callbacks_in_listeners',
   'avoid_unnecessary_stateful_widgets',
   'require_image_dimensions',
   'require_placeholder_for_network',
@@ -1546,6 +1414,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_async_callback',
 
   // Code Quality
+  'no_empty_block', // INFO - empty blocks indicate incomplete code
   'avoid_medium_length_files', // 300 lines - starting to get complex (production files)
   'avoid_medium_length_test_files', // 600 lines - starting to get complex (test files)
   'avoid_long_functions',
@@ -1559,7 +1428,6 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_unused_parameters',
   'avoid_duplicate_cascades',
   'avoid_complex_conditions',
-  'prefer_early_return',
   'avoid_recursive_calls',
   'avoid_recursive_tostring',
   'avoid_missed_calls',
@@ -1628,6 +1496,7 @@ const Set<String> professionalOnlyRules = <String>{
   // Platform (Batch 14)
   'prefer_url_strategy_for_web',
   'require_window_size_constraints',
+  'prefer_ios_storekit2', // INFO - StoreKit 2 for better IAP
 
   // Gap Analysis Rules (Batch 15)
   'avoid_duplicate_string_literals',
@@ -1737,7 +1606,6 @@ const Set<String> professionalOnlyRules = <String>{
   // Part 6 - State Management Rules (Professional)
   'avoid_bloc_public_methods',
   'require_bloc_selector',
-  'require_getx_binding',
 
   // Part 6 - Firebase Rules (Professional)
   'require_crashlytics_user_id',
@@ -1774,52 +1642,26 @@ const Set<String> professionalOnlyRules = <String>{
   // =========================================================================
 
   // Part 1 - Isar Database Rules (Professional - optimization)
-  'prefer_isar_index_for_queries', // INFO - query performance
-  'avoid_isar_embedded_large_objects', // WARNING - memory
-  'prefer_isar_async_writes', // INFO - UI responsiveness
-  'prefer_isar_lazy_links', // INFO - large collections
-  'avoid_isar_web_limitations', // WARNING - platform compat
-  'prefer_isar_batch_operations', // INFO - performance
-  'avoid_isar_string_contains_without_index', // WARNING - performance
-  'prefer_isar_composite_index', // INFO - query performance
-  'prefer_isar_query_stream', // INFO - reactivity
-  'avoid_isar_float_equality_queries', // WARNING - precision
-  'avoid_cached_isar_stream', // ERROR - Isar streams must not be cached
 
   // Part 7 - Dio Rules (Professional - architecture)
-  'require_dio_singleton', // INFO - consistency
-  'prefer_dio_base_options', // INFO - maintainability
 
   // Part 7 - GoRouter Rules (Professional - best practice)
-  'prefer_go_router_redirect_auth', // INFO - separation of concerns
-  'require_go_router_typed_params', // INFO - type safety
 
   // Part 7 - Provider Rules (Professional - best practice)
-  'avoid_provider_in_init_state', // WARNING - initState timing issue
-  'prefer_context_read_in_callbacks', // WARNING - unnecessary rebuilds
 
   // Part 7 - Hive Rules (Professional - data integrity)
-  'require_hive_type_id_management', // INFO - typeId documentation advisory
 
   // Part 7 - Image Picker Rules (Professional - error handling)
-  'require_image_picker_result_handling', // WARNING - null result crash
 
   // Part 7 - Cached Image Rules (Professional - performance)
-  'avoid_cached_image_in_build', // WARNING - cache key instability
 
   // Part 7 - SQLite Rules (Professional - migration safety)
-  'require_sqflite_migration', // WARNING - migration version check
 
   // Part 7 - Permission Rules (Professional - UX/compliance)
-  'require_permission_rationale', // INFO - Android best practice
-  'require_permission_status_check', // WARNING - crash prevention
-  'require_notification_permission_android13', // WARNING - Android 13+
 
   // URL Launcher Rules (Professional - consistency)
-  'require_url_launcher_mode', // INFO - cross-platform consistency
 
   // SQLite Rules (Professional - performance)
-  'avoid_sqflite_read_all_columns', // INFO - memory/bandwidth efficiency
 
   // Navigation Rules (Professional - type safety)
   'prefer_url_launcher_uri_over_string', // INFO - type-safe URI
@@ -1981,7 +1823,6 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_nested_switch_expressions',
   'avoid_nested_switches',
   'avoid_nested_try',
-  'avoid_nested_try_statements',
   'avoid_non_ascii_symbols',
   'avoid_non_empty_constructor_bodies',
   'avoid_nullable_tostring',
@@ -2004,7 +1845,6 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_text_span_in_build',
   'avoid_throw_objects_without_tostring',
   'avoid_top_level_members_in_tests',
-  'avoid_type_casts',
   'avoid_unassigned_fields',
   'avoid_unnecessary_block',
   'avoid_unnecessary_call',
@@ -2056,7 +1896,6 @@ const Set<String> professionalOnlyRules = <String>{
   'no_magic_string',
   'no_object_declaration',
   'pass_optional_argument',
-  'prefer_absolute_imports',
   'prefer_abstract_final_static_class',
   'prefer_add_all',
 // cspell:ignore addall
@@ -2131,7 +1970,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_edgeinsets_symmetric',
   'prefer_enhanced_enums',
   'prefer_enums_by_name',
-  'prefer_equatable_stringify',
   'prefer_exhaustive_enums',
   'prefer_expanded_over_flexible',
   'prefer_expect_over_assert_in_tests',
@@ -2148,21 +1986,17 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_fake_over_mock',
   'prefer_fields_before_methods',
   'prefer_fixme_format',
-  'prefer_flat_imports',
   'prefer_flexible_over_expanded',
   'prefer_for_in',
-  'prefer_freezed_default_values',
   'prefer_future_void_function_over_async_callback',
   'prefer_generic_exception',
   'prefer_getter_over_method',
   'prefer_given_when_then_comments',
   'prefer_grouped_by_purpose',
   'prefer_grouped_expectations',
-  'prefer_grouped_imports',
   'prefer_guard_clauses',
   'prefer_if_null_over_ternary',
   'prefer_immediate_return',
-  'prefer_immutable_annotation',
   'prefer_implicit_boolean_comparison',
   'prefer_initializing_formals',
   'prefer_inline_callbacks',
@@ -2186,10 +2020,8 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_material_theme_colors',
   'prefer_methods_before_fields',
   'prefer_moving_to_variable',
-  'prefer_mutable_collections',
   'prefer_named_boolean_parameters',
   'prefer_named_extensions',
-  'prefer_named_imports',
   'prefer_named_parameters',
   'prefer_native_file_dialogs',
   'prefer_no_blank_line_before_return',
@@ -2214,8 +2046,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_public_exception_classes',
   'prefer_public_members_first',
   'prefer_pushing_conditional_expressions',
-  'prefer_record_over_equatable',
-  'prefer_relative_imports',
   'prefer_required_before_optional',
   'prefer_returning_condition',
   'prefer_returning_conditionals',
@@ -2368,8 +2198,6 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'prefer_test_data_builder',
   'prefer_test_variant',
   'require_accessibility_tests',
-  'no_magic_number_in_tests', // Test-specific magic number detection
-  'no_magic_string_in_tests', // Test-specific magic string detection
   'prefer_fake_platform', // platform fakes in tests
 
   // Animation polish (moved from Professional)
@@ -2405,7 +2233,6 @@ const Set<String> insanityOnlyRules = <String>{
   'prefer_providing_intl_examples', // i18n examples
 
   // Very strict patterns
-  'require_bloc_repository_abstraction', // abstraction for everything
   'avoid_returning_widgets', // no widget helper methods
   'avoid_nullable_widget_methods', // no nullable widget returns
 
@@ -2445,4 +2272,17 @@ Set<String> getRulesForTier(String tier) {
       // fallback to essential
       return essentialRules;
   }
+}
+
+/// Returns the complete set of all rule names defined across all tiers.
+///
+/// Includes all tier rules plus stylistic rules. Used for validation
+/// to ensure plugin rules match tier definitions.
+Set<String> getAllDefinedRules() {
+  return essentialRules
+      .union(recommendedOnlyRules)
+      .union(professionalOnlyRules)
+      .union(comprehensiveOnlyRules)
+      .union(insanityOnlyRules)
+      .union(stylisticRules);
 }
