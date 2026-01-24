@@ -286,3 +286,88 @@ class _GoodMixedControllersWidgetState
   @override
   Widget build(BuildContext context) => Container();
 }
+
+// =========================================================================
+// GOOD: StreamController closed inside try-catch
+// =========================================================================
+// Should NOT trigger lint - proves try-catch wrapping works
+
+class TryCatchCloseWidget extends StatefulWidget {
+  const TryCatchCloseWidget({super.key});
+
+  @override
+  State<TryCatchCloseWidget> createState() => _TryCatchCloseWidgetState();
+}
+
+class _TryCatchCloseWidgetState extends State<TryCatchCloseWidget> {
+  final StreamController<String> _controller = StreamController<String>();
+
+  @override
+  void dispose() {
+    try {
+      _controller.close();
+    } catch (e) {
+      // Handle error
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// =========================================================================
+// GOOD: StreamController with record type parameter
+// =========================================================================
+// Should NOT trigger lint - proves record types work
+
+class RecordTypeControllerWidget extends StatefulWidget {
+  const RecordTypeControllerWidget({super.key});
+
+  @override
+  State<RecordTypeControllerWidget> createState() =>
+      _RecordTypeControllerWidgetState();
+}
+
+class _RecordTypeControllerWidgetState
+    extends State<RecordTypeControllerWidget> {
+  final StreamController<(double speed, double progress)> _progressController =
+      StreamController<(double speed, double progress)>.broadcast();
+
+  @override
+  void dispose() {
+    _progressController.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}
+
+// =========================================================================
+// GOOD: StreamController closed inside conditional
+// =========================================================================
+// Should NOT trigger lint
+
+class ConditionalCloseWidget extends StatefulWidget {
+  const ConditionalCloseWidget({super.key});
+
+  @override
+  State<ConditionalCloseWidget> createState() => _ConditionalCloseWidgetState();
+}
+
+class _ConditionalCloseWidgetState extends State<ConditionalCloseWidget> {
+  final StreamController<int> _controller = StreamController<int>();
+  bool _shouldClose = true;
+
+  @override
+  void dispose() {
+    if (_shouldClose) {
+      _controller.close();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Container();
+}

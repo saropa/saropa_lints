@@ -141,6 +141,7 @@
     "pubspec",
     "pycache",
     "realtime",
+    "recalibrated",
     "refreshtoken",
     "reorderable",
     "rethrowing",
