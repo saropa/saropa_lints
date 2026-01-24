@@ -306,6 +306,9 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 
 /// Quick fix that inserts `if (!mounted) return;` before context usage.
 class _AddMountedGuardFix extends DartFix {
+  // Cached regex for performance - matches any non-whitespace
+  static final RegExp _nonWhitespacePattern = RegExp(r'[^\s]');
+
   @override
   void run(
     CustomLintResolver resolver,
@@ -337,7 +340,7 @@ class _AddMountedGuardFix extends DartFix {
           statement.offset,
         );
         // Extract whitespace only (the indentation)
-        final indent = leadingText.replaceAll(RegExp(r'[^\s]'), '');
+        final indent = leadingText.replaceAll(_nonWhitespacePattern, '');
 
         // Insert guard before the statement
         builder.addSimpleInsertion(

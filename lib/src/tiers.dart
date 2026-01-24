@@ -84,6 +84,15 @@ const Set<String> stylisticRules = <String>{
   'prefer_grouped_imports',
   'prefer_named_imports',
   'prefer_relative_imports',
+
+  // === Quote style (conflicting pair - opt-in only) ===
+  'prefer_double_quotes',
+  'prefer_single_quotes',
+
+  // === Apostrophe style (conflicting pair - opt-in only) ===
+  'prefer_doc_curly_apostrophe',
+  'prefer_doc_straight_apostrophe',
+  'prefer_straight_apostrophe',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -1962,9 +1971,9 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_digit_separators',
   'prefer_dio_transformer',
   'prefer_doc_comments_over_regular',
-  'prefer_doc_curly_apostrophe',
-  'prefer_doc_straight_apostrophe',
-  'prefer_double_quotes',
+  // 'prefer_doc_curly_apostrophe' moved to stylisticRules (conflicting pair)
+  // 'prefer_doc_straight_apostrophe' moved to stylisticRules (conflicting pair)
+  // 'prefer_double_quotes' moved to stylisticRules (conflicting pair)
   'prefer_dynamic_over_object',
   'prefer_edgeinsets_only',
   'prefer_edgeinsets_symmetric',
@@ -2066,7 +2075,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_single_blank_line_max',
   'prefer_single_declaration_per_file',
   'prefer_single_expectation_per_test',
-  'prefer_single_quotes',
+  // 'prefer_single_quotes' moved to stylisticRules (conflicting pair)
   'prefer_single_widget_per_file',
   'prefer_sizedbox_over_container',
   'prefer_sliver_prefix',
@@ -2078,7 +2087,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_static_class',
   'prefer_static_const_widgets',
   'prefer_static_members_first',
-  'prefer_straight_apostrophe',
+  // 'prefer_straight_apostrophe' moved to stylisticRules (conflicting pair)
   'prefer_streaming_response',
   'prefer_super_parameters',
   'prefer_switch_expression',

@@ -278,6 +278,10 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
     'group',
   };
 
+  // Cached regex for performance - matches "test", "test1", "test2", etc.
+  static final RegExp _testNumberPattern =
+      RegExp(r'^test\d*$', caseSensitive: false);
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -309,7 +313,7 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
     if (name.length < 5) return true;
 
     // Just a number or test + number
-    if (RegExp(r'^test\d*$', caseSensitive: false).hasMatch(name)) return true;
+    if (_testNumberPattern.hasMatch(name)) return true;
 
     // Single word that's not descriptive
     if (!name.contains(' ') && name.length < 15) return true;
@@ -1457,6 +1461,9 @@ class PreferFakeOverMockRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  // Cached regex for performance - matches MockClassName(
+  static final RegExp _mockPattern = RegExp(r'\bMock\w+\(');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -1486,8 +1493,7 @@ class PreferFakeOverMockRule extends SaropaLintRule {
       final String bodySource = callback.body.toSource();
 
       // Count mock patterns
-      final int mockCount =
-          RegExp(r'\bMock\w+\(').allMatches(bodySource).length;
+      final int mockCount = _mockPattern.allMatches(bodySource).length;
       final int whenCount = 'when('.allMatches(bodySource).length;
       final int verifyCount = 'verify('.allMatches(bodySource).length;
       final int verifyNeverCount = 'verifyNever('.allMatches(bodySource).length;
@@ -1557,6 +1563,10 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
+  // Cached regex patterns for performance
+  static final RegExp _testPattern = RegExp(r'\btest\s*\(');
+  static final RegExp _testWidgetsPattern = RegExp(r'\btestWidgets\s*\(');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -1575,8 +1585,8 @@ class RequireEdgeCaseTestsRule extends SaropaLintRule {
       final String source = unit.toSource();
 
       // Count test cases
-      final int testCount = RegExp(r"\btest\s*\(").allMatches(source).length +
-          RegExp(r"\btestWidgets\s*\(").allMatches(source).length;
+      final int testCount = _testPattern.allMatches(source).length +
+          _testWidgetsPattern.allMatches(source).length;
 
       if (testCount < 3) return; // Not enough tests to analyze
 

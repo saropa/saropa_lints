@@ -1562,6 +1562,15 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // Cached regex patterns for performance
+  static final RegExp _returnStringPattern = RegExp(r'''return\s*['"]''');
+  static final RegExp _pluralWordPattern = RegExp(
+    r'''['"][^'"]*\b(items?|files?|messages?|users?|days?|hours?|minutes?|'''
+    r'''seconds?|photos?|videos?|comments?|posts?|results?|records?|'''
+    r'''entries?|elements?|objects?|things?)\b[^'"]*['"]''',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -1619,8 +1628,8 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
       if (!countComparisonPattern.hasMatch(bodySource)) return;
 
       // Must have multiple return statements with strings (different plurals)
-      final RegExp returnStringPattern = RegExp(r'''return\s*['"]''');
-      final int returnCount = returnStringPattern.allMatches(bodySource).length;
+      final int returnCount =
+          _returnStringPattern.allMatches(bodySource).length;
 
       // Need at least 2 different string returns (singular/plural)
       if (returnCount < 2) return;
@@ -1628,14 +1637,7 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
       // Look for explicit plural patterns in strings:
       // - Words ending in 's' that likely represent plurals
       // - Explicit singular/plural word pairs
-      final RegExp pluralWordPattern = RegExp(
-        r'''['"][^'"]*\b(items?|files?|messages?|users?|days?|hours?|minutes?|'''
-        r'''seconds?|photos?|videos?|comments?|posts?|results?|records?|'''
-        r'''entries?|elements?|objects?|things?)\b[^'"]*['"]''',
-        caseSensitive: false,
-      );
-
-      if (pluralWordPattern.hasMatch(bodySource)) {
+      if (_pluralWordPattern.hasMatch(bodySource)) {
         reporter.atNode(node, code);
       }
     });
