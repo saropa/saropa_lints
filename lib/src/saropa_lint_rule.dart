@@ -1,7 +1,7 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element
 
 import 'dart:developer' as developer;
-import 'dart:io' show Directory, File, Platform;
+import 'dart:io' show Directory, File, Platform, stderr;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -227,7 +227,8 @@ class ProgressTracker {
         final fileTime = now.difference(_currentFileStart!);
         if (fileTime.inSeconds >= 5) {
           final shortName = _currentFile!.split('/').last.split('\\').last;
-          print(
+          // Use stderr to avoid custom_lint rule name prefix
+          stderr.writeln(
             '[saropa_lints] Slow file: $shortName took ${fileTime.inSeconds}s',
           );
         }
@@ -308,7 +309,8 @@ class ProgressTracker {
       progressStr = '$fileCount files';
     }
 
-    print(
+    // Use stderr to avoid custom_lint rule name prefix
+    stderr.writeln(
       '[saropa_lints] Progress: $progressStr analyzed '
       '(${elapsed.inSeconds}s, ${filesPerSec.toStringAsFixed(1)} files/sec, '
       '$_violationsFound issues) - $shortName',
@@ -323,7 +325,8 @@ class ProgressTracker {
     final fileCount = _seenFiles.length;
     final filesPerSec = _calculateFilesPerSec(fileCount, elapsed);
 
-    print(
+    // Use stderr to avoid custom_lint rule name prefix
+    stderr.writeln(
       '[saropa_lints] Complete: $fileCount files analyzed in ${elapsed.inSeconds}s '
       '(${filesPerSec.toStringAsFixed(1)} files/sec, $_violationsFound issues found)',
     );
