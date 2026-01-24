@@ -2203,14 +2203,19 @@ class _MapWidgetVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Warns when BuildContext is used after async gap.
+/// Warns when BuildContext parameter is used after await in async methods.
 ///
-/// BuildContext becomes invalid after async gaps. Storing context and
-/// using it after await can access disposed widgets, causing crashes.
+/// BuildContext becomes invalid after async gaps. When a widget is disposed
+/// during an await, subsequent context usage causes "Looking up deactivated
+/// widget's ancestor" crashes. This rule specifically checks methods that
+/// receive BuildContext as a parameter.
+///
+/// This is a simpler check than `avoid_context_across_async` - it does not
+/// detect `if (mounted)` guards. Use the Essential tier for full protection.
 ///
 /// **BAD:**
 /// ```dart
-/// void onTap(BuildContext context) async {
+/// Future<void> onTap(BuildContext context) async {
 ///   await someAsyncOperation();
 ///   Navigator.of(context).pop(); // Context may be invalid!
 /// }
@@ -2218,14 +2223,37 @@ class _MapWidgetVisitor extends RecursiveAstVisitor<void> {
 ///
 /// **GOOD:**
 /// ```dart
-/// void onTap(BuildContext context) async {
+/// Future<void> onTap(BuildContext context) async {
 ///   final navigator = Navigator.of(context);
 ///   await someAsyncOperation();
 ///   navigator.pop(); // Using cached navigator
 /// }
 /// ```
+///
+/// **ALSO OK (context as argument to await):**
+/// ```dart
+/// Future<void> onTap(BuildContext context) async {
+///   await showDialog(context: context); // Safe - used synchronously
+/// }
+/// ```
+///
+/// See also:
+/// - `avoid_context_across_async` - Essential tier, detects mounted guards
+/// - `avoid_dialog_context_after_async` - Focuses on Navigator.pop patterns
 class RequireBuildContextScopeRule extends SaropaLintRule {
   const RequireBuildContextScopeRule() : super(code: _code);
+
+  /// Context after await can crash when widget is disposed.
+  @override
+  LintImpact get impact => LintImpact.high;
+
+  /// Traverses method body for await/context patterns.
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  /// Only relevant for async code.
+  @override
+  bool get requiresAsync => true;
 
   static const LintCode _code = LintCode(
     name: 'require_build_context_scope',
@@ -2251,10 +2279,9 @@ class RequireBuildContextScopeRule extends SaropaLintRule {
 
       String? contextParamName;
       for (final FormalParameter param in params.parameters) {
-        final String? typeName =
-            param.declaredFragment?.element.type.toString();
-        if (typeName != null && typeName.contains('BuildContext')) {
-          contextParamName = param.name?.lexeme;
+        final name = getBuildContextParamName(param);
+        if (name != null) {
+          contextParamName = name;
           break;
         }
       }
@@ -2274,16 +2301,25 @@ class _ContextAfterAwaitVisitor extends RecursiveAstVisitor<void> {
   final LintCode code;
   final String contextName;
   bool _sawAwait = false;
+  bool _insideAwait = false;
 
   @override
   void visitAwaitExpression(AwaitExpression node) {
-    _sawAwait = true;
+    // Mark that we're inside an await expression so context usages
+    // as arguments won't be flagged (even after previous awaits).
+    _insideAwait = true;
     super.visitAwaitExpression(node);
+    _insideAwait = false;
+    // After exiting the await expression, mark that an await was seen.
+    _sawAwait = true;
   }
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (_sawAwait && node.name == contextName) {
+    // Only flag if:
+    // 1. We've seen a previous await
+    // 2. We're NOT inside an await expression (i.e., not an argument)
+    if (_sawAwait && !_insideAwait && node.name == contextName) {
       reporter.atNode(node, code);
     }
     super.visitSimpleIdentifier(node);

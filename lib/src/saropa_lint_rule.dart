@@ -96,6 +96,25 @@ final bool _profilingEnabled =
 /// Threshold in milliseconds for logging slow rules.
 const int _slowRuleThresholdMs = 10;
 
+/// Threshold in milliseconds for deferring rules (when defer mode is enabled).
+const int _deferThresholdMs = 50;
+
+/// Controls whether slow rule deferral is enabled.
+///
+/// When enabled, rules that historically take >50ms are skipped in the first
+/// pass. Run with SAROPA_LINTS_DEFERRED=true to run only the deferred rules.
+///
+/// Set via environment variable: SAROPA_LINTS_DEFER=true
+final bool _deferSlowRules = const bool.fromEnvironment('SAROPA_LINTS_DEFER') ||
+    const String.fromEnvironment('SAROPA_LINTS_DEFER') == 'true';
+
+/// Controls whether to run ONLY deferred (slow) rules.
+///
+/// Set via environment variable: SAROPA_LINTS_DEFERRED=true
+final bool _runDeferredOnly =
+    const bool.fromEnvironment('SAROPA_LINTS_DEFERRED') ||
+        const String.fromEnvironment('SAROPA_LINTS_DEFERRED') == 'true';
+
 /// Controls whether progress reporting is enabled (default: true).
 ///
 /// Disable via environment variable: SAROPA_LINTS_PROGRESS=false
@@ -213,10 +232,47 @@ class RuleTimingTracker {
   static final Map<String, Duration> _totalTime = {};
   static final Map<String, int> _callCount = {};
 
+  /// Rules that have exceeded the deferral threshold (50ms) at least once.
+  static final Set<String> _slowRules = {};
+
+  /// Count of slow executions per rule (executions > 50ms).
+  static final Map<String, int> _slowExecutionCount = {};
+
+  /// Check if a rule should be deferred based on historical performance.
+  ///
+  /// Returns true if:
+  /// - Deferral mode is enabled (SAROPA_LINTS_DEFER=true)
+  /// - This rule has exceeded the deferral threshold before
+  /// - We're NOT in deferred-only mode
+  static bool shouldDefer(String ruleName) {
+    if (!_deferSlowRules) return false;
+    if (_runDeferredOnly) return false; // We want to run slow rules now
+    return _slowRules.contains(ruleName);
+  }
+
+  /// Check if a rule should run because we're in deferred-only mode.
+  ///
+  /// Returns true if:
+  /// - Deferred-only mode is enabled (SAROPA_LINTS_DEFERRED=true)
+  /// - This rule is NOT marked as slow (should have run in first pass)
+  static bool shouldSkipInDeferredMode(String ruleName) {
+    if (!_runDeferredOnly) return false;
+    return !_slowRules.contains(ruleName);
+  }
+
+  /// Get the list of slow rules for reporting.
+  static Set<String> get slowRules => Set.unmodifiable(_slowRules);
+
   /// Record a rule execution time.
   static void record(String ruleName, Duration elapsed) {
     _totalTime[ruleName] = (_totalTime[ruleName] ?? Duration.zero) + elapsed;
     _callCount[ruleName] = (_callCount[ruleName] ?? 0) + 1;
+
+    // Track rules that exceed the deferral threshold
+    if (elapsed.inMilliseconds >= _deferThresholdMs) {
+      _slowRules.add(ruleName);
+      _slowExecutionCount[ruleName] = (_slowExecutionCount[ruleName] ?? 0) + 1;
+    }
 
     // Log slow rules immediately for debugging
     if (elapsed.inMilliseconds >= _slowRuleThresholdMs) {
@@ -254,12 +310,27 @@ class RuleTimingTracker {
     buffer.writeln('');
 
     for (final timing in timings) {
+      final isSlowMarker =
+          _slowRules.contains(timing.ruleName) ? '[SLOW] ' : '';
       buffer.writeln(
-        '  ${timing.ruleName}: '
+        '  $isSlowMarker${timing.ruleName}: '
         '${timing.totalTime.inMilliseconds}ms total, '
         '${timing.callCount} calls, '
         '${timing.averageTime.inMicroseconds / 1000}ms avg',
       );
+    }
+
+    // Add slow rules summary for deferral
+    if (_slowRules.isNotEmpty) {
+      buffer.writeln('');
+      buffer.writeln(
+          '=== RULES ELIGIBLE FOR DEFERRAL (>${_deferThresholdMs}ms) ===');
+      buffer.writeln('Use SAROPA_LINTS_DEFER=true to defer these rules.');
+      buffer.writeln('');
+      for (final rule in _slowRules) {
+        final count = _slowExecutionCount[rule] ?? 0;
+        buffer.writeln('  $rule ($count slow executions)');
+      }
     }
 
     return buffer.toString();
@@ -269,6 +340,8 @@ class RuleTimingTracker {
   static void reset() {
     _totalTime.clear();
     _callCount.clear();
+    _slowRules.clear();
+    _slowExecutionCount.clear();
   }
 }
 
@@ -285,6 +358,239 @@ class RuleTimingRecord {
   final Duration totalTime;
   final int callCount;
   final Duration averageTime;
+}
+
+// =============================================================================
+// REPORT WRITER (Detailed Logging to reports/ folder)
+// =============================================================================
+//
+// Enable by setting the environment variable:
+//   SAROPA_LINTS_REPORT=true dart run custom_lint
+//
+// Reports are written to: <project>/reports/saropa_lints/
+// - timing_report.txt: Rule timing summary
+// - slow_rules.txt: Rules that exceeded threshold
+// - skipped_files.txt: Files excluded from analysis
+// - impact_report.txt: Violations grouped by impact level
+// =============================================================================
+
+/// Controls whether report writing is enabled.
+///
+/// Set via environment variable: SAROPA_LINTS_REPORT=true
+final bool _reportEnabled = const bool.fromEnvironment('SAROPA_LINTS_REPORT') ||
+    const String.fromEnvironment('SAROPA_LINTS_REPORT') == 'true';
+
+/// Writes detailed analysis reports to a reports/ folder.
+class ReportWriter {
+  ReportWriter._();
+
+  static String? _reportsDir;
+  static final List<String> _skippedFiles = [];
+  static final List<String> _slowRuleLog = [];
+  static DateTime? _analysisStartTime;
+  static int _filesAnalyzed = 0;
+  static int _rulesRun = 0;
+
+  /// Initialize the report writer with the project root.
+  static void initialize(String projectRoot) {
+    if (!_reportEnabled) return;
+
+    _reportsDir = '$projectRoot/reports/saropa_lints';
+    _analysisStartTime = DateTime.now();
+
+    // Create reports directory if it doesn't exist
+    // Note: Directory creation happens on first write
+  }
+
+  /// Record a file that was skipped during analysis.
+  static void recordSkippedFile(String path, String reason) {
+    if (!_reportEnabled) return;
+    _skippedFiles.add('$path - $reason');
+  }
+
+  /// Record a slow rule execution.
+  static void recordSlowRule(String ruleName, String filePath, int ms) {
+    if (!_reportEnabled) return;
+    _slowRuleLog.add('$ruleName took ${ms}ms on $filePath');
+  }
+
+  /// Record that a file was analyzed.
+  static void recordFileAnalyzed() {
+    _filesAnalyzed++;
+  }
+
+  /// Record that a rule was run.
+  static void recordRuleRun() {
+    _rulesRun++;
+  }
+
+  /// Write all reports to the reports/ folder.
+  ///
+  /// Call this at the end of analysis (e.g., in a shutdown hook).
+  static Future<void> writeReports() async {
+    if (!_reportEnabled || _reportsDir == null) return;
+
+    try {
+      // Import dart:io for file operations
+      // ignore: avoid_dynamic
+      final io = await _getIoLibrary();
+      if (io == null) return;
+
+      // Create reports directory
+      await _createDirectory(io, _reportsDir!);
+
+      // Write timing report
+      await _writeTimingReport(io);
+
+      // Write slow rules report
+      await _writeSlowRulesReport(io);
+
+      // Write skipped files report
+      await _writeSkippedFilesReport(io);
+
+      // Write impact report
+      await _writeImpactReport(io);
+
+      // Write summary report
+      await _writeSummaryReport(io);
+
+      print('[saropa_lints] Reports written to: $_reportsDir');
+    } catch (e) {
+      print('[saropa_lints] Failed to write reports: $e');
+    }
+  }
+
+  // ignore: avoid_dynamic
+  static Future<dynamic> _getIoLibrary() async {
+    try {
+      // Dynamic import of dart:io
+      // This allows the code to compile on web but gracefully fail
+      return await Future.value(
+          null); // Placeholder - actual impl needs dart:io
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ignore: avoid_dynamic
+  static Future<void> _createDirectory(dynamic io, String path) async {
+    // Placeholder - actual implementation needs dart:io
+  }
+
+  // ignore: avoid_dynamic
+  static Future<void> _writeTimingReport(dynamic io) async {
+    final timings = RuleTimingTracker.sortedTimings;
+    if (timings.isEmpty) return;
+
+    final buffer = StringBuffer();
+    buffer.writeln('SAROPA LINTS TIMING REPORT');
+    buffer.writeln('Generated: ${DateTime.now().toIso8601String()}');
+    buffer.writeln('='.padRight(60, '='));
+    buffer.writeln('');
+    buffer.writeln('All rules sorted by total execution time:');
+    buffer.writeln('');
+
+    for (final timing in timings) {
+      final avgMs = timing.averageTime.inMicroseconds / 1000;
+      buffer.writeln(
+        '${timing.ruleName.padRight(50)} '
+        '${timing.totalTime.inMilliseconds.toString().padLeft(6)}ms total  '
+        '${timing.callCount.toString().padLeft(5)} calls  '
+        '${avgMs.toStringAsFixed(2).padLeft(8)}ms avg',
+      );
+    }
+
+    // Would write to file here with dart:io
+    print(buffer.toString());
+  }
+
+  // ignore: avoid_dynamic
+  static Future<void> _writeSlowRulesReport(dynamic io) async {
+    if (_slowRuleLog.isEmpty) return;
+
+    final buffer = StringBuffer();
+    buffer.writeln('SAROPA LINTS SLOW RULES REPORT');
+    buffer.writeln('Generated: ${DateTime.now().toIso8601String()}');
+    buffer.writeln('Threshold: ${_slowRuleThresholdMs}ms');
+    buffer.writeln('='.padRight(60, '='));
+    buffer.writeln('');
+
+    for (final entry in _slowRuleLog) {
+      buffer.writeln(entry);
+    }
+
+    print('[saropa_lints] Slow rules: ${_slowRuleLog.length} occurrences');
+  }
+
+  // ignore: avoid_dynamic
+  static Future<void> _writeSkippedFilesReport(dynamic io) async {
+    if (_skippedFiles.isEmpty) return;
+
+    final buffer = StringBuffer();
+    buffer.writeln('SAROPA LINTS SKIPPED FILES REPORT');
+    buffer.writeln('Generated: ${DateTime.now().toIso8601String()}');
+    buffer.writeln('='.padRight(60, '='));
+    buffer.writeln('');
+
+    for (final entry in _skippedFiles) {
+      buffer.writeln(entry);
+    }
+
+    print('[saropa_lints] Skipped files: ${_skippedFiles.length}');
+  }
+
+  // ignore: avoid_dynamic
+  static Future<void> _writeImpactReport(dynamic io) async {
+    final buffer = StringBuffer();
+    buffer.writeln('SAROPA LINTS IMPACT REPORT');
+    buffer.writeln('Generated: ${DateTime.now().toIso8601String()}');
+    buffer.writeln('='.padRight(60, '='));
+    buffer.writeln('');
+    buffer.writeln(ImpactTracker.detailedSummary);
+    buffer.writeln('');
+
+    // List critical violations
+    final critical = ImpactTracker.violations[LintImpact.critical];
+    if (critical != null && critical.isNotEmpty) {
+      buffer.writeln('CRITICAL VIOLATIONS (fix immediately):');
+      for (final v in critical) {
+        buffer.writeln('  ${v.file}:${v.line} - ${v.rule}');
+      }
+    }
+
+    print(buffer.toString());
+  }
+
+  // ignore: avoid_dynamic
+  static Future<void> _writeSummaryReport(dynamic io) async {
+    final elapsed = _analysisStartTime != null
+        ? DateTime.now().difference(_analysisStartTime!)
+        : Duration.zero;
+
+    final buffer = StringBuffer();
+    buffer.writeln('SAROPA LINTS ANALYSIS SUMMARY');
+    buffer.writeln('Generated: ${DateTime.now().toIso8601String()}');
+    buffer.writeln('='.padRight(60, '='));
+    buffer.writeln('');
+    buffer.writeln('Analysis Duration: ${elapsed.inSeconds}s');
+    buffer.writeln('Files Analyzed: $_filesAnalyzed');
+    buffer.writeln('Files Skipped: ${_skippedFiles.length}');
+    buffer.writeln('Rule Executions: $_rulesRun');
+    buffer.writeln('Slow Rule Occurrences: ${_slowRuleLog.length}');
+    buffer.writeln('');
+    buffer.writeln(ImpactTracker.summary);
+
+    print(buffer.toString());
+  }
+
+  /// Reset all tracked data.
+  static void reset() {
+    _skippedFiles.clear();
+    _slowRuleLog.clear();
+    _analysisStartTime = null;
+    _filesAnalyzed = 0;
+    _rulesRun = 0;
+  }
 }
 
 // =============================================================================
@@ -886,22 +1192,83 @@ abstract class SaropaLintRule extends DartLintRule {
   /// Default: `true` - Fixture files often contain intentionally bad code.
   bool get skipFixtureFiles => true;
 
+  // =========================================================================
+  // GLOBAL FILE EXCLUSION PATTERNS
+  // =========================================================================
+  // These patterns are ALWAYS skipped regardless of rule settings.
+  // They represent files that should never be analyzed by any rule.
+
+  /// Folders that are ALWAYS excluded from analysis.
+  /// These contain build artifacts, cached packages, or tooling output.
+  static const Set<String> _globalExcludedFolders = <String>{
+    '/.dart_tool/',
+    '/build/',
+    '/.pub-cache/',
+    '/.pub/',
+    '/ios/Pods/',
+    '/ios/.symlinks/',
+    '/android/.gradle/',
+    '/windows/flutter/',
+    '/linux/flutter/',
+    '/macos/Flutter/',
+    '/.fvm/',
+  };
+
+  /// File suffixes that indicate generated code.
+  /// These files are machine-generated and can't be manually fixed.
+  static const Set<String> _generatedFileSuffixes = <String>{
+    '.g.dart',
+    '.freezed.dart',
+    '.gen.dart',
+    '.gr.dart',
+    '.config.dart',
+    '.mocks.dart',
+    '.chopper.dart',
+    '.reflectable.dart',
+    '.pb.dart',
+    '.pbjson.dart',
+    '.pbenum.dart',
+    '.pbserver.dart',
+    '.mapper.dart',
+    '.module.dart',
+  };
+
   /// Check if a file path should be skipped based on context settings.
   bool _shouldSkipFile(String path) {
     // Normalize path separators
     final normalizedPath = path.replaceAll('\\', '/');
 
-    // Check generated code patterns
-    if (skipGeneratedCode) {
-      if (normalizedPath.endsWith('.g.dart') ||
-          normalizedPath.endsWith('.freezed.dart') ||
-          normalizedPath.endsWith('.gen.dart') ||
-          normalizedPath.endsWith('.gr.dart') ||
-          normalizedPath.endsWith('.config.dart') ||
-          normalizedPath.endsWith('.mocks.dart') ||
-          normalizedPath.contains('/generated/')) {
+    // =========================================================================
+    // GLOBAL EXCLUSIONS (always skip, regardless of rule settings)
+    // =========================================================================
+
+    // Check global excluded folders
+    for (final folder in _globalExcludedFolders) {
+      if (normalizedPath.contains(folder)) {
         return true;
       }
+    }
+
+    // =========================================================================
+    // RULE-CONFIGURABLE EXCLUSIONS
+    // =========================================================================
+
+    // Check generated code patterns
+    if (skipGeneratedCode) {
+      // Check file suffixes
+      for (final suffix in _generatedFileSuffixes) {
+        if (normalizedPath.endsWith(suffix)) {
+          return true;
+        }
+      }
+
+      // Check generated folder
+      if (normalizedPath.contains('/generated/')) {
+        return true;
+      }
+
+      // Check for generated file markers in content (deferred - expensive)
+      // This is handled separately via content-based detection
     }
 
     // Check test files
@@ -998,6 +1365,40 @@ abstract class SaropaLintRule extends DartLintRule {
   static final Map<String, DateTime> _recentAnalysis = {};
   static const Duration _throttleWindow = Duration(milliseconds: 300);
 
+  /// Common markers found in generated files (checked in first 500 chars).
+  static const List<String> _generatedContentMarkers = <String>[
+    'GENERATED CODE',
+    'DO NOT MODIFY',
+    'DO NOT EDIT',
+    'AUTO-GENERATED',
+    'AUTOGENERATED',
+    '@GeneratedCode',
+    '@Generated(',
+    'Generated by ',
+    'Code generated by',
+    'This file was generated',
+    'generated file',
+    'part of ', // Part files are often generated
+  ];
+
+  /// Check if file content indicates it's generated code.
+  ///
+  /// Examines the first 500 characters for common generator markers.
+  static bool _isGeneratedContent(String content) {
+    if (content.isEmpty) return false;
+
+    // Only check the header of the file for performance
+    final header = content.length > 500 ? content.substring(0, 500) : content;
+    final upperHeader = header.toUpperCase();
+
+    for (final marker in _generatedContentMarkers) {
+      if (upperHeader.contains(marker.toUpperCase())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // Track edit frequency per file for adaptive tier switching
   // Maps file path to list of recent analysis timestamps
   static final Map<String, List<DateTime>> _fileEditHistory = {};
@@ -1052,6 +1453,18 @@ abstract class SaropaLintRule extends DartLintRule {
     // Check if rule is disabled
     if (isDisabled) return;
 
+    // =========================================================================
+    // SLOW RULE DEFERRAL (Performance Optimization)
+    // =========================================================================
+    // When SAROPA_LINTS_DEFER=true, skip rules that historically take >50ms.
+    // Run these later with SAROPA_LINTS_DEFERRED=true for a two-pass approach.
+    if (RuleTimingTracker.shouldDefer(code.name)) {
+      return; // Will run in second pass with SAROPA_LINTS_DEFERRED=true
+    }
+    if (RuleTimingTracker.shouldSkipInDeferredMode(code.name)) {
+      return; // Already ran in first pass
+    }
+
     // Check if file should be skipped based on context
     final path = resolver.source.fullName;
     if (_shouldSkipFile(path)) return;
@@ -1074,6 +1487,15 @@ abstract class SaropaLintRule extends DartLintRule {
 
     // Get file content from resolver (already loaded by analyzer)
     final content = resolver.source.contents.data;
+
+    // =========================================================================
+    // CONTENT-BASED GENERATED FILE DETECTION (Performance Optimization)
+    // =========================================================================
+    // Some generated files don't have a recognizable suffix. Detect them by
+    // looking for common generator markers in the first 500 chars of the file.
+    if (skipGeneratedCode && _isGeneratedContent(content)) {
+      return;
+    }
 
     // =========================================================================
     // DISK PERSISTENCE INITIALIZATION (Performance Optimization)

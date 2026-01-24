@@ -73,3 +73,5 @@ custom_lint:
     # Explicitly enable stylistic comment rules for testing
     - avoid_commented_out_code: true
     - capitalize_comment_start: true
+    # Explicitly enable BuildContext scope rule for testing
+    - require_build_context_scope: true
