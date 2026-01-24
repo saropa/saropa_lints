@@ -38,21 +38,58 @@ jobs:
             const release = context.payload.release;
             const repo = context.repo;
             const version = release.tag_name;
-            const changelog = process.env.CHANGELOG || process.env.changelog || `No changelog found for ${version}`;
+            const changelog = process.env.CHANGELOG || `No changelog found for ${version}`;
             const title = `New Release: ${version}`;
             const body = `A new version has been published!\n\n**Release:** [${version}](${release.html_url})\n\n${changelog}`;
 
-            // Find the Announcements category ID
-            const categories = await github.rest.discussions.listCategoriesInOrg({ org: repo.owner });
-            const annCategory = categories.data.find(c => c.name.toLowerCase() === 'announcements');
-            if (!annCategory) throw new Error('Announcements category not found.');
-
-            await github.rest.discussions.create({
+            // Get repository ID and discussion categories via GraphQL
+            const repoQuery = await github.graphql(`
+              query($owner: String!, $name: String!) {
+                repository(owner: $owner, name: $name) {
+                  id
+                  discussionCategories(first: 25) {
+                    nodes {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
+            `, {
               owner: repo.owner,
-              repo: repo.repo,
-              category_id: annCategory.id,
-              title,
-              body
+              name: repo.repo
             });
+
+            const repoId = repoQuery.repository.id;
+            const categories = repoQuery.repository.discussionCategories.nodes;
+            const annCategory = categories.find(c => c.name.toLowerCase() === 'announcements');
+
+            if (!annCategory) {
+              console.log('Available categories:', categories.map(c => c.name));
+              throw new Error('Announcements category not found. Enable Discussions and create an "Announcements" category.');
+            }
+
+            // Create the discussion via GraphQL
+            await github.graphql(`
+              mutation($repoId: ID!, $categoryId: ID!, $title: String!, $body: String!) {
+                createDiscussion(input: {
+                  repositoryId: $repoId,
+                  categoryId: $categoryId,
+                  title: $title,
+                  body: $body
+                }) {
+                  discussion {
+                    url
+                  }
+                }
+              }
+            `, {
+              repoId: repoId,
+              categoryId: annCategory.id,
+              title: title,
+              body: body
+            });
+
+            console.log(`Discussion created for ${version}`);
         env:
           CHANGELOG: ${{ steps.changelog.outputs.changelog }}
