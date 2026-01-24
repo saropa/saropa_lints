@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Progress tracking: misleading percentages**: Fixed bug where progress would show constantly recalibrating percentages (e.g., "130/149 (87%)") when file discovery failed. Now shows simple file count ("X files") when accurate totals aren't available.
 
+- **Progress tracking: rule name prefix spam**: Fixed progress output being prefixed with rule name (e.g., `[require_ios_privacy_manifest]`) for every update. Progress now uses stderr to avoid custom_lint's automatic rule tagging.
+
 ---
 ## [4.7.2] - 2026-01-24
 
