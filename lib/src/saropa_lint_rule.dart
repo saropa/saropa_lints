@@ -1564,6 +1564,7 @@ abstract class SaropaLintRule extends DartLintRule {
     '/.fvm/',
   };
 
+  // cspell:ignore pbenum pbjson pbserver
   /// File suffixes that indicate generated code.
   /// These files are machine-generated and can't be manually fixed.
   static const Set<String> _generatedFileSuffixes = <String>{
