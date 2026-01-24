@@ -796,6 +796,36 @@ Future<void> main(List<String> args) async {
   // Write detailed log file (unless dry-run)
   if (!cliArgs.dryRun) {
     _writeLogFile();
+
+    // Ask user if they want to run analysis
+    stdout
+        .write('\n🔍 ${_Colors.cyan}Run analysis now? [y/N]: ${_Colors.reset}');
+    final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
+
+    if (response == 'y' || response == 'yes') {
+      _logTerminal('');
+      _logTerminal(
+          '🚀 ${_Colors.bold}Running: dart run custom_lint${_Colors.reset}');
+      _logTerminal('${'─' * 60}');
+
+      final result = Process.runSync(
+        'dart',
+        ['run', 'custom_lint'],
+        runInShell: true,
+      );
+
+      stdout.write(result.stdout);
+      if (result.stderr.toString().isNotEmpty) {
+        stderr.write(result.stderr);
+      }
+
+      _logTerminal('${'─' * 60}');
+      if (result.exitCode == 0) {
+        _logTerminal('✅ ${_success('Analysis complete')}');
+      } else {
+        _logTerminal('⚠️ ${_warning('Analysis finished with issues')}');
+      }
+    }
   }
 }
 
