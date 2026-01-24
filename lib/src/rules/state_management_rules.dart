@@ -133,6 +133,10 @@ class _StateModificationVisitor extends RecursiveAstVisitor<void> {
 ///
 /// Not closing StreamControllers causes memory leaks.
 ///
+/// **Detection:**
+/// - Direct `StreamController` or `StreamController<T>`: requires `.close()`
+/// - Wrapper types (e.g., `IsarStreamController`): accepts `.close()` or `.dispose()`
+///
 /// **BAD:**
 /// ```dart
 /// class MyWidget extends StatefulWidget {
@@ -200,10 +204,15 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
           final String? typeStr = member.fields.type?.toSource();
           if (typeStr != null && typeStr.contains('StreamController')) {
             for (final variable in member.fields.variables) {
-              // Detect wrapper types (e.g., IsarStreamController, MyStreamController)
-              final bool isWrapper = typeStr != 'StreamController' &&
-                  typeStr != 'StreamController<dynamic>';
-              controllers.add(_ControllerField(variable, isWrapper));
+              // Detect if this is a direct StreamController vs a wrapper type
+              // Direct: StreamController, StreamController<T>, StreamController<dynamic>
+              // Wrapper: IsarStreamController, MyStreamController<T>, etc.
+              final bool isDirectStreamController =
+                  typeStr == 'StreamController' ||
+                      typeStr.startsWith('StreamController<');
+              controllers.add(
+                _ControllerField(variable, !isDirectStreamController),
+              );
             }
           }
         }
@@ -226,20 +235,25 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
 
       for (final controller in controllers) {
         final String name = controller.variable.name.lexeme;
+        final bool hasClose = bodySource.contains('$name.close()');
+        final bool hasDispose = bodySource.contains('$name.dispose()');
         if (controller.isWrapper) {
-          // Accept .dispose() as valid for wrapper types
-          if (!bodySource.contains('$name.dispose()')) {
+          // Accept .dispose() OR .close() for wrapper types
+          if (!hasDispose && !hasClose) {
             reporter.atNode(controller.variable, code);
           }
         } else {
           // Require .close() for direct StreamController
-          if (!bodySource.contains('$name.close()')) {
+          if (!hasClose) {
             reporter.atNode(controller.variable, code);
           }
         }
       }
     });
   }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddTodoForStreamControllerDisposeFix()];
 }
 
 class _ControllerField {
@@ -247,9 +261,6 @@ class _ControllerField {
   final bool isWrapper;
   const _ControllerField(this.variable, this.isWrapper);
 }
-
-@override
-List<Fix> getFixes() => <Fix>[_AddTodoForStreamControllerDisposeFix()];
 
 class _AddTodoForStreamControllerDisposeFix extends DartFix {
   @override
