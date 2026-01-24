@@ -687,7 +687,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_bloc_listen_in_build',
 
   // Performance (Batch 11)
-  'require_build_context_scope', // Can cause crashes after await
   'avoid_memory_intensive_operations',
   'avoid_closure_memory_leak',
   'require_dispose_pattern',
