@@ -8,9 +8,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.7.0] - 2026-01-24
+
+### Added
+
+- **Single source of truth for rule tiers**: Rules now declare their tier directly in the rule class via `RuleTier get tier` getter. The init script reads tier from rule classes with fallback to legacy `tiers.dart` for backwards compatibility.
+
+- **Enhanced init script output**:
+  - Cross-platform ANSI color support (Windows Terminal, ConEmu, macOS, Linux)
+  - Rules organized by tier with visual tier headers
+  - Problem message comments next to every rule in YAML
+  - Stylistic rules in dedicated section
+  - Summary with counts by tier and severity
+  - Massive ASCII art section headers for easy navigation
+
+- **Progress tracking with ETA**:
+  - File discovery at startup for accurate progress percentage
+  - Rolling average for stable ETA calculation
+  - Slow file detection (files taking >5 seconds)
+  - Violation count tracking
+  - Recalibration when more files found than expected
+
+### Fixed
+
+- **`prefer_small_length_files` and `prefer_small_length_test_files` tier misassignment**: Fixed bug where these insanity-tier rules were incorrectly enabled in comprehensive tier. Rules now correctly have `tier => RuleTier.insanity` override.
+
+---
 ## [Unreleased]
 
 ### Fixed
+
+- **`avoid_navigator_context_issue` severe false positives**: Fixed multiple critical issues causing ~90% false positive rate:
+  - Added missing Navigator check to instance creation handler (was flagging `Column`, `Row`, and other widgets)
+  - Fixed overly broad `.context` string matching that flagged property names containing "context" (e.g., `widget.contextMessage`)
+  - Added whitelist for `Scrollable.ensureVisible()` which legitimately requires `GlobalKey.currentContext`
+  - Now only flags Navigator/Route/Page-related operations with problematic context patterns
 
 - **`require_stream_controller_close` false positive on wrapper classes**: Fixed false positive when using wrapper classes like `IsarStreamController<T>` that contain "StreamController" in their type name. The rule now:
   - Requires `.close()` for exact `StreamController<T>` types

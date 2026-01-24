@@ -1127,7 +1127,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_large_touch_targets', // INFO - WCAG touch target guidelines
   'avoid_global_keys_in_state', // WARNING - GlobalKey in State causes issues
   'require_flutter_riverpod_not_riverpod', // ERROR - Flutter apps need flutter_riverpod
-  'avoid_navigator_context_issue', // WARNING - GlobalKey context in navigation
+  'avoid_navigator_context_issue', // ERROR - GlobalKey context in navigation
   'avoid_push_replacement_misuse', // WARNING - pushReplacement for detail pages
   'avoid_string_concatenation_l10n', // WARNING - string concat breaks i18n
   'avoid_time_limits', // INFO - short durations hurt accessibility
@@ -2078,8 +2078,6 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_single_widget_per_file',
   'prefer_sizedbox_over_container',
   'prefer_sliver_prefix',
-  'prefer_small_length_files',
-  'prefer_small_length_test_files',
   'prefer_snake_case_files',
   'prefer_specific_exceptions',
   'prefer_spread_over_addall',
@@ -2228,6 +2226,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
 /// Insanity tier rules - pedantic, highly opinionated rules.
 /// Rules most teams would find excessive. For greenfield projects.
 const Set<String> insanityOnlyRules = <String>{
+  // File length (very strict thresholds - 200 lines for production, 400 for tests)
+  'prefer_small_length_files', // 200 line limit
+  'prefer_small_length_test_files', // 400 line limit for tests
+
   // Architecture preferences (very opinionated)
   'prefer_feature_folder_structure', // folder organization preference
   'prefer_custom_single_child_layout', // CustomSingleChildLayout for positioning

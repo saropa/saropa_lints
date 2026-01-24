@@ -52,6 +52,7 @@ export 'package:saropa_lints/src/saropa_lint_rule.dart'
         OwaspMapping,
         OwaspMobile,
         OwaspWeb,
+        RuleTier,
         RuleTimingRecord,
         RuleTimingTracker,
         SaropaLintRule,
@@ -2254,6 +2255,14 @@ class _SaropaLints extends PluginBase {
 
       // Register rule groups for batch execution
       _registerRuleGroups();
+
+      // Discover files for ETA calculation (non-blocking, best effort)
+      // Uses current directory as project root
+      final fileCount = ProgressTracker.discoverFiles('.');
+      if (fileCount > 0) {
+        // ignore: avoid_print
+        print('[saropa_lints] Found ~$fileCount dart files to analyze');
+      }
     }
 
     // =========================================================================
