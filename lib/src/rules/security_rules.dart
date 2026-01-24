@@ -3062,35 +3062,54 @@ class _AddSecureKeyboardSettingsFix extends DartFix {
   }
 }
 
-/// Warns when file paths from user input might allow path traversal.
+/// Warns when File/Directory paths include function parameters without
+/// validation, which could allow path traversal attacks.
 ///
-/// File paths like `../../../etc/passwd` can access arbitrary files.
-/// Sanitize paths and validate they stay within allowed directories.
+/// Path traversal attacks use sequences like `../` to escape intended
+/// directories and access arbitrary files (e.g., `../../../etc/passwd`).
+///
+/// This rule only flags paths containing **function parameters** (user input).
+/// Paths using trusted sources like `getApplicationDocumentsDirectory()`,
+/// private constants, or `MethodChannel` results are NOT flagged.
+///
+/// The rule also skips paths where validation is detected (e.g., `basename()`,
+/// `startsWith()`, `isWithin()`, `sanitize()`).
 ///
 /// **BAD:**
 /// ```dart
+/// // Parameter used directly in path - user could pass '../../../etc/passwd'
 /// Future<String> readFile(String userPath) async {
-///   final file = File('/data/$userPath');
+///   final file = File('/data/$userPath');  // LINT
 ///   return file.readAsString();
 /// }
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
+/// // Trusted source - no user input
+/// Future<File> getAppFile() async {
+///   final dir = await getApplicationDocumentsDirectory();
+///   return File('${dir.path}/data.json');  // OK - trusted source
+/// }
+///
+/// // Parameter with validation
 /// Future<String> readFile(String userPath) async {
-///   // Sanitize path
 ///   final sanitized = path.basename(userPath);
 ///   if (sanitized != userPath || userPath.contains('..')) {
 ///     throw SecurityException('Invalid path');
 ///   }
 ///   final file = File('/data/$sanitized');
-///   final resolved = file.resolveSymbolicLinksSync();
-///   if (!resolved.startsWith('/data/')) {
+///   if (!file.path.startsWith('/data/')) {
 ///     throw SecurityException('Path outside allowed directory');
 ///   }
 ///   return file.readAsString();
 /// }
 /// ```
+///
+/// **OWASP:** [M4:Insufficient-Input-Output-Validation], [A01:Broken-Access],
+/// [A03:Injection]
+///
+/// See also: [require_file_path_sanitization] for a similar rule.
 class AvoidPathTraversalRule extends SaropaLintRule {
   const AvoidPathTraversalRule() : super(code: _code);
 
@@ -3134,43 +3153,79 @@ class AvoidPathTraversalRule extends SaropaLintRule {
       final Expression firstArg = args.arguments.first;
       final String argSource = firstArg.toSource();
 
-      // Check if path uses string interpolation with variable
-      if (argSource.contains(r'$') || argSource.contains('+')) {
-        // Path includes dynamic content
+      // Check if path uses string interpolation or concatenation
+      if (!argSource.contains(r'$') && !argSource.contains('+')) return;
 
-        // Check if there's nearby validation
-        AstNode? current = node.parent;
-        bool hasValidation = false;
+      // Get function parameters - only flag if user input (parameters) is used
+      final FormalParameterList? params = _getFunctionParameters(node);
+      if (params == null) return;
 
-        while (current != null) {
-          final String source = current.toSource();
-
-          // Check for path traversal validation patterns
-          if (source.contains('..') &&
-              (source.contains('throw') || source.contains('return'))) {
-            hasValidation = true;
-            break;
-          }
-          if (source.contains('basename') ||
-              source.contains('resolveSymbolicLinks') ||
-              source.contains('startsWith') ||
-              source.contains('sanitize') ||
-              source.contains('validate')) {
-            hasValidation = true;
-            break;
-          }
-
-          if (current is MethodDeclaration || current is FunctionDeclaration) {
-            break;
-          }
-          current = current.parent;
-        }
-
-        if (!hasValidation) {
-          reporter.atNode(node, code);
+      // Check if any parameter is used in the path
+      String? usedParam;
+      for (final FormalParameter param in params.parameters) {
+        final String paramName = param.name?.lexeme ?? '';
+        if (paramName.isNotEmpty && argSource.contains(paramName)) {
+          usedParam = paramName;
+          break;
         }
       }
+
+      // No parameter used in path - safe (e.g., system APIs, constants)
+      if (usedParam == null) return;
+
+      // Parameter is used - check for validation
+      if (_hasPathValidation(node)) return;
+
+      reporter.atNode(node, code);
     });
+  }
+
+  /// Gets the parameters of the enclosing function or method.
+  FormalParameterList? _getFunctionParameters(AstNode node) {
+    final FunctionDeclaration? funcDecl =
+        node.thisOrAncestorOfType<FunctionDeclaration>();
+    if (funcDecl != null) {
+      return funcDecl.functionExpression.parameters;
+    }
+
+    final MethodDeclaration? methodDecl =
+        node.thisOrAncestorOfType<MethodDeclaration>();
+    if (methodDecl != null) {
+      return methodDecl.parameters;
+    }
+
+    return null;
+  }
+
+  /// Checks if there's path validation in the enclosing scope.
+  bool _hasPathValidation(AstNode node) {
+    AstNode? current = node.parent;
+
+    while (current != null) {
+      final String source = current.toSource();
+
+      // Check for path traversal validation patterns
+      if (source.contains('..') &&
+          (source.contains('throw') || source.contains('return'))) {
+        return true;
+      }
+      if (source.contains('basename') ||
+          source.contains('resolveSymbolicLinks') ||
+          source.contains('startsWith') ||
+          source.contains('sanitize') ||
+          source.contains('validate') ||
+          source.contains('isWithin') ||
+          source.contains('normalize')) {
+        return true;
+      }
+
+      if (current is MethodDeclaration || current is FunctionDeclaration) {
+        break;
+      }
+      current = current.parent;
+    }
+
+    return false;
   }
 }
 
