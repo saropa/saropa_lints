@@ -17822,11 +17822,35 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 /// return Column(children: [content]); // OK - lint trusts variable usage
 /// ```
 ///
-/// ## False Positives
+/// **GOOD - Helper method returning Expanded:**
+/// ```dart
+/// List<Widget> _buildChildren() {
+///   return [Expanded(child: Text('Hi'))]; // OK - trusts helper methods
+/// }
+/// Widget build(BuildContext context) => Row(children: _buildChildren());
+/// ```
 ///
-/// This rule may flag widgets that return Expanded from `build()` when the
-/// widget is always used inside a Flex. Use `// ignore: avoid_expanded_outside_flex`
-/// if you're certain the widget is only used as a direct Flex child.
+/// **GOOD - Collection builders (List.generate, .map):**
+/// ```dart
+/// Column(
+///   children: List.generate(3, (i) => Expanded(child: Text('$i'))), // OK
+/// )
+/// Row(
+///   children: items.map((i) => Expanded(child: Text(i))).toList(), // OK
+/// )
+/// ```
+///
+/// ## Trusted Patterns (No False Positives)
+///
+/// The rule trusts these patterns and does not report them:
+/// - **Variable assignment**: `final x = Expanded(...);`
+/// - **Helper method returns**: Expanded in return statements of non-build methods
+/// - **Collection builders**: Expanded inside `List.generate()` or `.map()` callbacks
+///
+/// ## When to Ignore
+///
+/// Use `// ignore: avoid_expanded_outside_flex` if the widget's `build()`
+/// returns Expanded and you're certain it's only used as a direct Flex child.
 ///
 /// ## Design Guidance
 ///
@@ -17892,6 +17916,27 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
         if (current is VariableDeclaration) {
           assignedToVariable = true;
           break;
+        }
+
+        // Trust Expanded in return statements of helper methods (not build).
+        // Pattern: List<Widget> _buildChildren() => [Expanded(child: ...)];
+        // These are typically used as children of Flex widgets at the call site.
+        if (current is ReturnStatement) {
+          final method = current.thisOrAncestorOfType<MethodDeclaration>();
+          if (method != null && method.name.lexeme != 'build') {
+            assignedToVariable = true;
+            break;
+          }
+        }
+
+        // Trust Expanded inside collection-building patterns like List.generate
+        // or .map() - these almost always build children for Flex widgets.
+        if (current is MethodInvocation) {
+          final methodName = current.methodName.name;
+          if (methodName == 'generate' || methodName == 'map') {
+            assignedToVariable = true;
+            break;
+          }
         }
 
         if (current is InstanceCreationExpression) {

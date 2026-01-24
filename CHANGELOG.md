@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.7.4] - 2026-01-24
+
+### Fixed
+
+- **`avoid_expanded_outside_flex` false positive in helper methods**: Fixed false positives when `Expanded`/`Flexible` is created inside helper methods that return `List<Widget>`, or inside collection builders like `List.generate()` and `.map()`. These patterns are now trusted since the widgets typically end up inside Flex parents at runtime.
+
+---
 ## [4.7.3] - 2026-01-24
 
 ### Added
@@ -62,21 +69,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **`prefer_small_length_files` and `prefer_small_length_test_files` tier misassignment**: Fixed bug where these insanity-tier rules were incorrectly enabled in comprehensive tier. Rules now correctly have `tier => RuleTier.insanity` override.
-
----
-## [Unreleased]
-
-### Fixed
-
-- **`avoid_navigator_context_issue` severe false positives**: Fixed multiple critical issues causing ~90% false positive rate:
-  - Added missing Navigator check to instance creation handler (was flagging `Column`, `Row`, and other widgets)
-  - Fixed overly broad `.context` string matching that flagged property names containing "context" (e.g., `widget.contextMessage`)
-  - Added whitelist for `Scrollable.ensureVisible()` which legitimately requires `GlobalKey.currentContext`
-  - Now only flags Navigator/Route/Page-related operations with problematic context patterns
-
-- **`require_stream_controller_close` false positive on wrapper classes**: Fixed false positive when using wrapper classes like `IsarStreamController<T>` that contain "StreamController" in their type name. The rule now:
-  - Requires `.close()` for exact `StreamController<T>` types
-  - Accepts either `.close()` OR `.dispose()` for wrapper types, since wrappers typically close their internal StreamController in their dispose method
 
 ---
 ## [4.6.2] - 2026-01-24
