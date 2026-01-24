@@ -217,7 +217,8 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
 
   /// Alias: require_build_context_scope (deprecated, use avoid_context_across_async)
   @override
-  List<String> get configAliases => const <String>['require_build_context_scope'];
+  List<String> get configAliases =>
+      const <String>['require_build_context_scope'];
 
   static const LintCode _code = LintCode(
     name: 'avoid_context_across_async',
