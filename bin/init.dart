@@ -79,7 +79,169 @@ library;
 
 import 'dart:io';
 
-import 'package:saropa_lints/src/tiers.dart';
+import 'package:custom_lint_builder/custom_lint_builder.dart' show LintRule;
+import 'package:saropa_lints/saropa_lints.dart'
+    show RuleTier, SaropaLintRule, allSaropaRules;
+// ignore: deprecated_member_use_from_same_package
+import 'package:saropa_lints/src/tiers.dart' as legacy_tiers;
+
+// ---------------------------------------------------------------------------
+// Cross-platform ANSI color support
+// ---------------------------------------------------------------------------
+
+/// Detects if the terminal supports ANSI colors.
+bool get _supportsColor {
+  // Check for NO_COLOR environment variable (standard)
+  if (Platform.environment.containsKey('NO_COLOR')) return false;
+
+  // Check for FORCE_COLOR
+  if (Platform.environment.containsKey('FORCE_COLOR')) return true;
+
+  // Check if stdout is a terminal
+  if (!stdout.hasTerminal) return false;
+
+  // Windows: check for newer Windows Terminal or ConEmu
+  if (Platform.isWindows) {
+    final term = Platform.environment['TERM'];
+    final wtSession = Platform.environment['WT_SESSION'];
+    final conEmu = Platform.environment['ConEmuANSI'];
+    return wtSession != null || conEmu == 'ON' || term == 'xterm';
+  }
+
+  // Unix-like: most terminals support colors
+  return true;
+}
+
+/// ANSI color codes (cross-platform safe).
+class _Colors {
+  static String get reset => _supportsColor ? '\x1B[0m' : '';
+  static String get bold => _supportsColor ? '\x1B[1m' : '';
+  static String get dim => _supportsColor ? '\x1B[2m' : '';
+
+  // Foreground colors
+  static String get red => _supportsColor ? '\x1B[31m' : '';
+  static String get green => _supportsColor ? '\x1B[32m' : '';
+  static String get yellow => _supportsColor ? '\x1B[33m' : '';
+  static String get blue => _supportsColor ? '\x1B[34m' : '';
+  static String get magenta => _supportsColor ? '\x1B[35m' : '';
+  static String get cyan => _supportsColor ? '\x1B[36m' : '';
+
+  // Bright variants
+  static String get brightRed => _supportsColor ? '\x1B[91m' : '';
+  static String get brightCyan => _supportsColor ? '\x1B[96m' : '';
+}
+
+/// Color helpers for consistent styling.
+String _success(String text) => '${_Colors.green}$text${_Colors.reset}';
+String _error(String text) => '${_Colors.red}$text${_Colors.reset}';
+String _warning(String text) => '${_Colors.yellow}$text${_Colors.reset}';
+String _highlight(String text) => '${_Colors.bold}$text${_Colors.reset}';
+String _tierColor(String tier) {
+  switch (tier) {
+    case 'essential':
+      return '${_Colors.brightRed}$tier${_Colors.reset}';
+    case 'recommended':
+      return '${_Colors.yellow}$tier${_Colors.reset}';
+    case 'professional':
+      return '${_Colors.blue}$tier${_Colors.reset}';
+    case 'comprehensive':
+      return '${_Colors.magenta}$tier${_Colors.reset}';
+    case 'insanity':
+      return '${_Colors.brightCyan}$tier${_Colors.reset}';
+    case 'stylistic':
+      return '${_Colors.dim}$tier${_Colors.reset}';
+    default:
+      return tier;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Rule metadata cache (problem messages, severities)
+// ---------------------------------------------------------------------------
+
+/// Cache for rule metadata (built once from allSaropaRules).
+Map<String, _RuleMetadata>? _ruleMetadataCache;
+
+/// Metadata for a single rule.
+class _RuleMetadata {
+  const _RuleMetadata({
+    required this.name,
+    required this.problemMessage,
+    required this.severity,
+    required this.tier,
+  });
+
+  final String name;
+  final String problemMessage;
+  final String severity; // 'ERROR', 'WARNING', 'INFO'
+  final RuleTier tier;
+}
+
+/// Builds and returns rule metadata from rule classes.
+Map<String, _RuleMetadata> _getRuleMetadata() {
+  if (_ruleMetadataCache != null) return _ruleMetadataCache!;
+
+  _ruleMetadataCache = <String, _RuleMetadata>{};
+  for (final LintRule rule in allSaropaRules) {
+    if (rule is SaropaLintRule) {
+      final String ruleName = rule.code.name;
+      final String message = rule.code.problemMessage;
+
+      // Extract severity from LintCode
+      final severity = rule.code.errorSeverity.name.toUpperCase();
+
+      // Get tier (with legacy fallback)
+      RuleTier tier = rule.tier;
+      if (tier == RuleTier.professional) {
+        // Check legacy if not explicitly set
+        final legacyTier = _getLegacyTier(ruleName);
+        if (legacyTier != null) {
+          tier = legacyTier;
+        }
+      }
+
+      _ruleMetadataCache![ruleName] = _RuleMetadata(
+        name: ruleName,
+        problemMessage: message,
+        severity: severity,
+        tier: tier,
+      );
+    }
+  }
+  return _ruleMetadataCache!;
+}
+
+/// Gets a short problem message (truncated for YAML comment).
+String _getShortProblemMessage(String ruleName) {
+  final metadata = _getRuleMetadata()[ruleName];
+  if (metadata == null) return '';
+
+  String msg = metadata.problemMessage;
+
+  // Remove rule name prefix if present (e.g., "[rule_name] ...")
+  final prefixMatch = RegExp(r'^\[[\w_]+\]\s*').firstMatch(msg);
+  if (prefixMatch != null) {
+    msg = msg.substring(prefixMatch.end);
+  }
+
+  // Truncate to reasonable length for YAML comment
+  const maxLength = 60;
+  if (msg.length > maxLength) {
+    msg = '${msg.substring(0, maxLength - 3)}...';
+  }
+
+  return msg;
+}
+
+/// Gets the severity for a rule.
+String _getRuleSeverity(String ruleName) {
+  return _getRuleMetadata()[ruleName]?.severity ?? 'INFO';
+}
+
+/// Gets the tier for a rule.
+RuleTier _getRuleTierFromMetadata(String ruleName) {
+  return _getRuleMetadata()[ruleName]?.tier ?? RuleTier.professional;
+}
 
 // ---------------------------------------------------------------------------
 // Regex patterns (defined once, used in multiple places)
@@ -124,6 +286,162 @@ const Map<String, String> tierDescriptions = <String, String>{
   'insanity': 'All rules enabled (may have conflicts)',
 };
 
+// ---------------------------------------------------------------------------
+// Tier functions - read directly from rule classes (single source of truth)
+// ---------------------------------------------------------------------------
+
+/// Maps RuleTier enum to tier string name.
+String _tierToString(RuleTier tier) {
+  switch (tier) {
+    case RuleTier.essential:
+      return 'essential';
+    case RuleTier.recommended:
+      return 'recommended';
+    case RuleTier.professional:
+      return 'professional';
+    case RuleTier.comprehensive:
+      return 'comprehensive';
+    case RuleTier.insanity:
+      return 'insanity';
+    case RuleTier.stylistic:
+      return 'stylistic';
+  }
+}
+
+/// Maps tier string name to RuleTier enum.
+RuleTier? _stringToTier(String tier) {
+  switch (tier) {
+    case 'essential':
+      return RuleTier.essential;
+    case 'recommended':
+      return RuleTier.recommended;
+    case 'professional':
+      return RuleTier.professional;
+    case 'comprehensive':
+      return RuleTier.comprehensive;
+    case 'insanity':
+      return RuleTier.insanity;
+    case 'stylistic':
+      return RuleTier.stylistic;
+    default:
+      return null;
+  }
+}
+
+/// Returns the tier order index (lower = stricter requirements).
+int _tierIndex(RuleTier tier) {
+  switch (tier) {
+    case RuleTier.essential:
+      return 0;
+    case RuleTier.recommended:
+      return 1;
+    case RuleTier.professional:
+      return 2;
+    case RuleTier.comprehensive:
+      return 3;
+    case RuleTier.insanity:
+      return 4;
+    case RuleTier.stylistic:
+      return -1; // Stylistic is opt-in, not part of tier progression
+  }
+}
+
+/// Cache for rule tier mappings (built once from allSaropaRules).
+Map<String, RuleTier>? _ruleTierCache;
+
+/// Builds and returns the rule-to-tier mapping from rule classes.
+///
+/// Uses a two-phase approach for backwards compatibility during migration:
+/// 1. If rule class has explicit tier override (not default), use that
+/// 2. Otherwise, fall back to legacy tiers.dart assignments
+///
+/// This allows incremental migration from tiers.dart to rule classes.
+Map<String, RuleTier> _getRuleTiers() {
+  if (_ruleTierCache != null) return _ruleTierCache!;
+
+  _ruleTierCache = <String, RuleTier>{};
+  for (final LintRule rule in allSaropaRules) {
+    if (rule is SaropaLintRule) {
+      final String ruleName = rule.code.name;
+      final RuleTier declaredTier = rule.tier;
+
+      // Check if rule has explicit tier (not the default professional)
+      // Rules with explicit tier override take precedence
+      if (declaredTier != RuleTier.professional) {
+        _ruleTierCache![ruleName] = declaredTier;
+        continue;
+      }
+
+      // Fall back to legacy tiers.dart for unmigrated rules
+      final RuleTier? legacyTier = _getLegacyTier(ruleName);
+      _ruleTierCache![ruleName] = legacyTier ?? RuleTier.professional;
+    }
+  }
+  return _ruleTierCache!;
+}
+
+/// Gets tier from legacy tiers.dart (for backwards compatibility).
+RuleTier? _getLegacyTier(String ruleName) {
+  if (legacy_tiers.stylisticRules.contains(ruleName)) {
+    return RuleTier.stylistic;
+  }
+  if (legacy_tiers.essentialRules.contains(ruleName)) {
+    return RuleTier.essential;
+  }
+  // Check tier sets in order (most restrictive first)
+  if (legacy_tiers.insanityOnlyRules.contains(ruleName)) {
+    return RuleTier.insanity;
+  }
+  if (legacy_tiers.comprehensiveOnlyRules.contains(ruleName)) {
+    return RuleTier.comprehensive;
+  }
+  if (legacy_tiers.professionalOnlyRules.contains(ruleName)) {
+    return RuleTier.professional;
+  }
+  if (legacy_tiers.recommendedOnlyRules.contains(ruleName)) {
+    return RuleTier.recommended;
+  }
+  return null;
+}
+
+/// Returns all defined rule names (from rule classes).
+Set<String> getAllDefinedRules() {
+  return _getRuleTiers().keys.toSet();
+}
+
+/// Returns rules enabled for a given tier (cumulative).
+/// Tiers are cumulative: higher tiers include all rules from lower tiers.
+Set<String> getRulesForTier(String tierName) {
+  final RuleTier? targetTier = _stringToTier(tierName);
+  if (targetTier == null || targetTier == RuleTier.stylistic) {
+    return <String>{};
+  }
+
+  final int targetIndex = _tierIndex(targetTier);
+  final Map<String, RuleTier> ruleTiers = _getRuleTiers();
+
+  return ruleTiers.entries
+      .where((MapEntry<String, RuleTier> entry) {
+        final RuleTier ruleTier = entry.value;
+        // Stylistic rules are never included in tier progression
+        if (ruleTier == RuleTier.stylistic) return false;
+        // Include if rule's tier is at or below target tier
+        return _tierIndex(ruleTier) <= targetIndex;
+      })
+      .map((MapEntry<String, RuleTier> entry) => entry.key)
+      .toSet();
+}
+
+/// Returns all stylistic rules (opt-in only).
+Set<String> get stylisticRules {
+  final Map<String, RuleTier> ruleTiers = _getRuleTiers();
+  return ruleTiers.entries
+      .where((MapEntry<String, RuleTier> entry) =>
+          entry.value == RuleTier.stylistic)
+      .map((MapEntry<String, RuleTier> entry) => entry.key)
+      .toSet();
+}
+
 /// Main entry point for the CLI tool.
 Future<void> main(List<String> args) async {
   final CliArgs cliArgs = _parseArguments(args);
@@ -132,25 +450,31 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  _logTerminal('Saropa Lints Configuration Generator');
-  _logTerminal('=====================================');
+  _logTerminal('');
+  _logTerminal(
+      '${_Colors.bold}╔══════════════════════════════════════════════════════════╗${_Colors.reset}');
+  _logTerminal(
+      '${_Colors.bold}║     ${_Colors.cyan}SAROPA LINTS${_Colors.reset}${_Colors.bold} Configuration Generator                ║${_Colors.reset}');
+  _logTerminal(
+      '${_Colors.bold}╚══════════════════════════════════════════════════════════╝${_Colors.reset}');
   _logTerminal('');
 
   // Resolve tier (handle numeric input)
   final String? tier = _resolveTier(cliArgs.tier);
   if (tier == null) {
-    stderr.writeln('Error: Invalid tier "${cliArgs.tier}"');
-    stderr.writeln('');
-    stderr.writeln('Valid tiers:');
+    _logTerminal(_error('✗ Error: Invalid tier "${cliArgs.tier}"'));
+    _logTerminal('');
+    _logTerminal('Valid tiers:');
     for (final MapEntry<String, int> entry in tierIds.entries) {
-      stderr.writeln('  ${entry.value} or ${entry.key}');
+      _logTerminal('  ${entry.value} or ${_tierColor(entry.key)}');
     }
     exitCode = 1;
     return;
   }
 
-  _logTerminal('Tier: $tier (${tierIds[tier]})');
-  _logTerminal('Description: ${tierDescriptions[tier]}');
+  _logTerminal(
+      '${_Colors.bold}Tier:${_Colors.reset} ${_tierColor(tier)} (level ${tierIds[tier]})');
+  _logTerminal('${_Colors.dim}${tierDescriptions[tier]}${_Colors.reset}');
   _logTerminal('');
 
   // tiers.dart is the source of truth for all rules
@@ -188,35 +512,109 @@ Future<void> main(List<String> args) async {
       );
       if (userCustomizations.isNotEmpty) {
         _logTerminal(
-            'Preserving ${userCustomizations.length} user customizations:');
+            '${_Colors.yellow}⚡ Preserving ${userCustomizations.length} user customizations:${_Colors.reset}');
         for (final MapEntry<String, bool> entry in userCustomizations.entries) {
-          _logTerminal('  - ${entry.key}: ${entry.value}');
+          final color = entry.value ? _Colors.green : _Colors.red;
+          _logTerminal(
+              '  ${_Colors.dim}•${_Colors.reset} ${entry.key}: $color${entry.value}${_Colors.reset}');
         }
       }
     } else {
-      _logTerminal('--reset specified: discarding user customizations');
+      _logTerminal(
+          '${_Colors.yellow}⚠ --reset specified: discarding user customizations${_Colors.reset}');
     }
 
-    _logTerminal('Warning: ${cliArgs.outputPath} already exists.');
-    _logTerminal('Backing up to ${cliArgs.outputPath}.bak');
+    _logTerminal(
+        '${_Colors.yellow}⚠ Warning: ${cliArgs.outputPath} already exists.${_Colors.reset}');
+    _logTerminal(
+        '${_Colors.dim}  Backing up to ${cliArgs.outputPath}.bak${_Colors.reset}');
     try {
       outputFile.copySync('${cliArgs.outputPath}.bak');
     } on Exception catch (e) {
-      stderr.writeln('Error: Failed to backup file: $e');
+      _logTerminal(_error('✗ Failed to backup file: $e'));
     }
   }
 
+  // Count rules by severity for summary
+  final Map<String, int> enabledBySeverity = {
+    'ERROR': 0,
+    'WARNING': 0,
+    'INFO': 0
+  };
+  final Map<String, int> disabledBySeverity = {
+    'ERROR': 0,
+    'WARNING': 0,
+    'INFO': 0
+  };
+
+  for (final rule in finalEnabled) {
+    final severity = _getRuleSeverity(rule);
+    enabledBySeverity[severity] = (enabledBySeverity[severity] ?? 0) + 1;
+  }
+  for (final rule in finalDisabled) {
+    final severity = _getRuleSeverity(rule);
+    disabledBySeverity[severity] = (disabledBySeverity[severity] ?? 0) + 1;
+  }
+
+  // Count by tier for enabled rules
+  final Map<String, int> enabledByTierCount = {};
+  for (final rule in finalEnabled) {
+    final tierName = _tierToString(_getRuleTierFromMetadata(rule));
+    enabledByTierCount[tierName] = (enabledByTierCount[tierName] ?? 0) + 1;
+  }
+
   _logTerminal('');
-  _logTerminal('Rules summary:');
-  _logTerminal('  Enabled by tier: ${finalEnabled.length}');
-  _logTerminal('  Disabled by tier: ${finalDisabled.length}');
-  _logTerminal('  User customizations: ${userCustomizations.length}');
-  _logTerminal('  Total: ${allRules.length}');
-  if (!cliArgs.includeStylistic) {
+  _logTerminal(
+      '${_Colors.bold}┌─────────────────────────────────────────────────────────┐${_Colors.reset}');
+  _logTerminal(
+      '${_Colors.bold}│                     RULES SUMMARY                       │${_Colors.reset}');
+  _logTerminal(
+      '${_Colors.bold}└─────────────────────────────────────────────────────────┘${_Colors.reset}');
+  _logTerminal('');
+  _logTerminal(
+      '  ${_Colors.bold}Total rules:${_Colors.reset} ${allRules.length}');
+  _logTerminal('  ${_success('✓ Enabled:')} ${finalEnabled.length}');
+  _logTerminal('  ${_error('✗ Disabled:')} ${finalDisabled.length}');
+  _logTerminal(
+      '  ${_warning('⚡ User customizations:')} ${userCustomizations.length}');
+  _logTerminal('');
+
+  // Enabled by tier breakdown
+  _logTerminal('  ${_Colors.bold}Enabled by tier:${_Colors.reset}');
+  for (final tierName in [
+    'essential',
+    'recommended',
+    'professional',
+    'comprehensive',
+    'insanity'
+  ]) {
+    final count = enabledByTierCount[tierName] ?? 0;
+    if (count > 0) {
+      _logTerminal('    ${_tierColor(tierName)}: $count rules');
+    }
+  }
+  final stylisticCount = enabledByTierCount['stylistic'] ?? 0;
+  if (stylisticCount > 0 || cliArgs.includeStylistic) {
     _logTerminal(
-        '  (Stylistic rules disabled by default - use --stylistic to enable)');
+        '    ${_tierColor('stylistic')}: $stylisticCount rules ${cliArgs.includeStylistic ? '(included)' : '(opt-in)'}');
   }
   _logTerminal('');
+
+  // Enabled by severity breakdown
+  _logTerminal('  ${_Colors.bold}Enabled by severity:${_Colors.reset}');
+  _logTerminal(
+      '    ${_Colors.red}ERROR:${_Colors.reset}   ${enabledBySeverity['ERROR']}');
+  _logTerminal(
+      '    ${_Colors.yellow}WARNING:${_Colors.reset} ${enabledBySeverity['WARNING']}');
+  _logTerminal(
+      '    ${_Colors.cyan}INFO:${_Colors.reset}    ${enabledBySeverity['INFO']}');
+  _logTerminal('');
+
+  if (!cliArgs.includeStylistic) {
+    _logTerminal(
+        '  ${_Colors.dim}ℹ Stylistic rules disabled by default. Use --stylistic to enable.${_Colors.reset}');
+    _logTerminal('');
+  }
 
   // Generate the new custom_lint section with proper formatting
   final String customLintYaml = _generateCustomLintYaml(
@@ -225,6 +623,7 @@ Future<void> main(List<String> args) async {
     disabledRules: finalDisabled,
     userCustomizations: userCustomizations,
     allRules: allRules,
+    includeStylistic: cliArgs.includeStylistic,
   );
 
   // Replace custom_lint section in existing content, preserving everything else
@@ -232,49 +631,54 @@ Future<void> main(List<String> args) async {
       _replaceCustomLintSection(existingContent, customLintYaml);
 
   if (cliArgs.dryRun) {
-    _logTerminal('[DRY RUN] Would write to: ${cliArgs.outputPath}');
-    _logTerminal('');
-    _logTerminal('Enabled rules by tier:');
-    for (final String t in tierOrder) {
-      final Set<String> rules = getRulesForTier(t);
-      _logTerminal('  ${tierIds[t]}. $t: ${rules.length} rules');
-    }
+    _logTerminal('${_Colors.yellow}━━━ DRY RUN ━━━${_Colors.reset}');
     _logTerminal(
-        'Stylistic rules: ${cliArgs.includeStylistic ? stylisticRules.length : 0} ${cliArgs.includeStylistic ? "(included)" : "(not included)"}');
+        '${_Colors.dim}Would write to: ${cliArgs.outputPath}${_Colors.reset}');
     _logTerminal('');
 
     // Show preview of custom_lint section only
     final List<String> lines = customLintYaml.split('\n');
-    const int previewLines = 80;
+    const int previewLines = 100;
     _logTerminal(
-        'Preview of custom_lint section (first $previewLines lines of ${lines.length}):');
-    _logTerminal('-' * 60);
+        '${_Colors.bold}Preview${_Colors.reset} ${_Colors.dim}(first $previewLines of ${lines.length} lines):${_Colors.reset}');
+    _logTerminal('${_Colors.dim}${'─' * 60}${_Colors.reset}');
     for (int i = 0; i < previewLines && i < lines.length; i++) {
       _logTerminal(lines[i]);
     }
     if (lines.length > previewLines) {
-      _logTerminal('... (${lines.length - previewLines} more lines)');
+      _logTerminal(
+          '${_Colors.dim}... (${lines.length - previewLines} more lines)${_Colors.reset}');
     }
     return;
   }
 
   try {
     outputFile.writeAsStringSync(newContent);
-    _logTerminal('Written to: ${cliArgs.outputPath}');
+    _logTerminal('${_success('✓ Written to:')} ${cliArgs.outputPath}');
   } on Exception catch (e) {
-    stderr.writeln('Error: Failed to write file: $e');
+    _logTerminal(_error('✗ Failed to write file: $e'));
     exitCode = 2;
     return;
   }
 
   _logTerminal('');
-  _logTerminal('Next steps:');
-  _logTerminal('  1. Review the generated configuration');
-  _logTerminal('  2. Run: dart run custom_lint');
-  _logTerminal('  3. Customize rules as needed (change true to false)');
+  _logTerminal(
+      '${_Colors.bold}┌─────────────────────────────────────────────────────────┐${_Colors.reset}');
+  _logTerminal(
+      '${_Colors.bold}│                      NEXT STEPS                         │${_Colors.reset}');
+  _logTerminal(
+      '${_Colors.bold}└─────────────────────────────────────────────────────────┘${_Colors.reset}');
   _logTerminal('');
   _logTerminal(
-      'To change tiers later, run this command again with a different --tier');
+      '  ${_Colors.cyan}1.${_Colors.reset} Review the generated configuration');
+  _logTerminal(
+      '  ${_Colors.cyan}2.${_Colors.reset} Run: ${_highlight('dart run custom_lint')}');
+  _logTerminal(
+      '  ${_Colors.cyan}3.${_Colors.reset} Customize rules as needed (change true to false)');
+  _logTerminal('');
+  _logTerminal(
+      '${_Colors.dim}To change tiers later, run this command again with a different --tier${_Colors.reset}');
+  _logTerminal('');
 }
 
 /// Extract existing user customizations from custom_lint.rules section.
@@ -331,22 +735,46 @@ Map<String, bool> _extractUserCustomizations(
 }
 
 /// Generate the custom_lint YAML section with proper formatting.
+///
+/// Organizes rules by tier with problem message comments.
 String _generateCustomLintYaml({
   required String tier,
   required Set<String> enabledRules,
   required Set<String> disabledRules,
   required Map<String, bool> userCustomizations,
   required Set<String> allRules,
+  required bool includeStylistic,
 }) {
   final StringBuffer buffer = StringBuffer();
+  final customizedRuleNames = userCustomizations.keys.toSet();
 
   buffer.writeln('custom_lint:');
+  buffer.writeln(
+      '  # ═══════════════════════════════════════════════════════════════════════');
+  buffer.writeln('  # SAROPA LINTS CONFIGURATION');
+  buffer.writeln(
+      '  # ═══════════════════════════════════════════════════════════════════════');
   buffer
       .writeln('  # Regenerate with: dart run saropa_lints:init --tier $tier');
   buffer.writeln(
       '  # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)');
+  buffer.writeln(
+      '  # custom_lint enables ALL rules by default. To disable a rule, set it to false.');
   buffer
       .writeln('  # User customizations are preserved unless --reset is used');
+  buffer.writeln('  #');
+  buffer.writeln('  # Tiers (cumulative):');
+  buffer.writeln(
+      '  #   1. essential    - Critical: crashes, security, memory leaks');
+  buffer.writeln(
+      '  #   2. recommended  - Essential + accessibility, performance');
+  buffer.writeln('  #   3. professional - Recommended + architecture, testing');
+  buffer.writeln('  #   4. comprehensive - Professional + thorough coverage');
+  buffer.writeln(
+      '  #   5. insanity     - All rules (pedantic, highly opinionated)');
+  buffer.writeln('  #   +  stylistic    - Opt-in only (formatting, ordering)');
+  buffer.writeln(
+      '  # ═══════════════════════════════════════════════════════════════════════');
   buffer.writeln('');
   buffer.writeln('  rules:');
 
@@ -357,73 +785,239 @@ String _generateCustomLintYaml({
         '    # These rules have been manually configured and will be preserved');
     buffer.writeln(
         '    # when regenerating. Use --reset to discard these customizations.');
+    buffer.writeln('');
 
     final List<String> sortedCustomizations = userCustomizations.keys.toList()
       ..sort();
     for (final String rule in sortedCustomizations) {
       final bool enabled = userCustomizations[rule]!;
-      buffer.writeln('    - $rule: $enabled');
+      final String msg = _getShortProblemMessage(rule);
+      final String severity = _getRuleSeverity(rule);
+      buffer.writeln('    - $rule: $enabled  # [$severity] $msg');
     }
     buffer.writeln('');
   }
 
-  // Section 2: Enabled rules (by tier)
-  buffer.writeln(_sectionHeader('ENABLED RULES ($tier tier)', '*'));
+  // Group rules by their tier
+  final Map<RuleTier, List<String>> enabledByTier = {};
+  final Map<RuleTier, List<String>> disabledByTier = {};
 
-  // Filter out user-customized rules from the tier lists
-  final Set<String> tierEnabledNotCustomized =
-      enabledRules.difference(userCustomizations.keys.toSet());
-  final List<String> sortedEnabled = tierEnabledNotCustomized.toList()..sort();
-
-  for (final String rule in sortedEnabled) {
-    buffer.writeln('    - $rule: true');
+  for (final tier in RuleTier.values) {
+    enabledByTier[tier] = [];
+    disabledByTier[tier] = [];
   }
+
+  // Categorize enabled rules by tier
+  for (final String rule in enabledRules.difference(customizedRuleNames)) {
+    final ruleTier = _getRuleTierFromMetadata(rule);
+    enabledByTier[ruleTier]!.add(rule);
+  }
+
+  // Categorize disabled rules by tier
+  for (final String rule in disabledRules.difference(customizedRuleNames)) {
+    final ruleTier = _getRuleTierFromMetadata(rule);
+    disabledByTier[ruleTier]!.add(rule);
+  }
+
+  // Section 2: Enabled rules organized by tier
+  buffer.writeln(_sectionHeader('ENABLED RULES ($tier tier)', '='));
   buffer.writeln('');
 
-  // Section 3: Disabled rules (not in tier, excluding user customizations)
-  buffer.writeln(_sectionHeader('DISABLED RULES (below $tier tier)', '-'));
+  // Output enabled tiers in order
+  for (final tierLevel in [
+    RuleTier.essential,
+    RuleTier.recommended,
+    RuleTier.professional,
+    RuleTier.comprehensive,
+    RuleTier.insanity,
+  ]) {
+    final rules = enabledByTier[tierLevel]!..sort();
+    if (rules.isEmpty) continue;
 
-  final Set<String> tierDisabledNotCustomized =
-      disabledRules.difference(userCustomizations.keys.toSet());
-  final List<String> sortedDisabled = tierDisabledNotCustomized.toList()
-    ..sort();
+    final tierName = _tierToString(tierLevel).toUpperCase();
+    final tierNum = _tierIndex(tierLevel) + 1;
+    buffer.writeln('    #');
+    buffer.writeln(
+        '    # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓');
+    buffer.writeln(
+        '    # ┃  TIER $tierNum: $tierName${' ' * (60 - tierName.length)}┃');
+    buffer.writeln('    # ┃  ${rules.length} rules enabled${' ' * 53}┃');
+    buffer.writeln(
+        '    # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛');
+    buffer.writeln('    #');
+    for (final String rule in rules) {
+      final String msg = _getShortProblemMessage(rule);
+      final String severity = _getRuleSeverity(rule);
+      buffer.writeln('    - $rule: true  # [$severity] $msg');
+    }
+    buffer.writeln('');
+  }
 
-  for (final String rule in sortedDisabled) {
-    buffer.writeln('    - $rule: false');
+  // Section 3: Stylistic rules (separate section)
+  final stylisticEnabled = enabledByTier[RuleTier.stylistic]!..sort();
+  final stylisticDisabled = disabledByTier[RuleTier.stylistic]!..sort();
+
+  if (stylisticEnabled.isNotEmpty || stylisticDisabled.isNotEmpty) {
+    buffer.writeln(_sectionHeader('STYLISTIC RULES (opt-in)', '~'));
+    buffer.writeln('    # Formatting, ordering, naming conventions.');
+    buffer.writeln(
+        '    # Enable with: dart run saropa_lints:init --tier <tier> --stylistic');
+    buffer.writeln('');
+
+    if (stylisticEnabled.isNotEmpty) {
+      buffer.writeln('    #');
+      buffer.writeln(
+          '    # ┌───────────────────────────────────────────────────────────────────────┐');
+      buffer.writeln(
+          '    # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (47 - stylisticEnabled.length.toString().length)}│');
+      buffer.writeln(
+          '    # └───────────────────────────────────────────────────────────────────────┘');
+      buffer.writeln('    #');
+      for (final String rule in stylisticEnabled) {
+        final String msg = _getShortProblemMessage(rule);
+        buffer.writeln('    - $rule: true  # $msg');
+      }
+      buffer.writeln('');
+    }
+
+    if (stylisticDisabled.isNotEmpty) {
+      buffer.writeln('    #');
+      buffer.writeln(
+          '    # ┌───────────────────────────────────────────────────────────────────────┐');
+      buffer.writeln(
+          '    # │  ✗ DISABLED STYLISTIC (${stylisticDisabled.length} rules)${' ' * (46 - stylisticDisabled.length.toString().length)}│');
+      buffer.writeln(
+          '    # └───────────────────────────────────────────────────────────────────────┘');
+      buffer.writeln('    #');
+      for (final String rule in stylisticDisabled) {
+        final String msg = _getShortProblemMessage(rule);
+        buffer.writeln('    - $rule: false  # $msg');
+      }
+      buffer.writeln('');
+    }
+  }
+
+  // Section 4: Disabled rules by tier (rules above selected tier)
+  final hasDisabledNonStylistic = [
+    RuleTier.essential,
+    RuleTier.recommended,
+    RuleTier.professional,
+    RuleTier.comprehensive,
+    RuleTier.insanity,
+  ].any((t) => disabledByTier[t]!.isNotEmpty);
+
+  if (hasDisabledNonStylistic) {
+    buffer.writeln(_sectionHeader('DISABLED RULES (above $tier tier)', '-'));
+    buffer.writeln('    # These rules are in higher tiers. To enable:');
+    buffer.writeln('    #   1. Choose a higher tier with --tier <tier>');
+    buffer.writeln(
+        '    #   2. Or manually set to true in USER CUSTOMIZATIONS above');
+    buffer.writeln('');
+
+    // Output disabled tiers (from highest to lowest)
+    for (final tierLevel in [
+      RuleTier.insanity,
+      RuleTier.comprehensive,
+      RuleTier.professional,
+      RuleTier.recommended,
+      RuleTier.essential,
+    ]) {
+      final rules = disabledByTier[tierLevel]!..sort();
+      if (rules.isEmpty) continue;
+
+      final tierName = _tierToString(tierLevel).toUpperCase();
+      final tierNum = _tierIndex(tierLevel) + 1;
+      buffer.writeln('    #');
+      buffer.writeln(
+          '    # ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐');
+      buffer.writeln(
+          '    #   TIER $tierNum: $tierName (${rules.length} rules disabled)');
+      buffer.writeln(
+          '    # └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘');
+      buffer.writeln('    #');
+      for (final String rule in rules) {
+        final String msg = _getShortProblemMessage(rule);
+        final String severity = _getRuleSeverity(rule);
+        buffer.writeln('    - $rule: false  # [$severity] $msg');
+      }
+      buffer.writeln('');
+    }
   }
 
   return buffer.toString();
 }
 
-/// Generate a section header comment with centered title.
+/// Generate a MASSIVE, unmissable section header for YAML.
 ///
-/// Creates a visually distinct section separator like:
-/// ```
-/// # ************************************************************************
-/// # *                      ENABLED RULES (tier name)                       *
-/// # ************************************************************************
-/// ```
-///
-/// Handles long titles gracefully by truncating if necessary.
+/// Creates headers so big you can't possibly miss them when scrolling!
 String _sectionHeader(String title, String char) {
-  const int width = 76;
-  final String line = char * width;
+  final String upperTitle = title.toUpperCase();
 
-  // Handle titles that are too long (>72 chars leaves room for padding)
-  final String safeTitle = title.length > 72 ? title.substring(0, 72) : title;
-
-  // Calculate padding for centering (width - title - 2 chars for delimiters)
-  final int totalPadding = width - safeTitle.length - 2;
-  final int leftPadding = totalPadding ~/ 2;
-  final int rightPadding = totalPadding - leftPadding; // Handles odd lengths
-
-  final String paddedTitle =
-      '$char${' ' * leftPadding}$safeTitle${' ' * rightPadding}$char';
-
-  return '''
-    # $line
-    # $paddedTitle
-    # $line''';
+  // Different styles for different section types
+  if (char == '=') {
+    // ENABLED RULES - Double-line box, very prominent
+    return '''
+    #
+    #
+    # ████████████████████████████████████████████████████████████████████████████
+    # ████████████████████████████████████████████████████████████████████████████
+    # ████                                                                    ████
+    # ████    ███████╗███╗   ██╗ █████╗ ██████╗ ██╗     ███████╗██████╗       ████
+    # ████    ██╔════╝████╗  ██║██╔══██╗██╔══██╗██║     ██╔════╝██╔══██╗      ████
+    # ████    █████╗  ██╔██╗ ██║███████║██████╔╝██║     █████╗  ██║  ██║      ████
+    # ████    ██╔══╝  ██║╚██╗██║██╔══██║██╔══██╗██║     ██╔══╝  ██║  ██║      ████
+    # ████    ███████╗██║ ╚████║██║  ██║██████╔╝███████╗███████╗██████╔╝      ████
+    # ████    ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚══════╝╚═════╝       ████
+    # ████                                                                    ████
+    # ████████████████████████████████████████████████████████████████████████████
+    # ████████████████████████████████████████████████████████████████████████████
+    #
+    # ╔══════════════════════════════════════════════════════════════════════════╗
+    # ║                                                                          ║
+    # ║   ★ ★ ★ ★ ★ ★ ★ ★ ★   $upperTitle   ★ ★ ★ ★ ★ ★ ★ ★ ★
+    # ║                                                                          ║
+    # ╚══════════════════════════════════════════════════════════════════════════╝
+    #
+    #''';
+  } else if (char == '~') {
+    // STYLISTIC or USER CUSTOMIZATIONS - Wavy pattern
+    return '''
+    #
+    #
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #
+    #     ╭─────────────────────────────────────────────────────────────────────╮
+    #     │                                                                     │
+    #     │    ◆ ◇ ◆ ◇ ◆   $upperTitle   ◆ ◇ ◆ ◇ ◆
+    #     │                                                                     │
+    #     ╰─────────────────────────────────────────────────────────────────────╯
+    #
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #
+    #''';
+  } else {
+    // DISABLED RULES - Dashed pattern (less prominent)
+    return '''
+    #
+    #
+    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+    #
+    #     ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+    #
+    #         ○ ● ○ ● ○   $upperTitle   ○ ● ○ ● ○
+    #
+    #     └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+    #
+    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+    #
+    #''';
+  }
 }
 
 /// Replace the custom_lint section in existing content, preserving everything else.

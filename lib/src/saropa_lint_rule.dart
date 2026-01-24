@@ -1,6 +1,7 @@
 // ignore_for_file: always_specify_types, depend_on_referenced_packages, unused_element
 
 import 'dart:developer' as developer;
+import 'dart:io' show Directory, File, Platform;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -148,10 +149,57 @@ class ProgressTracker {
   static DateTime? _startTime;
   static DateTime? _lastProgressTime;
   static int _lastReportedCount = 0;
+  static String? _currentFile;
+  static DateTime? _currentFileStart;
+  static int _totalExpectedFiles = 0;
+  static int _violationsFound = 0;
+  static bool _etaCalibrated = false;
+
+  // Rolling rate samples for more stable ETA (last N samples)
+  static final List<double> _rateSamples = [];
+  static const int _maxRateSamples = 5;
 
   /// Interval between progress reports (in files or time).
-  static const int _fileInterval = 25;
-  static const Duration _timeInterval = Duration(seconds: 3);
+  static const int _fileInterval = 10; // More frequent updates
+  static const Duration _timeInterval = Duration(seconds: 5);
+
+  /// Set expected total file count (if known) for % calculation.
+  static void setExpectedFileCount(int count) {
+    _totalExpectedFiles = count;
+    _etaCalibrated = true;
+  }
+
+  /// Auto-discover dart files in a directory for ETA estimation.
+  /// Call this early to enable % progress. Returns estimated count.
+  static int discoverFiles(String projectPath) {
+    try {
+      final dir = Directory(projectPath);
+      if (!dir.existsSync()) return 0;
+
+      int count = 0;
+      // Quick recursive count of .dart files (excluding build, .dart_tool)
+      for (final entity in dir.listSync(recursive: true, followLinks: false)) {
+        if (entity is File && entity.path.endsWith('.dart')) {
+          final path = entity.path;
+          if (!path.contains('.dart_tool') &&
+              !path.contains('build${Platform.pathSeparator}') &&
+              !path.contains('.pub-cache')) {
+            count++;
+          }
+        }
+      }
+      _totalExpectedFiles = count;
+      _etaCalibrated = true;
+      return count;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  /// Record a violation found.
+  static void recordViolation() {
+    _violationsFound++;
+  }
 
   /// Record that a file is being analyzed and potentially report progress.
   static void recordFile(String path) {
@@ -161,11 +209,34 @@ class ProgressTracker {
     _startTime ??= DateTime.now();
     _lastProgressTime ??= _startTime;
 
-    // Track unique files
-    final wasNew = _seenFiles.add(path);
-    if (!wasNew) return; // Already seen this file
-
     final now = DateTime.now();
+
+    // Check if this is a new file or we're still on the same file
+    final wasNew = _seenFiles.add(path);
+
+    if (wasNew) {
+      // Report long-running files (> 5 seconds on previous file)
+      if (_currentFile != null && _currentFileStart != null) {
+        final fileTime = now.difference(_currentFileStart!);
+        if (fileTime.inSeconds >= 5) {
+          final shortName = _currentFile!.split('/').last.split('\\').last;
+          print(
+            '[saropa_lints] Slow file: $shortName took ${fileTime.inSeconds}s',
+          );
+        }
+      }
+
+      _currentFile = path;
+      _currentFileStart = now;
+
+      // Recalibrate ETA after seeing some files
+      // If we're seeing more files than expected, adjust upward
+      if (_etaCalibrated && _seenFiles.length > _totalExpectedFiles * 0.9) {
+        // Increase estimate by 20% if we're approaching the limit
+        _totalExpectedFiles = (_seenFiles.length * 1.2).round();
+      }
+    }
+
     final fileCount = _seenFiles.length;
 
     // Report progress at intervals (every N files or every N seconds)
@@ -180,11 +251,30 @@ class ProgressTracker {
     }
   }
 
-  /// Calculate files per second, avoiding division by zero.
+  /// Calculate files per second using rolling average for stability.
   static double _calculateFilesPerSec(int fileCount, Duration elapsed) {
-    return elapsed.inMilliseconds > 0
+    final instantRate = elapsed.inMilliseconds > 0
         ? (fileCount * 1000) / elapsed.inMilliseconds
         : 0.0;
+
+    // Add to rolling samples
+    _rateSamples.add(instantRate);
+    if (_rateSamples.length > _maxRateSamples) {
+      _rateSamples.removeAt(0);
+    }
+
+    // Return rolling average for smoother ETA
+    if (_rateSamples.isEmpty) return instantRate;
+    return _rateSamples.reduce((a, b) => a + b) / _rateSamples.length;
+  }
+
+  /// Format duration as human-readable string.
+  static String _formatDuration(int seconds) {
+    if (seconds < 60) return '${seconds}s';
+    if (seconds < 3600) return '${seconds ~/ 60}m ${seconds % 60}s';
+    final hours = seconds ~/ 3600;
+    final mins = (seconds % 3600) ~/ 60;
+    return '${hours}h ${mins}m';
   }
 
   static void _reportProgress(int fileCount, DateTime now) {
@@ -195,10 +285,25 @@ class ProgressTracker {
     final lastFile = _seenFiles.last;
     final shortName = lastFile.split('/').last.split('\\').last;
 
+    // Calculate percentage and ETA if we have an estimate
+    String progressStr;
+    if (_totalExpectedFiles > 0 && _etaCalibrated) {
+      final percent =
+          (fileCount * 100 / _totalExpectedFiles).clamp(0, 100).round();
+      final remaining =
+          (_totalExpectedFiles - fileCount).clamp(0, _totalExpectedFiles);
+      final etaSeconds =
+          filesPerSec > 0 ? (remaining / filesPerSec).round() : 0;
+      progressStr = '$fileCount/$_totalExpectedFiles ($percent%) '
+          '- ETA: ${_formatDuration(etaSeconds)}';
+    } else {
+      progressStr = '$fileCount files';
+    }
+
     print(
-      '[saropa_lints] Progress: $fileCount files analyzed '
-      '(${elapsed.inSeconds}s, ${filesPerSec.toStringAsFixed(1)} files/sec) '
-      '- $shortName',
+      '[saropa_lints] Progress: $progressStr analyzed '
+      '(${elapsed.inSeconds}s, ${filesPerSec.toStringAsFixed(1)} files/sec, '
+      '$_violationsFound issues) - $shortName',
     );
   }
 
@@ -212,7 +317,7 @@ class ProgressTracker {
 
     print(
       '[saropa_lints] Complete: $fileCount files analyzed in ${elapsed.inSeconds}s '
-      '(${filesPerSec.toStringAsFixed(1)} files/sec)',
+      '(${filesPerSec.toStringAsFixed(1)} files/sec, $_violationsFound issues found)',
     );
   }
 
@@ -688,6 +793,38 @@ enum LintImpact {
   opinionated,
 }
 
+/// The tier at which a rule is enabled by default.
+///
+/// This is the single source of truth for tier assignment. The init script
+/// reads this from each rule to generate analysis_options.yaml.
+///
+/// Tiers are cumulative: higher tiers include all rules from lower tiers.
+enum RuleTier {
+  /// Critical rules preventing crashes, security holes, memory leaks.
+  /// Must be enabled for all projects.
+  essential,
+
+  /// Essential + accessibility, performance patterns.
+  /// Recommended for most teams.
+  recommended,
+
+  /// Recommended + architecture, testing, documentation.
+  /// For enterprise/professional teams.
+  professional,
+
+  /// Professional + thorough coverage.
+  /// For quality-obsessed teams.
+  comprehensive,
+
+  /// All rules enabled including pedantic/opinionated ones.
+  /// For greenfield projects with strict standards.
+  insanity,
+
+  /// Stylistic rules (formatting, ordering, naming).
+  /// Opt-in only via --stylistic flag. Not included in any tier by default.
+  stylistic,
+}
+
 /// Tracks lint violations by impact level for summary reporting.
 ///
 /// Usage:
@@ -882,6 +1019,26 @@ abstract class SaropaLintRule extends DartLintRule {
   ///
   /// Default: [LintImpact.medium]
   LintImpact get impact => LintImpact.medium;
+
+  // ============================================================
+  // Tier Classification (Single Source of Truth)
+  // ============================================================
+
+  /// The tier at which this rule is enabled by default.
+  ///
+  /// **This is the single source of truth for tier assignment.**
+  /// The init script reads this from each rule to generate analysis_options.yaml.
+  ///
+  /// Override to specify the tier for your rule:
+  /// - [RuleTier.essential]: Critical (crashes, security, memory leaks)
+  /// - [RuleTier.recommended]: Essential + accessibility, performance
+  /// - [RuleTier.professional]: Recommended + architecture, testing
+  /// - [RuleTier.comprehensive]: Professional + thorough coverage
+  /// - [RuleTier.insanity]: Pedantic, highly opinionated rules
+  /// - [RuleTier.stylistic]: Opt-in only (formatting, ordering, naming)
+  ///
+  /// Default: [RuleTier.professional] (most rules are professional-level)
+  RuleTier get tier => RuleTier.professional;
 
   // ============================================================
   // Config Key Aliases
@@ -1853,8 +2010,9 @@ class SaropaDiagnosticReporter {
     );
   }
 
-  /// Track a violation in the ImpactTracker.
+  /// Track a violation in the ImpactTracker and ProgressTracker.
   void _trackViolation(LintCode code, int line) {
+    // Track for impact reporting
     ImpactTracker.record(
       impact: impact,
       rule: _ruleName,
@@ -1862,6 +2020,9 @@ class SaropaDiagnosticReporter {
       line: line,
       message: code.problemMessage,
     );
+
+    // Track for progress reporting
+    ProgressTracker.recordViolation();
   }
 
   /// Get approximate line number from an AST node.
