@@ -10,13 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [4.6.2] - 2026-01-24
 
-### Fixed
+### Removed
 
-- **require_build_context_scope**: Fixed false positives for BuildContext used as argument to awaited function calls. Previously, `await showDialog(context: context)` was incorrectly flagged. The rule now correctly distinguishes between:
-  - **Safe:** Context as argument to awaited call (`await showDialog(context: context)`)
-  - **Unsafe:** Context used after await completes (`await foo(); Navigator.of(context).pop()`)
-  - Also fixed: Parameter type detection was broken (using `declaredFragment` instead of `getBuildContextParamName` utility)
-  - Added `LintImpact.high`, `RuleCost.medium`, `requiresAsync` for proper classification and performance
+- **require_build_context_scope**: Removed duplicate rule and added `require_build_context_scope` as a config alias to `avoid_context_across_async`. The `avoid_context_across_async` rule (Essential tier) provides better detection with mounted guard awareness and a quick fix. Users with `require_build_context_scope` in their config will now use `avoid_context_across_async` automatically.
 
 ### Added
 
