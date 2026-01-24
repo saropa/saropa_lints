@@ -171,3 +171,76 @@ class ReorderableListView extends StatelessWidget {
 class Key {
   const Key(String value);
 }
+
+// =========================================================================
+// avoid_flashing_content
+// =========================================================================
+
+// Mock AnimationController for testing
+class AnimationController {
+  AnimationController({this.duration, this.vsync});
+  final Duration? duration;
+  final dynamic vsync;
+
+  void forward() {}
+  void reverse() {}
+  void animateTo(double target) {}
+  AnimationController repeat({bool reverse = false}) => this;
+}
+
+// BAD: Fast repeat animation - causes flashing
+void badFastRepeatAnimation() {
+  AnimationController(
+    // expect_lint: avoid_flashing_content
+    duration: Duration(milliseconds: 100), // 10 flashes/second!
+  )..repeat(reverse: true);
+}
+
+// BAD: Fast repeat without reverse - still flashes
+void badFastRepeatNoReverse() {
+  AnimationController(
+    // expect_lint: avoid_flashing_content
+    duration: Duration(milliseconds: 200),
+  )..repeat();
+}
+
+// GOOD: Fast forward-only animation - no flashing (single direction)
+void goodFastForwardOnly() {
+  // OK: Single-direction animations don't flash
+  AnimationController(
+    duration: Duration(milliseconds: 100),
+  )..forward();
+}
+
+// GOOD: Fast reverse-only animation - no flashing (single direction)
+void goodFastReverseOnly() {
+  // OK: Single-direction animations don't flash
+  AnimationController(
+    duration: Duration(milliseconds: 100),
+  )..reverse();
+}
+
+// GOOD: Slow repeat animation - under 3Hz threshold
+void goodSlowRepeat() {
+  // OK: 500ms duration = 2 flashes/second
+  AnimationController(
+    duration: Duration(milliseconds: 500),
+  )..repeat(reverse: true);
+}
+
+// GOOD: No cascade - can't detect repeat usage
+void goodNoCascade() {
+  // OK: Without cascade, we can't know if it repeats
+  final controller = AnimationController(
+    duration: Duration(milliseconds: 100),
+  );
+  controller.forward();
+}
+
+// GOOD: Fast animateTo - single direction
+void goodFastAnimateTo() {
+  // OK: animateTo is single-direction
+  AnimationController(
+    duration: Duration(milliseconds: 100),
+  )..animateTo(1.0);
+}
