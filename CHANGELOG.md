@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.5.7] - 2026-01-23
 
+### Changed
+
+- **CLI tool (bin/init.dart) improvements:**
+  - Enhanced doc header with comprehensive parameter documentation, examples, and exit codes
+  - Fixed section header padding bug that caused malformed output for very long titles
+  - Fixed asymmetric centering for odd-length section titles
+  - Added graceful truncation for titles exceeding 72 characters
+
 ### Fixed
 
 - **avoid_platform_channel_on_web**: Fixed false positives when MethodChannel is properly guarded with a ternary operator. The rule now recognizes both patterns:
@@ -20,12 +28,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Trailing ignore comment detection**: Fixed `// ignore:` comments not being recognized in certain contexts:
   - Constructor arguments: `url: 'http://example.com', // ignore: rule`
   - List items: `WebsiteItem(url: 'test.com'), // ignore: rule`
-  - Extracted `_checkNextTokenForIgnore()` helper for better code organization.
+  - Added line-based validation to distinguish trailing comments (apply to same-line code) from leading comments (apply to next statement).
+  - This prevents a trailing ignore on one argument from incorrectly suppressing lints on subsequent arguments.
 
 - **require_deep_link_fallback**: Fixed false positives on utility methods:
   - Skip methods starting with `reset`, `clear`, `set`, `get`
   - Skip simple getter expressions that just return a field
   - Skip trivial method bodies with single assignment statements
+
+### Documentation
+
+- Updated README.md version badge to 4.5.7
+- Updated example/analysis_options_template.yaml tier counts to match actual rule counts
 
 ---
 

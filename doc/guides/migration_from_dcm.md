@@ -69,10 +69,12 @@ dart_code_metrics:
 analyzer:
   plugins:
     - custom_lint
+```
 
-custom_lint:
-  saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+Then generate the configuration:
+
+```bash
+dart run saropa_lints:init --tier recommended
 ```
 
 ### Step 3: Run the linter
@@ -96,10 +98,12 @@ dart_code_metrics:
   metrics:
     cyclomatic-complexity: 20
     lines-of-code: 100
+```
 
-custom_lint:
-  saropa_lints:
-    tier: recommended
+Then generate saropa_lints configuration:
+
+```bash
+dart run saropa_lints:init --tier recommended
 ```
 
 ```yaml
@@ -238,16 +242,20 @@ dart_code_metrics:
 
 ### saropa_lints Tier Selection
 
-```yaml
-# saropa_lints style - choose a tier
-custom_lint:
-  saropa_lints:
-    tier: professional  # essential | recommended | professional | comprehensive | insanity
+```bash
+# Generate configuration for your chosen tier
+dart run saropa_lints:init --tier professional
 
-# Or disable specific rules
+# Or for a different tier
+dart run saropa_lints:init --tier recommended
+```
+
+After generation, customize specific rules in analysis_options.yaml:
+
+```yaml
 custom_lint:
   rules:
-    - avoid_magic_numbers: false
+    - avoid_magic_numbers: false  # Change to false to disable
 ```
 
 ## Getting Help

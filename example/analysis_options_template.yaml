@@ -1,5 +1,5 @@
 # ==============================================================================
-# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 4.2.0)
+# SAROPA LINTS - ANALYSIS OPTIONS TEMPLATE (Version 4.5.7)
 # ==============================================================================
 #
 # This is an up-to-date template for configuring Saropa Lints in your project.
@@ -17,11 +17,11 @@
 #
 # TIER GUIDE
 # ==========
-# - essential      : Critical rules (~310) - prevents crashes, security issues
-# - recommended    : Essential + common mistakes (~712) - default for most teams
-# - professional   : Recommended + architecture/testing (~1121) - enterprise teams
-# - comprehensive  : Professional + thorough coverage (~1392) - quality obsessed
-# - insanity       : Everything including opinionated rules (~1466) - greenfield projects
+# - essential      : Critical rules (~340) - prevents crashes, security issues
+# - recommended    : Essential + common mistakes (~850) - default for most teams
+# - professional   : Recommended + architecture/testing (~1590) - enterprise teams
+# - comprehensive  : Professional + thorough coverage (~1640) - quality obsessed
+# - insanity       : Everything including opinionated rules (~1650) - greenfield projects
 #
 # CONFIGURATION NOTES
 # ===================
@@ -84,11 +84,11 @@ analyzer:
 custom_lint:
   saropa_lints:
     # Choose one tier (required):
-    #   - essential      : ~45 rules (critical only)
-    #   - recommended    : ~150 rules (default) ← START HERE
-    #   - professional   : ~350 rules (strict)
-    #   - comprehensive  : ~700 rules (very strict)
-    #   - insanity       : ~1290+ rules (everything)
+    #   - essential      : ~340 rules (critical only)
+    #   - recommended    : ~850 rules (default) ← START HERE
+    #   - professional   : ~1590 rules (strict)
+    #   - comprehensive  : ~1640 rules (very strict)
+    #   - insanity       : ~1650 rules (everything)
     tier: recommended
 
   # cspell:ignore shouldrepaint itemextent
