@@ -10,7 +10,8 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/error/error.dart' show DiagnosticSeverity;
+import 'package:analyzer/error/error.dart'
+    show AnalysisError, DiagnosticSeverity;
 import 'package:custom_lint_builder/custom_lint_builder.dart';
 
 import '../saropa_lint_rule.dart';
@@ -2568,10 +2569,12 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
   }
 }
 
-/// Warns when animation may flash more than 3 times per second.
+/// Warns when repeating animation may flash more than 3 times per second.
 ///
 /// Rapidly flashing content can trigger seizures in photosensitive users.
-/// WCAG requires no more than 3 flashes per second.
+/// WCAG 2.3.1 requires no more than 3 flashes per second. A "flash" requires
+/// alternating between states, so only repeating animations can cause flashing.
+/// Single-direction animations (forward, reverse, animateTo) are not flagged.
 ///
 /// **BAD:**
 /// ```dart
@@ -2582,10 +2585,18 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
 ///
 /// **GOOD:**
 /// ```dart
+/// // Slow repeat is safe
 /// AnimationController(
 ///   duration: Duration(milliseconds: 500), // 2 flashes/second
 /// )..repeat(reverse: true);
+///
+/// // Single-direction animations don't flash
+/// AnimationController(
+///   duration: Duration(milliseconds: 100),
+/// )..forward(); // OK - runs once, no flashing
 /// ```
+///
+/// **Quick fix available:** Increases duration to 333ms (minimum safe threshold).
 class AvoidFlashingContentRule extends SaropaLintRule {
   const AvoidFlashingContentRule() : super(code: _code);
 
@@ -2606,6 +2617,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
   );
 
   @override
+  List<Fix> getFixes() => <Fix>[_IncreaseAnimationDurationFix()];
+
+  @override
   void runWithReporter(
     CustomLintResolver resolver,
     SaropaDiagnosticReporter reporter,
@@ -2617,29 +2631,93 @@ class AvoidFlashingContentRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'AnimationController') return;
 
+      // Only flag if animation repeats (actual flashing requires alternation)
+      if (!_hasRepeatCascade(node)) return;
+
       // Check duration argument
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'duration') {
+          final int? millis = _extractMilliseconds(arg.expression);
+          if (millis != null && millis > 0 && millis < 333) {
+            reporter.atNode(arg, code);
+          }
+        }
+      }
+    });
+  }
+
+  /// Check for cascade like `AnimationController(...)..repeat()`.
+  bool _hasRepeatCascade(InstanceCreationExpression node) {
+    final AstNode? parent = node.parent;
+    if (parent is! CascadeExpression) return false;
+    if (parent.target != node) return false;
+
+    for (final Expression section in parent.cascadeSections) {
+      if (section is MethodInvocation && section.methodName.name == 'repeat') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /// Extract milliseconds from a Duration constructor expression.
+  int? _extractMilliseconds(Expression duration) {
+    if (duration is! InstanceCreationExpression) return null;
+
+    final String durationTypeName = duration.constructorName.type.name.lexeme;
+    if (durationTypeName != 'Duration') return null;
+
+    for (final Expression durationArg in duration.argumentList.arguments) {
+      if (durationArg is NamedExpression &&
+          durationArg.name.label.name == 'milliseconds') {
+        final Expression millisExpr = durationArg.expression;
+        if (millisExpr is IntegerLiteral) {
+          return millisExpr.value;
+        }
+      }
+    }
+    return null;
+  }
+}
+
+/// Quick fix to increase animation duration to 333ms (WCAG 2.3.1 compliant).
+class _IncreaseAnimationDurationFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addInstanceCreationExpression((
+      InstanceCreationExpression node,
+    ) {
+      // Find the duration argument that was flagged
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'duration') {
+          if (!arg.sourceRange.intersects(analysisError.sourceRange)) continue;
+
           final Expression duration = arg.expression;
-          if (duration is InstanceCreationExpression) {
-            final String durationTypeName =
-                duration.constructorName.type.name.lexeme;
-            if (durationTypeName == 'Duration') {
-              // Check milliseconds
-              for (final Expression durationArg
-                  in duration.argumentList.arguments) {
-                if (durationArg is NamedExpression &&
-                    durationArg.name.label.name == 'milliseconds') {
-                  final Expression millisExpr = durationArg.expression;
-                  if (millisExpr is IntegerLiteral) {
-                    final int millis = millisExpr.value ?? 0;
-                    // Less than 333ms means more than 3 flashes/second
-                    if (millis > 0 && millis < 333) {
-                      reporter.atNode(arg, code);
-                    }
-                  }
-                }
-              }
+          if (duration is! InstanceCreationExpression) continue;
+
+          // Find the milliseconds argument to replace
+          for (final Expression durationArg
+              in duration.argumentList.arguments) {
+            if (durationArg is NamedExpression &&
+                durationArg.name.label.name == 'milliseconds') {
+              final changeBuilder = reporter.createChangeBuilder(
+                message: 'Increase duration to 333ms',
+                priority: 80,
+              );
+
+              changeBuilder.addDartFileEdit((builder) {
+                builder.addSimpleReplacement(
+                  durationArg.expression.sourceRange,
+                  '333',
+                );
+              });
+              return;
             }
           }
         }

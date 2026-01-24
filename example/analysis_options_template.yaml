@@ -163,6 +163,7 @@ custom_lint:
     - require_badge_semantics: false
     - require_badge_count_limit: false
     - prefer_focus_traversal_order: false        # INFO - define focus traversal order for keyboard navigation (v4.2.0)
+    - avoid_flashing_content: false              # WARNING - animation with repeat() <333ms can trigger seizures (WCAG 2.3.1)
 
     # =========================================================================
     # COLLECTIONS
