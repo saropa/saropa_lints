@@ -32,9 +32,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - This prevents a trailing ignore on one argument from incorrectly suppressing lints on subsequent arguments.
 
 - **require_deep_link_fallback**: Fixed false positives on utility methods:
-  - Skip methods starting with `reset`, `clear`, `set`, `get`
-  - Skip simple getter expressions that just return a field
-  - Skip trivial method bodies with single assignment statements
+  - Skip methods starting with `reset`, `clear`, `set`
+  - Skip simple expression body methods returning a field (e.g., `=> _uri`)
+  - Skip trivial method bodies with single assignment or simple return statements
+  - `get*` methods now use body-based detection (skip only if returning a simple field/null)
+
+### Added
+
+- **require_deep_link_fallback quick fix**: Wraps handler body with try/catch for fallback handling
 
 ### Documentation
 
