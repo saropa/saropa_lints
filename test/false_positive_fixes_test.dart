@@ -57,6 +57,52 @@ void main() {
         );
       });
 
+      test('should skip utility methods that manage state', () {
+        // Expected behavior: These should NOT trigger
+        // - resetInitialUri() (starts with "reset")
+        // - clearCurrentUri() (starts with "clear")
+        // - setInitialUri() (starts with "set")
+        // - getStoredUri() (starts with "get")
+
+        expect(
+          'Utility methods with reset/clear/set/get prefixes are skipped',
+          isNotNull,
+        );
+      });
+
+      test('should skip simple expression body getters', () {
+        // Expected behavior: These should NOT trigger
+        // - Uri? get initialUri => _initialUri;
+        // - Uri? get currentRouteUri => _currentUri;
+
+        expect(
+          'Simple getters returning a field are skipped',
+          isNotNull,
+        );
+      });
+
+      test('should skip trivial single-assignment method bodies', () {
+        // Expected behavior: These should NOT trigger
+        // - void resetUri() { _uri = null; }
+
+        expect(
+          'Methods with single assignment statement are skipped',
+          isNotNull,
+        );
+      });
+
+      test('should skip methods with simple return statements', () {
+        // Expected behavior: These should NOT trigger
+        // - Uri? getStoredUri() { return _uri; }
+        // - Uri? getCachedUri() => _uri;
+        // - Uri? getDefaultUri() { return null; }
+
+        expect(
+          'Methods with simple return of field/null are skipped',
+          isNotNull,
+        );
+      });
+
       test('should skip utility getters ending with empty/null/nullable', () {
         // Expected behavior: These should NOT trigger
         // - isUriEmpty (ends with "empty")
