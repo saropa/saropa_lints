@@ -228,9 +228,7 @@ class ProgressTracker {
         if (fileTime.inSeconds >= 5) {
           final shortName = _currentFile!.split('/').last.split('\\').last;
           // Use stderr to avoid custom_lint rule name prefix
-          stderr.writeln(
-            '[saropa_lints] Slow file: $shortName took ${fileTime.inSeconds}s',
-          );
+          stderr.writeln('⏱️  Slow: $shortName (${fileTime.inSeconds}s)');
         }
       }
 
@@ -303,17 +301,17 @@ class ProgressTracker {
           (_totalExpectedFiles - fileCount).clamp(0, _totalExpectedFiles);
       final etaSeconds =
           filesPerSec > 0 ? (remaining / filesPerSec).round() : 0;
-      progressStr = '$fileCount/$_totalExpectedFiles ($percent%) '
-          '- ETA: ${_formatDuration(etaSeconds)}';
+      progressStr =
+          '$fileCount/$_totalExpectedFiles ($percent%) ETA ${_formatDuration(etaSeconds)}';
     } else {
       progressStr = '$fileCount files';
     }
 
     // Use stderr to avoid custom_lint rule name prefix
+    // Clean format: progress | time | rate | issues | current file
     stderr.writeln(
-      '[saropa_lints] Progress: $progressStr analyzed '
-      '(${elapsed.inSeconds}s, ${filesPerSec.toStringAsFixed(1)} files/sec, '
-      '$_violationsFound issues) - $shortName',
+      '📊 $progressStr | ${elapsed.inSeconds}s | '
+      '${filesPerSec.toStringAsFixed(1)}/s | $_violationsFound issues | $shortName',
     );
   }
 
@@ -327,8 +325,8 @@ class ProgressTracker {
 
     // Use stderr to avoid custom_lint rule name prefix
     stderr.writeln(
-      '[saropa_lints] Complete: $fileCount files analyzed in ${elapsed.inSeconds}s '
-      '(${filesPerSec.toStringAsFixed(1)} files/sec, $_violationsFound issues found)',
+      '✅ Complete: $fileCount files in ${elapsed.inSeconds}s '
+      '(${filesPerSec.toStringAsFixed(1)}/s) - $_violationsFound issues',
     );
   }
 
