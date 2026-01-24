@@ -705,6 +705,9 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // Cached regex for performance
+  static final RegExp _discardedVarPattern = RegExp(r'^_[a-z]');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -719,7 +722,7 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
       if (name.length > 1 &&
           name.startsWith('_') &&
           !name.startsWith('__') &&
-          RegExp(r'^_[a-z]').hasMatch(name)) {
+          _discardedVarPattern.hasMatch(name)) {
         // Use resolved element to distinguish locals from members/methods
         final element = node.element;
 
@@ -6526,6 +6529,9 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // Cached regex for performance
+  static final RegExp _typePattern = RegExp(r'^(\w+)');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -6576,9 +6582,8 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 
   bool _sameBaseType(String pattern1, String pattern2) {
     // Extract base type from patterns like "int _" or "int x"
-    final RegExp typePattern = RegExp(r'^(\w+)');
-    final RegExpMatch? match1 = typePattern.firstMatch(pattern1);
-    final RegExpMatch? match2 = typePattern.firstMatch(pattern2);
+    final RegExpMatch? match1 = _typePattern.firstMatch(pattern1);
+    final RegExpMatch? match2 = _typePattern.firstMatch(pattern2);
 
     if (match1 != null && match2 != null) {
       return match1.group(1) == match2.group(1);

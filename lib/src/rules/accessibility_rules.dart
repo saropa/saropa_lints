@@ -1804,6 +1804,13 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
+  // Cached regex for performance
+  // cspell:ignore errorcolor redaccent
+  static final RegExp _errorColorPattern = RegExp(
+    r'colors\.red|\.red\b|\.error\b|errorcolor|redaccent',
+    caseSensitive: false,
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -1828,13 +1835,8 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
 
       // Check if using error colors - use patterns to avoid false positives
       // like 'thread', 'spread', 'shredded' matching 'red'
-      final errorColorPattern = RegExp(
-        // cspell:ignore errorcolor redaccent
-        r'colors\.red|\.red\b|\.error\b|errorcolor|redaccent',
-        caseSensitive: false,
-      );
-      if (!errorColorPattern.hasMatch(thenSource) &&
-          !errorColorPattern.hasMatch(elseSource)) {
+      if (!_errorColorPattern.hasMatch(thenSource) &&
+          !_errorColorPattern.hasMatch(elseSource)) {
         return;
       }
 

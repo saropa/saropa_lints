@@ -336,6 +336,11 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  // Cached regex for performance
+  static final RegExp _collectionPattern = RegExp(
+    r'(List|Set|Iterable)<\s*(Safe)?ValueNotifier<',
+  );
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -439,10 +444,7 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
     // - List<SafeValueNotifier<...>>
     // - Set<ValueNotifier<...>>
     // - Iterable<ValueNotifier<...>>
-    final collectionPattern = RegExp(
-      r'(List|Set|Iterable)<\s*(Safe)?ValueNotifier<',
-    );
-    return collectionPattern.hasMatch(typeName);
+    return _collectionPattern.hasMatch(typeName);
   }
 
   void _reportUndisposed(
@@ -2382,6 +2384,9 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
+  // Cached regex for performance
+  static final RegExp _onPattern = RegExp(r'on<\w+>');
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -2399,8 +2404,7 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
       final String classSource = node.toSource();
 
       // Count on<EventType> registrations
-      final RegExp onPattern = RegExp(r'on<\w+>');
-      final int eventCount = onPattern.allMatches(classSource).length;
+      final int eventCount = _onPattern.allMatches(classSource).length;
 
       // If only 1-2 simple events, suggest Cubit
       if (eventCount <= 2) {
