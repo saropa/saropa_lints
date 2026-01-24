@@ -65,6 +65,46 @@ class GoodDeepLinkHandler {
   }
 }
 
+// FALSE POSITIVE TEST: Utility methods managing state should NOT trigger
+class DeepLinkStateManager {
+  Uri? _initialUri;
+  Uri? _currentUri;
+
+  // OK: Simple getter returning a field - not a handler
+  Uri? get initialUri => _initialUri;
+
+  // OK: Simple getter returning a field - not a handler
+  Uri? get currentRouteUri => _currentUri;
+
+  // OK: Reset utility method - not a handler
+  void resetInitialUri() {
+    _initialUri = null;
+  }
+
+  // OK: Clear utility method - not a handler
+  void clearCurrentUri() {
+    _currentUri = null;
+  }
+
+  // OK: Set utility method - not a handler
+  void setInitialUri(Uri? uri) {
+    _initialUri = uri;
+  }
+
+  // OK: Get utility method with block body returning field - not a handler
+  Uri? getStoredUri() {
+    return _initialUri;
+  }
+
+  // OK: Get utility method with expression body - not a handler
+  Uri? getCachedUri() => _currentUri;
+
+  // OK: Method returning null - trivial accessor
+  Uri? getDefaultUri() {
+    return null;
+  }
+}
+
 // FALSE POSITIVE TEST: Utility getters should NOT trigger
 extension UriExtensions on Uri? {
   // OK: Utility getter checking URI state
