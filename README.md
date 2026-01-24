@@ -14,7 +14,7 @@ Developed by [Saropa][saropa_link]. Making the world of Dart & Flutter better, o
 [saropa_link]: https://saropa.com
 license
 
-> 💬 **Have feedback on Saropa Lints2?** Share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
+> 💬 **Have feedback on Saropa Lints?** Share it by [opening an issue](https://github.com/saropa/saropa_lints/issues/new) on GitHub!
 
 ---
 
