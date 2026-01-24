@@ -86,7 +86,7 @@ import 'package:saropa_lints/saropa_lints.dart'
 import 'package:saropa_lints/src/tiers.dart' as legacy_tiers;
 
 /// Package version - update when releasing.
-const String _version = '4.7.2';
+const String _version = '4.7.3';
 
 // ---------------------------------------------------------------------------
 // Log buffer for detailed report file
@@ -808,23 +808,16 @@ Future<void> main(List<String> args) async {
           '🚀 ${_Colors.bold}Running: dart run custom_lint${_Colors.reset}');
       _logTerminal('${'─' * 60}');
 
-      final result = Process.runSync(
+      // Run with inheritStdio for real-time output streaming
+      // Must await to prevent parent exit from killing child process
+      final process = await Process.start(
         'dart',
         ['run', 'custom_lint'],
+        mode: ProcessStartMode.inheritStdio,
         runInShell: true,
       );
-
-      stdout.write(result.stdout);
-      if (result.stderr.toString().isNotEmpty) {
-        stderr.write(result.stderr);
-      }
-
+      await process.exitCode;
       _logTerminal('${'─' * 60}');
-      if (result.exitCode == 0) {
-        _logTerminal('✅ ${_success('Analysis complete')}');
-      } else {
-        _logTerminal('⚠️ ${_warning('Analysis finished with issues')}');
-      }
     }
   }
 }
