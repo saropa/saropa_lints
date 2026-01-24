@@ -154,6 +154,8 @@ class ProgressTracker {
   static int _totalExpectedFiles = 0;
   static int _violationsFound = 0;
   static bool _etaCalibrated = false;
+  static bool _discoveredFromFiles =
+      false; // True only if discoverFiles() found files
 
   // Rolling rate samples for more stable ETA (last N samples)
   static final List<double> _rateSamples = [];
@@ -188,8 +190,13 @@ class ProgressTracker {
           }
         }
       }
-      _totalExpectedFiles = count;
-      _etaCalibrated = true;
+      // Only mark calibrated if we found a meaningful number of files
+      // (avoids false ETA when discovery fails or wrong directory)
+      if (count >= 10) {
+        _totalExpectedFiles = count;
+        _etaCalibrated = true;
+        _discoveredFromFiles = true;
+      }
       return count;
     } catch (_) {
       return 0;
@@ -285,9 +292,10 @@ class ProgressTracker {
     final lastFile = _seenFiles.last;
     final shortName = lastFile.split('/').last.split('\\').last;
 
-    // Calculate percentage and ETA if we have an estimate
+    // Calculate percentage and ETA only if we have a real file discovery
+    // (not just recalibrated guesses which are always wrong)
     String progressStr;
-    if (_totalExpectedFiles > 0 && _etaCalibrated) {
+    if (_discoveredFromFiles && _totalExpectedFiles > 0) {
       final percent =
           (fileCount * 100 / _totalExpectedFiles).clamp(0, 100).round();
       final remaining =
@@ -327,6 +335,11 @@ class ProgressTracker {
     _startTime = null;
     _lastProgressTime = null;
     _lastReportedCount = 0;
+    _totalExpectedFiles = 0;
+    _etaCalibrated = false;
+    _discoveredFromFiles = false;
+    _violationsFound = 0;
+    _rateSamples.clear();
   }
 }
 
