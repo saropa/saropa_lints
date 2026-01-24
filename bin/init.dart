@@ -86,7 +86,43 @@ import 'package:saropa_lints/saropa_lints.dart'
 import 'package:saropa_lints/src/tiers.dart' as legacy_tiers;
 
 /// Package version - update when releasing.
-const String _version = '4.7.1';
+const String _version = '4.7.2';
+
+// ---------------------------------------------------------------------------
+// Log buffer for detailed report file
+// ---------------------------------------------------------------------------
+
+/// Buffer to collect all log output for the report file.
+final StringBuffer _logBuffer = StringBuffer();
+
+/// Timestamp for log file naming.
+String? _logTimestamp;
+
+/// Strip ANSI escape codes from text for plain text log file.
+String _stripAnsi(String text) {
+  return text.replaceAll(RegExp(r'\x1B\[[0-9;]*m'), '');
+}
+
+/// Write the log buffer to a timestamped report file.
+void _writeLogFile() {
+  if (_logTimestamp == null) return;
+
+  try {
+    final reportsDir = Directory('reports');
+    if (!reportsDir.existsSync()) {
+      reportsDir.createSync(recursive: true);
+    }
+
+    final logPath = 'reports/${_logTimestamp}_saropa_lints_init.log';
+    final logContent = _stripAnsi(_logBuffer.toString());
+    File(logPath).writeAsStringSync(logContent);
+
+    print('${_Colors.dim}Log written to: $logPath${_Colors.reset}');
+  } on Exception catch (e) {
+    print(
+        '${_Colors.yellow}Warning: Could not write log file: $e${_Colors.reset}');
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Cross-platform ANSI color support
@@ -447,6 +483,20 @@ Set<String> get stylisticRules {
 
 /// Main entry point for the CLI tool.
 Future<void> main(List<String> args) async {
+  // Initialize log timestamp for report file
+  final now = DateTime.now();
+  _logTimestamp =
+      '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_'
+      '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+
+  // Add header to log buffer
+  _logBuffer.writeln('=' * 80);
+  _logBuffer.writeln('SAROPA LINTS CONFIGURATION LOG');
+  _logBuffer.writeln('Generated: ${now.toIso8601String()}');
+  _logBuffer.writeln('Arguments: ${args.join(' ')}');
+  _logBuffer.writeln('=' * 80);
+  _logBuffer.writeln();
+
   final CliArgs cliArgs = _parseArguments(args);
   if (cliArgs.showHelp) {
     _printUsage();
@@ -495,6 +545,27 @@ Future<void> main(List<String> args) async {
   } else {
     finalEnabled = finalEnabled.difference(stylisticRules);
     finalDisabled = finalDisabled.union(stylisticRules);
+  }
+
+  // Read or create custom overrides file (survives --reset)
+  final File overridesFile = File('analysis_options_custom.yaml');
+  Map<String, bool> permanentOverrides = <String, bool>{};
+
+  if (overridesFile.existsSync()) {
+    _logTerminal(
+        '${_Colors.cyan}📌 Found custom overrides: ${overridesFile.absolute.path}${_Colors.reset}');
+    permanentOverrides = _extractOverridesFromFile(overridesFile, allRules);
+    if (permanentOverrides.isNotEmpty) {
+      _logTerminal(
+          '${_Colors.dim}  ${permanentOverrides.length} custom rules loaded${_Colors.reset}');
+    }
+  } else {
+    // Create the custom overrides file with a helpful header
+    _createCustomOverridesFile(overridesFile);
+    _logTerminal(
+        '${_Colors.green}✓ Created: ${overridesFile.absolute.path}${_Colors.reset}');
+    _logTerminal(
+        '${_Colors.dim}  Add your permanent rule overrides to this file${_Colors.reset}');
   }
 
   // Read existing config and extract user customizations
@@ -557,13 +628,24 @@ Future<void> main(List<String> args) async {
     _logTerminal('');
     _logTerminal(
         '${_Colors.yellow}⚠ Warning: ${cliArgs.outputPath} already exists.${_Colors.reset}');
-    _logTerminal(
-        '${_Colors.dim}  Backing up to ${cliArgs.outputPath}.bak${_Colors.reset}');
+
+    // Create timestamped backup using same timestamp as log file
+    final outputDir = outputFile.parent.path;
+    final outputName = cliArgs.outputPath.split('/').last.split('\\').last;
+    final backupPath = '$outputDir/${_logTimestamp}_$outputName.bak';
+
+    _logTerminal('${_Colors.dim}  Backing up to: $backupPath${_Colors.reset}');
     try {
-      outputFile.copySync('${cliArgs.outputPath}.bak');
+      outputFile.copySync(backupPath);
     } on Exception catch (e) {
       _logTerminal(_error('✗ Failed to backup file: $e'));
     }
+  }
+
+  // Merge permanent overrides with user customizations
+  // Permanent overrides always take precedence
+  if (permanentOverrides.isNotEmpty) {
+    userCustomizations = {...userCustomizations, ...permanentOverrides};
   }
 
   // Count rules by severity for summary
@@ -710,6 +792,11 @@ Future<void> main(List<String> args) async {
   _logTerminal(
       '${_Colors.dim}To change tiers later, run this command again with a different --tier${_Colors.reset}');
   _logTerminal('');
+
+  // Write detailed log file (unless dry-run)
+  if (!cliArgs.dryRun) {
+    _writeLogFile();
+  }
 }
 
 /// Matches the USER CUSTOMIZATIONS section header in generated YAML.
@@ -771,6 +858,83 @@ Map<String, bool> _extractUserCustomizations(
   }
 
   return customizations;
+}
+
+/// Extract rule overrides from analysis_options_custom.yaml.
+///
+/// Supports multiple formats:
+/// ```yaml
+/// # Custom rule overrides (survives --reset)
+/// avoid_print: false  # Allow print in this project
+/// - avoid_null_assertion: false # With hyphen prefix
+///   - require_error_widget: false # Indented with hyphen
+/// prefer_const_constructors: true
+/// ```
+///
+/// These overrides are always applied, even when using --reset.
+Map<String, bool> _extractOverridesFromFile(File file, Set<String> allRules) {
+  final Map<String, bool> overrides = <String, bool>{};
+
+  if (!file.existsSync()) {
+    return overrides;
+  }
+
+  final content = file.readAsStringSync();
+
+  // Match rule entries with optional hyphen, indentation, and trailing comments:
+  // - rule_name: true/false # optional comment
+  //   rule_name: true/false
+  // rule_name: false
+  final rulePattern = RegExp(
+    r'^\s*-?\s*([\w_]+):\s*(true|false)',
+    multiLine: true,
+  );
+
+  for (final match in rulePattern.allMatches(content)) {
+    final ruleName = match.group(1)!;
+    final enabled = match.group(2) == 'true';
+
+    // Only include rules we know about
+    if (allRules.contains(ruleName)) {
+      overrides[ruleName] = enabled;
+    }
+  }
+
+  return overrides;
+}
+
+/// Create the analysis_options_custom.yaml file with a helpful header.
+void _createCustomOverridesFile(File file) {
+  final content = '''
+# ╔═══════════════════════════════════════════════════════════════════════════╗
+# ║                    CUSTOM RULE OVERRIDES                                  ║
+# ║                                                                           ║
+# ║  Rules in this file are ALWAYS applied, even when using --reset.         ║
+# ║  Use this for project-specific customizations that should persist.       ║
+# ╚═══════════════════════════════════════════════════════════════════════════╝
+#
+# FORMAT: Add rules with true/false values. All formats below are supported:
+#
+#   rule_name: false                    # Simple format
+#   - rule_name: false                  # With hyphen (YAML list style)
+#   - rule_name: false  # Comment here  # With trailing comment
+#
+# EXAMPLES:
+#
+#   # Disable specific rules for this project:
+#   - avoid_print: false                # Allow print statements
+#   - avoid_null_assertion: false       # Allow ! operator
+#
+#   # Force-enable rules regardless of tier:
+#   - prefer_const_constructors: true   # Always require const
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Add your custom rule overrides below:
+# ─────────────────────────────────────────────────────────────────────────────
+
+''';
+
+  file.writeAsStringSync(content);
 }
 
 /// Generate the custom_lint YAML section with proper formatting.
@@ -877,12 +1041,7 @@ String _generateCustomLintYaml({
     final tierNum = _tierIndex(tierLevel) + 1;
     buffer.writeln('    #');
     buffer.writeln(
-        '    # ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓');
-    buffer.writeln(
-        '    # ┃  TIER $tierNum: $tierName${' ' * (60 - tierName.length)}┃');
-    buffer.writeln('    # ┃  ${rules.length} rules enabled${' ' * 53}┃');
-    buffer.writeln(
-        '    # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛');
+        '    # --- TIER $tierNum: $tierName (${rules.length} rules) ---');
     buffer.writeln('    #');
     for (final String rule in rules) {
       final String msg = _getShortProblemMessage(rule);
@@ -986,75 +1145,34 @@ String _generateCustomLintYaml({
   return buffer.toString();
 }
 
-/// Generate a MASSIVE, unmissable section header for YAML.
-///
-/// Creates headers so big you can't possibly miss them when scrolling!
+/// Generate a clear, visible section header for YAML.
 String _sectionHeader(String title, String char) {
   final String upperTitle = title.toUpperCase();
+  const int width = 76;
 
-  // Different styles for different section types
   if (char == '=') {
-    // ENABLED RULES - Double-line box, very prominent
+    // ENABLED RULES - Double-line box
     return '''
     #
-    #
-    # ████████████████████████████████████████████████████████████████████████████
-    # ████████████████████████████████████████████████████████████████████████████
-    # ████                                                                    ████
-    # ████    ███████╗███╗   ██╗ █████╗ ██████╗ ██╗     ███████╗██████╗       ████
-    # ████    ██╔════╝████╗  ██║██╔══██╗██╔══██╗██║     ██╔════╝██╔══██╗      ████
-    # ████    █████╗  ██╔██╗ ██║███████║██████╔╝██║     █████╗  ██║  ██║      ████
-    # ████    ██╔══╝  ██║╚██╗██║██╔══██║██╔══██╗██║     ██╔══╝  ██║  ██║      ████
-    # ████    ███████╗██║ ╚████║██║  ██║██████╔╝███████╗███████╗██████╔╝      ████
-    # ████    ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═════╝ ╚══════╝╚══════╝╚═════╝       ████
-    # ████                                                                    ████
-    # ████████████████████████████████████████████████████████████████████████████
-    # ████████████████████████████████████████████████████████████████████████████
-    #
-    # ╔══════════════════════════════════════════════════════════════════════════╗
-    # ║                                                                          ║
-    # ║   ★ ★ ★ ★ ★ ★ ★ ★ ★   $upperTitle   ★ ★ ★ ★ ★ ★ ★ ★ ★
-    # ║                                                                          ║
-    # ╚══════════════════════════════════════════════════════════════════════════╝
-    #
+    # ${'═' * width}
+    #   ✓ $upperTitle
+    # ${'═' * width}
     #''';
   } else if (char == '~') {
     // STYLISTIC or USER CUSTOMIZATIONS - Wavy pattern
     return '''
     #
-    #
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #
-    #     ╭─────────────────────────────────────────────────────────────────────╮
-    #     │                                                                     │
-    #     │    ◆ ◇ ◆ ◇ ◆   $upperTitle   ◆ ◇ ◆ ◇ ◆
-    #     │                                                                     │
-    #     ╰─────────────────────────────────────────────────────────────────────╯
-    #
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #
+    # ${'~' * width}
+    #   ◆ $upperTitle
+    # ${'~' * width}
     #''';
   } else {
-    // DISABLED RULES - Dashed pattern (less prominent)
+    // DISABLED RULES - Dashed pattern
     return '''
     #
-    #
-    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-    #
-    #     ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-    #
-    #         ○ ● ○ ● ○   $upperTitle   ○ ● ○ ● ○
-    #
-    #     └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-    #
-    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-    # ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-    #
+    # ${'-' * width}
+    #   ✗ $upperTitle
+    # ${'-' * width}
     #''';
   }
 }
@@ -1147,6 +1265,7 @@ CliArgs _parseArguments(List<String> args) {
 
 void _logTerminal(String message) {
   print(message);
+  _logBuffer.writeln(message);
 }
 
 String? _resolveTier(String? input) {
