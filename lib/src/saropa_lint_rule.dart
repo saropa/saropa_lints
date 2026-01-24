@@ -310,8 +310,8 @@ class ProgressTracker {
     // Use stderr to avoid custom_lint rule name prefix
     // Clean format: progress | time | rate | issues | current file
     stderr.writeln(
-      '📊 $progressStr | ${elapsed.inSeconds}s | '
-      '${filesPerSec.toStringAsFixed(1)}/s | $_violationsFound issues | $shortName',
+      '📊 $progressStr | ${_formatDuration(elapsed.inSeconds)} | '
+      '${filesPerSec.round()}/s | $_violationsFound issues | $shortName',
     );
   }
 
@@ -325,8 +325,8 @@ class ProgressTracker {
 
     // Use stderr to avoid custom_lint rule name prefix
     stderr.writeln(
-      '✅ Complete: $fileCount files in ${elapsed.inSeconds}s '
-      '(${filesPerSec.toStringAsFixed(1)}/s) - $_violationsFound issues',
+      '✅ Complete: $fileCount files in ${_formatDuration(elapsed.inSeconds)} '
+      '(${filesPerSec.round()}/s) - $_violationsFound issues',
     );
   }
 
