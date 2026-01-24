@@ -1048,9 +1048,19 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   }
 }
 
-/// Warns when StatefulWidget has no state.
+/// Warns when a State class has no mutable state, lifecycle methods, or
+/// setState calls.
 ///
-/// Stateless widgets are more efficient when no state is needed.
+/// A StatefulWidget is designed for widgets that maintain mutable state.
+/// Using it without any state adds unnecessary complexity, increases lifecycle
+/// overhead, and can confuse maintainers. Convert to StatelessWidget for
+/// better performance and clearer intent.
+///
+/// The rule excludes State classes that have:
+/// - Non-final instance fields (mutable state)
+/// - Lifecycle method overrides (initState, didChangeDependencies,
+///   didUpdateWidget, deactivate, dispose)
+/// - Any `setState` calls in method bodies (including nested callbacks)
 ///
 /// **BAD:**
 /// ```dart
@@ -1059,19 +1069,39 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
 ///   State<MyWidget> createState() => _MyWidgetState();
 /// }
 ///
+/// // No mutable fields, no lifecycle methods, no setState calls
 /// class _MyWidgetState extends State<MyWidget> {
+///   final String title = 'Hello'; // final field doesn't count as state
+///
 ///   @override
-///   Widget build(BuildContext context) => Text('Hello');
+///   Widget build(BuildContext context) => Text(title);
 /// }
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
+/// // Option 1: Convert to StatelessWidget
 /// class MyWidget extends StatelessWidget {
 ///   @override
 ///   Widget build(BuildContext context) => Text('Hello');
 /// }
+///
+/// // Option 2: Has mutable state
+/// class _CounterState extends State<Counter> {
+///   int count = 0; // Non-final field = mutable state
+///   @override
+///   Widget build(BuildContext context) => Text('$count');
+/// }
+///
+/// // Option 3: Uses setState
+/// class _ToggleState extends State<Toggle> {
+///   void _onTap() => setState(() {}); // Uses setState
+///   @override
+///   Widget build(BuildContext context) => GestureDetector(onTap: _onTap);
+/// }
 /// ```
+///
+/// **Quick fix available:** Adds a TODO comment to convert to StatelessWidget.
 class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   const AvoidStatefulWithoutStateRule() : super(code: _code);
 
@@ -1091,7 +1121,7 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
         '[avoid_stateful_without_state] Using a StatefulWidget without any state fields adds unnecessary complexity, increases lifecycle overhead, and can confuse maintainers. This leads to harder-to-read code, wasted resources, and potential performance issues.',
     correctionMessage:
         'Convert the widget to a StatelessWidget if it does not manage any state. This simplifies your code and improves performance.',
-    errorSeverity: DiagnosticSeverity.ERROR,
+    errorSeverity: DiagnosticSeverity.WARNING,
   );
 
   @override
@@ -1115,6 +1145,7 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
       // Check if has any non-final fields (actual state)
       bool hasState = false;
       bool hasLifecycleMethods = false;
+      bool hasSetStateCalls = false;
 
       for (final ClassMember member in node.members) {
         if (member is FieldDeclaration) {
@@ -1133,13 +1164,79 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
               name == 'dispose') {
             hasLifecycleMethods = true;
           }
+
+          // Check for setState calls in method body
+          if (!hasSetStateCalls) {
+            final _StatefulSetStateVisitor visitor = _StatefulSetStateVisitor();
+            member.body.accept(visitor);
+            hasSetStateCalls = visitor.hasSetState;
+          }
         }
       }
 
-      if (!hasState && !hasLifecycleMethods) {
+      if (!hasState && !hasLifecycleMethods && !hasSetStateCalls) {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ConvertToStatelessWidgetFix()];
+}
+
+/// Quick fix that adds a TODO comment suggesting conversion to StatelessWidget.
+///
+/// The fix adds a comment above the State class rather than performing an
+/// automatic conversion because:
+/// 1. The StatefulWidget class also needs to be converted/removed
+/// 2. The conversion may require moving final fields to the widget class
+/// 3. Automatic widget refactoring is complex and error-prone
+class _ConvertToStatelessWidgetFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addClassDeclaration((ClassDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add TODO to convert to StatelessWidget',
+        priority: 1,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          node.offset,
+          '// TODO: Convert to StatelessWidget - this State has no mutable state\n',
+        );
+      });
+    });
+  }
+}
+
+/// Detects `setState` calls within method bodies.
+///
+/// Used by [AvoidStatefulWithoutStateRule] to identify State classes that
+/// call setState, even if they have no mutable fields. This prevents false
+/// positives for widgets that manage state through setState callbacks rather
+/// than explicit field declarations.
+///
+/// The visitor traverses the AST and stops early once setState is found
+/// for performance.
+class _StatefulSetStateVisitor extends RecursiveAstVisitor<void> {
+  bool hasSetState = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'setState') {
+      hasSetState = true;
+      return; // Early exit - no need to continue traversing
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

@@ -153,8 +153,9 @@ Future<void> main(List<String> args) async {
   _logTerminal('Description: ${tierDescriptions[tier]}');
   _logTerminal('');
 
-  // Get all rules (from all tiers and stylistic)
-  final Set<String> allRules = _getAllRules();
+  // tiers.dart is the source of truth for all rules
+  // A unit test validates that all plugin rules are in tiers.dart
+  final Set<String> allRules = getAllDefinedRules();
   final Set<String> enabledRules = getRulesForTier(tier);
   final Set<String> disabledRules = allRules.difference(enabledRules);
 
@@ -536,15 +537,6 @@ String? _resolveTier(String? input) {
   }
 
   return null;
-}
-
-Set<String> _getAllRules() {
-  return essentialRules
-      .union(recommendedOnlyRules)
-      .union(professionalOnlyRules)
-      .union(comprehensiveOnlyRules)
-      .union(insanityOnlyRules)
-      .union(stylisticRules);
 }
 
 void _printUsage() {
