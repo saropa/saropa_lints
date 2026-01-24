@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.7.1] - 2026-01-24
+
+### Fixed
+
+- **Init script: false "user customizations" count**: Fixed bug where switching tiers would incorrectly count all tier-changed rules as "user customizations". Now only rules explicitly in the USER CUSTOMIZATIONS section are preserved. Added warning when >50 customizations detected (suggests using `--reset` to fix corrupted config).
+
+---
 ## [4.7.0] - 2026-01-24
 
 ### Added
