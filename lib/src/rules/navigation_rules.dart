@@ -825,6 +825,9 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 /// Deep links may reference content that doesn't exist or has been deleted.
 /// Always handle the case where the linked content is unavailable.
 ///
+/// **Quick fix available:** Wraps the handler body with try/catch for
+/// fallback handling.
+///
 /// **BAD:**
 /// ```dart
 /// void handleDeepLink(Uri uri) {
@@ -901,11 +904,11 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
       }
 
       // Skip utility methods that manage state rather than handle deep links
-      // e.g., resetInitialUri(), clearUri(), setRouteUri(), getInitialUri()
+      // e.g., resetInitialUri(), clearUri(), setRouteUri()
+      // Note: 'get' prefix requires additional body analysis (see below)
       if (methodName.startsWith('reset') ||
           methodName.startsWith('clear') ||
-          methodName.startsWith('set') ||
-          methodName.startsWith('get')) {
+          methodName.startsWith('set')) {
         return;
       }
 
@@ -914,9 +917,10 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
 
       final String bodySource = body.toSource();
 
-      // Skip simple expression body getters that just return a field
+      // Skip simple expression body methods that just return a field
       // e.g., Uri? get initialUri => _initialUri;
-      if (node.isGetter && body is ExpressionFunctionBody) {
+      // e.g., Uri? getStoredUri() => _uri;
+      if (body is ExpressionFunctionBody) {
         final Expression expr = body.expression;
         // Simple field access or identifier (e.g., => _field or => field)
         if (expr is SimpleIdentifier || expr is PrefixedIdentifier) {
@@ -924,15 +928,27 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         }
       }
 
-      // Skip trivial method bodies (single assignment statement)
+      // Skip trivial method bodies (single statement that is assignment or return)
       // e.g., void resetUri() { _uri = null; }
+      // e.g., Uri? getUri() { return _uri; }
       if (body is BlockFunctionBody) {
         final Block block = body.block;
         if (block.statements.length == 1) {
           final Statement stmt = block.statements.first;
+          // Single assignment: void setUri(Uri? u) { _uri = u; }
           if (stmt is ExpressionStatement &&
               stmt.expression is AssignmentExpression) {
             return;
+          }
+          // Single return of simple value: Uri? getUri() { return _uri; }
+          if (stmt is ReturnStatement) {
+            final Expression? returnExpr = stmt.expression;
+            if (returnExpr == null ||
+                returnExpr is SimpleIdentifier ||
+                returnExpr is PrefixedIdentifier ||
+                returnExpr is NullLiteral) {
+              return;
+            }
           }
         }
       }
@@ -950,6 +966,56 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
       if (!hasFallback) {
         reporter.atToken(node.name, code);
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddDeepLinkFallbackFix()];
+}
+
+/// Quick fix that wraps the deep link handler body with a try/catch pattern.
+class _AddDeepLinkFallbackFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addMethodDeclaration((MethodDeclaration node) {
+      if (!analysisError.sourceRange.intersects(node.name.sourceRange)) return;
+
+      final FunctionBody? body = node.body;
+      if (body == null) return;
+
+      // Only fix block function bodies, not expression bodies
+      if (body is! BlockFunctionBody) return;
+
+      final Block block = body.block;
+      final String indent = '    '; // Standard 4-space indent
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Wrap with try/catch for fallback handling',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Insert try { after opening brace
+        builder.addSimpleInsertion(
+          block.leftBracket.end,
+          '\n${indent}try {',
+        );
+
+        // Insert catch block before closing brace
+        builder.addSimpleInsertion(
+          block.rightBracket.offset,
+          '} catch (e) {\n'
+          '$indent  // TODO: Handle error - show NotFound page or error message\n'
+          '$indent  rethrow;\n'
+          '$indent}\n$indent',
+        );
+      });
     });
   }
 }
