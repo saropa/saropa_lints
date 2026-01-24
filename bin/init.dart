@@ -85,6 +85,9 @@ import 'package:saropa_lints/saropa_lints.dart'
 // ignore: deprecated_member_use_from_same_package
 import 'package:saropa_lints/src/tiers.dart' as legacy_tiers;
 
+/// Package version - update when releasing.
+const String _version = '4.7.1';
+
 // ---------------------------------------------------------------------------
 // Cross-platform ANSI color support
 // ---------------------------------------------------------------------------
@@ -454,7 +457,7 @@ Future<void> main(List<String> args) async {
   _logTerminal(
       '${_Colors.bold}╔══════════════════════════════════════════════════════════╗${_Colors.reset}');
   _logTerminal(
-      '${_Colors.bold}║     ${_Colors.cyan}SAROPA LINTS${_Colors.reset}${_Colors.bold} Configuration Generator                ║${_Colors.reset}');
+      '${_Colors.bold}║     ${_Colors.cyan}SAROPA LINTS${_Colors.reset}${_Colors.bold} Configuration Generator      v$_version  ║${_Colors.reset}');
   _logTerminal(
       '${_Colors.bold}╚══════════════════════════════════════════════════════════╝${_Colors.reset}');
   _logTerminal('');
@@ -496,27 +499,54 @@ Future<void> main(List<String> args) async {
 
   // Read existing config and extract user customizations
   final File outputFile = File(cliArgs.outputPath);
+  final String absolutePath = outputFile.absolute.path;
   Map<String, bool> userCustomizations = <String, bool>{};
   String existingContent = '';
 
+  _logTerminal('${_Colors.dim}Reading: $absolutePath${_Colors.reset}');
+
   if (outputFile.existsSync()) {
     existingContent = outputFile.readAsStringSync();
+    _logTerminal(
+        '${_Colors.dim}  File size: ${existingContent.length} bytes${_Colors.reset}');
 
     if (!cliArgs.reset) {
       // Extract existing rule customizations from custom_lint.rules
-      // Only rules that differ from the tier's expected value are preserved
+      // Only rules in the USER CUSTOMIZATIONS section are preserved
       userCustomizations = _extractUserCustomizations(
         existingContent,
-        finalEnabled,
         allRules,
       );
+
+      // Debug: show where customizations section was found
+      final hasSection = existingContent.contains('USER CUSTOMIZATIONS');
+      _logTerminal(
+          '${_Colors.dim}  USER CUSTOMIZATIONS section: ${hasSection ? 'found' : 'not found'}${_Colors.reset}');
+
       if (userCustomizations.isNotEmpty) {
-        _logTerminal(
-            '${_Colors.yellow}⚡ Preserving ${userCustomizations.length} user customizations:${_Colors.reset}');
-        for (final MapEntry<String, bool> entry in userCustomizations.entries) {
-          final color = entry.value ? _Colors.green : _Colors.red;
+        // Warn if suspiciously many customizations (likely corrupted from buggy run)
+        if (userCustomizations.length > 50) {
+          _logTerminal('');
           _logTerminal(
-              '  ${_Colors.dim}•${_Colors.reset} ${entry.key}: $color${entry.value}${_Colors.reset}');
+              '${_Colors.red}⚠ WARNING: Found ${userCustomizations.length} user customizations!${_Colors.reset}');
+          _logTerminal(
+              '${_Colors.yellow}  This is unusually high and may indicate a corrupted config.${_Colors.reset}');
+          _logTerminal(
+              '${_Colors.yellow}  The USER CUSTOMIZATIONS section contains rules that should be in tier sections.${_Colors.reset}');
+          _logTerminal(
+              '${_Colors.yellow}  Consider running with --reset to start fresh:${_Colors.reset}');
+          _logTerminal(
+              '${_Colors.cyan}    dart run saropa_lints:init --tier ${cliArgs.tier} --reset${_Colors.reset}');
+        } else {
+          _logTerminal('');
+          _logTerminal(
+              '${_Colors.yellow}⚡ Preserving ${userCustomizations.length} user customizations:${_Colors.reset}');
+          for (final MapEntry<String, bool> entry
+              in userCustomizations.entries) {
+            final color = entry.value ? _Colors.green : _Colors.red;
+            _logTerminal(
+                '  ${_Colors.dim}•${_Colors.reset} ${entry.key}: $color${entry.value}${_Colors.reset}');
+          }
         }
       }
     } else {
@@ -524,6 +554,7 @@ Future<void> main(List<String> args) async {
           '${_Colors.yellow}⚠ --reset specified: discarding user customizations${_Colors.reset}');
     }
 
+    _logTerminal('');
     _logTerminal(
         '${_Colors.yellow}⚠ Warning: ${cliArgs.outputPath} already exists.${_Colors.reset}');
     _logTerminal(
@@ -681,39 +712,53 @@ Future<void> main(List<String> args) async {
   _logTerminal('');
 }
 
-/// Extract existing user customizations from custom_lint.rules section.
+/// Matches the USER CUSTOMIZATIONS section header in generated YAML.
+final RegExp _userCustomizationsSectionPattern =
+    RegExp(r'USER CUSTOMIZATIONS', multiLine: true);
+
+/// Extract existing user customizations from the USER CUSTOMIZATIONS section.
 ///
-/// A rule is only considered a "user customization" if its current value
-/// in the file DIFFERS from what the selected tier would set. This prevents
-/// treating all rules as customizations after a previous run of this tool.
+/// Only rules that appear in the explicit USER CUSTOMIZATIONS section are
+/// considered customizations. Rules in tier sections are NOT customizations -
+/// they were set by the tier system and will be recalculated.
+///
+/// This prevents tier changes from creating spurious "customizations".
 ///
 /// Parameters:
 /// - [yamlContent] - The existing YAML file content
-/// - [expectedEnabledRules] - Rules that the tier expects to be enabled
 /// - [allRules] - All known saropa_lints rules
 Map<String, bool> _extractUserCustomizations(
   String yamlContent,
-  Set<String> expectedEnabledRules,
   Set<String> allRules,
 ) {
   final Map<String, bool> customizations = <String, bool>{};
 
-  // Find custom_lint: section
-  final Match? customLintMatch =
-      _customLintSectionPattern.firstMatch(yamlContent);
-  if (customLintMatch == null) {
+  // Find USER CUSTOMIZATIONS section
+  final Match? customizationsMatch =
+      _userCustomizationsSectionPattern.firstMatch(yamlContent);
+  if (customizationsMatch == null) {
+    // No customizations section - file wasn't generated by this tool
+    // or user hasn't made any customizations
     return customizations;
   }
 
-  final String afterCustomLint = yamlContent.substring(customLintMatch.end);
+  // Find the content after USER CUSTOMIZATIONS header
+  final String afterHeader = yamlContent.substring(customizationsMatch.end);
 
-  // Stop at next top-level section (line starting without indentation)
-  final Match? nextSection = _topLevelKeyPattern.firstMatch(afterCustomLint);
-  final String customLintSection = nextSection != null
-      ? afterCustomLint.substring(0, nextSection.start)
-      : afterCustomLint;
+  // Find the end of the customizations section (next major section header)
+  // Look for ENABLED, DISABLED, STYLISTIC, or TIER headers
+  final sectionEndPattern = RegExp(
+    r'(ENABLED RULES|DISABLED RULES|STYLISTIC|TIER \d+:)',
+    multiLine: true,
+  );
+  final Match? nextSection = sectionEndPattern.firstMatch(afterHeader);
+  final String customizationsSection = nextSection != null
+      ? afterHeader.substring(0, nextSection.start)
+      : afterHeader;
 
-  for (final Match match in _ruleEntryPattern.allMatches(customLintSection)) {
+  // Extract rules from the customizations section only
+  for (final Match match
+      in _ruleEntryPattern.allMatches(customizationsSection)) {
     final String ruleName = match.group(1)!;
     final bool currentEnabled = match.group(2) == 'true';
 
@@ -722,13 +767,7 @@ Map<String, bool> _extractUserCustomizations(
       continue;
     }
 
-    // Determine what the tier expects for this rule
-    final bool tierWouldEnable = expectedEnabledRules.contains(ruleName);
-
-    // Only preserve as customization if user has changed from tier default
-    if (currentEnabled != tierWouldEnable) {
-      customizations[ruleName] = currentEnabled;
-    }
+    customizations[ruleName] = currentEnabled;
   }
 
   return customizations;
