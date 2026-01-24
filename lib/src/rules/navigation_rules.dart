@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/error/error.dart'
@@ -917,14 +918,45 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
 
       final String bodySource = body.toSource();
 
-      // Skip simple expression body methods that just return a field
+      // Skip simple expression body methods that just return a field or convert
       // e.g., Uri? get initialUri => _initialUri;
       // e.g., Uri? getStoredUri() => _uri;
+      // e.g., Uri? get uri => _uri ??= parseUri(url);
+      // e.g., Uri? get uri => url.toUri();
       if (body is ExpressionFunctionBody) {
         final Expression expr = body.expression;
         // Simple field access or identifier (e.g., => _field or => field)
         if (expr is SimpleIdentifier || expr is PrefixedIdentifier) {
           return;
+        }
+
+        // Lazy-loading pattern: _field ??= value
+        if (expr is AssignmentExpression &&
+            expr.operator.type == TokenType.QUESTION_QUESTION_EQ) {
+          return;
+        }
+
+        // Simple method invocation on a field: field.toUri(), url?.toUri()
+        // These are URI conversion utilities, not deep link handlers
+        if (expr is MethodInvocation) {
+          final Expression? target = expr.target;
+          if (target == null ||
+              target is SimpleIdentifier ||
+              target is PrefixedIdentifier ||
+              target is ThisExpression) {
+            return;
+          }
+        }
+
+        // Null-aware property access: url?.uri
+        if (expr is PropertyAccess) {
+          final Expression? target = expr.target;
+          if (target == null ||
+              target is SimpleIdentifier ||
+              target is PrefixedIdentifier ||
+              target is ThisExpression) {
+            return;
+          }
         }
       }
 
