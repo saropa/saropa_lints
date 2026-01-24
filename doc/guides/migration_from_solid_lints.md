@@ -46,10 +46,12 @@ analyzer:
 analyzer:
   plugins:
     - custom_lint
+```
 
-custom_lint:
-  saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
+Then generate the configuration:
+
+```bash
+dart run saropa_lints:init --tier recommended
 ```
 
 ### Step 3: Remove solid_lints config
@@ -215,15 +217,17 @@ custom_lint:
 
 ### saropa_lints Configuration
 
-```yaml
-# analysis_options.yaml
-custom_lint:
-  saropa_lints:
-    tier: professional
+```bash
+# Generate configuration for professional tier
+dart run saropa_lints:init --tier professional
+```
 
-  # Disable specific rules if needed
+Then customize specific rules in analysis_options.yaml:
+
+```yaml
+custom_lint:
   rules:
-    - avoid_returning_widgets: false
+    - avoid_returning_widgets: false  # Change to false to disable
 ```
 
 ## Using Both (Not Recommended)
