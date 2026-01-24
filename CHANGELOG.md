@@ -9,6 +9,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.6.0] - 2026-01-24
+
+### Added
+
+- **New CLI tool: `saropa_lints:init`** - Generates `analysis_options.yaml` with explicit rule configuration, bypassing custom_lint's unreliable plugin config mechanism:
+  - Select tier via `--tier` (1-5 or name: essential, recommended, professional, comprehensive, insanity)
+  - Include stylistic rules with `--stylistic` flag
+  - Preview changes with `--dry-run`
+  - Preserves user customizations when regenerating (use `--reset` to discard)
+  - Preserves non-custom_lint sections (analyzer, linter, formatter, etc.)
+  - Creates backup before overwriting existing files
+
+- **BROKEN_TIERS.md** - Documentation explaining why YAML tier configuration doesn't work and how to use the CLI tool instead
+
+### Changed
+
+- **README.md**: Updated Quick Start to recommend CLI tool instead of YAML tier config
+- **README_STYLISTIC.md**: Updated to use CLI tool approach
+- **bin/init.dart**: Extracted duplicate regex patterns to shared constants
+
+### Fixed
+
+- **Tier configuration reliability**: The new CLI tool generates explicit `- rule_name: true/false` for all 1674+ rules, eliminating the silent fallback to essential tier that occurred with YAML config
+
+---
+
 ## [4.5.7] - 2026-01-23
 
 ### Changed

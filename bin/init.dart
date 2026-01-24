@@ -81,6 +81,21 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/tiers.dart';
 
+// ---------------------------------------------------------------------------
+// Regex patterns (defined once, used in multiple places)
+// ---------------------------------------------------------------------------
+
+/// Matches the `custom_lint:` section header in YAML.
+final RegExp _customLintSectionPattern =
+    RegExp(r'^custom_lint:\s*$', multiLine: true);
+
+/// Matches any top-level YAML key (for finding section boundaries).
+final RegExp _topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
+
+/// Matches rule entries like `- rule_name: true` or `- rule_name: false`.
+final RegExp _ruleEntryPattern =
+    RegExp(r'^\s+-\s+(\w+):\s*(true|false)', multiLine: true);
+
 /// All available tiers in order of strictness.
 const List<String> tierOrder = <String>[
   'essential',
@@ -164,10 +179,18 @@ Future<void> main(List<String> args) async {
 
     if (!cliArgs.reset) {
       // Extract existing rule customizations from custom_lint.rules
-      userCustomizations = _extractUserCustomizations(existingContent);
+      // Only rules that differ from the tier's expected value are preserved
+      userCustomizations = _extractUserCustomizations(
+        existingContent,
+        finalEnabled,
+        allRules,
+      );
       if (userCustomizations.isNotEmpty) {
         _logTerminal(
-            'Preserving ${userCustomizations.length} user customizations');
+            'Preserving ${userCustomizations.length} user customizations:');
+        for (final MapEntry<String, bool> entry in userCustomizations.entries) {
+          _logTerminal('  - ${entry.key}: ${entry.value}');
+        }
       }
     } else {
       _logTerminal('--reset specified: discarding user customizations');
@@ -254,35 +277,53 @@ Future<void> main(List<String> args) async {
 }
 
 /// Extract existing user customizations from custom_lint.rules section.
-Map<String, bool> _extractUserCustomizations(String yamlContent) {
+///
+/// A rule is only considered a "user customization" if its current value
+/// in the file DIFFERS from what the selected tier would set. This prevents
+/// treating all rules as customizations after a previous run of this tool.
+///
+/// Parameters:
+/// - [yamlContent] - The existing YAML file content
+/// - [expectedEnabledRules] - Rules that the tier expects to be enabled
+/// - [allRules] - All known saropa_lints rules
+Map<String, bool> _extractUserCustomizations(
+  String yamlContent,
+  Set<String> expectedEnabledRules,
+  Set<String> allRules,
+) {
   final Map<String, bool> customizations = <String, bool>{};
 
   // Find custom_lint: section
-  final RegExp customLintPattern =
-      RegExp(r'^custom_lint:\s*$', multiLine: true);
-  final Match? customLintMatch = customLintPattern.firstMatch(yamlContent);
+  final Match? customLintMatch =
+      _customLintSectionPattern.firstMatch(yamlContent);
   if (customLintMatch == null) {
     return customizations;
   }
 
-  // Extract rules from the custom_lint section
-  // Match lines like "    - rule_name: true" or "    - rule_name: false"
-  final RegExp rulePattern =
-      RegExp(r'^\s+-\s+(\w+):\s*(true|false)', multiLine: true);
-
   final String afterCustomLint = yamlContent.substring(customLintMatch.end);
 
   // Stop at next top-level section (line starting without indentation)
-  final RegExp nextSectionPattern = RegExp(r'^\w+:', multiLine: true);
-  final Match? nextSection = nextSectionPattern.firstMatch(afterCustomLint);
+  final Match? nextSection = _topLevelKeyPattern.firstMatch(afterCustomLint);
   final String customLintSection = nextSection != null
       ? afterCustomLint.substring(0, nextSection.start)
       : afterCustomLint;
 
-  for (final Match match in rulePattern.allMatches(customLintSection)) {
+  for (final Match match in _ruleEntryPattern.allMatches(customLintSection)) {
     final String ruleName = match.group(1)!;
-    final bool enabled = match.group(2) == 'true';
-    customizations[ruleName] = enabled;
+    final bool currentEnabled = match.group(2) == 'true';
+
+    // Skip rules that aren't in our rule set (might be from other plugins)
+    if (!allRules.contains(ruleName)) {
+      continue;
+    }
+
+    // Determine what the tier expects for this rule
+    final bool tierWouldEnable = expectedEnabledRules.contains(ruleName);
+
+    // Only preserve as customization if user has changed from tier default
+    if (currentEnabled != tierWouldEnable) {
+      customizations[ruleName] = currentEnabled;
+    }
   }
 
   return customizations;
@@ -391,9 +432,8 @@ String _replaceCustomLintSection(String existingContent, String newCustomLint) {
   }
 
   // Find custom_lint: section
-  final RegExp customLintPattern =
-      RegExp(r'^custom_lint:\s*$', multiLine: true);
-  final Match? customLintMatch = customLintPattern.firstMatch(existingContent);
+  final Match? customLintMatch =
+      _customLintSectionPattern.firstMatch(existingContent);
 
   if (customLintMatch == null) {
     // No existing custom_lint section - append to end
@@ -407,9 +447,8 @@ String _replaceCustomLintSection(String existingContent, String newCustomLint) {
       existingContent.substring(customLintMatch.end);
 
   // Find next top-level section (line starting with a word followed by colon, no indentation)
-  final RegExp nextSectionPattern = RegExp(r'^\w+:', multiLine: true);
   final Match? nextSection =
-      nextSectionPattern.firstMatch(afterCustomLintStart);
+      _topLevelKeyPattern.firstMatch(afterCustomLintStart);
 
   final String afterCustomLint = nextSection != null
       ? afterCustomLintStart.substring(nextSection.start)
