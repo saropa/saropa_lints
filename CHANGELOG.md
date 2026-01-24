@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [Unreleased]
+
+### Fixed
+
+- **`require_stream_controller_close` false positive on wrapper classes**: Fixed false positive when using wrapper classes like `IsarStreamController<T>` that contain "StreamController" in their type name. The rule now:
+  - Requires `.close()` for exact `StreamController<T>` types
+  - Accepts either `.close()` OR `.dispose()` for wrapper types, since wrappers typically close their internal StreamController in their dispose method
+
+---
 ## [4.6.2] - 2026-01-24
 
 ### Removed
