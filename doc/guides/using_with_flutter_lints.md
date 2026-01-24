@@ -57,7 +57,9 @@ dev_dependencies:
   saropa_lints: ^2.6.0      # Deep analysis rules
 ```
 
-### 2. Update analysis_options.yaml
+### 2. Configure analysis_options.yaml
+
+First, set up your analysis_options.yaml with flutter_lints:
 
 ```yaml
 # Include flutter_lints standard rules
@@ -67,12 +69,16 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   plugins:
     - custom_lint
-
-# Configure saropa_lints tier
-custom_lint:
-  saropa_lints:
-    tier: recommended  # essential | recommended | professional | comprehensive | insanity
 ```
+
+Then generate saropa_lints configuration:
+
+```bash
+# Generate explicit rule configuration
+dart run saropa_lints:init --tier recommended
+```
+
+This adds explicit `- rule_name: true/false` entries to your existing file.
 
 ### 3. Run both analyzers
 
@@ -160,10 +166,12 @@ include: package:very_good_analysis/analysis_options.yaml
 analyzer:
   plugins:
     - custom_lint
+```
 
-custom_lint:
-  saropa_lints:
-    tier: professional
+Then generate saropa_lints configuration:
+
+```bash
+dart run saropa_lints:init --tier professional
 ```
 
 See our [VGA migration guide](migration_from_vga.md) for details.
