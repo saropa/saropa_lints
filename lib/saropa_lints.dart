@@ -1094,7 +1094,6 @@ const List<LintRule> _allRules = <LintRule>[
   PreferConstWidgetsRule(),
   AvoidExpensiveComputationInBuildRule(),
   AvoidWidgetCreationInLoopRule(),
-  RequireBuildContextScopeRule(),
   AvoidCallingOfInBuildRule(),
   RequireImageCacheManagementRule(),
   AvoidMemoryIntensiveOperationsRule(),

@@ -7,7 +7,9 @@
 // Core Flutter types
 // ============================================================================
 
-class BuildContext {}
+class BuildContext {
+  bool get mounted => true;
+}
 
 abstract class Widget {
   const Widget({Key? key});
@@ -172,6 +174,14 @@ class CustomScrollView extends Widget {
 // Material widgets
 // ============================================================================
 
+class Theme {
+  static ThemeData of(BuildContext context) => ThemeData();
+}
+
+class ThemeData {
+  dynamic get primaryColor => null;
+}
+
 class Scaffold extends Widget {
   const Scaffold({super.key, Widget? body, Widget? appBar});
 }
@@ -297,14 +307,6 @@ class BoxConstraints {
 }
 
 // ============================================================================
-// Duration
-// ============================================================================
-
-class Duration {
-  const Duration({int seconds = 0, int milliseconds = 0});
-}
-
-// ============================================================================
 // Physics
 // ============================================================================
 
@@ -321,6 +323,12 @@ class AlwaysScrollableScrollPhysics {
 // ============================================================================
 
 typedef VoidCallback = void Function();
+
+// ============================================================================
+// Debug printing
+// ============================================================================
+
+void debugPrint(String? message, {int? wrapWidth}) {}
 
 // ============================================================================
 // Image widget
@@ -395,6 +403,12 @@ class TextButton extends Widget {
 
 class Navigator {
   static void pop<T>(BuildContext context, [T? result]) {}
+  static NavigatorState of(BuildContext context) => NavigatorState();
+}
+
+class NavigatorState {
+  void pop<T>([T? result]) {}
+  Future<T?> pushNamed<T>(String routeName, {Object? arguments}) async => null;
 }
 
 class BottomNavigationBar extends Widget {
