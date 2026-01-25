@@ -18193,6 +18193,11 @@ class _PreferExpandedAtCallSiteFix extends DartFix {
 ///   },
 /// );
 /// ```
+///
+/// **Note:** When using multiple lists of the same length in itemBuilder, ensure
+/// each list access has a visible bounds check, or use an ignore comment if
+/// you've ensured the lists are synchronized. The lint cannot detect cross-method
+/// relationships like `List.generate(otherList.length, ...)`.
 class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   const AvoidBuilderIndexOutOfBoundsRule() : super(code: _code);
 
