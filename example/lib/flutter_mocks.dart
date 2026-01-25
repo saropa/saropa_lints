@@ -228,6 +228,70 @@ class AlertDialog extends Widget {
 class AnimationController {
   AnimationController({required dynamic vsync, Duration? duration});
   void dispose() {}
+  double get value => 0.0;
+}
+
+abstract class Animation<T> {
+  T get value;
+}
+
+class CurvedAnimation implements Animation<double> {
+  CurvedAnimation({required Animation<double> parent, required dynamic curve});
+  @override
+  double get value => 0.0;
+}
+
+/// Axis enum for SizeTransition
+enum Axis { horizontal, vertical }
+
+/// Curves for animations
+class Curves {
+  static const dynamic easeIn = null;
+  static const dynamic easeOut = null;
+  static const dynamic linear = null;
+}
+
+/// Transition widgets for animation rules testing
+class ScaleTransition extends Widget {
+  const ScaleTransition({
+    super.key,
+    required Animation<double> scale,
+    Widget? child,
+  });
+}
+
+class FadeTransition extends Widget {
+  const FadeTransition({
+    super.key,
+    required Animation<double> opacity,
+    Widget? child,
+  });
+}
+
+class SlideTransition extends Widget {
+  const SlideTransition({
+    super.key,
+    required Animation<dynamic> position,
+    Widget? child,
+  });
+}
+
+class RotationTransition extends Widget {
+  const RotationTransition({
+    super.key,
+    required Animation<double> turns,
+    Widget? child,
+  });
+}
+
+class SizeTransition extends Widget {
+  const SizeTransition({
+    super.key,
+    required Animation<double> sizeFactor,
+    Axis axis = Axis.vertical,
+    double axisAlignment = 0.0,
+    Widget? child,
+  });
 }
 
 mixin SingleTickerProviderStateMixin<T extends StatefulWidget> on State<T> {}
