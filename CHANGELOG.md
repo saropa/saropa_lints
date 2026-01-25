@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.7.6] - 2026-01-25
+
+### Fixed
+
+- **`require_ios_permission_description` false positive on ImagePicker constructor**: Fixed false positives where the rule required both `NSPhotoLibraryUsageDescription` AND `NSCameraUsageDescription` when only `ImagePicker()` was instantiated, before any method was called. The rule now uses smart method-level detection:
+  - `ImagePicker()` constructor alone → no warning
+  - `picker.pickImage(source: ImageSource.gallery)` → requires only `NSPhotoLibraryUsageDescription`
+  - `picker.pickImage(source: ImageSource.camera)` → requires only `NSCameraUsageDescription`
+  - `picker.pickImage(source: variable)` → requires both (can't determine statically)
+
+---
 ## [4.7.5] - 2026-01-24
 
 ### Added

@@ -264,10 +264,20 @@ Warns when permission-requiring APIs are used without Info.plist entries. Apps w
 | Calendar | NSCalendarsUsageDescription |
 | Bluetooth | NSBluetoothAlwaysUsageDescription |
 
+**ImagePicker Smart Detection**: The rule uses smart method-level detection for `ImagePicker`:
+
 ```dart
-// Triggers warning - ensure Info.plist has NSCameraUsageDescription
+// Only requires NSCameraUsageDescription
 final image = await ImagePicker().pickImage(source: ImageSource.camera);
+
+// Only requires NSPhotoLibraryUsageDescription
+final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+
+// Requires both (source determined at runtime)
+final image = await ImagePicker().pickImage(source: userSelectedSource);
 ```
+
+Note: `ImagePicker()` constructor alone does not trigger a warning - only the actual `pickImage`/`pickVideo` calls are checked.
 
 **Tier**: Essential | **Severity**: WARNING
 
