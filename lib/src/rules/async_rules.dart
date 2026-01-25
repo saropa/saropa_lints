@@ -2299,6 +2299,8 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
 ///   super.dispose();
 /// }
 /// ```
+///
+/// **Quick fix available:** Adds `controller.close()` call to dispose/close method.
 class RequireStreamControllerCloseRule extends SaropaLintRule {
   const RequireStreamControllerCloseRule() : super(code: _code);
 
@@ -2346,18 +2348,21 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
 
       if (controllers.isEmpty) return;
 
-      // Check for dispose method with close() or dispose() calls
+      // Check for dispose() or close() methods with close()/dispose() calls.
+      // Helper classes may use close() instead of dispose().
       bool hasClose = false;
       bool hasDispose = false;
 
       for (final member in node.members) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          final String? bodySource = member.body.toSource();
-          if (bodySource != null) {
-            hasClose = bodySource.contains('.close()');
-            hasDispose = bodySource.contains('.dispose()');
+        if (member is MethodDeclaration) {
+          final methodName = member.name.lexeme;
+          if (methodName == 'dispose' || methodName == 'close') {
+            final String? bodySource = member.body.toSource();
+            if (bodySource != null) {
+              hasClose = hasClose || bodySource.contains('.close()');
+              hasDispose = hasDispose || bodySource.contains('.dispose()');
+            }
           }
-          break;
         }
       }
 
@@ -2375,6 +2380,87 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
           }
         }
       }
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_AddStreamControllerCloseFix()];
+}
+
+/// Quick fix that adds `.close()` call to the dispose/close method.
+class _AddStreamControllerCloseFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final String fieldName = node.name.lexeme;
+
+      // Find the containing class
+      AstNode? current = node.parent;
+      while (current != null && current is! ClassDeclaration) {
+        current = current.parent;
+      }
+      if (current is! ClassDeclaration) return;
+
+      final ClassDeclaration classNode = current;
+
+      // Find dispose() or close() method
+      MethodDeclaration? cleanupMethod;
+      for (final member in classNode.members) {
+        if (member is MethodDeclaration) {
+          final name = member.name.lexeme;
+          if (name == 'dispose' || name == 'close') {
+            cleanupMethod = member;
+            break;
+          }
+        }
+      }
+
+      if (cleanupMethod == null) return;
+
+      final FunctionBody body = cleanupMethod.body;
+      if (body is! BlockFunctionBody) return;
+
+      final Block block = body.block;
+      final List<Statement> statements = block.statements;
+
+      // Find insertion point: before super.dispose() or at end
+      int insertOffset = block.rightBracket.offset;
+      String prefix = '\n    ';
+
+      for (final statement in statements) {
+        if (statement is ExpressionStatement) {
+          final expr = statement.expression;
+          if (expr is MethodInvocation) {
+            final target = expr.target;
+            if (target is SuperExpression &&
+                expr.methodName.name == 'dispose') {
+              insertOffset = statement.offset;
+              prefix = '';
+              break;
+            }
+          }
+        }
+      }
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add $fieldName.close() to ${cleanupMethod.name.lexeme}()',
+        priority: 80,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        builder.addSimpleInsertion(
+          insertOffset,
+          '$prefix$fieldName.close();\n    ',
+        );
+      });
     });
   }
 }
