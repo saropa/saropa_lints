@@ -791,7 +791,16 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 /// - Futures already inside a try block
 /// - Functions defined in the same file that have try-catch in their body
 ///
-/// **Quick fix available:** Adds `.catchError()` with `debugPrint`.
+/// ## Limitation: Cross-file analysis
+/// This rule can only detect try-catch in functions defined in the **same file**.
+/// If you call a method from another file that has internal error handling (e.g.,
+/// propagating errors via `StreamController.addError()`), this rule cannot detect
+/// that. Use `// ignore: avoid_uncaught_future_errors` with an explanatory comment
+/// or `.ignore()` for these cases.
+///
+/// **Quick fixes available:**
+/// - Add `.catchError()` with `debugPrint`
+/// - Add `// ignore:` comment
 class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   const AvoidUncaughtFutureErrorsRule() : super(code: _code);
 
@@ -1007,7 +1016,10 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
   }
 
   @override
-  List<Fix> getFixes() => <Fix>[_AddCatchErrorToFutureFix()];
+  List<Fix> getFixes() => <Fix>[
+        _AddCatchErrorToFutureFix(),
+        _AddIgnoreCommentForUncaughtFutureFix(),
+      ];
 }
 
 class _AddCatchErrorToFutureFix extends DartFix {
@@ -1037,6 +1049,54 @@ class _AddCatchErrorToFutureFix extends DartFix {
           ".catchError((Object e, StackTrace s) {\n"
           "      debugPrint('\$e\\n\$s');\n"
           "    })",
+        );
+      });
+    });
+  }
+}
+
+class _AddIgnoreCommentForUncaughtFutureFix extends DartFix {
+  @override
+  void run(
+    CustomLintResolver resolver,
+    ChangeReporter reporter,
+    CustomLintContext context,
+    AnalysisError analysisError,
+    List<AnalysisError> others,
+  ) {
+    context.registry.addExpressionStatement((ExpressionStatement node) {
+      if (!node.sourceRange.intersects(analysisError.sourceRange)) return;
+
+      final Expression expr = node.expression;
+      if (expr is! MethodInvocation) return;
+
+      final ChangeBuilder changeBuilder = reporter.createChangeBuilder(
+        message: 'Add // ignore: comment',
+        priority: 2,
+      );
+
+      changeBuilder.addDartFileEdit((builder) {
+        // Find the line start to insert the comment before the statement
+        final lineInfo = resolver.lineInfo;
+        final lineNumber = lineInfo.getLocation(node.offset).lineNumber;
+        final lineStart = lineInfo.getOffsetOfLine(lineNumber - 1);
+
+        // Get the indentation of the current line
+        final source = resolver.source.contents.data;
+        var indent = '';
+        for (int i = lineStart; i < node.offset; i++) {
+          final char = source[i];
+          if (char == ' ' || char == '\t') {
+            indent += char;
+          } else {
+            break;
+          }
+        }
+
+        builder.addSimpleInsertion(
+          lineStart,
+          '$indent// ignore: avoid_uncaught_future_errors, '
+          'method handles errors internally\n',
         );
       });
     });
