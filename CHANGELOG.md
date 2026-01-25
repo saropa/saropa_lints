@@ -8,10 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
-comm## [4.7.4] - 2026-01-24
+
+## [4.7.4] - 2026-01-24
 
 ### Fixed
 
+- **`avoid_unbounded_cache_growth` false positives on enum-keyed maps**: Fixed false positives on caches that use enum keys (e.g., `Map<PanelEnum, Widget>`). Enum-keyed maps are inherently bounded by the number of enum values and cannot grow indefinitely. Also added detection for immutable caches (read-only maps with no mutation methods like `add`, `set`, or index assignment).
+- **`require_stream_controller_close` false positives on helper classes**: Fixed false positives on helper/wrapper classes that have a `close()` method instead of `dispose()`. Classes like `CustomStreamController` with a `close()` method that properly closes the internal StreamController are no longer flagged. The rule now checks both `dispose()` and `close()` methods for cleanup calls.
 - **`avoid_unbounded_cache_growth` false positives on database models**: Fixed false positives on Isar (`@collection`), Hive (`@HiveType`), and Floor (`@Entity`) database models that have "cache" in the class name. These ORM models use disk-based storage with external cleanup, not in-memory Map caching. Also improved detection to only flag actual Map field declarations, not `toMap()` serialization method return types.
 - **`avoid_path_traversal` false positives on trusted system paths**: Fixed false positives when file paths are constructed using trusted system APIs (e.g., `path_provider`, platform MethodChannels) combined with hardcoded constants. The rule now only flags paths containing function parameters (actual user input), not paths using private fields, constants, or system API returns like `getApplicationDocumentsDirectory()`.
 - **`require_deep_link_fallback` false positives on URI getters**: Fixed false positives on simple URI getter and converter methods that are not deep link handlers. Now skips: lazy-loading patterns (`_uri ??= parseUri(url)`), method invocations on fields (`url.toUri()`), and null-aware property access (`url?.uri`).
@@ -22,6 +25,7 @@ comm## [4.7.4] - 2026-01-24
 ### Added
 
 - **Quick fix for `avoid_flashing_content`**: New quick fix increases animation duration to 333ms (minimum WCAG 2.3.1 compliant threshold).
+- **Quick fix for `require_stream_controller_close`**: New quick fix adds `controller.close()` call to the dispose/close method.
 
 ---
 ## [4.7.3] - 2026-01-24
