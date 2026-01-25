@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.7.6] - 2026-01-24
+
+### Fixed
+
+- **`avoid_overlapping_animations` false positives on different-axis SizeTransitions**: Fixed false positives when nesting `SizeTransition` widgets with different axes. `SizeTransition(axis: Axis.vertical)` animates height while `SizeTransition(axis: Axis.horizontal)` animates width - these are independent properties and should not conflict. The rule now distinguishes `size_vertical` from `size_horizontal` based on the `axis` parameter.
+
+---
+
+## [4.7.5] - 2026-01-24
+
+### Added
+
+- **Quick fix for `avoid_unbounded_cache_growth`**: New quick fix adds a `static const int maxSize = 100;` field to cache classes. Developers need to manually add eviction logic in mutation methods.
+
+### Fixed
+
+- **`avoid_unbounded_cache_growth` static regex patterns**: Improved performance by making regex patterns (`_limitPattern`, `_mutationMethodPattern`, `_mapKeyPattern`) static class fields instead of creating them on each method call.
+
+---
+
 ## [4.7.4] - 2026-01-24
 
 ### Fixed
