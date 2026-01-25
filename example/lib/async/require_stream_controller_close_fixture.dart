@@ -145,7 +145,7 @@ class _GoodWidgetWithWrapperControllerState
 // =========================================================================
 // BAD: Wrapper class without dispose() or close()
 // =========================================================================
-// SHOULD trigger lint
+// SHOULD trigger require_stream_controller_dispose (wrapper type, not _close)
 
 class BadWidgetWithWrapperNoDispose extends StatefulWidget {
   const BadWidgetWithWrapperNoDispose({super.key});
@@ -157,7 +157,7 @@ class BadWidgetWithWrapperNoDispose extends StatefulWidget {
 
 class _BadWidgetWithWrapperNoDisposeState
     extends State<BadWidgetWithWrapperNoDispose> {
-  // expect_lint: require_stream_controller_close
+  // expect_lint: require_stream_controller_dispose
   late IsarStreamController<String> _isarController;
 
   @override
