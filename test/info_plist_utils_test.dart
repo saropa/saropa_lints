@@ -204,11 +204,14 @@ void main() {
       expect(keys, contains('NSMicrophoneUsageDescription'));
     });
 
-    test('getRequiredKeys returns correct keys for ImagePicker', () {
+    test(
+        'getRequiredKeys returns null for ImagePicker (handled by smart detection)',
+        () {
+      // ImagePicker is intentionally NOT in typeToKeys because the rule uses
+      // smart method-level detection to check the actual ImageSource
+      // (gallery vs camera) and only require the relevant permission.
       final keys = IosPermissionMapping.getRequiredKeys('ImagePicker');
-      expect(keys, isNotNull);
-      expect(keys, contains('NSPhotoLibraryUsageDescription'));
-      expect(keys, contains('NSCameraUsageDescription'));
+      expect(keys, isNull);
     });
 
     test('getRequiredKeys returns null for unknown type', () {
