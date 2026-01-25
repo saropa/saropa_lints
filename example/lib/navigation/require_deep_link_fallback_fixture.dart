@@ -173,6 +173,42 @@ Future<dynamic> fetchUser(String userId) async {
   return null;
 }
 
+// FALSE POSITIVE TEST: Methods returning String? or Uri? are utilities, not handlers
+// Bug report: 20260125_require_deep_link_fallback_false_positives.md
+class UriParserUtility {
+  // OK: Returns String? - this is a parser, not a handler
+  String? accountIdFromUri(Uri uri) {
+    final String host = uri.host;
+    if (host != 'example.com') {
+      return null; // Valid fallback
+    }
+
+    final List<String> pathSegments = uri.pathSegments;
+    final int index = pathSegments.indexOf('u');
+    if (index != -1 && index < pathSegments.length - 1) {
+      return pathSegments[index + 1];
+    }
+    return null; // Valid fallback
+  }
+
+  // OK: Returns Uri? - this is a converter, not a handler
+  Uri? buildDeepLinkUri(String path) {
+    return Uri.tryParse('https://example.com/$path');
+  }
+
+  // OK: Ternary with null fallback
+  String? get postUriAt {
+    final postId = 'abc123';
+    return postId.isNotEmpty ? 'at://$postId' : null;
+  }
+
+  // OK: Another ternary with null in then branch
+  String? get legacyUriFormat {
+    final useLegacy = false;
+    return useLegacy ? null : 'https://new.example.com';
+  }
+}
+
 // Mock extension for URI conversion
 extension StringToUri on String {
   Uri? toUri() => Uri.tryParse(this);
