@@ -150,6 +150,7 @@
     "sandboxed",
     "saropa_dart_utils",
     "scrollables",
+    "Scroller",
     "scrollview",
     "secretkey",
     "securestorage",
