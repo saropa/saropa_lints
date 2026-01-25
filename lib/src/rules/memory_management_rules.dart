@@ -715,6 +715,16 @@ class RequireCacheExpirationRule extends SaropaLintRule {
 /// Caches without size limits cause out-of-memory errors.
 /// Implement LRU eviction or size limits.
 ///
+/// **Detection:**
+/// - Class name contains "cache" or "memo"
+/// - Class has Map field declarations (not just `toMap()` return types)
+/// - No size-limiting patterns detected (maxSize, capacity, limit, evict, lru)
+///
+/// **Exclusions:**
+/// - Database models with `@collection` (Isar), `@HiveType` (Hive),
+///   or `@Entity` (Floor) annotations - these use disk storage with
+///   external cleanup, not in-memory Map caching.
+///
 /// **BAD:**
 /// ```dart
 /// class ImageCache {
@@ -774,6 +784,14 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
 
       final String classSource = node.toSource().toLowerCase();
 
+      // Skip database models - they use disk storage, not memory caches
+      // Isar uses @collection, Hive uses @HiveType, Floor uses @Entity
+      if (classSource.contains('@collection') ||
+          classSource.contains('@hivetype') ||
+          classSource.contains('@entity')) {
+        return;
+      }
+
       // Check for size limiting patterns
       final bool hasSizeLimit = classSource.contains('maxsize') ||
           classSource.contains('max_size') ||
@@ -783,14 +801,28 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
           classSource.contains('evict') ||
           classSource.contains('lru');
 
-      // Check for Map used as cache storage
-      final bool hasMapCache =
-          classSource.contains('map<') || classSource.contains('= {}');
+      // Check for Map field declarations (not method return types)
+      final bool hasMapCacheField = _hasMapCacheField(node);
 
-      if (hasMapCache && !hasSizeLimit) {
+      if (hasMapCacheField && !hasSizeLimit) {
         reporter.atNode(node, code);
       }
     });
+  }
+
+  /// Checks if the class has a Map field that appears to be cache storage.
+  /// Excludes toMap/fromMap serialization methods.
+  bool _hasMapCacheField(ClassDeclaration node) {
+    for (final ClassMember member in node.members) {
+      if (member is FieldDeclaration) {
+        final String fieldSource = member.toSource().toLowerCase();
+        // Check for Map field declarations
+        if (fieldSource.contains('map<') || fieldSource.contains('= {}')) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
 
