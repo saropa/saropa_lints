@@ -47,6 +47,13 @@ import 'package:analyzer/source/line_info.dart';
 /// ];
 /// ```
 ///
+/// ### Chained method calls (mid-chain comments)
+/// ```dart
+/// position = await Geolocator
+///     // ignore: require_android_permission_request
+///     .getCurrentPosition();
+/// ```
+///
 /// ## Implementation Notes
 ///
 /// Trailing comments are stored as `precedingComments` on subsequent tokens,
@@ -86,8 +93,16 @@ class IgnoreUtils {
   ///
   /// Also handles trailing ignore comments on the same line.
   ///
-  /// Special handling for CatchClause: also checks the token immediately
-  /// before the catch clause (typically the `}` of the try block).
+  /// Special handling for:
+  /// - **MethodInvocation**: checks the `.` operator and method name tokens,
+  ///   allowing ignore comments mid-chain:
+  ///   ```dart
+  ///   object
+  ///       // ignore: rule_name
+  ///       .method()
+  ///   ```
+  /// - **PropertyAccess**: similarly checks operator and property tokens
+  /// - **CatchClause**: checks the token before the catch clause
   static bool hasIgnoreComment(AstNode node, String ruleName) {
     // Get line info for validation
     final root = node.root;
@@ -107,6 +122,64 @@ class IgnoreUtils {
       lineInfo,
     )) {
       return true;
+    }
+
+    // Special case for MethodInvocation: check operator and methodName tokens
+    // This handles comments placed mid-chain like:
+    //   object
+    //       // ignore: rule_name
+    //       .method()
+    if (node is MethodInvocation) {
+      final Token? operator = node.operator;
+      if (operator != null) {
+        final int operatorLine =
+            lineInfo?.getLocation(operator.offset).lineNumber ?? nodeStartLine;
+        if (_hasValidLeadingIgnoreComment(
+          operator,
+          ruleName,
+          operatorLine,
+          lineInfo,
+        )) {
+          return true;
+        }
+      }
+      final int methodNameLine =
+          lineInfo?.getLocation(node.methodName.offset).lineNumber ??
+              nodeStartLine;
+      if (_hasValidLeadingIgnoreComment(
+        node.methodName.beginToken,
+        ruleName,
+        methodNameLine,
+        lineInfo,
+      )) {
+        return true;
+      }
+    }
+
+    // Special case for PropertyAccess: check operator and propertyName tokens
+    if (node is PropertyAccess) {
+      final int operatorLine =
+          lineInfo?.getLocation(node.operator.offset).lineNumber ??
+              nodeStartLine;
+      if (_hasValidLeadingIgnoreComment(
+        node.operator,
+        ruleName,
+        operatorLine,
+        lineInfo,
+      )) {
+        return true;
+      }
+      final int propertyLine =
+          lineInfo?.getLocation(node.propertyName.offset).lineNumber ??
+              nodeStartLine;
+      if (_hasValidLeadingIgnoreComment(
+        node.propertyName.beginToken,
+        ruleName,
+        propertyLine,
+        lineInfo,
+      )) {
+        return true;
+      }
     }
 
     // Special case for CatchClause: check the token before the catch clause
