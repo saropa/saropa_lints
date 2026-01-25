@@ -40,6 +40,7 @@ abstract class State<T extends StatefulWidget> {
   void setState(void Function() fn) {}
   void dispose() {}
   void initState() {}
+  Widget build(BuildContext context);
 }
 
 // ============================================================================
