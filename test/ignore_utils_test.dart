@@ -410,6 +410,76 @@ class Config {
           );
         });
       });
+
+      group('chained method calls (mid-chain comments)', () {
+        test('detects comment before method in chain', () {
+          final unit = _parseCode('''
+void test() {
+  final result = obj
+      // ignore: my_rule
+      .doIt();
+}
+class C { C doIt() => this; }
+final obj = C();
+''');
+          final invocations = _findAll<MethodInvocation>(unit);
+          final doIt =
+              invocations.firstWhere((m) => m.methodName.name == 'doIt');
+          expect(IgnoreUtils.hasIgnoreComment(doIt, 'my_rule'), isTrue);
+        });
+
+        test('detects hyphen format in chain', () {
+          final unit = _parseCode('''
+void test() {
+  final result = obj
+      // ignore: my-rule
+      .doIt();
+}
+class C { C doIt() => this; }
+final obj = C();
+''');
+          final invocations = _findAll<MethodInvocation>(unit);
+          final doIt =
+              invocations.firstWhere((m) => m.methodName.name == 'doIt');
+          expect(IgnoreUtils.hasIgnoreComment(doIt, 'my_rule'), isTrue);
+        });
+
+        test('does not affect other methods in chain', () {
+          final unit = _parseCode('''
+void test() {
+  final result = obj
+      // ignore: my_rule
+      .methodA()
+      .methodB();
+}
+class C { C methodA() => this; C methodB() => this; }
+final obj = C();
+''');
+          final invocations = _findAll<MethodInvocation>(unit);
+          final methodB =
+              invocations.firstWhere((m) => m.methodName.name == 'methodB');
+          expect(IgnoreUtils.hasIgnoreComment(methodB, 'my_rule'), isFalse);
+        });
+      });
+
+      group('chained property access (mid-chain comments)', () {
+        test('detects comment before property in chain', () {
+          // Use method call result as target to ensure PropertyAccess node
+          final unit = _parseCode('''
+void test() {
+  final result = getObj()
+      // ignore: my_rule
+      .prop;
+}
+class C { final String prop = 'v'; }
+C getObj() => C();
+''');
+          final accesses = _findAll<PropertyAccess>(unit);
+          final prop =
+              accesses.firstWhere((p) => p.propertyName.name == 'prop');
+          expect(IgnoreUtils.hasIgnoreComment(prop, 'my_rule'), isTrue);
+        });
+      });
     });
   });
 }
