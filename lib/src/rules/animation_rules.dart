@@ -1182,24 +1182,67 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
 /// Alias: conflicting_animations, duplicate_animation_property, animation_conflict
 ///
 /// Overlapping animations on the same property fight each other,
-/// causing jitter and unpredictable behavior.
+/// causing jitter and unpredictable behavior. This rule detects nested
+/// transition widgets that animate the same property:
+/// - [ScaleTransition] → scale
+/// - [FadeTransition] → opacity
+/// - [SlideTransition] → position
+/// - [RotationTransition] → rotation
+/// - [SizeTransition] → size (axis-aware: vertical = height, horizontal = width)
 ///
-/// **BAD:**
+/// **BAD:** Nested transitions animating the same property
 /// ```dart
 /// ScaleTransition(
 ///   scale: _scaleAnimation,
 ///   child: ScaleTransition(
-///     scale: _anotherScaleAnimation,  // Conflicts!
+///     scale: _anotherScaleAnimation,  // Conflicts on 'scale'!
 ///     child: widget,
 ///   ),
 /// )
 /// ```
 ///
-/// **GOOD:**
+/// **BAD:** SizeTransition with same axis
+/// ```dart
+/// SizeTransition(
+///   sizeFactor: _animation,
+///   axis: Axis.vertical,
+///   child: SizeTransition(
+///     sizeFactor: _anotherAnimation,
+///     axis: Axis.vertical,  // Same axis = conflict on height!
+///     child: widget,
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:** Combine into single animation
 /// ```dart
 /// ScaleTransition(
 ///   scale: _combinedScaleAnimation,  // Single animation
 ///   child: widget,
+/// )
+/// ```
+///
+/// **GOOD:** SizeTransition on different axes (no conflict)
+/// ```dart
+/// SizeTransition(
+///   sizeFactor: _animation,
+///   axis: Axis.vertical,  // Animates HEIGHT
+///   child: SizeTransition(
+///     sizeFactor: _animation,
+///     axis: Axis.horizontal,  // Animates WIDTH - different property!
+///     child: widget,
+///   ),
+/// )
+/// ```
+///
+/// **GOOD:** Different transition types (no conflict)
+/// ```dart
+/// ScaleTransition(
+///   scale: _scaleAnimation,
+///   child: FadeTransition(
+///     opacity: _fadeAnimation,  // Different property
+///     child: widget,
+///   ),
 /// )
 /// ```
 class AvoidOverlappingAnimationsRule extends SaropaLintRule {
@@ -1210,6 +1253,18 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get requiresWidgets => true;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+        'ScaleTransition',
+        'FadeTransition',
+        'SlideTransition',
+        'RotationTransition',
+        'SizeTransition',
+      };
 
   static const LintCode _code = LintCode(
     name: 'avoid_overlapping_animations',
@@ -1229,6 +1284,33 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
     'SizeTransition': 'size',
   };
 
+  /// Gets the effective property being animated, accounting for axis.
+  ///
+  /// For [SizeTransition], the axis determines whether width or height is
+  /// animated - these are different properties and should not conflict.
+  static String? _getEffectiveProperty(
+    String typeName,
+    InstanceCreationExpression node,
+  ) {
+    if (!_transitionProperties.containsKey(typeName)) return null;
+
+    // SizeTransition needs special handling based on axis
+    if (typeName == 'SizeTransition') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'axis') {
+          final String axisValue = arg.expression.toSource();
+          if (axisValue.contains('horizontal')) {
+            return 'size_horizontal';
+          }
+        }
+      }
+      // Default axis is vertical
+      return 'size_vertical';
+    }
+
+    return _transitionProperties[typeName];
+  }
+
   @override
   void runWithReporter(
     CustomLintResolver resolver,
@@ -1239,17 +1321,18 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
       InstanceCreationExpression node,
     ) {
       final String typeName = node.constructorName.type.name.lexeme;
-      if (!_transitionProperties.containsKey(typeName)) return;
+      final String? property = _getEffectiveProperty(typeName, node);
+      if (property == null) return;
 
-      final String property = _transitionProperties[typeName]!;
-
-      // Check if child is same type of transition
+      // Check if child is same type of transition with same effective property
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'child') {
           final Expression child = arg.expression;
           if (child is InstanceCreationExpression) {
             final String childTypeName = child.constructorName.type.name.lexeme;
-            if (_transitionProperties[childTypeName] == property) {
+            final String? childProperty =
+                _getEffectiveProperty(childTypeName, child);
+            if (childProperty == property) {
               reporter.atNode(child.constructorName, code);
             }
           }

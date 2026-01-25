@@ -4,7 +4,7 @@
 import 'dart:typed_data';
 
 // =============================================================================
-// BAD: In-memory cache without size limit - should trigger
+// BAD: In-memory cache without bounds - should trigger
 // =============================================================================
 
 // expect_lint: avoid_unbounded_cache_growth
@@ -120,6 +120,104 @@ class CacheEntryFloorModel {
 }
 
 // =============================================================================
+// GOOD: Enum-keyed maps - inherently bounded - should NOT trigger
+// =============================================================================
+
+enum PanelEnum { actionIcons, activity, address, email, phone }
+
+enum DetailPanelsEnum {
+  actionIcons,
+  activity,
+  address,
+  email,
+  phone,
+  notes,
+  tags,
+}
+
+// OK: Enum keys cap the map at enum.values.length entries maximum
+class EnumKeyedCache {
+  final Map<PanelEnum, String> _cache = {
+    PanelEnum.actionIcons: 'icons',
+    PanelEnum.activity: 'activity',
+  };
+
+  String? get(PanelEnum key) => _cache[key];
+}
+
+// OK: Singleton with enum keys and getter-only access
+class PanelKeyCache {
+  factory PanelKeyCache() => _instance;
+  PanelKeyCache._internal();
+  static final PanelKeyCache _instance = PanelKeyCache._internal();
+
+  final Map<PanelEnum, int> _keys = {
+    PanelEnum.actionIcons: 1,
+    PanelEnum.activity: 2,
+    PanelEnum.address: 3,
+    PanelEnum.email: 4,
+    PanelEnum.phone: 5,
+  };
+
+  Map<PanelEnum, int> get keys => _keys;
+}
+
+// OK: Using Type suffix (common enum naming convention)
+enum SettingsType { general, privacy, notifications, appearance }
+
+class SettingsTypeCache {
+  final Map<SettingsType, String> _cache = {};
+
+  String? get(SettingsType key) => _cache[key];
+}
+
+// OK: Using Kind suffix (common enum naming convention)
+enum MessageKind { text, image, video, audio }
+
+class MessageKindCache {
+  final Map<MessageKind, int> _countCache = {};
+
+  int? getCount(MessageKind kind) => _countCache[kind];
+}
+
+// OK: Using Status suffix (common enum naming convention)
+enum TaskStatus { pending, inProgress, completed, cancelled }
+
+class TaskStatusCache {
+  final Map<TaskStatus, List<String>> _taskCache = {};
+
+  List<String>? getTasks(TaskStatus status) => _taskCache[status];
+}
+
+// =============================================================================
+// BAD: Simple cache service (matches BadCacheService pattern exactly)
+// =============================================================================
+
+// expect_lint: avoid_unbounded_cache_growth
+class SimpleCacheService {
+  final Map<String, Object> _cache = {};
+
+  void set(String key, Object value) {
+    _cache[key] = value;
+  }
+}
+
+// =============================================================================
+// GOOD: Immutable caches (no mutation methods) - should NOT trigger
+// =============================================================================
+
+// OK: Final map with no methods that add entries
+class ReadOnlyCache {
+  final Map<String, String> _cache = {
+    'key1': 'value1',
+    'key2': 'value2',
+  };
+
+  String? get(String key) => _cache[key];
+  bool contains(String key) => _cache.containsKey(key);
+}
+
+// =============================================================================
 // Dummy annotations for testing (simulating real ORM annotations)
 // =============================================================================
 
@@ -145,4 +243,26 @@ class Entity {
 class PrimaryKey {
   final bool autoGenerate;
   const PrimaryKey({this.autoGenerate = false});
+}
+
+// Test: Copy of ImageCache at end of file to check if position matters
+// expect_lint: avoid_unbounded_cache_growth
+class ImageCache2 {
+  final Map<String, Object> _cache = {};
+
+  void cache(String url, Object data) {
+    _cache[url] = data;
+  }
+
+  Object? get(String url) => _cache[url];
+}
+
+// Exact copy of BadCacheService from async fixture - should trigger
+// expect_lint: avoid_unbounded_cache_growth
+class BadCacheServiceCopy {
+  final Map<String, Object> _cache = {};
+
+  void set(String key, Object value) {
+    _cache[key] = value;
+  }
 }
