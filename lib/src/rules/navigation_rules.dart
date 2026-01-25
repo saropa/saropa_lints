@@ -897,6 +897,18 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         return;
       }
 
+      // Skip URL utility methods that return String or Uri
+      // These are parsers/converters, not deep link handlers
+      // e.g., String? accountIdFromUri(Uri uri) - extracts data from URI
+      // e.g., Uri? get storedUri - simple getter
+      final String? returnTypeStr = node.returnType?.toSource();
+      if (returnTypeStr != null) {
+        final String trimmed = returnTypeStr.replaceAll('?', '').trim();
+        if (trimmed == 'String' || trimmed == 'Uri') {
+          return;
+        }
+      }
+
       // Skip utility getters and simple boolean checks
       // These are helpers, not actual deep link handlers
       // Use endsWith instead of contains to be more precise:
@@ -967,6 +979,15 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
             return;
           }
         }
+
+        // Ternary with null fallback: condition ? value : null
+        // e.g., String? get postUriAt => postId.isNotEmpty ? 'at://$postId' : null;
+        if (expr is ConditionalExpression) {
+          if (expr.elseExpression is NullLiteral ||
+              expr.thenExpression is NullLiteral) {
+            return; // Has null fallback
+          }
+        }
       }
 
       // Skip trivial method bodies (single statement that is assignment or return)
@@ -999,6 +1020,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
           bodySource.contains('404') ||
           bodySource.contains('error') ||
           bodySource.contains('null)') ||
+          bodySource.contains('return null') ||
           bodySource.contains('== null') ||
           bodySource.contains('isEmpty') ||
           bodySource.contains('try') ||
