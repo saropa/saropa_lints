@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.8.0] - 2026-01-25
+
+### Changed
+
+- **Lazy rule loading for reduced memory usage**: Rules are now instantiated on-demand instead of at compile time. Previously, all 1500+ rules were created as a `const List<LintRule>`, consuming ~4GB of memory regardless of which tier was selected. Now only rules needed for the selected tier are created. For essential tier (~250 rules), this reduces memory usage significantly and eliminates OOM crashes on resource-constrained systems.
+  - Rule list changed from `const List<LintRule>` to `final List<LintRule Function()>` factories
+  - Factory map built lazily on first access
+  - No generated files required - stays in sync automatically when rules are added/removed
+
+---
 ## [4.7.6] - 2026-01-25
 
 ### Fixed
