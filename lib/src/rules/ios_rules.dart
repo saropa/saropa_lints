@@ -6885,16 +6885,19 @@ class AvoidIosMisleadingPushNotificationsRule extends SaropaLintRule {
 ///
 /// ## What This Rule Checks
 ///
-/// - `Isolate.spawn` / `Isolate.run` - Flags these as they create persistent
-///   isolates that could run indefinitely
-/// - `compute()` - Only flags if there's no indication the developer
-///   understands it's for short-lived foreground work. Add comments mentioning
-///   "foreground", "short-lived", "cpu-bound", or "offload" to suppress.
+/// - `Isolate.spawn` - Creates a persistent isolate that could run
+///   indefinitely. Always flagged unless `workmanager` or
+///   `BGTaskScheduler` usage is detected nearby.
+/// - `Isolate.run()` / `compute()` - Short-lived, one-shot operations that
+///   automatically clean up. Only flagged if there's no indication the
+///   developer understands it's for short-lived foreground work. Add comments
+///   mentioning "foreground", "short-lived", "cpu-bound", "offload",
+///   "fire-and-forget", or "never block" to suppress.
 ///
-/// Note: `compute()` is designed for one-shot, short-lived operations that
-/// offload CPU-bound work to avoid UI jank. It's fundamentally different from
-/// `Isolate.spawn` and is NOT flagged when used in StreamTransformers or with
-/// appropriate comments indicating intentional foreground use.
+/// Note: `Isolate.run()` (Dart 2.19+) and `compute()` are designed for
+/// one-shot operations that offload CPU-bound work to avoid UI jank. They
+/// automatically spawn, execute, return the result, and exit — unlike
+/// `Isolate.spawn` which creates a long-lived isolate.
 ///
 /// ## Example
 ///
