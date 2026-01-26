@@ -470,9 +470,6 @@ class PreferSmallFilesRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.low;
 
   @override
-  RuleTier get tier => RuleTier.insanity;
-
-  @override
   RuleCost get cost => RuleCost.trivial;
 
   static const int _maxLines = 200;
@@ -691,9 +688,6 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
 
   @override
   LintImpact get impact => LintImpact.low;
-
-  @override
-  RuleTier get tier => RuleTier.insanity;
 
   @override
   RuleCost get cost => RuleCost.trivial;
