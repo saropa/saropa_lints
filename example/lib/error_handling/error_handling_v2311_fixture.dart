@@ -155,6 +155,41 @@ void goodFlutterWidgetKey() {
   final uniqueKey = UniqueKey(); // Intentionally unique widget key
 }
 
+// GOOD: Constructor with deterministic key and metadata DateTime.now()
+void goodConstructorWithMetadataTimestamp(String userId) {
+  final cacheKey = MockCacheEntry(
+    key: userId,
+    value: 'some_value',
+    createdAt: DateTime.now(), // Metadata — should NOT trigger
+  );
+}
+
+// GOOD: Constructor with multiple metadata timestamps
+void goodConstructorWithMultipleMetadata(String userId) {
+  final cacheKey = MockCacheEntry(
+    key: userId,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(), // Both are metadata — should NOT trigger
+  );
+}
+
+// BAD: Constructor where the key argument itself is non-deterministic
+void badConstructorWithNonDeterministicKey() {
+  // expect_lint: require_cache_key_determinism
+  final cacheKey = MockCacheEntry(
+    key: 'user_${DateTime.now().millisecondsSinceEpoch}',
+    value: 'some_value',
+  );
+}
+
+// GOOD: Variable not ending with 'key' — Check 1 should skip entirely
+void goodCacheEntryNotNamedKey() {
+  final cacheEntry = MockCacheEntry(
+    key: 'stable_key',
+    createdAt: DateTime.now(), // Should NOT trigger — variable isn't *key
+  );
+}
+
 // =========================================================================
 // require_permission_permanent_denial_handling
 // =========================================================================
@@ -297,4 +332,20 @@ class Uuid {
 // Mock Random
 class Random {
   int nextInt(int max) => 0;
+}
+
+// Mock MockCacheEntry for constructor-based cache key tests
+class MockCacheEntry {
+  MockCacheEntry({
+    required this.key,
+    this.value,
+    this.createdAt,
+    this.updatedAt,
+    this.ttl,
+  });
+  final String key;
+  final String? value;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final int? ttl;
 }
