@@ -1931,6 +1931,9 @@ class _RefReadVisitor extends RecursiveAstVisitor<void> {
 /// should rebuild. Mutable state classes can lead to subtle bugs where state
 /// changes aren't detected because the same object instance is being compared.
 ///
+/// This rule only targets classes whose name ends with `State` and does NOT
+/// extend a Flutter `State` subclass, `StatefulWidget`, or `StatelessWidget`.
+///
 /// **BAD:**
 /// ```dart
 /// class CounterState {
@@ -1971,6 +1974,23 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
+  /// Known Flutter framework State subclasses that are not BLoC states.
+  static const Set<String> _flutterStateClasses = <String>{
+    'State',
+    'PopupMenuItemState',
+    'FormFieldState',
+    'AnimatedWidgetBaseState',
+    'ScrollableState',
+    'RefreshIndicatorState',
+  };
+
+  /// Flutter widget base classes — a class named "FooState" extending one of
+  /// these is using "State" as a domain term, not a BLoC state.
+  static const Set<String> _flutterWidgetClasses = <String>{
+    'StatefulWidget',
+    'StatelessWidget',
+  };
+
   static const LintCode _code = LintCode(
     name: 'require_immutable_bloc_state',
     problemMessage:
@@ -1995,11 +2015,16 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
       // Skip abstract classes
       if (node.abstractKeyword != null) return;
 
-      // Skip if it's a Flutter State (extends State<T>)
+      // Skip Flutter State subclasses and widget classes using "State" as
+      // a domain term (e.g., ButtonDeleteCountryState extends StatefulWidget)
       final ExtendsClause? extendsClause = node.extendsClause;
       if (extendsClause != null) {
         final String superName = extendsClause.superclass.name.lexeme;
-        if (superName == 'State') return; // Flutter State class
+        if (_flutterStateClasses.contains(superName)) return;
+        if (_flutterWidgetClasses.contains(superName)) return;
+        // A superclass ending with 'State' is likely a Flutter State
+        // subclass or custom State variant, not a BLoC state.
+        if (superName.endsWith('State')) return;
       }
 
       // Check for @immutable annotation
