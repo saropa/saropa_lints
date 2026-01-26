@@ -1346,6 +1346,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_biometric_fallback',
   'require_token_refresh',
   'prefer_uuid_v4', // UUID v4 over v1 for privacy
+  'require_https_only_test', // INFO - HTTP URLs in test files
 
   // Accessibility
   'avoid_merged_semantics_hiding_info',
