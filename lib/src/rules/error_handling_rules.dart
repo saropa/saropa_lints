@@ -1680,6 +1680,22 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     'debugName',
   };
 
+  // FIX: Exclude metadata parameters that store timestamps or expiry info about
+  // cache entries. These fields record when an entry was created/modified/expires
+  // but do NOT participate in cache key identity, lookup, or uniqueness.
+  // Non-deterministic values like DateTime.now() are expected here.
+  static const Set<String> _metadataParameters = <String>{
+    'createdAt',
+    'updatedAt',
+    'modifiedAt',
+    'lastAccessed',
+    'lastModified',
+    'timestamp',
+    'expiresAt',
+    'expiry',
+    'ttl',
+  };
+
   // FIX: Exclude Flutter Key types entirely - they're widget identity keys, NOT
   // cache keys. Variables like `_key = GlobalKey(...)` should not trigger this
   // rule even though the name contains "key".
@@ -1826,59 +1842,53 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     return null;
   }
 
-  /// Recursively checks for non-deterministic values, skipping debug-only parameters.
+  /// Recursively checks for non-deterministic values, skipping debug-only
+  /// and metadata parameters.
   void _checkForNonDeterministicValues(
     Expression expression,
     AstNode reportNode,
     SaropaDiagnosticReporter reporter,
   ) {
-    // For constructor/method calls, check arguments but skip debug-only params
+    // For constructor/method calls, check arguments but skip excluded params
     if (expression is InstanceCreationExpression) {
-      for (final Expression arg in expression.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          // Skip debug-only parameters like debugLabel
-          if (_debugOnlyParameters.contains(arg.name.label.name)) {
-            continue;
-          }
-          // Check the value of non-debug parameters
-          if (_containsNonDeterministicValue(arg.expression)) {
-            reporter.atNode(reportNode, code);
-            return;
-          }
-        } else {
-          // Positional argument
-          if (_containsNonDeterministicValue(arg)) {
-            reporter.atNode(reportNode, code);
-            return;
-          }
-        }
-      }
+      _checkArgumentList(expression.argumentList, reporter);
       return;
     }
 
     if (expression is MethodInvocation) {
-      for (final Expression arg in expression.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (_debugOnlyParameters.contains(arg.name.label.name)) {
-            continue;
-          }
-          if (_containsNonDeterministicValue(arg.expression)) {
-            reporter.atNode(reportNode, code);
-            return;
-          }
-        } else {
-          if (_containsNonDeterministicValue(arg)) {
-            reporter.atNode(reportNode, code);
-            return;
-          }
-        }
-      }
+      _checkArgumentList(expression.argumentList, reporter);
       return;
     }
 
     // For other expressions, check the whole source
     if (_containsNonDeterministicValue(expression)) {
       reporter.atNode(reportNode, code);
+    }
+  }
+
+  /// Checks each argument in [argList] for non-deterministic values.
+  /// Skips debug-only and metadata parameters. Reports at the specific
+  /// offending argument for precise diagnostics.
+  void _checkArgumentList(
+    ArgumentList argList,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final Expression arg in argList.arguments) {
+      if (arg is NamedExpression) {
+        final String paramName = arg.name.label.name;
+        if (_debugOnlyParameters.contains(paramName)) continue;
+        if (_metadataParameters.contains(paramName)) continue;
+        if (_containsNonDeterministicValue(arg.expression)) {
+          reporter.atNode(arg, code);
+          return;
+        }
+      } else {
+        // Positional argument
+        if (_containsNonDeterministicValue(arg)) {
+          reporter.atNode(arg, code);
+          return;
+        }
+      }
     }
   }
 
