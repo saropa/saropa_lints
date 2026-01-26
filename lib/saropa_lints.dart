@@ -1715,6 +1715,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
   // OWASP Coverage Gap Rules (v3.2.0)
   AvoidIgnoringSslErrorsRule.new,
   RequireHttpsOnlyRule.new,
+  RequireHttpsOnlyTestRule.new,
   AvoidUnsafeDeserializationRule.new,
   AvoidUserControlledUrlsRule.new,
   RequireCatchLoggingRule.new,
