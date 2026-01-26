@@ -1230,26 +1230,6 @@ abstract class SaropaLintRule extends DartLintRule {
   LintImpact get impact => LintImpact.medium;
 
   // ============================================================
-  // Tier Classification (Single Source of Truth)
-  // ============================================================
-
-  /// The tier at which this rule is enabled by default.
-  ///
-  /// **This is the single source of truth for tier assignment.**
-  /// The init script reads this from each rule to generate analysis_options.yaml.
-  ///
-  /// Override to specify the tier for your rule:
-  /// - [RuleTier.essential]: Critical (crashes, security, memory leaks)
-  /// - [RuleTier.recommended]: Essential + accessibility, performance
-  /// - [RuleTier.professional]: Recommended + architecture, testing
-  /// - [RuleTier.comprehensive]: Professional + thorough coverage
-  /// - [RuleTier.insanity]: Pedantic, highly opinionated rules
-  /// - [RuleTier.stylistic]: Opt-in only (formatting, ordering, naming)
-  ///
-  /// Default: [RuleTier.professional] (most rules are professional-level)
-  RuleTier get tier => RuleTier.professional;
-
-  // ============================================================
   // Config Key Aliases
   // ============================================================
 
