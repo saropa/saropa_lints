@@ -17966,8 +17966,18 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
             break;
           }
         }
-        // Stop at method/function boundaries
-        if (current is MethodDeclaration || current is FunctionDeclaration) {
+        // Stop at method/function boundaries.
+        // Trust non-build methods and standalone functions — these
+        // are helper methods that typically build children for Flex
+        // widgets at the call site.
+        if (current is MethodDeclaration) {
+          if (current.name.lexeme != 'build') {
+            assignedToVariable = true;
+          }
+          break;
+        }
+        if (current is FunctionDeclaration) {
+          assignedToVariable = true;
           break;
         }
         current = current.parent;
