@@ -173,6 +173,14 @@ class ProgressTracker {
   static final List<double> _rateSamples = [];
   static const int _maxRateSamples = 5;
 
+  // Total enabled rules (set from plugin entry point)
+  static int _totalEnabledRules = 0;
+
+  /// Set the total number of enabled rules for progress display.
+  static void setEnabledRuleCount(int count) {
+    _totalEnabledRules = count;
+  }
+
   /// Interval between progress reports (in files or time).
   static const int _fileInterval = 10; // More frequent updates
   static const Duration _timeInterval = Duration(seconds: 5);
@@ -257,6 +265,14 @@ class ProgressTracker {
     _startTime ??= DateTime.now();
     _lastProgressTime ??= _startTime;
 
+    // On first file, discover project files for progress %
+    if (!_discoveredFromFiles && _seenFiles.isEmpty) {
+      final projectRoot = ProjectContext.findProjectRoot(path);
+      if (projectRoot != null) {
+        discoverFiles(projectRoot);
+      }
+    }
+
     final now = DateTime.now();
 
     // Check if this is a new file or we're still on the same file
@@ -332,8 +348,7 @@ class ProgressTracker {
     final lastFile = _seenFiles.last;
     final shortName = lastFile.split('/').last.split('\\').last;
 
-    // Calculate percentage and ETA only if we have a real file discovery
-    // (not just recalibrated guesses which are always wrong)
+    // Calculate file progress percentage and ETA
     String progressStr;
     if (_discoveredFromFiles && _totalExpectedFiles > 0) {
       final percent =
@@ -343,20 +358,20 @@ class ProgressTracker {
       final etaSeconds =
           filesPerSec > 0 ? (remaining / filesPerSec).round() : 0;
       progressStr =
-          '$fileCount/$_totalExpectedFiles ($percent%) ETA ${_formatDuration(etaSeconds)}';
+          '$fileCount/$_totalExpectedFiles files ($percent%) ETA ${_formatDuration(etaSeconds)}';
     } else {
       progressStr = '$fileCount files';
     }
 
-    // Calculate % of files with issues
-    final issuePercent =
-        fileCount > 0 ? (_filesWithIssues * 100 / fileCount).round() : 0;
+    // Build rules segment if rule count is known
+    final rulesStr =
+        _totalEnabledRules > 0 ? ' | $_totalEnabledRules rules' : '';
 
     // Use stderr to avoid custom_lint rule name prefix
-    // Clean format: progress | time | rate | issues (% files) | current file
+    // Format: progress | time | rate | issues | rules | current file
     stderr.writeln(
       '📊 $progressStr | ${_formatDuration(elapsed.inSeconds)} | '
-      '${filesPerSec.round()}/s | $_violationsFound issues ($issuePercent% files) | $shortName',
+      '${filesPerSec.round()}/s | $_violationsFound issues$rulesStr | $shortName',
     );
   }
 
@@ -508,6 +523,7 @@ class ProgressTracker {
     _lastProgressTime = null;
     _lastReportedCount = 0;
     _totalExpectedFiles = 0;
+    _totalEnabledRules = 0;
     _etaCalibrated = false;
     _discoveredFromFiles = false;
     _violationsFound = 0;
