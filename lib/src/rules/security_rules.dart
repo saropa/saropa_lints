@@ -5142,6 +5142,9 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get skipTestFiles => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
         mobile: <OwaspMobile>{OwaspMobile.m5},
         web: <OwaspWeb>{OwaspWeb.a05},
@@ -5270,6 +5273,88 @@ class _ReplaceWithHttpsFix extends DartFix {
       });
     });
   }
+}
+
+/// Detects HTTP URLs in test files at reduced severity.
+///
+/// This is the test-file companion to [RequireHttpsOnlyRule]. The production
+/// rule skips test files entirely; this rule covers them at INFO severity
+/// so teams can independently disable it without losing production protection.
+///
+/// **Bad:**
+/// ```dart
+/// test('parses URL', () {
+///   final url = 'http://example.com/path'; // INFO
+/// });
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// test('parses URL', () {
+///   final url = 'https://example.com/path';
+/// });
+/// ```
+class RequireHttpsOnlyTestRule extends SaropaLintRule {
+  const RequireHttpsOnlyTestRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => const <FileType>{FileType.test};
+
+  static const LintCode _code = LintCode(
+    name: 'require_https_only_test',
+    problemMessage: '[require_https_only_test] HTTP URL detected in test file. '
+        'Consider using HTTPS even in test data.',
+    correctionMessage:
+        'Replace http:// with https:// or disable this rule for test files.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
+      final String value = node.value;
+
+      if (!value.startsWith('http://')) return;
+
+      for (final String pattern in RequireHttpsOnlyRule._allowedHttpPatterns) {
+        if (value.startsWith(pattern)) return;
+      }
+
+      if (RequireHttpsOnlyRule._isSafeReplacementPattern(node)) return;
+
+      reporter.atNode(node, code);
+    });
+
+    context.registry.addStringInterpolation((StringInterpolation node) {
+      final List<InterpolationElement> elements = node.elements;
+      if (elements.isEmpty) return;
+
+      final InterpolationElement first = elements.first;
+      if (first is! InterpolationString) return;
+
+      final String value = first.value;
+      if (!value.startsWith('http://')) return;
+
+      for (final String pattern in RequireHttpsOnlyRule._allowedHttpPatterns) {
+        if (value.startsWith(pattern)) return;
+      }
+
+      reporter.atNode(node, code);
+    });
+  }
+
+  @override
+  List<Fix> getFixes() => <Fix>[_ReplaceWithHttpsFix()];
 }
 
 /// Warns when JSON is decoded from untrusted sources without type validation.
