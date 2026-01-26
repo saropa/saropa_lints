@@ -1272,7 +1272,7 @@ abstract class SaropaLintRule extends DartLintRule {
   /// Then both of these work in custom_lint.yaml:
   /// ```yaml
   /// rules:
-  ///   enforce_arguments_ordering: false  # canonical name
+  ///   prefer_arguments_ordering: false  # canonical name
   ///   arguments_ordering: false           # alias
   /// ```
   ///

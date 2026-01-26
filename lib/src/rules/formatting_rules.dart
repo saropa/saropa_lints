@@ -757,14 +757,14 @@ class MemberOrderingFormattingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
-  /// Alias: member_ordering
   @override
-  List<String> get configAliases => const <String>['member_ordering'];
+  List<String> get configAliases =>
+      const <String>['enforce_member_ordering', 'member_ordering'];
 
   static const LintCode _code = LintCode(
-    name: 'enforce_member_ordering',
+    name: 'prefer_member_ordering',
     problemMessage:
-        '[enforce_member_ordering] Class members are not in conventional order.',
+        '[prefer_member_ordering] Class members are not in conventional order.',
     correctionMessage:
         'Order members: static fields, fields, constructors, methods.',
     errorSeverity: DiagnosticSeverity.INFO,

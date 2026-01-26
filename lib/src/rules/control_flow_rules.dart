@@ -507,10 +507,13 @@ class AvoidContinueRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<String> get configAliases => const <String>['avoid_continue_statement'];
+
   static const LintCode _code = LintCode(
-    name: 'avoid_continue_statement',
+    name: 'prefer_no_continue_statement',
     problemMessage:
-        '[avoid_continue_statement] Avoid using the continue statement.',
+        '[prefer_no_continue_statement] Avoid using the continue statement.',
     correctionMessage: 'Restructure the loop logic to avoid continue.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

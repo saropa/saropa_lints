@@ -5818,10 +5818,14 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  @override
+  List<String> get configAliases =>
+      const <String>['avoid_inferrable_type_arguments'];
+
   static const LintCode _code = LintCode(
-    name: 'avoid_inferrable_type_arguments',
+    name: 'prefer_inferred_type_arguments',
     problemMessage:
-        '[avoid_inferrable_type_arguments] Generic type matches inference.',
+        '[prefer_inferred_type_arguments] Generic type matches inference.',
     correctionMessage: 'Remove redundant type arguments that can be inferred.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

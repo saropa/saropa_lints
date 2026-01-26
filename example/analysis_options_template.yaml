@@ -673,7 +673,7 @@ custom_lint:
     # NAMING & STYLE
     # =========================================================================
     - prefer_boolean_prefixes: true
-    - avoid_getter_prefix: false
+    - prefer_no_getter_prefix: false
     - prefer_correct_identifier_length: false
     - prefer_correct_type_name: false
     - prefer_correct_error_name: false
@@ -1148,8 +1148,8 @@ custom_lint:
     - prefer_todo_format: false
     - prefer_fixme_format: false
     - prefer_sentence_case_comments: false
-    - capitalize_comment_start: false            # Comment capitalization (v4.2.0 fix)
-    - avoid_commented_out_code: false           # Delete dead code (v4.2.0 overhaul)
+    - prefer_capitalized_comment_start: false            # Comment capitalization (v4.2.0 fix)
+    - prefer_no_commented_out_code: false           # Delete dead code (v4.2.0 overhaul)
     - prefer_period_after_doc: false
     - prefer_screaming_case_constants: false
     - prefer_descriptive_bool_names: false       # Lenient - allows action verbs

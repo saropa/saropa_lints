@@ -400,7 +400,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Many rules now provide context-specific examples and describe the consequences of ignoring the lint.
 
 - **Stylistic tier now includes both type argument rules:**
-  - `avoid_inferrable_type_arguments` and `prefer_explicit_type_arguments` have been added to the `stylisticRules` set in `tiers.dart`.
+  - `prefer_inferred_type_arguments` and `prefer_explicit_type_arguments` have been added to the `stylisticRules` set in `tiers.dart`.
   - Both rules are now included when the stylistic tier is enabled, but remain mutually exclusive in effect (enabling both will cause conflicting lints).
   - This change makes it easier to opt into either style preference via the `--stylistic` flag or tier selection, but users should only enable one of the two in their configuration to avoid conflicts.
 
@@ -532,7 +532,7 @@ Both rules are in the comprehensive tier with INFO severity. They use `applicabl
 
 This prevents false positives on legitimate regex patterns like `RegExp(r'0+$')` or `RegExp(r'\d{3}-\d{4}')`.
 
-**`avoid_commented_out_code` and `capitalize_comment_start` false positives on prose comments** - These rules use shared heuristics to detect commented-out code vs prose comments. The previous pattern matched keywords at the start of comments too broadly, causing false positives on natural language sentences like `// null is before non-null` or `// return when the condition is met`. The detection patterns are now context-aware and only match keywords when they appear in actual code contexts:
+**`prefer_no_commented_out_code` and `prefer_capitalized_comment_start` false positives on prose comments** - These rules use shared heuristics to detect commented-out code vs prose comments. The previous pattern matched keywords at the start of comments too broadly, causing false positives on natural language sentences like `// null is before non-null` or `// return when the condition is met`. The detection patterns are now context-aware and only match keywords when they appear in actual code contexts:
 
 - Control flow keywords (`if`, `for`, `while`) now require opening parens/braces: `if (` or `while {`
 - Simple statements (`return`, `break`, `throw`) now require semicolons or specific literals
