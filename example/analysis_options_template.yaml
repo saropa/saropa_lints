@@ -830,6 +830,7 @@ custom_lint:
     # OWASP Coverage Gap Rules (v3.2.0)
     - avoid_ignoring_ssl_errors: false           # ERROR - MITM attack prevention (OWASP M5, A05)
     - require_https_only: false                  # WARNING - unencrypted traffic (OWASP M5, A05)
+    - require_https_only_test: false             # INFO - HTTP URLs in test files (v4.8.2)
     - avoid_unsafe_deserialization: false        # WARNING - data integrity (OWASP M4, A08)
     - avoid_user_controlled_urls: false          # WARNING - SSRF prevention (OWASP M4, A10)
     - require_catch_logging: false               # WARNING - security event logging (OWASP M8, A09)
@@ -839,6 +840,7 @@ custom_lint:
     - avoid_encryption_key_in_memory: false      # WARNING - keys in fields can be extracted (v4.1.8)
     # v4.1.6 Configuration rules
     - avoid_hardcoded_config: false              # WARNING - hardcoded URLs and keys (v4.1.6)
+    - avoid_hardcoded_config_test: false         # INFO - hardcoded config in test files (v4.8.2)
     - avoid_mixed_environments: false            # ERROR - prod/dev config mismatch (v4.1.6)
 
     # =========================================================================

@@ -40,6 +40,9 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get skipTestFiles => true;
+
   static const LintCode _code = LintCode(
     name: 'avoid_hardcoded_config',
     problemMessage:
@@ -110,6 +113,87 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
         }
       }
     });
+  }
+}
+
+/// Detects hardcoded configuration values in test files at reduced severity.
+///
+/// Test files routinely contain hardcoded URLs, ports, and paths as test
+/// fixture data. This variant of [AvoidHardcodedConfigRule] surfaces these
+/// at INFO level for awareness without blocking, since the advice to
+/// externalize configuration does not apply to test inputs.
+///
+/// `[HEURISTIC]` - Uses pattern matching to detect configuration values.
+///
+/// **BAD:**
+/// ```dart
+/// // test/utils_test.dart
+/// final url = 'https://api.example.com/v1/users'; // INFO
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // test/utils_test.dart
+/// const testUrl = 'https://api.example.com/v1/users'; // const preferred
+/// ```
+class AvoidHardcodedConfigTestRule extends SaropaLintRule {
+  const AvoidHardcodedConfigTestRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.low;
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  Set<FileType>? get applicableFileTypes => const <FileType>{FileType.test};
+
+  static const LintCode _code = LintCode(
+    name: 'avoid_hardcoded_config_test',
+    problemMessage:
+        '[avoid_hardcoded_config_test] Hardcoded configuration detected in test file. '
+        'Consider using a const or shared test helper.',
+    correctionMessage:
+        'Extract to a const or shared test fixture if reused across tests.',
+    errorSeverity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    CustomLintResolver resolver,
+    SaropaDiagnosticReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclaration((VariableDeclaration node) {
+      if (_isHardcodedConfig(node)) {
+        reporter.atNode(node, code);
+      }
+    });
+
+    context.registry
+        .addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
+      for (final VariableDeclaration variable in node.variables.variables) {
+        if (_isHardcodedConfig(variable)) {
+          reporter.atNode(variable, code);
+        }
+      }
+    });
+  }
+
+  static bool _isHardcodedConfig(VariableDeclaration node) {
+    final Expression? initializer = node.initializer;
+    if (initializer is! StringLiteral) return false;
+
+    final String? value = initializer.stringValue;
+    if (value == null || value.isEmpty) return false;
+
+    final String varName = node.name.lexeme;
+    if (!AvoidHardcodedConfigRule._configNamePattern.hasMatch(varName)) {
+      return false;
+    }
+
+    return AvoidHardcodedConfigRule._urlPattern.hasMatch(value) ||
+        AvoidHardcodedConfigRule._keyPattern.hasMatch(value);
   }
 }
 

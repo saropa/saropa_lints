@@ -3869,6 +3869,8 @@ class _ReplaceStraightWithCurlyFix extends DartFix {
 ///   width: 100,
 /// );
 /// ```
+///
+/// Formerly: `enforce_arguments_ordering`
 class ArgumentsOrderingRule extends SaropaLintRule {
   const ArgumentsOrderingRule() : super(code: _code);
 
@@ -4069,6 +4071,8 @@ class _SortArgumentsFix extends DartFix {
 /// **Quick fix available:** Deletes the commented-out code line.
 ///
 /// See also: [CommentPatterns] for shared detection heuristics.
+///
+/// Formerly: `avoid_commented_out_code`
 class AvoidCommentedOutCodeRule extends SaropaLintRule {
   const AvoidCommentedOutCodeRule() : super(code: _code);
 

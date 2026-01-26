@@ -2065,6 +2065,7 @@ final List<LintRule Function()> _allRuleFactories = <LintRule Function()>[
 
   // Configuration rules (config_rules.dart)
   AvoidHardcodedConfigRule.new,
+  AvoidHardcodedConfigTestRule.new,
   AvoidMixedEnvironmentsRule.new,
 
   // Lifecycle rules (lifecycle_rules.dart)

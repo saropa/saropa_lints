@@ -747,6 +747,8 @@ class FormatCommentFormattingRule extends SaropaLintRule {
 ///   void doSomething() {}
 /// }
 /// ```
+///
+/// Formerly: `enforce_member_ordering`
 class MemberOrderingFormattingRule extends SaropaLintRule {
   const MemberOrderingFormattingRule() : super(code: _code);
 
