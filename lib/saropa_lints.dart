@@ -2302,13 +2302,9 @@ class _SaropaLints extends PluginBase {
       // Register rule groups for batch execution
       _registerRuleGroups();
 
-      // Discover files for ETA calculation (non-blocking, best effort)
-      // Uses current directory as project root
-      final fileCount = ProgressTracker.discoverFiles('.');
-      if (fileCount > 0) {
-        // ignore: avoid_print
-        print('[saropa_lints] Found ~$fileCount dart files to analyze');
-      }
+      // File discovery for progress % is now handled automatically
+      // in ProgressTracker.recordFile() using the first analyzed file's path
+      // to derive the actual project root (fixes wrong CWD in plugin mode).
     }
 
     // =========================================================================
@@ -2425,6 +2421,9 @@ class _SaropaLints extends PluginBase {
     // ignore: avoid_print
     print(
         '[saropa_lints] Loaded ${filteredRules.length} rules (tier: $tier, enableAll: $enableAll)');
+
+    // Tell progress tracker how many rules are active
+    ProgressTracker.setEnabledRuleCount(filteredRules.length);
 
     return filteredRules;
   }
