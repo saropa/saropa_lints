@@ -155,6 +155,26 @@ class _GoodExpandedInListGenerateFieldState
   }
 }
 
+// GOOD: Expanded in expression-body helper method
+class GoodExpandedInExpressionBodyHelper extends StatelessWidget {
+  const GoodExpandedInExpressionBodyHelper({super.key});
+
+  List<Widget> _buildItems() => [Expanded(child: Container())];
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: _buildItems());
+  }
+}
+
+// GOOD: Expanded in top-level helper function
+List<Widget> _topLevelBuildItems() {
+  return [Expanded(child: Container())];
+}
+
+// GOOD: Expanded in expression-body top-level function
+List<Widget> _topLevelBuildItemsArrow() => [Expanded(child: Container())];
+
 // GOOD: Expanded assigned to variable
 class GoodExpandedAssignedToVariable extends StatelessWidget {
   const GoodExpandedAssignedToVariable({super.key});
