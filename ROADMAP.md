@@ -326,11 +326,12 @@ Before merging any fix:
 | `require_backup_exclusion` | Professional | INFO | Sensitive data should be excluded from iCloud/Google backups. Backups are often less protected than the device. |
 | `prefer_root_detection` | Professional | INFO | Rooted/jailbroken devices bypass security controls. Detect and warn users, or disable sensitive features on compromised devices. |
 
-#### Network Security (Test Files)
+#### Security & Configuration (Test Files)
 
 | Rule Name | Tier | Severity | Description |
 |-----------|------|----------|-------------|
 | `require_https_only_test` | Professional | INFO | HTTP URLs in test files are typically test fixtures, not real endpoints. Reports at INFO severity so teams can disable independently from production `require_https_only`. |
+| `avoid_hardcoded_config_test` | Professional | INFO | Hardcoded URLs and keys in test files are typically test fixture data, not deployment configuration. Reports at INFO severity so teams can disable independently from production `avoid_hardcoded_config`. |
 
 #### Input Validation & Injection
 
