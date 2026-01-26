@@ -112,6 +112,49 @@ class GoodExpandedInMap extends StatelessWidget {
   }
 }
 
+// GOOD: Expanded inside List.generate callback in helper method
+// Combined pattern: return + List.generate + helper method
+class GoodExpandedInListGenerateHelper extends StatelessWidget {
+  const GoodExpandedInListGenerateHelper({super.key});
+
+  List<Widget> _buildChildren() {
+    return List<Widget>.generate(3, (int index) {
+      return Expanded(child: Text('Item $index'));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: _buildChildren());
+  }
+}
+
+// GOOD: Expanded inside List.generate with field assignment in helper
+class GoodExpandedInListGenerateField extends StatefulWidget {
+  const GoodExpandedInListGenerateField({super.key});
+
+  @override
+  State<GoodExpandedInListGenerateField> createState() =>
+      _GoodExpandedInListGenerateFieldState();
+}
+
+class _GoodExpandedInListGenerateFieldState
+    extends State<GoodExpandedInListGenerateField> {
+  List<Widget>? _cached;
+
+  List<Widget> _buildChildren() {
+    _cached ??= List<Widget>.generate(3, (int index) {
+      return Expanded(child: Text('Item $index'));
+    });
+    return _cached!;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: _buildChildren());
+  }
+}
+
 // GOOD: Expanded assigned to variable
 class GoodExpandedAssignedToVariable extends StatelessWidget {
   const GoodExpandedAssignedToVariable({super.key});
