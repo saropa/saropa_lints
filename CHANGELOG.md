@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
+## [4.8.2] - 2026-01-26
+
+### Fixed
+
+- **`avoid_context_after_await_in_static` false positives in try-catch**: The rule now recurses into try, catch, and finally blocks instead of skipping the entire `TryStatement`. Mounted guards and ternary patterns inside try-catch are correctly recognized.
+- **`avoid_context_across_async` false positives in try-catch**: Same try-catch recursion fix applied to the non-static context rule.
+- **`avoid_expanded_outside_flex` false positive in `List.generate` helper**: Added defensive `FunctionExpression` check so `Expanded` inside a `List.generate()` or `.map()` callback within a helper method is correctly trusted.
+
+---
 ## [4.8.1] - 2026-01-25
 
 ### Added
