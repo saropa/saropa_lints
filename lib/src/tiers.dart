@@ -93,6 +93,12 @@ const Set<String> stylisticRules = <String>{
   'prefer_doc_curly_apostrophe',
   'prefer_doc_straight_apostrophe',
   'prefer_straight_apostrophe',
+
+  // === Member ordering (conflicting pairs - opt-in only) ===
+  'prefer_static_members_first',
+  'prefer_instance_members_first',
+  'prefer_public_members_first',
+  'prefer_private_members_first',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -2008,7 +2014,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_implicit_boolean_comparison',
   'prefer_initializing_formals',
   'prefer_inline_callbacks',
-  'prefer_instance_members_first',
+  // 'prefer_instance_members_first' moved to stylisticRules (conflicting pair)
   'prefer_interpolation_over_concatenation',
   'prefer_ios_app_intents_framework',
   'prefer_ios_context_menu',
@@ -2048,11 +2054,11 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_positive_conditions_first',
   'prefer_prefixed_global_constants',
   'prefer_private_extension_type_field',
-  'prefer_private_members_first',
+  // 'prefer_private_members_first' moved to stylisticRules (conflicting pair)
   'prefer_private_underscore_prefix',
   'prefer_proxy_provider',
   'prefer_public_exception_classes',
-  'prefer_public_members_first',
+  // 'prefer_public_members_first' moved to stylisticRules (conflicting pair)
   'prefer_pushing_conditional_expressions',
   'prefer_required_before_optional',
   'prefer_returning_condition',
@@ -2083,7 +2089,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_spread_over_addall',
   'prefer_static_class',
   'prefer_static_const_widgets',
-  'prefer_static_members_first',
+  // 'prefer_static_members_first' moved to stylisticRules (conflicting pair)
   // 'prefer_straight_apostrophe' moved to stylisticRules (conflicting pair)
   'prefer_streaming_response',
   'prefer_super_parameters',
