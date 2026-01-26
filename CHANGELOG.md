@@ -133,7 +133,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Single source of truth for rule tiers**: `tiers.dart` is the sole authority for tier assignments. The init script reads tier directly from tiers.dart sets with no fallback logic.
+- **Single source of truth for rule tiers**: Rules now declare their tier directly in the rule class via `RuleTier get tier` getter. The init script reads tier from rule classes with fallback to legacy `tiers.dart` for backwards compatibility.
 
 - **Enhanced init script output**:
   - Cross-platform ANSI color support (Windows Terminal, ConEmu, macOS, Linux)

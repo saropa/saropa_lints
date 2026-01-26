@@ -339,26 +339,6 @@ String _tierToString(RuleTier tier) {
   }
 }
 
-/// Maps tier string name to RuleTier enum.
-RuleTier? _stringToTier(String tier) {
-  switch (tier) {
-    case 'essential':
-      return RuleTier.essential;
-    case 'recommended':
-      return RuleTier.recommended;
-    case 'professional':
-      return RuleTier.professional;
-    case 'comprehensive':
-      return RuleTier.comprehensive;
-    case 'insanity':
-      return RuleTier.insanity;
-    case 'stylistic':
-      return RuleTier.stylistic;
-    default:
-      return null;
-  }
-}
-
 /// Returns the tier order index (lower = stricter requirements).
 int _tierIndex(RuleTier tier) {
   switch (tier) {
@@ -377,25 +357,6 @@ int _tierIndex(RuleTier tier) {
   }
 }
 
-/// Cache for rule tier mappings (built once from allSaropaRules).
-Map<String, RuleTier>? _ruleTierCache;
-
-/// Builds and returns the rule-to-tier mapping.
-///
-/// Reads tier assignments from tiers.dart (single source of truth).
-Map<String, RuleTier> _getRuleTiers() {
-  if (_ruleTierCache != null) return _ruleTierCache!;
-
-  _ruleTierCache = <String, RuleTier>{};
-  for (final LintRule rule in allSaropaRules) {
-    if (rule is SaropaLintRule) {
-      final String ruleName = rule.code.name;
-      _ruleTierCache![ruleName] = _getTierFromSets(ruleName);
-    }
-  }
-  return _ruleTierCache!;
-}
-
 /// Gets tier from tiers.dart sets (single source of truth).
 RuleTier _getTierFromSets(String ruleName) {
   if (tiers.stylisticRules.contains(ruleName)) return RuleTier.stylistic;
@@ -411,44 +372,6 @@ RuleTier _getTierFromSets(String ruleName) {
     return RuleTier.recommended;
   }
   return RuleTier.professional;
-}
-
-/// Returns all defined rule names (from rule classes).
-Set<String> getAllDefinedRules() {
-  return _getRuleTiers().keys.toSet();
-}
-
-/// Returns rules enabled for a given tier (cumulative).
-/// Tiers are cumulative: higher tiers include all rules from lower tiers.
-Set<String> getRulesForTier(String tierName) {
-  final RuleTier? targetTier = _stringToTier(tierName);
-  if (targetTier == null || targetTier == RuleTier.stylistic) {
-    return <String>{};
-  }
-
-  final int targetIndex = _tierIndex(targetTier);
-  final Map<String, RuleTier> ruleTiers = _getRuleTiers();
-
-  return ruleTiers.entries
-      .where((MapEntry<String, RuleTier> entry) {
-        final RuleTier ruleTier = entry.value;
-        // Stylistic rules are never included in tier progression
-        if (ruleTier == RuleTier.stylistic) return false;
-        // Include if rule's tier is at or below target tier
-        return _tierIndex(ruleTier) <= targetIndex;
-      })
-      .map((MapEntry<String, RuleTier> entry) => entry.key)
-      .toSet();
-}
-
-/// Returns all stylistic rules (opt-in only).
-Set<String> get stylisticRules {
-  final Map<String, RuleTier> ruleTiers = _getRuleTiers();
-  return ruleTiers.entries
-      .where((MapEntry<String, RuleTier> entry) =>
-          entry.value == RuleTier.stylistic)
-      .map((MapEntry<String, RuleTier> entry) => entry.key)
-      .toSet();
 }
 
 /// Main entry point for the CLI tool.
@@ -502,19 +425,19 @@ Future<void> main(List<String> args) async {
 
   // tiers.dart is the source of truth for all rules
   // A unit test validates that all plugin rules are in tiers.dart
-  final Set<String> allRules = getAllDefinedRules();
-  final Set<String> enabledRules = getRulesForTier(tier);
+  final Set<String> allRules = tiers.getAllDefinedRules();
+  final Set<String> enabledRules = tiers.getRulesForTier(tier);
   final Set<String> disabledRules = allRules.difference(enabledRules);
 
   // Handle stylistic rules (opt-in)
   Set<String> finalEnabled = enabledRules;
   Set<String> finalDisabled = disabledRules;
   if (cliArgs.includeStylistic) {
-    finalEnabled = finalEnabled.union(stylisticRules);
-    finalDisabled = finalDisabled.difference(stylisticRules);
+    finalEnabled = finalEnabled.union(tiers.stylisticRules);
+    finalDisabled = finalDisabled.difference(tiers.stylisticRules);
   } else {
-    finalEnabled = finalEnabled.difference(stylisticRules);
-    finalDisabled = finalDisabled.union(stylisticRules);
+    finalEnabled = finalEnabled.difference(tiers.stylisticRules);
+    finalDisabled = finalDisabled.union(tiers.stylisticRules);
   }
 
   // Read or create custom overrides file (survives --reset)
