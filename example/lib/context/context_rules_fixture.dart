@@ -97,6 +97,34 @@ class GoodFunctionTypeWithContext extends StatelessWidget {
   }
 }
 
+// GOOD: Function type with NAMED BuildContext parameter is NOT storing context
+// This is a builder callback signature, not an actual stored context instance.
+// Regression test for: named-parameter function types were falsely flagged
+// because toSource() on GenericFunctionType with named params may not contain
+// the literal 'Function' keyword, bypassing the _isContextType string check.
+class GoodFunctionTypeWithNamedContext extends StatelessWidget {
+  const GoodFunctionTypeWithNamedContext({
+    required this.builder,
+    required this.builderWithValue,
+    this.optionalCallback,
+    super.key,
+  });
+
+  // These should NOT trigger avoid_storing_context - they are function
+  // signatures with named (not positional) BuildContext parameters
+  final Widget Function({required BuildContext context}) builder;
+  final Widget Function({
+    required BuildContext context,
+    required bool value,
+  }) builderWithValue;
+  final void Function({BuildContext? context})? optionalCallback;
+
+  @override
+  Widget build(BuildContext context) {
+    return builder(context: context);
+  }
+}
+
 // =========================================================================
 // avoid_context_across_async
 // =========================================================================
@@ -434,6 +462,51 @@ class GoodContextWithMountedTernary {
       // context.mounted ? context : null is a safe pattern
       // The ternary ensures context is only used when mounted
       debugException(e, context: context.mounted ? context : null);
+    }
+  }
+}
+
+// GOOD: Guarded context after await inside try-catch (mounted guard + ternary)
+class GoodContextInTryCatchGuarded {
+  // ignore: avoid_context_in_async_static
+  static Future<void> fetchData(BuildContext context) async {
+    try {
+      await Future.value('data');
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar();
+    } catch (e) {
+      debugException(e, context: context.mounted ? context : null);
+    }
+  }
+}
+
+// GOOD: Nested if-block with mounted guard inside try-catch
+class GoodContextInNestedTryCatch {
+  // ignore: avoid_context_in_async_static
+  static Future<void> restoreData(BuildContext context) async {
+    try {
+      final data = await Future.value(<int>[1, 2]);
+      if (data.isNotEmpty) {
+        await Future.value('processed');
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar();
+      }
+    } catch (e) {
+      debugException(e, context: context.mounted ? context : null);
+    }
+  }
+}
+
+// BAD: Unguarded context after await inside try-catch
+class BadContextInTryCatchUnguarded {
+  // ignore: avoid_context_in_async_static
+  // expect_lint: avoid_context_after_await_in_static
+  static Future<void> fetchData(BuildContext context) async {
+    try {
+      await Future.value('data');
+      ScaffoldMessenger.of(context).showSnackBar();
+    } catch (e) {
+      rethrow;
     }
   }
 }
