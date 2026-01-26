@@ -17939,6 +17939,22 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
           }
         }
 
+        // Trust Expanded returned from callbacks of collection builders.
+        // Handles: List.generate(n, (i) { return Expanded(...); })
+        if (current is FunctionExpression) {
+          final feParent = current.parent;
+          if (feParent is ArgumentList) {
+            final grandparent = feParent.parent;
+            if (grandparent is MethodInvocation) {
+              final methodName = grandparent.methodName.name;
+              if (methodName == 'generate' || methodName == 'map') {
+                assignedToVariable = true;
+                break;
+              }
+            }
+          }
+        }
+
         if (current is InstanceCreationExpression) {
           final String parentType = current.constructorName.type.name.lexeme;
           if (_flexTypes.contains(parentType)) {
@@ -18252,8 +18268,16 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
           .map(_extractListName) // Get base name for property access
           .toSet();
 
+      // Check if itemCount is bound to any accessed list's .length.
+      // When itemCount: list.length is set, Flutter guarantees
+      // index < list.length, making explicit bounds checks redundant.
+      final Set<String> itemCountBoundLists = _getItemCountBoundLists(node);
+
       // Check if ANY accessed list has a proper bounds check
       for (final String listName in accessedLists) {
+        // Skip lists whose bounds are guaranteed by itemCount
+        if (itemCountBoundLists.contains(listName)) continue;
+
         if (!_hasBoundsCheckForList(bodySource, listName)) {
           reporter.atNode(node, code);
           return; // Report once per itemBuilder
@@ -18284,6 +18308,31 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
         bodySource.contains('$listName.isNotEmpty');
 
     return hasLengthCheck || hasEmptyCheck;
+  }
+
+  /// Extracts list names that are bound via itemCount in sibling arguments.
+  ///
+  /// When `itemCount: contacts.length` is set on the same widget,
+  /// Flutter guarantees `0 <= index < contacts.length`, so explicit
+  /// bounds checks in `itemBuilder` are redundant for that list.
+  Set<String> _getItemCountBoundLists(NamedExpression itemBuilderNode) {
+    final AstNode? argumentList = itemBuilderNode.parent;
+    if (argumentList is! ArgumentList) return const <String>{};
+
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'itemCount') {
+        final String countSource = arg.expression.toSource();
+        // Match: list.length, widget.list.length, _list.length
+        final RegExp lengthPattern = RegExp(r'(\b[a-zA-Z_][\w.]*?)\.length\b');
+        final RegExpMatch? match = lengthPattern.firstMatch(countSource);
+        if (match != null) {
+          return <String>{_extractListName(match.group(1)!)};
+        }
+        break;
+      }
+    }
+
+    return const <String>{};
   }
 
   // No quick fix - bounds checking requires knowing variable names and fallback widgets
