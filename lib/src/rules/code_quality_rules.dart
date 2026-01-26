@@ -5808,6 +5808,8 @@ class _AwaitFinderVisitor extends RecursiveAstVisitor<void> {
 /// final list = ['a', 'b'];  // Type inferred as List<String>
 /// final map = <String, int>{};  // Explicit when needed
 /// ```
+///
+/// Formerly: `avoid_inferrable_type_arguments`
 class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
   const AvoidInferrableTypeArgumentsRule() : super(code: _code);
 

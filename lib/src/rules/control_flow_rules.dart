@@ -497,6 +497,8 @@ class AvoidConstantSwitchesRule extends SaropaLintRule {
 ///   }
 /// }
 /// ```
+///
+/// Formerly: `avoid_continue_statement`
 class AvoidContinueRule extends SaropaLintRule {
   const AvoidContinueRule() : super(code: _code);
 

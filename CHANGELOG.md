@@ -10,11 +10,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 ## [4.8.2] - 2026-01-26
 
+### Added
+
+- **`require_https_only_test` rule**: New test-file variant of `require_https_only` at INFO severity (Professional tier). The production rule now skips test files, and the test variant covers them independently so teams can disable HTTP URL linting in tests without affecting production enforcement.
+- **`avoid_hardcoded_config_test` rule**: New test-file variant of `avoid_hardcoded_config` at INFO severity (Professional tier). Hardcoded URLs and keys in test files are typically test fixture data; this rule surfaces them at reduced severity for awareness without blocking.
+- **`require_deep_link_fallback` test fixture**: Added coverage for lazy-loading getters that use utility class methods (e.g., `_uri ??= UrlUtils.getSecureUri(url)`) to prevent false positives.
+
+### Changed
+
+- **98 opinionated rules moved to stylistic tier**: Rules that are subjective or conflict with each other are now opt-in only via `--stylistic` flag, not enabled by default in any tier. This includes member ordering, argument ordering, naming conventions, and similar stylistic preferences.
+- **8 stylistic rules renamed for consistency**: All stylistic rules now use `prefer_` prefix:
+  - `always_fail_test_case` → `prefer_fail_test_case`
+  - `enforce_member_ordering` → `prefer_member_ordering`
+  - `enforce_arguments_ordering` → `prefer_arguments_ordering`
+  - `capitalize_comment_start` → `prefer_capitalized_comment_start`
+  - `avoid_continue_statement` → `prefer_no_continue_statement`
+  - `avoid_getter_prefix` → `prefer_no_getter_prefix`
+  - `avoid_commented_out_code` → `prefer_no_commented_out_code`
+  - `avoid_inferrable_type_arguments` → `prefer_inferred_type_arguments`
+  - Old names preserved as `configAliases` for backwards compatibility.
+- **Conflicting member-ordering rules moved to stylistic tier**: `prefer_static_members_first`, `prefer_instance_members_first`, `prefer_public_members_first`, `prefer_private_members_first` now require explicit opt-in since they conflict in pairs.
+- **Tier assignment: single source of truth**: `tiers.dart` is now the sole authority for rule tier assignments. Removed the `RuleTier get tier` getter from `SaropaLintRule` and the legacy two-phase fallback in `bin/init.dart`. The init script now reads tier assignments exclusively from `tiers.dart` sets.
+- **Unified CLI entry point**: Added `bin/saropa_lints.dart` as a dispatcher supporting `init`, `baseline`, and `impact-report` subcommands.
+- **Progress tracking improvements**: `ProgressTracker` now derives project root from the first analyzed file path instead of using `.` (which fails in plugin mode). Shows enabled rule count instead of misleading file percentage.
+
 ### Fixed
 
 - **`avoid_context_after_await_in_static` false positives in try-catch**: The rule now recurses into try, catch, and finally blocks instead of skipping the entire `TryStatement`. Mounted guards and ternary patterns inside try-catch are correctly recognized.
 - **`avoid_context_across_async` false positives in try-catch**: Same try-catch recursion fix applied to the non-static context rule.
-- **`avoid_expanded_outside_flex` false positive in `List.generate` helper**: Added defensive `FunctionExpression` check so `Expanded` inside a `List.generate()` or `.map()` callback within a helper method is correctly trusted.
+- **`avoid_storing_context` false positives on function type fields**: Fields declaring callback signatures (e.g., `void Function(BuildContext)`) no longer trigger the rule. Only actual `BuildContext` storage is flagged.
+- **`avoid_expanded_outside_flex` false positives**: Three scenarios fixed:
+  - `Expanded` inside `List.generate()` or `.map()` callbacks within helper methods is now trusted.
+  - Expression-body helper methods (e.g., `List<Widget> _items() => [Expanded(...)]`) are now trusted.
+  - Top-level `FunctionDeclaration` boundaries are now recognized.
+- **`avoid_builder_index_out_of_bounds` false positives with `itemCount`**: Lists whose bounds are guaranteed by `itemCount: list.length` are no longer flagged.
+- **`avoid_long_running_isolates` false positive on `Isolate.run`**: `Isolate.run()` is now correctly classified as short-lived (like `compute()`), not as a persistent isolate like `Isolate.spawn()`. Context window expanded from 200 to 500 chars. Added fire-and-forget and never-block awareness keywords.
+- **`require_immutable_bloc_state` false positives on non-BLoC classes**: Skip indirect Flutter State subclasses (`PopupMenuItemState`, `FormFieldState`, `AnimatedWidgetBaseState`, `ScrollableState`, `RefreshIndicatorState`) and `StatefulWidget`/`StatelessWidget` subclasses using "State" as a domain term.
+- **`require_cache_key_determinism` false positive on metadata parameters**: Common metadata parameter names (`createdAt`, `updatedAt`, `timestamp`, `expiresAt`, `ttl`, etc.) are now excluded from determinism checks. Diagnostics now report at the specific offending argument instead of the entire variable declaration. Extracted shared `_checkArgumentList` helper to reduce duplication.
 
 ---
 ## [4.8.1] - 2026-01-25

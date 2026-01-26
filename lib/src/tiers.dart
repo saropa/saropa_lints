@@ -1347,6 +1347,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_token_refresh',
   'prefer_uuid_v4', // UUID v4 over v1 for privacy
   'require_https_only_test', // INFO - HTTP URLs in test files
+  'avoid_hardcoded_config_test', // INFO - hardcoded config in test files
 
   // Accessibility
   'avoid_merged_semantics_hiding_info',

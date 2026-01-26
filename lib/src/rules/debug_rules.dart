@@ -11,6 +11,8 @@ import '../mode_constants_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Test-only rule that always reports a lint at the start of the file.
+///
+/// Formerly: `always_fail_test_case`
 class AlwaysFailRule extends SaropaLintRule {
   const AlwaysFailRule() : super(code: _code);
 

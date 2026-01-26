@@ -12,6 +12,8 @@ import '../comment_utils.dart';
 import '../saropa_lint_rule.dart';
 
 /// Warns when a getter name starts with 'get'.
+///
+/// Formerly: `avoid_getter_prefix`
 class AvoidGetterPrefixRule extends SaropaLintRule {
   const AvoidGetterPrefixRule() : super(code: _code);
 
@@ -142,6 +144,8 @@ class AvoidNonAsciiSymbolsRule extends SaropaLintRule {
 /// **Quick fix available:** Capitalizes the first letter of the comment.
 ///
 /// See also: [CommentPatterns] for shared detection heuristics.
+///
+/// Formerly: `capitalize_comment_start`
 class FormatCommentRule extends SaropaLintRule {
   const FormatCommentRule() : super(code: _code);
 
