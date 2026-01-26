@@ -82,8 +82,7 @@ import 'dart:io';
 import 'package:custom_lint_builder/custom_lint_builder.dart' show LintRule;
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleTier, SaropaLintRule, allSaropaRules;
-// ignore: deprecated_member_use_from_same_package
-import 'package:saropa_lints/src/tiers.dart' as legacy_tiers;
+import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Package version - update when releasing.
 const String _version = '4.7.3';
@@ -229,15 +228,8 @@ Map<String, _RuleMetadata> _getRuleMetadata() {
       // Extract severity from LintCode
       final severity = rule.code.errorSeverity.name.toUpperCase();
 
-      // Get tier (with legacy fallback)
-      RuleTier tier = rule.tier;
-      if (tier == RuleTier.professional) {
-        // Check legacy if not explicitly set
-        final legacyTier = _getLegacyTier(ruleName);
-        if (legacyTier != null) {
-          tier = legacyTier;
-        }
-      }
+      // Get tier from tiers.dart (single source of truth)
+      final RuleTier tier = _getTierFromSets(ruleName);
 
       _ruleMetadataCache![ruleName] = _RuleMetadata(
         name: ruleName,
@@ -388,13 +380,9 @@ int _tierIndex(RuleTier tier) {
 /// Cache for rule tier mappings (built once from allSaropaRules).
 Map<String, RuleTier>? _ruleTierCache;
 
-/// Builds and returns the rule-to-tier mapping from rule classes.
+/// Builds and returns the rule-to-tier mapping.
 ///
-/// Uses a two-phase approach for backwards compatibility during migration:
-/// 1. If rule class has explicit tier override (not default), use that
-/// 2. Otherwise, fall back to legacy tiers.dart assignments
-///
-/// This allows incremental migration from tiers.dart to rule classes.
+/// Reads tier assignments from tiers.dart (single source of truth).
 Map<String, RuleTier> _getRuleTiers() {
   if (_ruleTierCache != null) return _ruleTierCache!;
 
@@ -402,45 +390,27 @@ Map<String, RuleTier> _getRuleTiers() {
   for (final LintRule rule in allSaropaRules) {
     if (rule is SaropaLintRule) {
       final String ruleName = rule.code.name;
-      final RuleTier declaredTier = rule.tier;
-
-      // Check if rule has explicit tier (not the default professional)
-      // Rules with explicit tier override take precedence
-      if (declaredTier != RuleTier.professional) {
-        _ruleTierCache![ruleName] = declaredTier;
-        continue;
-      }
-
-      // Fall back to legacy tiers.dart for unmigrated rules
-      final RuleTier? legacyTier = _getLegacyTier(ruleName);
-      _ruleTierCache![ruleName] = legacyTier ?? RuleTier.professional;
+      _ruleTierCache![ruleName] = _getTierFromSets(ruleName);
     }
   }
   return _ruleTierCache!;
 }
 
-/// Gets tier from legacy tiers.dart (for backwards compatibility).
-RuleTier? _getLegacyTier(String ruleName) {
-  if (legacy_tiers.stylisticRules.contains(ruleName)) {
-    return RuleTier.stylistic;
-  }
-  if (legacy_tiers.essentialRules.contains(ruleName)) {
-    return RuleTier.essential;
-  }
-  // Check tier sets in order (most restrictive first)
-  if (legacy_tiers.insanityOnlyRules.contains(ruleName)) {
-    return RuleTier.insanity;
-  }
-  if (legacy_tiers.comprehensiveOnlyRules.contains(ruleName)) {
+/// Gets tier from tiers.dart sets (single source of truth).
+RuleTier _getTierFromSets(String ruleName) {
+  if (tiers.stylisticRules.contains(ruleName)) return RuleTier.stylistic;
+  if (tiers.essentialRules.contains(ruleName)) return RuleTier.essential;
+  if (tiers.insanityOnlyRules.contains(ruleName)) return RuleTier.insanity;
+  if (tiers.comprehensiveOnlyRules.contains(ruleName)) {
     return RuleTier.comprehensive;
   }
-  if (legacy_tiers.professionalOnlyRules.contains(ruleName)) {
+  if (tiers.professionalOnlyRules.contains(ruleName)) {
     return RuleTier.professional;
   }
-  if (legacy_tiers.recommendedOnlyRules.contains(ruleName)) {
+  if (tiers.recommendedOnlyRules.contains(ruleName)) {
     return RuleTier.recommended;
   }
-  return null;
+  return RuleTier.professional;
 }
 
 /// Returns all defined rule names (from rule classes).
