@@ -5202,6 +5202,18 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
+    checkHttpUrls(context, (AstNode node) => reporter.atNode(node, code));
+  }
+
+  /// Shared detection logic for HTTP URL checking.
+  ///
+  /// Used by both [RequireHttpsOnlyRule] and [RequireHttpsOnlyTestRule]
+  /// to avoid duplicating the detection logic across production and test
+  /// rule variants.
+  static void checkHttpUrls(
+    CustomLintContext context,
+    void Function(AstNode node) onViolation,
+  ) {
     context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
@@ -5216,7 +5228,7 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
       // Allow safe http→https replacement patterns
       if (_isSafeReplacementPattern(node)) return;
 
-      reporter.atNode(node, code);
+      onViolation(node);
     });
 
     // Also check string interpolations that might construct HTTP URLs
@@ -5236,7 +5248,7 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
         if (value.startsWith(pattern)) return;
       }
 
-      reporter.atNode(node, code);
+      onViolation(node);
     });
   }
 
@@ -5321,36 +5333,10 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     CustomLintContext context,
   ) {
-    context.registry.addSimpleStringLiteral((SimpleStringLiteral node) {
-      final String value = node.value;
-
-      if (!value.startsWith('http://')) return;
-
-      for (final String pattern in RequireHttpsOnlyRule._allowedHttpPatterns) {
-        if (value.startsWith(pattern)) return;
-      }
-
-      if (RequireHttpsOnlyRule._isSafeReplacementPattern(node)) return;
-
-      reporter.atNode(node, code);
-    });
-
-    context.registry.addStringInterpolation((StringInterpolation node) {
-      final List<InterpolationElement> elements = node.elements;
-      if (elements.isEmpty) return;
-
-      final InterpolationElement first = elements.first;
-      if (first is! InterpolationString) return;
-
-      final String value = first.value;
-      if (!value.startsWith('http://')) return;
-
-      for (final String pattern in RequireHttpsOnlyRule._allowedHttpPatterns) {
-        if (value.startsWith(pattern)) return;
-      }
-
-      reporter.atNode(node, code);
-    });
+    RequireHttpsOnlyRule.checkHttpUrls(
+      context,
+      (AstNode node) => reporter.atNode(node, code),
+    );
   }
 
   @override
