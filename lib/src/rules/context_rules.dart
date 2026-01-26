@@ -79,6 +79,13 @@ class AvoidStoringContextRule extends SaropaLintRule {
   ) {
     // Detect field declarations with BuildContext type
     context.registry.addFieldDeclaration((node) {
+      // Function types with BuildContext parameters are fine - they declare
+      // callback signatures, not store actual context instances.
+      // e.g., `Widget Function({required BuildContext context})` is safe.
+      // Check the AST node type directly rather than relying on toSource()
+      // string matching, which can fail for named-parameter function types.
+      if (node.fields.type is GenericFunctionType) return;
+
       for (final variable in node.fields.variables) {
         final type = node.fields.type?.toSource() ?? '';
         if (_isContextType(type)) {
@@ -261,11 +268,27 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
   /// 2. Reset guard flag after each await (need fresh guard per async gap)
   /// 3. Detect mounted guards that protect subsequent code
   /// 4. Report unguarded context usage after await
-  void _checkAsyncBody(Block block, SaropaDiagnosticReporter reporter) {
-    bool seenAwait = false;
-    bool hasGuard = false;
+  /// 5. Recurse into try-catch sub-blocks with proper state propagation
+  void _checkAsyncBody(
+    Block block,
+    SaropaDiagnosticReporter reporter, {
+    bool initialSeenAwait = false,
+    bool initialHasGuard = false,
+  }) {
+    bool seenAwait = initialSeenAwait;
+    bool hasGuard = initialHasGuard;
 
     for (final statement in block.statements) {
+      // Try-catch: recurse into sub-blocks with proper await tracking
+      if (statement is TryStatement) {
+        if (_checkTryBody(statement, reporter,
+            seenAwait: seenAwait, hasGuard: hasGuard)) {
+          seenAwait = true;
+          hasGuard = false;
+        }
+        continue;
+      }
+
       // Await found: enter danger zone, reset any previous guard
       if (containsAwait(statement)) {
         seenAwait = true;
@@ -296,6 +319,39 @@ class AvoidContextAcrossAsyncRule extends SaropaLintRule {
         _reportContextUsage(statement, reporter);
       }
     }
+  }
+
+  /// Analyzes try-catch for context usage after await.
+  ///
+  /// Recurses into the try body with inherited await/guard state, then
+  /// analyzes catch and finally blocks as danger zones (if any await was
+  /// seen). Guards inside the try body do not protect catch/finally blocks
+  /// because exceptions may be thrown before the guard executes.
+  ///
+  /// Returns true if the try body contains await expressions.
+  bool _checkTryBody(
+    TryStatement statement,
+    SaropaDiagnosticReporter reporter, {
+    bool seenAwait = false,
+    bool hasGuard = false,
+  }) {
+    final tryHasAwait = containsAwait(statement.body);
+
+    _checkAsyncBody(statement.body, reporter,
+        initialSeenAwait: seenAwait, initialHasGuard: hasGuard);
+
+    final catchInDanger = seenAwait || tryHasAwait;
+    if (catchInDanger) {
+      for (final clause in statement.catchClauses) {
+        _checkAsyncBody(clause.body, reporter, initialSeenAwait: true);
+      }
+      if (statement.finallyBlock != null) {
+        _checkAsyncBody(statement.finallyBlock!, reporter,
+            initialSeenAwait: true);
+      }
+    }
+
+    return tryHasAwait;
   }
 
   /// Finds and reports all context usages in the given statement.
@@ -509,12 +565,29 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
   static void _checkAsyncStaticBody(
     Block block,
     List<String> contextParamNames,
-    void Function(AstNode) onUnguardedUsage,
-  ) {
-    bool seenAwait = false;
-    bool hasGuard = false;
+    void Function(AstNode) onUnguardedUsage, {
+    bool initialSeenAwait = false,
+    bool initialHasGuard = false,
+  }) {
+    bool seenAwait = initialSeenAwait;
+    bool hasGuard = initialHasGuard;
 
     for (final statement in block.statements) {
+      // Try-catch: recurse into sub-blocks with proper await tracking
+      if (statement is TryStatement) {
+        if (_checkTryStaticBody(
+          statement,
+          contextParamNames,
+          onUnguardedUsage,
+          seenAwait: seenAwait,
+          hasGuard: hasGuard,
+        )) {
+          seenAwait = true;
+          hasGuard = false;
+        }
+        continue;
+      }
+
       // Await found: enter danger zone, reset any previous guard
       if (containsAwait(statement)) {
         seenAwait = true;
@@ -554,6 +627,56 @@ class AvoidContextAfterAwaitInStaticRule extends SaropaLintRule {
         );
       }
     }
+  }
+
+  /// Analyzes try-catch for context usage after await in static methods.
+  ///
+  /// Recurses into the try body with inherited await/guard state, then
+  /// analyzes catch and finally blocks as danger zones (if any await was
+  /// seen). Guards inside the try body do not protect catch/finally blocks
+  /// because exceptions may be thrown before the guard executes.
+  ///
+  /// Returns true if the try body contains any await expressions.
+  static bool _checkTryStaticBody(
+    TryStatement statement,
+    List<String> contextParamNames,
+    void Function(AstNode) onUnguardedUsage, {
+    bool seenAwait = false,
+    bool hasGuard = false,
+  }) {
+    final tryHasAwait = containsAwait(statement.body);
+
+    // Analyze try body with inherited state
+    _checkAsyncStaticBody(
+      statement.body,
+      contextParamNames,
+      onUnguardedUsage,
+      initialSeenAwait: seenAwait,
+      initialHasGuard: hasGuard,
+    );
+
+    // Catch/finally: danger zone if any prior await was seen
+    final catchInDanger = seenAwait || tryHasAwait;
+    if (catchInDanger) {
+      for (final clause in statement.catchClauses) {
+        _checkAsyncStaticBody(
+          clause.body,
+          contextParamNames,
+          onUnguardedUsage,
+          initialSeenAwait: true,
+        );
+      }
+      if (statement.finallyBlock != null) {
+        _checkAsyncStaticBody(
+          statement.finallyBlock!,
+          contextParamNames,
+          onUnguardedUsage,
+          initialSeenAwait: true,
+        );
+      }
+    }
+
+    return tryHasAwait;
   }
 
   /// Checks if statement is `if (!context.mounted) return;` for static methods.
