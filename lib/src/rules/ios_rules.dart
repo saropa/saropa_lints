@@ -6949,11 +6949,10 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
     context.registry.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Detect Isolate.spawn or compute with long operations
-      if (methodName == 'spawn' || methodName == 'run') {
+      // Detect Isolate.spawn - creates long-lived isolates
+      if (methodName == 'spawn') {
         final Expression? target = node.target;
         if (target != null && target.toSource() == 'Isolate') {
-          // Check if there's a comment indicating awareness
           final String fileSource = resolver.source.contents.data;
           if (!fileSource.contains('workmanager') &&
               !fileSource.contains('Workmanager') &&
@@ -6963,17 +6962,20 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
         }
       }
 
-      // Also detect compute() calls - but be less aggressive since compute()
-      // is designed for short-lived, one-shot operations (unlike Isolate.spawn).
-      // Only flag if there's evidence of potentially long-running work.
-      if (methodName == 'compute') {
+      // Detect Isolate.run() and compute() - both designed for short-lived,
+      // one-shot operations. Less aggressive: skip if surrounding context
+      // shows awareness of short-lived/foreground usage.
+      if (methodName == 'compute' ||
+          (methodName == 'run' &&
+              node.target != null &&
+              node.target!.toSource() == 'Isolate')) {
         final String fileSource = resolver.source.contents.data;
         if (!fileSource.contains('workmanager') &&
             !fileSource.contains('Workmanager')) {
-          // Only warn if file doesn't show awareness of compute() being
-          // for short-lived foreground work
+          // Only warn if surrounding context doesn't show awareness
+          // of short-lived foreground work
           final int nodeOffset = node.offset;
-          final int startOffset = nodeOffset > 200 ? nodeOffset - 200 : 0;
+          final int startOffset = nodeOffset > 500 ? nodeOffset - 500 : 0;
           final String preceding =
               fileSource.substring(startOffset, nodeOffset);
           final String precedingLower = preceding.toLowerCase();
@@ -6985,7 +6987,9 @@ class AvoidLongRunningIsolatesRule extends SaropaLintRule {
               precedingLower.contains('one-shot') ||
               precedingLower.contains('ui jank') ||
               precedingLower.contains('cpu-bound') ||
-              precedingLower.contains('offload')) {
+              precedingLower.contains('offload') ||
+              precedingLower.contains('fire-and-forget') ||
+              precedingLower.contains('never block')) {
             return;
           }
 
