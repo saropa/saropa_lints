@@ -1,6 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_element
 
-/// Fixture file for avoid_commented_out_code rule.
+/// Fixture file for prefer_no_commented_out_code rule.
 /// This rule warns when commented-out code is detected.
 /// Prose comments are NOT flagged - only code-like patterns.
 
@@ -9,74 +9,74 @@
 // =============================================================================
 
 void badExamples() {
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // final oldValue = compute();
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // return x;
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // if (condition) {
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // for (int i = 0; i < 10; i++) {
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // while (running) {
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // myList.add(item);
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // doSomething();
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // x = 5;
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // foo.bar()
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // @override
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // import 'package:flutter/material.dart';
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // class MyClass {
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // }
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // {
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // (a, b) => a + b
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // statement;
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // int value = 0;
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // String name = "test";
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // List<int> items = [];
 
   // Literals in code context (should still trigger)
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // null;
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // true,
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // return null;
 
-  // expect_lint: avoid_commented_out_code
+  // expect_lint: prefer_no_commented_out_code
   // return false;
 }
 

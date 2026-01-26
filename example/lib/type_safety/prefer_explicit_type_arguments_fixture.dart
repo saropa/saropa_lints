@@ -8,7 +8,7 @@ import 'dart:async';
 
 /// Tests prefer_explicit_type_arguments rule.
 ///
-/// NOTE: This is a stylistic rule that conflicts with avoid_inferrable_type_arguments.
+/// NOTE: This is a stylistic rule that conflicts with prefer_inferred_type_arguments.
 /// Only enable one or the other, not both.
 void testPreferExplicitTypeArguments() {
   // =========================================================================

@@ -12,7 +12,7 @@ Stylistic rules represent team preferences where there's no objectively "correct
 dart run saropa_lints:init --tier comprehensive --stylistic
 ```
 
-This enables the 35 non-conflicting stylistic rules like `enforce_member_ordering`, `prefer_trailing_comma_always`, and `prefer_arrow_functions`.
+This enables the 35 non-conflicting stylistic rules like `prefer_member_ordering`, `prefer_trailing_comma_always`, and `prefer_arrow_functions`.
 
 ### Option 2: Enable Individual Rules
 

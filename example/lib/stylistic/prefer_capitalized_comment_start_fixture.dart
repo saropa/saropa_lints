@@ -1,6 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_element
 
-/// Fixture file for capitalize_comment_start rule.
+/// Fixture file for prefer_capitalized_comment_start rule.
 /// This rule warns when single-line comments don't start with a capital letter.
 /// Commented-out code is automatically detected and skipped.
 
@@ -9,16 +9,16 @@
 // =============================================================================
 
 void badExamples() {
-  // expect_lint: capitalize_comment_start
+  // expect_lint: prefer_capitalized_comment_start
   // this is a bad comment
 
-  // expect_lint: capitalize_comment_start
+  // expect_lint: prefer_capitalized_comment_start
   // the user can click here to submit
 
-  // expect_lint: capitalize_comment_start
+  // expect_lint: prefer_capitalized_comment_start
   // note that this feature is experimental
 
-  // expect_lint: capitalize_comment_start
+  // expect_lint: prefer_capitalized_comment_start
   // always remember to validate input
 }
 
@@ -103,7 +103,7 @@ void edgeCases() {
   // !important - starts with punctuation
   //    - empty after trim
 
-  // expect_lint: capitalize_comment_start
+  // expect_lint: prefer_capitalized_comment_start
   // simple prose that should be capitalized
 
   // URLs and file paths often look like code

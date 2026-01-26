@@ -134,4 +134,4 @@ custom_lint:
     # NAMING & STYLE - Consistency
     # =========================================================================
     prefer_boolean_prefixes: true
-    avoid_getter_prefix: true
+    prefer_no_getter_prefix: true
