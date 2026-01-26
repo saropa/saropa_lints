@@ -258,18 +258,18 @@ dart run saropa_lints:init --tier professional
 Rule config keys match the rule name shown in lint messages (the part in `[brackets]`):
 
 ```
-lib/my_file.dart:42 - [enforce_arguments_ordering] Named arguments should be in alphabetical order.
+lib/my_file.dart:42 - [prefer_arguments_ordering] Named arguments should be in alphabetical order.
                        ^^^^^^^^^^^^^^^^^^^^^^^^^ This is the config key
 ```
 
-To disable this rule: `- enforce_arguments_ordering: false`
+To disable this rule: `- prefer_arguments_ordering: false`
 
-**Aliases**: Some rules support shorter aliases for convenience. For example, `enforce_arguments_ordering` also accepts `arguments_ordering`:
+**Aliases**: Some rules support shorter aliases for convenience. For example, `prefer_arguments_ordering` also accepts `arguments_ordering`:
 
 ```yaml
 rules:
   # Both of these work:
-  - enforce_arguments_ordering: false  # canonical name
+  - prefer_arguments_ordering: false  # canonical name
   - arguments_ordering: false          # alias
 ```
 

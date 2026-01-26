@@ -32,7 +32,7 @@ custom_lint:
     # Rules for testing utilities and debug-only code.
     # =========================================================================
 
-    always_fail_test_case: false # Test hook rule that always fails. [LOW]
+    prefer_fail_test_case: false # Test hook rule that always fails. [LOW]
 
     # =========================================================================
     # SECURITY
@@ -570,7 +570,7 @@ custom_lint:
     avoid_unnecessary_length_check: false # Use isNotEmpty instead of length check. [LOW]
     avoid_referencing_discarded_variables: false # Avoid referencing discarded variables. [HIGH]
     avoid_empty_spread: false # Empty spread has no effect. [LOW]
-    avoid_commented_out_code: false # Avoid commented-out code. [NOISY]
+    prefer_no_commented_out_code: false # Avoid commented-out code. [NOISY]
     no_empty_block: false # Empty block detected. [MEDIUM]
     avoid_duplicate_constant_values: false # Duplicate constant value found. [MEDIUM]
     avoid_duplicate_initializers: false # Duplicate initializer expression. [HIGH]
@@ -582,7 +582,7 @@ custom_lint:
     # Rules for identifier naming patterns and conventions.
     # =========================================================================
 
-    avoid_getter_prefix: false # Getter name should not start with get. [LOW]
+    prefer_no_getter_prefix: false # Getter name should not start with get. [LOW]
     prefer_boolean_prefixes: false # Boolean should have is/has/can prefix. [MEDIUM]
     prefer_correct_identifier_length: false # Identifier name length is not ideal. [LOW]
     prefer_correct_type_name: false # Type name should be UpperCamelCase. [MEDIUM]
@@ -859,5 +859,5 @@ custom_lint:
 
     prefer_shorthands_with_constructors: false # Constructor can use .new shorthand. [LOW]
     prefer_shorthands_with_static_fields: false # Consider using static field directly. [LOW]
-    avoid_inferrable_type_arguments: false # Type argument can be inferred. [LOW]
+    prefer_inferred_type_arguments: false # Type argument can be inferred. [LOW]
     avoid_passing_default_values: false # Passing default value explicitly. [LOW]

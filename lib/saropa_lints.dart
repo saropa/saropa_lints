@@ -2435,7 +2435,7 @@ class _SaropaLints extends PluginBase {
 /// Each pair contains two mutually exclusive rules.
 const List<List<String>> _conflictingRulePairs = <List<String>>[
   // Type inference vs explicit types
-  <String>['avoid_inferrable_type_arguments', 'prefer_explicit_type_arguments'],
+  <String>['prefer_inferred_type_arguments', 'prefer_explicit_type_arguments'],
   // Import style preferences
   <String>['prefer_relative_imports', 'always_use_package_imports'],
 ];

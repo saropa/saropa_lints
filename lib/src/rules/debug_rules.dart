@@ -21,10 +21,13 @@ class AlwaysFailRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<String> get configAliases => const <String>['always_fail_test_case'];
+
   static const LintCode _code = LintCode(
-    name: 'always_fail_test_case',
+    name: 'prefer_fail_test_case',
     problemMessage:
-        '[always_fail_test_case] This custom lint always fails (test hook).',
+        '[prefer_fail_test_case] This custom lint always fails (test hook).',
     correctionMessage: 'Disable the rule or remove the test lint trigger.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );

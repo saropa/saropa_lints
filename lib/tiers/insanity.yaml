@@ -13,7 +13,7 @@ custom_lint:
     # =========================================================================
     # NOISY BUT VALUABLE - Style preferences that may generate many warnings
     # =========================================================================
-    # avoid_commented_out_code: moved to stylistic tier (v4.2.0)
+    # prefer_no_commented_out_code: moved to stylistic tier (v4.2.0)
     avoid_dynamic: true
     avoid_late_keyword: true
     avoid_nested_conditional_expressions: true
@@ -86,7 +86,7 @@ custom_lint:
     pass_optional_argument: true
     prefer_shorthands_with_constructors: true
     prefer_shorthands_with_static_fields: true
-    avoid_inferrable_type_arguments: true
+    prefer_inferred_type_arguments: true
     avoid_passing_default_values: true
     prefer_single_declaration_per_file: true
     prefer_bytes_builder: true
@@ -99,4 +99,4 @@ custom_lint:
     # =========================================================================
     # ALWAYS FAIL (for testing the linter itself)
     # =========================================================================
-    # always_fail_test_case: true  # Uncomment only for testing
+    # prefer_fail_test_case: true  # Uncomment only for testing
