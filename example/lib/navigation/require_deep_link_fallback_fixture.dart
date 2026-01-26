@@ -80,6 +80,9 @@ class DeepLinkStateManager {
   // OK: Lazy-loading pattern - not a handler
   Uri? get uri => _initialUri ??= Uri.parse(_url);
 
+  // OK: Lazy-loading pattern with utility class method - not a handler
+  Uri? get secureUri => _currentUri ??= _UrlUtilsLocal.getSecureUri(_url);
+
   // OK: Simple method invocation on a field - not a handler
   Uri? get parsedUri => _url.toUri();
 
@@ -207,6 +210,11 @@ class UriParserUtility {
     final useLegacy = false;
     return useLegacy ? null : 'https://new.example.com';
   }
+}
+
+// Mock utility class for URI conversion
+class _UrlUtilsLocal {
+  static Uri? getSecureUri(String? url) => Uri.tryParse(url ?? '');
 }
 
 // Mock extension for URI conversion
