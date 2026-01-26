@@ -134,7 +134,7 @@ void main() {
       );
     });
 
-    test('opinionated rules must be in stylisticRules', () {
+    test('opinionated prefer_* rules must be in stylisticRules', () {
       final List<String> misclassified = <String>[];
 
       for (final LintRule rule in allSaropaRules) {
@@ -142,6 +142,9 @@ void main() {
         if (rule.impact != LintImpact.opinionated) continue;
 
         final String name = rule.code.name;
+        // All prefer_* opinionated rules are stylistic, no exceptions.
+        // Non-prefer opinionated rules (avoid_*, require_*) are case-by-case.
+        if (!name.startsWith('prefer_')) continue;
         if (!stylisticRules.contains(name)) {
           misclassified.add(name);
         }
@@ -152,7 +155,7 @@ void main() {
       expect(
         misclassified,
         isEmpty,
-        reason: 'Rules with LintImpact.opinionated must be in '
+        reason: 'Opinionated prefer_* rules must be in '
             'stylisticRules, not a tier set:\n'
             '${misclassified.map((n) => '  $n').join('\n')}\n\n'
             'Move these rules to stylisticRules in lib/src/tiers.dart.',

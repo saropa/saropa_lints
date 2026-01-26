@@ -3879,14 +3879,14 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
-  /// Alias: arguments_ordering
   @override
-  List<String> get configAliases => const <String>['arguments_ordering'];
+  List<String> get configAliases =>
+      const <String>['enforce_arguments_ordering', 'arguments_ordering'];
 
   static const LintCode _code = LintCode(
-    name: 'enforce_arguments_ordering',
+    name: 'prefer_arguments_ordering',
     problemMessage:
-        '[enforce_arguments_ordering] Named arguments should be in alphabetical order.',
+        '[prefer_arguments_ordering] Named arguments should be in alphabetical order.',
     correctionMessage: 'Reorder named arguments alphabetically.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -4079,10 +4079,13 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<String> get configAliases => const <String>['avoid_commented_out_code'];
+
   static const LintCode _code = LintCode(
-    name: 'avoid_commented_out_code',
+    name: 'prefer_no_commented_out_code',
     problemMessage:
-        '[avoid_commented_out_code] Commented-out code clutters the codebase. '
+        '[prefer_no_commented_out_code] Commented-out code clutters the codebase. '
         'Delete it - git preserves history.',
     correctionMessage:
         'Delete the commented-out code. Use version control to retrieve it if needed.',

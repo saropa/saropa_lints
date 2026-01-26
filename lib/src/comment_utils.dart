@@ -1,8 +1,8 @@
 /// Utilities for detecting commented-out code vs prose comments.
 ///
 /// These patterns are shared between:
-/// - `capitalize_comment_start` - skips code comments, flags prose
-/// - `avoid_commented_out_code` - flags code comments, skips prose
+/// - `prefer_capitalized_comment_start` - skips code comments, flags prose
+/// - `prefer_no_commented_out_code` - flags code comments, skips prose
 ///
 /// Both rules use the same heuristics to ensure consistent behavior.
 library;

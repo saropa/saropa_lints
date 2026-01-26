@@ -22,10 +22,13 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<String> get configAliases => const <String>['avoid_getter_prefix'];
+
   static const LintCode _code = LintCode(
-    name: 'avoid_getter_prefix',
+    name: 'prefer_no_getter_prefix',
     problemMessage:
-        "[avoid_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it.",
+        "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it.",
     correctionMessage: "Rename: getName → name, getValue → value.",
     errorSeverity: DiagnosticSeverity.INFO,
   );
@@ -149,10 +152,13 @@ class FormatCommentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  List<String> get configAliases => const <String>['capitalize_comment_start'];
+
   static const LintCode _code = LintCode(
-    name: 'capitalize_comment_start',
+    name: 'prefer_capitalized_comment_start',
     problemMessage:
-        '[capitalize_comment_start] Comment should start with capital letter.',
+        '[prefer_capitalized_comment_start] Comment should start with capital letter.',
     correctionMessage: 'Capitalize the first letter of the comment.',
     errorSeverity: DiagnosticSeverity.INFO,
   );

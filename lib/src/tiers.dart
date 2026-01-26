@@ -14,11 +14,11 @@ export 'tiers.dart' show getRulesForTier;
 /// See README_STYLISTIC.md for all available rules including conflicting pairs.
 const Set<String> stylisticRules = <String>{
   // === Debug/Test utility ===
-  'always_fail_test_case', // Test hook - always fails
+  'prefer_fail_test_case', // Test hook - always fails
 
   // === Ordering & Sorting ===
-  'enforce_member_ordering',
-  'enforce_arguments_ordering',
+  'prefer_member_ordering',
+  'prefer_arguments_ordering',
   'prefer_sorted_members',
   'prefer_sorted_parameters',
   'prefer_sorted_pattern_fields',
@@ -26,9 +26,9 @@ const Set<String> stylisticRules = <String>{
 
   // === Naming conventions ===
   'prefer_boolean_prefixes',
-  'avoid_getter_prefix',
+  'prefer_no_getter_prefix',
   'prefer_kebab_tag_name',
-  'capitalize_comment_start',
+  'prefer_capitalized_comment_start',
   'prefer_descriptive_bool_names',
   'prefer_snake_case_files',
   'prefer_camel_case_method_names',
@@ -39,7 +39,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_catch_over_on',
 
   // === Code style preferences ===
-  'avoid_continue_statement',
+  'prefer_no_continue_statement',
   'prefer_single_exit_point',
   'prefer_wildcard_for_unused_param',
   'prefer_rethrow_over_throw_e',
@@ -70,12 +70,12 @@ const Set<String> stylisticRules = <String>{
   'prefer_sentence_case_comments',
   'prefer_period_after_doc',
   'prefer_doc_comments_over_regular',
-  'avoid_commented_out_code', // Moved from insanity (v4.2.0)
+  'prefer_no_commented_out_code', // Moved from insanity (v4.2.0)
 
   // === Testing style ===
   'prefer_expect_over_assert_in_tests',
   // === Type argument style (conflicting, opt-in only) ===
-  'avoid_inferrable_type_arguments',
+  'prefer_inferred_type_arguments',
   'prefer_explicit_type_arguments',
 
   // === Import style (opinionated - opt-in only) ===
@@ -99,6 +99,85 @@ const Set<String> stylisticRules = <String>{
   'prefer_instance_members_first',
   'prefer_public_members_first',
   'prefer_private_members_first',
+
+  // === Opinionated prefer_* rules (conflicting/stylistic - opt-in only) ===
+  'prefer_addall_over_spread',
+  'prefer_async_only_when_awaiting',
+  'prefer_await_over_then',
+  'prefer_blank_line_after_declarations',
+  'prefer_blank_lines_between_members',
+  'prefer_cascade_over_chained',
+  'prefer_chained_over_cascade',
+  'prefer_collection_if_over_ternary',
+  'prefer_compact_class_members',
+  'prefer_compact_declarations',
+  'prefer_concatenation_over_interpolation',
+  'prefer_concise_variable_names',
+  'prefer_constructor_assertion',
+  'prefer_constructor_body_assignment',
+  'prefer_container_over_sizedbox',
+  'prefer_curly_apostrophe',
+  'prefer_default_enum_case',
+  'prefer_descriptive_bool_names_strict',
+  'prefer_descriptive_variable_names',
+  'prefer_dot_shorthand',
+  'prefer_dynamic_over_object',
+  'prefer_edgeinsets_only',
+  'prefer_edgeinsets_symmetric',
+  'prefer_exhaustive_enums',
+  'prefer_expanded_over_flexible',
+  'prefer_explicit_boolean_comparison',
+  'prefer_explicit_colors',
+  'prefer_explicit_null_assignment',
+  'prefer_explicit_types',
+  'prefer_factory_for_validation',
+  'prefer_fake_over_mock',
+  'prefer_fields_before_methods',
+  'prefer_flexible_over_expanded',
+  'prefer_future_void_function_over_async_callback',
+  'prefer_generic_exception',
+  'prefer_given_when_then_comments',
+  'prefer_grouped_by_purpose',
+  'prefer_grouped_expectations',
+  'prefer_guard_clauses',
+  'prefer_if_null_over_ternary',
+  'prefer_implicit_boolean_comparison',
+  'prefer_initializing_formals',
+  'prefer_interpolation_over_concatenation',
+  'prefer_keys_with_lookup',
+  'prefer_late_over_nullable',
+  'prefer_lower_camel_case_constants',
+  'prefer_map_entries_iteration',
+  'prefer_material_theme_colors',
+  'prefer_methods_before_fields',
+  'prefer_no_blank_line_before_return',
+  'prefer_no_blank_line_inside_blocks',
+  'prefer_null_aware_assignment',
+  'prefer_nullable_over_late',
+  'prefer_object_over_dynamic',
+  'prefer_on_over_catch',
+  'prefer_positive_conditions_first',
+  'prefer_required_before_optional',
+  'prefer_richtext_over_text_rich',
+  'prefer_screaming_case_constants',
+  'prefer_self_documenting_tests',
+  'prefer_single_blank_line_max',
+  'prefer_single_expectation_per_test',
+  'prefer_sizedbox_over_container',
+  'prefer_specific_exceptions',
+  'prefer_spread_over_addall',
+  'prefer_super_parameters',
+  'prefer_switch_statement',
+  'prefer_sync_over_async_where_possible',
+  'prefer_ternary_over_collection_if',
+  'prefer_ternary_over_if_null',
+  'prefer_test_data_builder',
+  'prefer_test_name_descriptive',
+  'prefer_test_name_should_when',
+  'prefer_text_rich_over_richtext',
+  'prefer_then_over_await',
+  'prefer_var_over_explicit_type',
+  'prefer_wheretype_over_where_is',
 };
 
 /// Essential tier rules - Critical rules that prevent crashes, data loss, and security holes.
@@ -524,7 +603,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_api_pagination',
 
   // BuildContext Safety (Recommended)
-  'prefer_rethrow_over_throw_e',
+  // 'prefer_rethrow_over_throw_e' moved to stylisticRules (opinionated)
   'avoid_context_in_async_static', // WARNING - async static with context
 
   // Memory Management Best Practices
@@ -716,7 +795,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_unnecessary_type_assertions',
   'avoid_unnecessary_type_casts',
 
-  // Note: prefer_boolean_prefixes, avoid_getter_prefix, prefer_wildcard_for_unused_param
+  // Note: prefer_boolean_prefixes, prefer_no_getter_prefix, prefer_wildcard_for_unused_param
   // moved to Stylistic tier
 
   // Security (Batch 14)
@@ -1063,7 +1142,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_screenshot_sensitive', // INFO - screenshot protection
   'avoid_semantics_exclusion', // INFO - semantics exclusion
   'prefer_merge_semantics', // INFO - merge semantics
-  'avoid_small_text', // INFO - minimum text size
+  // 'avoid_small_text' moved to stylisticRules (opinionated)
 
   // Data/Collections (Medium)
   'avoid_misused_set_literals', // INFO - set literal usage
@@ -1646,7 +1725,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_content_type_check',
   'avoid_websocket_without_heartbeat',
   'prefer_iterable_operations',
-  'prefer_dot_shorthand',
+  // 'prefer_dot_shorthand' moved to stylisticRules (opinionated)
   'require_future_wait_error_handling',
   'require_stream_on_done',
   'require_completer_error_handling',
@@ -1786,7 +1865,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_border_all',
   'avoid_calling_of_in_build',
   'avoid_collapsible_if',
-  // 'avoid_commented_out_code' moved to stylisticRules (v4.2.0)
+  // 'prefer_no_commented_out_code' moved to stylisticRules (v4.2.0)
   'avoid_complex_arithmetic_expressions',
   'avoid_complex_loop_conditions',
   'avoid_context_in_static_methods',
@@ -1817,7 +1896,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_immediately_invoked_functions',
   'avoid_incomplete_copy_with',
   'avoid_inconsistent_digit_separators',
-  // Note: avoid_inferrable_type_arguments is stylistic (opt-in only, conflicts with prefer_explicit_type_arguments)
+  // Note: prefer_inferred_type_arguments is stylistic (opt-in only, conflicts with prefer_explicit_type_arguments)
   'avoid_inverted_boolean_checks',
   'avoid_ios_debug_code_in_release',
   'avoid_late_keyword',
@@ -1913,47 +1992,47 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_abstract_final_static_class',
   'prefer_add_all',
 // cspell:ignore addall
-  'prefer_addall_over_spread',
+  // 'prefer_addall_over_spread' moved to stylisticRules (opinionated)
   'prefer_addition_subtraction_assignments',
-  'prefer_all_named_parameters',
+  // 'prefer_all_named_parameters' moved to stylisticRules (opinionated)
   'prefer_any_or_every',
-  'prefer_arrow_functions',
+  // 'prefer_arrow_functions' moved to stylisticRules (opinionated)
   'prefer_async_await',
-  'prefer_async_only_when_awaiting',
+  // 'prefer_async_only_when_awaiting' moved to stylisticRules (opinionated)
   'prefer_audio_session_config',
-  'prefer_await_over_then',
-  'prefer_blank_line_after_declarations',
+  // 'prefer_await_over_then' moved to stylisticRules (opinionated)
+  // 'prefer_blank_line_after_declarations' moved to stylisticRules (opinionated)
   'prefer_blank_line_before_case',
   'prefer_blank_line_before_constructor',
   'prefer_blank_line_before_method',
   'prefer_blank_line_before_return',
-  'prefer_blank_lines_between_members',
+  // 'prefer_blank_lines_between_members' moved to stylisticRules (opinionated)
   'prefer_boolean_prefixes_for_locals',
-  'prefer_borderradius_circular',
+  // 'prefer_borderradius_circular' moved to stylisticRules (opinionated)
   'prefer_both_inlining_annotations',
   'prefer_bytes_builder',
   'prefer_cached_network_image',
-  'prefer_camel_case_method_names',
+  // 'prefer_camel_case_method_names' moved to stylisticRules (opinionated)
   'prefer_camera_resolution_selection',
-  'prefer_cascade_over_chained',
-  'prefer_chained_over_cascade',
-  'prefer_class_over_record_return',
-  'prefer_collection_if_over_ternary',
+  // 'prefer_cascade_over_chained' moved to stylisticRules (opinionated)
+  // 'prefer_chained_over_cascade' moved to stylisticRules (opinionated)
+  // 'prefer_class_over_record_return' moved to stylisticRules (opinionated)
+  // 'prefer_collection_if_over_ternary' moved to stylisticRules (opinionated)
   'prefer_color_scheme_from_seed',
   'prefer_commenting_analyzer_ignores',
   'prefer_commenting_future_delayed',
-  'prefer_compact_class_members',
-  'prefer_compact_declarations',
+  // 'prefer_compact_class_members' moved to stylisticRules (opinionated)
+  // 'prefer_compact_declarations' moved to stylisticRules (opinionated)
   'prefer_compound_assignment_operators',
-  'prefer_concatenation_over_interpolation',
-  'prefer_concise_variable_names',
+  // 'prefer_concatenation_over_interpolation' moved to stylisticRules (opinionated)
+  // 'prefer_concise_variable_names' moved to stylisticRules (opinionated)
   'prefer_conditional_expressions',
   'prefer_const_border_radius',
   'prefer_const_string_list',
   'prefer_const_widgets',
-  'prefer_constructor_assertion',
-  'prefer_constructor_body_assignment',
-  'prefer_container_over_sizedbox',
+  // 'prefer_constructor_assertion' moved to stylisticRules (opinionated)
+  // 'prefer_constructor_body_assignment' moved to stylisticRules (opinionated)
+  // 'prefer_container_over_sizedbox' moved to stylisticRules (opinionated)
   'prefer_context_selector',
   'prefer_correct_callback_field_name',
   'prefer_correct_edge_insets_constructor',
@@ -1965,57 +2044,57 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_correct_test_file_name',
   'prefer_cupertino_for_ios',
   'prefer_cupertino_for_ios_feel',
-  'prefer_curly_apostrophe',
+  // 'prefer_curly_apostrophe' moved to stylisticRules (opinionated)
   'prefer_declaring_const_constructor',
   'prefer_dedicated_media_query_method',
-  'prefer_default_enum_case',
-  'prefer_descriptive_bool_names',
-  'prefer_descriptive_bool_names_strict',
+  // 'prefer_default_enum_case' moved to stylisticRules (opinionated)
+  // 'prefer_descriptive_bool_names' moved to stylisticRules (opinionated)
+  // 'prefer_descriptive_bool_names_strict' moved to stylisticRules (opinionated)
   'prefer_descriptive_test_name',
-  'prefer_descriptive_variable_names',
+  // 'prefer_descriptive_variable_names' moved to stylisticRules (opinionated)
   'prefer_digit_separators',
   'prefer_dio_transformer',
-  'prefer_doc_comments_over_regular',
+  // 'prefer_doc_comments_over_regular' moved to stylisticRules (opinionated)
   // 'prefer_doc_curly_apostrophe' moved to stylisticRules (conflicting pair)
   // 'prefer_doc_straight_apostrophe' moved to stylisticRules (conflicting pair)
   // 'prefer_double_quotes' moved to stylisticRules (conflicting pair)
-  'prefer_dynamic_over_object',
-  'prefer_edgeinsets_only',
-  'prefer_edgeinsets_symmetric',
+  // 'prefer_dynamic_over_object' moved to stylisticRules (opinionated)
+  // 'prefer_edgeinsets_only' moved to stylisticRules (opinionated)
+  // 'prefer_edgeinsets_symmetric' moved to stylisticRules (opinionated)
   'prefer_enhanced_enums',
   'prefer_enums_by_name',
-  'prefer_exhaustive_enums',
-  'prefer_expanded_over_flexible',
-  'prefer_expect_over_assert_in_tests',
-  'prefer_explicit_boolean_comparison',
-  'prefer_explicit_colors',
+  // 'prefer_exhaustive_enums' moved to stylisticRules (opinionated)
+  // 'prefer_expanded_over_flexible' moved to stylisticRules (opinionated)
+  // 'prefer_expect_over_assert_in_tests' moved to stylisticRules (opinionated)
+  // 'prefer_explicit_boolean_comparison' moved to stylisticRules (opinionated)
+  // 'prefer_explicit_colors' moved to stylisticRules (opinionated)
   'prefer_explicit_function_type',
-  'prefer_explicit_null_assignment',
+  // 'prefer_explicit_null_assignment' moved to stylisticRules (opinionated)
   'prefer_explicit_parameter_names',
-  'prefer_explicit_this',
-  'prefer_explicit_types',
+  // 'prefer_explicit_this' moved to stylisticRules (opinionated)
+  // 'prefer_explicit_types' moved to stylisticRules (opinionated)
   'prefer_extracting_callbacks',
   'prefer_extracting_function_callbacks',
-  'prefer_factory_for_validation',
-  'prefer_fake_over_mock',
-  'prefer_fields_before_methods',
-  'prefer_fixme_format',
-  'prefer_flexible_over_expanded',
+  // 'prefer_factory_for_validation' moved to stylisticRules (opinionated)
+  // 'prefer_fake_over_mock' moved to stylisticRules (opinionated)
+  // 'prefer_fields_before_methods' moved to stylisticRules (opinionated)
+  // 'prefer_fixme_format' moved to stylisticRules (opinionated)
+  // 'prefer_flexible_over_expanded' moved to stylisticRules (opinionated)
   'prefer_for_in',
-  'prefer_future_void_function_over_async_callback',
-  'prefer_generic_exception',
+  // 'prefer_future_void_function_over_async_callback' moved to stylisticRules (opinionated)
+  // 'prefer_generic_exception' moved to stylisticRules (opinionated)
   'prefer_getter_over_method',
-  'prefer_given_when_then_comments',
-  'prefer_grouped_by_purpose',
-  'prefer_grouped_expectations',
-  'prefer_guard_clauses',
-  'prefer_if_null_over_ternary',
+  // 'prefer_given_when_then_comments' moved to stylisticRules (opinionated)
+  // 'prefer_grouped_by_purpose' moved to stylisticRules (opinionated)
+  // 'prefer_grouped_expectations' moved to stylisticRules (opinionated)
+  // 'prefer_guard_clauses' moved to stylisticRules (opinionated)
+  // 'prefer_if_null_over_ternary' moved to stylisticRules (opinionated)
   'prefer_immediate_return',
-  'prefer_implicit_boolean_comparison',
-  'prefer_initializing_formals',
-  'prefer_inline_callbacks',
+  // 'prefer_implicit_boolean_comparison' moved to stylisticRules (opinionated)
+  // 'prefer_initializing_formals' moved to stylisticRules (opinionated)
+  // 'prefer_inline_callbacks' moved to stylisticRules (opinionated)
   // 'prefer_instance_members_first' moved to stylisticRules (conflicting pair)
-  'prefer_interpolation_over_concatenation',
+  // 'prefer_interpolation_over_concatenation' moved to stylisticRules (opinionated)
   'prefer_ios_app_intents_framework',
   'prefer_ios_context_menu',
   'prefer_ios_handoff_support',
@@ -2023,100 +2102,100 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_ios_spotlight_indexing',
   'prefer_iterable_of',
   'prefer_keyboard_shortcuts',
-  'prefer_keys_with_lookup',
-  'prefer_late_over_nullable',
+  // 'prefer_keys_with_lookup' moved to stylisticRules (opinionated)
+  // 'prefer_late_over_nullable' moved to stylisticRules (opinionated)
   'prefer_list_contains',
-  'prefer_lower_camel_case_constants',
+  // 'prefer_lower_camel_case_constants' moved to stylisticRules (opinionated)
   'prefer_macos_keyboard_shortcuts',
   'prefer_macos_menu_bar_integration',
-  'prefer_map_entries_iteration',
+  // 'prefer_map_entries_iteration' moved to stylisticRules (opinionated)
   'prefer_match_file_name',
-  'prefer_material_theme_colors',
-  'prefer_methods_before_fields',
+  // 'prefer_material_theme_colors' moved to stylisticRules (opinionated)
+  // 'prefer_methods_before_fields' moved to stylisticRules (opinionated)
   'prefer_moving_to_variable',
   'prefer_named_boolean_parameters',
   'prefer_named_extensions',
   'prefer_named_parameters',
   'prefer_native_file_dialogs',
-  'prefer_no_blank_line_before_return',
-  'prefer_no_blank_line_inside_blocks',
-  'prefer_null_aware_assignment',
+  // 'prefer_no_blank_line_before_return' moved to stylisticRules (opinionated)
+  // 'prefer_no_blank_line_inside_blocks' moved to stylisticRules (opinionated)
+  // 'prefer_null_aware_assignment' moved to stylisticRules (opinionated)
   'prefer_null_aware_elements',
   'prefer_null_aware_spread',
-  'prefer_nullable_over_late',
-  'prefer_object_over_dynamic',
-  'prefer_on_over_catch',
-  'prefer_one_widget_per_file',
+  // 'prefer_nullable_over_late' moved to stylisticRules (opinionated)
+  // 'prefer_object_over_dynamic' moved to stylisticRules (opinionated)
+  // 'prefer_on_over_catch' moved to stylisticRules (opinionated)
+  // 'prefer_one_widget_per_file' moved to stylisticRules (opinionated)
   'prefer_parentheses_with_if_null',
   'prefer_pattern_destructuring',
-  'prefer_period_after_doc',
+  // 'prefer_period_after_doc' moved to stylisticRules (opinionated)
   'prefer_physics_simulation',
-  'prefer_positive_conditions_first',
+  // 'prefer_positive_conditions_first' moved to stylisticRules (opinionated)
   'prefer_prefixed_global_constants',
   'prefer_private_extension_type_field',
   // 'prefer_private_members_first' moved to stylisticRules (conflicting pair)
-  'prefer_private_underscore_prefix',
+  // 'prefer_private_underscore_prefix' moved to stylisticRules (opinionated)
   'prefer_proxy_provider',
   'prefer_public_exception_classes',
   // 'prefer_public_members_first' moved to stylisticRules (conflicting pair)
   'prefer_pushing_conditional_expressions',
-  'prefer_required_before_optional',
+  // 'prefer_required_before_optional' moved to stylisticRules (opinionated)
   'prefer_returning_condition',
   'prefer_returning_conditionals',
   'prefer_returning_shorthands',
   'prefer_rich_text_for_complex',
-  'prefer_richtext_over_text_rich',
-  'prefer_screaming_case_constants',
+  // 'prefer_richtext_over_text_rich' moved to stylisticRules (opinionated)
+  // 'prefer_screaming_case_constants' moved to stylisticRules (opinionated)
   'prefer_sealed_events',
   'prefer_selectable_text',
-  'prefer_self_documenting_tests',
-  'prefer_sentence_case_comments',
+  // 'prefer_self_documenting_tests' moved to stylisticRules (opinionated)
+  // 'prefer_sentence_case_comments' moved to stylisticRules (opinionated)
   'prefer_set_for_lookup',
   'prefer_shorthands_with_constructors',
   'prefer_shorthands_with_enums',
   'prefer_shorthands_with_static_fields',
   'prefer_simpler_patterns_null_check',
   'prefer_single_assertion',
-  'prefer_single_blank_line_max',
+  // 'prefer_single_blank_line_max' moved to stylisticRules (opinionated)
   'prefer_single_declaration_per_file',
-  'prefer_single_expectation_per_test',
+  // 'prefer_single_expectation_per_test' moved to stylisticRules (opinionated)
   // 'prefer_single_quotes' moved to stylisticRules (conflicting pair)
   'prefer_single_widget_per_file',
-  'prefer_sizedbox_over_container',
+  // 'prefer_sizedbox_over_container' moved to stylisticRules (opinionated)
   'prefer_sliver_prefix',
-  'prefer_snake_case_files',
-  'prefer_specific_exceptions',
-  'prefer_spread_over_addall',
+  // 'prefer_snake_case_files' moved to stylisticRules (opinionated)
+  // 'prefer_specific_exceptions' moved to stylisticRules (opinionated)
+  // 'prefer_spread_over_addall' moved to stylisticRules (opinionated)
   'prefer_static_class',
   'prefer_static_const_widgets',
   // 'prefer_static_members_first' moved to stylisticRules (conflicting pair)
   // 'prefer_straight_apostrophe' moved to stylisticRules (conflicting pair)
   'prefer_streaming_response',
-  'prefer_super_parameters',
+  // 'prefer_super_parameters' moved to stylisticRules (opinionated)
   'prefer_switch_expression',
-  'prefer_switch_statement',
+  // 'prefer_switch_statement' moved to stylisticRules (opinionated)
   'prefer_switch_with_enums',
   'prefer_switch_with_sealed_classes',
-  'prefer_sync_over_async_where_possible',
-  'prefer_ternary_over_collection_if',
-  'prefer_ternary_over_if_null',
-  'prefer_test_name_descriptive',
-  'prefer_test_name_should_when',
+  // 'prefer_sync_over_async_where_possible' moved to stylisticRules (opinionated)
+  // 'prefer_ternary_over_collection_if' moved to stylisticRules (opinionated)
+  // 'prefer_ternary_over_if_null' moved to stylisticRules (opinionated)
+  // 'prefer_test_name_descriptive' moved to stylisticRules (opinionated)
+  // 'prefer_test_name_should_when' moved to stylisticRules (opinionated)
   'prefer_text_rich',
-  'prefer_text_rich_over_richtext',
-  'prefer_then_over_await',
-  'prefer_todo_format',
+  // 'prefer_text_rich_over_richtext' moved to stylisticRules (opinionated)
+  // 'prefer_then_over_await' moved to stylisticRules (opinionated)
+  // 'prefer_todo_format' moved to stylisticRules (opinionated)
   'prefer_trailing_comma',
-  'prefer_trailing_comma_always',
+  // 'prefer_trailing_comma_always' moved to stylisticRules (opinionated)
   'prefer_trailing_underscore_for_unused',
   'prefer_type_over_var',
   'prefer_typedef_for_callbacks',
   'prefer_utc_datetimes',
-  'prefer_var_over_explicit_type',
+  // 'prefer_var_over_explicit_type' moved to stylisticRules (opinionated)
   'prefer_visible_for_testing_on_members',
   'prefer_when_guard_over_if',
-  'prefer_wheretype_over_where_is',
-  'prefer_widget_methods_over_classes',
+  // 'prefer_wheretype_over_where_is' moved to stylisticRules (opinionated)
+  // 'prefer_widget_methods_over_classes' moved to stylisticRules (opinionated)
   'prefer_wildcard_pattern',
   'require_extend_equatable',
   'require_form_restoration',
@@ -2191,7 +2270,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // Type strictness (moved from Professional)
   'prefer_constrained_generics',
-  // Note: prefer_explicit_type_arguments is stylistic (opt-in only, conflicts with avoid_inferrable_type_arguments)
+  // Note: prefer_explicit_type_arguments is stylistic (opt-in only, conflicts with prefer_inferred_type_arguments)
   'prefer_typed_data',
   'prefer_typedefs_for_callbacks',
 
@@ -2207,7 +2286,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
 
   // Testing extras (moved from Professional)
   'require_animation_tests',
-  'prefer_test_data_builder',
+  // 'prefer_test_data_builder' moved to stylisticRules (opinionated)
   'prefer_test_variant',
   'require_accessibility_tests',
   'prefer_fake_platform', // platform fakes in tests

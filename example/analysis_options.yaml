@@ -71,7 +71,7 @@ custom_lint:
     # Explicitly enable type safety rules for testing
     - prefer_explicit_type_arguments: true
     # Explicitly enable stylistic comment rules for testing
-    - avoid_commented_out_code: true
-    - capitalize_comment_start: true
+    - prefer_no_commented_out_code: true
+    - prefer_capitalized_comment_start: true
     # Explicitly enable animation rules for testing
     - avoid_overlapping_animations: true
