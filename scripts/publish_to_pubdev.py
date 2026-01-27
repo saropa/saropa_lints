@@ -28,6 +28,7 @@ Workflow:
 Options:
     --audit-only      Run audit + integrity checks only, skip publish
     --skip-audit      Skip audit (use with caution)
+    --fix-docs        Auto-fix angle brackets in doc comments, then exit
     --silent          Suppress all output except errors
     --warnings-only   Only show warnings and errors
     --verbose         Show all details (default)
@@ -92,6 +93,10 @@ _REQUIRED_MODULES = [
     "modules/_audit_dx.py",
     "modules/_audit.py",
     "modules/_tier_integrity.py",
+    "modules/_git_ops.py",
+    "modules/_pubdev_lint.py",
+    "modules/_rule_metrics.py",
+    "modules/_version_changelog.py",
 ]
 
 
@@ -156,12 +161,36 @@ from scripts.modules._utils import (
     print_error,
     print_header,
     print_info,
-    print_section,
     print_success,
     print_warning,
     run_command,
     set_output_level,
     show_saropa_logo,
+)
+from scripts.modules._git_ops import (
+    create_git_tag,
+    create_github_release,
+    extract_repo_path,
+    get_current_branch,
+    get_remote_url,
+    git_commit_and_push,
+    publish_to_pubdev_step,
+)
+from scripts.modules._pubdev_lint import (
+    check_pubdev_lint_issues,
+    fix_doc_angle_brackets,
+)
+from scripts.modules._rule_metrics import (
+    count_categories,
+    count_rules,
+    display_test_coverage,
+)
+from scripts.modules._version_changelog import (
+    display_changelog,
+    get_latest_changelog_version,
+    get_package_name,
+    get_version_from_pubspec,
+    validate_changelog_version,
 )
 
 
@@ -232,185 +261,6 @@ def run_pre_publish_audits(project_dir: Path) -> bool:
 
     print_success("All pre-publish audit checks passed.")
     return True
-
-
-# =============================================================================
-# VERSION AND CHANGELOG
-# =============================================================================
-
-
-def get_version_from_pubspec(pubspec_path: Path) -> str:
-    """Read version string from pubspec.yaml."""
-    content = pubspec_path.read_text(encoding="utf-8")
-    match = re.search(r"^version:\s*(\d+\.\d+\.\d+)", content, re.MULTILINE)
-    if not match:
-        raise ValueError("Could not find version in pubspec.yaml")
-    return match.group(1)
-
-
-def get_package_name(pubspec_path: Path) -> str:
-    """Read package name from pubspec.yaml."""
-    content = pubspec_path.read_text(encoding="utf-8")
-    match = re.search(r"^name:\s*(.+)$", content, re.MULTILINE)
-    if not match:
-        raise ValueError("Could not find name in pubspec.yaml")
-    return match.group(1).strip()
-
-
-def get_latest_changelog_version(changelog_path: Path) -> str | None:
-    """Extract the latest version from CHANGELOG.md."""
-    if not changelog_path.exists():
-        return None
-    content = changelog_path.read_text(encoding="utf-8")
-    match = re.search(r"##\s*\[?(\d+\.\d+\.\d+)\]?", content)
-    return match.group(1) if match else None
-
-
-def validate_changelog_version(project_dir: Path, version: str) -> str | None:
-    """Validate version exists in CHANGELOG and extract release notes."""
-    changelog_path = project_dir / "CHANGELOG.md"
-    if not changelog_path.exists():
-        return None
-
-    content = changelog_path.read_text(encoding="utf-8")
-    version_pattern = rf"##\s*\[?{re.escape(version)}\]?"
-    if not re.search(version_pattern, content):
-        return None
-
-    pattern = (
-        rf"(?s)##\s*\[?{re.escape(version)}\]?[^\n]*\n"
-        rf"(.*?)(?=##\s*\[?\d+\.\d+\.\d+|$)"
-    )
-    match = re.search(pattern, content)
-    return match.group(1).strip() if match else ""
-
-
-def display_changelog(project_dir: Path) -> str | None:
-    """Display the latest changelog entry."""
-    changelog_path = project_dir / "CHANGELOG.md"
-    if not changelog_path.exists():
-        print_warning("CHANGELOG.md not found")
-        return None
-
-    content = changelog_path.read_text(encoding="utf-8")
-    match = re.search(
-        r"^(## \[?\d+\.\d+\.\d+\]?.*?)(?=^## |\Z)",
-        content,
-        re.MULTILINE | re.DOTALL,
-    )
-
-    if match:
-        latest_entry = match.group(1).strip()
-        print()
-        print_colored("  CHANGELOG (latest entry):", Color.WHITE)
-        print_colored("  " + "-" * 50, Color.CYAN)
-        for line in latest_entry.split("\n"):
-            print_colored(f"  {line}", Color.CYAN)
-        print_colored("  " + "-" * 50, Color.CYAN)
-        print()
-        return latest_entry
-
-    print_warning("Could not parse CHANGELOG.md")
-    return None
-
-
-# =============================================================================
-# LINT RULE COUNTING
-# =============================================================================
-
-
-def count_rules(project_dir: Path) -> int:
-    """Count the number of lint rules."""
-    rules_dir = project_dir / "lib" / "src" / "rules"
-    if not rules_dir.exists():
-        return 0
-
-    count = 0
-    for dart_file in rules_dir.glob("*.dart"):
-        if dart_file.name == "all_rules.dart":
-            continue
-        content = dart_file.read_text(encoding="utf-8")
-        count += len(
-            re.findall(
-                r"class \w+ extends (?:SaropaLintRule|DartLintRule)", content
-            )
-        )
-    return count
-
-
-def count_categories(project_dir: Path) -> int:
-    """Count the number of rule category files."""
-    rules_dir = project_dir / "lib" / "src" / "rules"
-    if not rules_dir.exists():
-        return 0
-    return sum(
-        1
-        for f in rules_dir.glob("*_rules.dart")
-        if f.name != "all_rules.dart"
-    )
-
-
-def count_test_fixtures(project_dir: Path) -> int:
-    """Count the number of test fixture files."""
-    example_dir = project_dir / "example" / "lib"
-    if not example_dir.exists():
-        return 0
-    return sum(1 for _ in example_dir.rglob("*_fixture.dart"))
-
-
-def display_test_coverage(project_dir: Path) -> None:
-    """Display test coverage report with emphasis on low coverage."""
-    rules_dir = project_dir / "lib" / "src" / "rules"
-    example_dir = project_dir / "example" / "lib"
-    if not rules_dir.exists():
-        return
-
-    category_details: list[tuple[str, int, int]] = []
-    for dart_file in sorted(rules_dir.glob("*_rules.dart")):
-        if dart_file.name == "all_rules.dart":
-            continue
-        category = dart_file.stem.replace("_rules", "")
-        content = dart_file.read_text(encoding="utf-8")
-        rule_count = len(
-            re.findall(
-                r"class \w+ extends (?:SaropaLintRule|DartLintRule)", content
-            )
-        )
-
-        fixture_count = 0
-        for suffix in [category, f"{category}s"]:
-            fixture_dir = example_dir / suffix
-            if fixture_dir.exists():
-                fixture_count = len(list(fixture_dir.glob("*_fixture.dart")))
-                if fixture_count > 0:
-                    break
-
-        category_details.append((category, rule_count, fixture_count))
-
-    total_rules = sum(c[1] for c in category_details)
-    total_fixtures = sum(c[2] for c in category_details)
-    coverage_pct = (total_fixtures / total_rules * 100) if total_rules > 0 else 0
-
-    print()
-    print_colored("  Test Coverage Report:", Color.WHITE)
-    print_colored("  " + "-" * 50, Color.CYAN)
-
-    if coverage_pct < 10:
-        color, status = Color.RED, "CRITICAL"
-    elif coverage_pct < 30:
-        color, status = Color.YELLOW, "LOW"
-    elif coverage_pct < 70:
-        color, status = Color.CYAN, "MODERATE"
-    else:
-        color, status = Color.GREEN, "GOOD"
-
-    print_colored(
-        f"      Overall: {total_fixtures}/{total_rules} "
-        f"({coverage_pct:.1f}%) - {status}",
-        color,
-    )
-    print_colored("  " + "-" * 50, Color.CYAN)
-    print()
 
 
 # =============================================================================
@@ -647,80 +497,6 @@ def run_format(project_dir: Path) -> bool:
     return True
 
 
-def check_pubdev_lint_issues(project_dir: Path) -> list[str]:
-    """Check for issues that pub.dev's stricter lints will catch."""
-    issues: list[str] = []
-    scan_dirs = [project_dir / "lib", project_dir / "bin"]
-
-    for scan_dir in scan_dirs:
-        if not scan_dir.exists():
-            continue
-        for dart_file in scan_dir.rglob("*.dart"):
-            content = dart_file.read_text(encoding="utf-8")
-            lines = content.split("\n")
-            rel_path = dart_file.relative_to(project_dir)
-
-            # Check: Dangling library doc comments
-            in_header = True
-            found_doc_comment = False
-            doc_comment_line = 0
-            for i, line in enumerate(lines, 1):
-                stripped = line.strip()
-                if not stripped or stripped.startswith("#!"):
-                    continue
-                if stripped.startswith("// ignore"):
-                    continue
-                if stripped.startswith("///") and in_header:
-                    if not found_doc_comment:
-                        found_doc_comment = True
-                        doc_comment_line = i
-                    continue
-                if (
-                    stripped == "library;"
-                    or stripped.startswith("library ")
-                ) and found_doc_comment:
-                    found_doc_comment = False
-                    break
-                if not stripped.startswith("///"):
-                    in_header = False
-                    if found_doc_comment:
-                        issues.append(
-                            f"{rel_path}:{doc_comment_line}: "
-                            "Dangling library doc comment."
-                        )
-                    break
-
-            # Check: Angle brackets in doc comments
-            in_code_block = False
-            for i, line in enumerate(lines, 1):
-                stripped = line.strip()
-                if stripped.startswith("///") and "```" in stripped:
-                    in_code_block = not in_code_block
-                    continue
-                if in_code_block:
-                    continue
-                if not stripped.startswith("///"):
-                    in_code_block = False
-                    continue
-                doc_content = stripped[3:].strip()
-                if doc_content.startswith("```"):
-                    continue
-                angle_matches = list(
-                    re.finditer(r"\b[\w.]+<[\w\s,]+>", doc_content)
-                )
-                for match in angle_matches:
-                    pos = match.start()
-                    before = doc_content[:pos]
-                    if before.count("`") % 2 == 1:
-                        continue
-                    issues.append(
-                        f"{rel_path}:{i}: Angle brackets in "
-                        f"'{match.group()}' interpreted as HTML."
-                    )
-
-    return issues
-
-
 def run_analysis(project_dir: Path) -> bool:
     """Step 6: Run static analysis."""
     print_header("STEP 6: RUNNING STATIC ANALYSIS")
@@ -731,6 +507,9 @@ def run_analysis(project_dir: Path) -> bool:
         print_error("Found pub.dev lint issues:")
         for issue in pubdev_issues:
             print_colored(f"      {issue}", Color.YELLOW)
+        print_info(
+            "Run with --fix-docs to auto-fix angle bracket issues."
+        )
         return False
     print_success("No pub.dev lint issues found")
 
@@ -819,247 +598,6 @@ def pre_publish_validation(project_dir: Path) -> bool:
 
 
 # =============================================================================
-# GIT OPERATIONS
-# =============================================================================
-
-
-def get_current_branch(project_dir: Path) -> str:
-    """Get the current git branch name."""
-    use_shell = get_shell_mode()
-    result = subprocess.run(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-    return result.stdout.strip() if result.returncode == 0 else "main"
-
-
-def get_remote_url(project_dir: Path) -> str:
-    """Get the git remote URL."""
-    use_shell = get_shell_mode()
-    result = subprocess.run(
-        ["git", "remote", "get-url", "origin"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-    return result.stdout.strip() if result.returncode == 0 else ""
-
-
-def extract_repo_path(remote_url: str) -> str:
-    """Extract owner/repo from git remote URL."""
-    match = re.search(r"github\.com[:/](.+?)(?:\.git)?$", remote_url)
-    return match.group(1) if match else "owner/repo"
-
-
-def git_commit_and_push(
-    project_dir: Path, version: str, branch: str
-) -> bool:
-    """Step 10: Commit changes and push to remote."""
-    print_header("STEP 10: COMMITTING CHANGES")
-
-    tag_name = f"v{version}"
-    use_shell = get_shell_mode()
-
-    result = run_command(
-        ["git", "add", "-A"], project_dir, "Staging changes"
-    )
-    if result.returncode != 0:
-        return False
-
-    result = subprocess.run(
-        ["git", "status", "--porcelain"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-
-    if result.stdout.strip():
-        result = run_command(
-            ["git", "commit", "-m", f"Release {tag_name}"],
-            project_dir,
-            f"Committing: Release {tag_name}",
-        )
-        if result.returncode != 0:
-            return False
-
-        if not _push_with_retry(project_dir, branch):
-            return False
-    else:
-        print_warning("No changes to commit.")
-
-    return True
-
-
-def _push_with_retry(
-    project_dir: Path, branch: str, max_retries: int = 2
-) -> bool:
-    """Push to remote, pulling and retrying if rejected."""
-    use_shell = get_shell_mode()
-
-    for attempt in range(max_retries + 1):
-        print_info(f"Pushing to {branch}...")
-        result = subprocess.run(
-            ["git", "push", "origin", branch],
-            cwd=project_dir,
-            capture_output=True,
-            text=True,
-            shell=use_shell,
-        )
-        if result.returncode == 0:
-            print_success(f"Pushed to {branch}")
-            return True
-
-        output = (result.stdout or "") + (result.stderr or "")
-        if "rejected" in output and (
-            "fetch first" in output or "non-fast-forward" in output
-        ):
-            if attempt < max_retries:
-                print_warning("Push rejected - pulling and retrying...")
-                pull_result = subprocess.run(
-                    ["git", "pull", "--rebase", "origin", branch],
-                    cwd=project_dir,
-                    capture_output=True,
-                    text=True,
-                    shell=use_shell,
-                )
-                if pull_result.returncode != 0:
-                    print_error("Failed to pull remote changes.")
-                    return False
-                print_success("Rebased remote changes")
-                continue
-            print_error("Push failed after retries.")
-            return False
-
-        print_error(f"Push failed (exit code {result.returncode})")
-        if output:
-            print_colored(output, Color.RED)
-        return False
-
-    return False
-
-
-def create_git_tag(project_dir: Path, version: str) -> bool:
-    """Step 11: Create and push git tag."""
-    print_header("STEP 11: CREATING GIT TAG")
-
-    tag_name = f"v{version}"
-    use_shell = get_shell_mode()
-
-    # Check if tag exists locally
-    result = subprocess.run(
-        ["git", "tag", "-l", tag_name],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-    if result.stdout.strip():
-        print_warning(f"Tag {tag_name} already exists locally.")
-    else:
-        result = run_command(
-            ["git", "tag", "-a", tag_name, "-m", f"Release {tag_name}"],
-            project_dir,
-            f"Creating tag {tag_name}",
-        )
-        if result.returncode != 0:
-            return False
-
-    # Check if tag exists on remote
-    result = subprocess.run(
-        ["git", "ls-remote", "--tags", "origin", tag_name],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-    if result.stdout.strip():
-        print_warning(f"Tag {tag_name} already exists on remote.")
-    else:
-        result = run_command(
-            ["git", "push", "origin", tag_name],
-            project_dir,
-            f"Pushing tag {tag_name}",
-        )
-        if result.returncode != 0:
-            return False
-
-    return True
-
-
-def publish_to_pubdev_step(project_dir: Path) -> bool:
-    """Step 12: Notify that publishing happens via GitHub Actions."""
-    print_header("STEP 12: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
-
-    print_success("Tag push triggered GitHub Actions publish workflow!")
-    print_colored(
-        "  Publishing is now running automatically on GitHub Actions.",
-        Color.CYAN,
-    )
-
-    remote_url = get_remote_url(project_dir)
-    repo_path = extract_repo_path(remote_url)
-    print_colored(
-        f"  Monitor: https://github.com/{repo_path}/actions", Color.CYAN
-    )
-    print()
-    return True
-
-
-def create_github_release(
-    project_dir: Path, version: str, release_notes: str
-) -> tuple[bool, str | None]:
-    """Step 13: Create GitHub release."""
-    print_header("STEP 13: CREATING GITHUB RELEASE")
-
-    tag_name = f"v{version}"
-    use_shell = get_shell_mode()
-
-    # Check if release exists
-    result = subprocess.run(
-        ["gh", "release", "view", tag_name],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-    if result.returncode == 0:
-        print_warning(f"Release {tag_name} already exists.")
-        return True, None
-
-    result = subprocess.run(
-        [
-            "gh", "release", "create", tag_name,
-            "--title", f"Release {tag_name}",
-            "--notes", release_notes,
-        ],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-    )
-
-    if result.returncode == 0:
-        print_success(f"Created GitHub release {tag_name}")
-        return True, None
-
-    error_output = (result.stderr or "") + (result.stdout or "")
-    if any(
-        s in error_output.lower()
-        for s in ["401", "bad credentials", "authentication"]
-    ):
-        return False, (
-            "GitHub CLI auth failed. Clear GITHUB_TOKEN env var "
-            "and run: gh auth status"
-        )
-    return False, f"Release failed (exit code {result.returncode})"
-
-
-# =============================================================================
 # MAIN
 # =============================================================================
 
@@ -1089,6 +627,23 @@ def main() -> int:
             f"CHANGELOG.md not found at {changelog_path}",
             ExitCode.PREREQUISITES_FAILED,
         )
+
+    # --- Quick-exit: --fix-docs ---
+    if "--fix-docs" in sys.argv:
+        print_header("FIX DOC ANGLE BRACKETS")
+        issues = check_pubdev_lint_issues(project_dir)
+        if not issues:
+            print_success("No angle bracket issues found.")
+            return ExitCode.SUCCESS.value
+        print_info(f"Found {len(issues)} issue(s):")
+        for issue in issues:
+            print_colored(f"      {issue}", Color.YELLOW)
+        fixed = fix_doc_angle_brackets(project_dir)
+        if fixed:
+            print_success(f"Fixed {fixed} angle bracket(s).")
+        else:
+            print_warning("No auto-fixable issues found.")
+        return ExitCode.SUCCESS.value
 
     # --- Package info ---
     package_name = get_package_name(pubspec_path)

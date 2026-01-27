@@ -1,0 +1,272 @@
+"""
+Git operations for the publish workflow.
+
+Handles branch detection, remote URL parsing, commit/push with retry,
+tag creation, GitHub Actions publish trigger, and GitHub release creation.
+
+Version:   1.0
+Author:    Saropa
+Copyright: (c) 2025-2026 Saropa
+"""
+
+from __future__ import annotations
+
+import re
+import subprocess
+from pathlib import Path
+
+from scripts.modules._utils import (
+    Color,
+    get_shell_mode,
+    print_colored,
+    print_error,
+    print_header,
+    print_info,
+    print_success,
+    print_warning,
+    run_command,
+)
+
+
+def get_current_branch(project_dir: Path) -> str:
+    """Get the current git branch name."""
+    use_shell = get_shell_mode()
+    result = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    return result.stdout.strip() if result.returncode == 0 else "main"
+
+
+def get_remote_url(project_dir: Path) -> str:
+    """Get the git remote URL."""
+    use_shell = get_shell_mode()
+    result = subprocess.run(
+        ["git", "remote", "get-url", "origin"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def extract_repo_path(remote_url: str) -> str:
+    """Extract owner/repo from git remote URL."""
+    match = re.search(r"github\.com[:/](.+?)(?:\.git)?$", remote_url)
+    return match.group(1) if match else "owner/repo"
+
+
+def git_commit_and_push(
+    project_dir: Path, version: str, branch: str
+) -> bool:
+    """Step 10: Commit changes and push to remote."""
+    print_header("STEP 10: COMMITTING CHANGES")
+
+    tag_name = f"v{version}"
+    use_shell = get_shell_mode()
+
+    result = run_command(
+        ["git", "add", "-A"], project_dir, "Staging changes"
+    )
+    if result.returncode != 0:
+        return False
+
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+
+    if result.stdout.strip():
+        result = run_command(
+            ["git", "commit", "-m", f"Release {tag_name}"],
+            project_dir,
+            f"Committing: Release {tag_name}",
+        )
+        if result.returncode != 0:
+            return False
+
+        if not _push_with_retry(project_dir, branch):
+            return False
+    else:
+        print_warning("No changes to commit.")
+
+    return True
+
+
+def _push_with_retry(
+    project_dir: Path, branch: str, max_retries: int = 2
+) -> bool:
+    """Push to remote, pulling and retrying if rejected."""
+    use_shell = get_shell_mode()
+
+    for attempt in range(max_retries + 1):
+        print_info(f"Pushing to {branch}...")
+        result = subprocess.run(
+            ["git", "push", "origin", branch],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell,
+        )
+        if result.returncode == 0:
+            print_success(f"Pushed to {branch}")
+            return True
+
+        output = (result.stdout or "") + (result.stderr or "")
+        if "rejected" in output and (
+            "fetch first" in output or "non-fast-forward" in output
+        ):
+            if attempt < max_retries:
+                print_warning(
+                    "Push rejected - pulling and retrying..."
+                )
+                pull_result = subprocess.run(
+                    ["git", "pull", "--rebase", "origin", branch],
+                    cwd=project_dir,
+                    capture_output=True,
+                    text=True,
+                    shell=use_shell,
+                )
+                if pull_result.returncode != 0:
+                    print_error("Failed to pull remote changes.")
+                    return False
+                print_success("Rebased remote changes")
+                continue
+            print_error("Push failed after retries.")
+            return False
+
+        print_error(f"Push failed (exit code {result.returncode})")
+        if output:
+            print_colored(output, Color.RED)
+        return False
+
+    return False
+
+
+def create_git_tag(project_dir: Path, version: str) -> bool:
+    """Step 11: Create and push git tag."""
+    print_header("STEP 11: CREATING GIT TAG")
+
+    tag_name = f"v{version}"
+    use_shell = get_shell_mode()
+
+    # Check if tag exists locally
+    result = subprocess.run(
+        ["git", "tag", "-l", tag_name],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.stdout.strip():
+        print_warning(f"Tag {tag_name} already exists locally.")
+    else:
+        result = run_command(
+            [
+                "git", "tag", "-a", tag_name,
+                "-m", f"Release {tag_name}",
+            ],
+            project_dir,
+            f"Creating tag {tag_name}",
+        )
+        if result.returncode != 0:
+            return False
+
+    # Check if tag exists on remote
+    result = subprocess.run(
+        ["git", "ls-remote", "--tags", "origin", tag_name],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.stdout.strip():
+        print_warning(f"Tag {tag_name} already exists on remote.")
+    else:
+        result = run_command(
+            ["git", "push", "origin", tag_name],
+            project_dir,
+            f"Pushing tag {tag_name}",
+        )
+        if result.returncode != 0:
+            return False
+
+    return True
+
+
+def publish_to_pubdev_step(project_dir: Path) -> bool:
+    """Step 12: Notify that publishing happens via GitHub Actions."""
+    print_header("STEP 12: PUBLISHING TO PUB.DEV VIA GITHUB ACTIONS")
+
+    print_success(
+        "Tag push triggered GitHub Actions publish workflow!"
+    )
+    print_colored(
+        "  Publishing is now running automatically on GitHub Actions.",
+        Color.CYAN,
+    )
+
+    remote_url = get_remote_url(project_dir)
+    repo_path = extract_repo_path(remote_url)
+    print_colored(
+        f"  Monitor: https://github.com/{repo_path}/actions",
+        Color.CYAN,
+    )
+    print()
+    return True
+
+
+def create_github_release(
+    project_dir: Path, version: str, release_notes: str
+) -> tuple[bool, str | None]:
+    """Step 13: Create GitHub release."""
+    print_header("STEP 13: CREATING GITHUB RELEASE")
+
+    tag_name = f"v{version}"
+    use_shell = get_shell_mode()
+
+    # Check if release exists
+    result = subprocess.run(
+        ["gh", "release", "view", tag_name],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode == 0:
+        print_warning(f"Release {tag_name} already exists.")
+        return True, None
+
+    result = subprocess.run(
+        [
+            "gh", "release", "create", tag_name,
+            "--title", f"Release {tag_name}",
+            "--notes", release_notes,
+        ],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+
+    if result.returncode == 0:
+        print_success(f"Created GitHub release {tag_name}")
+        return True, None
+
+    error_output = (result.stderr or "") + (result.stdout or "")
+    if any(
+        s in error_output.lower()
+        for s in ["401", "bad credentials", "authentication"]
+    ):
+        return False, (
+            "GitHub CLI auth failed. Clear GITHUB_TOKEN env var "
+            "and run: gh auth status"
+        )
+    return False, f"Release failed (exit code {result.returncode})"
