@@ -3,12 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Dates are not included in version headers — [pub.dev](https://pub.dev/packages/saropa_lints/changelog) displays publish dates separately.
 
 > **Looking for older changes?** \
 > See [CHANGELOG_ARCHIVE.md](./CHANGELOG_ARCHIVE.md) for versions 0.1.0 through 4.2.0.
 
 ---
-## [4.8.5] - 2026-01-27 (Unreleased)
+## [4.8.5]
 
 ### Added
 
@@ -32,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`skipTestFiles` getter**: Replaced by `testRelevance`. The old boolean getter still compiles but is marked `@Deprecated`. Migration: `skipTestFiles => true` is now the default; `skipTestFiles => false` becomes `testRelevance => TestRelevance.always`.
 
 ---
-## [4.8.4] - 2026-01-27
+## [4.8.4]
 
 ### Added
 
@@ -56,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`doc/flutter_widget_rules_full_table.md`**: Obsolete split-plan document that was no longer referenced.
 
-## [4.8.3] - 2026-01-26
+## [4.8.3]
 
 ### Added
 
@@ -80,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **High DX pass rate**: 34.8% → 42.7% (+23 additional rules passing)
 - **Audit scripts refactored**: `_audit.py` split into `_audit_checks.py` (extraction/display) and `_audit_dx.py` (DX quality analysis) for maintainability.
 
-## [4.8.2] - 2026-01-26
+## [4.8.2]
 
 ### Added
 
@@ -121,7 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`require_cache_key_determinism` false positive on metadata parameters**: Common metadata parameter names (`createdAt`, `updatedAt`, `timestamp`, `expiresAt`, `ttl`, etc.) are now excluded from determinism checks. Diagnostics now report at the specific offending argument instead of the entire variable declaration. Extracted shared `_checkArgumentList` helper to reduce duplication.
 
 ---
-## [4.8.1] - 2026-01-25
+## [4.8.1]
 
 ### Added
 
@@ -140,7 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Methods returning `String?` or `Uri?` are now skipped as they are URL parsers/converters, not deep link handlers
 
 ---
-## [4.8.0] - 2026-01-25
+## [4.8.0]
 
 ### Changed
 
@@ -150,7 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - No generated files required - stays in sync automatically when rules are added/removed
 
 ---
-## [4.7.6] - 2026-01-25
+## [4.7.6]
 
 ### Fixed
 
@@ -161,7 +162,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `picker.pickImage(source: variable)` → requires both (can't determine statically)
 
 ---
-## [4.7.5] - 2026-01-24
+## [4.7.5]
 
 ### Added
 
@@ -178,7 +179,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ```
 
 ---
-## [4.7.4] - 2026-01-24
+## [4.7.4]
 
 ### Added
 
@@ -203,7 +204,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Quick fix for `require_stream_controller_close`**: New quick fix adds `controller.close()` call to the dispose/close method.
 
 ---
-## [4.7.3] - 2026-01-24
+## [4.7.3]
 
 ### Added
 
@@ -216,7 +217,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Progress tracking: rule name prefix spam**: Fixed progress output being prefixed with rule name (e.g., `[require_ios_privacy_manifest]`) for every update. Progress now uses stderr to avoid custom_lint's automatic rule tagging.
 
 ---
-## [4.7.2] - 2026-01-24
+## [4.7.2]
 
 ### Added
 
@@ -233,7 +234,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Init script: false "user customizations" count**: Fixed bug where switching tiers would incorrectly count all tier-changed rules as "user customizations". Now only rules explicitly in the USER CUSTOMIZATIONS section are preserved. Added warning when >50 customizations detected (suggests using `--reset` to fix corrupted config).
 
 ---
-## [4.7.0] - 2026-01-24
+## [4.7.0]
 
 ### Added
 
@@ -259,7 +260,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`prefer_small_length_files` and `prefer_small_length_test_files` tier misassignment**: Fixed bug where these insanity-tier rules were incorrectly enabled in comprehensive tier. Rules now correctly have `tier => RuleTier.insanity` override.
 
 ---
-## [4.6.2] - 2026-01-24
+## [4.6.2]
 
 ### Removed
 
@@ -301,7 +302,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Consolidated duplicate RegExp**: Merged two identical `_privateMethodCallPattern` definitions in `flutter_widget_rules.dart` into a single shared constant.
 
 ---
-## [4.6.1] - 2026-01-24
+## [4.6.1]
 
 ### Added
 
@@ -336,7 +337,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [4.6.0] - 2026-01-24
+## [4.6.0]
 
 ### Added
 
@@ -362,7 +363,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [4.5.7] - 2026-01-23
+## [4.5.7]
 
 ### Changed
 
@@ -401,7 +402,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [4.5.6] - 2026-01-23
+## [4.5.6]
 
 ### Changed
 - **Major upgrade to developer-facing lint rule messages:**
@@ -422,7 +423,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [4.5.5] - 2026-01-23
+## [4.5.5]
 
 ### Changed
 - **Major upgrade to developer-facing lint rule messages:**
@@ -454,7 +455,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - This improves transparency, prioritization, and community contribution for both complex rules and planned enhancements.
 
 ---
-## [4.5.4] - 2026-01-22
+## [4.5.4]
 
 ### Changed
 
@@ -475,14 +476,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a type error in the CLI tool (`bin/init.dart`) when serializing YAML to JSON for config generation. The tool now correctly converts `YamlMap` and nested YAML structures to regular Dart maps before passing them to `json2yaml`, preventing runtime exceptions when updating `analysis_options.yaml`.
 
 ---
-## [4.5.3] - 2026-01-22
+## [4.5.3]
 
 ### Fixed
 
 - Moved `json2yaml` and added `yaml` to main dependencies in pubspec.yaml to satisfy pub.dev requirements for CLI tools in `bin/`.
   This fixes publishing errors and allows versions above 4.5.0 to be published to pub.dev.
 
-## [4.5.2] - 2026-01-22
+## [4.5.2]
 
 ### Changed
 
@@ -508,7 +509,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Both rules are now included when the stylistic tier is enabled, but remain mutually exclusive in effect (enabling both will cause conflicting lints).
   - This change makes it easier to opt into either style preference via the `--stylistic` flag or tier selection, but users should only enable one of the two in their configuration to avoid conflicts.
 
-## [4.5.1] - 2026-01-22
+## [4.5.1]
 
 ### Package Dependancies
 
@@ -549,7 +550,7 @@ Production file length rules now skip test files automatically.
 **Explanation:**
 Production file length rules (such as `prefer_small_length_files`, `avoid_medium_length_files`, etc.) now automatically exclude test files from their checks. This prevents false positives on large test files and means you no longer need to manually disable these rules for test files in your configuration. Only production (non-test) Dart files are checked for file length limits by these rules.
 
-## [4.5.0] - 2026-01-21
+## [4.5.0]
 
 ### Added
 
@@ -592,7 +593,7 @@ dart run saropa_lints:init --help
 
 ---
 
-## [4.4.0] - 2026-01-21
+## [4.4.0]
 
 ### Added
 
@@ -612,7 +613,7 @@ All three rules include quick fixes to remove duplicate elements.
 
 **`avoid_variable_shadowing` false positives on sibling closures** - The rule was incorrectly flagging variables with the same name in sibling closures (like separate `test()` callbacks within a `group()`) as shadowing. These are independent scopes, not nested scopes, so they don't actually shadow each other. The rule now properly tracks scope boundaries.
 
-## [4.3.0] - 2026-01-21
+## [4.3.0]
 
 ### Added
 
@@ -645,7 +646,7 @@ This prevents false positives on legitimate regex patterns like `RegExp(r'0+$')`
 
 This eliminates false positives while maintaining detection of actual commented-out code.
 
-## [4.2.3] - 2026-01-20
+## [4.2.3]
 
 ### Added
 
@@ -692,7 +693,7 @@ If you had `avoid_sensitive_data_in_logs` in your config, it will continue to wo
 
 **Shared utility for mode constant detection** - Extracted `usesFlutterModeConstants()` to `mode_constants_utils.dart` for detecting `kReleaseMode`, `kDebugMode`, and `kProfileMode` guards. Used by 5 rule files: config_rules.dart, debug_rules.dart, iap_rules.dart, isar_rules.dart, ios_rules.dart. This also fixed missing `kProfileMode` checks in iap_rules.dart and isar_rules.dart.
 
-## [4.2.2] - 2026-01-19
+## [4.2.2]
 
 ### Fixed
 
@@ -704,7 +705,7 @@ If you had `avoid_sensitive_data_in_logs` in your config, it will continue to wo
 
 **Impact**: These bugs affected all users on all platforms. Windows users were additionally affected by path normalization issues fixed in earlier commits.
 
-## [4.2.1] - 2026-01-19
+## [4.2.1]
 
 ### Changed
 

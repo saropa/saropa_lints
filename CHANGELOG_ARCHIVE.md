@@ -4,7 +4,7 @@
 
 Archived releases 0.1.0 through 4.2.0. See [CHANGELOG.md](./CHANGELOG.md) for the latest versions.
 
-## [4.2.0] - 2026-01-19
+## [4.2.0]
 
 ### Added
 
@@ -239,7 +239,7 @@ Added aliases for:
 - `require_openai_error_handling` - "Rate limits crash instead of graceful fallback"
 - `prefer_value_listenable_builder` - "Full-widget rebuilds cause jank"
 
-## [4.1.9] - 2026-01-18
+## [4.1.9]
 
 ### Changed
 
@@ -255,7 +255,7 @@ Added aliases for:
 
 **Documentation**: Updated README tier table with detailed purpose, target user, and examples for each tier.
 
-## [4.1.8] - 2026-01-18
+## [4.1.8]
 
 ### Added
 
@@ -321,7 +321,7 @@ Added aliases for:
 - **Performance file type filtering** - Added `applicableFileTypes` to `RequireDialogBarrierConsiderationRule` to skip non-widget files
 - **Template updated** - Added all 25 new rules to `analysis_options_template.yaml` with proper categorization
 
-## [4.1.7] - 2026-01-18
+## [4.1.7]
 
 ### Fixed
 
@@ -343,7 +343,7 @@ Added aliases for:
 
 ---
 
-## [4.1.6] - 2026-01-18
+## [4.1.6]
 
 ### Added
 
@@ -384,7 +384,7 @@ Added aliases for:
 - **Recommended tier:** 2 rules for best practices
 - **Professional tier:** 3 rules for code quality
 
-## [4.1.5] - 2026-01-18
+## [4.1.5]
 
 ### Added
 
@@ -446,7 +446,7 @@ Added aliases for:
 - **Recommended tier:** 14 rules for common best practices
 - **Professional tier:** 11 rules for stricter architecture/quality standards
 
-## [4.1.4] - 2026-01-18
+## [4.1.4]
 
 ### Added
 
@@ -516,7 +516,7 @@ Added aliases for:
 - **Recommended tier:** 17 rules covering best practices
 - **Professional tier:** require_bloc_repository_injection, avoid_freezed_for_logic_classes
 
-## [4.1.3] - 2026-01-14
+## [4.1.3]
 
 - Migrated all single/double-word lint rules to three-word convention for clarity and discoverability. Notable migrations include:
   - `arguments_ordering` → `enforce_arguments_ordering`
@@ -555,13 +555,13 @@ Added aliases for:
   - `extend_equatable` → `require_extend_equatable`
   - `avoid_shadowing` → `avoid_variable_shadowing`
 
-## [4.1.2] - 2026-01-13
+## [4.1.2]
 
 ### Fixed
 
 - Removed a stray change log entry from the readme
 
-## [4.1.1] - 2026-01-13
+## [4.1.1]
 
 ### Added
 
@@ -602,7 +602,7 @@ This ensures all implemented rules are available through tiered configuration an
 - This change improves roadmap alignment and prevents accidental activation of unimplemented rules.
 - Materially improve the message quality for all Critical rules
 
-## [4.1.0] - 2026-01-12
+## [4.1.0]
 
 ### Tier Assignment Audit
 
@@ -664,7 +664,7 @@ Stylistic/opinionated rules remain untiered for team-specific configuration:
 
 ---
 
-## [4.0.1] - 2026-01-12
+## [4.0.1]
 
 ### Testing Best Practices Rules
 
@@ -704,7 +704,7 @@ Improved problem messages for 7 critical-impact rules to provide specific conseq
 
 ---
 
-## [4.0.0] - 2026-01-12
+## [4.0.0]
 
 ### OWASP Compliance Mapping
 
@@ -828,7 +828,7 @@ Five new rules to fill gaps in OWASP coverage:
 
 ---
 
-## [3.4.0] - 2026-01-12
+## [3.4.0]
 
 ### Performance Optimizations
 
@@ -893,7 +893,7 @@ Added comprehensive performance infrastructure to support 1400+ lint rules effic
 
 ---
 
-## [3.3.1] - 2026-01-12
+## [3.3.1]
 
 ### Quick Fix Policy Update
 
@@ -924,7 +924,7 @@ Safety checklist: no deleting code, no behavior changes, works in edge cases.
 
 ---
 
-## [3.3.0] - 2026-01-12
+## [3.3.0]
 
 ### Audit Script v2.0
 
@@ -959,7 +959,7 @@ python scripts/audit_rules.py --no-dx      # Skip DX audit
 
 ---
 
-## [3.1.2] - 2026-01-12
+## [3.1.2]
 
 ### New Rules
 
@@ -1099,7 +1099,7 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ---
 
-## [3.1.1] - 2026-01-12
+## [3.1.1]
 
 ### New Rules
 
@@ -1121,7 +1121,7 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ---
 
-## [3.1.0] - 2026-01-12
+## [3.1.0]
 
 ### Enhancements
 
@@ -1136,7 +1136,7 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ---
 
-## [3.0.2] - 2026-01-12
+## [3.0.2]
 
 ### Bug Fixes
 
@@ -1164,7 +1164,7 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ---
 
-## [3.0.1] - 2026-01-12
+## [3.0.1]
 
 ### Performance Optimizations
 
@@ -1192,7 +1192,7 @@ All rules can be disabled per-file with `// ignore_for_file: rule_name`.
 
 ---
 
-## [3.0.0] - 2026-01-12
+## [3.0.0]
 
 ### Performance Optimizations
 
@@ -1264,7 +1264,7 @@ None. All changes are backwards-compatible performance improvements.
 
 ---
 
-## [2.7.0] - 2026-01-12
+## [2.7.0]
 
 ### Added
 
@@ -1388,7 +1388,7 @@ None. All changes are backwards-compatible performance improvements.
 - Updated pubspec.yaml version to 2.7.0
 - Updated analysis_options_template.yaml with all 92 stylistic rules
 
-## [2.6.0] - 2026-01-12
+## [2.6.0]
 
 ### Added
 
@@ -1466,7 +1466,7 @@ None. All changes are backwards-compatible performance improvements.
 - Updated rule counts in README.md (1340+ → 1360+)
 - Updated pubspec.yaml version to 2.6.0
 
-## [2.5.0] - 2026-01-12
+## [2.5.0]
 
 ### Changed
 
@@ -1535,19 +1535,19 @@ None. All changes are backwards-compatible performance improvements.
 
 - **ROADMAP**: Removed `avoid_using_context_after_dispose` (now covered by `avoid_context_across_async` + `avoid_context_in_initstate_dispose`)
 
-## [2.4.2] - 2026-01-11
+## [2.4.2]
 
 ### Changed
 
 - Minor doc header escaping in ios_rules.dart
 
-## [2.4.1] - 2026-01-11
+## [2.4.1]
 
 ### Changed
 
 - Minor doc header escaping of `Provider.of<T>(context)`
 
-## [2.4.0] - 2026-01-11
+## [2.4.0]
 
 ### Added
 
@@ -1732,7 +1732,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_rethrow_preserve_stack`**: Fixed type comparison error where `Token` was compared to `String`. Now correctly uses `.lexeme` to extract the exception parameter name
 - **`avoid_yield_in_on_event`**: Fixed doc comment where `on<Event>` angle brackets were being interpreted as HTML. Wrapped in backticks for proper escaping
 
-## [2.3.11] - 2026-01-11
+## [2.3.11]
 
 ### Changed
 
@@ -1798,7 +1798,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **`avoid_builder_index_out_of_bounds`**: Warns when itemBuilder accesses list without bounds check. Index may be out of bounds if list changes. (WARNING)
 
-## [2.3.10] - 2026-01-11
+## [2.3.10]
 
 ### Added
 
@@ -1869,7 +1869,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_stack_without_positioned`**: Warns when Stack has children without Positioned wrapper. Non-positioned children overlay each other. (WARNING)
 - **`avoid_expanded_outside_flex`**: Warns when Expanded/Flexible is used outside Row, Column, or Flex. Will cause runtime error. (ERROR)
 
-## [2.3.9] - 2026-01-11
+## [2.3.9]
 
 ### Added
 
@@ -1899,7 +1899,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ---
 
-## [2.3.8] - 2026-01-11
+## [2.3.8]
 
 ### Fixed
 
@@ -1914,7 +1914,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ---
 
-## [2.3.7] - 2026-01-11
+## [2.3.7]
 
 ### Added
 
@@ -2030,7 +2030,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`prefer_late_final`**: Now correctly counts inline initializers and only flags fields assigned exactly once (not zero times)
 - **`require_qr_content_validation`**: Added explicit parentheses to fix operator precedence in validation check
 
-## [2.3.6] - 2026-01-11
+## [2.3.6]
 
 ### Fixed
 
@@ -2057,7 +2057,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - Updated 12 fixture files to import `flutter_mocks.dart` instead of Flutter/external packages
 - **prefer_dedicated_media_query_method**: Added alias `prefer_dedicated_media_query_methods`
 
-## [2.3.5] - 2026-01-11
+## [2.3.5]
 
 ### Fixed
 
@@ -2083,14 +2083,14 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - `avoid_keyboard_overlap`: Adds comment for manual keyboard handling
   - `avoid_hardcoded_encryption_keys`: Adds comment for secure key loading
 
-## [2.3.4] - 2026-01-11
+## [2.3.4]
 
 ### Fixed
 
 - **avoid_dialog_context_after_async**: Fixed `RangeError` crash when analyzing files where `toSource()` produces a different length string than the original source
 - **avoid_set_state_after_async**: Fixed the same `RangeError` in `_hasAwaitBefore` method
 
-## [2.3.3] - 2026-01-11
+## [2.3.3]
 
 ### Changed
 
@@ -2138,7 +2138,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **41 TODO quick fixes**: Removed quick fixes that only added TODO comments (these just created noise by triggering the `todo` lint rule)
 
-## [2.3.2] - 2026-01-11
+## [2.3.2]
 
 ### Added
 
@@ -2171,7 +2171,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - `avoid_riverpod_ref_in_dispose` → alias for `avoid_ref_inside_state_dispose`
   - `avoid_set_state_in_build` → alias for `avoid_setstate_in_build`
 
-## [2.3.1] - 2026-01-11
+## [2.3.1]
 
 ### Changed
 
@@ -2197,7 +2197,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **`avoid_future_builder_rebuild`**: Merged into `pass_existing_future_to_future_builder`
 
-## [2.3.0] - 2026-01-10
+## [2.3.0]
 
 ### Added
 
@@ -2294,7 +2294,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **state_management_rules.dart**: Fixed `prefer_context_read_in_callbacks` rule to properly detect Flutter callback conventions. Now checks for `on` prefix followed by uppercase letter (e.g., `onPressed`, `onTap`) to avoid false positives on words like `once`, `only`, `ongoing`.
 - **import_utils.dart**: New shared utility file for package import validation. Provides `fileImportsPackage()` function and `PackageImports` constants for Dio, Geolocator, Connectivity, Firebase Messaging, Permission Handler, GoRouter, Riverpod, Hive, GetIt, Provider, Bloc, and more. Reduces code duplication across rule files.
 
-## [2.2.0] - 2026-01-10
+## [2.2.0]
 
 ### Added
 
@@ -2349,7 +2349,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_google_fonts_fallback`**: Warns when GoogleFonts lacks `fontFamilyFallback`
 - **`prefer_uuid_v4`**: Suggests using UUID v4 over v1 for better randomness
 
-## [2.1.0] - 2026-01-10
+## [2.1.0]
 
 #### SharedPreferences Security Rules (4 rules)
 
@@ -2520,7 +2520,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`require_stream_on_done`**: Warns when Stream.listen lacks onDone handler
 - **`require_completer_error_handling`**: Warns when Completer in try-catch lacks completeError
 
-## [2.0.0] - 2026-01-10
+## [2.0.0]
 
 ### Changed
 
@@ -2721,7 +2721,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ---
 
-## [1.8.2] - 2026-01-10
+## [1.8.2]
 
 ### Added
 
@@ -2784,7 +2784,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Bloc: BlocSelector usage, state over-engineering, manual dispose
   - GetX: Context access patterns, static context testing issues
 
-## [1.8.1] - 2026-01-10
+## [1.8.1]
 
 ### Fixed
 
@@ -2810,7 +2810,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `require_getit_reset_in_tests`: Adds reminder comment for GetIt reset
 - `require_websocket_error_handling`: Adds onError handler stub
 
-## [1.8.0] - 2026-01-10
+## [1.8.0]
 
 ### Changed
 
@@ -2821,7 +2821,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **`avoid_sensitive_data_in_logs`**: Fixed false positives for null checks and property access. Now only flags direct value interpolation (`$password`, `${password}`), not expressions like `${credential != null}`, `${password.length}`, or `${token?.isEmpty}`. Pre-compiled regex patterns for better performance.
 - **`avoid_hardcoded_encryption_keys`**: Simplified rule to only detect string literals passed directly to `Key.fromUtf8()`, `Key.fromBase64()`, etc. - removes false positives from variable name heuristics
 
-## [1.7.12] - 2026-01-10
+## [1.7.12]
 
 ### Fixed
 
@@ -2831,14 +2831,14 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **`require_unique_iv_per_encryption`**: Auto-replaces `IV.fromUtf8`/`IV.fromBase64` with `IV.fromSecureRandom(16)`
 
-## [1.7.11] - 2026-01-10
+## [1.7.11]
 
 ### Fixed
 
 - **`avoid_shrinkwrap_in_scrollview`**: Rule now properly skips widgets with `NeverScrollableScrollPhysics` - the recommended fix should no longer trigger the lint
 - **Test fixtures**: Updated fixture files with correct `expect_lint` annotations and disabled conflicting rules in example analysis_options.yaml
 
-## [1.7.10] - 2026-01-10
+## [1.7.10]
 
 ### Fixed
 
@@ -2853,7 +2853,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **Rule implementation**: `AvoidNestedScrollablesConflictRule` now uses visitor pattern with `RecursiveAstVisitor`
 - **Rule implementation**: `AvoidExcessiveBottomNavItemsRule` now uses `addNamedExpression` to detect excessive items
 
-## [1.7.9] - 2026-01-09
+## [1.7.9]
 
 ### Added
 
@@ -2917,7 +2917,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `avoid_autoplay_audio`: Auto-sets `autoPlay: false`
 - `avoid_hardcoded_feature_flags`: Adds TODO comment for feature flag replacement
 
-## [1.7.8] - 2026-01-09
+## [1.7.8]
 
 ### Added
 
@@ -2972,13 +2972,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - `require_secure_password_field`: Auto-adds `enableSuggestions: false` and `autocorrect: false`
 
-## [1.7.7] - 2026-01-09
+## [1.7.7]
 
 ### Changed
 
 - **Docs**: README now has a Limitations section clarifying Dart-only analysis and dependency_overrides behavior.
 
-## [1.7.6] - 2026-01-09
+## [1.7.6]
 
 ### Added
 
@@ -2992,7 +2992,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - Restored NullabilitySuffix-based checks for analyzer compatibility.
 
-## [1.7.5] - 2026-01-09
+## [1.7.5]
 
 ### Added
 
@@ -3009,11 +3009,11 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **Docs**: Updated counts to reflect 767+ rules.
 - **Severity**: Stylistic rules moved to LintImpact.opinionated.
 
-## [1.7.4] - 2026-01-08
+## [1.7.4]
 
 - Updated the banner image to show the project name Saropa Lints.
 
-## [1.7.3] - 2026-01-08
+## [1.7.3]
 
 ### Added
 
@@ -3025,7 +3025,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **Naming**: Standardized "Saropa Lints" vs saropa_lints across all docs.
 - **Migration Guides**: Updated rules (766+), versions (^1.3.0), and tier counts.
 
-## [1.7.2] - 2026-01-08
+## [1.7.2]
 
 ### Added
 
@@ -3034,13 +3034,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **47 New Rules**: Covering Riverpod, GetX, Bloc, Accessibility, Security, and Testing.
 - **11 New Quick Fixes**.
 
-## [1.7.1] - 2026-01-08
+## [1.7.1]
 
 ### Fixed
 
 - Resolved 25 violations for curly_braces_in_flow_control_structures.
 
-## [1.7.0] - 2026-01-08
+## [1.7.0]
 
 ### Added
 
@@ -3049,7 +3049,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 ---
 
-## [1.6.0] - 2026-01-07
+## [1.6.0]
 
 ### Added
 
@@ -3097,7 +3097,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **RequireTestGroupsRule** - Now correctly detects Windows-style test paths (`\test\`)
 - **PreferImplicitAnimationsRule** - Fixed O(n²) performance issue; now uses efficient per-class tracking
 
-## [1.5.3] - 2026-01-07
+## [1.5.3]
 
 ### Fixed
 
@@ -3121,7 +3121,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - "Out of Memory errors" - new section with 3 solutions (cache clean, heap size, delete artifacts)
   - "Native crashes (Windows)" - moved existing crash fix content
 
-## [1.5.2] - 2026-01-07
+## [1.5.2]
 
 ### Changed
 
@@ -3129,7 +3129,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **API documentation landing page** - Added `doc/README.md` with API-focused content instead of repeating the project README on the documentation homepage.
 
-## [1.5.1] - 2026-01-07
+## [1.5.1]
 
 ### Fixed
 
@@ -3170,7 +3170,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **`prefer_returning_shorthands`** - Added quick fix that converts `{ return x; }` to `=> x` arrow syntax.
 
-## [1.5.0] - 2026-01-07
+## [1.5.0]
 
 ### Changed
 
@@ -3237,7 +3237,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - structure_rules.dart (5 fixes)
   - type_rules.dart (7 fixes)
 
-## [1.4.4] - 2025-01-07
+## [1.4.4]
 
 ### Changed
 
@@ -3267,7 +3267,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **cspell.json** - Added technical terms: assetlinks, autovalidate, backgrounded, backgrounding, EXIF, geofencing, unfocus, unindexed, vsync, workmanager
 
-## [1.4.3] - 2025-01-07
+## [1.4.3]
 
 ### Added
 
@@ -3336,7 +3336,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   detection of compound names like `onProcessPayment`, `onConfirmDelete`,
   `onBackupData`, etc.
 
-## [1.4.2] - 2025-01-07
+## [1.4.2]
 
 ### Added
 
@@ -3413,7 +3413,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - `prefer_mock_http` - Consolidated duplicate InstanceCreationExpression registrations into single handler
 
-## [1.4.1] - 2025-01-07
+## [1.4.1]
 
 ### Changed
 
@@ -3424,7 +3424,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Added allowed exact names: `value` (Flutter Checkbox/Switch convention)
   - Examples now passing: `_deviceEnabled`, `sortAlphabetically`, `filterCountryHasContacts`, `applyScrollView`, `defaultHideIcons`
 
-## [1.4.0] - 2025-01-07
+## [1.4.0]
 
 ### Added
 
@@ -3484,7 +3484,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - `avoid_unsafe_where_methods` - Removed debug print statements from quick fix
 
-## [1.3.1] - 2025-01-06
+## [1.3.1]
 
 ### Fixed
 
@@ -3504,7 +3504,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - **.gitattributes** - Enforces LF line endings for LICENSE file to prevent future license detection issues
 
-## [1.3.0] - 2025-01-06
+## [1.3.0]
 
 ### Added
 
@@ -3632,7 +3632,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **README** - Added hyphenated ignore comment example in "Suppressing Warnings" section
 - **ROADMAP** - Added section 5.0 "SaropaLintRule Base Class Enhancements" documenting implemented and planned features
 
-## [1.2.0] - 2025-01-06
+## [1.2.0]
 
 ### Changed
 
@@ -3653,7 +3653,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - **Tier descriptions** - Updated Recommended tier to highlight null safety and collection bounds checking
 - **Package description** - Updated pub.dev description from "1,000+" to "500+" rules
 
-## [1.1.19] - 2025-01-06
+## [1.1.19]
 
 ### Changed
 
@@ -3680,7 +3680,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `avoid_undisposed_instances` - Fixed type annotation access for analyzer 8.x (`name2.lexeme`); now follows helper method calls to detect indirect disposal patterns
 - `avoid_undisposed_instances` - Enhanced field extraction to handle parenthesized expressions and cascade expressions
 
-## [1.1.18] - 2025-01-06
+## [1.1.18]
 
 ### Added
 
@@ -3709,7 +3709,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `require_platform_channel_cleanup` - Now recognizes `cancelSafe()` as valid cancel method
 - `require_image_disposal` - Now recognizes `disposeSafe()` as valid dispose method
 
-## [1.1.17] - 2025-01-06
+## [1.1.17]
 
 ### Added
 
@@ -3726,13 +3726,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `require_dispose` - Now follows helper method calls from dispose() to detect indirect disposal patterns like `_cancelTimer()` that internally call the disposal method
 - `require_timer_cancellation` - Follows helper method calls from dispose() to detect indirect cancellation patterns
 
-## [1.1.16] - 2025-01-05
+## [1.1.16]
 
 ### Changed
 
 - Renamed `docs/` to `doc/guides/` to follow Dart/Pub package layout conventions
 
-## [1.1.15] - 2025-01-05
+## [1.1.15]
 
 ### Fixed
 
@@ -3744,7 +3744,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - README: Clarified that rules must use YAML list format (`- rule: value`) not map format
 - README: Updated IDE integration section with realistic expectations and CLI recommendation
 
-## [1.1.14] - 2025-01-05
+## [1.1.14]
 
 ### Fixed
 
@@ -3754,7 +3754,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - `x != null && x!.doSomething()` - safe due to && short-circuit
   - Added `isListNullOrEmpty`, `isNullOrEmpty`, `isNullOrBlank` to recognized null checks
 
-## [1.1.13] - 2025-01-05
+## [1.1.13]
 
 ### Changed
 
@@ -3764,7 +3764,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - After null-check extensions: `.isNotNullOrEmpty`, `.isNotNullOrBlank`, `.isNotEmpty`
 - `dispose_controllers` - Now recognizes `disposeSafe()` as a valid dispose method
 
-## [1.1.12] - 2025-01-05
+## [1.1.12]
 
 ### Fixed
 
@@ -3773,7 +3773,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - More accurate character sets for Base64 encoding in Basic auth
   - End-of-string anchoring for Bearer/Basic tokens
 
-## [1.1.11] - 2025-01-05
+## [1.1.11]
 
 ### Changed
 
@@ -3792,13 +3792,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - YAML-based tier configuration (include directives were not being followed by custom_lint)
 
-## [1.1.10] - 2025-01-05
+## [1.1.10]
 
 ### Fixed
 
 - Added `license: MIT` field to pubspec.yaml for proper pub.dev display
 
-## [1.1.9] - 2025-01-05
+## [1.1.9]
 
 ### Added
 
@@ -3822,7 +3822,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - `doc/PLAN_LINT_RULES_AND_TESTING.md` (replaced by `ROADMAP.md`)
 - `doc/SAROPA_LINT_RULES_GUIDE.md` (replaced by `ENTERPRISE.md`)
 
-## [0.1.8] - 2025-01-05
+## [0.1.8]
 
 ### Added
 
@@ -3850,7 +3850,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - Doc reference warnings in rule comments (`[i]`, `[0]`, `[length-1]`)
 
-## [0.1.7] - 2025-01-05
+## [0.1.7]
 
 ### Fixed
 
@@ -3859,7 +3859,7 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Now respects rules enabled/disabled in tier YAML files (essential, recommended, etc.)
   - Supports `enable_all_lint_rules: true` to enable all 500+ rules
 
-## [0.1.6] - 2025-01-05
+## [0.1.6]
 
 ### Fixed
 
@@ -3869,14 +3869,14 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
   - Reverted `NamedType.name2` back to `NamedType.name`
   - Updated `enclosingElement3` to `enclosingElement`
 
-## [0.1.5] - 2025-01-05
+## [0.1.5]
 
 ### Fixed
 
 - Fixed `MethodElement.enclosingElement3` error - `MethodElement` requires cast to `Element` for `enclosingElement3` access
 - Expanded analyzer constraint to support version 9.x (`>=6.0.0 <10.0.0`)
 
-## [0.1.4] - 2025-01-05
+## [0.1.4]
 
 ### Fixed
 
@@ -3892,13 +3892,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 
 - Now fully compatible with `analyzer ^7.5.0` and `custom_lint ^0.8.0`
 
-## [0.1.3] - 2025-01-05
+## [0.1.3]
 
 ### Fixed
 
 - Removed custom documentation URL so pub.dev uses its auto-generated API docs
 
-## [0.1.2] - 2025-01-05
+## [0.1.2]
 
 ### Added
 
@@ -3916,13 +3916,13 @@ The original `avoid_context_in_static_methods` rule has been refined into a tier
 - Updated README with accurate rule count (497 rules)
 - Simplified README messaging and performance guidance
 
-## [0.1.1] - 2024-12-27
+## [0.1.1]
 
 ### Fixed
 
 - Improved documentation formatting and examples
 
-## [0.1.0] - 2024-12-27
+## [0.1.0]
 
 ### Added
 
