@@ -62,9 +62,9 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_unknown_route_handler',
     problemMessage:
-        '[require_unknown_route_handler] App has routes but no onUnknownRoute. Unknown routes will crash.',
+        '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen.',
     correctionMessage:
-        'Add onUnknownRoute to handle undefined routes gracefully.',
+        'Add an onUnknownRoute callback to MaterialApp that returns a route to a user-friendly 404 error page when navigation targets an undefined route path.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -666,9 +666,9 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_pop_without_result',
     problemMessage:
-        '[avoid_pop_without_result] Navigator.push result may be null. Handle the case when user presses back.',
+        '[avoid_pop_without_result] Navigator.push awaits a result but does not handle the null case when the user dismisses the route by pressing the back button or using a system gesture. Accessing properties on a null result throws a runtime exception that crashes the app. This creates a fragile navigation flow that fails under normal user interaction patterns.',
     correctionMessage:
-        'Check if result is null before using it, or use type-safe routing.',
+        'Check if the navigation result is null before accessing its properties, and provide a default value or early return to handle route dismissal without a result.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -874,9 +874,9 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_deep_link_fallback',
     problemMessage:
-        '[require_deep_link_fallback] Deep link handler should handle missing/invalid content.',
+        '[require_deep_link_fallback] Deep link handler navigates to content without verifying the target exists or is accessible. When a deep link references deleted, restricted, or invalid content, the app either crashes with a null reference error or displays a blank screen. Users tapping expired links in emails, notifications, or shared messages encounter a broken experience.',
     correctionMessage:
-        'Add fallback for when linked content is not found or unavailable.',
+        'Add a fallback route or error screen that displays a user-friendly message when deep-linked content is missing, deleted, or inaccessible, with an option to navigate home.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

@@ -41,8 +41,9 @@ class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_read_inside_build',
     problemMessage:
-        '[avoid_ref_read_inside_build] ref.read() should not be used inside build().',
-    correctionMessage: 'Use ref.watch() in build() for reactivity.',
+        '[avoid_ref_read_inside_build] ref.read() called inside build() bypasses Riverpod reactivity. The widget will not rebuild when the provider state changes, resulting in stale data displayed to the user. This creates inconsistent UI state that fails silently and produces hard-to-diagnose rendering errors across dependent widgets.',
+    correctionMessage:
+        'Replace ref.read() with ref.watch() inside build() to subscribe to provider changes and trigger automatic widget rebuilds on state updates.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -114,8 +115,9 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_ref_watch_outside_build',
     problemMessage:
-        '[avoid_ref_watch_outside_build] ref.watch() used outside build() breaks Riverpod lifecycle. This causes missed updates, stale data, and hard-to-debug state inconsistencies.',
-    correctionMessage: 'Move ref.watch() calls into build().',
+        '[avoid_ref_watch_outside_build] ref.watch() detected outside build() method, breaking the Riverpod widget lifecycle. Subscriptions created outside build() leak memory, produce stale data, and cause missed UI updates that lead to inconsistent state and hard-to-debug rendering errors across dependent widgets.',
+    correctionMessage:
+        'Move ref.watch() calls into the build() method where Riverpod manages subscription lifecycle and automatic widget rebuilds on provider state changes.',
     errorSeverity: DiagnosticSeverity.ERROR,
   );
 
