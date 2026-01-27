@@ -58,27 +58,30 @@ class RuleMessage:
         msg = self.problem_message.lower()
         content = re.sub(r"^\[[a-z0-9_]+\]\s*", "", self.problem_message)
 
-        # --- Vague language (-20) ---
-        vague_patterns = [
-            ("should be", "Vague 'should be' - state consequence"),
-            ("should have", "Vague 'should have' - state consequence"),
-            ("consider ", "Vague 'consider' - be direct"),
-            ("may want to", "Vague 'may want' - be direct"),
-            ("might cause", "Vague 'might' - state definite consequence"),
-            ("could lead to", "Vague 'could' - state definite consequence"),
-            ("is not recommended", "Passive 'not recommended' - say why"),
-            ("prefer to", "Vague 'prefer to' - explain why"),
-            ("it is better", "Vague 'better' - quantify the benefit"),
-            ("for better", "Vague 'better' - quantify the benefit"),
-            ("best practice", "Vague 'best practice' - explain the risk"),
-            ("not ideal", "Vague 'not ideal' - state consequence"),
-            ("suboptimal", "Vague 'suboptimal' - state consequence"),
-        ]
-        for pattern, issue in vague_patterns:
-            if pattern in msg:
-                self.dx_issues.append(issue)
-                self.dx_score -= 20
-                break
+        # --- Vague language (-20, skip for low-impact) ---
+        # Low-impact rules are advisory by nature, so suggestive
+        # phrasing like "consider" is appropriate and not penalised.
+        if self.impact != "low":
+            vague_patterns = [
+                ("should be", "Vague 'should be' - state consequence"),
+                ("should have", "Vague 'should have' - state consequence"),
+                ("consider ", "Vague 'consider' - be direct"),
+                ("may want to", "Vague 'may want' - be direct"),
+                ("might cause", "Vague 'might' - state definite consequence"),
+                ("could lead to", "Vague 'could' - state definite consequence"),
+                ("is not recommended", "Passive 'not recommended' - say why"),
+                ("prefer to", "Vague 'prefer to' - explain why"),
+                ("it is better", "Vague 'better' - quantify the benefit"),
+                ("for better", "Vague 'better' - quantify the benefit"),
+                ("best practice", "Vague 'best practice' - explain the risk"),
+                ("not ideal", "Vague 'not ideal' - state consequence"),
+                ("suboptimal", "Vague 'suboptimal' - state consequence"),
+            ]
+            for pattern, issue in vague_patterns:
+                if pattern in msg:
+                    self.dx_issues.append(issue)
+                    self.dx_score -= 20
+                    break
 
         # --- Consequence check (-30 for critical/high) ---
         consequence_indicators = [

@@ -1443,8 +1443,9 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_go_router_inline_creation',
     problemMessage:
-        '[avoid_go_router_inline_creation] GoRouter created in build() is recreated on every rebuild, breaking navigation state and hot reload.',
-    correctionMessage: 'Create GoRouter as a final field or in initState().',
+        '[avoid_go_router_inline_creation] GoRouter instance created inside build() is destroyed and recreated on every widget rebuild. This resets all navigation state including the current route stack, destroys in-flight transitions, breaks hot reload during development, and causes users to lose their navigation position whenever the parent widget rebuilds.',
+    correctionMessage:
+        'Create the GoRouter instance as a final field in the State class or initialize it in initState() so the router persists across rebuilds and preserves navigation state.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2740,8 +2741,9 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_go_router_fallback_route',
     problemMessage:
-        '[require_go_router_fallback_route] GoRouter without errorBuilder or errorPageBuilder.',
-    correctionMessage: 'Add errorBuilder: (context, state) => ErrorPage().',
+        '[require_go_router_fallback_route] GoRouter configuration without errorBuilder or errorPageBuilder has no fallback for unmatched routes. When users navigate to a non-existent path via deep link, push notification, or typo, the router throws an unhandled exception that crashes the app instead of showing a helpful error page.',
+    correctionMessage:
+        'Add errorBuilder: (context, state) => NotFoundPage() or errorPageBuilder to display a user-friendly error screen when navigation targets an undefined route.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 

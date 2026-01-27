@@ -52,9 +52,9 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrinkwrap_in_scrollview',
     problemMessage:
-        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true disables virtualization. This forces all items to render immediately, causing jank and high memory usage with large lists.',
+        '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true on a scrollable list disables virtualization, forcing Flutter to lay out and render every child widget immediately regardless of visibility. This causes severe jank, high memory usage, and slow initial rendering for lists with more than a few dozen items, degrading the user experience.',
     correctionMessage:
-        'Use CustomScrollView with slivers, or add NeverScrollableScrollPhysics.',
+        'Use CustomScrollView with SliverList for nested scrollables, or add NeverScrollableScrollPhysics() and let the parent scrollable manage scrolling behavior.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -580,8 +580,9 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_refresh_without_await',
     problemMessage:
-        '[avoid_refresh_without_await] RefreshIndicator onRefresh must return Future. Without await, the spinner dismisses immediately while data is still loading, confusing users.',
-    correctionMessage: 'Make onRefresh async and await async operations.',
+        '[avoid_refresh_without_await] RefreshIndicator onRefresh callback must return a Future that completes when data loading finishes. Without awaiting async operations, the refresh spinner dismisses immediately while data is still loading, leaving users confused about whether the refresh succeeded or failed and showing stale content.',
+    correctionMessage:
+        'Make the onRefresh callback async and await all asynchronous data-fetching operations so the refresh indicator stays visible until loading completes.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -823,9 +824,9 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_shrink_wrap_expensive',
     problemMessage:
-        '[avoid_shrink_wrap_expensive] shrinkWrap: true disables virtualization and can cause performance issues.',
+        '[avoid_shrink_wrap_expensive] shrinkWrap: true disables list virtualization, forcing Flutter to measure and lay out every item upfront instead of lazily building only visible items. For lists with many children, this causes slow initial rendering, high memory consumption, and jank during scrolling as the framework processes the entire list eagerly.',
     correctionMessage:
-        'Use a fixed-height container, Slivers, or reconsider the layout.',
+        'Use a fixed-height parent container, replace with CustomScrollView and Slivers, or reconsider the layout to avoid disabling list virtualization.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 

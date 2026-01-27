@@ -603,8 +603,9 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_object_creation_in_hot_loops',
     problemMessage:
-        '[avoid_object_creation_in_hot_loops] Object creation inside loop causes GC pressure.',
-    correctionMessage: 'Move object creation outside the loop.',
+        '[avoid_object_creation_in_hot_loops] Creating objects inside hot loops triggers frequent garbage collection pauses that freeze the UI thread. Each allocation adds GC pressure proportionally to iteration count, causing visible jank, dropped frames during animations, and degraded scrolling performance on lower-end devices.',
+    correctionMessage:
+        'Move object creation outside the loop body and reuse instances across iterations. For collections, preallocate with a known capacity to minimize allocation overhead.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -913,9 +914,9 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'require_item_extent_for_large_lists',
     problemMessage:
-        '[require_item_extent_for_large_lists] Large list should specify itemExtent for performance.',
+        '[require_item_extent_for_large_lists] ListView with many items but no itemExtent forces Flutter to lay out every child widget to calculate scroll extent. This causes expensive initial rendering, prevents efficient jump-to-index operations, and degrades scroll bar accuracy, resulting in slow list initialization and janky scrolling.',
     correctionMessage:
-        'Add itemExtent or prototypeItem for better scrolling performance.',
+        'Add itemExtent for fixed-height items or prototypeItem for consistent sizes to enable O(1) scroll position calculations and smoother scrolling performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1430,9 +1431,9 @@ class AvoidScrollListenerInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_scroll_listener_in_build',
     problemMessage:
-        '[avoid_scroll_listener_in_build] Scroll listener added in build() accumulates subscriptions on every rebuild, causing memory leaks and duplicate callbacks.',
+        '[avoid_scroll_listener_in_build] Scroll listener registered in build() accumulates duplicate subscriptions on every widget rebuild. Each rebuild adds another listener that is never removed, causing memory leaks, duplicate callback executions, and progressively degrading scroll performance as listeners compound over the widget lifecycle.',
     correctionMessage:
-        'Register listener once in initState() and remove in dispose().',
+        'Register the scroll listener once in initState() and remove it in dispose() to prevent listener accumulation across widget rebuilds.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -1506,9 +1507,9 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_value_listenable_builder',
     problemMessage:
-        '[prefer_value_listenable_builder] Simple single-value state using setState causes expensive full-widget rebuilds. ValueListenableBuilder isolates rebuilds to only the affected subtree, reducing jank.',
+        '[prefer_value_listenable_builder] Simple single-value state managed with setState causes the entire widget subtree to rebuild on every change. ValueListenableBuilder isolates rebuilds to only the affected subtree, significantly reducing unnecessary widget tree comparisons, improving frame rendering performance, and lowering battery consumption.',
     correctionMessage:
-        'Consider using ValueNotifier + ValueListenableBuilder for isolated rebuilds.',
+        'Replace setState with a ValueNotifier field and wrap the dependent UI in ValueListenableBuilder to isolate rebuilds to only the affected subtree.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1606,10 +1607,9 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_global_key_misuse',
     problemMessage:
-        '[avoid_global_key_misuse] Multiple GlobalKeys in a class may indicate overuse. GlobalKeys are expensive.',
+        '[avoid_global_key_misuse] Multiple GlobalKey instances in a single class indicate overuse of an expensive mechanism. Each GlobalKey prevents Flutter from efficiently diffing the widget tree, forces cross-tree reference tracking, and can cause unexpected widget reparenting that corrupts state and degrades rendering performance.',
     correctionMessage:
-        'Use ValueKey or ObjectKey for list items. Reserve GlobalKey for Form, '
-        'accessing widget state, or navigator operations.',
+        'Use ValueKey or ObjectKey for list item identification. Reserve GlobalKey only for Form validation, accessing widget state, or navigator operations.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -1982,9 +1982,9 @@ class PreferConstWidgetsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'prefer_const_widgets',
     problemMessage:
-        '[prefer_const_widgets] Widget could be const but is recreated on every rebuild. This wastes CPU cycles and battery, causing unnecessary widget comparisons that slow down UI rendering.',
+        '[prefer_const_widgets] Widget constructor could use const but is recreated on every build() call. Non-const widgets force Flutter to allocate new instances, compare entire subtrees, and perform unnecessary rebuilds. This wastes CPU cycles and battery, degrading frame rendering performance especially in frequently rebuilt parent widgets.',
     correctionMessage:
-        'Add const keyword to skip unnecessary widget tree comparisons.',
+        'Add the const keyword to the widget constructor call to enable compile-time canonicalization and skip unnecessary widget tree comparisons during rebuilds.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
@@ -2076,8 +2076,9 @@ class AvoidExpensiveComputationInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_expensive_computation_in_build',
     problemMessage:
-        '[avoid_expensive_computation_in_build] Expensive computation in build() runs every rebuild, causing jank.',
-    correctionMessage: 'Cache the result in a field or use memoization.',
+        '[avoid_expensive_computation_in_build] Expensive computation detected inside build() method. Build runs on every frame during animations and on every state change, so heavy operations here cause jank, dropped frames, and sluggish UI responsiveness. Users will experience visible stuttering especially during transitions and scrolling.',
+    correctionMessage:
+        'Cache the computation result in a field, compute it in initState() or didChangeDependencies(), or use memoization to avoid repeated expensive work.',
     errorSeverity: DiagnosticSeverity.WARNING,
   );
 
@@ -2159,9 +2160,9 @@ class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     name: 'avoid_widget_creation_in_loop',
     problemMessage:
-        '[avoid_widget_creation_in_loop] Widgets created in .map() are all instantiated eagerly on every rebuild, even if off-screen. This causes jank and high memory usage for long lists.',
+        '[avoid_widget_creation_in_loop] Widgets created in .map() or a loop are all instantiated eagerly on every rebuild, including those currently off-screen. This causes jank, high memory usage, and slow rendering for long lists because Flutter allocates and lays out every item upfront instead of lazily constructing only visible items.',
     correctionMessage:
-        'Use ListView.builder for lazy construction of large lists.',
+        'Use ListView.builder or SliverList.builder for lazy construction that only creates widgets as they scroll into view, reducing memory usage and improving performance.',
     errorSeverity: DiagnosticSeverity.INFO,
   );
 
